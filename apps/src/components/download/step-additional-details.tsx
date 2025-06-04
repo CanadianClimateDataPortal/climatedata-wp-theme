@@ -23,6 +23,13 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import appConfig from "@/config/app.config";
 import { useLocale } from '@/hooks/use-locale';
 
+const modelLabels: Record<string, string> = {
+	'pcic12': __('PCIC12 (Ensemble)'),
+	'24models': __('Full ensemble'),
+	'26models': __('Full ensemble'),
+	'humidex_models': __('Full ensemble'),
+}
+
 /**
  * Additional details step will allow the user to customize the download request
  */
@@ -140,8 +147,8 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 
 	const modelOptions = climateVariable?.getModelOptions() ?? [];
 	const formattedModelOptions = modelOptions.map(option => ({
-		label: option === 'full' ? __('Full ensemble') : option.toUpperCase() + __(' (Ensemble)'),
-		value: option
+		label: modelLabels[option] || option,
+		value: option,
 	}));
 
 	const showSSP3Warning = isDownloadTypeAnalyzed

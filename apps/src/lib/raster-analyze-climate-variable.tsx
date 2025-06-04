@@ -24,7 +24,7 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 		if (this.getDatasetType() === "ahccd") {
 			return null;
 		}
-		
+
 		return {
 			min: "1950",
 			max: "2100",
@@ -83,9 +83,11 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 			return [];
 		} else {
 			if (this.getVersion() === "cmip5") {
-				return [ "PCIC12", "full" ];
+				return [ "pcic12", "24models" ];
+			} else if (this.getVersion() === "humidex") {
+				return [ "humidex_models" ];
 			} else {
-				return [ "full" ];
+				return [ "26models" ];
 			}
 		}
 	}

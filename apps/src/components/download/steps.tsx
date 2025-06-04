@@ -4,18 +4,24 @@ import { __ } from '@/context/locale-provider';
 import StepNavigation from '@/components/download/step-navigation';
 import { useDownload } from '@/hooks/use-download';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setRequestStatus, setRequestError, setRequestResult, setDownloadLinks, setCaptchaValue } from '@/features/download/download-slice';
+import {
+	setCaptchaValue,
+	setDownloadLinks,
+	setRequestError,
+	setRequestResult,
+	setRequestStatus,
+} from '@/features/download/download-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { cn } from '@/lib/utils';
-import { GEOSERVER_BASE_URL, DATASETS, FINCH_DATASET_CMIP6_SSP370 } from '@/lib/constants';
+import { DATASETS, FINCH_DATASET_CMIP6_SSP370, FINCH_FREQUENCY_NAMES, GEOSERVER_BASE_URL } from '@/lib/constants';
 import { StepComponentRef } from '@/types/download-form-interface';
 import {
 	DownloadFile,
 	DownloadType,
 	FileFormatType,
 	FrequencyType,
+	InteractiveRegionOption,
 	StationDownloadUrlsProps,
-	InteractiveRegionOption
 } from '@/types/climate-variable-interface';
 
 /**
@@ -129,6 +135,9 @@ const Steps: React.FC = () => {
 
 				if (percentiles.length > 0) {
 					inputs.push({ id: 'ensemble_percentiles', data: percentiles.join(',') });
+				} else {
+					// If no percentiles are selected, 'ensemble_percentiles' must still be in the request
+					inputs.push({ id: 'ensemble_percentiles', data: '' });
 				}
 
 				// Add dataset using Finch name from DATASETS
@@ -148,17 +157,23 @@ const Steps: React.FC = () => {
 					inputs.push({ id: 'dataset', data: datasetFinchName });
 				}
 
-				if (scenarios.length > 0) {
-					inputs.push({ id: 'scenario', data: scenarios });
-				}
+				scenarios.forEach((scenario) => {
+					inputs.push({ id: 'scenario', data: scenario });
+				});
 
 				if (model) {
 					inputs.push({ id: 'models', data: model });
 				}
 
 				const freq = climateVariable.getFrequency?.();
-				if (freq) {
-					inputs.push({ id: 'freq', data: freq });
+				let finchFreq = freq;
+
+				if (freq && FINCH_FREQUENCY_NAMES && (freq as keyof typeof FINCH_FREQUENCY_NAMES) in FINCH_FREQUENCY_NAMES) {
+					finchFreq = FINCH_FREQUENCY_NAMES[freq as keyof typeof FINCH_FREQUENCY_NAMES] ?? null;
+				}
+
+				if (finchFreq) {
+					inputs.push({ id: 'freq', data: finchFreq });
 				}
 
 				inputs.push({ id: 'data_validation', data: 'warn' });

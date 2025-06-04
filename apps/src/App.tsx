@@ -24,7 +24,7 @@ function App() {
 					<AnimatedPanelProvider>
 						<SidebarProvider>
 							<AppSidebar />
-							<SidebarTrigger className="xl:hidden" />
+							<SidebarTrigger className="lg:hidden absolute top-4 right-4 [&_svg]:size-6" />
 							<main className="flex flex-col h-screen">
 								<Header />
 								<MapWrapper />

@@ -26,16 +26,15 @@ const MapLegendControl: React.FC<{
 	const [svgWidth, setSvgWidth] = useState(0);
 	const [legendHeight, setLegendHeight] = useState<number | undefined>(undefined);
 	const svgRef = useRef<SVGSVGElement>(null);
-
 	const isBlocksGradient = isCategorical || colourType === ColourType.DISCRETE;
 
 	// Calculate dynamic height based on number of labels and minimum spacing
-	const totalLabels = isBlocksGradient ? data.length : data.length;
+	const totalLabels = data.length;
 	const GRADIENT_HEIGHT = legendHeight !== undefined ? legendHeight : (totalLabels - 1) * MIN_LABEL_SPACING + PADDING_TOP + PADDING_BOTTOM;
 	const LEGEND_HEIGHT = GRADIENT_HEIGHT + (isBlocksGradient ? PADDING_BOTTOM : 0);
 
 	// For categorical/discrete data, we want equal height blocks for each category
-	const ITEM_HEIGHT = GRADIENT_HEIGHT / (isBlocksGradient ? data.length : (data.length - 1));
+	const ITEM_HEIGHT = GRADIENT_HEIGHT / totalLabels;
 
 	// Position gradient box, label and line horizontally
 	const gradientX = svgWidth - GRADIENT_WIDTH;
@@ -53,7 +52,7 @@ const MapLegendControl: React.FC<{
 		function updateLegendHeight() {
 			if (svgRef.current) {
 				const svgTop = svgRef.current.getBoundingClientRect().y;
-				const available = window.innerHeight - svgTop - PADDING_TOP - 20; // 15px leaflet banner.
+				const available = window.innerHeight - svgTop - PADDING_TOP -10; // 15px leaflet banner.
 				setLegendHeight(available);
 			}
 		}
@@ -109,7 +108,7 @@ const MapLegendControl: React.FC<{
 										{data.map((entry, index) => (
 											<stop
 												key={index}
-												offset={`${(index / (data.length - 1)) * 100}%`}
+												offset={`${(index / (totalLabels - 1)) * 100}%`}
 												stopColor={entry.color}
 												stopOpacity={entry.opacity}
 											/>
@@ -119,7 +118,7 @@ const MapLegendControl: React.FC<{
 
 								<rect
 									width={GRADIENT_WIDTH}
-									height={LEGEND_HEIGHT}
+									height={GRADIENT_HEIGHT}
 									fill="url(#temperatureGradient)"
 									x={gradientX}
 								/>
@@ -129,7 +128,7 @@ const MapLegendControl: React.FC<{
 						{data.map((entry, index) => {
 							const y = PADDING_TOP + index * ITEM_HEIGHT;
 							// For categorical/discrete data, center the label in the block
-							const labelY = isBlocksGradient ? y + (ITEM_HEIGHT / 2) : y;
+							const labelY =	y;
 
 							// Custom scheme variables like "building_climate_zones" may have labels that can be parsed but shouldn't
 							//  eg. 7A, 7B, 8 -- so those even if parseable we should keep them as they are

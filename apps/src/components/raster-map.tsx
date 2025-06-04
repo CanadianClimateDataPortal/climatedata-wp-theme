@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import 'leaflet.sync';
+import L from 'leaflet';
 
 // components
 import RasterMapContainer from '@/components/raster-map-container';
@@ -8,17 +9,20 @@ import RasterMapContainer from '@/components/raster-map-container';
 import { cn } from '@/lib/utils';
 import { useMap } from '@/hooks/use-map';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useSynchronizedMarkers } from '@/hooks/use-synchronized-markers';
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
 export default function RasterMap(): React.ReactElement {
-	const { setMap } = useMap();
-	const { climateVariable } = useClimateVariable();
-
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const mapRef = useRef<L.Map | null>(null);
 	const comparisonMapRef = useRef<L.Map | null>(null);
+
+	const { setMap, setComparisonMap } = useMap();
+	const { climateVariable } = useClimateVariable();
+	const { addMarker } = useSynchronizedMarkers(mapRef, comparisonMapRef);
+
 	const showComparisonMap = !!(climateVariable?.getScenarioCompare() && climateVariable?.getScenarioCompareTo());
 
 	// helper sync/unsync methods for convenience
@@ -64,6 +68,7 @@ export default function RasterMap(): React.ReactElement {
 				}}
 				onUnmount={() => (mapRef.current = null)}
 				isComparisonMap={false}
+				onAddMarker={addMarker}
 			/>
 			{showComparisonMap && (
 				<RasterMapContainer
@@ -71,10 +76,12 @@ export default function RasterMap(): React.ReactElement {
 					onMapReady={(map: L.Map) => {
 						map.invalidateSize();
 						comparisonMapRef.current = map;
+						setComparisonMap(map)
 						syncMaps(); // sync once the comparison map is ready
 					}}
 					onUnmount={unsyncMaps}// unsync and clear the reference to this map
 					isComparisonMap={true}
+					onAddMarker={addMarker}
 				/>
 			)}
 		</div>

@@ -480,15 +480,15 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		thresholds: [
 			{
 				value: "HXmax30",
-				label: "30",
+				label: "> 30",
 			},
 			{
 				value: "HXmax35",
-				label: "35",
+				label: "> 35",
 			},
 			{
 				value: "HXmax40",
-				label: "40",
+				label: "> 40",
 			},
 		],
 		frequencyConfig: {
@@ -919,23 +919,23 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		thresholds: [
 			{
 				value: "txgt_25",
-				label: "25 ºC",
+				label: "> 25 ºC",
 			},
 			{
 				value: "txgt_27",
-				label: "27 ºC",
+				label: "> 27 ºC",
 			},
 			{
 				value: "txgt_29",
-				label: "29 ºC",
+				label: "> 29 ºC",
 			},
 			{
 				value: "txgt_30",
-				label: "30 ºC",
+				label: "> 30 ºC",
 			},
 			{
 				value: "txgt_32",
-				label: "32 ºC",
+				label: "> 32 ºC",
 			},
 		],
 		analysisFields: [
@@ -1071,11 +1071,11 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		thresholds: [
 			{
 				value: "tnlt_-15",
-				label: "-15 ºC",
+				label: "< -15 ºC",
 			},
 			{
 				value: "tnlt_-25",
-				label: "-25 ºC",
+				label: "< -25 ºC",
 			},
 		],
 		analysisFields: [
@@ -1485,15 +1485,15 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		thresholds: [
 			{
 				value: "tr_18",
-				label: "18 ºC",
+				label: "> 18 ºC",
 			},
 			{
 				value: "tr_20",
-				label: "20 ºC",
+				label: "> 20 ºC",
 			},
 			{
 				value: "tr_22",
-				label: "22 ºC",
+				label: "> 22 ºC",
 			},
 		],
 		averagingOptions: [
@@ -1586,15 +1586,15 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		thresholds: [
 			{
 				value: "r1mm",
-				label: "1 mm",
+				label: ">= 1 mm",
 			},
 			{
 				value: "r10mm",
-				label: "10 mm",
+				label: ">= 10 mm",
 			},
 			{
 				value: "r20mm",
-				label: "20 mm",
+				label: ">= 20 mm",
 			},
 		],
 		frequencyConfig: {

@@ -359,7 +359,8 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
-		unit: "DoY",
+		unit: "Days",
+		unitLegend: "DoY",
 		temporalThresholdConfig: {
 			thresholds: {
 				last_spring_frost: {

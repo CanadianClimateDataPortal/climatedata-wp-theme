@@ -36,6 +36,16 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	// Displayed info
 	const datasetLabel = dataset?.title.en ?? '';
 	const climateVariableTitle = climateVariable?.getTitle() || variableList?.[0]?.title || '';
+	const thresholds = climateVariable?.getThresholds() ?? [];
+	const threshold: string = climateVariable?.getThreshold() ?? '';
+
+	// Get the label associated with a given value.
+	const getLabelByValue = (value: string): string =>
+		(thresholds.length > 0 && value)
+			? thresholds.find(t => t.value === value)?.label || ''
+			: '';
+	// Get the label for the current threshold, or null if not found.
+	const thresholdLabel = getLabelByValue(threshold);
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
 	const scenarioLabel = appConfig.scenarios.filter((item) => item.value === scenario)[0]?.label;
 
@@ -49,6 +59,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 					[
 						__(datasetLabel),
 						__(climateVariableTitle),
+						__(thresholdLabel),
 						__(versionLabel),
 						__(scenarioLabel)
 					].filter(Boolean).join(' - ')

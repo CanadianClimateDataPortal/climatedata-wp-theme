@@ -128,14 +128,14 @@ const DownloadMapModal: React.FC<{
 	// Generate download section URL with dataset and variable parameters
 	const getDownloadUrl = useMemo(() => {
 		const isFrenchSite = currentLocale === 'fr';
-		
+
 		let downloadBaseUrl;
 		if (isFrenchSite && getFrenchDomain()) {
 			downloadBaseUrl = `${getFrenchDomain()}/telechargement/`;
 		} else {
 			downloadBaseUrl = `${WP_API_DOMAIN}/download/`;
 		}
-		
+
 		if (!dataset || !climateVariableData || !climateVariableData.id) {
 			return downloadBaseUrl;
 		}

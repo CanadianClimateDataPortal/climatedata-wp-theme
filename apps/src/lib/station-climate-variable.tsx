@@ -13,7 +13,8 @@ import {
 	StationDownloadUrlsProps,
 	DownloadFile,
 } from "@/types/climate-variable-interface";
-import {WP_API_DOMAIN} from "@/lib/constants.tsx";
+import {WP_API_DOMAIN} from "@/lib/constants";
+import { __ } from "@/context/locale-provider";
 
 class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 
@@ -120,25 +121,59 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 		else if(this.getId() === 'short_duration_rainfall_idf_data') {
 			if(!props?.stationId) return [];
 
-			const url = `https://climatedata.ca/site/assets/themes/climate-data-ca/resources/app/run-frontend-sync/search_idfs.php?idf=${props?.stationId}`;
+			const isDev = window.location.hostname.includes('localhost') || window.location.hostname.includes('dev-en') || window.location.hostname.includes('dev-fr');
 
-			const fetchData = async () => {
-				try {
-					const response = await fetch(url);
-					if (!response.ok) {
-						throw new Error(`HTTP error! status: ${response.status}`);
+			// For DEV environments, use dummy files.
+			if (isDev) {
+				const dummyFileUrl = "data:application/zip;base64,UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==";
+				const dummyFiles = [
+					{
+						label: "Historical IDF (ZIP)",
+						url: dummyFileUrl,
+					}, {
+						label: "Climate Change-Scaled IDF - CMIP5 (ZIP)",
+						url: dummyFileUrl,
+					}, {
+						label: "Climate Change-Scaled IDF - CMIP6 (ZIP)",
+						url: dummyFileUrl,
+					}, {
+						label: "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)",
+						url: dummyFileUrl,
 					}
+				];
 
-					const data = await response.json();
-					return data.map((element: { filename: string; label: string }): DownloadFile => ({
-						...element,
-						url: `${WP_API_DOMAIN}${element.filename}`,
-					}));
-				} catch (error) {
-					console.error('Error fetching data:', error);
+				return Promise.resolve(dummyFiles);
+			}
+
+			const url = `${WP_API_DOMAIN}/wp-json/cdc/v3/idf-station-files?station=${props?.stationId}`;
+
+			try {
+				const response = await fetch(url);
+
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
 				}
-			};
-			fetchData();
+
+				const data = await response.json();
+				const files = data?.files ?? [];
+				const labels = {
+					'historical': 'Historical IDF (ZIP)',
+					'cmip5': 'Climate Change-Scaled IDF - CMIP5 (ZIP)',
+					'cmip6': 'Climate Change-Scaled IDF - CMIP6 (ZIP)',
+					'cmip6-quickstart': 'Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)',
+				};
+
+				return files.map((file: { type: string, url: string}) => {
+					return {
+						label: labels[file.type as keyof typeof labels] ? __(labels[file.type as keyof typeof labels]) : file.type,
+						url: file.url,
+					}
+				});
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			}
+
+			return [];
 		}
 		// For Station Data - handled in StationDataClimateVariable class now
 		else if(this.getId() === 'station_data') {

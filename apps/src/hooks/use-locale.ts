@@ -12,11 +12,33 @@ export const useLocale = () => {
 	const { locale, setLocale } = context;
 
 	/**
-	 * Returns the localized label value from an object with label_en and label_fr fields.
-	 * Falls back to label_en or empty string if not present.
+	 * Returns the localized value from an object.
+	 * Tries multiple common keys (e.g., label, title), supporting:
+	 * - Flat keys like label_en, title_fr
+	 * - Nested keys like label.en, title.fr
+	 * - Objects shaped like { en: '...', fr: '...' }
+	 * Falls back to the English ('en') version, or an empty string if none found.
 	 */
-	const getLocalizedLabel = (obj: { label_en?: string; label_fr?: string }) => {
-		return obj[`label_${locale}` as 'label_en' | 'label_fr'] || obj.label_en || '';
+	const getLocalized = (obj: any): string => {
+		if (!obj) return '';
+
+		const keys = ['label', 'title'];
+
+		for (const key of keys) {
+			const value =
+				obj?.[`${key}_${locale}`] || // e.g. label_en
+				obj?.[key]?.[locale] || // e.g. label.en
+				obj?.[`${key}_en`] || // e.g. label_en
+				obj?.[key]?.en; // e.g. label.en
+
+			if (value) {
+				return value;
+			}
+		}
+
+		// fallback if obj is directly { en: '...', fr: '...' }
+		return obj?.[locale] || obj?.en || '';
 	};
-	return { locale, setLocale, getLocalizedLabel };
+
+	return { locale, setLocale, getLocalized };
 };

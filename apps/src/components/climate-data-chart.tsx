@@ -646,6 +646,40 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					});
 					break;
 					case 'csv':
+						{
+							// Get the Unit.
+							const unit = climateVariable?.getUnit();
+
+							// Update the data array selecting the right Decimals.
+							for (const key in data) {
+								if (Array.isArray(data[key])) {
+									const isRange = key.includes('_range');
+									(data[key] as (number | string)[][]).forEach((item) => {
+										if (item.length > 1) {
+											switch (unit) {
+												case "doy":
+													item[1] = doyFormatter(Number(item[1]), locale);
+													break;
+												default:
+													item[1] = Number(item[1]).toFixed(decimals) + ' ' + unit;
+													break;
+											}
+										}
+										if (isRange && item.length > 2) {
+											switch (unit) {
+												case "doy":
+													item[2] = doyFormatter(Number(item[2]), locale);
+													break;
+												default:
+													item[2] = Number(item[2]).toFixed(decimals) + ' ' + unit;
+													break;
+											}
+										}
+									});
+								}
+							}
+						}
+
 						if(activeTab === 'annual-values') {
 							chart.downloadCSV();
 						} else {

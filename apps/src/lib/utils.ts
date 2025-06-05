@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
-import { FrequencyConfig, FrequencyDisplayModeOption, FrequencyType } from '@/types/climate-variable-interface';
+import { FrequencyConfig, FrequencyDisplayModeOption, FrequencyType, InteractiveRegionOption } from '@/types/climate-variable-interface';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -228,4 +228,27 @@ export function prepareRaster(): void {
 
 	// Resize the window to force a layout update.
 	window.dispatchEvent(new Event('resize'));
+}
+
+/**
+ * Returns the color for a given feature based on the interactive region and color map.
+ */
+export function getFeatureColor(
+	featureId: number,
+	interactiveRegion: string,
+	layerData: Record<number, number> | null,
+	colorMap: { quantities: number[]; colours: string[] } | null,
+	getColor: (value: number) => string
+): string {
+	if (!colorMap || !colorMap.quantities || !colorMap.colours) {
+		return '#fff';
+	}
+
+	// Extract value based on interactive region type
+	const value =
+		interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
+			? featureId
+			: (layerData?.[featureId] ?? 0);
+
+	return getColor(value);
 }

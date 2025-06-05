@@ -1,6 +1,8 @@
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo, useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { MAP_CONFIG } from '@/config/map.config';
+import 'leaflet.vectorgrid';
+import L from 'leaflet';
 
 import MapLegend from '@/components/map-layers/map-legend';
 import VariableLayer from '@/components/map-layers/variable-layer';
@@ -31,13 +33,21 @@ export default function RasterMapContainer({
 	scenario,
 	onMapReady,
 	onUnmount,
-	isComparisonMap
+	isComparisonMap = false,
+	onOver,
+	onOut,
+	onClick,
+	layerRef,
 }: {
 	scenario: string;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 	isComparisonMap?: boolean;
-}) {
+	onOver?: (e: { latlng: L.LatLng; layer: { properties: any } }, color: string) => void;
+	onOut?: () => void;
+	onClick?: (e: { latlng: L.LatLng; layer: { properties: any } }) => void;
+	layerRef?: React.MutableRefObject<any>;
+}): React.ReactElement {
 	const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
 
@@ -66,8 +76,20 @@ export default function RasterMapContainer({
 		setLocationModalContent(null);
 	};
 
+	const mapRef = useRef<L.Map | null>(null);
+
+	useEffect(() => {
+		if (mapRef.current) {
+			onMapReady(mapRef.current);
+		}
+		return () => {
+			if (onUnmount) onUnmount();
+		};
+	}, [onMapReady, onUnmount]);
+
 	return (
 		<MapContainer
+			ref={mapRef}
 			attributionControl={false}
 			center={[mapCoordinates.lat, mapCoordinates.lng]}
 			zoomControl={false}
@@ -75,7 +97,7 @@ export default function RasterMapContainer({
 			minZoom={DEFAULT_MIN_ZOOM}
 			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}
-			className="z-10" // important to keep the map below other interactive elements
+			className="z-10 h-full w-full"
 			bounds={CANADA_BOUNDS}
 		>
 			<MapEvents
@@ -108,8 +130,10 @@ export default function RasterMapContainer({
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<InteractiveRegionsLayer
 					scenario={scenario}
-					onLocationModalOpen={handleLocationModalOpen}
-					onLocationModalClose={handleLocationModalClose}
+					onOver={onOver}
+					onOut={onOut}
+					onClick={onClick}
+					layerRef={layerRef}
 				/>
 			)}
 			{climateVariable?.getInteractiveMode() === 'station' && (

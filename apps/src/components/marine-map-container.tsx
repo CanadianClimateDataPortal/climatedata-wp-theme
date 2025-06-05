@@ -78,10 +78,10 @@ export default function MarineMapContainer({
 	}, [climateVariable, scenario, section]);
 
 
-	const handleLocationModalOpen = (content: React.ReactNode) => {
-		setLocationModalContent(content);
-		setIsLocationModalOpen(true);
-	};
+	// const handleLocationModalOpen = (content: React.ReactNode) => {
+	// 	setLocationModalContent(content);
+	// 	setIsLocationModalOpen(true);
+	// };
 
 	const handleLocationModalClose = () => {
 		setIsLocationModalOpen(false);
@@ -131,8 +131,6 @@ export default function MarineMapContainer({
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<InteractiveRegionsLayer
 					scenario={scenario}
-					onLocationModalOpen={handleLocationModalOpen}
-					onLocationModalClose={handleLocationModalClose}
 				/>
 			)}
 

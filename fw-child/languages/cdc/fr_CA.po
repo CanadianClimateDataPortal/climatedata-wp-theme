@@ -1216,7 +1216,7 @@ msgstr "Date"
 #: template/post-meta.php:26
 #: template/query/news-item.php:44
 msgid "F j, Y"
-msgstr "j F, Y"
+msgstr "j F Y"
 
 #: template/post-meta.php:36
 msgid "Author"

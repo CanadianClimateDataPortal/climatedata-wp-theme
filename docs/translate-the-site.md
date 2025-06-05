@@ -31,6 +31,9 @@ by WordPress.
 When you add or modify a string in the PHP files, you need to update the
 `.pot` file that contains all the strings to be translated.
 
+> Note that this step is not required if you didn't add a new, or removed a
+> new string to translate (skip to "Compiling translations").
+
 1. Start the development environment.
 2. Once the `portal` container is running, start a Bash terminal on it.
 3. From this terminal, execute the following commands:
@@ -53,6 +56,8 @@ French language.
    ```
 
 Then do your translations in the `languages/cdc/fr_CA.po` file.
+
+### Compiling translations
 
 Once the translations are done, you then compile the `.po` file into a `.mo`
 file.

@@ -60,11 +60,11 @@ export default function RasterDownloadMap(): React.ReactElement {
 	}, [selectionMode, climateVariable]);
 
 	const showStationTypesFilter = climateVariable?.getId() === 'daily_ahccd_temperature_and_precipitation';
-	const isInteractiveModeStation = climateVariable?.getInteractiveMode() === 'station';
+	const isInteractiveModeStation = climateVariable?.getInteractiveMode() === 'station' || climateVariable?.getDatasetType() === 'ahccd';
 	const multipleStationSelect = ! [
 		'future_building_design_value_summaries',
 		'short_duration_rainfall_idf_data'
-	].includes(climateVariable?.getId() ?? '');
+	].includes(climateVariable?.getId() ?? '') || climateVariable?.getDatasetType() === 'ahccd';
 
 	const stationOptions = stations.map(station => ({ value: String(station.id), label: station.name }))
 	.sort((a, b) => a.label.localeCompare(b.label));

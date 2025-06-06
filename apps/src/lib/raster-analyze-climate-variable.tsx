@@ -8,6 +8,7 @@ import {
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
 	FrequencyType,
+	InteractiveMode,
 } from "@/types/climate-variable-interface";
 
 class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
@@ -90,6 +91,10 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 				return [ "26models" ];
 			}
 		}
+	}
+
+	getInteractiveMode(): InteractiveMode {
+		return this.getDatasetType() === "ahccd" ? "station" : super.getInteractiveMode();
 	}
 }
 

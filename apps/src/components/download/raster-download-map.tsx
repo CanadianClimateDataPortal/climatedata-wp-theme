@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { setSelectionMode } from '@/features/download/download-slice';
+import { setSelectedStation, setSelectionMode } from '@/features/download/download-slice';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import MapEvents from '@/components/map-layers/map-events';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
@@ -126,7 +126,12 @@ export default function RasterDownloadMap(): React.ReactElement {
 			}
 		};
 
-		multipleStationSelect ? addSelectedPoints(selectedPoint) : setSelectedPoints(selectedPoint);
+		if (multipleStationSelect) {
+			addSelectedPoints(selectedPoint)
+		} else {
+			dispatch(setSelectedStation(station));
+			setSelectedPoints(selectedPoint);
+		}
 	};
 
 	const clearSelection = () => {

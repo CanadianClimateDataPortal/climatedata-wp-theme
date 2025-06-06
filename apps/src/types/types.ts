@@ -218,6 +218,7 @@ export interface DownloadState {
 	captchaValue: string;
 	downloadLinks?: DownloadFile[];
 	currentStep: number;
+	selectedStation?: Station;
 }
 
 /**
@@ -655,6 +656,7 @@ export interface Station {
 		lat: number;
 		lng: number;
 	};
+	filename?: { [key: string]: string };
 }
 
 // -----------------------------------------------------------------------------
@@ -800,4 +802,3 @@ export interface VariableLayerProps {
 	scenario: string | null | undefined;
 	layerValue: string;
 }
-

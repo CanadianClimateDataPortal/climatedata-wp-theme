@@ -164,6 +164,8 @@ export interface StationDownloadUrlsProps {
 	stationName?: string;
 	fileFormat?: FileFormatType | null;
 	dateRange?: {start: string, end: string}
+	filename?: { [key: string]: string };
+	locale?: string;
 }
 
 export interface DownloadFile {

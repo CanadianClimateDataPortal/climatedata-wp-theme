@@ -504,6 +504,7 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }) =
 				lat: feature.geometry.coordinates[1],
 				lng: feature.geometry.coordinates[0],
 			},
+			filename: feature.properties?.filename,
 		}));
 	} catch (error) {
 		console.error('Error fetching stations list:', error);

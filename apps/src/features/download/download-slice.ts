@@ -6,7 +6,7 @@
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { DownloadState, TaxonomyData } from '@/types/types';
+import { DownloadState, Station, TaxonomyData } from '@/types/types';
 import { CANADA_CENTER, DEFAULT_ZOOM } from '@/lib/constants';
 import { LatLngExpression } from 'leaflet';
 import { DownloadFile } from '@/types/climate-variable-interface';
@@ -25,6 +25,7 @@ export const initialState: DownloadState = {
 	captchaValue: '',
 	currentStep: 1,
 	downloadLinks: undefined,
+	selectedStation: undefined
 };
 
 // Create the slice
@@ -79,6 +80,9 @@ const downloadSlice = createSlice({
 		setCurrentStep(state, action: PayloadAction<number>) {
 			state.currentStep = action.payload;
 		},
+		setSelectedStation(state, action: PayloadAction<Station>) {
+			state.selectedStation = action.payload;
+		},
 		resetVariableSelection(state) {
 			state.dataset = state.dataset; // Keep dataset
 			state.currentStep = 1;
@@ -112,6 +116,7 @@ export const {
 	resetVariableSelection,
 	setDownloadLinks,
 	resetDownloadLinks,
+	setSelectedStation,
 } = downloadSlice.actions;
 
 // Export reducer

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { useLocale } from '@/hooks/use-locale';
 import { setOpacity, setTimePeriodEnd, setDataset, setVariableList, setVariableListLoading, setMapCoordinates } from '@/features/map/map-slice';
 import { setClimateVariable } from '@/store/climate-variable-slice';
 import { ClimateVariables } from '@/config/climate-variables.config';
@@ -20,6 +21,7 @@ export const useUrlSync = () => {
 	const lastUrlUpdateRef = useRef<string>('');
 	const isUpdatingFromMapRef = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
+	const { locale } = useLocale();
 
 	// Get the URL sync state
 	const isInitialized = useAppSelector((state) => state.urlSync.isInitialized);
@@ -182,37 +184,33 @@ export const useUrlSync = () => {
 	
 	const updateUrlWithDebounce = useCallback(() => {
 		if (typeof window === 'undefined' || !isInitialized) return;
-		
+		if (!climateVariableData) return; // Only update URL if a variable is selected
+
 		if (updateTimeoutRef.current !== null) {
 			window.clearTimeout(updateTimeoutRef.current);
 		}
-		
+
 		updateTimeoutRef.current = window.setTimeout(() => {
 			const params = new URLSearchParams();
-			
-			// First, add all climate variable parameters
-			if (climateVariableData) {
-				// Find the default config for the current variable
-				const defaultConfig = climateVariableData.id 
-					? ClimateVariables.find(config => config.id === climateVariableData.id) || null 
-					: null;
-				
-				addClimateVariableParamsToUrl(params, climateVariableData, defaultConfig);
-			}
-			
-			// Then add map-only parameters
+
+			// Always add climate variable parameters if a variable is selected
+			const defaultConfig = climateVariableData.id
+				? ClimateVariables.find(config => config.id === climateVariableData.id) || null
+				: null;
+			addClimateVariableParamsToUrl(params, climateVariableData, defaultConfig);
+
+			// Add map-only parameters
 			addMapOnlyParamsToUrl(params);
 
 			// Only update URL if parameters have changed significantly
 			if (haveParamsChanged(params)) {
 				const newUrl = `${window.location.pathname}?${params.toString()}`;
-				
 				if (newUrl !== lastUrlUpdateRef.current) {
 					lastUrlUpdateRef.current = newUrl;
 					window.history.replaceState({}, '', newUrl);
 				}
 			}
-			
+
 			updateTimeoutRef.current = null;
 		}, 300);
 	}, [
@@ -413,7 +411,7 @@ export const useUrlSync = () => {
 			
 			try {
 				const variables = await fetchPostsData('variables', 'map', firstDataset, {});
-				const normalizedVariables = await normalizePostData(variables, 'en');
+				const normalizedVariables = await normalizePostData(variables, locale);
 				
 				dispatch(setVariableList(normalizedVariables));
 				
@@ -529,7 +527,7 @@ export const useUrlSync = () => {
 					// Fetch variables for this dataset to ensure we have variable data in state
 					try {
 						const variables = await fetchPostsData('variables', 'map', selectedDataset, {});
-						const normalizedVariables = await normalizePostData(variables, 'en');
+						const normalizedVariables = await normalizePostData(variables, locale);
 						dispatch(setVariableList(normalizedVariables));
 					} catch (error) {
 						console.error('Error fetching variables for URL dataset:', error);
@@ -571,14 +569,10 @@ export const useUrlSync = () => {
 
 	useEffect(() => {
 		if (!isInitialized || isUpdatingFromMapRef.current) return;
-		updateUrlWithDebounce();
-	}, [
-		climateVariableData,
-		opacity,
-		dataset,
-		updateUrlWithDebounce,
-		isInitialized
-	]);
+		if (climateVariableData) {
+			updateUrlWithDebounce();
+		}
+	}, [climateVariableData, opacity, dataset, updateUrlWithDebounce, isInitialized]);
 	
 	useEffect(() => {
 		if (!isInitialized || isUpdatingFromMapRef.current) return;

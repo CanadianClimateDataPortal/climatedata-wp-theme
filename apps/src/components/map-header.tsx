@@ -115,23 +115,22 @@ MapHeader.displayName = 'MapHeader';
 const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 	onClick,
 }) => {
-	const { locale } = useLocale();
+	const { locale, getLocalized } = useLocale();
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const variableList = useAppSelector((state) => state.map.variableList);
 	const { climateVariable } = useClimateVariable();
 
 	const datasetName = useMemo(() => {
 		if (!dataset) return '';
-		return locale === 'fr' && dataset.title.fr
-			? dataset.title.fr
-			: dataset.title.en;
+
+		return getLocalized(dataset);
 	}, [dataset, locale]);
 
 	const variableTitle = useMemo(() => {
 		if (climateVariable && climateVariable.toObject().postId) {
 			return climateVariable.getTitle() || '';
 		}
-		
+
 		// If no explicit climate variable selection, but we have variableList data,
 		// show the first variable as a fallback
 		if (variableList && variableList.length > 0) {

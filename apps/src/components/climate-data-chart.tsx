@@ -55,7 +55,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	featureId,
 	data,
 }) => {
-	const { locale } = useLocale();
+	const { locale, getLocalized } = useLocale();
 	const { climateVariable } = useClimateVariable();
 	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
 	const { dataset } = useAppSelector((state) => state.map);
@@ -75,7 +75,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const [enableChartNavigator, setEnableChartNavigator] = useState(true);
 
 	// Subtitle displayed info
-	const datasetLabel = dataset?.title.en ?? '';
+	const datasetLabel = getLocalized(dataset) ?? '';
 	const climateVariableTitle = climateVariable?.getTitle() || variableList?.[0]?.title || '';
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
 

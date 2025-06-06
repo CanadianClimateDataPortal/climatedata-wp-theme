@@ -4,7 +4,6 @@ import { SidebarProvider } from '@/context/sidebar-provider';
 import Header from '@/components/header';
 import { MapWrapper } from "@/components/map-wrapper";
 import { MapProvider } from '@/context/map-provider';
-import { LocaleProvider } from '@/context/locale-provider';
 import { AnimatedPanelProvider } from '@/context/animated-panel-provider';
 import { ClimateVariableProvider } from "@/context/climate-variable-provider";
 
@@ -18,22 +17,20 @@ function App() {
 	useLeaflet();
 
 	return (
-		<LocaleProvider>
-			<ClimateVariableProvider>
-				<MapProvider>
-					<AnimatedPanelProvider>
-						<SidebarProvider>
-							<AppSidebar />
-							<SidebarTrigger className="lg:hidden absolute top-4 right-4 [&_svg]:size-6" />
-							<main className="flex flex-col h-screen">
-								<Header />
-								<MapWrapper />
-							</main>
-						</SidebarProvider>
-					</AnimatedPanelProvider>
-				</MapProvider>
-			</ClimateVariableProvider>
-		</LocaleProvider>
+		<ClimateVariableProvider>
+			<MapProvider>
+				<AnimatedPanelProvider>
+					<SidebarProvider>
+						<AppSidebar />
+						<SidebarTrigger className="lg:hidden absolute top-4 right-4 [&_svg]:size-6" />
+						<main className="flex flex-col h-screen">
+							<Header />
+							<MapWrapper />
+						</main>
+					</SidebarProvider>
+				</AnimatedPanelProvider>
+			</MapProvider>
+		</ClimateVariableProvider>
 	);
 }
 

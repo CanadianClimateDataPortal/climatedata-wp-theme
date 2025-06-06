@@ -108,9 +108,12 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 		}
 		// For Future Building Design Value Summaries
 		else if(this.getId() === 'future_building_design_value_summaries') {
-			if(!props?.stationName) return [];
+			if(!props?.filename) return [];
 
-			const url = `${window.DATA_URL}/fileserver/bdv/en/DVE Guidance_${props?.stationName}.pdf`;
+			const locale: string = props?.locale ?? 'en'
+			const filename: string = props.filename[locale];
+
+			const url = `${window.DATA_URL}/fileserver/bdv/${locale}/${filename}`;
 
 			return [{
 				label: '',

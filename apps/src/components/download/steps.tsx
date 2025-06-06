@@ -23,18 +23,20 @@ import {
 	InteractiveRegionOption,
 	StationDownloadUrlsProps,
 } from '@/types/climate-variable-interface';
+import { useLocale } from "@/hooks/use-locale";
 
 /**
  * The Steps component dynamically renders the current step component from the STEPS configuration.
  */
 const Steps: React.FC = () => {
+	const { locale } = useLocale();
 	const [isStepValid, setIsStepValid] = useState<boolean>(false);
 
 	const dispatch = useAppDispatch();
 	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
 	const { climateVariable } = useClimateVariable();
 
-	const { subscribe, email, requestStatus, captchaValue } = useAppSelector((state) => state.download);
+	const { subscribe, email, requestStatus, captchaValue, selectedStation } = useAppSelector((state) => state.download);
 
 	const isLastStep = currentStep === steps.length;
 	const isSecondToLastStep = currentStep === steps.length - 1;
@@ -300,8 +302,8 @@ const Steps: React.FC = () => {
 							stationDownloadUrlsProps.fileFormat = fileFormat;
 							break;
 						case 'future_building_design_value_summaries': {
-							const first = Object.values(selectedPoints)[0];
-							stationDownloadUrlsProps.stationName = first?.name;
+							stationDownloadUrlsProps.filename = selectedStation?.filename;
+							stationDownloadUrlsProps.locale = locale;
 							break;
 						}
 						case 'short_duration_rainfall_idf_data':

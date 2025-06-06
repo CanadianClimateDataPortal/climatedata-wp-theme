@@ -395,7 +395,6 @@ export const ClimateVariableProvider: React.FC<{
 			if (!climateVariableData) return;
 			const { [gid]: removed, ...rest } =
 				climateVariableData.selectedPoints ?? {};
-			console.log({ removed, rest });
 			dispatch(
 				updateClimateVariable({
 					selectedPoints: rest,

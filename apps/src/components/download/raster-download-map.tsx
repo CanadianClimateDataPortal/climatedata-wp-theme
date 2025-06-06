@@ -77,11 +77,13 @@ export default function RasterDownloadMap(): React.ReactElement {
 		if (!multipleStationSelect) {
 			const id = ids[0];
 			const station = stations.find(s => s.id === id);
+
 			if (!id || !station?.coordinates) {
 				resetSelectedPoints();
 				return;
 			}
 
+			dispatch(setSelectedStation(station));
 			setSelectedPoints({
 				[station.id]: {
 					lat: station.coordinates.lat,

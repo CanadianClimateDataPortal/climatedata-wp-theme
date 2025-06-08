@@ -231,6 +231,21 @@ export function prepareRaster(): void {
 }
 
 /**
+ * Extracts a feature ID from the properties object of a map layer click event.
+ * @param properties
+ */
+export const getFeatureId = (properties: {
+	gid?: number;
+	id?: number;
+	name?: string;
+	title?: string;
+	label_en?: string;
+	label_fr?: string;
+}): number | null => {
+	return properties.gid ?? properties.id ?? null;
+};
+
+/**
  * Returns the color for a given feature based on the interactive region and color map.
  */
 export function getFeatureColor(

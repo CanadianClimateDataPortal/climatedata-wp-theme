@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState, useEffect, useRef } from 'react';
+import React, { useContext, useMemo, useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { MAP_CONFIG } from '@/config/map.config';
 import 'leaflet.vectorgrid';
@@ -13,18 +13,24 @@ import SearchControl from '@/components/map-layers/search-control';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
 import InteractiveStationsLayer from '@/components/map-layers/interactive-stations-layer';
 import LocationModal from '@/components/map-layers/location-modal';
+import LocationInfoPanel from '@/components/map-info/location-info-panel';
 
 import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useAnimatedPanel } from '@/hooks/use-animated-panel';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { generateChartData } from '@/services/services';
+import { cn, getDefaultFrequency, remToPx } from "@/lib/utils";
+import SectionContext from "@/context/section-provider";
+import appConfig from "@/config/app.config";
 import {
 	DEFAULT_MIN_ZOOM,
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
-	CANADA_BOUNDS
+	CANADA_BOUNDS, SIDEBAR_WIDTH
 } from '@/lib/constants';
-import { cn } from "@/lib/utils";
-import SectionContext from "@/context/section-provider";
-import appConfig from "@/config/app.config";
+import { LocationModalContent } from '@/components/map-layers/location-modal-content';
+import { SelectedLocationInfo } from '@/types/types';
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
@@ -37,18 +43,21 @@ export default function RasterMapContainer({
 	onOver,
 	onOut,
 	onClick,
+	selectedLocation,
+	clearSelectedLocation,
 	layerRef,
 }: {
 	scenario: string;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 	isComparisonMap?: boolean;
-	onOver?: (e: { latlng: L.LatLng; layer: { properties: any } }, color: string) => void;
-	onOut?: () => void;
-	onClick?: (e: { latlng: L.LatLng; layer: { properties: any } }) => void;
+	onOver: (e: { latlng: L.LatLng; layer: { properties: any } }, getFeatureColor: (featureId: number) => string) => void;
+	onOut: () => void;
+	onClick: (e: { latlng: L.LatLng; layer: { properties: any } }) => void;
+	selectedLocation: SelectedLocationInfo | null;
+	clearSelectedLocation: () => void;
 	layerRef?: React.MutableRefObject<any>;
 }): React.ReactElement {
-	const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
 
 	const {
@@ -57,6 +66,8 @@ export default function RasterMapContainer({
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
+	const { togglePanel } = useAnimatedPanel();
+	const isMobile = useIsMobile();
 
 	const section = useContext(SectionContext);
 
@@ -68,15 +79,70 @@ export default function RasterMapContainer({
 
 	const handleLocationModalOpen = (content: React.ReactNode) => {
 		setLocationModalContent(content);
-		setIsLocationModalOpen(true);
 	};
 
 	const handleLocationModalClose = () => {
-		setIsLocationModalOpen(false);
+		clearSelectedLocation();
 		setLocationModalContent(null);
 	};
 
+	// Handle click on details button of a location (to open the chart panel)
+	const handleDetailsClick = async () => {
+		if (selectedLocation) {
+			const { title, latlng, featureId } = selectedLocation;
+			const frequencyConfig = climateVariable?.getFrequencyConfig();
+			let frequency = climateVariable?.getFrequency() ?? ''
+			if (!frequency && frequencyConfig) {
+				frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
+			}
+
+			const chartData = await generateChartData({
+				latlng,
+				variable: climateVariable?.getThreshold() ?? '',
+				frequency: frequency,
+				dataset: climateVariable?.getVersion() ?? '',
+			});
+
+			togglePanel(
+				<LocationInfoPanel
+					title={title}
+					latlng={latlng}
+					featureId={featureId}
+					data={chartData}
+				/>,
+				{
+					position: {
+						left: isMobile ? 0 : remToPx(SIDEBAR_WIDTH),
+						right: 0,
+						bottom: 0,
+					},
+					direction: 'bottom',
+					className: 'location-info-panel-wrapper',
+				}
+			);
+		}
+	}
+
 	const mapRef = useRef<L.Map | null>(null);
+
+	useEffect(() => {
+		if (selectedLocation) {
+			const { title, latlng, featureId } = selectedLocation;
+
+			setLocationModalContent(
+				<LocationModalContent
+					title={title}
+					latlng={latlng}
+					scenario={scenario}
+					featureId={featureId}
+					onDetailsClick={handleDetailsClick}
+				/>
+			)
+		}
+		else {
+			setLocationModalContent(null);
+		}
+	}, [selectedLocation, setLocationModalContent]);
 
 	useEffect(() => {
 		if (mapRef.current) {
@@ -103,7 +169,7 @@ export default function RasterMapContainer({
 			<MapEvents
 				onMapReady={onMapReady}
 				onUnmount={onUnmount}
-				onLocationModalClose={handleLocationModalClose}
+				// onLocationModalClose={handleLocationModalClose}
 			/>
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
@@ -121,7 +187,7 @@ export default function RasterMapContainer({
 			{ !isComparisonMap && <SearchControl /> }
 
 			<LocationModal
-				isOpen={isLocationModalOpen}
+				isOpen={!!(selectedLocation)}
 				onClose={handleLocationModalClose}
 			>
 				{locationModalContent}

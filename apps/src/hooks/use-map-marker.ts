@@ -1,15 +1,14 @@
-import { useRef, useCallback } from 'react';
-import L from 'leaflet';
+import { useCallback } from 'react';
+import { useMap } from '@/hooks/use-map';
 import { MAP_MARKER_CONFIG } from '@/lib/constants';
+import L from 'leaflet';
 
-export function useMarker(
-  mapRef: React.RefObject<L.Map | null>,
-  comparisonMapRef: React.RefObject<L.Map | null>
-) {
-  const currentLocation = useRef<{ latlng: L.LatLng; title: string; id: string } | null>(null);
+export function useMapMarker() {
+
+  const { map, comparisonMap } = useMap();
 
   const clearMarkers = useCallback(() => {
-    [mapRef.current, comparisonMapRef.current].forEach(map => {
+    [map, comparisonMap].forEach(map => {
       if (map) {
         map.eachLayer(layer => {
           if (layer instanceof L.Marker) {
@@ -18,14 +17,10 @@ export function useMarker(
         });
       }
     });
-    currentLocation.current = null;
-  }, [mapRef, comparisonMapRef]);
+  }, [map, comparisonMap]);
 
-  const addMarker = useCallback((latlng: L.LatLng, title: string, locationId: string) => {
-    clearMarkers();
-    currentLocation.current = { latlng, title, id: locationId };
-
-    [mapRef.current, comparisonMapRef.current].forEach(map => {
+  const addMarker = useCallback((latlng: L.LatLng, title: string) => {
+    [map, comparisonMap].forEach(map => {
       if (map) {
         const marker = L.marker(latlng, MAP_MARKER_CONFIG)
         .bindTooltip(title, {
@@ -43,7 +38,7 @@ export function useMarker(
         }, 0);
       }
     });
-  }, [clearMarkers, mapRef, comparisonMapRef]);
+  }, [map, comparisonMap]);
 
-  return { addMarker, clearMarkers, currentLocation };
+  return { addMarker, clearMarkers };
 }

@@ -8,7 +8,7 @@ import { setCenter, setZoom, } from '@/features/download/download-slice';
 import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, GEOSERVER_BASE_URL } from '@/lib/constants';
 import { MapFeatureProps } from '@/types/types';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { getFeatureId } from '@/hooks/use-interactive-map-events';
+import { getFeatureId } from '@/lib/utils';
 
 /**
  * Component that allows to select cells on the map and tally the number of cells selected

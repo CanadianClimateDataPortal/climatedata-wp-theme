@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import 'leaflet.sync';
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
@@ -10,86 +10,45 @@ import RasterMapContainer from '@/components/raster-map-container';
 import { cn } from '@/lib/utils';
 import { useMap } from '@/hooks/use-map';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { InteractiveRegionOption } from "@/types/climate-variable-interface";
-import { useMarker } from '@/hooks/use-map-marker';
-import { fetchLocationByCoords } from '@/services/services';
-import { useAppDispatch } from '@/app/hooks';
-import { addRecentLocation } from '@/features/map/map-slice';
+import { useMapInteractions } from '@/hooks/use-map-interactions';
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
 export default function RasterMap(): React.ReactElement {
-	const { setMap } = useMap();
+	const { setMap, setComparisonMap } = useMap();
 	const { climateVariable } = useClimateVariable();
 
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const mapRef = useRef<L.Map | null>(null);
 	const comparisonMapRef = useRef<L.Map | null>(null);
-	const hoveredRef = useRef<number | null>(null);
-	const primaryLayerRef = useRef<any>(null);
-	const comparisonLayerRef = useRef<any>(null);
+	// @ts-expect-error: suppress leaflet typescript error
+	const primaryLayerRef = useRef<L.VectorGrid | null>(null);
+	// @ts-expect-error: suppress leaflet typescript error
+	const comparisonLayerRef = useRef<L.VectorGrid | null>(null);
 	const showComparisonMap = !!(climateVariable?.getScenarioCompare() && climateVariable?.getScenarioCompareTo());
 
-	const dispatch = useAppDispatch();
-	const { addMarker } = useMarker(mapRef, comparisonMapRef);
+	const {
+		selectedLocation,
+		handleOver,
+		handleOut,
+		handleClick,
+		handleClearSelectedLocation
+	} = useMapInteractions({
+		primaryLayerRef,
+		comparisonLayerRef,
+	});
 
-	const handleOver = (e: { latlng: L.LatLng; layer: { properties: any } }, fillColor: string) => {
-		const featureId = e.layer?.properties?.gid ?? e.layer?.properties?.id;
-		if (!featureId) return;
-		hoveredRef.current = featureId;
-		const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
-		const style = {
-			fill: true,
-			fillColor: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
-					? '#fff'
-					: fillColor,
-			fillOpacity: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA ? 0.2 : 1,
-			weight: 1.5,
-			color: '#fff',
-		};
-		[primaryLayerRef, comparisonLayerRef].forEach(ref => {
-			if (ref.current) {
-				ref.current.setFeatureStyle(featureId, style);
-			}
-		});
-	};
-
-	const handleOut = () => {
-		[primaryLayerRef, comparisonLayerRef].forEach(ref => {
-			if (ref.current && hoveredRef.current !== null) {
-				ref.current.resetFeatureStyle(hoveredRef.current);
-			}
-		});
-		hoveredRef.current = null;
-	};
-
-	const handleClick = async (e: { latlng: L.LatLng; layer: { properties: any } }) => {
-		const locationByCoords = await fetchLocationByCoords(e.latlng);
-		const locationId = locationByCoords?.geo_id ?? `${locationByCoords?.lat}|${locationByCoords?.lng}`;
-		const locationTitle = e.layer?.properties?.label_en ?? locationByCoords?.title;
-
-		addMarker(e.latlng, locationTitle, locationId);
-
-		dispatch(addRecentLocation({
-			id: locationId,
-			title: locationTitle,
-			...e.latlng,
-		}));
-
-		// open modal
-	};
-
-	const syncMaps = () => {
+	const syncMaps = useCallback(() => {
 		if (mapRef.current && comparisonMapRef.current) {
 			// @ts-expect-error: suppress leaflet typescript errors
 			mapRef.current.sync(comparisonMapRef.current);
 			// @ts-expect-error: suppress leaflet typescript errors
 			comparisonMapRef.current.sync(mapRef.current);
 		}
-	};
+	}, []);
 
-	const unsyncMaps = () => {
+	const unsyncMaps = useCallback(() => {
 		if (mapRef.current && comparisonMapRef.current) {
 			// @ts-expect-error: suppress leaflet typescript errors
 			mapRef.current.unsync(comparisonMapRef.current);
@@ -97,7 +56,24 @@ export default function RasterMap(): React.ReactElement {
 			comparisonMapRef.current.unsync(mapRef.current);
 			comparisonMapRef.current = null;
 		}
-	};
+	}, []);
+
+	const handleMapReady = useCallback((map: L.Map) => {
+		map.invalidateSize();
+		mapRef.current = map;
+		setMap(map);
+	}, [setMap]);
+
+	const handleComparisonMapReady = useCallback((map: L.Map) => {
+		map.invalidateSize();
+		comparisonMapRef.current = map;
+		setComparisonMap(map);
+		syncMaps();
+	}, [setComparisonMap, syncMaps]);
+
+	const handleUnmount = useCallback(() => {
+		mapRef.current = null;
+	}, []);
 
 	return (
 		<div
@@ -111,31 +87,27 @@ export default function RasterMap(): React.ReactElement {
 		>
 			<RasterMapContainer
 				scenario={climateVariable?.getScenario() ?? ''}
-				onMapReady={(map: L.Map) => {
-					map.invalidateSize();
-					mapRef.current = map;
-					setMap(map);
-				}}
-				onUnmount={() => (mapRef.current = null)}
+				onMapReady={handleMapReady}
+				onUnmount={handleUnmount}
 				isComparisonMap={false}
 				onOver={handleOver}
 				onOut={handleOut}
 				onClick={handleClick}
+				selectedLocation={selectedLocation}
+				clearSelectedLocation={handleClearSelectedLocation}
 				layerRef={primaryLayerRef}
 			/>
 			{showComparisonMap && (
 				<RasterMapContainer
 					scenario={climateVariable?.getScenarioCompareTo() ?? ''}
-					onMapReady={(map: L.Map) => {
-						map.invalidateSize();
-						comparisonMapRef.current = map;
-						syncMaps();
-					}}
+					onMapReady={handleComparisonMapReady}
 					onUnmount={unsyncMaps}
 					isComparisonMap={true}
 					onOver={handleOver}
 					onOut={handleOut}
 					onClick={handleClick}
+					selectedLocation={selectedLocation}
+					clearSelectedLocation={handleClearSelectedLocation}
 					layerRef={comparisonLayerRef}
 				/>
 			)}

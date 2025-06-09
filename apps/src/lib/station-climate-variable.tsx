@@ -87,7 +87,7 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 
 			const stations = props?.stationIds?.map(stationId => stationId).join('|');
 			const fileFormat = props?.fileFormat === FileFormatType.GeoJSON ? 'json' : props?.fileFormat;
-			const url = `https://api.weather.gc.ca/collections/climate-normals/items?CLIMATE_IDENTIFIER=${stations}&sortby=MONTH&f=${fileFormat}&limit=150000&startindex=0`;
+			const url = `https://api.weather.gc.ca/collections/climate-normals/items?CLIMATE_IDENTIFIER=${stations}&sortby=MONTH&f=${fileFormat}&limit=150000&offset=0`;
 
 			return [{
 				label: '',

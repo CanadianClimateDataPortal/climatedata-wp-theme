@@ -51,7 +51,7 @@ class StationDataClimateVariable extends StationClimateVariable {
 		const start = props?.dateRange.start + ' 00:00:00';
 		const end = props?.dateRange.end + ' 00:00:00';
 		const fileFormat = props?.fileFormat === FileFormatType.GeoJSON ? 'json' : props?.fileFormat;
-		const url = `https://api.weather.gc.ca/collections/climate-daily/items?datetime=${start}/${end}&STN_ID=${stations}&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=${fileFormat}&limit=150000&startindex=0`;
+		const url = `https://api.weather.gc.ca/collections/climate-daily/items?datetime=${start}/${end}&STN_ID=${stations}&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=${fileFormat}&limit=150000&offset=0`;
 
 		return [{
 			label: '',

@@ -102,7 +102,6 @@ const toggleVariableDetailsPanel = () => {
 			<DownloadMapModal
 				isOpen={downloadInfo}
 				onClose={toggleDownloadInfo}
-				title={data?.dataset?.[0]?.title?.[locale] || dataset?.title?.[locale] || ''}
 			/>
 		</>
 	);

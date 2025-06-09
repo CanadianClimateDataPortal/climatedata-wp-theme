@@ -27,8 +27,21 @@ if (
 	$current_lang = $GLOBALS['fw']['current_lang_code'];
 }
 
-// Get the French domain
-$fr_domain = cdc_get_fr_domain();
+$internal_urls = [
+	'wp-api-domain' => home_url(),
+
+	'home-en' => home_url(),
+	'home-fr' => cdc_get_fr_domain(),
+
+	'about-data-en' => '/about/our-data/',
+	'about-data-fr' => '/le-portail/nos-donnees/',
+
+	'support-en' => '/feedback/',
+	'support-fr' => '/retroaction/',
+
+	'download-en' => '/download/',
+	'download-fr' => '/telechargement/',
+];
 
 /**
  * Load translation data for the map application.
@@ -145,8 +158,7 @@ $translation_data = array(
 <div
         id="root"
         data-app-lang="<?php echo esc_attr( $current_lang ); ?>"
-        data-wp-home-url="<?php echo esc_attr( home_url() ); ?>"
-        data-wp-home-url-fr="<?php echo esc_attr( $fr_domain ); ?>"
+        data-internal-urls="<?php echo esc_attr( wp_json_encode( $internal_urls ) ); ?>"
 ></div>
 
 <?php

@@ -52,7 +52,8 @@ export const REGION_HEALTH: string = 'health';
 export const REGION_WATERSHED: string = 'watershed';
 
 const rootElement = document.getElementById('root');
-export const WP_API_DOMAIN = (rootElement?.getAttribute('data-wp-home-url')) ?? 'https://dev-en.climatedata.ca';
+export const INTERNAL_URLS: Record<string, string> = JSON.parse(rootElement?.getAttribute('data-internal-urls') ?? '{}');
+export const WP_API_DOMAIN = INTERNAL_URLS['wp-api-domain'];
 
 export const WP_API_VARIABLE_PATH: string = '/wp-json/cdc/v3/variable';
 export const WP_API_LOCATION_BY_COORDS_PATH: string = '/wp-json/cdc/v2/get_location_by_coords';

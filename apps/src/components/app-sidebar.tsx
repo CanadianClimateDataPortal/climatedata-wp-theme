@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
-import { __ } from '@/context/locale-provider';
+import { useContext, useEffect, useState } from 'react';
+import { __, LocaleContext } from '@/context/locale-provider';
 import { BadgeInfo, MessageCircleQuestion } from 'lucide-react';
-import { useMap } from '@/hooks/use-map';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 import {
@@ -31,6 +30,7 @@ import LinkWithIcon from '@/components/sidebar-footer-links/link-with-icon';
 import LayerOpacities from '@/components/ui/layer-opacities';
 
 import { PostData } from '@/types/types';
+import { INTERNAL_URLS } from '@/lib/constants';
 import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
@@ -51,8 +51,9 @@ export function AppSidebar() {
 	const [selectedVariable, setSelectedVariable] = useState<PostData | null>(
 		null
 	);
-	const { setExtendInfo } = useMap();
 	const dispatch = useAppDispatch();
+	const localeContext = useContext(LocaleContext);
+	const currentLocale = localeContext?.locale || 'en';
 
 	// Update the selected variable when the climate variable changes
 	useEffect(() => {
@@ -99,6 +100,9 @@ export function AppSidebar() {
 	const hasDelta = climateVariable && climateVariable.hasDelta();
 	// Show the map colors dropdown if the climate variable has color options
 	const hasColourOptions = climateVariable && climateVariable.getColourOptionsStatus();
+
+	const about_url = INTERNAL_URLS[`about-data-${currentLocale}`] || '';
+	const support_url = INTERNAL_URLS[`support-${currentLocale}`] || '';
 
 	return (
 		<Sidebar>
@@ -187,15 +191,14 @@ export function AppSidebar() {
 					<RecentLocationsLink />
 					<LinkWithIcon
 						icon={BadgeInfo}
-						target="_blank"
-						href="/about"
+						href={about_url}
 						className="font-normal text-brand-blue hover:text-soft-purple"
 					>
 						{__('About our data')}
 					</LinkWithIcon>
 					<LinkWithIcon
 						icon={MessageCircleQuestion}
-						onClick={() => setExtendInfo(true)}
+						href={support_url}
 						className="font-normal text-brand-blue hover:text-soft-purple"
 					>
 						{__('Support')}

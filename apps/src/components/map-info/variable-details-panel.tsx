@@ -76,7 +76,7 @@ const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
 						</SectionHeading>
 						<SectionText
 							content={__(
-								'Click on one of them to get specific insights for your needs.'
+								'Click on the following to get sector-specific insights.'
 							)}
 						/>
 						<SectorsArea items={mapInfo.relevantSectors} />

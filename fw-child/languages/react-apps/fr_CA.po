@@ -521,7 +521,7 @@ msgstr ""
 msgid "Relevant sectors"
 msgstr ""
 
-msgid "Click on one of them to get specific insights for your needs."
+msgid "Click on the following to get sector-specific insights."
 msgstr ""
 
 msgid "Relevant training resources"

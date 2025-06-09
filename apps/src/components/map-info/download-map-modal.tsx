@@ -40,8 +40,7 @@ declare global {
 const DownloadMapModal: React.FC<{
 	isOpen: boolean;
 	onClose: () => void;
-	title: string;
-}> = ({ isOpen, onClose, title }) => {
+}> = ({ isOpen, onClose }) => {
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
 	const localeContext = useContext(LocaleContext);
 	const currentLocale = localeContext?.locale || 'en';
@@ -71,23 +70,6 @@ const DownloadMapModal: React.FC<{
 		};
 	}, []);
 
-
-	// Make sure to remove #download so no tab is opened at the time of the screenshot
-
-	// Utility to trigger a download of a Blob object as a file in the browser.
-	// Creates a temporary anchor element, sets the blob as its href, and programmatically clicks it.
-	// Cleans up the element and revokes the object URL after download starts.
-	const downloadBlob = (blob: Blob, filename: string) => {
-		const url = window.URL.createObjectURL(blob);
-		const link = document.createElement('a');
-		link.href = url;
-		link.download = filename;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-		window.URL.revokeObjectURL(url);
-	};
-
 	/**
 	 * Handles the click event for the "Download" link.
 	 * Fetches the image from the provided downloadUrl as a Blob and triggers a file download in the browser.
@@ -105,19 +87,9 @@ const DownloadMapModal: React.FC<{
 		if (!api_url) {
 			return;
 		}
+
 		setIsGenerating(true);
-		try {
-			const response = await fetch(api_url);
-			if (!response.ok) {
-				throw new Error('Network response was not ok');
-			}
-			const blob = await response.blob();
-			downloadBlob(blob, `${title}-map.png`);
-		} catch (error) {
-			console.error('Failed to generate download URL:', error);
-		} finally {
-			setIsGenerating(false);
-		}
+		window.location.href = api_url;
 	};
 
 	// Generate download section URL with dataset and variable parameters

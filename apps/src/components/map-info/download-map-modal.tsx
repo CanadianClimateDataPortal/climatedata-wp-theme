@@ -89,7 +89,7 @@ const DownloadMapModal: React.FC<{
 		}
 
 		setIsGenerating(true);
-		window.location.href = api_url;
+		window.open(api_url, '_blank');
 	};
 
 	// Generate download section URL with dataset and variable parameters

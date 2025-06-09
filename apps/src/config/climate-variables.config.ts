@@ -794,6 +794,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"1980",
 			"2010",
 		],
+		ahccdDownloadRequiredVariables: [
+			"pr",
+		],
 	},
 	/** Cold Spell Days */
 	{
@@ -831,6 +834,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		defaultDateRange: [
 			"1980",
 			"2010",
+		],
+		ahccdDownloadRequiredVariables: [
+			"tas",
 		],
 	},
 	/** Cooling Degree Days */
@@ -875,6 +881,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			},
+		],
+		ahccdDownloadRequiredVariables: [
+			"tas",
 		],
 	},
 	/** Days above HXmax */
@@ -1023,6 +1032,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				},
 			},
 		},
+		ahccdDownloadRequiredVariables: [
+			"tasmax",
+		],
 	},
 	/** Days above Tmax and Tmin */
 	{
@@ -1062,6 +1074,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		defaultDateRange: [
 			"1980",
 			"2010",
+		],
+		ahccdDownloadRequiredVariables: [
+			"tasmin",
+			"tasmax",
 		],
 	},
 	/** Days below temperature threshold */
@@ -1127,6 +1143,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				},
 			},
 		},
+		ahccdDownloadRequiredVariables: [
+			"tasmin",
+		],
 	},
 	/** Degree days exceedance date */
 	{
@@ -1200,6 +1219,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
+		ahccdDownloadRequiredVariables: [
+			"tas",
+		],
 	},
 
 	/** Freeze-Thaw Cycles */
@@ -1258,6 +1280,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				},
 			},
 		},
+		ahccdDownloadRequiredVariables: [
+			"tasmin",
+			"tasmax",
+		],
 	},
 	/** Heat Wave Frequency */
 	{
@@ -1305,6 +1331,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
+		ahccdDownloadRequiredVariables: [
+			"tasmin",
+			"tasmax",
+		],
 	},
 	/** Heat Wave */
 	{
@@ -1342,6 +1372,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		defaultDateRange: [
 			"1980",
 			"2010",
+		],
+		ahccdDownloadRequiredVariables: [
+			"tasmax",
 		],
 	},
 	/** Heat Wave Total Duration */
@@ -1390,6 +1423,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
+		ahccdDownloadRequiredVariables: [
+			"tasmin",
+			"tasmax",
+		],
 	},
 	/** Heating Degree Days */
 	{
@@ -1423,6 +1460,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
+		ahccdDownloadRequiredVariables: [
+			"tas",
+		],
 	},
 	/** Maximum Consecutive Dry Days */
 	{
@@ -1450,6 +1490,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"1980",
 			"2010",
 		],
+		ahccdDownloadRequiredVariables: [
+			"pr",
+		],
 	},
 	/** Maximum Consecutive Wet Days */
 	{
@@ -1476,6 +1519,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		defaultDateRange: [
 			"1980",
 			"2010",
+		],
+		ahccdDownloadRequiredVariables: [
+			"pr",
 		],
 	},
 	/** Tropical Nights (Days with Tmin above threshold) */
@@ -1562,6 +1608,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			},
+		],
+		ahccdDownloadRequiredVariables: [
+			"tasmin",
 		],
 	},
 	/** Wet Days */
@@ -1664,6 +1713,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				},
 			},
 		},
+		ahccdDownloadRequiredVariables: [
+			"pr",
+		],
 	},
 	/** Relative Sea-Level Change */
 	{

@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { createI18n } from '@wordpress/i18n';
 import { I18nProvider } from '@wordpress/react-i18n';
 
+import { LocaleProvider } from '@/context/locale-provider';
 import { store } from '@/app/store';
 
 import App from '@/App';
@@ -18,7 +19,9 @@ createRoot(document.getElementById('root')!).render(
 		<Provider store={store}>
 			<I18nProvider i18n={i18n}>
 				<SectionContext.Provider value={'map'} >
-					<App />
+					<LocaleProvider>
+						<App />
+					</LocaleProvider>
 				</SectionContext.Provider>
 			</I18nProvider>
 		</Provider>

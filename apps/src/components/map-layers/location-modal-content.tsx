@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import L from 'leaflet';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useAppSelector } from '@/app/hooks';
+import { useLocale } from '@/hooks/use-locale';
 import appConfig from '@/config/app.config';
 
 interface LocationModalContentProps {
@@ -30,11 +31,12 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	onDetailsClick,
 }) => {
 	const { climateVariable } = useClimateVariable();
+	const { getLocalized } = useLocale();
 	const { dataset } = useAppSelector((state) => state.map);
 	const variableList = useAppSelector((state) => state.map.variableList);
 
 	// Displayed info
-	const datasetLabel = dataset?.title.en ?? '';
+	const datasetLabel = getLocalized(dataset);
 	const climateVariableTitle = climateVariable?.getTitle() || variableList?.[0]?.title || '';
 	const thresholds = climateVariable?.getThresholds() ?? [];
 	const threshold: string = climateVariable?.getThreshold() ?? '';

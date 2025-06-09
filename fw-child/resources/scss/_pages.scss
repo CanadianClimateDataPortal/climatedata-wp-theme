@@ -99,7 +99,7 @@
   .swiper-pagination-bullet {
     top: 1rem;
   }
-  
+
   @include media-breakpoint-up(md) {
     --swiper-pagination-bottom: -5rem;
     --swiper-pagination-top: auto;
@@ -115,13 +115,6 @@
   --swiper-pagination-bullet-inactive-opacity: 0.5;
   --swiper-pagination-color: #{$dark};
   width: 100%;
-}
-
-#hero-eccc {
-
-  p {
-    font-size: 0.625rem;
-  }
 }
 
 #page-home {

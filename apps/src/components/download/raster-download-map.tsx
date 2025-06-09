@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { setSelectionMode } from '@/features/download/download-slice';
+import { setSelectedStation, setSelectionMode } from '@/features/download/download-slice';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import MapEvents from '@/components/map-layers/map-events';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
@@ -60,11 +60,11 @@ export default function RasterDownloadMap(): React.ReactElement {
 	}, [selectionMode, climateVariable]);
 
 	const showStationTypesFilter = climateVariable?.getId() === 'daily_ahccd_temperature_and_precipitation';
-	const isInteractiveModeStation = climateVariable?.getInteractiveMode() === 'station';
+	const isInteractiveModeStation = climateVariable?.getInteractiveMode() === 'station' || climateVariable?.getDatasetType() === 'ahccd';
 	const multipleStationSelect = ! [
 		'future_building_design_value_summaries',
 		'short_duration_rainfall_idf_data'
-	].includes(climateVariable?.getId() ?? '');
+	].includes(climateVariable?.getId() ?? '') || climateVariable?.getDatasetType() === 'ahccd';
 
 	const stationOptions = stations.map(station => ({ value: String(station.id), label: station.name }))
 	.sort((a, b) => a.label.localeCompare(b.label));
@@ -77,11 +77,13 @@ export default function RasterDownloadMap(): React.ReactElement {
 		if (!multipleStationSelect) {
 			const id = ids[0];
 			const station = stations.find(s => s.id === id);
+
 			if (!id || !station?.coordinates) {
 				resetSelectedPoints();
 				return;
 			}
 
+			dispatch(setSelectedStation(station));
 			setSelectedPoints({
 				[station.id]: {
 					lat: station.coordinates.lat,
@@ -126,7 +128,12 @@ export default function RasterDownloadMap(): React.ReactElement {
 			}
 		};
 
-		multipleStationSelect ? addSelectedPoints(selectedPoint) : setSelectedPoints(selectedPoint);
+		if (multipleStationSelect) {
+			addSelectedPoints(selectedPoint)
+		} else {
+			dispatch(setSelectedStation(station));
+			setSelectedPoints(selectedPoint);
+		}
 	};
 
 	const clearSelection = () => {

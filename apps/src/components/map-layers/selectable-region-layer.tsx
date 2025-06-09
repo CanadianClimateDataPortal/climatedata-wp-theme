@@ -28,7 +28,7 @@ const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_,
 	const map = useMap();
 	const { climateVariable, setSelectedPoints, removeSelectedPoint } = useClimateVariable();
 	const dispatch = useAppDispatch();
-	const { getLocalizedLabel } = useLocale();
+	const { getLocalized } = useLocale();
 
 	// @ts-expect-error: suppress leaflet typescript error
 	const layerRef = useRef<L.VectorGrid | null>(null);
@@ -145,14 +145,14 @@ const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_,
 				layerRef.current?.resetFeatureStyle(gid);
 			});
 
-			// add the feature to the selected points, including name from getLocalizedLabel
-			const name = getLocalizedLabel(e.layer?.properties || {});
+			// add the feature to the selected points, including name from getLocalized
+			const name = getLocalized(e.layer?.properties || {});
 			layerRef.current.setFeatureStyle(featureId, selectedStyles);
 			setSelectedPoints({
 				[String(featureId)]: { ...e.latlng, name },
 			});
 		},
-		[selectedStyles, selectedIds, setSelectedPoints, removeSelectedPoint, getLocalizedLabel]
+		[selectedStyles, selectedIds, setSelectedPoints, removeSelectedPoint, getLocalized]
 	);
 
 	// ensure refs always have the latest function versions

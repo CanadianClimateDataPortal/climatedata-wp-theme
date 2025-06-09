@@ -81,7 +81,7 @@ const InteractiveStationsLayer = forwardRef<{
 
 	// Fetch stations list on mount
 	useEffect(() => {
-		fetchStationsList({ threshold: climateVariable?.getThreshold() ?? undefined }).then(stations => {
+		fetchStationsList({threshold: climateVariable?.getDatasetType() === "ahccd" ? "ahccd" : climateVariable?.getThreshold() ?? undefined}).then(stations => {
 			setStations(stations);
 			if (typeof onStationsLoaded === 'function') {
 				onStationsLoaded(stations);

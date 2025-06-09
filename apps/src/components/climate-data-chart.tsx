@@ -55,7 +55,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	featureId,
 	data,
 }) => {
-	const { locale } = useLocale();
+	const { locale, getLocalized } = useLocale();
 	const { climateVariable } = useClimateVariable();
 	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
 	const { dataset } = useAppSelector((state) => state.map);
@@ -75,7 +75,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const [enableChartNavigator, setEnableChartNavigator] = useState(true);
 
 	// Subtitle displayed info
-	const datasetLabel = dataset?.title.en ?? '';
+	const datasetLabel = getLocalized(dataset) ?? '';
 	const climateVariableTitle = climateVariable?.getTitle() || variableList?.[0]?.title || '';
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
 
@@ -646,6 +646,40 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					});
 					break;
 					case 'csv':
+						{
+							// Get the Unit.
+							const unit = climateVariable?.getUnit();
+
+							// Update the data array selecting the right Decimals.
+							for (const key in data) {
+								if (Array.isArray(data[key])) {
+									const isRange = key.includes('_range');
+									(data[key] as (number | string)[][]).forEach((item) => {
+										if (item.length > 1) {
+											switch (unit) {
+												case "doy":
+													item[1] = doyFormatter(Number(item[1]), locale);
+													break;
+												default:
+													item[1] = Number(item[1]).toFixed(decimals) + ' ' + unit;
+													break;
+											}
+										}
+										if (isRange && item.length > 2) {
+											switch (unit) {
+												case "doy":
+													item[2] = doyFormatter(Number(item[2]), locale);
+													break;
+												default:
+													item[2] = Number(item[2]).toFixed(decimals) + ' ' + unit;
+													break;
+											}
+										}
+									});
+								}
+							}
+						}
+
 						if(activeTab === 'annual-values') {
 							chart.downloadCSV();
 						} else {

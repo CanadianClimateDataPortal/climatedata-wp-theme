@@ -73,11 +73,11 @@
         },
         {
             "key": "field_674d4164b944b",
-            "label": "Relevant Training Resources",
+            "label": "Relevant Articles",
             "name": "relevant_trainings",
             "aria-label": "",
             "type": "relationship",
-            "instructions": "This will be shown under Relevant Training Resources for this variable.",
+            "instructions": "This will be shown under Relevant Articles for this variable.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {

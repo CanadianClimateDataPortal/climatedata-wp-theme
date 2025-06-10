@@ -408,9 +408,12 @@ class ClimateVariableBase implements ClimateVariableInterface {
 			frequencyCode,
 			scenario,
 		];
-		if (this.getId() !== "sea_level") {
+
+		// If the percentile is not already in the scenario name, we need to add it.
+		if (scenario && ! /-p\d+$/.test(scenario)) {
 			valuesArr.push('p50');
 		}
+
 		valuesArr.push(
 			frequency,
 			'30year',

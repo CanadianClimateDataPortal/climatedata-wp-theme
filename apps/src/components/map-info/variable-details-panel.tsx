@@ -86,7 +86,7 @@ const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
 				{mapInfo.relevantTrainings?.length > 0 && (
 					<div className="py-4">
 						<SectionHeading>
-							{__('Relevant training resources')}
+							{__('Relevant articles')}
 						</SectionHeading>
 						<SectionText
 							content={__('To help you get more of our data.')}
@@ -159,7 +159,7 @@ const SectionText: React.FC<{
 SectionText.displayName = 'SectionText';
 
 /**
- * Custom component for displaying relevant trainings for the selected variable.
+ * Custom component for displaying relevant articles for the selected variable.
  * No need to export this component since it's only used in the main VariableDetailsPanel.
  */
 const RelevantTrainings: React.FC<{ items: Training[] }> = ({

@@ -524,7 +524,7 @@ msgstr ""
 msgid "Click on the following to get sector-specific insights."
 msgstr ""
 
-msgid "Relevant training resources"
+msgid "Relevant articles"
 msgstr ""
 
 msgid "To help you get more of our data."

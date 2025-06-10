@@ -10,4 +10,3 @@
 advanced-custom-fields-pro-6.3.6.zip
 motionpage-2.1.9.zip
 jquery-collapse-o-matic-1.8.5.3.zip
-katex-4.5.4.zip

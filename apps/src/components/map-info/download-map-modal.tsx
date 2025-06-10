@@ -4,22 +4,23 @@
  * A modal component that allows users to download the map as an image.
  *
  */
-import React, {useContext, useEffect, useMemo, useState} from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { __, LocaleContext } from '@/context/locale-provider';
 import { Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { encodeURL, prepareRaster } from '@/lib/utils';
 import { useAppSelector } from '@/app/hooks';
-import { WP_API_DOMAIN } from '@/lib/constants';
 
 // components
 import Modal from '@/components/ui/modal';
 import {
 	ModalSection,
 	ModalSectionBlock,
-	ModalSectionBlockTitle,
 	ModalSectionBlockDescription,
+	ModalSectionBlockTitle,
 } from '@/components/map-info/modal-section';
+
+import { INTERNAL_URLS } from '@/lib/constants';
 
 
 // Extend the global Window interface to allow simulation of jQuery-style API.
@@ -39,8 +40,7 @@ declare global {
 const DownloadMapModal: React.FC<{
 	isOpen: boolean;
 	onClose: () => void;
-	title: string;
-}> = ({ isOpen, onClose, title }) => {
+}> = ({ isOpen, onClose }) => {
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
 	const localeContext = useContext(LocaleContext);
 	const currentLocale = localeContext?.locale || 'en';
@@ -70,23 +70,6 @@ const DownloadMapModal: React.FC<{
 		};
 	}, []);
 
-
-	// Make sure to remove #download so no tab is opened at the time of the screenshot
-
-	// Utility to trigger a download of a Blob object as a file in the browser.
-	// Creates a temporary anchor element, sets the blob as its href, and programmatically clicks it.
-	// Cleans up the element and revokes the object URL after download starts.
-	const downloadBlob = (blob: Blob, filename: string) => {
-		const url = window.URL.createObjectURL(blob);
-		const link = document.createElement('a');
-		link.href = url;
-		link.download = filename;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-		window.URL.revokeObjectURL(url);
-	};
-
 	/**
 	 * Handles the click event for the "Download" link.
 	 * Fetches the image from the provided downloadUrl as a Blob and triggers a file download in the browser.
@@ -104,37 +87,15 @@ const DownloadMapModal: React.FC<{
 		if (!api_url) {
 			return;
 		}
-		setIsGenerating(true);
-		try {
-			const response = await fetch(api_url);
-			if (!response.ok) {
-				throw new Error('Network response was not ok');
-			}
-			const blob = await response.blob();
-			downloadBlob(blob, `${title}-map.png`);
-		} catch (error) {
-			console.error('Failed to generate download URL:', error);
-		} finally {
-			setIsGenerating(false);
-		}
-	};
 
-	// French domain from the root div
-	const getFrenchDomain = (): string | null => {
-		const rootElement = document.getElementById('root');
-		return rootElement?.getAttribute('data-wp-home-url-fr') || null;
+		setIsGenerating(true);
+		window.open(api_url, '_blank');
+		setIsGenerating(false);
 	};
 
 	// Generate download section URL with dataset and variable parameters
 	const getDownloadUrl = useMemo(() => {
-		const isFrenchSite = currentLocale === 'fr';
-
-		let downloadBaseUrl;
-		if (isFrenchSite && getFrenchDomain()) {
-			downloadBaseUrl = `${getFrenchDomain()}/telechargement/`;
-		} else {
-			downloadBaseUrl = `${WP_API_DOMAIN}/download/`;
-		}
+		const downloadBaseUrl = INTERNAL_URLS[`download-${currentLocale}`] || '';
 
 		if (!dataset || !climateVariableData || !climateVariableData.id) {
 			return downloadBaseUrl;

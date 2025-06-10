@@ -493,11 +493,11 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }) =
 		} else if (threshold === 'idf') {
 			data = await fetchJson('/assets/themes/fw-child/resources/app/idf_curves.json');
 		} else {
-			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y');
+			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&offset=0&HAS_NORMALS_DATA=Y');
 		}
 
 		return (data.features || []).map((feature: any) => ({
-			id: String(feature.properties?.ID ?? ((threshold === 'station-data' || threshold === 'climate-normals') ? feature.properties?.STN_ID : feature?.id)),
+			id: String(feature.properties?.ID ?? ((threshold === 'station-data') ? feature.properties?.STN_ID : feature?.id)),
 			name: feature.properties?.STATION_NAME ?? feature.properties?.Name ?? feature.properties?.Location,
 			type: feature.properties?.type,
 			coordinates: {

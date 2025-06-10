@@ -76,7 +76,7 @@ const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
 						</SectionHeading>
 						<SectionText
 							content={__(
-								'Click on one of them to get specific insights for your needs.'
+								'Click on the following to get sector-specific insights.'
 							)}
 						/>
 						<SectorsArea items={mapInfo.relevantSectors} />
@@ -86,7 +86,7 @@ const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
 				{mapInfo.relevantTrainings?.length > 0 && (
 					<div className="py-4">
 						<SectionHeading>
-							{__('Relevant trainings')}
+							{__('Relevant training resources')}
 						</SectionHeading>
 						<SectionText
 							content={__('To help you get more of our data.')}

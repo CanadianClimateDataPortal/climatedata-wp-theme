@@ -95,7 +95,7 @@ function cdc_rest_v3_get_variable( $request ) {
 			$variable['meta']['content']['relevant_sectors'] = $relevant_sectors;
 		}
 
-		// Variable relevant trainings.
+		// Variable relevant training resources.
 		$relevant_trainings = cdc_rest_v3_get_relevant_trainings( $post_id );
 
 		if ( ! empty( $relevant_trainings ) ) {
@@ -186,11 +186,11 @@ function cdc_rest_v3_get_relevant_sectors( $post_id ) {
 }
 
 /**
- * Get relevant trainings from ACF relationship field.
+ * Get relevant training resources from ACF relationship field.
  *
  * @param int $post_id The variable post ID.
  *
- * @return array The formatted relevant trainings' data.
+ * @return array The formatted relevant training resources' data.
  */
 function cdc_rest_v3_get_relevant_trainings( $post_id ) {
 	$trainings         = array();

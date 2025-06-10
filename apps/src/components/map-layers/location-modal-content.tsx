@@ -68,7 +68,11 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 				}
 			</p>
 
-			{ climateVariable?.getLocationModalContent(latlng, featureId) }
+			{ climateVariable?.getLocationModalContent({
+				latlng,
+				featureId,
+				scenario,
+			}) }
 
 			<p className="text-right">
 				<a

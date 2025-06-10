@@ -21,10 +21,10 @@ import {
 	ThresholdInterface,
 	DownloadFile,
 	FrequencyType,
+	LocationModalContentParams,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
 import RasterDownloadMap from "@/components/download/raster-download-map";
-import L from "leaflet";
 import { getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
 
 /**
@@ -379,7 +379,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	getLocationModalContent(_latlng: L.LatLng, _featureId: number): React.ReactNode {
+	getLocationModalContent(_params: LocationModalContentParams): React.ReactNode | null {
 		return null;
 	}
 

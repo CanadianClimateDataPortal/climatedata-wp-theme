@@ -12,7 +12,8 @@ import SectionContext from "@/context/section-provider";
 interface RasterPrecalcultatedClimateVariableValuesProps {
 	latlng: L.LatLng;
 	featureId: number,
-	mode: "modal" | "panel"
+	mode: "modal" | "panel",
+	scenario: string,
 }
 
 /**
@@ -27,6 +28,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	latlng,
 	featureId,
 	mode,
+	scenario,
 }) => {
 	const { locale } = useLocale();
 	const { climateVariable } = useClimateVariable();
@@ -45,7 +47,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	// useEffect to retrieve location values for the current climate variable
 	useEffect(() => {
 		const variableId = climateVariable?.getId() ?? '';
-		
+
 		// Skip data fetching for SPEI variables - these variables don't have data available in the API
 		if (variableId === 'spei_12' || variableId === 'spei_3') {
 			// We don't show "No data available" for these variables
@@ -66,7 +68,11 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
 			}
 
-			const scenario = climateVariable?.getScenario() ?? '';
+			// Fallback to the selected scenario of the variable when nothing's provided
+			// to the component.
+			const _scenario = (scenario && scenario !== "")
+				? scenario
+				: climateVariable?.getScenario() ?? '';
 			const version = climateVariable?.getVersion() ?? '';
 
 			// Special case variable id
@@ -102,8 +108,8 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				// If we don't have data
 				setNoDataAvailable(true);
 			} else {
-				setMedian(medianRangeData[scenario]?.p50 || 0);
-				setRange([medianRangeData[scenario]?.p10 || 0, medianRangeData[scenario]?.p90 || 0]);
+				setMedian(medianRangeData[_scenario]?.p50 || 0);
+				setRange([medianRangeData[_scenario]?.p10 || 0, medianRangeData[_scenario]?.p90 || 0]);
 				setNoDataAvailable(false);
 			}
 
@@ -119,8 +125,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				unitDecimals: decimals
 			});
 
-
-			const deltaValueKey = 'delta7100_' + scenario + '_median';
+			const deltaValueKey = 'delta7100_' + _scenario + '_median';
 
 			// If annual, we take the first month (so 0)
 			// If monthly, we take the frequency month index

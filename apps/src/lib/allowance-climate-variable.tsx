@@ -1,8 +1,9 @@
 import MarineClimateVariable from "@/lib/marine-climate-variable";
 import MedianOnlyVariableValues from "@/components/map-layers/median-only-variable-values";
+import { LocationModalContentParams } from "@/types/climate-variable-interface";
 
 class AllowanceClimateVariable extends MarineClimateVariable {
-	getLocationModalContent(latlng: L.LatLng, featureId: number, mode: "modal" | "panel" = "modal"): React.ReactNode {
+	getLocationModalContent({latlng, featureId, mode = "modal"}: LocationModalContentParams): React.ReactNode {
 		const { lat, lng } = latlng;
 
 		return (

@@ -78,6 +78,7 @@ const Steps: React.FC = () => {
 				dispatch(setRequestError(null));
 				dispatch(setRequestResult(undefined));
 
+				const ahccdDownloadRequiredVariables = climateVariable.getAhccdDownloadRequiredVariables?.() ?? [];
 				const analysisNamespace = climateVariable.getDatasetType() === 'ahccd' ? 'analyze-stations' : 'analyze';
 				const analysisFieldValues = climateVariable.getAnalysisFieldValues();
 				const analysisFields = climateVariable.getAnalysisFields?.() ?? [];
@@ -85,6 +86,7 @@ const Steps: React.FC = () => {
 				const scenarios = climateVariable.getAnalyzeScenarios?.() ?? climateVariable.getScenarios?.() ?? [];
 				const percentiles = climateVariable.getPercentiles?.() ?? [];
 				const model = climateVariable.getModel?.();
+				const missingData = climateVariable.getMissingData?.();
 				const fileFormat = climateVariable.getFileFormat?.();
 				const decimals = climateVariable.getDecimalPlace?.();
 				const interactiveRegion = climateVariable.getInteractiveRegion?.();
@@ -220,6 +222,19 @@ const Steps: React.FC = () => {
 					inputs.push({ id: 'csv_precision', data: decimals });
 				}
 
+				// Missing data
+				if (missingData) {
+					if (missingData === 'wmo') {
+						inputs.push({ id: 'check_missing', data: 'wmo' });
+					} else {
+						inputs.push({ id: 'check_missing', data: 'pct' });
+						const toleranceMap: { [key: number]: number } = { 5: 0.05, 10: 0.1, 15: 0.15 };
+						const tolerance = toleranceMap[Number(missingData)] ?? 0.05;
+						const missingOptions = { pct: { tolerance } };
+						inputs.push({ id: 'missing_options', data: JSON.stringify(missingOptions) });
+					}
+				}
+
 				const request_data: { [key: string]: any } = {};
 				request_data['inputs'] = inputs;
 				request_data['notification_email'] = email;
@@ -233,6 +248,18 @@ const Steps: React.FC = () => {
 				formData.append('signup', String(subscribe));
 				formData.append('captcha_code', captchaValue ?? '');
 				formData.append('submit_url', analysisUrl ?? '');
+
+				if (climateVariable.getDatasetType() === 'ahccd') {
+					// Stations list
+					const stations = Object.keys(selectedPoints ?? {});
+					formData.append('stations', stations.join(','));
+
+					// Required variables
+					if (ahccdDownloadRequiredVariables.length > 0) {
+						appendFormData(formData, ahccdDownloadRequiredVariables, 'required_variables');
+					}
+				}
+
 				appendFormData(formData, request_data, 'request_data');
 
 				try {

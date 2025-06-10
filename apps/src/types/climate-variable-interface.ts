@@ -343,6 +343,8 @@ export interface ClimateVariableConfigInterface {
 
 	finch?: string;
 
+	ahccdDownloadRequiredVariables?: string[];
+
 	selectedPoints?: GridCoordinates;
 
 	selectedRegion?: GridRegion | null;
@@ -478,6 +480,8 @@ export interface ClimateVariableInterface {
 	getAnalysisUrl(): string | null;
 
 	getFinch(): string;
+
+	getAhccdDownloadRequiredVariables(): string[];
 
 	getSelectedPoints(): GridCoordinates | null;
 

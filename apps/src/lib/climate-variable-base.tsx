@@ -356,6 +356,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.finch ?? this.getId();
 	}
 
+	getAhccdDownloadRequiredVariables(): string[] {
+		return this._config.ahccdDownloadRequiredVariables ?? [];
+	}
+
 	getSelectedPoints(): GridCoordinates | null {
 		return this._config.selectedPoints ?? null;
 	}

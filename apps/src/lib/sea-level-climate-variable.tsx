@@ -15,7 +15,7 @@ class SeaLevelClimateVariable extends MarineClimateVariable {
 		}
 	}
 
-	getLocationModalContent({latlng, featureId, mode = "modal"}: LocationModalContentParams): React.ReactNode {
+	getLocationModalContent({latlng, featureId, mode = "modal", scenario}: LocationModalContentParams): React.ReactNode {
 		const { lat, lng } = latlng;
 
 		return (
@@ -24,6 +24,7 @@ class SeaLevelClimateVariable extends MarineClimateVariable {
 				featureId={featureId}
 				mode={mode}
 				endpoint={`get-slr-gridded-values/${lat}/${lng}`}
+				scenario={scenario ?? ""}
 			/>
 		);
 	}

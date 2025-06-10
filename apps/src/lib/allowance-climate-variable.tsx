@@ -3,7 +3,7 @@ import MedianOnlyVariableValues from "@/components/map-layers/median-only-variab
 import { LocationModalContentParams } from "@/types/climate-variable-interface";
 
 class AllowanceClimateVariable extends MarineClimateVariable {
-	getLocationModalContent({latlng, featureId, mode = "modal"}: LocationModalContentParams): React.ReactNode {
+	getLocationModalContent({latlng, featureId, mode = "modal", scenario}: LocationModalContentParams): React.ReactNode {
 		const { lat, lng } = latlng;
 
 		return (
@@ -12,6 +12,7 @@ class AllowanceClimateVariable extends MarineClimateVariable {
 				featureId={featureId}
 				mode={mode}
 				endpoint={`get-allowance-gridded-values/${lat}/${lng}`}
+				scenario={scenario ?? ""}
 			/>
 		);
 	}

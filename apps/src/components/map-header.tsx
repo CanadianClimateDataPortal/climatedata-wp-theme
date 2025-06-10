@@ -35,9 +35,6 @@ const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement 
 	>(undefined);
 	const { togglePanel } = useAnimatedPanel();
 
-	const { locale } = useLocale();
-	const dataset = useAppSelector((state) => state.map.dataset);
-
 	const ref = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -102,7 +99,6 @@ const toggleVariableDetailsPanel = () => {
 			<DownloadMapModal
 				isOpen={downloadInfo}
 				onClose={toggleDownloadInfo}
-				title={data?.dataset?.[0]?.title?.[locale] || dataset?.title?.[locale] || ''}
 			/>
 		</>
 	);

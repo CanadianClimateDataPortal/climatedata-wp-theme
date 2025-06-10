@@ -59,7 +59,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 		return 0;
 	}, [selectionMode, climateVariable]);
 
-	const showStationTypesFilter = climateVariable?.getId() === 'daily_ahccd_temperature_and_precipitation';
+	const showStationTypesFilter = climateVariable?.getId() === 'daily_ahccd_temperature_and_precipitation' || climateVariable?.getDatasetType() === 'ahccd';
 	const isInteractiveModeStation = climateVariable?.getInteractiveMode() === 'station' || climateVariable?.getDatasetType() === 'ahccd';
 	const multipleStationSelect = ! [
 		'future_building_design_value_summaries',

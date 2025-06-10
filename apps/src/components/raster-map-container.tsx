@@ -27,7 +27,8 @@ import {
 	DEFAULT_MIN_ZOOM,
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
-	CANADA_BOUNDS, SIDEBAR_WIDTH
+	CANADA_BOUNDS,
+	SIDEBAR_WIDTH,
 } from '@/lib/constants';
 import { LocationModalContent } from '@/components/map-layers/location-modal-content';
 import { SelectedLocationInfo } from '@/types/types';
@@ -169,7 +170,6 @@ export default function RasterMapContainer({
 			<MapEvents
 				onMapReady={onMapReady}
 				onUnmount={onUnmount}
-				// onLocationModalClose={handleLocationModalClose}
 			/>
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />

@@ -169,10 +169,10 @@ const RelevantTrainings: React.FC<{ items: Training[] }> = ({
     return (
     <ul className="list-disc list-inside text-sm ms-4 marker:text-brand-blue">
         {items.map((item: Training, index: number) => (
-            <li key={index}>
+            <li key={index} className='my-2'>
                 <Button
                     asChild
-                    variant="link"
+                    variant="longLink"
                     className="font-normal text-brand-blue px-0"
                 >
                     <a href={item.link[locale]} className="h-auto">

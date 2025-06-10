@@ -26,7 +26,8 @@ const DataValuesControl: React.FC = () => {
 		setDataValue(value);
 
 		// also, colour type should be set depending on the data value and the colour scheme
-		const defaultsToDiscreteColourType = value === 'delta' && climateVariable?.getColourScheme() === 'default';
+		const colourScheme = climateVariable?.getColourScheme() ?? 'default';
+		const defaultsToDiscreteColourType = value === 'delta' && colourScheme === 'default';
 		setColourType(defaultsToDiscreteColourType ? ColourType.DISCRETE : ColourType.CONTINUOUS);
 	}
 

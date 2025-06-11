@@ -1,0 +1,19 @@
+services:
+  portal:
+    build:
+      args:
+        LOCAL_WP_PLUGINS_DIR: dockerfiles/mounts/wp-plugins
+    volumes:
+      # Mount the SSL certificate
+      - type: bind
+        source: dockerfiles/mounts/ssl
+        target: /etc/nginx/ssl
+      # Proxy requests to missing files in /assets/uploads to the staging server
+      - type: bind
+        source: dockerfiles/dev/www/configs/nginx/site-extra/proxy-uploads.conf
+        target: /etc/nginx/conf.d/climatedata-site/proxy-uploads.conf
+    ports:
+      - "80:80"
+      - "443:443"
+  db:
+    image: registry.gitlab.com/crim.ca/clients/ccdp/portal/deployment/db:20250319

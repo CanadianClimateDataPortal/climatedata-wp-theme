@@ -6,23 +6,75 @@ import {
 	ApiPostData,
 	MultilingualField,
 	TermItem,
+	Locale,
 } from '@/types/types';
 import { ColorMap } from '@/types/climate-variable-interface';
 import React from 'react';
 
 export async function transformLegendData(
 	input: WMSLegendData,
-	colorMap: ColorMap
+	colourScheme: string,
+	isDelta: boolean,
+	unit: string | undefined,
+	locale: Locale,
+	decimals: number,
+	colorMap: ColorMap,
 ): Promise<TransformedLegendEntry[]> {
-	const legendEntries = input?.Legend?.[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap?.entries
-		?.map((item, i) => ({
+	let legendEntries = undefined;
+
+	// Get raw legend entries with right labels
+	const rawLegendEntries = input?.Legend?.[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap?.entries
+		?.map((item) => ({
 			...item,
-			// use the color from the color map if available
-			color: colorMap?.colours?.[i] ?? item.color,
 			// for some variables, the response has an item with NaN text as its label, we need to convert to 0 instead
-			label: item.label === 'NaN' ? '0' : item.label,
+			label: item.label === 'NaN' ? 0 : item.label,
 			opacity: Number(item.opacity ?? 1),
-		}));
+		}))
+		.reverse(); // reverse the data to put higher values at the top
+
+	if(colourScheme === 'default') {
+		// If default scheme we keep raw legend entries
+		legendEntries = rawLegendEntries?.slice();
+	} else {
+		// Format legend entries from color map colours entries
+
+		const values = isDelta
+			? rawLegendEntries?.map(entry => typeof entry.label === 'number' ? entry.label : parseFloat(entry.label))
+			: rawLegendEntries?.map(entry => typeof entry.quantity === 'number' ? entry.quantity : parseFloat(entry.quantity));
+		const min = Math.min(...(values ?? []));
+		const max = Math.max(...(values ?? []));
+		const length = values?.length;
+
+		// Set label between min and max regarding its position
+		if(min !== undefined && max !== undefined && length !== undefined) {
+			legendEntries = colorMap.colours.map((color, i) => {
+				let label: string | number = min + ((max - min) * i) / (colorMap.colours.length - 1);
+
+				if(isDelta) {
+					label = parseFloat(label.toFixed(decimals));
+				} else {
+					// Format with umit
+					switch (unit) {
+						case "DoY":
+							label = doyFormatter(label - 1, locale, 'short');
+							break;
+						case "°C":
+							label = parseFloat((label - 273.15).toFixed(decimals));
+							break;
+						default:
+							label = parseFloat(label.toFixed(decimals));
+					}
+				}
+
+				return {
+					label: label,
+					color: color,
+					opacity: 1,
+				};
+			})
+			.reverse();
+		}
+	}
 
 	if (!legendEntries) {
 		throw new Error('Invalid input format');
@@ -137,7 +189,7 @@ export const normalizePostData = async (
 		.filter(Boolean);
 };
 
-export const doyFormatter = (value: number, language: string) => {
+export const doyFormatter = (value: number, language: string, monthFormat: "long" | "numeric" | "2-digit" | "short" | "narrow" | undefined = 'long') => {
 	// First day of the year (UTC)
 	const firstDayOfYear = Date.UTC(2019, 0, 1);
 
@@ -146,7 +198,7 @@ export const doyFormatter = (value: number, language: string) => {
 
 	// Format the date according to the given language
 	return date.toLocaleDateString(language, {
-		month: 'long',
+		month: monthFormat,
 		day: 'numeric',
 	});
 };

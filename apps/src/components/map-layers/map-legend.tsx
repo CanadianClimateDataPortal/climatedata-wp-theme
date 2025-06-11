@@ -14,6 +14,7 @@ import { TransformedLegendEntry, WMSLegendData } from '@/types/types';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useColorMap } from '@/hooks/use-color-map';
 import { ColourType } from '@/types/climate-variable-interface';
+import { useLocale } from '@/hooks/use-locale';
 
 const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -25,6 +26,11 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 	const { climateVariable } = useClimateVariable();
 	const { colorMap } = useColorMap();
 
+	const { locale } = useLocale();
+	const isDelta = climateVariable?.getDataValue() === 'delta';
+	const unit = climateVariable?.getUnitLegend();
+	const decimals = climateVariable?.getDecimalPlace() ?? 0;
+	const colourScheme = climateVariable?.getColourScheme() ?? 'default';
 	const isCategorical = climateVariable?.getCustomColourSchemes()?.default?.categorical ?? false;
 	const customColors = climateVariable?.getCustomColourSchemes()?.default?.colours;
 
@@ -43,53 +49,42 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 	// This is what updates the legend colors when selecting a new color scheme
 	useEffect(() => {
 		if (!rawLegendData || !colorMap) return;
-		(async () => {
-			if (customColors) {
-				const commonPrefix = getCommonPrefix(customColors.map(item => item.label))
 
-				// Using this to get a properly typed transformed legend data
-				const legendEntries = rawLegendData?.Legend?.flatMap(legend =>
-					legend.rules?.flatMap(rule =>
-						rule.symbolizers?.flatMap(symbolizer =>
-							symbolizer.Raster?.colormap?.entries ?? []
-						) ?? []
+		if (customColors) {
+			const commonPrefix = getCommonPrefix(customColors.map(item => item.label))
+
+			// Using this to get a properly typed transformed legend data
+			const legendEntries = rawLegendData?.Legend?.flatMap(legend =>
+				legend.rules?.flatMap(rule =>
+					rule.symbolizers?.flatMap(symbolizer =>
+						symbolizer.Raster?.colormap?.entries ?? []
 					) ?? []
-				) ?? [];
+				) ?? []
+			) ?? [];
 
-				setTransformedLegendData(
-					customColors.map((item, index) => ({
-						label: item.label.replace(commonPrefix, ''),
-						color: item.colour,
-						// use these from raw legend data because the custom colors config doesn't have them
-						opacity: Number(legendEntries[index]?.opacity ?? 1),
-						quantities: legendEntries[index]?.quantity !== undefined ? [legendEntries[index].quantity] : [],
-					})).reverse()
-				);
-				return
-			}
+			// Format legend data
+			setTransformedLegendData(
+				customColors.map((item, index) => ({
+					label: item.label.replace(commonPrefix, ''),
+					color: item.colour,
+					// use these from raw legend data because the custom colors config doesn't have them
+					opacity: Number(legendEntries[index]?.opacity ?? 1),
+					quantities: legendEntries[index]?.quantity !== undefined ? [legendEntries[index].quantity] : [],
+				})).reverse()
+			);
+			return;
+		}
 
+		(async () => {
 			const transformedData: TransformedLegendEntry[] =
-				await transformLegendData(rawLegendData, {
+				await transformLegendData(rawLegendData, colourScheme, isDelta, unit, locale, decimals, {
 					...colorMap,
 					schemeType: colorMap.schemeType as ColourType,
 				});
 
-			let processedData = transformedData.slice();
-
-			if (colorMap.isDivergent && colorMap.quantities) {
-				processedData = transformedData.map((entry, index) => ({
-					...entry,
-					label: colorMap.quantities?.[index]?.toFixed(climateVariable?.getUnitDecimalPlaces() ?? 0) ?? entry.label
-				}));
-			}
-
-			setTransformedLegendData(
-				processedData
-					.reverse() // reverse the data to put higher values at the top
-					.slice(isCategorical ? 0 : 1) // remove the first element for non categorical data
-			);
+			setTransformedLegendData(transformedData);
 		})();
-	}, [rawLegendData, colorMap, isCategorical, climateVariable]);
+	}, [rawLegendData, colourScheme, colorMap, isCategorical, climateVariable]);
 
 	useEffect(() => {
 		if (!transformedLegendData) {
@@ -103,7 +98,6 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 			?? ColourType.CONTINUOUS;
 
 		const hasCustomScheme = Boolean(customColors);
-		const unit = climateVariable?.getUnitLegend();
 		legend.onAdd = () => {
 			const container = L.DomUtil.create(
 				'div',

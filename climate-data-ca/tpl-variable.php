@@ -80,7 +80,13 @@ if (have_posts()) : while (have_posts()) : the_post();
 
     <main id="variable-content" data-variable="<?php the_field('var_name'); ?>">
 
-        <input type="hidden" id="varPostID" value="<?=$post_id?>"></input>
+        <input type="hidden" id="varPostID" value="<?=$post_id?>">
+        
+        <div id="warning-no-data" class="alert alert-warning text-center" style="display: none">
+            <div style="font-size: 1.4em;">
+                ⚠ <?php _e('This data is temporarily unavailable. The ClimateData.ca team is working to restore it as soon as possible.', 'cdc'); ?>
+            </div>
+        </div>
 
         <div id="map1"></div>
 

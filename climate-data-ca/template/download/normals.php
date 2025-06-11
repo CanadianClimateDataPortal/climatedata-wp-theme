@@ -1,3 +1,33 @@
+<div class="row">
+    <div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3">
+        <div class="alert alert-warning text-center mb-5">
+            <div style="font-size: 1.2em;">
+                ⚠ <?php _e('This data is temporarily unavailable. The ClimateData.ca team is working to restore it as soon as possible.', 'cdc'); ?>
+            </div>
+        </div>
+        <p>
+            <?php
+            printf (
+                __ ( 'Additional Climate Normals variables are available from the %sCanadian Centre for Climate Services%s and the %sGovernment of Canada Historical Climate Data%s websites.', 'cdc' ),
+                '<a href="https://climate-change.canada.ca/climate-data/#/climate-normals" target="_blank">',
+                '</a>',
+                '<a href="https://climate.weather.gc.ca/climate_normals/index_e.html" target="_blank">',
+                '</a>',
+            );
+
+            ?>
+        </p>
+    </div>
+</div>
+
+<?php
+
+/**
+ * Station data selection removed while waiting for the fix for api.weather.gc.ca
+ * 2025-06-11
+ */
+
+/*
 <form action="./" method="get" name="normals-download-form" id="normals-download-form">
   <input type="hidden" name="limit" id="normals-limit" value="150000">
   <input type="hidden" name="offset" id="offset" value="0">
@@ -79,3 +109,4 @@
         </div>
     </div>
 </form>
+*/ ?>

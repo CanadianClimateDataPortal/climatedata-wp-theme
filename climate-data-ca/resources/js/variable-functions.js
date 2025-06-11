@@ -824,6 +824,11 @@
         map1.getPane('stations').style.pointerEvents = 'all';
 
         function loadClimateNormals() {
+            /*
+             * This code disabled while waiting for the api.weather.gc.ca fix
+             * 2025-06-11
+             */
+            /*
             $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
                 station_layer = L.geoJson(data, {
                     pointToLayer: function (feature, latlng) {
@@ -849,6 +854,7 @@
                     station_layer.addTo(map1);
                 }
             });
+            */
         }
 
         //
@@ -1853,6 +1859,17 @@
 
             if (settings.action === 'on') {
                 $('body').addClass(settings.layer + '-on');
+
+                /**
+                 * While waiting for the api.weather.gc.ca fix, we show a warning
+                 * message only for the MSC Climate Normal variable
+                 */
+                if (settings.layer === 'stations' && settings.station === 'weather-stations') {
+                    show_missing_data_message();
+                } else {
+                    hide_missing_data_message();
+                }
+                
             } else {
                 $('body').removeClass(settings.layer + '-on');
             }
@@ -2133,7 +2150,19 @@
 
         }
 
+        /**
+         * Show the "missing data" warning alert
+         */
+        function show_missing_data_message() {
+            $('#warning-no-data').show();
+        }
 
+        /**
+         * Hide the "missing data" warning alert
+         */
+        function hide_missing_data_message() {
+            $('#warning-no-data').hide();
+        }
 
         //
         //

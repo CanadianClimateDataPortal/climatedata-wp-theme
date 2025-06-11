@@ -10,7 +10,7 @@ import appConfig from "@/config/app.config"
  * Versions dropdown component.
  */
 const VersionsDropdown: React.FC = () => {
-	const { climateVariable, setVersion, setScenarioCompare } = useClimateVariable();
+	const { climateVariable, setVersion, setScenarioCompare, setScenarioCompareTo } = useClimateVariable();
 
 	const options = appConfig.versions.filter((version) =>
 		climateVariable?.getVersions()?.includes(version.value)
@@ -27,6 +27,7 @@ const VersionsDropdown: React.FC = () => {
 
 		// Also reset compare scenarios checkbox
 		setScenarioCompare(false);
+		setScenarioCompareTo(null);
 	};
 
 	return (

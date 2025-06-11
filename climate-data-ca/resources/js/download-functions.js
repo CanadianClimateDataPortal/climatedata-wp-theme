@@ -1196,7 +1196,11 @@
         var selected_stations = {};
 
         function station_init() {
-
+            /**
+             * Temporarily disabled the station map while waiting for the fix for api.weather.gc.ca
+             * 2025-06-11
+             */
+            /*
             create_map('station');
             $('#station-process-data').removeAttr("style").hide();
 
@@ -1281,6 +1285,7 @@
                 return $item;
 
             }
+            */
 
         }
 
@@ -1537,7 +1542,12 @@
         var selected_normals_stations = {};
         
         function normals_init() {
-        
+
+            /**
+             * Temporarily disabled the normals map while waiting for the fix for api.weather.gc.ca
+             * 2025-06-11
+             */
+            /*
             create_map('normals');
             $('#normals-process-data').removeAttr("style").hide();
             
@@ -1637,7 +1647,7 @@
             }).done(function () {
                 
             });
-        
+            */
         }
         
         $("#normals-select").select2({

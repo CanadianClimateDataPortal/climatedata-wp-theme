@@ -28,7 +28,7 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 # Install SASS
 
-RUN wget -qO- https://github.com/sass/dart-sass/releases/download/1.72.0/dart-sass-1.72.0-linux-x64.tar.gz | tar xvz -C /opt
+RUN wget -qO- https://github.com/sass/dart-sass/releases/download/1.89.2/dart-sass-1.89.2-linux-arm64.tar.gz | tar xvz -C /opt
 RUN ln -s /opt/dart-sass/sass /usr/local/bin/sass
 
 # Install custom scripts

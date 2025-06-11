@@ -22,3 +22,6 @@ fw-child/node_modules/
 /docker-override.yaml
 /dockerfiles/mounts/*
 !/dockerfiles/mounts/README.md
+
+# New apps
+apps/

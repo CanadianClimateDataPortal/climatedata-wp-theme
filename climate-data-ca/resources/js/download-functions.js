@@ -1196,11 +1196,6 @@
         var selected_stations = {};
 
         function station_init() {
-            /**
-             * Temporarily disabled the station map while waiting for the fix for api.weather.gc.ca
-             * 2025-06-11
-             */
-            /*
             create_map('station');
             $('#station-process-data').removeAttr("style").hide();
 
@@ -1285,7 +1280,6 @@
                 return $item;
 
             }
-            */
 
         }
 
@@ -1448,12 +1442,6 @@
             } else {
                 $('#station-process').removeClass('disabled');
                 station_status = T('Ready to process.');
-
-                populate_station_URL();
-            }
-
-            if (selected_stations == undefined || Object.keys(selected_stations).length == 0) {
-                populate_station_URL(0); // update only #station-download-data
             }
 
             $('#station-download-status').text(station_status);
@@ -1513,14 +1501,48 @@
             }
             // selected_stations_file_extension get text from class="csvFormat" or class="geoFomrat"
             set_datalayer_for_download_station_data(selected_stations_to_str, selected_stations_file_extension);
+            
+            generate_stations_download();
         });
 
-        function populate_station_URL(ga4_event = 1) {
-            if (ga4_event == 1) {
-                var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + station_dl_obj.start + ' 00:00:00/' + station_dl_obj.end + ' 00:00:00&STN_ID=' + station_dl_obj['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + station_dl_obj.format + '&limit=' + station_dl_obj.limit + '&startindex=' + station_dl_obj.offset;
-                $('#station-process').attr('href', new_url);
+        function generate_stations_download() {
+            const $results = $('#station-results'),
+                $container = $results.find('.results-list-container'),
+                $list = $results.find('.results-list'),
+                $loading = $results.find('.message-loading'),
+                $error = $results.find('.message-error');
+            
+            const parameters = {
+                'datetime': station_dl_obj.start + ' 00:00:00/' + station_dl_obj.end + ' 00:00:00',
+                'STN_ID': station_dl_obj['s'],
+                'sortby': 'PROVINCE_CODE,STN_ID,LOCAL_DATE',
+                'f': station_dl_obj.format,
             }
-            selected_stations_to_str = get_selected_stations();
+
+            $container.hide();
+            $error.hide();
+            $loading.show();
+            $results.show();
+
+            $.getJSON( data_url + '/get-geomet-collection-items-links/climate-daily' , parameters)
+                .always(function() {
+                    $loading.hide();
+                })
+                .done(function(links) {
+                    $list.empty();
+                    const pattern = $list.attr('data-label-pattern');
+                    
+                    links.forEach(function(link) {
+                        let label = pattern.replace('{start}', link['start_index'] + 1);
+                        label = label.replace('{end}', link['end_index'] + 1);
+                        $list.append('<li><a href="' + link['url'] + '" target="_blank" rel="noopener noreferrer">' + label + '</a></li>');
+                    });
+                    
+                    $container.show();
+                })
+                .fail(function() {
+                    $error.show();
+                });
         }
         
         //

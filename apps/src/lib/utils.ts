@@ -227,8 +227,8 @@ export function prepareRaster(): void {
 	const mapObjects = document.getElementById('wrapper-map');
 	if (mapObjects) {
 		setTimeout(() => {
-			// Give it one second to make sure everything is loaded.
+			// Give it three seconds to make sure everything is loaded.
 			mapObjects.classList.add('to-raster');
-		}, 1000);
+		}, 3000);
 	}
 }

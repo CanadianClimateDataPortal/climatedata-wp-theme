@@ -1542,16 +1542,10 @@
         var selected_normals_stations = {};
         
         function normals_init() {
-
-            /**
-             * Temporarily disabled the normals map while waiting for the fix for api.weather.gc.ca
-             * 2025-06-11
-             */
-            /*
             create_map('normals');
             $('#normals-process-data').removeAttr("style").hide();
             
-            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
+            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&HAS_NORMALS_DATA=Y', function (data) {
                 var markers = L.markerClusterGroup();
                 
                 normals_layer = L.geoJson(data, {
@@ -1647,7 +1641,6 @@
             }).done(function () {
                 
             });
-            */
         }
         
         $("#normals-select").select2({
@@ -1847,7 +1840,7 @@
                 
                 let station_name = $('#normals-select [value="' + normals_dl_obj['s'] + '"]').text()
                 
-                var new_url = 'https://api.weather.gc.ca/collections/climate-normals/items?CLIMATE_IDENTIFIER=' + normals_dl_obj.s + '&sortby=MONTH&f=' + normals_dl_obj.format + '&limit=' + station_dl_obj.limit + '&startindex=' + normals_dl_obj.offset
+                var new_url = 'https://api.weather.gc.ca/collections/climate-normals/items?CLIMATE_IDENTIFIER=' + normals_dl_obj.s + '&sortby=MONTH&f=' + normals_dl_obj.format + '&limit=' + station_dl_obj.limit + '&offset=' + normals_dl_obj.offset
                 
                 $('#normals-process').attr('href', new_url);
                 

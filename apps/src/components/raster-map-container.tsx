@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { MAP_CONFIG } from '@/config/map.config';
 import 'leaflet.vectorgrid';
@@ -24,14 +24,15 @@ import { cn, getDefaultFrequency, remToPx } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
 import appConfig from "@/config/app.config";
 import {
-	DEFAULT_MIN_ZOOM,
-	DEFAULT_MAX_ZOOM,
-	GEOSERVER_BASE_URL,
 	CANADA_BOUNDS,
+	DEFAULT_MAX_ZOOM,
+	DEFAULT_MIN_ZOOM,
+	GEOSERVER_BASE_URL,
 	SIDEBAR_WIDTH,
 } from '@/lib/constants';
 import { LocationModalContent } from '@/components/map-layers/location-modal-content';
 import { SelectedLocationInfo } from '@/types/types';
+import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
@@ -126,8 +127,21 @@ export default function RasterMapContainer({
 
 	const mapRef = useRef<L.Map | null>(null);
 
-	useEffect(() => {
+	const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
+
+	const canShowModal = useMemo(() => {
 		if (selectedLocation) {
+			const { featureId } = selectedLocation;
+
+			// To properly show the modal for non-grid interactive region, the feature ID must be present.
+			return !(interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA && !featureId);
+		}
+
+		return false;
+	}, [selectedLocation, interactiveRegion])
+
+	useEffect(() => {
+		if (selectedLocation && canShowModal) {
 			const { title, latlng, featureId } = selectedLocation;
 
 			setLocationModalContent(
@@ -143,7 +157,7 @@ export default function RasterMapContainer({
 		else {
 			setLocationModalContent(null);
 		}
-	}, [selectedLocation, setLocationModalContent]);
+	}, [selectedLocation, setLocationModalContent, scenario, canShowModal]);
 
 	useEffect(() => {
 		if (mapRef.current) {
@@ -184,10 +198,10 @@ export default function RasterMapContainer({
 			<ZoomControl />
 
 			{/* Show search control if not a comparison map. */}
-			{ !isComparisonMap && <SearchControl /> }
+			{ !isComparisonMap && <SearchControl layerRef={layerRef} /> }
 
 			<LocationModal
-				isOpen={!!(selectedLocation)}
+				isOpen={canShowModal}
 				onClose={handleLocationModalClose}
 			>
 				{locationModalContent}

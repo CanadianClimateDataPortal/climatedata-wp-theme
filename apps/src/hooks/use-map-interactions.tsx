@@ -65,38 +65,36 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
     hoveredRef.current = null;
   }, [primaryLayerRef, comparisonLayerRef]); // No dependencies since we're only using refs via .current
 
-  const handleClick = useCallback(async (e: { latlng: L.LatLng; layer: { properties: any } }) => {
-    const featureId = getFeatureId(e.layer.properties);
-    if (!featureId) {
-      return;
-    }
+  const handleClick = useCallback(async ({ latlng, layer }: { latlng: L.LatLng; layer: { properties: any } }) => {
+    const featureId = layer && getFeatureId(layer.properties);
 
     const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 
-    const locationByCoords = await fetchLocationByCoords(e.latlng);
+    const locationByCoords = await fetchLocationByCoords(latlng);
     const locationId = locationByCoords?.geo_id ?? `${locationByCoords?.lat}|${locationByCoords?.lng}`;
-    let locationTitle = '';
+    let locationTitle = locationByCoords.title;
 
-    if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
-      locationTitle = locationByCoords.title;
-    } else {
-      if (locale === 'en') {
-        locationTitle = e.layer.properties.label_en ?? '';
-      } else if (locale === 'fr') {
-        locationTitle = e.layer.properties.label_fr ?? '';
-      }
+		// For non-gridded data, try to get the title from the layer properties, if available.
+    if (interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA) {
+			if (layer) {
+				if (locale === 'en') {
+					locationTitle = layer.properties.label_en ?? '';
+				} else if (locale === 'fr') {
+					locationTitle = layer.properties.label_fr ?? '';
+				}
+			}
     }
 
     clearMarkers();
-    addMarker(e.latlng, locationTitle);
+    addMarker(latlng, locationTitle);
 
     dispatch(addRecentLocation({
       id: locationId,
       title: locationTitle,
-      ...e.latlng,
+      ...latlng,
     }));
 
-    setSelectedLocation({ featureId, title: locationTitle, latlng: e.latlng });
+    setSelectedLocation({ featureId: featureId ?? 0, title: locationTitle, latlng });
   }, [clearMarkers, addMarker, dispatch, climateVariable, locale]);
 
   const handleClearSelectedLocation = useCallback(() => {

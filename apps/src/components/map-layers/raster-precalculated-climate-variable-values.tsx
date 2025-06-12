@@ -84,9 +84,19 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			// Fetching median and range
 
 			// Endpoint
-			let medianRangeEndpoint = `get-delta-30y-regional-values/${interactiveRegion}/${featureId}`;
+			let medianRangeEndpoint: string = '';
 			if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
 				medianRangeEndpoint = `get-delta-30y-gridded-values/${lat}/${lng}`;
+			} else {
+				if (featureId) {
+					medianRangeEndpoint = `get-delta-30y-regional-values/${interactiveRegion}/${featureId}`;
+				}
+			}
+
+			// We don't have a valid endpoint. Exit early.
+			if (!medianRangeEndpoint) {
+				setNoDataAvailable(true);
+				return;
 			}
 
 			// Params
@@ -156,7 +166,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		};
 
 		fetchData();
-	}, [climateVariable, decimals, dateRange, featureId, latlng, section]);
+	}, [climateVariable, decimals, dateRange, featureId, latlng, section, scenario]);
 
 	// Value formatter (for delta, for units)
 	const valueFormatter = (value: number, delta: boolean = (climateVariable?.getDataValue() === 'delta')) => {

@@ -14,7 +14,7 @@ import { SidebarPanel } from '@/components/ui/sidebar';
 // other
 import { useAppSelector } from '@/app/hooks';
 import { MapLocation } from '@/types/types';
-import { MAP_MARKER_CONFIG, SEARCH_DEFAULT_ZOOM } from '@/lib/constants';
+import { SEARCH_DEFAULT_ZOOM } from '@/lib/constants';
 import { useMap } from '@/hooks/use-map';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
@@ -62,22 +62,24 @@ const RecentLocationsPanel: React.FC = () => {
 
 	const moveToLocation = (location: MapLocation) => {
 		map.setView(location, SEARCH_DEFAULT_ZOOM);
+		let vectorLayer: any;
 
-		// clear all existing markers from the map
+		// Find our vector layer.
 		map.eachLayer(layer => {
-			if (layer instanceof L.Marker) {
-				map.removeLayer(layer);
+			// @ts-expect-error: suppress leaflet typescript error
+			if (layer instanceof L.VectorGrid) {
+				vectorLayer = layer;
 			}
 		});
 
-		// then add the new marker to the map
-		L.marker(location, MAP_MARKER_CONFIG)
-		.bindTooltip(location.title, {
-			direction: 'top',
-			offset: [0, -30],
-		})
-		.addTo(map);
-
+		if (vectorLayer) {
+			vectorLayer.fire('click', {
+				latlng: {
+					lat: location.lat,
+					lng: location.lng
+				}
+			})
+		}
 	};
 
 	return (

@@ -1,6 +1,6 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, WMSTileLayer, useMap } from 'react-leaflet';
-import { MAP_CONFIG, LAYER_KEYS } from '@/config/map.config';
+import { useContext, useMemo, useState } from 'react';
+import { MapContainer, TileLayer, WMSTileLayer } from 'react-leaflet';
+import { MAP_CONFIG, LAYER_KEYS, WMS_PARAMS } from '@/config/map.config';
 
 import MapLegend from '@/components/map-layers/map-legend';
 import VariableLayer from '@/components/map-layers/variable-layer';
@@ -22,22 +22,6 @@ import {
 import { cn } from '@/lib/utils';
 import SectionContext from '@/context/section-provider';
 import appConfig from '@/config/app.config';
-
-/**
- * Applies CSS filters to make green landmass appear white
- */
-function LandmassStyler(): null {
-	const map = useMap();
-
-	useEffect(() => {
-		const pane = map.getPane('marineBasemap');
-		if (pane) {
-			pane.style.filter = MAP_CONFIG.landmassFilter;
-		}
-	}, [map]);
-
-	return null;
-}
 
 /**
  * Renders a Leaflet map for marine variables with a specialized approach:
@@ -111,7 +95,6 @@ export default function MarineMapContainer({
 
 			{/* Use the unified custom panes with 'marine' mode */}
 			<CustomPanesLayer mode="marine" />
-			<LandmassStyler />
 
 			{/* Use the unified variable layer */}
 			<VariableLayer layerValue={layerValue} scenario={scenario} />
@@ -149,6 +132,7 @@ export default function MarineMapContainer({
 			<WMSTileLayer
 				url={`${GEOSERVER_BASE_URL}/geoserver/wms`}
 				layers={LAYER_KEYS.landmass}
+				params={WMS_PARAMS.landmass}
 				format="image/png"
 				transparent={true}
 				version="1.1.1"

@@ -45,7 +45,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	// useEffect to retrieve location values for the current climate variable
 	useEffect(() => {
 		const variableId = climateVariable?.getId() ?? '';
-		
+
 		// Skip data fetching for SPEI variables - these variables don't have data available in the API
 		if (variableId === 'spei_12' || variableId === 'spei_3') {
 			// We don't show "No data available" for these variables
@@ -264,7 +264,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				<>
 					<div className={mode === "modal" ? "mb-3 flex" : "flex flex-col xl:flex-row xl:gap-6"}>
 						{ median !== null && generateMedianDiv(median) }
-						{ relativeToBaseline !== null && generateRelativeToBaselineDiv(relativeToBaseline) }
+						{ climateVariable?.getDataValue() !== 'delta' && relativeToBaseline !== null && generateRelativeToBaselineDiv(relativeToBaseline) }
 					</div>
 					<div>
 						{ range !== null && generateRangeDiv(range[0], range[1]) }

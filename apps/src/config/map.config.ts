@@ -1,7 +1,7 @@
 import L from 'leaflet';
 import type { LatLngExpression, LatLngBounds } from 'leaflet';
 
-type WmsParam = { SLD_BODY: string };
+type WmsParam = { SLD_BODY: string, layers: string };
 
 // Common map configuration
 export const MAP_CONFIG = {
@@ -97,5 +97,5 @@ export const SLD_STYLES = {
 };
 
 export const WMS_PARAMS: { landmass: WmsParam } = {
-	landmass: { SLD_BODY: SLD_STYLES.landmass }
+	landmass: { SLD_BODY: SLD_STYLES.landmass, layers: '' }
 };

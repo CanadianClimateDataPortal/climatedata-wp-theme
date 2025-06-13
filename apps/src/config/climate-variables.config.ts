@@ -1463,6 +1463,17 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"tas",
 		],
+		temporalThresholdConfig: {
+			thresholds: {
+				hddheat_18: {
+					ys: {
+						absolute: { low: 3000.0, high: 20000.0 },
+						delta: { low: -4000.0, high: 700.0 },
+						unit: 'degree_days',
+					},
+				},
+			},
+		},
 	},
 	/** Maximum Consecutive Dry Days */
 	{

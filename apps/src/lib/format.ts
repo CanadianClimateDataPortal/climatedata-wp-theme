@@ -8,17 +8,18 @@ import {
 	TermItem,
 	Locale,
 } from '@/types/types';
-import { ColorMap } from '@/types/climate-variable-interface';
+import { TemporalRange } from '@/types/climate-variable-interface';
 import React from 'react';
 
 export async function transformLegendData(
 	input: WMSLegendData,
 	colourScheme: string,
+	temporalRange: TemporalRange | null,
 	isDelta: boolean,
 	unit: string | undefined,
 	locale: Locale,
 	decimals: number,
-	colorMap: ColorMap,
+	colorMap: { colours: string[]; quantities: number[]; schemeType: string; isDivergent: boolean; },
 ): Promise<TransformedLegendEntry[]> {
 	let legendEntries = undefined;
 
@@ -32,48 +33,58 @@ export async function transformLegendData(
 		}))
 		.reverse(); // reverse the data to put higher values at the top
 
-	if(colourScheme === 'default') {
+	if(colourScheme === 'default' || !temporalRange) {
 		// If default scheme we keep raw legend entries
 		legendEntries = rawLegendEntries?.slice();
 	} else {
 		// Format legend entries from color map colours entries
 
-		const values = isDelta
-			? rawLegendEntries?.map(entry => typeof entry.label === 'number' ? entry.label : parseFloat(entry.label))
-			: rawLegendEntries?.map(entry => typeof entry.quantity === 'number' ? entry.quantity : parseFloat(entry.quantity));
-		const min = Math.min(...(values ?? []));
-		const max = Math.max(...(values ?? []));
-		const length = values?.length;
+		let low = temporalRange.low;
+		let high = temporalRange.high;
+		const schemeLength = colorMap.colours.length;
 
-		// Set label between min and max regarding its position
-		if(min !== undefined && max !== undefined && length !== undefined) {
-			legendEntries = colorMap.colours.map((color, i) => {
-				let label: string | number = min + ((max - min) * i) / (colorMap.colours.length - 1);
+		// if we have a diverging ramp, we center the legend at zero
+		if (colorMap.isDivergent) {
+			high = Math.max(Math.abs(low), Math.abs(high));
+			low = high * -1;
 
-				if(isDelta) {
-					label = parseFloat(label.toFixed(decimals));
-				} else {
-					// Format with umit
-					switch (unit) {
-						case "DoY":
-							label = doyFormatter(label - 1, locale, 'short');
-							break;
-						case "°C":
-							label = parseFloat((label - 273.15).toFixed(decimals));
-							break;
-						default:
-							label = parseFloat(label.toFixed(decimals));
-					}
-				}
-
-				return {
-					label: label,
-					color: color,
-					opacity: 1,
-				};
-			})
-			.reverse();
+			if ((high - low) * 10**decimals < schemeLength) {
+				// workaround to avoid legend with repeated values for very low range variables
+				low = -(schemeLength / 10**decimals / 2.0);
+				high = schemeLength / 10**decimals / 2.0;
+			}
+		} else {
+			if ((high - low) * 10**decimals < schemeLength) {
+				// workaround to avoid legend with repeated values for very low range variables
+				high = low + schemeLength / 10**decimals;
+			}
 		}
+
+		const step = (high - low) / schemeLength;
+
+		legendEntries = colorMap.colours.map((color, i) => {
+			let value: string | number = low + i * step;
+
+			if(isDelta) {
+				value = parseFloat(value.toFixed(decimals));
+			} else {
+				// Format with umit
+				switch (unit) {
+					case "DoY":
+						value = doyFormatter(value - 1, locale, 'short');
+						break;
+					default:
+						value = parseFloat(value.toFixed(decimals));
+				}
+			}
+
+			return {
+				label: value,
+				color: color,
+				opacity: 1,
+			};
+		})
+		.reverse();
 	}
 
 	if (!legendEntries) {

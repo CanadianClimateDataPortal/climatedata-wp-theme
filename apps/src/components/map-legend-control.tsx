@@ -19,10 +19,11 @@ const MapLegendControl: React.FC<{
 	isOpen: boolean;
 	toggleOpen: () => void;
 	isCategorical?: boolean;
+	isDelta: boolean;
 	hasCustomScheme?: boolean;
 	unit?: string;
 	colourType?: string;
-}> = ({ data, isOpen, toggleOpen, isCategorical, hasCustomScheme, unit, colourType }) => {
+}> = ({ data, isOpen, toggleOpen, isCategorical, isDelta, hasCustomScheme, unit, colourType }) => {
 	const [svgWidth, setSvgWidth] = useState(0);
 	const [legendHeight, setLegendHeight] = useState<number | undefined>(undefined);
 	const svgRef = useRef<SVGSVGElement>(null);
@@ -151,7 +152,10 @@ const MapLegendControl: React.FC<{
 							if (isNaN(Number(parsedLabel))) {
 								parsedLabel = entry.label;
 							}
-							parsedLabel = String(parsedLabel);
+
+							// Add '+' for delta values
+							const prefix = isDelta && Number(parsedLabel) > 0 ? '+' : '';
+							parsedLabel = prefix + String(parsedLabel);
 
 							// Skip if the current parsedLabel is the same as the previous one
 							if (index > 0) {

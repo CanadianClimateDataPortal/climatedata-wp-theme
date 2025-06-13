@@ -421,6 +421,8 @@ export interface ClimateVariableInterface {
 
 	getTemporalThresholdConfig(): TemporalThresholdConfig | null;
 
+	getCurrentTemporalRange(): TemporalRange | null;
+
 	getAnalysisFields(): FieldConfig[];
 
 	getAnalysisFieldValues(): FieldValues;

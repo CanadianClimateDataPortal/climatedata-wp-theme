@@ -33,6 +33,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 	const colourScheme = climateVariable?.getColourScheme() ?? 'default';
 	const isCategorical = climateVariable?.getCustomColourSchemes()?.default?.categorical ?? false;
 	const customColors = climateVariable?.getCustomColourSchemes()?.default?.colours;
+	const temporalRange = climateVariable?.getCurrentTemporalRange() ?? null;
 
 	// Fetch legend data from the API
 	useEffect(() => {
@@ -77,10 +78,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 
 		(async () => {
 			const transformedData: TransformedLegendEntry[] =
-				await transformLegendData(rawLegendData, colourScheme, isDelta, unit, locale, decimals, {
-					...colorMap,
-					schemeType: colorMap.schemeType as ColourType,
-				});
+				await transformLegendData(rawLegendData, colourScheme, temporalRange, isDelta, unit, locale, decimals, colorMap);
 
 			setTransformedLegendData(transformedData);
 		})();
@@ -111,6 +109,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 					isOpen={isOpen}
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 					isCategorical={isCategorical}
+					isDelta={isDelta}
 					hasCustomScheme={hasCustomScheme}
 					colourType={colourType}
 					unit={unit}

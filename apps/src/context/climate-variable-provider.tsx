@@ -192,6 +192,8 @@ export const ClimateVariableProvider: React.FC<{
 			dispatch(
 				updateClimateVariable({
 					scenarioCompare,
+					// If the compare checkbox is unchecked, also reset the compareTo scenario
+					...(scenarioCompare ? {} : { scenarioCompareTo: null }),
 				})
 			);
 		},

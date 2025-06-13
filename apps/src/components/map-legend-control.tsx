@@ -45,26 +45,20 @@ const MapLegendControl: React.FC<{
 	let previousLabel = '';
 
 	// If first or last color should be bigger
-	const [maxItemExtra, setMaxItemExtra] = useState<number>(isCategorical ? 0 : 1);
-	// const [minItemExtra, setMinItemExtra] = useState<number>((!isDefaultColourScheme && isDelta) ? 1 : 0);
 	const [itemHeight, setItemHeight] = useState<number>(0);
 	const [maxItemHeight, setMaxItemHeight] = useState<number>(0);
 	const [minItemHeight, setMinItemHeight] = useState<number>(0);
 
 	useEffect(() => {
-		const currentMaxItemExtra = isCategorical ? 0 : 1;
-		const currentMinItemExtra = !isDefaultColourScheme && isDelta ? 1 : 0;
+		const currentMaxItemExtra = isCategorical || !isDefaultColourScheme || (isDefaultColourScheme && isDelta) ? 0 : 1;
+		const currentMinItemExtra = !isDefaultColourScheme ? 1 : 0;
 		const currentItemHeight = GRADIENT_HEIGHT / (totalLabels + currentMaxItemExtra + currentMinItemExtra);
 		const currentMaxItemHeight = currentItemHeight * (1 + currentMaxItemExtra);
 		const currentMinItemHeight = currentItemHeight * (1 + currentMinItemExtra);
 
-		setMaxItemExtra(currentMaxItemExtra);
-		// setMinItemExtra(currentMinItemExtra);
 		setItemHeight(currentItemHeight);
 		setMaxItemHeight(currentMaxItemHeight);
 		setMinItemHeight(currentMinItemHeight);
-
-		console.log(currentMaxItemExtra, currentMinItemExtra, GRADIENT_HEIGHT, (19 * currentItemHeight + currentMaxItemExtra + currentMinItemExtra));
 	}, [isCategorical, isDefaultColourScheme, isDelta, GRADIENT_HEIGHT, totalLabels]);
 
 	useEffect(() => {
@@ -119,6 +113,11 @@ const MapLegendControl: React.FC<{
 										height = minItemHeight;
 									}
 
+									let paddingTop = PADDING_TOP;
+									if(index > 0) {
+										paddingTop += maxItemHeight + (index - 1) * itemHeight;
+									}
+
 									return (
 										<rect
 											key={index}
@@ -127,7 +126,7 @@ const MapLegendControl: React.FC<{
 											fill={entry.color}
 											opacity={entry.opacity}
 											x={gradientX}
-											y={PADDING_TOP + index * itemHeight}
+											y={paddingTop}
 										/>
 									);
 								})}
@@ -160,7 +159,7 @@ const MapLegendControl: React.FC<{
 						)}
 
 						{data.map((entry, index) => {
-							let indexCoefficient = isDelta ? 1 : maxItemExtra;
+							let indexCoefficient = 1;
 							// For categorical data, center the label in the block
 							if(isCategorical) {
 								indexCoefficient = 0.5
@@ -182,11 +181,11 @@ const MapLegendControl: React.FC<{
 							parsedLabel = prefix + String(parsedLabel);
 
 							// Skip if the current parsedLabel is the same as the previous one
-							// if (index > 0) {
-							// 	if (parsedLabel === previousLabel) {
-							// 		return null;
-							// 	}
-							// }
+							if (index > 0) {
+								if (parsedLabel === previousLabel) {
+									return null;
+								}
+							}
 							previousLabel = parsedLabel;
 
 							return (

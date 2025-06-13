@@ -104,7 +104,7 @@ const MapLegendControl: React.FC<{
 			</button>
 
 			{isOpen && (
-				<div className="flex flex-col items-end gap-1 rounded-md py-2 px-1 overflow-y-auto">
+				<div className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto">
 					<div className="font-sans text-zinc-900 font-semibold text-lg leading-5 capitalize text-right">
 						{unit}
 					</div>

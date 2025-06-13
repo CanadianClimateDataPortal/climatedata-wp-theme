@@ -75,9 +75,10 @@ const AnimatedPanel: React.FC<AnimatedPanelProps> = ({
 							left: direction === 'left' ? 0 : undefined, // default to all the way to the left
 							right: direction === 'right' ? 0 : undefined, // default to all the way to the right
 							...position, // may override left/right defaults if provided
+							height: position?.top ? `calc(100% - ${position.top}px)` : undefined, // position from the top if specified
 						}}
 						className={cn(
-							'absolute bg-white shadow-sm z-40',
+							'absolute bg-white shadow-sm z-40 overflow-y-auto',
 							className
 						)}
 					>

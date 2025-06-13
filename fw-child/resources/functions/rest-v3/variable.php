@@ -60,8 +60,8 @@ function cdc_rest_v3_get_variable( $request ) {
 
 		// Variable tagline (card descriptions)
 		$tagline = cdc_rest_v3_build_multilingual_field(
-			get_field( 'card_description', $post_id ),
-			get_field( 'card_description_fr', $post_id )
+			cdc_get_sanitized_field( 'card_description', $post_id ),
+			cdc_get_sanitized_field( 'card_description_fr', $post_id )
 		);
 
 		if ( ! empty( $tagline ) ) {
@@ -70,8 +70,8 @@ function cdc_rest_v3_get_variable( $request ) {
 
 		// Variable full descriptions.
 		$full_descriptions = cdc_rest_v3_build_multilingual_field(
-			get_field( 'var_description', $post_id ),
-			get_field( 'var_description_fr', $post_id )
+			cdc_get_sanitized_field( 'var_description', $post_id ),
+			cdc_get_sanitized_field( 'var_description_fr', $post_id )
 		);
 
 		if ( ! empty( $full_descriptions ) ) {
@@ -80,8 +80,8 @@ function cdc_rest_v3_get_variable( $request ) {
 
 		// Variable technical descriptions.
 		$tech_descriptions = cdc_rest_v3_build_multilingual_field(
-			get_field( 'var_tech_description', $post_id ),
-			get_field( 'var_tech_description_fr', $post_id )
+			cdc_get_sanitized_field( 'var_tech_description', $post_id ),
+			cdc_get_sanitized_field( 'var_tech_description_fr', $post_id )
 		);
 
 		if ( ! empty( $tech_descriptions ) ) {
@@ -237,4 +237,44 @@ function cdc_rest_v3_get_featured_image( $post_id ) {
 		'large'     => get_the_post_thumbnail_url( $post_id, 'large' ),
 		'full'      => get_the_post_thumbnail_url( $post_id, 'full' ),
 	);
+}
+
+/**
+ * Return a sanitized version of a text field.
+ *
+ * The sanitization process removes specific shortcodes and optionally passes it
+ * through the formatting filter.
+ *
+ * @param string $selector The ACF field selector.
+ * @param int|false $post_id The post ID to retrieve the field from, or false for current post.
+ * @param bool $format_value Whether to format the value for display.
+ * @param bool $escape_html Whether to escape HTML in the content.
+ *
+ * @return string The sanitized text field content.
+ */
+function cdc_get_sanitized_field(
+	$selector,
+	$post_id = false,
+	$format_value = true,
+	$escape_html = false,
+) {
+	$content = get_field( $selector, $post_id, false, $escape_html );
+
+	if ( ! is_string( $content ) ) {
+		return $content;
+	}
+
+	$shortcodes_to_ignore = [
+		'expand',
+	];
+
+	foreach ( $shortcodes_to_ignore as $shortcode ) {
+		$content = preg_replace( '/\[' . $shortcode . '.+?](.+?)\[\/' . $shortcode . ']/s', '$1', $content );
+	}
+
+	if ( $format_value ) {
+		$content = apply_filters( 'the_content', $content, $post_id );
+	}
+
+	return $content;
 }

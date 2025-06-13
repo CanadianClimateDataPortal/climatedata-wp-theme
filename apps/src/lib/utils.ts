@@ -220,14 +220,17 @@ export function prepareRaster(): void {
 	// Remove all tooltip elements
 	document.querySelectorAll('.tooltip').forEach(el => el.remove());
 
+	// Resize the window to force a layout update.
+	window.dispatchEvent(new Event('resize'));
+
 	// Add 'to-raster' class to the map container to adjust its appearance for raster output
 	const mapObjects = document.getElementById('wrapper-map');
 	if (mapObjects) {
-		mapObjects.classList.add('to-raster');
+		setTimeout(() => {
+			// Give it three seconds to make sure everything is loaded.
+			mapObjects.classList.add('to-raster');
+		}, 3000);
 	}
-
-	// Resize the window to force a layout update.
-	window.dispatchEvent(new Event('resize'));
 }
 
 /**

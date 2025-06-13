@@ -1,6 +1,8 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, WMSTileLayer, useMap } from 'react-leaflet';
-import { MAP_CONFIG, LAYER_KEYS } from '@/config/map.config';
+import React, { useContext, useMemo, useState, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, WMSTileLayer } from 'react-leaflet';
+import { MAP_CONFIG, LAYER_KEYS, WMS_PARAMS } from '@/config/map.config';
+import 'leaflet.vectorgrid';
+import L from 'leaflet';
 
 import MapLegend from '@/components/map-layers/map-legend';
 import VariableLayer from '@/components/map-layers/variable-layer';
@@ -10,34 +12,25 @@ import MapEvents from '@/components/map-layers/map-events';
 import SearchControl from '@/components/map-layers/search-control';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
 import LocationModal from '@/components/map-layers/location-modal';
+import LocationInfoPanel from '@/components/map-info/location-info-panel';
 
 import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { useAnimatedPanel } from '@/hooks/use-animated-panel';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { generateChartData } from '@/services/services';
+import { cn, getDefaultFrequency, remToPx } from "@/lib/utils";
+import SectionContext from "@/context/section-provider";
+import appConfig from "@/config/app.config";
 import {
 	DEFAULT_MIN_ZOOM,
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
 	CANADA_BOUNDS,
+	SIDEBAR_WIDTH,
 } from '@/lib/constants';
-import { cn } from '@/lib/utils';
-import SectionContext from '@/context/section-provider';
-import appConfig from '@/config/app.config';
-
-/**
- * Applies CSS filters to make green landmass appear white
- */
-function LandmassStyler(): null {
-	const map = useMap();
-
-	useEffect(() => {
-		const pane = map.getPane('marineBasemap');
-		if (pane) {
-			pane.style.filter = MAP_CONFIG.landmassFilter;
-		}
-	}, [map]);
-
-	return null;
-}
+import { LocationModalContent } from '@/components/map-layers/location-modal-content';
+import { SelectedLocationInfo } from '@/types/types';
 
 /**
  * Renders a Leaflet map for marine variables with a specialized approach:
@@ -51,14 +44,25 @@ export default function MarineMapContainer({
 	scenario,
 	onMapReady,
 	onUnmount,
-	isComparisonMap,
+	isComparisonMap = false,
+	onOver,
+	onOut,
+	onClick,
+	selectedLocation,
+	clearSelectedLocation,
+	layerRef,
 }: {
 	scenario: string;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 	isComparisonMap?: boolean;
+	onOver: (e: { latlng: L.LatLng; layer: { properties: any } }, getFeatureColor: (featureId: number) => string) => void;
+	onOut: () => void;
+	onClick: (e: { latlng: L.LatLng; layer: { properties: any } }) => void;
+	selectedLocation: SelectedLocationInfo | null;
+	clearSelectedLocation: () => void;
+	layerRef?: React.MutableRefObject<any>;
 }) {
-	const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
 
 
@@ -68,6 +72,8 @@ export default function MarineMapContainer({
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
+	const { togglePanel } = useAnimatedPanel();
+	const isMobile = useIsMobile();
 
 	const section = useContext(SectionContext);
 
@@ -77,19 +83,85 @@ export default function MarineMapContainer({
 		return climateVariable?.getLayerValue(scenario, section) ?? '';
 	}, [climateVariable, scenario, section]);
 
-
-	const handleLocationModalOpen = (content: React.ReactNode) => {
-		setLocationModalContent(content);
-		setIsLocationModalOpen(true);
-	};
+	// const handleLocationModalOpen = (content: React.ReactNode) => {
+	// 	setLocationModalContent(content);
+	// };
 
 	const handleLocationModalClose = () => {
-		setIsLocationModalOpen(false);
+		clearSelectedLocation();
 		setLocationModalContent(null);
 	};
 
+	// Handle click on details button of a location (to open the chart panel)
+	const handleDetailsClick = async () => {
+		if (selectedLocation) {
+			const { title, latlng, featureId } = selectedLocation;
+			const frequencyConfig = climateVariable?.getFrequencyConfig();
+			let frequency = climateVariable?.getFrequency() ?? ''
+			if (!frequency && frequencyConfig) {
+				frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
+			}
+
+			const chartData = await generateChartData({
+				latlng,
+				variable: climateVariable?.getThreshold() ?? '',
+				frequency: frequency,
+				dataset: climateVariable?.getVersion() ?? '',
+			});
+
+			togglePanel(
+				<LocationInfoPanel
+					title={title}
+					latlng={latlng}
+					featureId={featureId}
+					data={chartData}
+				/>,
+				{
+					position: {
+						left: isMobile ? 0 : remToPx(SIDEBAR_WIDTH),
+						right: 0,
+						bottom: 0,
+					},
+					direction: 'bottom',
+					className: 'location-info-panel-wrapper',
+				}
+			);
+		}
+	}
+
+	const mapRef = useRef<L.Map | null>(null);
+
+	useEffect(() => {
+		if (selectedLocation) {
+			const { title, latlng, featureId } = selectedLocation;
+
+			setLocationModalContent(
+				<LocationModalContent
+					title={title}
+					latlng={latlng}
+					scenario={scenario}
+					featureId={featureId}
+					onDetailsClick={handleDetailsClick}
+				/>
+			)
+		}
+		else {
+			setLocationModalContent(null);
+		}
+	}, [selectedLocation, setLocationModalContent]);
+
+	useEffect(() => {
+		if (mapRef.current) {
+			onMapReady(mapRef.current);
+		}
+		return () => {
+			if (onUnmount) onUnmount();
+		};
+	}, [onMapReady, onUnmount]);
+
 	return (
 		<MapContainer
+			ref={mapRef}
 			attributionControl={false}
 			center={[mapCoordinates.lat, mapCoordinates.lng]}
 			zoomControl={false}
@@ -97,13 +169,12 @@ export default function MarineMapContainer({
 			minZoom={DEFAULT_MIN_ZOOM}
 			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}
-			className="z-10"
+			className="z-10 h-full w-full"
 			bounds={CANADA_BOUNDS}
 		>
 			<MapEvents
 				onMapReady={onMapReady}
 				onUnmount={onUnmount}
-				onLocationModalClose={handleLocationModalClose}
 			/>
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
@@ -111,7 +182,6 @@ export default function MarineMapContainer({
 
 			{/* Use the unified custom panes with 'marine' mode */}
 			<CustomPanesLayer mode="marine" />
-			<LandmassStyler />
 
 			{/* Use the unified variable layer */}
 			<VariableLayer layerValue={layerValue} scenario={scenario} />
@@ -122,7 +192,7 @@ export default function MarineMapContainer({
 			{ !isComparisonMap && <SearchControl /> }
 
 			<LocationModal
-				isOpen={isLocationModalOpen}
+				isOpen={!!(selectedLocation)}
 				onClose={handleLocationModalClose}
 			>
 				{locationModalContent}
@@ -131,8 +201,10 @@ export default function MarineMapContainer({
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<InteractiveRegionsLayer
 					scenario={scenario}
-					onLocationModalOpen={handleLocationModalOpen}
-					onLocationModalClose={handleLocationModalClose}
+					onOver={onOver}
+					onOut={onOut}
+					onClick={onClick}
+					layerRef={layerRef}
 				/>
 			)}
 
@@ -149,6 +221,7 @@ export default function MarineMapContainer({
 			<WMSTileLayer
 				url={`${GEOSERVER_BASE_URL}/geoserver/wms`}
 				layers={LAYER_KEYS.landmass}
+				params={WMS_PARAMS.landmass}
 				format="image/png"
 				transparent={true}
 				version="1.1.1"

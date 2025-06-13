@@ -173,6 +173,13 @@ export interface DownloadFile {
 	url: string;
 }
 
+export interface LocationModalContentParams {
+	latlng: L.LatLng,
+	featureId: number,
+	scenario?: string,
+	mode?: "modal" | "panel"
+}
+
 export interface ClimateVariableConfigInterface {
 	/** Unique identifier for the climate variable */
 	id: string;
@@ -493,5 +500,5 @@ export interface ClimateVariableInterface {
 
 	toObject(): ClimateVariableConfigInterface;
 
-	getLocationModalContent(latlng: L.LatLng, featureId: number, mode?: string): React.ReactNode | null;
+	getLocationModalContent({latlng, featureId, mode}: LocationModalContentParams): React.ReactNode | null;
 }

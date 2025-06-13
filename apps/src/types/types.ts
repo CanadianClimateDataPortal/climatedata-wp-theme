@@ -802,3 +802,9 @@ export interface VariableLayerProps {
 	scenario: string | null | undefined;
 	layerValue: string;
 }
+
+export interface SelectedLocationInfo {
+	featureId: number;
+	title: string;
+	latlng: L.LatLng;
+};

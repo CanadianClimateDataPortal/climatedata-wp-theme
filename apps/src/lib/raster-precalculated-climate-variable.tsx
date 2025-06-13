@@ -9,6 +9,7 @@ import {
 	FrequencyType,
 	InteractiveRegionConfig,
 	InteractiveRegionOption,
+	LocationModalContentParams,
 	ScenariosConfig
 } from "@/types/climate-variable-interface";
 import RasterPrecalcultatedClimateVariableValues from '../components/map-layers/raster-precalculated-climate-variable-values'
@@ -203,9 +204,14 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		}
 	}
 
-	getLocationModalContent(latlng: L.LatLng, featureId: number, mode: "modal" | "panel" = "modal"): React.ReactNode {
+	getLocationModalContent({
+		latlng,
+		featureId,
+		mode = "modal",
+		scenario
+	}: LocationModalContentParams): React.ReactNode {
 		return (
-			<RasterPrecalcultatedClimateVariableValues latlng={latlng} featureId={featureId} mode={mode} />
+			<RasterPrecalcultatedClimateVariableValues latlng={latlng} featureId={featureId} mode={mode} scenario={scenario ?? ''} />
 		);
 	}
 }

@@ -1,6 +1,8 @@
 import L from 'leaflet';
 import type { LatLngExpression, LatLngBounds } from 'leaflet';
 
+type WmsParam = { SLD_BODY: string, layers: string };
+
 // Common map configuration
 export const MAP_CONFIG = {
 	// Center coordinates for Canada
@@ -94,6 +96,6 @@ export const SLD_STYLES = {
 </sld:StyledLayerDescriptor>`
 };
 
-export const WMS_PARAMS = {
-	landmass: { 'SLD_BODY': SLD_STYLES.landmass } as any
+export const WMS_PARAMS: { landmass: WmsParam } = {
+	landmass: { SLD_BODY: SLD_STYLES.landmass, layers: '' }
 };

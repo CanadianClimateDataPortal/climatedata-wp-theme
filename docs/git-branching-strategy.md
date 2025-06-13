@@ -54,12 +54,12 @@ When a release is ready to be made, two steps must be taken:
 1. **On the commit on `main` that you want to release, add a _release tag_.**
    
    A _release tag_ serves to mark a commit containing a released version. A _release tag_'s name is the release's
-   version number `<MAJOR>.<MINOR>.<PATCH>` preceded by `v`. Example: `v2.1.0`. See (C) in the graph below. 
+   version number `<MAJOR>.<MINOR>.<HOTFIX>` preceded by `v`. Example: `v2.1.0`. See (C) in the graph below. 
 2. **From the same commit, create a new _release branch_.**
 
    A _release branch_ allows to eventually implement hot fixes in case a bug is discovered in this release (see
-   the ["Hot fixes" section](#hot-fixes) below). The _release branch_'s name is `release/<MAJOR>.<MINOR>.x`. Note that
-   `<PATCH>` is replaced by `x`. Example: `release/2.1.x`. See (D) in the graph below. 
+   the ["Hot fixes" section](#hot-fixes) below). The _release branch_'s name is `release/v<MAJOR>.<MINOR>.x`. Note that
+   `<HOTFIX>` is the letter `x` and note the prefix `v`. Example: `release/v2.1.x`. See (D) in the graph below. 
 
 ![Creating a release](images/git-02-release.svg)
 
@@ -77,14 +77,15 @@ created on the commit to release. See (F) in the graph below for an example for 
 
 ### Release version number
 
-The version number for the release is determined by the developer, based on the previous release's version number. It is
-globally inspired by the [semver](https://semver.org/) format `<MAJOR>.<MINOR>.<PATCH>`.
+The version number for the release is determined by the developer, based on the previous release's version number.
+The format is `<MAJOR>.<MINOR>.<HOTFIX>`. Note that it does _not_ follow the _Semantic Versioning_ specification.
 
-* The `<PATCH>` is increased when introducing fixes that don’t introduce or change existing features. In this Git
-  strategy, this number is increased only for [hot fixes](#hot-fixes). A new release should always introduce new
-  features, so it should have a `<PATCH>` number of 0.
-* The `<MINOR>` is increased when introducing a new feature, or changing an existing feature.
-* The `<MAJOR>` is increased when introducing a major redesign that affects most of the site.
+* The `<HOTFIX>` is increased _only_ when doing a [hot fixes](#hot-fixes), i.e. a small bug fix that must be done
+  on an already released version when the code on `main` is not ready to be released. This number will generally
+  be 0.
+* The `<MINOR>` is increased for any code change (new feature, bug fix) that is neither a hot fix, nor
+  a major refactor of the site. This number will frequently be increased.
+* The `<MAJOR>` is increased when doing a major refactor of the site. This number will rarely be increased.
 
 ### Notes about _release branches_:
 
@@ -92,7 +93,7 @@ globally inspired by the [semver](https://semver.org/) format `<MAJOR>.<MINOR>.<
   ["Hot fixes" section](#hot-fixes) below). In particular, no new feature should be developed on a _release branch_.
 * If a _release branch_ never gets any "hot fix", it will simply stay an "empty" branch starting from a commit on
   `main`.
-* The name of the _release branch_ always ends with `.x`, it doesn't include the `<PATCH>` number.
+* The name of the _release branch_ always ends with `.x`, it doesn't include the `<HOTFIX>` number.
 * "Previous" _release branches_ and _release tags_ are not deleted when releasing a new version. They allow for easy
   rollback.
 
@@ -101,8 +102,8 @@ globally inspired by the [semver](https://semver.org/) format `<MAJOR>.<MINOR>.<
 A "hot fix" is a correction of a bug on a released version. This section assumes the following about the fix:
 
 * It's a small (bug) fix, not a new feature. New features should be developed only on the `main` branch.
-* It's to be applied on a previous release. If it's a fix to apply only on the latest commit of `main`, develop it like
-  a _feature_ (see ["Developing new features"](#developing-new-features) above).
+* _And_ it's to be applied on a previous release. If it's a fix to apply only on the latest commit of `main`,
+  develop it like a _feature_ (see ["Developing new features"](#developing-new-features) above).
 
 Developing a hot fix is similar to developing a new feature and creating a release, except it's done from the _release
 branch_ instead of from `main`.
@@ -112,7 +113,7 @@ Pull Request to merge it back into the _release branch_. It's possible to create
 are required. See (G) in the graph below.
 
 Once all fixes are approved and merged, create a new _version tag_ on the branch's latest commit. The version number
-should only have it's `<PATCH>` version number incremented by one. See (H) in the graph below.
+should only have it's `<HOTFIX>` version number incremented by one. See (H) in the graph below.
 
 ![Developing and applying a hot fix](images/git-05-hotfix.svg)
 

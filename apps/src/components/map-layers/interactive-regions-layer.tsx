@@ -1,13 +1,12 @@
 /**
  * Component that adds interaction to the map depending on the selected region (gridded data, watershed, health, census).
  */
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState, } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
 
-import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { useInteractiveMapEvents } from '@/hooks/use-interactive-map-events';
+import { useAppSelector } from '@/app/hooks';
 import { fetchChoroValues } from '@/services/services';
 import {
 	CANADA_BOUNDS,
@@ -16,7 +15,6 @@ import {
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { clearRecentLocations } from '@/features/map/map-slice';
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 import { getDefaultFrequency } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
@@ -24,20 +22,15 @@ import { useColorMap } from '@/hooks/use-color-map';
 
 interface InteractiveRegionsLayerProps {
 	scenario: string;
-	onLocationModalOpen: (content: React.ReactNode) => void;
-	onLocationModalClose: () => void;
+	onOver?: (e: { latlng: L.LatLng; layer: { properties: any } }, getFeatureColor: (featureId: number) => string) => void;
+	onOut?: () => void;
+	onClick?: (e: { latlng: L.LatLng; layer: { properties: any } }) => void;
+	layerRef?: React.MutableRefObject<any>;
 }
 
-const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scenario, onLocationModalOpen, onLocationModalClose }) => {
-	const [layerData, setLayerData] = useState<Record<number, number> | null>(
-		null
-	);
-
-	// @ts-expect-error: suppress leaflet typescript error
-	const layerRef = useRef<L.VectorGrid | null>(null);
-
+const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scenario, onOver, onOut, onClick, layerRef }) => {
+	const [layerData, setLayerData] = useState<Record<number, number> | null>(null);
 	const map = useMap();
-	const dispatch = useAppDispatch();
 	const section = useContext(SectionContext);
 
 	const {
@@ -136,14 +129,6 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 		};
 	}, [interactiveRegion, layerData, getFeatureColor, gridType]);
 
-	const { handleClick, handleOver, handleOut } = useInteractiveMapEvents(
-		layerRef,
-		scenario ?? '',
-		getFeatureColor,
-		onLocationModalOpen,
-		onLocationModalClose
-	);
-
 	// fetch layer data if needed
 	useEffect(() => {
 		(async () => {
@@ -177,6 +162,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 		threshold
 	]);
 
+	// Helper for click event
 	useEffect(() => {
 		// make sure all needed data is available
 		if (
@@ -204,46 +190,59 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 		// @ts-expect-error: suppress leaflet typescript error
 		const layer = L.vectorGrid.protobuf(tileLayerUrl, layerOptions);
 		layer.setOpacity(mapData);
-		layerRef.current = layer;
+		if (layerRef) {
+			layerRef.current = layer;
+		}
 
-		layer.on('click', handleClick);
+		if (onClick && onOver && onOut) {
+			layer.on('click', onClick);
 
-		if ('ontouchstart' in window) {
-			layer.on('touchstart', handleOver).on('touchend', handleOut);
-		} else {
-			layer.on('mouseover', handleOver).on('mouseout', handleOut);
+			// We need this to get the correct fill color on hover
+			const onOverWithCallback = (e: any) => onOver(e, getFeatureColor);
+
+			if ('ontouchstart' in window) {
+				layer.on('touchstart', onOverWithCallback).on('touchend', onOut);
+			} else {
+				layer.on('mouseover', onOverWithCallback).on('mouseout', onOut);
+			}
 		}
 
 		layer.addTo(map);
 
-		// clear all existing markers from the map
-		map.eachLayer(layer => {
-			if (layer instanceof L.Marker) {
-				map.removeLayer(layer);
-			}
-		});
-
-		// clear recent locations
-		dispatch(clearRecentLocations());
+		// TODO: this was moved to the RasterMap component, but not sure if we should also clearLocations?
+		// // clear all existing markers from the map
+		// map.eachLayer(layer => {
+		// 	if (layer instanceof L.Marker) {
+		// 		map.removeLayer(layer);
+		// 	}
+		// });
+		//
+		// // clear recent locations
+		// dispatch(clearRecentLocations());
 
 		return () => {
 			map.removeLayer(layer);
-			layerRef.current = null;
+
+			if (layerRef) {
+				layerRef.current = null;
+			}
 		};
-	},
-	// Intentionally not including the event handlers (e.g. handleClick)
-	// as dependencies since they are already being handled by the
-	// userInteractiveMapEvents hook.
-	[
+	}, [
 		map,
 		interactiveRegion,
 		layerData,
 		tileLayerUrl,
 		vectorTileLayerStyles,
+		onClick,
+		onOver,
+		onOut,
+		layerRef,
+		colorMap,
+		getColor
 	]);
 
 	useEffect(() => {
-		if (layerRef.current) {
+		if (layerRef?.current) {
 			layerRef.current.setOpacity(mapData);
 		}
 	}, [mapData]);

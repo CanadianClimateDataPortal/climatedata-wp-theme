@@ -3,7 +3,7 @@
  * This component allows users to search for locations using the OpenStreetMap Nominatim API and navigate the map to the selected location.
  */
 
-import { useState, useEffect, ReactElement, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, ReactElement, useCallback, useMemo } from 'react';
 import { __ } from '@/context/locale-provider';
 import { Locate, LocateFixed } from 'lucide-react';
 import { useMap } from 'react-leaflet';
@@ -14,8 +14,6 @@ import 'leaflet-search/dist/leaflet-search.min.css';
 import 'leaflet-search';
 import mapPinIcon from '@/assets/map-pin.svg';
 
-import { useAppDispatch } from '@/app/hooks';
-import { addRecentLocation } from '@/features/map/map-slice';
 import { cn, isLatLong } from '@/lib/utils';
 import { fetchLocationByCoords } from '@/services/services';
 import {
@@ -40,12 +38,15 @@ import {
  */
 export default function SearchControl({
 	className,
+	layerRef,
 }: {
 	className?: string;
+	layerRef?: React.MutableRefObject<any>;
 }): ReactElement | null {
 	const [isGeolocationEnabled, setIsGeolocationEnabled] =
 		useState<boolean>(false);
 	const [isTracking, setIsTracking] = useState<boolean>(false);
+	const vectorLayer: any = layerRef?.current;
 
 	// we need a unique id for the search control container for cases where multiple maps
 	// are rendered on the same page -- ie. comparing emission scenarios
@@ -65,10 +66,8 @@ export default function SearchControl({
 
 	const map = useMap();
 
-	const dispatch = useAppDispatch();
-
 	const handleLocationChange = useCallback(
-		(title: string, latlng: L.LatLng) => {
+		(latlng: any) => {
 
 			// clear all existing markers from the map
 			map.eachLayer(layer => {
@@ -78,16 +77,18 @@ export default function SearchControl({
 			});
 			map.setView(latlng, SEARCH_DEFAULT_ZOOM);
 
-			// Save recent location
-			dispatch(
-				addRecentLocation({
-					id: `${latlng?.lat}|${latlng?.lng}`,
-					title,
-					...latlng,
+			// The location will be saved via the click event.
+			// see handleClick() in use-map-interactions.tsx.
+			if (vectorLayer) {
+				vectorLayer.fire('click', {
+					latlng: {
+						lat: latlng.lat,
+						lng: latlng.lon,
+					}
 				})
-			);
+			}
 		},
-		[map, dispatch]
+		[map, vectorLayer]
 	);
 
 	const toggleGeoLocation = () => {
@@ -105,7 +106,6 @@ export default function SearchControl({
 					const { latitude, longitude } = position.coords;
 					const title = __('Your current location');
 					handleLocationChange(
-						title,
 						L.latLng(latitude, longitude)
 					);
 					L.marker([latitude, longitude], {
@@ -231,11 +231,9 @@ export default function SearchControl({
 			}).on('click', async (e: L.LayerEvent) => {
 				console.log(e);
 			}),
-			moveToLocation: (latlng: L.LatLng, title: string, _: L.Map) => {
-				void _; // intentionally ignore to suppress typescript error
-				handleLocationChange(title, latlng);
+			moveToLocation: (latlng: L.LatLng) => {
+				handleLocationChange(latlng);
 			},
-
 		});
 
 		map.addControl(searchControl);

@@ -20,10 +20,11 @@ const MapLegendControl: React.FC<{
 	toggleOpen: () => void;
 	isCategorical?: boolean;
 	isDelta: boolean;
+	isDefaultColourScheme: boolean;
 	hasCustomScheme?: boolean;
 	unit?: string;
 	colourType?: string;
-}> = ({ data, isOpen, toggleOpen, isCategorical, isDelta, hasCustomScheme, unit, colourType }) => {
+}> = ({ data, isOpen, toggleOpen, isCategorical, isDelta, isDefaultColourScheme, hasCustomScheme, unit, colourType }) => {
 	const [svgWidth, setSvgWidth] = useState(0);
 	const [legendHeight, setLegendHeight] = useState<number | undefined>(undefined);
 	const svgRef = useRef<SVGSVGElement>(null);
@@ -34,11 +35,6 @@ const MapLegendControl: React.FC<{
 	const GRADIENT_HEIGHT = legendHeight !== undefined ? legendHeight : (totalLabels - 1) * MIN_LABEL_SPACING + PADDING_TOP + PADDING_BOTTOM;
 	const LEGEND_HEIGHT = GRADIENT_HEIGHT + PADDING_BOTTOM;
 
-	// If last color should have a bigger height (to go below its tick)
-	const MIN_ITEM_EXTRA = isCategorical ? 0 : 0.5;
-	const ITEM_HEIGHT = GRADIENT_HEIGHT / (totalLabels + MIN_ITEM_EXTRA);
-	const MIN_ITEM_HEIGHT = ITEM_HEIGHT * (1 + MIN_ITEM_EXTRA);
-
 	// Position gradient box, label and line horizontally
 	const gradientX = svgWidth - GRADIENT_WIDTH;
 	const labelX = gradientX - TICK_WIDTH - 5;
@@ -47,6 +43,29 @@ const MapLegendControl: React.FC<{
 
 	// Used to skip a legend label if it's the same as the previous one
 	let previousLabel = '';
+
+	// If first or last color should be bigger
+	const [maxItemExtra, setMaxItemExtra] = useState<number>(isCategorical ? 0 : 1);
+	// const [minItemExtra, setMinItemExtra] = useState<number>((!isDefaultColourScheme && isDelta) ? 1 : 0);
+	const [itemHeight, setItemHeight] = useState<number>(0);
+	const [maxItemHeight, setMaxItemHeight] = useState<number>(0);
+	const [minItemHeight, setMinItemHeight] = useState<number>(0);
+
+	useEffect(() => {
+		const currentMaxItemExtra = isCategorical ? 0 : 1;
+		const currentMinItemExtra = !isDefaultColourScheme && isDelta ? 1 : 0;
+		const currentItemHeight = GRADIENT_HEIGHT / (totalLabels + currentMaxItemExtra + currentMinItemExtra);
+		const currentMaxItemHeight = currentItemHeight * (1 + currentMaxItemExtra);
+		const currentMinItemHeight = currentItemHeight * (1 + currentMinItemExtra);
+
+		setMaxItemExtra(currentMaxItemExtra);
+		// setMinItemExtra(currentMinItemExtra);
+		setItemHeight(currentItemHeight);
+		setMaxItemHeight(currentMaxItemHeight);
+		setMinItemHeight(currentMinItemHeight);
+
+		console.log(currentMaxItemExtra, currentMinItemExtra, GRADIENT_HEIGHT, (19 * currentItemHeight + currentMaxItemExtra + currentMinItemExtra));
+	}, [isCategorical, isDefaultColourScheme, isDelta, GRADIENT_HEIGHT, totalLabels]);
 
 	useEffect(() => {
 		if (svgRef.current) {
@@ -85,7 +104,7 @@ const MapLegendControl: React.FC<{
 			</button>
 
 			{isOpen && (
-				<div className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto">
+				<div className="flex flex-col items-end gap-1 rounded-md py-2 px-1 overflow-y-auto">
 					<div className="font-sans text-zinc-900 font-semibold text-lg leading-5 capitalize text-right">
 						{unit}
 					</div>
@@ -93,8 +112,13 @@ const MapLegendControl: React.FC<{
 						{isBlocksGradient ? (
 							<g>
 								{data.map((entry, index) => {
-									const isLast = index === data.length - 1;
-									const height = isLast ? MIN_ITEM_HEIGHT : ITEM_HEIGHT;
+									let height = itemHeight;
+									if (index === 0) {
+										height = maxItemHeight;
+									} else if (index === data.length - 1) {
+										height = minItemHeight;
+									}
+
 									return (
 										<rect
 											key={index}
@@ -103,7 +127,7 @@ const MapLegendControl: React.FC<{
 											fill={entry.color}
 											opacity={entry.opacity}
 											x={gradientX}
-											y={PADDING_TOP + index * ITEM_HEIGHT}
+											y={PADDING_TOP + index * itemHeight}
 										/>
 									);
 								})}
@@ -118,7 +142,7 @@ const MapLegendControl: React.FC<{
 										{data.map((entry, index) => (
 											<stop
 												key={index}
-												offset={`${(index / (totalLabels - MIN_ITEM_EXTRA)) * 100}%`}
+												offset={`${(index / totalLabels) * 100}%`}
 												stopColor={entry.color}
 												stopOpacity={entry.opacity}
 											/>
@@ -136,12 +160,12 @@ const MapLegendControl: React.FC<{
 						)}
 
 						{data.map((entry, index) => {
-							let indexCoefficient = 1;
+							let indexCoefficient = isDelta ? 1 : maxItemExtra;
 							// For categorical data, center the label in the block
 							if(isCategorical) {
 								indexCoefficient = 0.5
 							}
-							const labelY = PADDING_TOP + (index + indexCoefficient) * ITEM_HEIGHT;
+							const labelY = PADDING_TOP + (index + indexCoefficient) * itemHeight;
 
 							// Custom scheme variables like "building_climate_zones" may have labels that can be parsed but shouldn't
 							//  eg. 7A, 7B, 8 -- so those even if parseable we should keep them as they are
@@ -158,11 +182,11 @@ const MapLegendControl: React.FC<{
 							parsedLabel = prefix + String(parsedLabel);
 
 							// Skip if the current parsedLabel is the same as the previous one
-							if (index > 0) {
-								if (parsedLabel === previousLabel) {
-									return null;
-								}
-							}
+							// if (index > 0) {
+							// 	if (parsedLabel === previousLabel) {
+							// 		return null;
+							// 	}
+							// }
 							previousLabel = parsedLabel;
 
 							return (

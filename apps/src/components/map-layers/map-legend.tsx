@@ -110,6 +110,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 					isCategorical={isCategorical}
 					isDelta={isDelta}
+					isDefaultColourScheme={colourScheme === 'default'}
 					hasCustomScheme={hasCustomScheme}
 					colourType={colourType}
 					unit={unit}

@@ -45,17 +45,23 @@ const MapLegendControl: React.FC<{
 	let previousLabel = '';
 
 	// If first or last color should be bigger
+	const [maxItemExtra, setMaxItemExtra] = useState<number>(0);
 	const [itemHeight, setItemHeight] = useState<number>(0);
 	const [maxItemHeight, setMaxItemHeight] = useState<number>(0);
 	const [minItemHeight, setMinItemHeight] = useState<number>(0);
 
 	useEffect(() => {
-		const currentMaxItemExtra = isCategorical || !isDefaultColourScheme || (isDefaultColourScheme && isDelta) ? 0 : 1;
-		const currentMinItemExtra = !isDefaultColourScheme ? 1 : 0;
+		const currentMaxItemExtra = isCategorical || !isDefaultColourScheme || (isDefaultColourScheme && isDelta) ? 0 : 0.5;
+		const currentMinItemExtra = isCategorical  || (isDefaultColourScheme && isDelta)
+			? 0 : 
+			(isDefaultColourScheme && !isDelta) 
+				? 0.5
+				: 1;
 		const currentItemHeight = GRADIENT_HEIGHT / (totalLabels + currentMaxItemExtra + currentMinItemExtra);
 		const currentMaxItemHeight = currentItemHeight * (1 + currentMaxItemExtra);
 		const currentMinItemHeight = currentItemHeight * (1 + currentMinItemExtra);
 
+		setMaxItemExtra(currentMaxItemExtra)
 		setItemHeight(currentItemHeight);
 		setMaxItemHeight(currentMaxItemHeight);
 		setMinItemHeight(currentMinItemHeight);
@@ -138,14 +144,21 @@ const MapLegendControl: React.FC<{
 										id="temperatureGradient"
 										gradientTransform="rotate(90)"
 									>
-										{data.map((entry, index) => (
-											<stop
-												key={index}
-												offset={`${(index / totalLabels) * 100}%`}
-												stopColor={entry.color}
-												stopOpacity={entry.opacity}
-											/>
-										))}
+										{data.map((entry, index) => {
+											let offset = 0;
+											if(index > 0) {
+												offset = ((index + maxItemExtra) / totalLabels) * 100;
+											}
+
+											return (
+												<stop
+													key={index}
+													offset={`${offset}%`}
+													stopColor={entry.color}
+													stopOpacity={entry.opacity}
+												/>
+											)
+										})}
 									</linearGradient>
 								</defs>
 

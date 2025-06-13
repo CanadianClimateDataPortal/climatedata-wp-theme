@@ -1,10 +1,5 @@
 <div class="row">
     <div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3">
-        <div class="alert alert-warning text-center mb-5">
-            <div style="font-size: 1.2em;">
-                ⚠ <?php _e('This data is temporarily unavailable. The ClimateData.ca team is working to restore it as soon as possible.', 'cdc'); ?>
-            </div>
-        </div>
         <p>
             <?php
             printf (

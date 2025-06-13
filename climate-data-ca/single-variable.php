@@ -144,7 +144,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                     <?php if ($disabled_variable) { ?>
                         <div class="alert alert-warning text-center">
                             <div style="font-size: 1.8em;">
-                                ⚠ <?php _e('This data is temporarily unavailable. The ClimateData.ca team is working to restore it as soon as possible.', 'cdc'); ?>
+                                ⚠ <?php _e('These data are temporarily unavailable. The ClimateData.ca team is working to restore them as soon as possible.', 'cdc'); ?>
                             </div>
                         </div>
                     <?php } else { ?>

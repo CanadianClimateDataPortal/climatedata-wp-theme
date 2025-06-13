@@ -1,10 +1,5 @@
 <div class="row">
     <div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3">
-        <div class="alert alert-warning text-center mb-5">
-            <div style="font-size: 1.2em;">
-                ⚠ <?php _e('This data is temporarily unavailable. The ClimateData.ca team is working to restore it as soon as possible.', 'cdc'); ?>
-            </div>
-        </div>
         <p>
             <?php _e('Hourly data for some stations and variables can be found on the <a href="https://climate.weather.gc.ca/historical_data/search_historic_data_e.html" target="_blank">Government of Canada Historical Climate Data</a> website.','cdc'); ?>
             <br>

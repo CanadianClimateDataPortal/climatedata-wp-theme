@@ -1196,6 +1196,7 @@
         var selected_stations = {};
 
         function station_init() {
+
             create_map('station');
             $('#station-process-data').removeAttr("style").hide();
 
@@ -1291,6 +1292,7 @@
         $('#start_date').on('change.datetimepicker', function () {
             update_URL('start', $('#station-start').val());
             check_station_form();
+            hide_stations_download();
         });
 
         $('#end_date').datetimepicker({
@@ -1301,6 +1303,7 @@
         $('#end_date').on('change.datetimepicker', function () {
             update_URL('end', $('#station-end').val());
             check_station_form();
+            hide_stations_download();
         });
 
         $("#station-select").select2({
@@ -1337,6 +1340,7 @@
 
         $('#station-download-form :input').change(function () {
             $('#generated_container').hide();
+            hide_stations_download();
 
 
             var param = $(this).attr('name');
@@ -1528,7 +1532,12 @@
                 .always(function() {
                     $loading.hide();
                 })
-                .done(function(links) {
+                .done(function( links ) {
+                    if ( links.length === 0 ) {
+                        $error.show();
+                        return;
+                    }
+
                     $list.empty();
                     const pattern = $list.attr('data-label-pattern');
                     
@@ -1543,6 +1552,10 @@
                 .fail(function() {
                     $error.show();
                 });
+        }
+
+        function hide_stations_download() {
+            $('#station-results').hide();
         }
         
         //
@@ -1564,10 +1577,11 @@
         var selected_normals_stations = {};
         
         function normals_init() {
+
             create_map('normals');
             $('#normals-process-data').removeAttr("style").hide();
             
-            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&HAS_NORMALS_DATA=Y', function (data) {
+            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&offset=0&HAS_NORMALS_DATA=Y', function (data) {
                 var markers = L.markerClusterGroup();
                 
                 normals_layer = L.geoJson(data, {
@@ -1663,6 +1677,7 @@
             }).done(function () {
                 
             });
+
         }
         
         $("#normals-select").select2({

@@ -114,7 +114,7 @@
         <div class="message-error">
             <p class="text-danger text-center"><?php _e ( 'An error occurred while processing your request. Please try again later.', 'cdc' ); ?></p>
         </div>
-    </div> 
+    </div>
 
   </div>
     <div><p></p></div>

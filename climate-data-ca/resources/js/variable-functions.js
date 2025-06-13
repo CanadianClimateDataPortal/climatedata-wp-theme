@@ -824,7 +824,7 @@
         map1.getPane('stations').style.pointerEvents = 'all';
 
         function loadClimateNormals() {
-            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&HAS_NORMALS_DATA=Y', function (data) {
+            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&offset=0&HAS_NORMALS_DATA=Y', function (data) {
                 station_layer = L.geoJson(data, {
                     pointToLayer: function (feature, latlng) {
                         markerColor = '#e50e40';

@@ -33,12 +33,11 @@ export async function transformLegendData(
 		}))
 		.reverse(); // reverse the data to put higher values at the top
 
-	if(colourScheme === 'default' || !temporalRange) {
+	if (colourScheme === 'default' || !temporalRange) {
 		// If default scheme we keep raw legend entries
 		legendEntries = rawLegendEntries?.slice();
 	} else {
 		// Format legend entries from color map colours entries
-
 		let low = temporalRange.low;
 		let high = temporalRange.high;
 		const schemeLength = colorMap.colours.length;

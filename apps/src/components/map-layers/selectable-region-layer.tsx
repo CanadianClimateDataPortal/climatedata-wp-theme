@@ -17,7 +17,7 @@ import {
 } from '@/features/download/download-slice';
 import {CANADA_BOUNDS, DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM, GEOSERVER_BASE_URL} from '@/lib/constants';
 import { MapFeatureProps } from '@/types/types';
-import { getFeatureId } from '@/hooks/use-interactive-map-events';
+import { getFeatureId } from '@/lib/utils';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useLocale } from '@/hooks/use-locale';
 

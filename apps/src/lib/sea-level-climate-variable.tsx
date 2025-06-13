@@ -1,5 +1,5 @@
 import MarineClimateVariable from "@/lib/marine-climate-variable";
-import { DateRangeConfig } from "@/types/climate-variable-interface";
+import { DateRangeConfig, LocationModalContentParams } from "@/types/climate-variable-interface";
 import MedianOnlyVariableValues from "@/components/map-layers/median-only-variable-values";
 
 class SeaLevelClimateVariable extends MarineClimateVariable {
@@ -15,7 +15,7 @@ class SeaLevelClimateVariable extends MarineClimateVariable {
 		}
 	}
 
-	getLocationModalContent(latlng: L.LatLng, featureId: number, mode: "modal" | "panel" = "modal"): React.ReactNode {
+	getLocationModalContent({latlng, featureId, mode = "modal", scenario}: LocationModalContentParams): React.ReactNode {
 		const { lat, lng } = latlng;
 
 		return (
@@ -24,6 +24,7 @@ class SeaLevelClimateVariable extends MarineClimateVariable {
 				featureId={featureId}
 				mode={mode}
 				endpoint={`get-slr-gridded-values/${lat}/${lng}`}
+				scenario={scenario ?? ""}
 			/>
 		);
 	}

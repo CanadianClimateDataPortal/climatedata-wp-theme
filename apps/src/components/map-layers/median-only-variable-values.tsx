@@ -10,6 +10,7 @@ interface MedianOnlyVariableValuesProps {
 	featureId: number,
 	mode: "modal" | "panel",
 	endpoint: string,
+	scenario: string,
 }
 
 /**
@@ -24,6 +25,7 @@ const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 	featureId,
 	mode,
 	endpoint,
+	scenario,
 }) => {
 	const { climateVariable } = useClimateVariable();
 	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
@@ -43,7 +45,9 @@ const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 		const fetchData = async () => {
 			if (!decadeValue && !variableId) return;
 
-			const scenario = climateVariable?.getScenario() ?? '';
+			const _scenario = (scenario && scenario !== "")
+				? scenario
+				: climateVariable?.getScenario() ?? '';
 			const version = climateVariable?.getVersion() ?? '';
 
 			// Fetching median
@@ -69,12 +73,12 @@ const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 
 				// If the scenario name already contains the percentile, use it, else
 				// default to 'p50' if it exists
-				if (/-p\d+$/.test(scenario)) {
-					[scenarioName, percentile] = scenario.split('-');
+				if (/-p\d+$/.test(_scenario)) {
+					[scenarioName, percentile] = _scenario.split('-');
 				} else {
 					const defaultPercentile = 'p50';
-					if (medianData[scenario]?.[defaultPercentile]) {
-						scenarioName = scenario;
+					if (medianData[_scenario]?.[defaultPercentile]) {
+						scenarioName = _scenario;
 						percentile = defaultPercentile;
 					}
 				}

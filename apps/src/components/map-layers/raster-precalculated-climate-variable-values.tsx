@@ -12,7 +12,8 @@ import SectionContext from "@/context/section-provider";
 interface RasterPrecalcultatedClimateVariableValuesProps {
 	latlng: L.LatLng;
 	featureId: number,
-	mode: "modal" | "panel"
+	mode: "modal" | "panel",
+	scenario: string,
 }
 
 /**
@@ -27,6 +28,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	latlng,
 	featureId,
 	mode,
+	scenario,
 }) => {
 	const { locale } = useLocale();
 	const { climateVariable } = useClimateVariable();
@@ -66,7 +68,11 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
 			}
 
-			const scenario = climateVariable?.getScenario() ?? '';
+			// Fallback to the selected scenario of the variable when nothing's provided
+			// to the component.
+			const _scenario = (scenario && scenario !== "")
+				? scenario
+				: climateVariable?.getScenario() ?? '';
 			const version = climateVariable?.getVersion() ?? '';
 
 			// Special case variable id
@@ -78,9 +84,19 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			// Fetching median and range
 
 			// Endpoint
-			let medianRangeEndpoint = `get-delta-30y-regional-values/${interactiveRegion}/${featureId}`;
+			let medianRangeEndpoint: string = '';
 			if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
 				medianRangeEndpoint = `get-delta-30y-gridded-values/${lat}/${lng}`;
+			} else {
+				if (featureId) {
+					medianRangeEndpoint = `get-delta-30y-regional-values/${interactiveRegion}/${featureId}`;
+				}
+			}
+
+			// We don't have a valid endpoint. Exit early.
+			if (!medianRangeEndpoint) {
+				setNoDataAvailable(true);
+				return;
 			}
 
 			// Params
@@ -102,8 +118,8 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				// If we don't have data
 				setNoDataAvailable(true);
 			} else {
-				setMedian(medianRangeData[scenario]?.p50 || 0);
-				setRange([medianRangeData[scenario]?.p10 || 0, medianRangeData[scenario]?.p90 || 0]);
+				setMedian(medianRangeData[_scenario]?.p50 || 0);
+				setRange([medianRangeData[_scenario]?.p10 || 0, medianRangeData[_scenario]?.p90 || 0]);
 				setNoDataAvailable(false);
 			}
 
@@ -119,8 +135,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				unitDecimals: decimals
 			});
 
-
-			const deltaValueKey = 'delta7100_' + scenario + '_median';
+			const deltaValueKey = 'delta7100_' + _scenario + '_median';
 
 			// If annual, we take the first month (so 0)
 			// If monthly, we take the frequency month index
@@ -151,7 +166,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		};
 
 		fetchData();
-	}, [climateVariable, decimals, dateRange, featureId, latlng, section]);
+	}, [climateVariable, decimals, dateRange, featureId, latlng, section, scenario]);
 
 	// Value formatter (for delta, for units)
 	const valueFormatter = (value: number, delta: boolean = (climateVariable?.getDataValue() === 'delta')) => {

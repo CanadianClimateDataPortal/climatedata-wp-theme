@@ -111,6 +111,8 @@ function calculateQuantities({
 		for (let i = 0; i < schemeLength; i++) {
 			quantities.push(low + i * step);
 		}
+		// Increase last quantity to cover every high value on map
+		quantities[quantities.length - 1] = (high + 1) * (high + 1);
 	} else {
 		// For non-divergent palettes, use the original logic
 		const step = (high - low) / schemeLength;

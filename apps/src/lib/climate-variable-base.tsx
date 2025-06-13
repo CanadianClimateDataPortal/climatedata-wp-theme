@@ -21,6 +21,7 @@ import {
 	ThresholdInterface,
 	DownloadFile,
 	FrequencyType,
+	TemporalRange,
 	LocationModalContentParams,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
@@ -216,6 +217,27 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.temporalThresholdConfig ?? null;
 	}
 
+	getCurrentTemporalRange(): TemporalRange | null {
+		const temporalThresholdConfig = this.getTemporalThresholdConfig();
+		if (!temporalThresholdConfig) return null;
+
+		const frequencyConfig = this.getFrequencyConfig();
+		if (!frequencyConfig) return null;
+
+		const frequency = this.getFrequency() ?? getDefaultFrequency(frequencyConfig, 'map');
+		if (frequency === undefined) return null;
+
+		const frequencyCode = getFrequencyCode(frequency);
+		const threshold = this.getThreshold();
+		if (!threshold) return null;
+
+		const useDelta = this.hasDelta?.() ?? false;
+		const dataType = useDelta && this.getDataValue() === 'delta' ? 'delta' : 'absolute';
+
+		const temporalRange = temporalThresholdConfig.thresholds?.[threshold]?.[frequencyCode]?.[dataType];
+		return temporalRange ?? null;
+	}
+
 	getAnalysisFields(): FieldConfig[] {
 		return this._config.analysisFields ?? [];
 	}
@@ -300,7 +322,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getDecimalPlace(): number {
-		return this._config.decimalPlace ?? 0;
+		return this._config.unitDecimalPlaces ?? 0;
 	}
 
 	renderMap(): React.ReactElement {

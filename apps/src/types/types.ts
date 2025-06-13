@@ -253,7 +253,7 @@ export interface WMSLegendData {
  * Represents a processed legend entry with parsed data.
  */
 export interface TransformedLegendEntry {
-	label: string;
+	label: string | number;
 	color: string;
 	opacity: number;
 }

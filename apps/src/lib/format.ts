@@ -6,23 +6,85 @@ import {
 	ApiPostData,
 	MultilingualField,
 	TermItem,
+	Locale,
 } from '@/types/types';
-import { ColorMap } from '@/types/climate-variable-interface';
+import { TemporalRange } from '@/types/climate-variable-interface';
 import React from 'react';
 
 export async function transformLegendData(
 	input: WMSLegendData,
-	colorMap: ColorMap
+	colourScheme: string,
+	temporalRange: TemporalRange | null,
+	isDelta: boolean,
+	unit: string | undefined,
+	locale: Locale,
+	decimals: number,
+	colorMap: { colours: string[]; quantities: number[]; schemeType: string; isDivergent: boolean; },
 ): Promise<TransformedLegendEntry[]> {
-	const legendEntries = input?.Legend?.[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap?.entries
-		?.map((item, i) => ({
+	let legendEntries = undefined;
+
+	// Get raw legend entries with right labels
+	const rawLegendEntries = input?.Legend?.[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap?.entries
+		?.map((item) => ({
 			...item,
-			// use the color from the color map if available
-			color: colorMap?.colours?.[i] ?? item.color,
 			// for some variables, the response has an item with NaN text as its label, we need to convert to 0 instead
-			label: item.label === 'NaN' ? '0' : item.label,
+			label: item.label === 'NaN' ? 0 : item.label,
 			opacity: Number(item.opacity ?? 1),
-		}));
+		}))
+		.reverse(); // reverse the data to put higher values at the top
+
+	if (colourScheme === 'default' || !temporalRange) {
+		// If default scheme we keep raw legend entries
+		legendEntries = rawLegendEntries?.slice();
+	} else {
+		// Format legend entries from color map colours entries
+		let low = temporalRange.low;
+		let high = temporalRange.high;
+		const schemeLength = colorMap.colours.length;
+
+		// if we have a diverging ramp, we center the legend at zero
+		if (colorMap.isDivergent) {
+			high = Math.max(Math.abs(low), Math.abs(high));
+			low = high * -1;
+
+			if ((high - low) * 10**decimals < schemeLength) {
+				// workaround to avoid legend with repeated values for very low range variables
+				low = -(schemeLength / 10**decimals / 2.0);
+				high = schemeLength / 10**decimals / 2.0;
+			}
+		} else {
+			if ((high - low) * 10**decimals < schemeLength) {
+				// workaround to avoid legend with repeated values for very low range variables
+				high = low + schemeLength / 10**decimals;
+			}
+		}
+
+		const step = (high - low) / schemeLength;
+
+		legendEntries = colorMap.colours.map((color, i) => {
+			let value: string | number = low + i * step;
+
+			if(isDelta) {
+				value = parseFloat(value.toFixed(decimals));
+			} else {
+				// Format with umit
+				switch (unit) {
+					case "DoY":
+						value = doyFormatter(value - 1, locale, 'short');
+						break;
+					default:
+						value = parseFloat(value.toFixed(decimals));
+				}
+			}
+
+			return {
+				label: value,
+				color: color,
+				opacity: 1,
+			};
+		})
+		.reverse();
+	}
 
 	if (!legendEntries) {
 		throw new Error('Invalid input format');
@@ -137,7 +199,7 @@ export const normalizePostData = async (
 		.filter(Boolean);
 };
 
-export const doyFormatter = (value: number, language: string) => {
+export const doyFormatter = (value: number, language: string, monthFormat: "long" | "numeric" | "2-digit" | "short" | "narrow" | undefined = 'long') => {
 	// First day of the year (UTC)
 	const firstDayOfYear = Date.UTC(2019, 0, 1);
 
@@ -146,7 +208,7 @@ export const doyFormatter = (value: number, language: string) => {
 
 	// Format the date according to the given language
 	return date.toLocaleDateString(language, {
-		month: 'long',
+		month: monthFormat,
 		day: 'numeric',
 	});
 };

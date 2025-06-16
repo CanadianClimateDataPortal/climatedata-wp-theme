@@ -19,7 +19,9 @@ const MapColorsDropdown: React.FC = () => {
 	const { climateVariable, setColourType, setColourScheme } = useClimateVariable();
 
 	const Tooltip = () => (
-		<div className="text-sm text-gray-500">{__('Select a map color.')}</div>
+		<div>
+			{__('Select a map color.')}
+		</div>
 	);
 
 	const defaultColourType = useMemo(() => {

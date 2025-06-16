@@ -25,7 +25,7 @@ const EmissionScenariosControl: React.FC = () => {
 	);
 
 	const Tooltip = () => (
-		<div className="text-sm text-gray-500">
+		<div>
 			{__('Select an emission scenario.')}
 		</div>
 	);

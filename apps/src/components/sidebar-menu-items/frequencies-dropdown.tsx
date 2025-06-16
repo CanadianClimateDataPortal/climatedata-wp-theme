@@ -23,7 +23,7 @@ const FrequenciesDropdown: React.FC = () => {
 	const defaultValue = climateVariable?.getFrequency() ?? getDefaultFrequency(frequencyConfig, section);
 
 	const Tooltip = () => (
-		<div className="text-sm text-gray-500">
+		<div>
 			{__('Select a frequency.')}
 		</div>
 	);

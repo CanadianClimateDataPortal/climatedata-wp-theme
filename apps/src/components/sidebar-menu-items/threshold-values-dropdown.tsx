@@ -17,7 +17,7 @@ const ThresholdValuesDropdown: React.FC = () => {
 	const { climateVariable, setThreshold } = useClimateVariable();
 
 	const Tooltip = () => (
-		<div className="text-sm text-gray-500">
+		<div>
 			{__('Select a threshold value.')}
 		</div>
 	);

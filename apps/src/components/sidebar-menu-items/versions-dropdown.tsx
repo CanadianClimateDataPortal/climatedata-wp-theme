@@ -17,7 +17,7 @@ const VersionsDropdown: React.FC = () => {
 	);
 
 	const Tooltip = () => (
-		<div className="text-sm text-gray-500">
+		<div>
 			{__('Select a version.')}
 		</div>
 	);

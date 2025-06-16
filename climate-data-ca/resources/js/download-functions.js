@@ -1196,11 +1196,7 @@
         var selected_stations = {};
 
         function station_init() {
-            /**
-             * Temporarily disabled the station map while waiting for the fix for api.weather.gc.ca
-             * 2025-06-11
-             */
-            /*
+
             create_map('station');
             $('#station-process-data').removeAttr("style").hide();
 
@@ -1285,7 +1281,6 @@
                 return $item;
 
             }
-            */
 
         }
 
@@ -1297,6 +1292,7 @@
         $('#start_date').on('change.datetimepicker', function () {
             update_URL('start', $('#station-start').val());
             check_station_form();
+            hide_stations_download();
         });
 
         $('#end_date').datetimepicker({
@@ -1307,6 +1303,7 @@
         $('#end_date').on('change.datetimepicker', function () {
             update_URL('end', $('#station-end').val());
             check_station_form();
+            hide_stations_download();
         });
 
         $("#station-select").select2({
@@ -1343,6 +1340,7 @@
 
         $('#station-download-form :input').change(function () {
             $('#generated_container').hide();
+            hide_stations_download();
 
 
             var param = $(this).attr('name');
@@ -1448,12 +1446,6 @@
             } else {
                 $('#station-process').removeClass('disabled');
                 station_status = T('Ready to process.');
-
-                populate_station_URL();
-            }
-
-            if (selected_stations == undefined || Object.keys(selected_stations).length == 0) {
-                populate_station_URL(0); // update only #station-download-data
             }
 
             $('#station-download-status').text(station_status);
@@ -1513,14 +1505,57 @@
             }
             // selected_stations_file_extension get text from class="csvFormat" or class="geoFomrat"
             set_datalayer_for_download_station_data(selected_stations_to_str, selected_stations_file_extension);
+            
+            generate_stations_download();
         });
 
-        function populate_station_URL(ga4_event = 1) {
-            if (ga4_event == 1) {
-                var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + station_dl_obj.start + ' 00:00:00/' + station_dl_obj.end + ' 00:00:00&STN_ID=' + station_dl_obj['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + station_dl_obj.format + '&limit=' + station_dl_obj.limit + '&startindex=' + station_dl_obj.offset;
-                $('#station-process').attr('href', new_url);
+        function generate_stations_download() {
+            const $results = $('#station-results'),
+                $container = $results.find('.results-list-container'),
+                $list = $results.find('.results-list'),
+                $loading = $results.find('.message-loading'),
+                $error = $results.find('.message-error');
+            
+            const parameters = {
+                'datetime': station_dl_obj.start + ' 00:00:00/' + station_dl_obj.end + ' 00:00:00',
+                'STN_ID': station_dl_obj['s'],
+                'sortby': 'PROVINCE_CODE,STN_ID,LOCAL_DATE',
+                'f': station_dl_obj.format,
             }
-            selected_stations_to_str = get_selected_stations();
+
+            $container.hide();
+            $error.hide();
+            $loading.show();
+            $results.show();
+
+            $.getJSON( data_url + '/get-geomet-collection-items-links/climate-daily' , parameters)
+                .always(function() {
+                    $loading.hide();
+                })
+                .done(function( links ) {
+                    if ( links.length === 0 ) {
+                        $error.show();
+                        return;
+                    }
+
+                    $list.empty();
+                    const pattern = $list.attr('data-label-pattern');
+                    
+                    links.forEach(function(link) {
+                        let label = pattern.replace('{start}', link['start_index'] + 1);
+                        label = label.replace('{end}', link['end_index'] + 1);
+                        $list.append('<li><a href="' + link['url'] + '" target="_blank" rel="noopener noreferrer">' + label + '</a></li>');
+                    });
+                    
+                    $container.show();
+                })
+                .fail(function() {
+                    $error.show();
+                });
+        }
+
+        function hide_stations_download() {
+            $('#station-results').hide();
         }
         
         //
@@ -1543,15 +1578,10 @@
         
         function normals_init() {
 
-            /**
-             * Temporarily disabled the normals map while waiting for the fix for api.weather.gc.ca
-             * 2025-06-11
-             */
-            /*
             create_map('normals');
             $('#normals-process-data').removeAttr("style").hide();
             
-            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
+            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&offset=0&HAS_NORMALS_DATA=Y', function (data) {
                 var markers = L.markerClusterGroup();
                 
                 normals_layer = L.geoJson(data, {
@@ -1647,7 +1677,7 @@
             }).done(function () {
                 
             });
-            */
+
         }
         
         $("#normals-select").select2({
@@ -1664,6 +1694,7 @@
         
         $('#normals-download-form :input').change(function () {
             $('#normals-generated_container').hide();
+            hide_normals_download();
         
             var param = $(this).attr('name');
             var new_val = $(this).val();
@@ -1772,12 +1803,6 @@
             } else {
                 $('#normals-process').removeClass('disabled');
                 station_status = T('Ready to process.');
-        
-                populate_normals_URL();
-            }
-        
-            if (selected_normals_stations == undefined || Object.keys(selected_normals_stations).length == 0) {
-                populate_normals_URL(0); // update only #station-download-data
             }
         
             $('#normals-download-status').text(station_status);
@@ -1839,21 +1864,56 @@
             
             // selected_normals_stations_file_extension get text from class="csvFormat" or class="geoFomrat"
             set_datalayer_for_download_normals(selected_normals_stations_to_str, selected_normals_stations_file_extension);
+
+            generate_normals_download();
         });
-        
-        function populate_normals_URL(ga4_event = 1) {
-            
-            if (ga4_event == 1) {
-                
-                let station_name = $('#normals-select [value="' + normals_dl_obj['s'] + '"]').text()
-                
-                var new_url = 'https://api.weather.gc.ca/collections/climate-normals/items?CLIMATE_IDENTIFIER=' + normals_dl_obj.s + '&sortby=MONTH&f=' + normals_dl_obj.format + '&limit=' + station_dl_obj.limit + '&startindex=' + normals_dl_obj.offset
-                
-                $('#normals-process').attr('href', new_url);
-                
+
+        function generate_normals_download() {
+            const $results = $('#normals-results'),
+                $container = $results.find('.results-list-container'),
+                $list = $results.find('.results-list'),
+                $loading = $results.find('.message-loading'),
+                $error = $results.find('.message-error');
+
+            const parameters = {
+                'CLIMATE_IDENTIFIER': normals_dl_obj.s,
+                'sortby': 'MONTH',
+                'f': normals_dl_obj.format,
             }
-            
-            selected_normals_stations_to_str = get_selected_normals_stations();
+
+            $container.hide();
+            $error.hide();
+            $loading.show();
+            $results.show();
+
+            $.getJSON( data_url + '/get-geomet-collection-items-links/climate-normals' , parameters)
+            .always(function() {
+                $loading.hide();
+            })
+            .done(function( links ) {
+                if ( links.length === 0 ) {
+                    $error.show();
+                    return;
+                }
+
+                $list.empty();
+                const pattern = $list.attr('data-label-pattern');
+
+                links.forEach(function(link) {
+                    let label = pattern.replace('{start}', link['start_index'] + 1);
+                    label = label.replace('{end}', link['end_index'] + 1);
+                    $list.append('<li><a href="' + link['url'] + '" target="_blank" rel="noopener noreferrer">' + label + '</a></li>');
+                });
+
+                $container.show();
+            })
+            .fail(function() {
+                $error.show();
+            });
+        }
+
+        function hide_normals_download() {
+            $('#normals-results').hide();
         }
 
         //

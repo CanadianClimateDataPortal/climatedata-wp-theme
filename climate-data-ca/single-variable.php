@@ -129,8 +129,6 @@ if (have_posts()) : while (have_posts()) : the_post();
         <?php
         
             } else {
-                
-                $disabled_variable =  get_field('var_name') === 'weather-stations';
 
         ?>
 
@@ -141,7 +139,6 @@ if (have_posts()) : while (have_posts()) : the_post();
 
             <div class="overlay-content-text">
                 <div class="overlay-scenarios">
-                    <?php if ( ! $disabled_variable ) { ?>
                     <form class="form-inline" action="<?php echo $var_url; ?>">
                         <input type="hidden" name="var" value="<?php the_field('var_name'); ?>">
 
@@ -151,7 +148,6 @@ if (have_posts()) : while (have_posts()) : the_post();
                             </div>
                         </div>
                     </form>
-                    <?php } ?>
                 </div>
             </div>
         </div>

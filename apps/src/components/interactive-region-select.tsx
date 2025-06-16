@@ -36,7 +36,9 @@ const InteractiveRegionSelect: React.FC<InteractiveRegionSelectProps> = ({ onCha
 
   const Tooltip = () => (
     <div>
-      {__('Select an interactive region.')}
+      {__('Some gridded datasets have been averaged over different regions of interest. ' +
+				  'For climate model ensembles, these averages were calculated for each individual model simulation before being summarized into percentiles. ' +
+				  'Select a region from the options in the dropdown menu.')}
     </div>
   );
 

@@ -601,3 +601,9 @@ msgstr ""
 
 msgid "image from your viewport"
 msgstr ""
+
+msgid "Delta with 1971-2000"
+msgstr "Delta de la période 1971-2000"
+
+msgid "Delta is the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model. The reference period used here is 1971-2000."
+msgstr "Le delta est la différence entre la valeur future et la valeur de la période de référence d'une variable climatique, telle que simulée par un modèle climatique. La période de référence utilisée ici est 1971-2000."

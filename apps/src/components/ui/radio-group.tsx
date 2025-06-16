@@ -57,7 +57,7 @@ const RadioGroupFactory = forwardRef<
 	React.ElementRef<typeof RadioGroup>,
 	React.ComponentPropsWithoutRef<typeof RadioGroup> & {
 		name: string;
-		options: { value: string; label: string }[] | string[] | number[];
+		options: { value: string; label: React.ReactNode }[] | string[] | number[];
 		optionClassName?: string;
 		title?: string;
 		tooltip?: React.ReactNode;

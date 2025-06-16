@@ -9,17 +9,36 @@ import { __ } from '@/context/locale-provider';
 // components
 import { SidebarMenuItem } from '@/components/ui/sidebar';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 // other
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { ColourType } from '@/types/climate-variable-interface';
+import { InfoIcon } from "lucide-react";
 
 const DataValuesControl: React.FC = () => {
 	const { climateVariable, setDataValue, setColourType } = useClimateVariable();
+	
+	const deltaLabel = (
+		<div className="flex items-center gap-x-1">
+			<span>{__('Delta')}</span>
+			<Popover>
+				<PopoverTrigger>
+					<InfoIcon size={15} fill="#657092" color="#fafafa" />
+				</PopoverTrigger>
+				<PopoverContent>
+					<p className="font-semibold tracking-wider uppercase">
+						{__('Delta with 1971-2000')}
+					</p>
+					<p>{__('Delta is the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model. The reference period used here is 1971-2000.')}</p>
+				</PopoverContent>
+			</Popover>
+		</div>
+	);
 
 	const options = [
 		{ value: 'absolute', label: __('Absolute') },
-		{ value: 'delta', label: __('Delta') },
+		{ value: 'delta', label: deltaLabel },
 	];
 
 	const onDataValueChange = (value: string) => {

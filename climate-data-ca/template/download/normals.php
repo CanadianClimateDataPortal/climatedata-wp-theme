@@ -1,28 +1,3 @@
-<div class="row">
-    <div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3">
-        <p>
-            <?php
-            printf (
-                __ ( 'Additional Climate Normals variables are available from the %sCanadian Centre for Climate Services%s and the %sGovernment of Canada Historical Climate Data%s websites.', 'cdc' ),
-                '<a href="https://climate-change.canada.ca/climate-data/#/climate-normals" target="_blank">',
-                '</a>',
-                '<a href="https://climate.weather.gc.ca/climate_normals/index_e.html" target="_blank">',
-                '</a>',
-            );
-
-            ?>
-        </p>
-    </div>
-</div>
-
-<?php
-
-/**
- * Station data selection removed while waiting for the fix for api.weather.gc.ca
- * 2025-06-11
- */
-
-/*
 <form action="./" method="get" name="normals-download-form" id="normals-download-form">
   <input type="hidden" name="limit" id="normals-limit" value="150000">
   <input type="hidden" name="offset" id="offset" value="0">
@@ -81,8 +56,21 @@
       </div>
     </div>
 
-
-      <div id="result"></div>
+    <div id="normals-results" class="col-10 offset-1 col-sm-6 offset-sm-3 mt-5 p-5 bg-light" style="display: none;">
+      <div class="results-list-container">
+          <p><?php _e ( 'Please use the links below to download your data.', 'cdc' ) ?></p>
+          <div style="max-height: 215px; overflow-y: auto;">
+              <ul class="results-list" data-label-pattern="<?php _e ('Download Records {start} to {end}', 'cdc' ); ?>">
+              </ul>
+          </div>
+      </div>
+      <div class="message-loading">
+          <p class="font-italic text-center"><?php _e ( 'Please wait while the links are generated...', 'cdc' ); ?></p>
+      </div>
+      <div class="message-error">
+          <p class="text-danger text-center"><?php _e ( 'An error occurred while processing your request. Please try again later.', 'cdc' ); ?></p>
+      </div>
+    </div>
 
   </div>
     <div><p></p></div>
@@ -104,4 +92,3 @@
         </div>
     </div>
 </form>
-*/ ?>

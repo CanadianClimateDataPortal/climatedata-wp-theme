@@ -179,18 +179,6 @@ body.admin-bar {
   }
 }
 
-// Missing data warning alert
-
-#warning-no-data {
-  position: absolute;
-  top: calc(50% + 75px);
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  pointer-events: none;
-  font-size: 1.2em;
-}
-
 // map containers
 
 #map1 {

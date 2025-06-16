@@ -127,7 +127,9 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 			// Params
 			const chartsData = await generateChartData({
+				interactiveRegion: interactiveRegion,
 				latlng: latlng,
+				featureId: featureId,
 				variable: varName,
 				frequency: frequency,
 				dataset: version,

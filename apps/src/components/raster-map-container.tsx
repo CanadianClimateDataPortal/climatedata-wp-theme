@@ -91,6 +91,7 @@ export default function RasterMapContainer({
 	// Handle click on details button of a location (to open the chart panel)
 	const handleDetailsClick = async () => {
 		if (selectedLocation) {
+			const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 			const { title, latlng, featureId } = selectedLocation;
 			const frequencyConfig = climateVariable?.getFrequencyConfig();
 			let frequency = climateVariable?.getFrequency() ?? ''
@@ -99,7 +100,9 @@ export default function RasterMapContainer({
 			}
 
 			const chartData = await generateChartData({
-				latlng,
+				interactiveRegion: interactiveRegion,
+				latlng: latlng,
+				featureId: featureId,
 				variable: climateVariable?.getThreshold() ?? '',
 				frequency: frequency,
 				dataset: climateVariable?.getVersion() ?? '',

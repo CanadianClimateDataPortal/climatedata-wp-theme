@@ -141,13 +141,7 @@ if (have_posts()) : while (have_posts()) : the_post();
 
             <div class="overlay-content-text">
                 <div class="overlay-scenarios">
-                    <?php if ($disabled_variable) { ?>
-                        <div class="alert alert-warning text-center">
-                            <div style="font-size: 1.8em;">
-                                ⚠ <?php _e('These data are temporarily unavailable. The ClimateData.ca team is working to restore them as soon as possible.', 'cdc'); ?>
-                            </div>
-                        </div>
-                    <?php } else { ?>
+                    <?php if ( ! $disabled_variable ) { ?>
                     <form class="form-inline" action="<?php echo $var_url; ?>">
                         <input type="hidden" name="var" value="<?php the_field('var_name'); ?>">
 

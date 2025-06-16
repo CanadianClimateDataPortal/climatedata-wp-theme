@@ -21,21 +21,30 @@ export function useMapMarker() {
 
   const addMarker = useCallback((latlng: L.LatLng, title: string) => {
     [map, comparisonMap].forEach(map => {
-      if (map) {
-        const marker = L.marker(latlng, MAP_MARKER_CONFIG)
-        .bindTooltip(title, {
-          direction: 'top',
-          offset: [0, -30],
-        })
-        .addTo(map);
-        marker.getElement()?.classList.add('bounce');
-        setTimeout(() => {
-          marker.getElement()?.addEventListener(
-            'animationend',
-            () => marker.getElement()?.classList.remove('bounce'),
-            { once: true }
-          );
-        }, 0);
+      if (
+        map &&
+        map.getPanes() &&
+        Object.keys(map.getPanes()).length > 0
+      ) {
+        try {
+          const marker = L.marker(latlng, MAP_MARKER_CONFIG)
+            .bindTooltip(title, {
+              direction: 'top',
+              offset: [0, -30],
+            })
+            .addTo(map);
+
+          marker.getElement()?.classList.add('bounce');
+          setTimeout(() => {
+            marker.getElement()?.addEventListener(
+              'animationend',
+              () => marker.getElement()?.classList.remove('bounce'),
+              { once: true }
+            );
+          }, 0);
+        } catch (error) {
+          console.error('Error adding marker:', error);
+        }
       }
     });
   }, [map, comparisonMap]);

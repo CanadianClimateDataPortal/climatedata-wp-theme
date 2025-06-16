@@ -148,7 +148,7 @@ export default function MarineMapContainer({
 		else {
 			setLocationModalContent(null);
 		}
-	}, [selectedLocation, setLocationModalContent]);
+	}, [selectedLocation, setLocationModalContent, scenario]);
 
 	useEffect(() => {
 		if (mapRef.current) {

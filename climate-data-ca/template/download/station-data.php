@@ -104,7 +104,7 @@
         <div class="results-list-container">
             <p><?php _e ( 'Please use the links below to download your data.', 'cdc' ) ?></p>
             <div style="max-height: 215px; overflow-y: auto;">
-                <ul class="results-list" data-label-pattern="<?php _e ('Records {start} to {end}', 'cdc' ); ?>">
+                <ul class="results-list" data-label-pattern="<?php _e ('Download Records {start} to {end}', 'cdc' ); ?>">
                 </ul>
             </div>
         </div>

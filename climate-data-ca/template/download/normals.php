@@ -56,8 +56,21 @@
       </div>
     </div>
 
-
-      <div id="result"></div>
+    <div id="normals-results" class="col-10 offset-1 col-sm-6 offset-sm-3 mt-5 p-5 bg-light" style="display: none;">
+      <div class="results-list-container">
+          <p><?php _e ( 'Please use the links below to download your data.', 'cdc' ) ?></p>
+          <div style="max-height: 215px; overflow-y: auto;">
+              <ul class="results-list" data-label-pattern="<?php _e ('Download Records {start} to {end}', 'cdc' ); ?>">
+              </ul>
+          </div>
+      </div>
+      <div class="message-loading">
+          <p class="font-italic text-center"><?php _e ( 'Please wait while the links are generated...', 'cdc' ); ?></p>
+      </div>
+      <div class="message-error">
+          <p class="text-danger text-center"><?php _e ( 'An error occurred while processing your request. Please try again later.', 'cdc' ); ?></p>
+      </div>
+    </div>
 
   </div>
     <div><p></p></div>

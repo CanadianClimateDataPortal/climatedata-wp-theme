@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import type { LatLngExpression, LatLngBounds } from 'leaflet';
-import { ColourScheme, DatasetKey, EmissionScenarioKey } from '@/types/types';
+import { ColourScheme, DatasetKey } from '@/types/types';
 import { MAP_CONFIG } from '@/config/map.config';
 import { FrequencyType } from '@/types/climate-variable-interface';
 
@@ -58,32 +58,6 @@ export const WP_API_DOMAIN = INTERNAL_URLS['wp-api-domain'];
 export const WP_API_VARIABLE_PATH: string = '/wp-json/cdc/v3/variable';
 export const WP_API_LOCATION_BY_COORDS_PATH: string = '/wp-json/cdc/v2/get_location_by_coords';
 
-// TODO: these will come from the API..
-//  also, "high" key has the value that in the figma designs is set for "very-high", and
-//  the value for "high" from the designs doesn't seem to work, so these below are the
-//  ones used in the original implementation
-export const SCENARIO_NAMES: Record<
-	DatasetKey,
-	Record<EmissionScenarioKey, string>
-> = {
-	cmip5: {
-		low: 'RCP 2.6',
-		medium: 'RCP 4.5',
-		high: 'RCP 8.5',
-	},
-	cmip6: {
-		low: 'SSP 1–2.6',
-		medium: 'SSP 2–4.5',
-		high: 'SSP 5–8.5',
-	},
-	humidex: {
-		low: 'SSP 1–2.6',
-		medium: 'SSP 2–4.5',
-		high: 'SSP 5–8.5',
-	},
-};
-
-// TODO: these will come from the API
 export const DATASETS: Record<
 	DatasetKey,
 	{

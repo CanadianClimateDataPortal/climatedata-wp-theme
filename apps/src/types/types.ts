@@ -18,11 +18,6 @@ export type Locale = 'en' | 'fr';
 export type DatasetKey = 'cmip5' | 'cmip6' | 'humidex';
 
 /**
- * Represents valid emission scenario keys.
- */
-export type EmissionScenarioKey = 'low' | 'medium' | 'high';
-
-/**
  * Represents a field with multilingual support.
  */
 export interface MultilingualField<T = string> {
@@ -807,4 +802,4 @@ export interface SelectedLocationInfo {
 	featureId: number;
 	title: string;
 	latlng: L.LatLng;
-};
+}

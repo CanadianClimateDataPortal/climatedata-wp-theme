@@ -94,7 +94,7 @@ const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 		};
 
 		fetchData();
-	}, [climateVariable, decimals, dateRange, endpoint, featureId, latlng, section]);
+	}, [climateVariable, decimals, dateRange, endpoint, featureId, latlng, section, scenario]);
 
 	// Value formatter (for units)
 	const valueFormatter = (value: number) => {

@@ -24,7 +24,7 @@ const FrequenciesDropdown: React.FC = () => {
 
 	const Tooltip = () => (
 		<div>
-			{__('Select a frequency.')}
+			{__('Select a time of the year from the options in the dropdown menu.')}
 		</div>
 	);
 

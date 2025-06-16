@@ -74,7 +74,7 @@ const TimePeriodsControlSingle: React.FC = () => {
 			<div className="time-periods-control">
 				<ControlTitle
 					title={__('Time Periods')}
-					tooltip={__('Time periods tooltip')}
+					tooltip={__('Move the slider to select your time period of interest.')}
 				/>
 				<Slider.Root
 					className={cn(

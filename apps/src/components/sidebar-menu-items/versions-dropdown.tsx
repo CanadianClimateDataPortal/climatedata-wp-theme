@@ -18,7 +18,8 @@ const VersionsDropdown: React.FC = () => {
 
 	const Tooltip = () => (
 		<div>
-			{__('Select a version.')}
+			{__('Climate datasets are updated regularly meaning that more than one version may be available. ' +
+				  'The most recent version is selected by default, but you can switch between versions by clicking on the options in the dropdown menu.')}
 		</div>
 	);
 

@@ -29,7 +29,8 @@ const EmissionScenariosControl: React.FC = () => {
 
 	const Tooltip = () => (
 		<div>
-			{__('Select an emission scenario.')}
+			{__('Climate projections are available for multiple emissions scenarios, ranging from lower to higher emissions. ' +
+				  'Select from the options available in the dropdown menu to view the climate projection for that emissions scenario.')}
 		</div>
 	);
 

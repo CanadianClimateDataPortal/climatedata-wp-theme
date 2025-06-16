@@ -36,6 +36,14 @@ const DataValuesControl: React.FC = () => {
 		</div>
 	);
 
+	const Tooltip = () => (
+		<div className="text-sm text-gray-500">
+			{__('Switch between Absolute and Delta values by clicking on either option. ' +
+				  'Delta values represent the change in the selected variable between the future selected time period and the reference period (or baseline) value. ' +
+				  'The reference period used here is 1971-2000.')}
+		</div>
+	);
+
 	const options = [
 		{ value: 'absolute', label: __('Absolute') },
 		{ value: 'delta', label: deltaLabel },
@@ -55,6 +63,7 @@ const DataValuesControl: React.FC = () => {
 			<RadioGroupFactory
 				title={__('Values')}
 				name="data-value"
+				tooltip={<Tooltip />}
 				options={options}
 				value={climateVariable?.getDataValue() ?? options[0].value}
 				disabled={climateVariable ? !climateVariable.hasDelta() : false}

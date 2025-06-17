@@ -305,3 +305,7 @@
 .download-summary-bullet li::marker {
 	color: #d1d5db; /* Tailwind gray-300 */
 }
+
+.popover-content {
+	max-width: min(500px, var(--radix-popover-content-available-width));
+}

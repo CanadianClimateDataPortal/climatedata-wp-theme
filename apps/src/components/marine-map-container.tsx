@@ -115,6 +115,7 @@ export default function MarineMapContainer({
 					latlng={latlng}
 					featureId={featureId}
 					data={chartData}
+					scenario={scenario}
 				/>,
 				{
 					position: {

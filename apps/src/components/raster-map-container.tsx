@@ -111,6 +111,7 @@ export default function RasterMapContainer({
 					latlng={latlng}
 					featureId={featureId}
 					data={chartData}
+					scenario={scenario}
 				/>,
 				{
 					position: {

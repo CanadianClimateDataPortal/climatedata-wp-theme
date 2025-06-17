@@ -45,13 +45,15 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 		datasetVersion,
 		gridType,
 		interactiveRegion,
-		startYear
+		startYear,
+		isDelta7100,
 	} = useMemo(() => ({
 		threshold: climateVariable?.getThreshold() ?? '',
 		datasetVersion: climateVariable?.getVersion() ?? '',
 		gridType: climateVariable?.getGridType() ?? 'canadagrid',
 		interactiveRegion: climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA,
 		startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
+		isDelta7100: climateVariable?.getDataValue() === 'delta',
 	}), [climateVariable]);
 
 	const getFeatureColor = useCallback(
@@ -146,6 +148,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 					interactiveRegion,
 					emissionScenario: scenario ?? '',
 					decimals: 1,
+					isDelta7100: isDelta7100,
 				});
 
 				setLayerData(data);
@@ -159,7 +162,8 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 		interactiveRegion,
 		scenario ?? '',
 		startYear,
-		threshold
+		threshold,
+		isDelta7100,
 	]);
 
 	// Helper for click event

@@ -574,6 +574,7 @@ export interface ChoroValuesOptions {
 	interactiveRegion: string;
 	emissionScenario: string;
 	decimals: number;
+	isDelta7100: boolean;
 }
 
 export interface ColourScheme {

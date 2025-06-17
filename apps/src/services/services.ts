@@ -472,6 +472,7 @@ export const fetchChoroValues = async (options: ChoroValuesOptions) => {
 		`period=${parseInt(options.decade) + 1}`,
 		`dataset_name=${options.dataset}`,
 		`decimals=${options.decimals}`,
+		`delta7100=${options.isDelta7100 ? 'true' : 'false'}`,
 	].join('&');
 
 	return await fetch(

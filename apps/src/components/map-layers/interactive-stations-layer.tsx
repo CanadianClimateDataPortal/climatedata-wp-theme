@@ -185,6 +185,7 @@ const InteractiveStationsLayer = forwardRef<{
 											latlng={L.latLng(station.coordinates.lat, station.coordinates.lng)}
 											featureId={-1}
 											data={chartData}
+											scenario={climateVariable?.getScenario() ?? ''}
 										/>,
 										{
 											position: {

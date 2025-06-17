@@ -49,11 +49,18 @@ interface TooltipPoint extends Point {
 /**
  * Component to render a chart using Highcharts with climate data.
  */
-const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: number, data: ClimateDataProps }> = ({
+const ClimateDataChart: React.FC<{
+	title: string;
+	latlng: L.LatLng;
+	featureId: number;
+	data: ClimateDataProps;
+	scenario: string;
+}> = ({
 	title,
 	latlng,
 	featureId,
 	data,
+	scenario,
 }) => {
 	const { locale, getLocalized } = useLocale();
 	const { climateVariable } = useClimateVariable();
@@ -63,7 +70,6 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const chartRef = useRef<HighchartsReact.RefObject>(null);
 	const climateVariableId = climateVariable?.getId();
 	const version = climateVariable?.getVersion();
-	const scenario = climateVariable?.getScenario();
 	const unit = climateVariable?.getUnit();
 	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -753,6 +759,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						latlng,
 						featureId,
 						mode: "panel",
+						scenario,
 					}) }
 				</div>
 			</div>

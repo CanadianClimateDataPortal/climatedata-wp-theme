@@ -106,6 +106,7 @@ export default function RasterMapContainer({
 				variable: climateVariable?.getThreshold() ?? '',
 				frequency: frequency,
 				dataset: climateVariable?.getVersion() ?? '',
+				unitDecimals: climateVariable?.getUnitDecimalPlaces() ?? 0,
 			});
 
 			togglePanel(

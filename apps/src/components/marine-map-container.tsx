@@ -111,6 +111,7 @@ export default function MarineMapContainer({
 				variable: climateVariable?.getThreshold() ?? '',
 				frequency: frequency,
 				dataset: climateVariable?.getVersion() ?? '',
+				unitDecimals: climateVariable?.getUnitDecimalPlaces() ?? 0,
 			});
 
 			togglePanel(

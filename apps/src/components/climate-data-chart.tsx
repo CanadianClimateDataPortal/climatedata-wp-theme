@@ -351,7 +351,6 @@ const ClimateDataChart: React.FC<{
 			__(datasetLabel),
 			__(climateVariableTitle),
 			__(versionLabel),
-			enableTabs ? __(activeTab) : null,
 		].filter(Boolean).join('-'));
 	};
 

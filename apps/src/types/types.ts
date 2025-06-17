@@ -5,7 +5,7 @@ import { buttonVariants } from '@/lib/format';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { LucideIcon } from 'lucide-react';
 import L from 'leaflet';
-import { ClimateVariableConfigInterface, DownloadFile } from '@/types/climate-variable-interface';
+import { ClimateVariableConfigInterface, DownloadFile, InteractiveRegionOption } from '@/types/climate-variable-interface';
 
 /**
  * Represents valid locale values.
@@ -526,7 +526,9 @@ export interface InteractivePanelProps<T> {
  * Represents the options for the request to fetch chart data.
  */
 export interface ChartDataOptions {
-	latlng: L.LatLng;
+	interactiveRegion: InteractiveRegionOption;
+	latlng?: L.LatLng;
+	featureId?: number;
 	variable: string;
 	dataset: string;
 	frequency: string;

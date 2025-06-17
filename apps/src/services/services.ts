@@ -13,6 +13,7 @@ import {
 import L from 'leaflet';
 
 import {GEOSERVER_BASE_URL, WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH} from '@/lib/constants';
+import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, any>();
@@ -379,8 +380,32 @@ export const fetchLocationByCoords = async (latlng: L.LatLng | { lat: number; ln
  * @param options Options to pass to the API
  */
 export const generateChartData = async (options: ChartDataOptions) => {
-	const { latlng: { lat, lng }, dataset, variable, frequency  } = options;
-	const response = await fetch(`${window.DATA_URL}/generate-charts/${lat}/${lng}/${variable}/${frequency}?decimals=1&dataset_name=${dataset}`);
+	const { 
+		interactiveRegion,
+		latlng,
+		featureId,
+		dataset,
+		variable,
+		frequency
+	} = options;
+// 
+	let fetchUrl = `${window.DATA_URL}`;
+
+	if(interactiveRegion == InteractiveRegionOption.GRIDDED_DATA) {
+		// For gridded data
+		if(latlng === undefined) return null;
+
+		const {lat, lng} = latlng;
+		fetchUrl += `/generate-charts/${lat}/${lng}`;
+	} else {
+		// For other interactive regions
+		if(featureId === undefined) return null;
+
+		fetchUrl += `/generate-regional-charts/${interactiveRegion}/${featureId}`;
+	}
+
+	fetchUrl += `/${variable}/${frequency}?decimals=1&dataset_name=${dataset}`;
+	const response = await fetch(fetchUrl);
 
 	if (!response.ok) {
 		throw new Error('Failed to fetch data');

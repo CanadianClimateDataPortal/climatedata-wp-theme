@@ -27,7 +27,7 @@
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { MapState, MapLocation, WMSLegendData, TaxonomyData, PostData, MapCoordinates } from '@/types/types';
+import { MapState, MapLocation, WMSLegendData, TaxonomyData, PostData, MapCoordinates, TransformedLegendEntry } from '@/types/types';
 import {
 	SLIDER_DEFAULT_YEAR_VALUE,
 	SLIDER_MAX_YEAR,
@@ -59,6 +59,7 @@ const initialState: MapState = {
 		labels: 1,
 	},
 	legendData: {},
+	transformedLegendEntry: [],
 	variableList: [],
 	variableListLoading: false,
 	mapCoordinates: {
@@ -128,6 +129,9 @@ const mapSlice = createSlice({
 		setLegendData(state, action: PayloadAction<WMSLegendData>) {
 			state.legendData = action.payload;
 		},
+		setTransformedLegendEntry(state, action: PayloadAction<TransformedLegendEntry[]>) {
+			state.transformedLegendEntry = action.payload;
+		},
 		setOpacity(
 			state,
 			action: PayloadAction<{ key: keyof MapItemsOpacity; value: number }>
@@ -156,6 +160,7 @@ export const {
 	clearRecentLocations,
 	setMapColor,
 	setLegendData,
+	setTransformedLegendEntry,
 	setOpacity,
 	setMapCoordinates,
 } = mapSlice.actions;

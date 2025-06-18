@@ -182,7 +182,10 @@ export default function MarineMapContainer({
 				onUnmount={onUnmount}
 			/>
 			{climateVariable?.getInteractiveMode() === 'region' && (
-				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
+				<MapLegend 
+					url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`}
+					isComparisonMap={isComparisonMap}
+				/>
 			)}
 
 			{/* Use the unified custom panes with 'marine' mode */}
@@ -210,6 +213,7 @@ export default function MarineMapContainer({
 					onOut={onOut}
 					onClick={onClick}
 					layerRef={layerRef}
+					isComparisonMap={isComparisonMap}
 				/>
 			)}
 

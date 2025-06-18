@@ -421,7 +421,7 @@ export const generateChartData = async (options: ChartDataOptions) => {
  * @param options Options to pass to the API
  */
 export const fetchMSCClimateNormalsChartData = async (stationId: string, normalId: number) => {
-	const response = await fetch(`https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=${stationId}&NORMAL_ID=${normalId}&sortby=MONTH`);
+	const response = await fetch(`https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=${stationId}&NORMAL_ID=${normalId}&sortby=MONTH`);
 
 	if (!response.ok) {
 		throw new Error('Failed to fetch data');

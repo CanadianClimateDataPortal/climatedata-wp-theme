@@ -145,7 +145,9 @@ const InteractiveStationsLayer = forwardRef<{
 			marker.on('click', () => {
 				if (typeof onStationSelect === 'function') {
 					onStationSelect(station);
-				} else if (onLocationModalOpen) {
+				} 
+				
+				if (onLocationModalOpen) {
 					// Open the location modal with the station details
 					// For MSC Climate normals 1981 - 2010
 

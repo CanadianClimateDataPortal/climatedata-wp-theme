@@ -31,7 +31,7 @@ import {
 	SIDEBAR_WIDTH,
 } from '@/lib/constants';
 import { LocationModalContent } from '@/components/map-layers/location-modal-content';
-import { SelectedLocationInfo } from '@/types/types';
+import { SelectedLocationInfo, Station } from '@/types/types';
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 
 /**
@@ -61,6 +61,7 @@ export default function RasterMapContainer({
 	layerRef?: React.MutableRefObject<any>;
 }): React.ReactElement {
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
+	const [selectedStation, setSelectedStation] = useState<Station | null>(null);
 
 	const {
 		opacity: { labels: labelsOpacity },
@@ -85,6 +86,7 @@ export default function RasterMapContainer({
 
 	const handleLocationModalClose = () => {
 		clearSelectedLocation();
+		setSelectedStation(null);
 		setLocationModalContent(null);
 	};
 
@@ -135,6 +137,7 @@ export default function RasterMapContainer({
 	const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 
 	const canShowModal = useMemo(() => {
+		// If we have a location
 		if (selectedLocation) {
 			const { featureId } = selectedLocation;
 
@@ -142,8 +145,13 @@ export default function RasterMapContainer({
 			return !(interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA && !featureId);
 		}
 
+		// If we have a station
+		if (selectedStation !== null) {
+			return locationModalContent !== null;
+		}
+
 		return false;
-	}, [selectedLocation, interactiveRegion])
+	}, [selectedLocation, interactiveRegion, selectedStation, locationModalContent])
 
 	useEffect(() => {
 		if (selectedLocation && canShowModal) {
@@ -159,7 +167,7 @@ export default function RasterMapContainer({
 				/>
 			)
 		}
-		else {
+		else if(!selectedStation) {
 			setLocationModalContent(null);
 		}
 	}, [selectedLocation, setLocationModalContent, scenario, canShowModal]);
@@ -223,6 +231,7 @@ export default function RasterMapContainer({
 			)}
 			{climateVariable?.getInteractiveMode() === 'station' && (
 				<InteractiveStationsLayer
+					onStationSelect={setSelectedStation}
 					onLocationModalOpen={handleLocationModalOpen}
 					onLocationModalClose={handleLocationModalClose}
 				/>

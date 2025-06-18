@@ -386,7 +386,8 @@ export const generateChartData = async (options: ChartDataOptions) => {
 		featureId,
 		dataset,
 		variable,
-		frequency
+		frequency,
+		unitDecimals
 	} = options;
 // 
 	let fetchUrl = `${window.DATA_URL}`;
@@ -404,7 +405,7 @@ export const generateChartData = async (options: ChartDataOptions) => {
 		fetchUrl += `/generate-regional-charts/${interactiveRegion}/${featureId}`;
 	}
 
-	fetchUrl += `/${variable}/${frequency}?decimals=1&dataset_name=${dataset}`;
+	fetchUrl += `/${variable}/${frequency}?decimals=${unitDecimals}&dataset_name=${dataset}`;
 	const response = await fetch(fetchUrl);
 
 	if (!response.ok) {

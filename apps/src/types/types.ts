@@ -533,7 +533,7 @@ export interface ChartDataOptions {
 	dataset: string;
 	frequency: string;
 	unit?: string;
-	unitDecimals?: number;
+	unitDecimals: number;
 }
 
 export interface DeltaValuesOptions {

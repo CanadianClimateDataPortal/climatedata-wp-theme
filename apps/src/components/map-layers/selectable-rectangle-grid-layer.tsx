@@ -1,23 +1,14 @@
-import {
-	useEffect,
-	useRef,
-	useMemo,
-	useCallback,
-	useImperativeHandle,
-	forwardRef,
-} from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 
 import L from 'leaflet';
-import 'leaflet.pm';
+import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet.pm/dist/leaflet.pm.css';
+import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 
 import { useAppDispatch } from '@/app/hooks';
-import {
-	setCenter,
-	setZoom,
-} from '@/features/download/download-slice';
+import { useLocale } from '@/hooks/use-locale';
+import { setCenter, setZoom } from '@/features/download/download-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 /**
@@ -33,6 +24,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 
 	const { climateVariable, setSelectedRegion, resetSelectedRegion } = useClimateVariable();
 	const dispatch = useAppDispatch();
+	const { locale } = useLocale();
 
 	const gridResolutions = useMemo<Record<string, number>>(
 			() => ({
@@ -142,6 +134,8 @@ const SelectableRectangleGridLayer = forwardRef<{
 			return;
 		}
 
+		map.pm.setLang(locale);
+
 		// enable drawing a rectangle
 		map.pm.enableDraw('Rectangle');
 
@@ -163,7 +157,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 				map.removeLayer(layerGroup);
 			}
 		};
-	}, [map, onCreate, handleMoveEnd]);
+	}, [map, onCreate, handleMoveEnd, locale]);
 
 	// expose the clear selection method to the parent component
 	useImperativeHandle(

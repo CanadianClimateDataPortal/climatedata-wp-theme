@@ -192,7 +192,11 @@ export default function MarineMapContainer({
 			<CustomPanesLayer mode="marine" />
 
 			{/* Use the unified variable layer */}
-			<VariableLayer layerValue={layerValue} scenario={scenario} />
+			<VariableLayer 
+				layerValue={layerValue}
+				scenario={scenario}
+				isComparisonMap={isComparisonMap}
+			/>
 
 			<ZoomControl />
 
@@ -213,7 +217,6 @@ export default function MarineMapContainer({
 					onOut={onOut}
 					onClick={onClick}
 					layerRef={layerRef}
-					isComparisonMap={isComparisonMap}
 				/>
 			)}
 

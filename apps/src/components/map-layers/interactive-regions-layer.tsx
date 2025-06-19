@@ -26,7 +26,6 @@ interface InteractiveRegionsLayerProps {
 	onOut?: () => void;
 	onClick?: (e: { latlng: L.LatLng; layer: { properties: any } }) => void;
 	layerRef?: React.MutableRefObject<any>;
-	isComparisonMap: boolean;
 }
 
 const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
@@ -35,7 +34,6 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 	onOut,
 	onClick,
 	layerRef,
-	isComparisonMap = false,
 }) => {
 	const [layerData, setLayerData] = useState<Record<number, number> | null>(null);
 	const map = useMap();
@@ -43,7 +41,6 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 
 	const {
 		opacity: { mapData },
-		transformedLegendEntry,
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
@@ -71,13 +68,6 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 				return '#fff';
 			}
 
-			// We override color if it's for the comparison map of sea level variable
-			// if(isComparisonMap && climateVariable?.getId() === "sea_level" && transformedLegendEntry.length > 0) {
-			// 	console.log('override');
-			// 	colorMap.colours = transformedLegendEntry.map((entry) => entry.color) ?? [];
-      // 	colorMap.quantities = transformedLegendEntry.map((entry) => Number(entry.quantity)) ?? [];
-			// }
-
 			// Extract value based on interactive region type
 			const value =
 				interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
@@ -86,7 +76,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 
 			return getColor(value);
 		},
-		[interactiveRegion, layerData, colorMap, getColor, isComparisonMap, climateVariable, transformedLegendEntry]
+		[interactiveRegion, layerData, colorMap, getColor]
 	);
 
 	const frequency = useMemo(() => {

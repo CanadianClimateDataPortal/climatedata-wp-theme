@@ -21,10 +21,11 @@ const MapLegendControl: React.FC<{
 	isCategorical?: boolean;
 	isDelta: boolean;
 	isDefaultColourScheme: boolean;
+	isSeaLevel: boolean;
 	hasCustomScheme?: boolean;
 	unit?: string;
 	colourType?: string;
-}> = ({ data, isOpen, toggleOpen, isCategorical, isDelta, isDefaultColourScheme, hasCustomScheme, unit, colourType }) => {
+}> = ({ data, isOpen, toggleOpen, isCategorical, isDelta, isDefaultColourScheme, isSeaLevel, hasCustomScheme, unit, colourType }) => {
 	const [svgWidth, setSvgWidth] = useState(0);
 	const [legendHeight, setLegendHeight] = useState<number | undefined>(undefined);
 	const svgRef = useRef<SVGSVGElement>(null);
@@ -51,12 +52,13 @@ const MapLegendControl: React.FC<{
 	const [minItemHeight, setMinItemHeight] = useState<number>(0);
 
 	useEffect(() => {
-		const currentMaxItemExtra = isCategorical || !isDefaultColourScheme || (isDefaultColourScheme && isDelta) ? 0 : 0.5;
-		const currentMinItemExtra = isCategorical  || (isDefaultColourScheme && isDelta)
+		const currentMaxItemExtra = isCategorical || !isDefaultColourScheme || (isDefaultColourScheme && isDelta) || isSeaLevel ? 0 : 0.5;
+		const currentMinItemExtra = isCategorical || (isDefaultColourScheme && isDelta) || isSeaLevel
 			? 0 : 
 			(isDefaultColourScheme && !isDelta) 
 				? 0.5
 				: 1;
+
 		const currentItemHeight = GRADIENT_HEIGHT / (totalLabels + currentMaxItemExtra + currentMinItemExtra);
 		const currentMaxItemHeight = currentItemHeight * (1 + currentMaxItemExtra);
 		const currentMinItemHeight = currentItemHeight * (1 + currentMinItemExtra);

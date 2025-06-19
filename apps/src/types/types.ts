@@ -801,6 +801,7 @@ export interface WMSParams {
 export interface VariableLayerProps {
 	scenario: string | null | undefined;
 	layerValue: string;
+	isComparisonMap?: boolean;
 }
 
 export interface SelectedLocationInfo {

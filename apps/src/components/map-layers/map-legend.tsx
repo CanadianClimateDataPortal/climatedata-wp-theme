@@ -95,7 +95,7 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 				setTransformedLegendData(transformedData);
 			})();
 		}
-	}, [rawLegendData, colourScheme, colorMap, isCategorical, climateVariable, isComparisonMap, transformedLegendEntry]);
+	}, [rawLegendData, colourScheme, colorMap, isCategorical, climateVariable, isComparisonMap]);
 
 	useEffect(() => {
 		if (!transformedLegendData) {
@@ -124,6 +124,7 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 					isCategorical={isCategorical}
 					isDelta={isDelta}
 					isDefaultColourScheme={colourScheme === 'default'}
+					isSeaLevel={climateVariable?.getId() === "sea_level"}
 					hasCustomScheme={hasCustomScheme}
 					colourType={colourType}
 					unit={unit}

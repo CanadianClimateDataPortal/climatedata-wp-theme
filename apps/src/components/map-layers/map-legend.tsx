@@ -81,21 +81,29 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 			return;
 		}
 
-		if(isComparisonMap && climateVariable?.getId() === "sea_level" && transformedLegendEntry.length > 0) {
-			setTransformedLegendData(transformedLegendEntry);
-		} else {
-			(async () => {
+		(async () => {
+			// Update legend entries (if it's not the comparison map of sea level)
+			if(!isComparisonMap || climateVariable?.getId() !== "sea_level") {
 				const transformedData: TransformedLegendEntry[] =
 					await transformLegendData(rawLegendData, colourScheme, temporalRange, isDelta, unit, locale, decimals, colorMap);
-
-				if(!isComparisonMap) {
-					dispatch(setTransformedLegendEntry(transformedData));
-				}
-
+	
+				dispatch(setTransformedLegendEntry(transformedData));
+	
 				setTransformedLegendData(transformedData);
-			})();
-		}
+			}
+		})();
 	}, [rawLegendData, colourScheme, colorMap, isCategorical, climateVariable, isComparisonMap]);
+
+	// Listen for changes to transformedLegendEntry for sea level comparison map and update the legend entries
+	useEffect(() => {
+		if (
+			isComparisonMap &&
+			climateVariable?.getId() === "sea_level" &&
+			transformedLegendEntry.length > 0
+		) {
+			setTransformedLegendData(transformedLegendEntry);
+		}
+	}, [isComparisonMap, climateVariable, transformedLegendEntry]);
 
 	useEffect(() => {
 		if (!transformedLegendData) {

@@ -185,6 +185,7 @@ export interface MapState {
 	pane: string;
 	mapColor: string;
 	legendData: WMSLegendData;
+	transformedLegendEntry: TransformedLegendEntry[];
 	opacity: {
 		mapData: number;
 		labels: number;
@@ -251,6 +252,7 @@ export interface TransformedLegendEntry {
 	label: string | number;
 	color: string;
 	opacity: number;
+	quantity?: number;
 }
 
 /**
@@ -799,6 +801,7 @@ export interface WMSParams {
 export interface VariableLayerProps {
 	scenario: string | null | undefined;
 	layerValue: string;
+	isComparisonMap?: boolean;
 }
 
 export interface SelectedLocationInfo {

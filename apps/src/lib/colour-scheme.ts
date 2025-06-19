@@ -50,16 +50,18 @@ export function generateColourScheme(
 
 	const useDelta = climateVariable?.hasDelta() ?? false;
 
+	const quantities = calculateQuantities({
+		temporalScaleConfig,
+		useDelta: useDelta && climateVariable?.getDataValue() === "delta",
+		colours,
+		schemeType,
+		decimals
+	});
+
 	return {
 		colours,
 		type: schemeType,
-		quantities: calculateQuantities({
-			temporalScaleConfig,
-			useDelta: useDelta && climateVariable?.getDataValue() === "delta",
-			colours,
-			schemeType,
-			decimals
-		}),
+		quantities: quantities,
 		isDivergent: schemeType === 'divergent'
 	};
 }

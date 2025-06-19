@@ -28,7 +28,13 @@ interface InteractiveRegionsLayerProps {
 	layerRef?: React.MutableRefObject<any>;
 }
 
-const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scenario, onOver, onOut, onClick, layerRef }) => {
+const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
+	scenario,
+	onOver,
+	onOut,
+	onClick,
+	layerRef,
+}) => {
 	const [layerData, setLayerData] = useState<Record<number, number> | null>(null);
 	const map = useMap();
 	const section = useContext(SectionContext);

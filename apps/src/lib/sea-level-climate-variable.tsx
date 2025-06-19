@@ -1,5 +1,5 @@
 import MarineClimateVariable from "@/lib/marine-climate-variable";
-import { DateRangeConfig, LocationModalContentParams } from "@/types/climate-variable-interface";
+import { DateRangeConfig, LocationModalContentParams, ColourType } from "@/types/climate-variable-interface";
 import MedianOnlyVariableValues from "@/components/map-layers/median-only-variable-values";
 
 class SeaLevelClimateVariable extends MarineClimateVariable {
@@ -27,6 +27,10 @@ class SeaLevelClimateVariable extends MarineClimateVariable {
 				scenario={scenario ?? ""}
 			/>
 		);
+	}
+
+	getColourType(): string | null {
+		return ColourType.DISCRETE;
 	}
 }
 

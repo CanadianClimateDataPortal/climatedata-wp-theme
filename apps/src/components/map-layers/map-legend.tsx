@@ -6,7 +6,8 @@ import { useMap } from 'react-leaflet';
 import MapLegendControl from '@/components/map-legend-control';
 
 import { useAppDispatch } from '@/app/hooks';
-import { setLegendData } from '@/features/map/map-slice';
+import { useAppSelector } from "@/app/hooks";
+import { setLegendData, setTransformedLegendEntry } from '@/features/map/map-slice';
 import { transformLegendData } from '@/lib/format';
 import { getCommonPrefix } from '@/lib/utils';
 import { fetchLegendData } from '@/services/services';
@@ -16,7 +17,10 @@ import { useColorMap } from '@/hooks/use-color-map';
 import { ColourType } from '@/types/climate-variable-interface';
 import { useLocale } from '@/hooks/use-locale';
 
-const MapLegend: React.FC<{ url: string }> = ({ url }) => {
+const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
+	url,
+	isComparisonMap = false,
+}) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [rawLegendData, setRawLegendData] = useState<WMSLegendData | null>(null);
 	const [transformedLegendData, setTransformedLegendData] = useState<TransformedLegendEntry[] | null>(null);
@@ -25,6 +29,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 	const dispatch = useAppDispatch();
 	const { climateVariable } = useClimateVariable();
 	const { colorMap } = useColorMap();
+	const transformedLegendEntry = useAppSelector((state) => state.map.transformedLegendEntry);
 
 	const { locale } = useLocale();
 	const isDelta = climateVariable?.getDataValue() === 'delta';
@@ -76,13 +81,21 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 			return;
 		}
 
-		(async () => {
-			const transformedData: TransformedLegendEntry[] =
-				await transformLegendData(rawLegendData, colourScheme, temporalRange, isDelta, unit, locale, decimals, colorMap);
+		if(isComparisonMap && climateVariable?.getId() === "sea_level" && transformedLegendEntry.length > 0) {
+			setTransformedLegendData(transformedLegendEntry);
+		} else {
+			(async () => {
+				const transformedData: TransformedLegendEntry[] =
+					await transformLegendData(rawLegendData, colourScheme, temporalRange, isDelta, unit, locale, decimals, colorMap);
 
-			setTransformedLegendData(transformedData);
-		})();
-	}, [rawLegendData, colourScheme, colorMap, isCategorical, climateVariable]);
+				if(!isComparisonMap) {
+					dispatch(setTransformedLegendEntry(transformedData));
+				}
+
+				setTransformedLegendData(transformedData);
+			})();
+		}
+	}, [rawLegendData, colourScheme, colorMap, isCategorical, climateVariable, isComparisonMap]);
 
 	useEffect(() => {
 		if (!transformedLegendData) {
@@ -111,6 +124,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 					isCategorical={isCategorical}
 					isDelta={isDelta}
 					isDefaultColourScheme={colourScheme === 'default'}
+					isSeaLevel={climateVariable?.getId() === "sea_level"}
 					hasCustomScheme={hasCustomScheme}
 					colourType={colourType}
 					unit={unit}

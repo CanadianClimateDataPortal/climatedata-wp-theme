@@ -24,7 +24,8 @@ import { VariableLayerProps, WMSParams } from '@/types/types';
  */
 
 export default function VariableLayer({
-	scenario
+	scenario,
+	isComparisonMap = false,
 }: VariableLayerProps): null {
 	const map = useMap();
 	const {
@@ -32,6 +33,7 @@ export default function VariableLayer({
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
+	const transformedLegendEntry = useAppSelector((state) => state.map.transformedLegendEntry);
 
 	const section = useContext(SectionContext);
 
@@ -69,11 +71,24 @@ export default function VariableLayer({
 	 * ramp quantities, and layer value.
 	 */
 	const generateSLD = useCallback(() => {
-		if (!colourScheme) {
-			return;
+		let colours, quantities;
+
+		if(isComparisonMap && climateVariable?.getId() === "sea_level" && transformedLegendEntry.length > 0) {
+			// If it's the sea level comparison map -> we override colors to match legend
+
+			colours = transformedLegendEntry.map((entry) => entry.color).reverse() ?? [];
+      quantities = transformedLegendEntry.map((entry) => Number(entry.quantity)).reverse() ?? [];
+		} else {
+			// Else (if we have a selected custom palette)
+
+			if (!colourScheme) {
+				return;
+			}
+
+			colours = colourScheme.colours;
+			quantities = colourScheme.quantities;
 		}
 
-		const { colours, quantities } = colourScheme;
 		if (!quantities || !quantities.length) {
 			return
 		}
@@ -88,7 +103,6 @@ export default function VariableLayer({
 		for (let i = 0; i < colours.length; i++) {
 			sldBody += `<ColorMapEntry color="${colours[i]}" quantity="${quantities[i]}"/>`;
 		}
-
 		sldBody +=
 			'</ColorMap></RasterSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>';
 
@@ -96,7 +110,10 @@ export default function VariableLayer({
 	}, [
 		colourMapType,
 		colourScheme,
-		layerValue
+		layerValue,
+		isComparisonMap,
+		climateVariable,
+		transformedLegendEntry,
 	])
 
 	useEffect(() => {

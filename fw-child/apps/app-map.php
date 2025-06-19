@@ -43,50 +43,7 @@ $internal_urls = [
 	'download-fr' => '/telechargement/',
 ];
 
-/**
- * Load translation data for the map application.
- *
- * This loads .mo translation files and converts them to a JavaScript-compatible
- * format for use in the React application.
- */
-$translation_base_path = get_stylesheet_directory() . '/languages/react-apps/';
-$translation_data      = array();
-
-// Load all translation files
-$translation_files = array(
-	$translation_base_path . get_locale() . '.mo',
-);
-
-// JED compatible locale_data
-$jed_locale_data = array();
-
-// MO files exists
-$mo_files_exists = false;
-
-foreach ( $translation_files as $mofile ) {
-	if ( file_exists( $mofile ) ) {
-		$mo = new MO();
-
-		// Mark the MO files as existing
-		$mo_files_exists = true;
-
-		if ( $mo->import_from_file( $mofile ) ) {
-			// Convert MO entries to Jed-compatible format
-			// $mo->entries has keys as original strings and values as Translation_Entry objects
-			foreach ( $mo->entries as $original => $translation_entry ) {
-				if ( ! empty( $original ) ) {
-					// $translation_entry->translations is an array of translated strings
-					$jed_locale_data[ $original ] = $translation_entry->translations;
-				}
-			}
-		}
-	}
-}
-
-// Structure the translation data
-$translation_data = array(
-	'locale_data' => $jed_locale_data
-);
+$locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
 ?>
 
 <!DOCTYPE html>
@@ -101,19 +58,16 @@ $translation_data = array(
 	add_favicon();
 
 	// Load the translation data for the map app
-	if ( true === $mo_files_exists ) {
+	if ( count( $locale_data ) ) {
 		?>
         <!-- Load WordPress script dependencies for i18n -->
         <script src="<?php echo esc_url( get_site_url() . '/wp-includes/js/dist/hooks.min.js' ); ?>"></script>
         <script src="<?php echo esc_url( get_site_url() . '/wp-includes/js/dist/i18n.min.js' ); ?>"></script>
 
         <script>
-            // Translation data for the map application
-			<?php if ( ! empty( $translation_data['locale_data'] ) ) { ?>
-            window.wp.i18n.setLocaleData(
-            	<?php echo wp_json_encode( $translation_data['locale_data'] ); ?>
-            );
-			<?php } ?>
+        window.wp.i18n.setLocaleData(
+            <?php echo wp_json_encode( $locale_data ); ?>
+        );
         </script>
 		<?php
 	}
@@ -156,9 +110,9 @@ $translation_data = array(
 </head>
 <body>
 <div
-        id="root"
-        data-app-lang="<?php echo esc_attr( $current_lang ); ?>"
-        data-internal-urls="<?php echo esc_attr( wp_json_encode( $internal_urls ) ); ?>"
+    id="root"
+    data-app-lang="<?php echo esc_attr( $current_lang ); ?>"
+    data-internal-urls="<?php echo esc_attr( wp_json_encode( $internal_urls ) ); ?>"
 ></div>
 
 <?php

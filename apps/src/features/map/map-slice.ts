@@ -132,6 +132,9 @@ const mapSlice = createSlice({
 		setTransformedLegendEntry(state, action: PayloadAction<TransformedLegendEntry[]>) {
 			state.transformedLegendEntry = action.payload;
 		},
+		clearTransformedLegendEntry(state) {
+			state.transformedLegendEntry = [];
+		},
 		setOpacity(
 			state,
 			action: PayloadAction<{ key: keyof MapItemsOpacity; value: number }>
@@ -161,6 +164,7 @@ export const {
 	setMapColor,
 	setLegendData,
 	setTransformedLegendEntry,
+	clearTransformedLegendEntry,
 	setOpacity,
 	setMapCoordinates,
 } = mapSlice.actions;

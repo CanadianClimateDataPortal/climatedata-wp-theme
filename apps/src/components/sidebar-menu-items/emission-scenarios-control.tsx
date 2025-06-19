@@ -13,12 +13,15 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { SidebarMenuItem } from '@/components/ui/sidebar';
 import { Checkbox } from '@/components/ui/checkbox';
 import Dropdown from '@/components/ui/dropdown';
+import { useAppDispatch } from '@/app/hooks';
+import { clearTransformedLegendEntry } from '@/features/map/map-slice';
 
 // other
 import appConfig from "@/config/app.config";
 
 const EmissionScenariosControl: React.FC = () => {
 	const { climateVariable, setScenario, setScenarioCompare, setScenarioCompareTo } = useClimateVariable();
+	const dispatch = useAppDispatch();
 
 	const scenarioOptions = appConfig.scenarios.filter((scenario) =>
 		climateVariable?.getScenarios()?.includes(scenario.value)
@@ -37,6 +40,9 @@ const EmissionScenariosControl: React.FC = () => {
 		if (!value) {
 			setScenarioCompareTo(null);
 		}
+
+		// Clear the transformed legend entry
+		dispatch(clearTransformedLegendEntry());
 	}
 
 	return (

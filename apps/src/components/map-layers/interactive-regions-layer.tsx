@@ -126,7 +126,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 				weight: 1,
 				color: layerData ? '#fff' : '#999',
 				fillColor:
-					properties.id && layerData?.[properties.id]
+					properties.id && layerData?.[properties.id] !== undefined
 						? getFeatureColor(properties.id)
 						: 'transparent',
 				opacity: 0.5,

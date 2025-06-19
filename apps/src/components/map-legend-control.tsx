@@ -4,6 +4,7 @@ import { __ } from '@/context/locale-provider';
 
 import { TransformedLegendEntry } from '@/types/types';
 import { ColourType } from '@/types/climate-variable-interface';
+import { getUnitName } from "@/lib/utils";
 
 const PADDING_TOP = 0;
 const PADDING_BOTTOM = 20;
@@ -30,6 +31,7 @@ const MapLegendControl: React.FC<{
 	const [legendHeight, setLegendHeight] = useState<number | undefined>(undefined);
 	const svgRef = useRef<SVGSVGElement>(null);
 	const isBlocksGradient = isCategorical || colourType === ColourType.DISCRETE;
+	const unitName = getUnitName(unit ?? '');
 
 	// Calculate dynamic height based on number of labels and minimum spacing
 	const totalLabels = data.length;
@@ -107,8 +109,8 @@ const MapLegendControl: React.FC<{
 
 			{isOpen && (
 				<div className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto">
-					<div className="font-sans text-zinc-900 font-semibold text-lg leading-5 capitalize text-right">
-						{unit}
+					<div className="font-sans text-zinc-900 font-semibold text-lg leading-5 text-right">
+						{unitName}
 					</div>
 					<svg ref={svgRef} height={LEGEND_HEIGHT} className="w-full">
 						{isBlocksGradient ? (

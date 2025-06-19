@@ -1,5 +1,10 @@
 # For how to use this file, see /docs/react-apps-translation.md
 
+msgid ""
+msgstr ""
+"Language: fr_CA\n"
+"Plural-Forms: nplurals=2; plural=n>=2 ? 1 : n<0;\n"
+
 msgid "Final Step"
 msgstr "Étape finale"
 
@@ -779,8 +784,46 @@ msgstr "Delta de la période 1971-2000"
 msgid "Delta is the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model. The reference period used here is 1971-2000."
 msgstr "Le delta est la différence entre la valeur future et la valeur de la période de référence d'une variable climatique, telle que simulée par un modèle climatique. La période de référence utilisée ici est 1971-2000."
 
-msgid "days"
-msgstr ""
+msgid "Day"
+msgstr "Jour"
 
 msgid "Days"
-msgstr ""
+msgstr "Jours"
+
+msgid "days"
+msgstr "jours"
+
+msgid "Periods"
+msgstr "Périodes"
+
+msgid "Events"
+msgstr "Événements"
+
+msgid "mm/day"
+msgstr "mm/jour"
+
+msgid "Degree Days"
+msgstr "Degrés-jours"
+
+msgid "%s day"
+msgid_plural "%s days"
+msgstr[0] "%s jour"
+msgstr[1] "%s jours"
+
+msgid "%s period"
+msgid_plural "%s periods"
+msgstr[0] "%s période"
+msgstr[1] "%s périodes"
+
+msgid "%s event"
+msgid_plural "%s events"
+msgstr[0] "%s événement"
+msgstr[1] "%s événements"
+
+msgid "%s mm/day"
+msgstr "%s mm/jour"
+
+msgid "%s degree day"
+msgid_plural "%s degree days"
+msgstr[0] "%s degré-jour"
+msgstr[1] "%s degrés-jours"

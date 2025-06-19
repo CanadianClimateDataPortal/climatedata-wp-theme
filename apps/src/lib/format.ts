@@ -1,15 +1,17 @@
 import { cva } from 'class-variance-authority';
 import {
-	WMSLegendData,
-	TransformedLegendEntry,
-	PostData,
 	ApiPostData,
-	MultilingualField,
-	TermItem,
 	Locale,
+	MultilingualField,
+	PostData,
+	TermItem,
+	TransformedLegendEntry,
+	WMSLegendData,
 } from '@/types/types';
 import { TemporalRange } from '@/types/climate-variable-interface';
 import React from 'react';
+import { __, _n } from "@/context/locale-provider";
+import { sprintf } from '@wordpress/i18n';
 
 export async function transformLegendData(
 	input: WMSLegendData,
@@ -243,3 +245,62 @@ export const buttonVariants = cva(
 		},
 	}
 );
+
+/**
+ * TODO: Not to format date (use doyFormatter instead), but to format a value with a unit.
+ * @param value
+ * @param locale
+ * @param decimals
+ * @param unit
+ * @param relative
+ */
+export function formatValue(value: number, locale: string, decimals: number, unit: string | undefined, relative: boolean = false): string {
+	const formatter = new Intl.NumberFormat(
+		locale,
+		{
+			minimumFractionDigits: decimals,
+			maximumFractionDigits: decimals,
+			signDisplay: relative ? 'exceptZero' : 'negative',
+			useGrouping: false,
+		}
+	);
+	let valuePattern = `%s`;
+
+	if (unit) {
+		valuePattern = `%s ${unit}`;
+
+		switch (unit) {
+			case 'DoY':
+				if (relative) {
+					valuePattern = _n(`%s day`, `%s days`, value);
+				}
+				break;
+			case 'degC':
+				valuePattern = __(`%s °C`);
+				break;
+			case 'mm':
+				valuePattern = __(`%s mm`);
+				break;
+			case 'cm':
+				valuePattern = __(`%s cm`);
+				break;
+			case 'days':
+				valuePattern = _n(`%s day`, `%s days`, value);
+				break;
+			case 'periods':
+				valuePattern = _n(`%s period`, `%s periods`, value);
+				break;
+			case 'events':
+				valuePattern = _n(`%s event`, `%s events`, value);
+				break;
+			case 'mm/day':
+				valuePattern = __(`%s mm/day`);
+				break;
+			case 'degree_days':
+				valuePattern = _n(`%s degree day`, `%s degree days`, value);
+				break;
+		}
+	}
+
+	return sprintf(valuePattern, formatter.format(value));
+}

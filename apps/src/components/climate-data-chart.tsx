@@ -671,7 +671,7 @@ const ClimateDataChart: React.FC<{
 									(dataCopy[key] as (number | string)[][]).forEach((item) => {
 										if (item.length > 1) {
 											switch (unit) {
-												case "doy":
+												case "DoY":
 													item[1] = doyFormatter(Number(item[1]), locale);
 													break;
 												default:
@@ -681,7 +681,7 @@ const ClimateDataChart: React.FC<{
 										}
 										if (isRange && item.length > 2) {
 											switch (unit) {
-												case "doy":
+												case "DoY":
 													item[2] = doyFormatter(Number(item[2]), locale);
 													break;
 												default:

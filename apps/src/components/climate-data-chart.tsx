@@ -666,7 +666,7 @@ const ClimateDataChart: React.FC<{
 													item[1] = doyFormatter(Number(item[1]), locale);
 													break;
 												default:
-													item[1] = Number(item[1]).toFixed(decimals) + ' ' + unit;
+													item[1] = Number(item[1]).toFixed(decimals);
 													break;
 											}
 										}
@@ -676,7 +676,7 @@ const ClimateDataChart: React.FC<{
 													item[2] = doyFormatter(Number(item[2]), locale);
 													break;
 												default:
-													item[2] = Number(item[2]).toFixed(decimals) + ' ' + unit;
+													item[2] = Number(item[2]).toFixed(decimals);
 													break;
 											}
 										}

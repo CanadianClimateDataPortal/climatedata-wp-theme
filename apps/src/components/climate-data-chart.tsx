@@ -418,11 +418,15 @@ const ClimateDataChart: React.FC<{
 						text: [
 							__(title),
 							__(climateVariableTitle),
+							__(thresholdLabel),
 						].filter(Boolean).join(' - '),
 					},
 					yAxis: {
 						title: {
-							text: title,
+							text: [
+								__(climateVariableTitle),
+								__(thresholdLabel),
+							].filter(Boolean).join(' - '),
 						},
 					},
 				},

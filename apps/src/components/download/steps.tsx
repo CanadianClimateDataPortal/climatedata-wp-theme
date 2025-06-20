@@ -300,7 +300,7 @@ const Steps: React.FC = () => {
 						.then((url) => {
 							const file: DownloadFile = {
 								url: url ?? '',
-								label: fileFormat === FileFormatType.NetCDF ? 'file.nc' : 'file.zip',
+								label: fileFormat === FileFormatType.NetCDF ? __('file.nc') : __('file.zip'),
 							};
 
 							dispatch(setDownloadLinks([file]));

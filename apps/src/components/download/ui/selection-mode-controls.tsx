@@ -1,5 +1,6 @@
 import React from 'react';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
+import {__} from "@/context/locale-provider.tsx";
 
 /**
  * SelectionModeControls
@@ -15,7 +16,7 @@ export interface SelectionModeControlsProps {
 const SelectionModeControls: React.FC<SelectionModeControlsProps> = ({ selectionMode, selectionModeOptions, onChange }) => {
   return (
     <RadioGroupFactory
-      title="Ways to select on the map"
+      title={__('Ways to select on the map')}
       name="map-selection-mode"
       value={selectionMode}
       orientation="horizontal"
@@ -27,4 +28,4 @@ const SelectionModeControls: React.FC<SelectionModeControlsProps> = ({ selection
   );
 };
 
-export default SelectionModeControls; 
+export default SelectionModeControls;

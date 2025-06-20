@@ -155,7 +155,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		&& climateVariable?.getAnalyzeScenarios().includes("ssp370");
 
 	return (
-		<StepContainer title="Additional details">
+		<StepContainer title={__("Additional details")}>
 			<StepContainerDescription>
 				{__('Adjust the controls below to customize your analysis.')}
 			</StepContainerDescription>
@@ -289,7 +289,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			<FrequencySelect
-				title={'Temporal frequency'}
+				title={__('Temporal frequency')}
 				config={frequencyConfig}
 				section={section}
 				value={climateVariable?.getFrequency() ?? undefined}

@@ -19,19 +19,19 @@ import { clearTransformedLegendEntry } from '@/features/map/map-slice';
 // other
 import appConfig from "@/config/app.config";
 
+const EmissionScenariosTooltip = () => (
+	<div>
+		{__('Climate projections are available for multiple emissions scenarios, ranging from lower to higher emissions. ' +
+			  'Select from the options available in the dropdown menu to view the climate projection for that emissions scenario.')}
+	</div>
+);
+
 const EmissionScenariosControl: React.FC = () => {
 	const { climateVariable, setScenario, setScenarioCompare, setScenarioCompareTo } = useClimateVariable();
 	const dispatch = useAppDispatch();
 
 	const scenarioOptions = appConfig.scenarios.filter((scenario) =>
 		climateVariable?.getScenarios()?.includes(scenario.value)
-	);
-
-	const Tooltip = () => (
-		<div>
-			{__('Climate projections are available for multiple emissions scenarios, ranging from lower to higher emissions. ' +
-				  'Select from the options available in the dropdown menu to view the climate projection for that emissions scenario.')}
-		</div>
 	);
 
 	const handleCompareChange = (value: boolean) => {
@@ -52,7 +52,7 @@ const EmissionScenariosControl: React.FC = () => {
 				<Dropdown
 					key={climateVariable?.getId()}
 					label={__('Emissions Scenarios')}
-					tooltip={<Tooltip />}
+					tooltip={<EmissionScenariosTooltip />}
 					placeholder={__('Select an option')}
 					options={scenarioOptions.filter(
 						(option) => option.value !== climateVariable?.getScenarioCompareTo()
@@ -92,4 +92,4 @@ const EmissionScenariosControl: React.FC = () => {
 };
 EmissionScenariosControl.displayName = 'EmissionScenariosControl';
 
-export { EmissionScenariosControl };
+export { EmissionScenariosControl, EmissionScenariosTooltip };

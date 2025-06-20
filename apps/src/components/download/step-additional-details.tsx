@@ -7,6 +7,7 @@ import {
 	StepContainer,
 	StepContainerDescription,
 } from '@/components/download/step-container';
+import { EmissionScenariosTooltip } from '@/components/sidebar-menu-items/emission-scenarios-control';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import {
@@ -230,7 +231,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 						<CheckboxFactory
 							name="emission-scenarios"
 							title={__('Emissions Scenarios')}
-							tooltip={__('Select emission scenarios')}
+							tooltip={<EmissionScenariosTooltip />}
 							orientation="horizontal"
 							className="max-w-md"
 							optionClassName="w-1/2 sm:w-1/4"

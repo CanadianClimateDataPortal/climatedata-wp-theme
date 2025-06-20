@@ -27,6 +27,7 @@ const SelectTrigger = forwardRef<
 			'ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
 			'disabled:cursor-not-allowed disabled:opacity-50',
 			'[&>span]:line-clamp-1',
+			'text-left',
 			className
 		)}
 		{...props}

@@ -58,8 +58,8 @@ export interface FieldConfig {
 	unit?: string;
 	attributes?: {
 		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url' | 'date';
+		format?: string,
 		placeholder?: string;
-
 	};
 	options?: { value: string; label: string }[];
 }

@@ -33,12 +33,24 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 					.map(f => {
 						const value = values?.[f.key];
 						// If it's a date field with a format, check both existence and format validity
-						if (f.type === 'input' && f.attributes?.type === 'date' && f.unit) {
-							return (
-								value != null &&
-								value !== '' &&
-								dateFormatCheck(f.unit).test(value)
-							);
+						if (f.type === 'input' && f.attributes?.type === 'date' && f.attributes?.format) {
+							if(value != null && value !== '' && f.attributes?.format === 'MM-DD') {
+								// Regex test if month between 01 and 12 and if day between 01 and 31
+								const regex = /^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
+								if (!regex.test(value)) return false;
+
+								// Test if the day is consistent with the month
+								const [monthStr, dayStr] = value.split("-");
+								const month = parseInt(monthStr, 10);
+								const day = parseInt(dayStr, 10);
+								const thirtyDaysMonths = [4, 6, 9, 11];
+								if (month === 2) return day <= 29; // For february
+								if (thirtyDaysMonths.includes(month)) return day <= 30;
+
+								return true;
+							}
+
+							return value != null && value !== '';
 						}
 						// Otherwise, just check existence
 						return value != null && value !== '';

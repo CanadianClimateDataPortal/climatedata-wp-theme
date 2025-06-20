@@ -41,11 +41,11 @@ const SelectedCellsSummary: React.FC<SelectedCellsSummaryProps> = ({ selectedCel
             selectedCells > 0 ? 'text-brand-blue' : 'text-neutral-grey-medium'
           )}
         >
-          {_n('1 Cell', `${selectedCells} Cells`, selectedCells)}
+          {_n('1 Cell', `%d Cells`, selectedCells).replace('%d', String(selectedCells))}
         </div>
       </div>
     </>
   );
 };
 
-export default SelectedCellsSummary; 
+export default SelectedCellsSummary;

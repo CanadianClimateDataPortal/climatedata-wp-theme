@@ -15,6 +15,9 @@ msgstr "Sélectionnez un jeu de données pour commencer à élaborer votre deman
 msgid "Learn more"
 msgstr "En savoir plus"
 
+msgid "Zoom to a location, region, city, coordinates..."
+msgstr "Rechercher un lieu, une région, une ville, des coordonnées..."
+
 msgid "Select a variable"
 msgstr "Sélectionnez une variable"
 
@@ -186,7 +189,13 @@ msgstr[0] "1 sélection"
 msgstr[1] "%d sélections"
 
 msgid "Additional details"
-msgstr "Détails supplémentaires"
+msgstr "Détails additionnels"
+
+msgid "From Date"
+msgstr "Date de début"
+
+msgid "To Date"
+msgstr "Date de fin"
 
 msgid "All percentiles"
 msgstr "Tous les percentiles"
@@ -195,6 +204,27 @@ msgid "1 percentile"
 msgid_plural "%d percentiles"
 msgstr[0] "1 percentile"
 msgstr[1] "%d percentiles"
+
+msgid "Unselect all to receive output from individual models"
+msgstr "Désélectionnez tout pour obtenir les résultats des modèles individuels"
+
+msgid "Temporal frequency"
+msgstr "Fréquence temporelle"
+
+msgid "30 years average"
+msgstr "Moyennes sur 30 ans"
+
+msgid "Station type"
+msgstr "Type de station"
+
+msgid "Temperature"
+msgstr "Température"
+
+msgid "Precipitation"
+msgstr "Précipitations"
+
+msgid "Both"
+msgstr "Les deux"
 
 msgid "File parameters"
 msgstr "Paramètres du fichier"
@@ -207,6 +237,23 @@ msgstr "Étape suivante"
 
 msgid "Send Request"
 msgstr "Envoyer votre requête"
+
+msgid "Click the button below to start the download."
+msgstr "Cliquez sur le bouton ci-dessous pour commencer le téléchargement."
+
+msgid "Ways to select on the map"
+msgstr "Types de sélection sur la carte"
+
+msgid "You selected:"
+msgstr "Vous avez sélectionné :"
+
+msgid "1 Cell"
+msgid_plural "%d Cells"
+msgstr[0] "1 cellule"
+msgstr[1] "%d cellules"
+
+msgid "Clear"
+msgstr "Effacer"
 
 msgctxt "text direction"
 msgid "ltr"
@@ -270,7 +317,7 @@ msgid "Grid Cells"
 msgstr "Points de grille"
 
 msgid "Census Subdivisions"
-msgstr "Subdivision de recensement"
+msgstr "Subdivisions de recensement"
 
 msgid "Health Regions"
 msgstr "Régions socio-sanitaires"
@@ -430,6 +477,108 @@ msgstr "à"
 
 msgid "Range"
 msgstr "Plage de valeurs"
+
+msgid "Gridded Historical Data"
+msgstr "Données observées interpolées"
+
+msgid "Modeled Historical"
+msgstr "Historique modélisé"
+
+msgid "Historical Range"
+msgstr "Plage historique"
+
+msgid "SSP1-2.6 Median"
+msgstr "SSP1-2.6 Médiane"
+
+msgid "SSP1-2.6 Range"
+msgstr "SSP1-2.6 Portée"
+
+msgid "SSP2-4.5 Median"
+msgstr "SSP2-4.5 Médiane"
+
+msgid "SSP2-4.5 Range"
+msgstr "SSP2-4.5 Portée"
+
+msgid "SSP3-7.0 Median"
+msgstr "SSP3-7.0 Médiane"
+
+msgid "SSP3-7.0 Range"
+msgstr "SSP3-7.0 Portée"
+
+msgid "SSP5-8.5 Median"
+msgstr "SSP5-8.5 Médiane"
+
+msgid "SSP5-8.5 Range"
+msgstr "SSP5-8.5 Portée"
+
+msgid "SSP5-8.5 High ice sheet loss A"
+msgstr "SSP5-8.5 Perte de calotte glaciaire élevée A"
+
+msgid "SSP5-8.5 High ice sheet loss B"
+msgstr "SSP5-8.5 Perte de calotte glaciaire élevée B"
+
+msgid "Vertical Land Motion"
+msgstr "Mouvement terrestre vertical"
+
+msgid "RCP 2.6 Median"
+msgstr "RCP 2.6 Médiane"
+
+msgid "RCP 2.6 Range"
+msgstr "RCP 2.6 Portée"
+
+msgid "RCP 4.5 Median"
+msgstr "RCP 4.5 Médiane"
+
+msgid "RCP 4.5 Range"
+msgstr "RCP 4.5 Portée"
+
+msgid "RCP 8.5 Median"
+msgstr "RCP 8.5 Médiane"
+
+msgid "RCP 8.5 Range"
+msgstr "RCP 8.5 Portée"
+
+msgid "RCP 8.5 Enhanced scenario"
+msgstr "RCP 8.5 Scénario renforcé"
+
+msgid "RCP8.5 enhanced scenario"
+msgstr "RCP8.5 scénario renforcé"
+
+msgid "RCP8.5 lower (5th percentile)"
+msgstr "RCP8.5 inférieur (5e percentile)"
+
+msgid "RCP8.5 median (50th percentile)"
+msgstr "RCP8.5 médian (50e percentile)"
+
+msgid "RCP8.5 upper (95th percentile)"
+msgstr "RCP8.5 supérieur (95e percentile)"
+
+msgid "RCP4.5 lower (5th percentile)"
+msgstr "RCP4.5 inférieur (5e percentile)"
+
+msgid "RCP4.5 median (50th percentile)"
+msgstr "RCP4.5 médian (50e percentile)"
+
+msgid "RCP4.5 upper (95th percentile)"
+msgstr "RCP4.5 supérieur (95e percentile)"
+
+msgid "RCP2.6 lower (5th percentile)"
+msgstr "RCP2.6 inférieur (5e percentile)"
+
+msgid "RCP2.6 median (50th percentile)"
+msgstr "RCP2.6 médian (50e percentile)"
+
+msgid "RCP2.6 upper (95th percentile)"
+msgstr "RCP2.6 supérieur (95e percentile)"
+
+msgid "Daily Average Temperature"
+msgstr "Température moyenne quotidienne"
+
+msgid "Daily Maximum Temperature"
+msgstr "Température maximale quotidienne"
+
+msgid "Daily Minimum Temperature"
+msgstr "Température minimale quotidienne"
 
 msgid "No data available."
 msgstr "Aucune donnée disponible."

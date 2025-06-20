@@ -660,10 +660,11 @@ const ClimateDataChart: React.FC<{
 							const unit = climateVariable?.getUnit();
 
 							// Update the data array selecting the right Decimals.
-							for (const key in data) {
-								if (Array.isArray(data[key])) {
+							const dataCopy = JSON.parse(JSON.stringify(data));
+							for (const key in dataCopy) {
+								if (Array.isArray(dataCopy[key])) {
 									const isRange = key.includes('_range');
-									(data[key] as (number | string)[][]).forEach((item) => {
+									(dataCopy[key] as (number | string)[][]).forEach((item) => {
 										if (item.length > 1) {
 											switch (unit) {
 												case "doy":
@@ -687,43 +688,43 @@ const ClimateDataChart: React.FC<{
 									});
 								}
 							}
-						}
 
-						if(activeTab === 'annual-values') {
-							chart.downloadCSV();
-						} else {
-							const prefixes: string[] = ['30y_', 'delta7100_'];
+							if(activeTab === 'annual-values') {
+								chart.downloadCSV();
+							} else {
+								const prefixes: string[] = ['30y_', 'delta7100_'];
 
-							// Get only data we want with the rights keys
-							const csvData = Object.keys(data)
-								.filter((key) => {
-									return prefixes.some((prefix) => key.startsWith(prefix));
-								})
-								.reduce((acc: Record<string, Record<string, number[]>>, key) => {
-									if(key === '30y_observations') return acc;
+								// Get only data we want with the rights keys
+								const csvData = Object.keys(dataCopy)
+									.filter((key) => {
+										return prefixes.some((prefix) => key.startsWith(prefix));
+									})
+									.reduce((acc: Record<string, Record<string, number[]>>, key) => {
+										if(key === '30y_observations') return acc;
 
-									const newKey = key.replace('_median', '_p50')
-										.replace('_range', '');
+										const newKey = key.replace('_median', '_p50')
+											.replace('_range', '');
 
-									acc[newKey] = Object.fromEntries(
-										Object.entries(data[key] ?? {}).map(([timestamp, value]) => {
-											const year = new Date(Number(timestamp)).getFullYear();
-											return [(year + 1) + "-" + (year + 30), value as number[]];
-										})
-									);
-									return acc;
-								}, {} as Record<string, Record<string, number[]>>);
+										acc[newKey] = Object.fromEntries(
+											Object.entries(dataCopy[key] ?? {}).map(([timestamp, value]) => {
+												const year = new Date(Number(timestamp)).getFullYear();
+												return [(year + 1) + "-" + (year + 30), value as number[]];
+											})
+										);
+										return acc;
+									}, {} as Record<string, Record<string, number[]>>);
 
-							const csvString = exportCsvFromData(csvData);
+								const csvString = exportCsvFromData(csvData);
 
-							// Trigger download
-							const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-							const link = document.createElement('a');
-							link.href = URL.createObjectURL(blob);
-							link.setAttribute('download', getExportFilename());
-							document.body.appendChild(link);
-							link.click();
-							document.body.removeChild(link);
+								// Trigger download
+								const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+								const link = document.createElement('a');
+								link.href = URL.createObjectURL(blob);
+								link.setAttribute('download', getExportFilename());
+								document.body.appendChild(link);
+								link.click();
+								document.body.removeChild(link);
+							}
 						}
 						break;
 				case 'print':

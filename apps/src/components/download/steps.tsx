@@ -294,13 +294,14 @@ const Steps: React.FC = () => {
 				if (climateVariable?.getInteractiveMode() === 'region') {
 					// Precalcultated variables (no station)
 					const fileFormat = climateVariable.getFileFormat?.() ?? '';
+					const fileName = climateVariable.getId() ?? 'file';
 
 					// Generate the file to be downloaded.
 					climateVariable.getDownloadUrl()
 						.then((url) => {
 							const file: DownloadFile = {
 								url: url ?? '',
-								label: fileFormat === FileFormatType.NetCDF ? 'file.nc' : 'file.zip',
+								label: fileName + (fileFormat === FileFormatType.NetCDF ? '.nc' : '.zip'),
 							};
 
 							dispatch(setDownloadLinks([file]));

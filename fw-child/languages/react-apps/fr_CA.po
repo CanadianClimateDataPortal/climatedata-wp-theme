@@ -106,7 +106,7 @@ msgid "Select percentiles"
 msgstr "Sélectionnez les percentiles"
 
 msgid "Missing data options"
-msgstr "Options de données manquantes"
+msgstr "Options pour les valeurs manquantes"
 
 msgid "Select missing data options"
 msgstr "Sélectionnez les options de données manquantes"

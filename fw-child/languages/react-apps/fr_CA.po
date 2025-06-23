@@ -15,6 +15,9 @@ msgstr "Sélectionnez un jeu de données pour commencer à élaborer votre deman
 msgid "Learn more"
 msgstr "En savoir plus"
 
+msgid "Zoom to a location, region, city, coordinates..."
+msgstr "Rechercher un lieu, une région, une ville, des coordonnées..."
+
 msgid "Select a variable"
 msgstr "Sélectionnez une variable"
 
@@ -70,10 +73,10 @@ msgid "WMO Parameters"
 msgstr "Paramètres de l'OMM"
 
 msgid "Full ensemble"
-msgstr ""
+msgstr "Ensemble complet"
 
 msgid " (Ensemble)"
-msgstr ""
+msgstr " (Ensemble)"
 
 msgid "Adjust the controls below to customize your analysis."
 msgstr "Ajustez les contrôles ci-dessous pour personnaliser votre analyse."
@@ -112,495 +115,647 @@ msgid "Select file parameters"
 msgstr "Sélectionnez les paramètres du fichier"
 
 msgid "Data processing starts after you \"Send Request\". It may take 30 to 90 minutes to complete, depending on available resources."
-msgstr ""
+msgstr "Le traitement des données commence lorsque vous cliquez sur \"Envoyer votre requête\". Cela peut prendre de 30 à 90 minutes, en fonction des ressources disponibles."
 
 msgid "You will be notified by email when your request has been processed and the data are available. Don't forget to check your spam folder."
-msgstr ""
+msgstr "Vous serez informé par courrier électronique lorsque votre demande aura été traitée et que les données seront disponibles. N'oubliez pas de vérifier votre dossier de courrier indésirable."
 
 msgid "Format"
-msgstr ""
+msgstr "Format"
 
 msgid "Decimal Place"
-msgstr ""
+msgstr "Décimales"
 
 msgid "Please enter your email address to receive your download link."
-msgstr ""
+msgstr "Veuillez saisir votre adresse courriel pour recevoir un lien de téléchargement."
 
 msgid "Email Address"
-msgstr ""
+msgstr "Adresse courriel"
 
 msgid "john.doe@gmail.com"
-msgstr ""
+msgstr "john.doe@gmail.com"
 
 msgid "I would like to subscribe to ClimateData Newsletter"
-msgstr ""
+msgstr "J'aimerais m'inscrire à l’infolettre de DonneesClimatiques.ca"
 
 msgid "Enter the characters shown:"
-msgstr ""
+msgstr "Entrer les caractères qui apparaissent ici"
 
 msgid "Refresh Captcha"
-msgstr ""
+msgstr "Rafraîchir le Captcha"
 
 msgid "Your request has been sent."
-msgstr ""
+msgstr "Votre requête a été envoyée."
 
 msgid "It may take 30 to 90 minutes to complete, depending on available resources."
-msgstr ""
+msgstr "Cela peut prendre de 30 à 90 minutes, en fonction des ressources disponibles."
 
 msgid "Your file is ready to download."
-msgstr ""
+msgstr "Votre fichier est prêt à être téléchargé."
 
 msgid "Download"
-msgstr ""
+msgstr "Télécharger"
 
 msgid "Additional Climate Normals variables are available from the"
-msgstr ""
+msgstr "Les variables additionnelles des normales climatiques sont disponibles sur les sites Web du"
 
 msgid "Canadian Centre for Climate Services"
-msgstr ""
+msgstr "Centre canadien des services climatiques"
 
 msgid "and the"
-msgstr ""
+msgstr "et sur celui des"
 
 msgid "Government of Canada Historical Climate Data"
-msgstr ""
+msgstr "normales climatiques du gouvernement du Canada"
 
 msgid "websites."
-msgstr ""
+msgstr "."
 
 msgid "Dataset"
-msgstr ""
+msgstr "Jeu de données"
 
 msgid "Variable"
-msgstr ""
+msgstr "Variable"
 
 msgid "Variable options"
-msgstr ""
+msgstr "Options de variable"
 
 msgid "Location or area"
-msgstr ""
+msgstr "Lieu ou région"
 
 msgid "1 selected"
 msgid_plural "%d selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 sélection"
+msgstr[1] "%d sélections"
 
 msgid "Additional details"
-msgstr ""
+msgstr "Détails additionnels"
+
+msgid "From Date"
+msgstr "Date de début"
+
+msgid "To Date"
+msgstr "Date de fin"
 
 msgid "All percentiles"
-msgstr ""
+msgstr "Tous les percentiles"
 
 msgid "1 percentile"
 msgid_plural "%d percentiles"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 percentile"
+msgstr[1] "%d percentiles"
+
+msgid "Unselect all to receive output from individual models"
+msgstr "Désélectionnez tout pour obtenir les résultats des modèles individuels"
+
+msgid "Temporal frequency"
+msgstr "Fréquence temporelle"
+
+msgid "30 years average"
+msgstr "Moyennes sur 30 ans"
+
+msgid "Station type"
+msgstr "Type de station"
+
+msgid "Temperature"
+msgstr "Température"
+
+msgid "Precipitation"
+msgstr "Précipitations"
+
+msgid "Both"
+msgstr "Les deux"
 
 msgid "File parameters"
-msgstr ""
+msgstr "Paramètres du fichier"
 
 msgid "Summary"
-msgstr ""
+msgstr "Résumé"
 
 msgid "Next Step"
-msgstr ""
+msgstr "Étape suivante"
 
 msgid "Send Request"
-msgstr ""
+msgstr "Envoyer votre requête"
+
+msgid "Click the button below to start the download."
+msgstr "Cliquez sur le bouton ci-dessous pour commencer le téléchargement."
+
+msgid "Ways to select on the map"
+msgstr "Types de sélection sur la carte"
+
+msgid "You selected:"
+msgstr "Vous avez sélectionné :"
+
+msgid "1 Cell"
+msgid_plural "%d Cells"
+msgstr[0] "1 cellule"
+msgstr[1] "%d cellules"
+
+msgid "Clear"
+msgstr "Effacer"
 
 msgctxt "text direction"
 msgid "ltr"
-msgstr ""
+msgstr "ltr"
 
 msgid "Close panel"
-msgstr ""
+msgstr "Fermer"
 
 msgid "Filter variables"
-msgstr ""
+msgstr "Filtrer les variables"
 
 msgid "Search for variables"
-msgstr ""
+msgstr "Rechercher des variables"
 
 msgid "Search"
-msgstr ""
+msgstr "Rechercher"
 
 msgid "Clear search"
-msgstr ""
+msgstr "Effacer la recherche"
 
 msgid "Search..."
-msgstr ""
+msgstr "Rechercher..."
 
 msgid "Loading..."
-msgstr ""
+msgstr "Chargement en cours..."
 
 msgid "Loading variables..."
-msgstr ""
+msgstr "Chargement des variables..."
 
 msgid "No variables found matching your search and filters."
-msgstr ""
+msgstr "Aucune variable trouvée correspondant à votre recherche et vos filtres."
 
 msgid "No variables found matching your search."
-msgstr ""
+msgstr "Aucune variable trouvée correspondant à votre recherche."
 
 msgid "No variables found for the selected filters."
-msgstr ""
+msgstr "Aucune variable trouvée pour les filtres sélectionnés."
 
 msgid "No variables available for this dataset."
-msgstr ""
+msgstr "Aucune variable disponible pour ce jeu de données."
 
 msgid "Variables"
-msgstr ""
+msgstr "Variables"
 
 msgid "Here you can browse all the variables contained in the selected dataset."
-msgstr ""
+msgstr "Vous pouvez parcourir ici toutes les variables contenues dans le jeu de données sélectionné."
 
 msgid "Please select a dataset first"
-msgstr ""
+msgstr "Veuillez d'abord sélectionner un jeu de données"
 
 msgid "Showing"
-msgstr ""
+msgstr "Affichage de"
 
 msgid "of"
-msgstr ""
+msgstr "sur"
 
 msgid "variables"
-msgstr ""
+msgstr "variables"
 
 msgid "Grid Cells"
-msgstr ""
+msgstr "Points de grille"
 
 msgid "Census Subdivisions"
-msgstr ""
+msgstr "Subdivisions de recensement"
 
 msgid "Health Regions"
-msgstr ""
+msgstr "Régions socio-sanitaires"
 
 msgid "Watersheds"
-msgstr ""
+msgstr "Bassins versants"
 
 msgid "Select an interactive region."
 msgstr ""
 
 msgid "Interactive Regions"
-msgstr ""
+msgstr "Régions interactives"
 
 msgid "January"
-msgstr ""
+msgstr "Janvier"
 
 msgid "February"
-msgstr ""
+msgstr "Février"
 
 msgid "March"
-msgstr ""
+msgstr "Mars"
 
 msgid "April"
-msgstr ""
+msgstr "Avril"
 
 msgid "May"
-msgstr ""
+msgstr "Mai"
 
 msgid "June"
-msgstr ""
+msgstr "Juin"
 
 msgid "July"
-msgstr ""
+msgstr "Juillet"
 
 msgid "August"
-msgstr ""
+msgstr "Août"
 
 msgid "September"
-msgstr ""
+msgstr "Septembre"
 
 msgid "October"
-msgstr ""
+msgstr "Octobre"
 
 msgid "November"
-msgstr ""
+msgstr "Novembre"
 
 msgid "December"
-msgstr ""
+msgstr "Décembre"
 
 msgid "Spring"
-msgstr ""
+msgstr "Printemps"
 
 msgid "Summer"
-msgstr ""
+msgstr "Été"
 
 msgid "Fall"
-msgstr ""
+msgstr "Automne"
 
 msgid "Winter"
-msgstr ""
+msgstr "Hiver"
 
 msgid "Monthly"
-msgstr ""
+msgstr "Mensuelle"
 
 msgid "All months"
-msgstr ""
+msgstr "Tous les mois"
 
 msgid "Seasonal"
-msgstr ""
+msgstr "Saisonnière"
 
 msgid "Annual"
-msgstr ""
+msgstr "Annuelle"
 
 msgid "Annual (July to June)"
-msgstr ""
+msgstr "Annuelle (juillet à juin)"
 
 msgid "Daily"
-msgstr ""
+msgstr "Quotidienne"
 
 msgid "Climate Data"
-msgstr ""
+msgstr "Données climatiques"
 
 msgid "Go back to the main website"
-msgstr ""
+msgstr "Retourner au site principal"
 
 msgid "Legend"
-msgstr ""
+msgstr "Légende"
 
 msgid "Zoom In"
-msgstr ""
+msgstr "Zoom avant"
 
 msgid "Zoom Out"
-msgstr ""
+msgstr "Zoom arrière"
 
 msgid "Geolocation is not supported by your browser."
-msgstr ""
+msgstr "La géolocalisation n'est pas supportée par votre navigateur."
 
 msgid "Your current location"
-msgstr ""
+msgstr "Votre emplacement actuel"
 
 msgid "Unable to retrieve your location."
-msgstr ""
+msgstr "Impossible de récupérer votre emplacement."
 
 msgid "Change from "
-msgstr ""
+msgstr "Changement par rapport à "
 
 msgid "Annual Values"
-msgstr ""
+msgstr "Valeurs annuelles"
 
 msgid "30 Year Averages"
-msgstr ""
+msgstr "Moyennes sur 30 ans"
 
 msgid "30 Year Changes"
-msgstr ""
+msgstr "Changements sur 30 ans"
 
 msgid "Export failed. Please try again."
-msgstr ""
+msgstr "L’exportation a échoué. Veuillez réessayer."
 
 msgid "Export"
-msgstr ""
+msgstr "Exporter"
 
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 msgid "PNG"
-msgstr ""
+msgstr "PNG"
 
 msgid "CSV"
-msgstr ""
+msgstr "CSV"
 
 msgid "Print"
-msgstr ""
+msgstr "Imprimer"
 
 msgid "Go to details section"
-msgstr ""
+msgstr "Aller à la section des détails"
 
 msgid "See details"
-msgstr ""
+msgstr "Voir les détails"
 
 msgid "Grid cells"
-msgstr ""
+msgstr "Points de grille"
 
 msgid "Draw region"
-msgstr ""
+msgstr "Dessiner une région"
 
 msgid "Select station(s)"
-msgstr ""
+msgstr "Sélectionner une ou plusieurs stations"
 
 msgid "Median"
-msgstr ""
+msgstr "Médiane"
 
 msgid "Relative to baseline"
-msgstr ""
+msgstr "Relatif à la référence"
 
 msgid "to"
-msgstr ""
+msgstr "à"
 
 msgid "Range"
-msgstr ""
+msgstr "Plage de valeurs"
+
+msgid "Gridded Historical Data"
+msgstr "Données observées interpolées"
+
+msgid "Modeled Historical"
+msgstr "Historique modélisé"
+
+msgid "Historical Range"
+msgstr "Plage historique"
+
+msgid "SSP1-2.6 Median"
+msgstr "SSP1-2.6 Médiane"
+
+msgid "SSP1-2.6 Range"
+msgstr "SSP1-2.6 Portée"
+
+msgid "SSP2-4.5 Median"
+msgstr "SSP2-4.5 Médiane"
+
+msgid "SSP2-4.5 Range"
+msgstr "SSP2-4.5 Portée"
+
+msgid "SSP3-7.0 Median"
+msgstr "SSP3-7.0 Médiane"
+
+msgid "SSP3-7.0 Range"
+msgstr "SSP3-7.0 Portée"
+
+msgid "SSP5-8.5 Median"
+msgstr "SSP5-8.5 Médiane"
+
+msgid "SSP5-8.5 Range"
+msgstr "SSP5-8.5 Portée"
+
+msgid "SSP5-8.5 High ice sheet loss A"
+msgstr "SSP5-8.5 Perte de calotte glaciaire élevée A"
+
+msgid "SSP5-8.5 High ice sheet loss B"
+msgstr "SSP5-8.5 Perte de calotte glaciaire élevée B"
+
+msgid "Vertical Land Motion"
+msgstr "Mouvement terrestre vertical"
+
+msgid "RCP 2.6 Median"
+msgstr "RCP 2.6 Médiane"
+
+msgid "RCP 2.6 Range"
+msgstr "RCP 2.6 Portée"
+
+msgid "RCP 4.5 Median"
+msgstr "RCP 4.5 Médiane"
+
+msgid "RCP 4.5 Range"
+msgstr "RCP 4.5 Portée"
+
+msgid "RCP 8.5 Median"
+msgstr "RCP 8.5 Médiane"
+
+msgid "RCP 8.5 Range"
+msgstr "RCP 8.5 Portée"
+
+msgid "RCP 8.5 Enhanced scenario"
+msgstr "RCP 8.5 Scénario renforcé"
+
+msgid "RCP8.5 enhanced scenario"
+msgstr "RCP8.5 scénario renforcé"
+
+msgid "RCP8.5 lower (5th percentile)"
+msgstr "RCP8.5 inférieur (5e percentile)"
+
+msgid "RCP8.5 median (50th percentile)"
+msgstr "RCP8.5 médian (50e percentile)"
+
+msgid "RCP8.5 upper (95th percentile)"
+msgstr "RCP8.5 supérieur (95e percentile)"
+
+msgid "RCP4.5 lower (5th percentile)"
+msgstr "RCP4.5 inférieur (5e percentile)"
+
+msgid "RCP4.5 median (50th percentile)"
+msgstr "RCP4.5 médian (50e percentile)"
+
+msgid "RCP4.5 upper (95th percentile)"
+msgstr "RCP4.5 supérieur (95e percentile)"
+
+msgid "RCP2.6 lower (5th percentile)"
+msgstr "RCP2.6 inférieur (5e percentile)"
+
+msgid "RCP2.6 median (50th percentile)"
+msgstr "RCP2.6 médian (50e percentile)"
+
+msgid "RCP2.6 upper (95th percentile)"
+msgstr "RCP2.6 supérieur (95e percentile)"
+
+msgid "Daily Average Temperature"
+msgstr "Température moyenne quotidienne"
+
+msgid "Daily Maximum Temperature"
+msgstr "Température maximale quotidienne"
+
+msgid "Daily Minimum Temperature"
+msgstr "Température minimale quotidienne"
 
 msgid "No data available."
-msgstr ""
+msgstr "Aucune donnée disponible."
 
 msgid "Datasets"
-msgstr ""
+msgstr "Jeux de données"
 
 msgid "Select a dataset"
-msgstr ""
+msgstr "Sélectionnez un jeu de données"
 
 msgid "Climate Data provides a selection of historical and future climate datasets."
-msgstr ""
+msgstr "Données Climatiques propose une sélection de jeux de données climatiques historiques et futurs."
 
 msgid "Select an emission scenario."
 msgstr ""
 
 msgid "Compare scenarios"
-msgstr ""
+msgstr "Comparer des scénarios"
 
 msgid "Select a threshold value."
 msgstr ""
 
 msgid "Threshold Values"
-msgstr ""
+msgstr "Valeurs seuils"
 
 msgid "Select a frequency."
 msgstr ""
 
+msgid "Frequencies"
+msgstr "Fréquences"
+
 msgid "Time Periods"
-msgstr ""
+msgstr "Périodes temporelles"
 
 msgid "Time periods tooltip"
 msgstr ""
 
 msgid "Absolute"
-msgstr ""
+msgstr "Absolues"
 
 msgid "Delta"
-msgstr ""
+msgstr "Delta"
 
 msgid "Values"
-msgstr ""
+msgstr "Valeurs"
+
+msgid "Map colours"
+msgstr "Couleurs de la carte"
 
 msgid "Select a map color."
 msgstr ""
 
 msgid "Discrete"
-msgstr ""
+msgstr "Discrète"
 
 msgid "Continuous"
-msgstr ""
+msgstr "Continue"
 
 msgid "Select a version."
 msgstr ""
 
 msgid "Versions"
-msgstr ""
+msgstr "Versions"
 
 msgid "Recent locations"
-msgstr ""
+msgstr "Emplacements récents"
 
 msgid "Data"
-msgstr ""
+msgstr "Données"
 
 msgid "Labels"
-msgstr ""
+msgstr "Étiquettes"
 
 msgid "Layer opacities"
-msgstr ""
+msgstr "Opacité des couches"
 
 msgid "Explore Data"
-msgstr ""
+msgstr "Données"
 
 msgid "Map Settings"
-msgstr ""
+msgstr "Options"
 
 msgid "About our data"
-msgstr ""
+msgstr "À propos de nos données"
 
 msgid "Support"
-msgstr ""
+msgstr "Support"
 
 msgid "Description"
-msgstr ""
+msgstr "Description"
 
 msgid "Technical description"
-msgstr ""
+msgstr "Description technique"
 
 msgid "Relevant sectors"
-msgstr ""
+msgstr "Secteurs concernés"
 
 msgid "Click on the following to get sector-specific insights."
-msgstr ""
+msgstr "Cliquez sur les éléments suivants pour obtenir des informations spécifiques à chaque secteur."
 
 msgid "Relevant articles"
-msgstr ""
+msgstr "Articles pertinents"
 
 msgid "To help you get more of our data."
-msgstr ""
+msgstr "Pour vous aider à obtenir plus de nos données."
 
 msgid "Check out the Canadian climate data map"
-msgstr ""
+msgstr "Consultez la carte des données climatiques du Canada"
 
 msgid "Share on Facebook (opens in a new tab)"
-msgstr ""
+msgstr "Partager sur Facebook (ouvre un nouvel onglet)"
 
 msgid "Share on Twitter (opens in a new tab)"
-msgstr ""
+msgstr "Partager sur Twitter (ouvre un nouvel onglet)"
 
 msgid "Share on LinkedIn (opens in a new tab)"
-msgstr ""
+msgstr "Partager sur LinkedIn (ouvre un nouvel onglet)"
 
 msgid "Share via Email (opens in the same tab)"
-msgstr ""
+msgstr "Partager par courriel (ouvre dans le même onglet)"
 
 msgid "Climate Data Map"
-msgstr ""
+msgstr "Carte des données climatiques"
 
 msgid "Sharing this map"
-msgstr ""
+msgstr "Partager cette carte"
 
 msgid "You can copy-paste this link anywhere you want; it will keep all your data options and your map position."
-msgstr ""
+msgstr "Vous pouvez copier-coller ce lien où vous le souhaitez ; le lien conservera toutes vos options de données et la position de votre carte."
 
 msgid "Copied"
-msgstr ""
+msgstr "Copié"
 
 msgid "Copy Link"
-msgstr ""
+msgstr "Copier le lien"
 
 msgid "Or click one of these social links:"
-msgstr ""
+msgstr "Ou cliquez sur l'un de ces liens sociaux :"
 
 msgid "Clicking on icons will launch a new window."
-msgstr ""
+msgstr "Cliquer sur les icônes ouvrira une nouvelle fenêtre."
 
 msgid "Generating..."
-msgstr ""
+msgstr "Génération en cours..."
 
 msgid "Download image from viewport"
-msgstr ""
+msgstr "Télécharger l'image de la vue actuelle"
 
 msgid "Your export will showcase your various data options. The map position will be the one you see on your screen."
-msgstr ""
+msgstr "Votre export mettra en valeur vos différentes options de données. La position de la carte sera celle affichée à l’écran."
 
 msgid "Download current map image (opens in a new tab)"
-msgstr ""
+msgstr "Télécharger l’image actuelle de la carte (ouvre dans un nouvel onglet)"
 
 msgid "Need control over your own data?"
-msgstr ""
+msgstr "Besoin de contrôler vos propres données?"
 
 msgid "Head over to the download section where you can select multiple grid cells and personalize more data options."
-msgstr ""
+msgstr "Rendez-vous dans la section de téléchargement, où vous pouvez sélectionner plusieurs cellules de la grille et personnaliser davantage vos options de données."
 
 msgid "Go to download sections (opens in a new tab)"
-msgstr ""
+msgstr "Aller à la section Téléchargement (ouvre dans un nouvel onglet)"
 
 msgid "Go to Download Section"
-msgstr ""
+msgstr "Aller à la section Téléchargement"
 
 msgid "View details"
-msgstr ""
+msgstr "Voir les détails"
 
 msgid "Share"
-msgstr ""
+msgstr "Partager"
 
 msgid "the current visible map"
-msgstr ""
+msgstr "la carte actuellement visible"
 
 msgid "image from your viewport"
-msgstr ""
+msgstr "l'image de votre vue actuelle"
 
 msgid "Delta with 1971-2000"
 msgstr "Delta de la période 1971-2000"

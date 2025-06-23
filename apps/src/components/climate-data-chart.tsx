@@ -467,7 +467,7 @@ const ClimateDataChart: React.FC<{
 			yAxis: climateVariableId === 'msc_climate_normals' ? [
 				{
 					title: {
-						text: 'Temperature (°C)',
+						text: __('Temperature (°C)'),
 						rotation: 270,
 						align: 'middle',
 						margin: 20,
@@ -485,7 +485,7 @@ const ClimateDataChart: React.FC<{
 				},
 				{
 					title: {
-						text: 'Precipitation (mm)',
+						text: __('Precipitation (mm)'),
 						rotation: -270,
 						align: 'middle',
 						margin: 20,

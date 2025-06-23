@@ -1,3 +1,5 @@
+import {__} from "@/context/locale-provider.tsx";
+
 const appConfig = {
 	versions: [
 		{
@@ -48,51 +50,51 @@ const appConfig = {
 		},
 		{
 			value: "rcp85plus65-p50",
-			label: "RCP8.5 enhanced scenario",
+			label: __("RCP8.5 enhanced scenario"),
 		},
 		{
 			value: "rcp85-p05",
-			label: "RCP8.5 lower (5th percentile)",
+			label: __("RCP8.5 lower (5th percentile)"),
 		},
 		{
 			value: "rcp85-p50",
-			label: "RCP8.5 median (50th percentile)",
+			label: __("RCP8.5 median (50th percentile)"),
 		},
 		{
 			value: "rcp85-p95",
-			label: "RCP8.5 upper (95th percentile)",
+			label: __("RCP8.5 upper (95th percentile)"),
 		},
 		{
 			value: "rcp45-p05",
-			label: "RCP4.5 lower (5th percentile)",
+			label: __("RCP4.5 lower (5th percentile)"),
 		},
 		{
 			value: "rcp45-p50",
-			label: "RCP4.5 median (50th percentile)",
+			label: __("RCP4.5 median (50th percentile)"),
 		},
 		{
 			value: "rcp45-p95",
-			label: "RCP4.5 upper (95th percentile)",
+			label: __("RCP4.5 upper (95th percentile)"),
 		},
 		{
 			value: "rcp26-p05",
-			label: "RCP2.6 lower (5th percentile)",
+			label: __("RCP2.6 lower (5th percentile)"),
 		},
 		{
 			value: "rcp26-p50",
-			label: "RCP2.6 median (50th percentile)",
+			label: __("RCP2.6 median (50th percentile)"),
 		},
 		{
 			value: "rcp26-p95",
-			label: "RCP2.6 upper (95th percentile)",
+			label: __("RCP2.6 upper (95th percentile)"),
 		},
 		{
 			value: "ssp585lowConf-p83",
-			label: "SSP5-8.5 High ice sheet loss A",
+			label: __("SSP5-8.5 High ice sheet loss A"),
 		},
 		{
 			value: "ssp585highEnd-p98",
-			label: "SSP5-8.5 High ice sheet loss B",
+			label: __("SSP5-8.5 High ice sheet loss B"),
 		},
 	],
 	frequencies: [

@@ -106,7 +106,7 @@ msgid "Select percentiles"
 msgstr "Sélectionnez les percentiles"
 
 msgid "Missing data options"
-msgstr "Options de données manquantes"
+msgstr "Options pour les valeurs manquantes"
 
 msgid "Select missing data options"
 msgstr "Sélectionnez les options de données manquantes"
@@ -325,8 +325,8 @@ msgstr "Régions socio-sanitaires"
 msgid "Watersheds"
 msgstr "Bassins versants"
 
-msgid "Select an interactive region."
-msgstr ""
+msgid "Some gridded datasets have been averaged over different regions of interest. For climate model ensembles, these averages were calculated for each individual model simulation before being summarized into percentiles. Select a region from the options in the dropdown menu."
+msgstr "Certains jeux de données maillées ont été moyennés sur différentes régions d’intérêt. Pour les ensembles de modèles climatiques, ces moyennes ont été calculées pour chaque simulation de modèle avant d’être synthétisées en percentiles. Sélectionnez une région parmi les options du menu déroulant."
 
 msgid "Interactive Regions"
 msgstr "Régions interactives"
@@ -592,20 +592,20 @@ msgstr "Sélectionnez un jeu de données"
 msgid "Climate Data provides a selection of historical and future climate datasets."
 msgstr "Données Climatiques propose une sélection de jeux de données climatiques historiques et futurs."
 
-msgid "Select an emission scenario."
-msgstr ""
+msgid "Climate projections are available for multiple emissions scenarios, ranging from lower to higher emissions. Select from the options available in the dropdown menu to view the climate projection for that emissions scenario."
+msgstr "Des projections climatiques sont disponibles pour plusieurs scénarios d’émissions, allant des émissions les plus faibles aux plus élevées. Sélectionnez l’une des options du menu déroulant pour afficher la projection climatique pour ce scénario d’émissions."
 
 msgid "Compare scenarios"
 msgstr "Comparer des scénarios"
 
-msgid "Select a threshold value."
-msgstr ""
+msgid "Multiple threshold options are available for some variables, e.g., “Days above Tmax”. Select a threshold from the options available in the dropdown menu."
+msgstr "Plusieurs options de seuil sont disponibles pour certaines variables, par exemple « Jours au-dessus de Tmax ». Sélectionnez un seuil parmi les options du menu déroulant."
 
 msgid "Threshold Values"
 msgstr "Valeurs seuils"
 
-msgid "Select a frequency."
-msgstr ""
+msgid "Select a time of the year from the options in the dropdown menu."
+msgstr "Sélectionnez une période de l’année parmi les options du menu déroulant."
 
 msgid "Frequencies"
 msgstr "Fréquences"
@@ -613,8 +613,8 @@ msgstr "Fréquences"
 msgid "Time Periods"
 msgstr "Périodes temporelles"
 
-msgid "Time periods tooltip"
-msgstr ""
+msgid "Move the slider to select your time period of interest."
+msgstr "Déplacez le curseur temporel pour sélectionner la période qui vous intéresse."
 
 msgid "Absolute"
 msgstr "Absolues"
@@ -628,8 +628,11 @@ msgstr "Valeurs"
 msgid "Map colours"
 msgstr "Couleurs de la carte"
 
-msgid "Select a map color."
-msgstr ""
+msgid "Switch between Absolute and Delta values by clicking on either option. Delta values represent the change in the selected variable between the future selected time period and the reference period (or baseline) value. The reference period used here is 1971-2000."
+msgstr "Passez entre les valeurs absolues et delta en cliquant sur l'une ou l'autre option. Les valeurs delta représentent la variation de la variable sélectionnée entre la période future sélectionnée et la valeur de référence. La période de référence utilisée ici est 1971-2000."
+
+msgid "Select a colour bar for the map from the options in the dropdown menu."
+msgstr "Sélectionnez une barre de couleur pour la carte parmi les options du menu déroulant."
 
 msgid "Discrete"
 msgstr "Discrète"
@@ -637,8 +640,8 @@ msgstr "Discrète"
 msgid "Continuous"
 msgstr "Continue"
 
-msgid "Select a version."
-msgstr ""
+msgid "Climate datasets are updated regularly meaning that more than one version may be available. The most recent version is selected by default, but you can switch between versions by clicking on the options in the dropdown menu."
+msgstr "Les jeux de données climatiques sont mis à jour régulièrement, ce qui signifie que plusieurs versions peuvent être disponibles. La version la plus récente est sélectionnée par défaut, mais vous pouvez passer d’une version à l’autre en cliquant sur les options du menu déroulant."
 
 msgid "Versions"
 msgstr "Versions"

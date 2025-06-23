@@ -18,7 +18,7 @@ const ThresholdValuesDropdown: React.FC = () => {
 
 	const Tooltip = () => (
 		<div>
-			{__('Select a threshold value.')}
+			{__('Multiple threshold options are available for some variables, e.g., “Days above Tmax”. Select a threshold from the options available in the dropdown menu.')}
 		</div>
 	);
 

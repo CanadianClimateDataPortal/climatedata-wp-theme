@@ -6,6 +6,13 @@ import { SidebarMenuItem } from "@/components/ui/sidebar";
 import Dropdown from "@/components/ui/dropdown";
 import appConfig from "@/config/app.config"
 
+const VersionsTooltip = () => (
+	<div>
+		{__('Climate datasets are updated regularly meaning that more than one version may be available. ' +
+				'The most recent version is selected by default, but you can switch between versions by clicking on the options in the dropdown menu.')}
+	</div>
+);
+
 /**
  * Versions dropdown component.
  */
@@ -14,12 +21,6 @@ const VersionsDropdown: React.FC = () => {
 
 	const options = appConfig.versions.filter((version) =>
 		climateVariable?.getVersions()?.includes(version.value)
-	);
-
-	const Tooltip = () => (
-		<div>
-			{__('Select a version.')}
-		</div>
 	);
 
 	const handleChange = (value: string) => {
@@ -38,12 +39,12 @@ const VersionsDropdown: React.FC = () => {
 				options={options}
 				value={climateVariable?.getVersion() ?? undefined}
 				onChange={handleChange}
-				tooltip={<Tooltip />}
+				tooltip={<VersionsTooltip />}
 			/>
 		</SidebarMenuItem>
 	);
 }
 
 export {
-	VersionsDropdown,
+	VersionsDropdown, VersionsTooltip
 };

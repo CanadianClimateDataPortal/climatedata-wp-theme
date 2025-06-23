@@ -20,7 +20,7 @@ const MapColorsDropdown: React.FC = () => {
 
 	const Tooltip = () => (
 		<div>
-			{__('Select a map color.')}
+			{__('Select a colour bar for the map from the options in the dropdown menu.')}
 		</div>
 	);
 

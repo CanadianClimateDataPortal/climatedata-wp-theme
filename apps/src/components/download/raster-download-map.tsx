@@ -37,7 +37,8 @@ export default function RasterDownloadMap(): React.ReactElement {
 	);
 	const dispatch = useAppDispatch();
 
-	const [ahccdStationTypes, setAhccdStationTypes] = useState<string[]>(['T', 'P', 'B']);
+	const stationTypeFilters = climateVariable?.getStationTypeFilter() ?? ['T', 'P', 'B'];
+	const [ahccdStationTypes, setAhccdStationTypes] = useState<string[]>(stationTypeFilters);
 	const [stations, setStations] = useState<{ id: string, name: string, coordinates: { lat: number, lng: number }, type?: string }[]>([]);
 
 	const selectedIds = React.useMemo(
@@ -200,6 +201,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 				<StationTypeFilter
 					stationTypes={ahccdStationTypes}
 					setStationTypes={setAhccdStationTypes}
+					stationTypesOptions={stationTypeFilters}
 				/>
 			)}
 

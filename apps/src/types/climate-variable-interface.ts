@@ -355,6 +355,8 @@ export interface ClimateVariableConfigInterface {
 	selectedPoints?: GridCoordinates;
 
 	selectedRegion?: GridRegion | null;
+
+	stationTypeFilter?: string[];
 }
 
 /**
@@ -501,4 +503,6 @@ export interface ClimateVariableInterface {
 	toObject(): ClimateVariableConfigInterface;
 
 	getLocationModalContent({latlng, featureId, mode}: LocationModalContentParams): React.ReactNode | null;
+
+	getStationTypeFilter(): string[];
 }

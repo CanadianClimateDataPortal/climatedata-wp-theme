@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckboxFactory } from '@/components/ui/checkbox';
 import { AHCCD_SQUARE_ICON, AHCCD_TRIANGLE_ICON, AHCCD_CIRCLE_ICON } from '@/lib/constants';
+import {__} from "@/context/locale-provider.tsx";
 
 /**
  * StationTypeFilter
@@ -20,13 +21,13 @@ export interface StationTypeFilterProps {
 const StationTypeFilter: React.FC<StationTypeFilterProps> = ({ stationTypes, setStationTypes, loading, disabled, stationTypesOptions }) => {
   return (
     <CheckboxFactory
-      title="Station type"
+			title={__('Station type')}
       name="ahccd-type"
       values={stationTypes}
       options={[
-        { value: 'T', label: <span className="flex items-center gap-2">{AHCCD_SQUARE_ICON} Temperature</span>, disabled: !stationTypesOptions.includes('T') },
-        { value: 'P', label: <span className="flex items-center gap-2">{AHCCD_TRIANGLE_ICON} Precipitation</span>, disabled: !stationTypesOptions.includes('P') },
-        { value: 'B', label: <span className="flex items-center gap-2">{AHCCD_CIRCLE_ICON} Both</span> },
+        { value: 'T', label: <span className="flex items-center gap-2">{AHCCD_SQUARE_ICON} {__('Temperature')}</span>, disabled: !stationTypesOptions.includes('T')  },
+        { value: 'P', label: <span className="flex items-center gap-2">{AHCCD_TRIANGLE_ICON} {__('Precipitation')}</span>, disabled: !stationTypesOptions.includes('P') },
+        { value: 'B', label: <span className="flex items-center gap-2">{AHCCD_CIRCLE_ICON} {__('Both')}</span> },
       ]}
       onChange={setStationTypes}
       orientation="vertical"

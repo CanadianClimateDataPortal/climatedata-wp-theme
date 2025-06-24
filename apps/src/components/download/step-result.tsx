@@ -32,7 +32,7 @@ const StepResult = React.forwardRef(() => {
 			}
 		} else if (climateVariable?.getDownloadType() === DownloadType.PRECALCULATED && downloadLinks) {
 			setContainerTitle(__('Your file is ready to download.'));
-			setContainerDescription('Click the button below to start the download.');
+			setContainerDescription(__('Click the button below to start the download.'));
 			setFiles(downloadLinks);
 		}
 	}, [climateVariable, requestResult, downloadLinks, __]);

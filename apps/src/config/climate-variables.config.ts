@@ -1344,7 +1344,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		stationTypeFilter: ['T'],
 	},
-	/** Heat Wave */
+	/** Heat Wave Index */
 	{
 		id: "heat_wave_index",
 		finch: "heat_wave_index",

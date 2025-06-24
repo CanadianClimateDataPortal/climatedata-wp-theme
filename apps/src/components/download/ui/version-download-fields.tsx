@@ -11,6 +11,7 @@ import appConfig from "@/config/app.config.ts";
 // UI components
 import Dropdown from '@/components/ui/dropdown';
 import {useClimateVariable} from "@/hooks/use-climate-variable";
+import {VersionsTooltip} from "@/components/sidebar-menu-items/versions-dropdown.tsx";
 
 /**
  * ThresholdDownloadFields
@@ -32,7 +33,7 @@ const VersionDownloadFields: React.FC = () => {
 			options={versionOptions}
 			value={climateVariable?.getVersion() ?? undefined}
 			label={__('Versions of the dataset')}
-			tooltip={__('Select a version for the dataset')}
+			tooltip={<VersionsTooltip />}
 			onChange={setVersion}
 		/>
 	);

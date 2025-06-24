@@ -58,7 +58,7 @@ const StepSummary: React.FC = () => {
 		if (stepNames.includes("StepVariable")) {
 			summaryData.push({
 				title: __('Variable'),
-				content: [climateVariable?.getTitle() ?? ''],
+				content: [__(climateVariable?.getTitle() ?? '')],
 			})
 		}
 
@@ -102,7 +102,7 @@ const StepSummary: React.FC = () => {
 					}
 
 					if (frequency && frequency !== '') {
-						data.push(appConfig.frequencies.find(({ value }) => value === frequency)?.label ?? frequency);
+						data.push(__(appConfig.frequencies.find(({ value }) => value === frequency)?.label ?? frequency));
 					}
 
 					if (scenarios && scenarios.length > 0) {

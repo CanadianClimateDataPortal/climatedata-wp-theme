@@ -7,6 +7,7 @@ import {
 	StepContainer,
 	StepContainerDescription,
 } from '@/components/download/step-container';
+import { EmissionScenariosTooltip } from '@/components/sidebar-menu-items/emission-scenarios-control';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import {
@@ -116,7 +117,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		},
 		{
 			value: AveragingType.THIRTY_YEARS,
-			label: __('30 years average'),
+			label: __('30 years averages'),
 		},
 	].filter((option) =>
 		climateVariable?.getAveragingOptions()?.includes(option.value)
@@ -155,7 +156,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		&& climateVariable?.getAnalyzeScenarios().includes("ssp370");
 
 	return (
-		<StepContainer title="Additional details">
+		<StepContainer title={__("Additional details")}>
 			<StepContainerDescription>
 				{__('Adjust the controls below to customize your analysis.')}
 			</StepContainerDescription>
@@ -230,7 +231,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 						<CheckboxFactory
 							name="emission-scenarios"
 							title={__('Emissions Scenarios')}
-							tooltip={__('Select emission scenarios')}
+							tooltip={<EmissionScenariosTooltip />}
 							orientation="horizontal"
 							className="max-w-md"
 							optionClassName="w-1/2 sm:w-1/4"
@@ -289,7 +290,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			<FrequencySelect
-				title={'Temporal frequency'}
+				title={__('Temporal frequency')}
 				config={frequencyConfig}
 				section={section}
 				value={climateVariable?.getFrequency() ?? undefined}

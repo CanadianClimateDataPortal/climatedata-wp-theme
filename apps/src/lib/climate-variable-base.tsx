@@ -444,6 +444,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 		return 'CDC:' + valuesArr.filter(Boolean).join('-');
 	}
+
+	getStationTypeFilter(): string[] {
+		return this._config.stationTypeFilter ?? ['T', 'P', 'B'];
+	}
 }
 
 export default ClimateVariableBase;

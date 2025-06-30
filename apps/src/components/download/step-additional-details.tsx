@@ -262,7 +262,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 							title={__('Percentiles')}
 							tooltip={
 								<span>
-									<a href={__("/glossary/#def-13396")} target="_blank" rel="noopener noreferrer" className="underline text-blue-300">
+									<a href={__("/glossary/#def-13396")} target="_blank" rel="noopener noreferrer" className='text-dark-purple underline'>
 										{__('The percentiles')}
 									</a>
 									{__(' are statistics used to summarize large datasets (in this case, information from 20+ models). ' +

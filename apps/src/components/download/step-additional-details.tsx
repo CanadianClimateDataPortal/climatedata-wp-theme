@@ -214,7 +214,8 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				&& <RadioGroupFactory
 					name="models"
 					title={__('Models')}
-					tooltip={__('Select models')}
+					tooltip={__('Where applicable, select how many models to include in the analysis. ' +
+						'The PCIC12 model ensemble contains 12 models and will take less time and computer resources to process while still covering 95% of the ensemble spread.')}
 					orientation="horizontal"
 					className="max-w-md mb-8"
 					optionClassName="w-1/4"
@@ -259,7 +260,17 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 						<CheckboxFactory
 							name="percentiles"
 							title={__('Percentiles')}
-							tooltip={__('Select percentiles')}
+							tooltip={
+								<span>
+									<a href={__("/glossary/#def-13396")} target="_blank" rel="noopener noreferrer" className="underline text-blue-300">
+										{__('The percentiles')}
+									</a>
+									{__(' are statistics used to summarize large datasets (in this case, information from 20+ models). ' +
+										'On the ClimateData.ca time series plots, the range of the model results are represented by the 10th, 50th (median) and 90th percentiles. ' +
+										'Select the percentiles you wish to use to summarize this multi-model ensemble. ' +
+										'If you would like to receive information for all models individually, do not select any percentiles.')}
+								</span>
+							}
 							orientation="horizontal"
 							className="max-w-md"
 							optionClassName="w-1/4"

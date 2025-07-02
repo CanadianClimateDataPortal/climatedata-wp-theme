@@ -5,14 +5,17 @@ import L from 'leaflet';
 import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
+import 'leaflet.vectorgrid';
 
 import { useAppDispatch } from '@/app/hooks';
 import { useLocale } from '@/hooks/use-locale';
 import { setCenter, setZoom } from '@/features/download/download-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, GEOSERVER_BASE_URL } from '@/lib/constants';
 
 /**
- * Component that allows to select a rectangle on the map and calculate the number of cells selected
+ * Component that allows to select a rectangle on the map and calculate the number of cells selected.
+ * Also displays a non-interactive grid layer for visual reference.
  */
 const SelectableRectangleGridLayer = forwardRef<{
 	clearSelection: () => void;
@@ -21,6 +24,8 @@ const SelectableRectangleGridLayer = forwardRef<{
 }>(({ maxCellsAllowed = 1000 }, ref) => {
 	const map = useMap();
 	const layerGroupRef = useRef<L.LayerGroup>(new L.LayerGroup());
+	// @ts-expect-error: suppress leaflet typescript error
+	const gridLayerRef = useRef<L.VectorGrid | null>(null);
 
 	const { climateVariable, setSelectedRegion, resetSelectedRegion } = useClimateVariable();
 	const dispatch = useAppDispatch();
@@ -36,6 +41,24 @@ const SelectableRectangleGridLayer = forwardRef<{
 			era5landgrid: 0.1,
 		}),
 		[]
+	);
+
+	// Grid configuration for visual reference
+	const gridName = climateVariable?.getGridType() ?? 'canadagrid';
+	const tileLayerUrl = `${GEOSERVER_BASE_URL}/geoserver/gwc/service/tms/1.0.0/CDC:${gridName}@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf`;
+
+	const tileLayerStyles = useMemo(
+		() => ({
+			[gridName]: () => ({
+				weight: 0.2,
+				color: '#777',
+				opacity: 0.6,
+				fill: true,
+				radius: 4,
+				fillOpacity: 0,
+			}),
+		}),
+		[gridName]
 	);
 
 	const handleMoveEnd = useCallback(() => {
@@ -115,8 +138,38 @@ const SelectableRectangleGridLayer = forwardRef<{
 
 			layer.on('pm:edit', handleEdit);
 		},
-		[map, getSelectedShapeData, setSelectedRegion]
+		[map, getSelectedShapeData, setSelectedRegion, maxCellsAllowed]
 	);
+
+	// Initialize the non-interactive grid layer for visual reference
+	useEffect(() => {
+		if (!map) {
+			return;
+		}
+
+		// @ts-expect-error: suppress leaflet typescript error
+		const gridLayer = L.vectorGrid.protobuf(tileLayerUrl, {
+			interactive: false, // Non-interactive, this is for visual reference only
+			maxNativeZoom: DEFAULT_MAX_ZOOM,
+			getFeatureId: (feature: { properties: { gid: number } }) =>
+				feature.properties.gid,
+			vectorTileLayerStyles: tileLayerStyles,
+			bounds: CANADA_BOUNDS,
+			maxZoom: DEFAULT_MAX_ZOOM,
+			minZoom: 7, // Same as SelectableCellsGridLayer for consistency
+			pane: 'grid',
+		});
+
+		gridLayer.addTo(map);
+		gridLayerRef.current = gridLayer;
+
+		return () => {
+			if (gridLayerRef.current) {
+				map.removeLayer(gridLayerRef.current);
+				gridLayerRef.current = null;
+			}
+		};
+	}, [map, tileLayerStyles, tileLayerUrl]);
 
 	// draw a rectangle if there are selected cells when the component mounts
 	useEffect(() => {
@@ -175,7 +228,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 				resetSelectedRegion();
 			},
 		}),
-		[map, dispatch]
+		[map, resetSelectedRegion]
 	);
 
 	return null;

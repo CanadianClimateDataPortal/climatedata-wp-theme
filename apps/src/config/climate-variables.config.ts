@@ -1212,7 +1212,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				format: "MM-DD",
 				attributes: {
 					type: "date",
-					placeholder: "0",
+					placeholder: "MM-DD",
 				}
 			}
 		],

@@ -56,6 +56,7 @@ export interface FieldConfig {
 	required?: boolean;
 	comparison?: string;
 	unit?: string;
+	format?: string;
 	attributes?: {
 		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url' | 'date';
 		placeholder?: string;

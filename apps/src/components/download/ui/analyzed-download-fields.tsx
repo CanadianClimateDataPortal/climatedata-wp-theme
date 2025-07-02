@@ -28,6 +28,7 @@ const AnalyzedField: React.FC<AnalyzedFieldProps> = (
 		label,
 		description,
 		help,
+		format,
 		attributeType = 'text',
 		placeholder,
 		value,
@@ -59,7 +60,7 @@ const AnalyzedField: React.FC<AnalyzedFieldProps> = (
 					value={value}
 					placeholder={placeholder ? __(placeholder) : undefined}
 					onChange={e => onChange(keyName, e.target.value)}
-					format="MM-DD"
+					format={format ?? 'MM-DD'}
 				/>
 			) : type === 'input' ? (
 				<InputAnalyzedField
@@ -100,7 +101,7 @@ const AnalyzedDownloadFields: React.FC = () => {
 		if (!climateVariable) return null;
 		return (
 			climateVariable.getAnalysisFields()?.map((field) => {
-				const { key, type, label, description, help, attributes, options } = field;
+				const { key, type, label, description, help, attributes, options, format } = field;
 				const { type: attributeType, placeholder } = attributes || {};
 				const value = climateVariable.getAnalysisFieldValue(key) ?? '';
 
@@ -114,6 +115,7 @@ const AnalyzedDownloadFields: React.FC = () => {
 						help={help}
 						attributeType={attributeType}
 						placeholder={placeholder}
+						format={format}
 						value={value}
 						options={options}
 						onChange={setAnalysisFieldValue}

@@ -128,6 +128,83 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		return super.getDownloadType() ?? DownloadType.PRECALCULATED;
 	}
 
+	getAllCanDCSVariable(): string[] {
+		return  [
+			'tx_max',
+			'tg_mean',
+			'tn_mean',
+			'tx_mean',
+			'tnlt_-15',
+			'tnlt_-25',
+			'txgt_25',
+			'txgt_27',
+			'txgt_29',
+			'txgt_30',
+			'txgt_32',
+			'tn_min',
+			'last_spring_frost',
+			'first_fall_frost',
+			'frost_free_season',
+			'r1mm',
+			'r10mm',
+			'r20mm',
+			'rx1day',
+			'prcptot',
+			'rx5day',
+			'cdd',
+			'nr_cdd',
+			'frost_days',
+			'dlyfrzthw_tx0_tn-1',
+			'cddcold_18',
+			'tr_18',
+			'tr_20',
+			'tr_22',
+			'gddgrow_5',
+			'gddgrow_0',
+			'hddheat_18',
+			'ice_days'
+		];
+	}
+
+	/**
+	 * Sends a POST request to the download endpoint with the provided payload,
+	 * receives a Blob in response (usually a ZIP file), and returns a temporary
+	 * object URL that can be used to trigger a file download in the browser.
+	 *
+	 * @param payload - The data specifying what file(s) to download (variable, region, format, etc.)
+	 * @returns A temporary blob URL as a string, or null if the request fails
+	 * @throws Any network or HTTP error that occurs during the fetch
+	 */
+	async fetchDownloadUrl(payload: DownloadPayloadProps): Promise<string | null> {
+		const url = `${window.DATA_URL}/download`;
+
+		try {
+			// Send the POST request with the payload as JSON
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(payload)
+			});
+
+			// Throw an error if the response is not OK (4xx or 5xx)
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+
+			// Convert the response to a Blob (usually a ZIP file)
+			const blob = await response.blob();
+
+			// Return a temporary object URL to be used for downloading
+			return window.URL.createObjectURL(blob);
+		} catch (error) {
+			// Log and rethrow any errors during the request
+			console.error('Download error:', error);
+			throw error;
+		}
+	}
+
 	// TODO: it seems this method is only used for gridded_data + drawn region
 	// 	if that's the case, remove the `points` key from DownloadPayloadProps and
 	// 	the logic below that handles selectedPoints
@@ -181,27 +258,90 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 			};
 		}
 
-		const url = `${window.DATA_URL}/download`;
+		if (payload.var !== 'all') {
+			return await this.fetchDownloadUrl(payload);
+		} else {
+			// Get the full list of variables to download (e.g., tx_max, rx5day, etc.)
+			const allCanDcsVars = this.getAllCanDCSVariable();
 
-		try {
-			const response = await fetch(url, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(payload)
+			// Create a list of promises for each variable's download request
+			const downloadPromises = allCanDcsVars.map(async (allCanDcsVar) => {
+				const payloadCopy = { ...payload, var: allCanDcsVar };
+				return this.fetchDownloadUrl(payloadCopy); // This returns a blob URL or null
 			});
 
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
+			// Wait for all download requests to resolve
+			const downloadUrls = await Promise.all(downloadPromises);
 
-			const blob = await response.blob();
-			return window.URL.createObjectURL(blob);
-		} catch (error) {
-			console.error('Download error:', error);
-			throw error;
+			// Remove any null results (e.g., failed requests)
+			const validUrls = downloadUrls.filter(
+				(url): url is string => url !== null
+			);
+
+			// If more than one valid file was downloaded, combine them into a single ZIP
+			if (validUrls.length > 1) {
+				const JSZip = (await import('jszip')).default;
+				const finalZip = new JSZip();
+
+				// For each variable and its corresponding download URL:
+				const fetchAndUnzip = allCanDcsVars.map(
+					async (varName, index) => {
+						const url = validUrls[index];
+						if (!url) return;
+
+						// Fetch the ZIP blob from the URL
+						const response = await fetch(url);
+						const blob = await response.blob();
+
+						// Load the ZIP contents using JSZip
+						const innerZip = await JSZip.loadAsync(blob);
+
+						// Create a folder in the final ZIP named after the variable (e.g., tx_max/)
+						const folder = finalZip.folder(varName);
+						if (!folder) {
+							console.warn(
+								`Could not create folder for variable: ${varName}`
+							);
+							return;
+						}
+
+						// For each file in the inner ZIP (e.g., tx_max.csv, metadata.txt), add it to the folder
+						await Promise.all(
+							Object.keys(innerZip.files).map(
+								async (innerFileName) => {
+									const fileData =
+										await innerZip.files[
+											innerFileName
+										].async('blob');
+									folder.file(innerFileName, fileData);
+								}
+							)
+						);
+					}
+				);
+
+				// Wait for all folders/files to be processed
+				await Promise.all(fetchAndUnzip);
+
+				// Generate the final ZIP blob and create a URL for it
+				const finalZipBlob = await finalZip.generateAsync({
+					type: 'blob',
+				});
+				const finalZipUrl = window.URL.createObjectURL(finalZipBlob);
+
+				// Trigger download via a temporary <a> tag
+				const a = document.createElement('a');
+				a.href = finalZipUrl;
+				a.download = 'all_variables.zip';
+				document.body.appendChild(a);
+				a.click();
+				a.remove();
+				window.URL.revokeObjectURL(finalZipUrl); // Clean up the blob URL
+
+				return null; // Download has already been triggered
+			}
 		}
+		return null;
 	}
 
 	getLocationModalContent({

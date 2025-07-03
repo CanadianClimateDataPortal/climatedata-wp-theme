@@ -322,7 +322,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getDecimalPlace(): number {
-		return this._config.unitDecimalPlaces ?? 0;
+		return this._config.decimalPlace ?? 0;
 	}
 
 	renderMap(): React.ReactElement {

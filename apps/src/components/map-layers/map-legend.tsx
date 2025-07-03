@@ -34,7 +34,7 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 	const { locale } = useLocale();
 	const isDelta = climateVariable?.getDataValue() === 'delta';
 	const unit = climateVariable?.getUnitLegend();
-	const decimals = climateVariable?.getDecimalPlace() ?? 0;
+	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
 	const colourScheme = climateVariable?.getColourScheme() ?? 'default';
 	const isCategorical = climateVariable?.getCustomColourSchemes()?.default?.categorical ?? false;
 	const customColors = climateVariable?.getCustomColourSchemes()?.default?.colours;
@@ -86,9 +86,9 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 			if(!isComparisonMap || climateVariable?.getId() !== "sea_level") {
 				const transformedData: TransformedLegendEntry[] =
 					await transformLegendData(rawLegendData, colourScheme, temporalRange, isDelta, unit, locale, decimals, colorMap);
-	
+
 				dispatch(setTransformedLegendEntry(transformedData));
-	
+
 				setTransformedLegendData(transformedData);
 			}
 		})();

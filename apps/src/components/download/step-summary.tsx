@@ -88,6 +88,7 @@ const StepSummary: React.FC = () => {
 				content: (() => {
 					const variableId = climateVariable?.getId();
 					const isDownloadTypeAnalyzed = climateVariable?.getDownloadType() === DownloadType.ANALYZED;
+					const [startYear, endYear] = climateVariable?.getDateRange() ?? [];
 					const missingData = climateVariable?.getMissingData();
 					const frequency = climateVariable?.getFrequency() ?? '';
 					const percentiles = climateVariable?.getPercentiles() ?? [];
@@ -96,8 +97,14 @@ const StepSummary: React.FC = () => {
 					const data = [];
 
 					if (isDownloadTypeAnalyzed || variableId === "station_data") {
-						if (missingData) {
-							data.push(missingData === 'wmo' ? __('WMO Parameters') :missingData + '%');
+						if (climateVariable?.getDatasetType() === "ahccd") {
+							if (missingData) {
+								data.push(missingData === 'wmo' ? __('WMO Parameters') :missingData + '%');
+							}
+						} else {
+							if (startYear && endYear) {
+								data.push(`${startYear} - ${endYear}`);
+							}
 						}
 					}
 

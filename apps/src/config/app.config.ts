@@ -178,6 +178,14 @@ const appConfig = {
 			value: "winter",
 			label: "Winter",
 		},
+		{
+			value: "months",
+			label: "Monthly",
+		},
+		{
+			value: "seasons",
+			label: "Seasonal",
+		},
 	],
 }
 

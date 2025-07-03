@@ -24,6 +24,7 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
   const { addMarker, clearMarkers } = useMapMarker();
   const hoveredRef = useRef<number | null>(null);
   const selectedInteractiveRegion = useRef<InteractiveRegionOption | null>(climateVariable?.getInteractiveRegion() || null);
+	const variableId = climateVariable?.getId();
 
   const handleOver = useCallback((
     e: { latlng: L.LatLng; layer: { properties: any } },
@@ -127,6 +128,11 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
     handleClearSelectedLocation,
     setSelectedLocation
   ]);
+
+	useEffect(() => {
+		// Clear selections whenever the variable changes.
+		handleClearSelectedLocation();
+	}, [handleClearSelectedLocation, variableId]);
 
   return {
     selectedLocation,

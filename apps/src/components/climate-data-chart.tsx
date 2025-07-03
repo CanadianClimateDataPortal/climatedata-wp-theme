@@ -89,15 +89,20 @@ const ClimateDataChart: React.FC<{
 	const formatValue = (value: number | undefined, isDelta:boolean = false) => {
 		if (value === undefined) return '';
 
-		if(unit === "doy") {
+		if (unit === "doy" && !isDelta) {
 			return doyFormatter(Number(value), locale);
 		} else {
 			const formattedValue = Number(value).toFixed(decimals);
+
+			// Since we're showing the delta, a "doy" unit should not be formatted.
+			// Instead, we'll show the number of days.
+			const _unit = unit === "doy" ? "Days" : unit
+
 			// Add "+" prefix for positive delta values
 			if (isDelta && Number(value) > 0) {
-				return `+${formattedValue} ${unit}`;
+				return `+${formattedValue} ${_unit}`;
 			}
-			return `${formattedValue} ${unit}`;
+			return `${formattedValue} ${_unit}`;
 		}
 	};
 

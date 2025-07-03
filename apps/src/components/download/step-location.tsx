@@ -9,6 +9,8 @@ import {
 } from '@/components/download/step-container';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { StepComponentRef } from '@/types/download-form-interface';
+import { useAppDispatch } from '@/app/hooks';
+import { setSelectionMode } from '@/features/download/download-slice';
 
 /**
  * Location step, allows the user to make a selection on the map and choose what type of region to select
@@ -16,10 +18,15 @@ import { StepComponentRef } from '@/types/download-form-interface';
 const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { climateVariable } = useClimateVariable();
 
+	const dispatch = useAppDispatch();
+
 	React.useImperativeHandle(ref, () => ({
 		isValid: () =>
 			(climateVariable?.getSelectedPointsCount() ?? 0) > 0 || Boolean(climateVariable?.getSelectedRegion()),
 		getResetPayload: () => {
+			// Reset also the selection mode
+			dispatch(setSelectionMode('cells'));
+
 			return {
 				selectedPoints: {},
 				selectedRegion: null,

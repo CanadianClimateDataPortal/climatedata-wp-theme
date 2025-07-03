@@ -46,7 +46,7 @@ Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
 const CheckboxFactory: React.FC<{
 	name: string;
-	options: { value: string; label: React.ReactNode }[] | string[] | number[];
+	options: { value: string; label: React.ReactNode; disabled?: boolean;}[] | string[] | number[];
 	optionClassName?: string;
 	className?: string;
 	title?: string;
@@ -80,7 +80,7 @@ const CheckboxFactory: React.FC<{
 	};
 
 	// when receiving an array of strings or numbers as options we will convert them valid value/label objects
-	const normalizedOptions = normalizeOptions(options) as { value: string; label: React.ReactNode }[];
+	const normalizedOptions = normalizeOptions(options) as { value: string; label: React.ReactNode; disabled?: boolean }[];
 
 	const orientationClasses: { [key: string]: string } = {
 		vertical: 'sm:flex-col',
@@ -104,6 +104,7 @@ const CheckboxFactory: React.FC<{
 						>
 							<Checkbox
 								id={`checkbox-${name}-${index}`}
+								disabled={option.disabled}
 								checked={selectedValues.includes(option.value)}
 								onCheckedChange={(checked) =>
 									handleCheckboxChange(checked, option.value)

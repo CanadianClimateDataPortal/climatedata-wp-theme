@@ -677,6 +677,7 @@ export interface AnalyzedFieldProps {
 	label: string;
 	description?: string;
 	help?: string;
+	format?: string;
 	attributeType?: string;
 	placeholder?: string;
 	value: string | readonly string[] | number | undefined;

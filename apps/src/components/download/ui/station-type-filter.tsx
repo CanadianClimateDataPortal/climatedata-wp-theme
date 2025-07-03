@@ -14,17 +14,19 @@ export interface StationTypeFilterProps {
   setStationTypes: (types: string[]) => void;
   loading?: boolean;
   disabled?: boolean;
+  stationTypesOptions: string[];
 }
 
-const StationTypeFilter: React.FC<StationTypeFilterProps> = ({ stationTypes, setStationTypes, loading, disabled }) => {
+
+const StationTypeFilter: React.FC<StationTypeFilterProps> = ({ stationTypes, setStationTypes, loading, disabled, stationTypesOptions }) => {
   return (
     <CheckboxFactory
 			title={__('Station type')}
       name="ahccd-type"
       values={stationTypes}
       options={[
-        { value: 'T', label: <span className="flex items-center gap-2">{AHCCD_SQUARE_ICON} {__('Temperature')}</span> },
-        { value: 'P', label: <span className="flex items-center gap-2">{AHCCD_TRIANGLE_ICON} {__('Precipitation')}</span> },
+        { value: 'T', label: <span className="flex items-center gap-2">{AHCCD_SQUARE_ICON} {__('Temperature')}</span>, disabled: !stationTypesOptions.includes('T')  },
+        { value: 'P', label: <span className="flex items-center gap-2">{AHCCD_TRIANGLE_ICON} {__('Precipitation')}</span>, disabled: !stationTypesOptions.includes('P') },
         { value: 'B', label: <span className="flex items-center gap-2">{AHCCD_CIRCLE_ICON} {__('Both')}</span> },
       ]}
       onChange={setStationTypes}

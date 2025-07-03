@@ -100,7 +100,7 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
                     onFilterChange={(value) => setVarType(value)}
                     slug="var-type"
                     label={__('Variable Types')}
-                    tooltip={__('Select a variable type')}
+                    tooltip={__('Filter the variable list by selecting a variable type from the dropdown menu.')}
                     placeholder={__('All')}
                     value={filterValues['var-type'] || ''}
                 />
@@ -109,7 +109,7 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
                     onFilterChange={(value) => setSector(value)}
                     slug="sector"
                     label={__('Sectors')}
-                    tooltip={__('Select a sector')}
+                    tooltip={__('Filter the variable list by selecting a relevant sector from the dropdown menu.')}
                     placeholder={__('All')}
                     value={filterValues.sector || ''}
                 />

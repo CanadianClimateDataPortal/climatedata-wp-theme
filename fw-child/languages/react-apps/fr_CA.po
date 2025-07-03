@@ -27,8 +27,8 @@ msgstr "Sélectionnez une variable contenue dans le jeu de données précédemme
 msgid "Variable Types"
 msgstr "Types de variables"
 
-msgid "Select a variable type"
-msgstr "Sélectionnez un type de variable"
+msgid "Filter the variable list by selecting a variable type from the dropdown menu."
+msgstr "Filtrez la liste des variables en sélectionnant un type de variable dans le menu déroulant."
 
 msgid "All"
 msgstr "Tous"
@@ -36,8 +36,8 @@ msgstr "Tous"
 msgid "Sectors"
 msgstr "Secteurs"
 
-msgid "Select a sector"
-msgstr "Sélectionnez un secteur"
+msgid "Filter the variable list by selecting a relevant sector from the dropdown menu."
+msgstr "Filtrez la liste des variables en sélectionnant un secteur pertinent dans le menu déroulant."
 
 msgid "Select an option"
 msgstr "Sélectionnez une option"
@@ -90,8 +90,10 @@ msgstr "Année de fin"
 msgid "Models"
 msgstr "Modèles"
 
-msgid "Select models"
-msgstr "Sélectionnez les modèles"
+msgid "Where applicable, select how many models to include in the analysis. "
+"The PCIC12 model ensemble contains 12 models and will take less time and computer resources to process while still covering 95% of the ensemble spread."
+msgstr "Le cas échéant, sélectionnez le nombre de modèles à inclure dans l’analyse. "
+"L’ensemble de modèles PCIC12 comprend 12 modèles et nécessitera moins de temps et de ressources informatiques, tout en couvrant 95 % de l’étendue de l’ensemble."
 
 msgid "Emissions Scenarios"
 msgstr "Scénarios d'émissions"
@@ -102,8 +104,19 @@ msgstr "Sélectionnez les scénarios d'émissions"
 msgid "Percentiles"
 msgstr "Percentiles"
 
-msgid "Select percentiles"
-msgstr "Sélectionnez les percentiles"
+msgid "The percentiles"
+msgstr "Les percentiles"
+
+msgid "/glossary/#def-13396"
+msgstr "/glossaire/#def-13396"
+
+msgid " are statistics used to summarize large datasets (in this case, information from 20+ models). "
+"On the ClimateData.ca time series plots, the range of the model results are represented by the 10th, 50th (median) and 90th percentiles. "
+"Select the percentiles you wish to use to summarize this multi-model ensemble. If you would like to receive information for all models individually, do not select any percentiles."
+msgstr " sont des statistiques utilisées pour résumer de grands ensembles de données (ici, les résultats de plus de 20 modèles). "
+"Sur les graphiques de séries chronologiques de DonneesClimatiques.ca, l’étendue des résultats des modèles est représentée par les 10e, 50e (médiane) et 90e percentiles. "
+"Sélectionnez les percentiles que vous souhaitez utiliser pour résumer cet ensemble multi-modèles. "
+"Si vous souhaitez recevoir l’information pour chacun des modèles individuellement, ne sélectionnez aucun percentile."
 
 msgid "Missing data options"
 msgstr "Options pour les valeurs manquantes"
@@ -765,3 +778,9 @@ msgstr "Delta de la période 1971-2000"
 
 msgid "Delta is the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model. The reference period used here is 1971-2000."
 msgstr "Le delta est la différence entre la valeur future et la valeur de la période de référence d'une variable climatique, telle que simulée par un modèle climatique. La période de référence utilisée ici est 1971-2000."
+
+msgid "days"
+msgstr ""
+
+msgid "Days"
+msgstr ""

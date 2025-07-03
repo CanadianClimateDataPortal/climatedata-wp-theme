@@ -795,6 +795,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"pr",
 		],
+		stationTypeFilter: ['P'],
 	},
 	/** Cold Spell Days */
 	{
@@ -836,6 +837,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"tas",
 		],
+		stationTypeFilter: ['T'],
 	},
 	/** Cooling Degree Days */
 	{
@@ -883,6 +885,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"tas",
 		],
+		stationTypeFilter: ['T'],
 	},
 	/** Days above HXmax */
 	{
@@ -1033,6 +1036,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"tasmax",
 		],
+		stationTypeFilter: ['T'],
 	},
 	/** Days above Tmax and Tmin */
 	{
@@ -1077,6 +1081,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"tasmin",
 			"tasmax",
 		],
+		stationTypeFilter: ['T'],
 	},
 	/** Days below temperature threshold */
 	{
@@ -1144,6 +1149,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"tasmin",
 		],
+		stationTypeFilter: ['T'],
 	},
 	/** Degree days exceedance date */
 	{
@@ -1203,9 +1209,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: 'Start Date (MM-DD)',
 				description: 'Specify the date to begin accumulating degree-days.',
 				help: 'Use a date like "09-01" to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models.',
+				format: "MM-DD",
 				attributes: {
 					type: "date",
-					placeholder: "0",
+					placeholder: "MM-DD",
 				}
 			}
 		],
@@ -1220,6 +1227,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"tas",
 		],
+		stationTypeFilter: ['T'],
 	},
 
 	/** Freeze-Thaw Cycles */
@@ -1282,6 +1290,8 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"tasmin",
 			"tasmax",
 		],
+		stationTypeFilter: ['T'],
+
 	},
 	/** Heat Wave Frequency */
 	{
@@ -1333,6 +1343,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"tasmin",
 			"tasmax",
 		],
+		stationTypeFilter: ['T'],
 	},
 	/** Heat Wave Index */
 	{
@@ -1374,6 +1385,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"tasmax",
 		],
+		stationTypeFilter: ['T'],
 	},
 	/** Heat Wave Total Duration */
 	{
@@ -1425,6 +1437,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"tasmin",
 			"tasmax",
 		],
+		stationTypeFilter: ['T'],
 	},
 	/** Heating Degree Days */
 	{
@@ -1502,6 +1515,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"pr",
 		],
+		stationTypeFilter: ['T'],
 	},
 	/** Maximum Consecutive Wet Days */
 	{
@@ -1532,6 +1546,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"pr",
 		],
+		stationTypeFilter: ['T'],
 	},
 	/** Tropical Nights (Days with Tmin above threshold) */
 	{
@@ -1621,6 +1636,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"tasmin",
 		],
+		stationTypeFilter: ['T'],
 	},
 	/** Wet Days */
 	{
@@ -1725,6 +1741,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"pr",
 		],
+		stationTypeFilter: ['P'],
 	},
 	/** Relative Sea-Level Change */
 	{

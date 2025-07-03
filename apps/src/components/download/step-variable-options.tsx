@@ -33,11 +33,11 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 					.map(f => {
 						const value = values?.[f.key];
 						// If it's a date field with a format, check both existence and format validity
-						if (f.type === 'input' && f.attributes?.type === 'date' && f.unit) {
+						if (f.type === 'input' && f.attributes?.type === 'date' && f.format) {
 							return (
 								value != null &&
 								value !== '' &&
-								dateFormatCheck(f.unit).test(value)
+								dateFormatCheck(f.format).test(value)
 							);
 						}
 						// Otherwise, just check existence

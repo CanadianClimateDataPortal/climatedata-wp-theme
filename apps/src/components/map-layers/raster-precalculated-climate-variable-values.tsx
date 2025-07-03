@@ -177,13 +177,13 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		switch (unit) {
 			case 'doy':
 				if (delta) {
-					str = `${value.toFixed(decimals)} days`;
+					str = `${value.toFixed(decimals)} ${__('days')}`;
 				} else {
 					str = doyFormatter(value, locale);
 				}
 				break;
 			default:
-				str = `${value.toFixed(decimals)} ${unit}`;
+				str = `${value.toFixed(decimals)} ${__(unit ?? '')}`;
 				break;
 		}
 

@@ -22,11 +22,41 @@ Example (from the repository root):
 docker build -f dockerfiles/build/task-runner/Dockerfile .
 ```
 
+### Permission issues with mounted directories
+
+(The following instructions are optional, only if you need it.)
+
+If you're using the Task Runner to update files in a mounted local directory
+(e.g., when developing), you can encounter permission errors because the user
+inside the container doesn't have the permissions to update the local (mounted)
+files.
+
+To circumvent this issue, it's possible to set, at build time, the ID of the
+user inside the container. By giving it an ID that matches a local user that has
+the required permissions (e.g., the local files' owner), the user inside the
+container will be able to access and update mounted files.
+
+> Note that this can only be done at build time, once the ID is set, it cannot
+> be changed when running the container.
+
+Set the ID with the `USER_ID` and `GROUP_ID` build arguments:
+
+```shell
+# For example, use the current user's informations
+new_user_id=$(id -u)
+new_group_id=$(id -g)
+
+docker build \
+  --build-arg USER_ID=$new_user_id \
+  --build-arg GROUP_ID=$new_group_id \
+  -f dockerfiles/build/task-runner/Dockerfile \
+  .
+```
+
 ## Available tools
 
-The _Task Runner_ image has the following tools available on the command line:
+The _Task Runner_ contains scripts to perform the most common tasks.
 
-* [`compile-sass.sh`](../dockerfiles/build/task-runner/bin/compile-sass.sh)
-  to compile the SASS files of the themes.
-* [`watch-sass.sh`](../dockerfiles/build/task-runner/bin/watch-sass.sh)
-  to continually watch the themes' SASS files and recompile them when changed.
+The scripts are in the `dockerfiles/build/task-runner/bin/` directory. Inside
+the image, all those scripts are available globally (i.e., you can run directly
+`build-fe.sh`).

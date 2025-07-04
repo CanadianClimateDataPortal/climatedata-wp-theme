@@ -19,7 +19,7 @@ framework/resources/vendor/bootstrap/
 framework/resources/vendor/font-awesome-pro/
 fw-child/node_modules/
 .nova/
-/docker-override.yaml
+/compose.override.yaml
 /dockerfiles/mounts/*
 !/dockerfiles/mounts/README.md
 

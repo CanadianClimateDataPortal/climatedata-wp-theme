@@ -1,10 +1,13 @@
-# Climate Data Map
+# Maps and Download apps
 
-This project is a Climate Data map application built using **TypeScript**, **React**, and **Vite**. It visualizes climate-related data interactively, leveraging mapping and charting libraries to enhance data representation.
+This directory contains the source code of the "Maps" and "Download" single page
+apps.
+
+The apps are built using **TypeScript**, **React**, and **Vite**.
 
 ## Key Technologies
 
-The project utilizes several essential libraries and frameworks:
+The project uses several essential libraries and frameworks:
 
 - [React](https://reactjs.org/): Component-based JavaScript library for building user interfaces.
 - [Vite](https://vitejs.dev/): Next-generation frontend tooling for faster builds.
@@ -18,63 +21,15 @@ The project utilizes several essential libraries and frameworks:
 - [wordpress/react-i18n](https://github.com/WordPress/gutenberg/blob/d9b726b8451746703cc1b9680487e3726ab4a03f/packages/react-i18n/README.md): Internationalization library for React applications.
 - [ReactMotion](https://motion.dev/): Animation library for React.
 
-## Node Version Management
-
-The project utilizes **nvm** (Node Version Manager) for managing Node.js versions. Using `nvm` ensures compatibility across different environments by locking the required Node version.
-
-1. To install `nvm`, follow the [official installation guide](https://github.com/nvm-sh/nvm).
-2. Run the following to switch to the required Node version:
-   ```bash
-   nvm install
-   nvm use
-   ```
-3. Once the correct Node version is active, proceed with the steps below to run or build the project.
-
 ## Getting Started
 
-### Running the Project Locally (Vite internal server only)
+The apps are automatically built (and updated) when [running the development
+environment](../docs/developing-with-docker-compose.md).
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository_url>
-   ```
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-3. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
-
-The project will be available at `http://localhost:3000` (or the specified port).
-
-This project uses multiple entry points so for local development you access the following routes:
-- `http://localhost:3000/map` - Map application
-- `http://localhost:3000/download` - Download application
-
-### To run this project with WordPress backend (Vite + WordPress):
-1. TODO: Add instructions on how to run the project with WordPress backend.
-
-### Building the Project
-
-To create an optimized production build:
-
-```bash
-npm run build
-```
-
-The production-ready files will be available in the `/fw-child/apps/dist` folder.
-
-There are additional build scripts available:
-
-- **`npm run watch`**: Build the project in watch mode.
-
-## Project Structure
+## Directory structure
 
 The project's structure is organized to maintain modularity and readability:
 
-- **`public/`**: Public static assets.
 - **`src/components/`**: Reusable UI components.
 - **`src/assets/`**: Project-specific images and other media assets.
 - **`src/hooks/`**: Custom React hooks for logic reusability.
@@ -89,7 +44,7 @@ The project's structure is organized to maintain modularity and readability:
 - **`src/App.css`**: Main stylesheet for the application.
 - **`src/App.tsx`**: Root component.
 - **`src/Global.css`**: Global styles.
-- **`src/main.tsx`**: Entry point for the application.
+- **`src/main-*.tsx`**: Entry point for the application.
 
 ### Redux Toolkit
 - **`src/features/**`**: This folder will contain all the slices of the Redux Store. Each feature will have its own folder with the following structure:
@@ -98,7 +53,3 @@ The project's structure is organized to maintain modularity and readability:
 - **`src/app/store.ts`**: Redux store configuration.
 - **`src/app/hooks.ts`**: Redux hooks configuration.
 - **`src/services/`**: API and data-fetching Redux services.
-
-## API Information
-
-*To be defined*: Include details on API integrations, such as data sources, and any specific instructions for handling WMS (Web Map Service) requests or other APIs utilized in the application.

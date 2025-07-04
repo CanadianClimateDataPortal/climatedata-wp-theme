@@ -293,9 +293,6 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 						const response = await fetch(url);
 						const blob = await response.blob();
 
-						// Load the ZIP contents using JSZip
-						const innerZip = await JSZip.loadAsync(blob);
-
 						// Create a folder in the final ZIP named after the variable (e.g., tx_max/)
 						const folder = finalZip.folder(varName);
 						if (!folder) {
@@ -305,18 +302,30 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 							return;
 						}
 
-						// For each file in the inner ZIP (e.g., tx_max.csv, metadata.txt), add it to the folder
-						await Promise.all(
-							Object.keys(innerZip.files).map(
-								async (innerFileName) => {
-									const fileData =
-										await innerZip.files[
-											innerFileName
-										].async('blob');
-									folder.file(innerFileName, fileData);
-								}
-							)
-						);
+						// Check if the blob is a ZIP file and extract its contents before adding it.
+						// If not, add the file directly.
+						const isZip = blob.type.includes('zip');
+						if (isZip) {
+							// Load the ZIP contents using JSZip
+							const innerZip = await JSZip.loadAsync(blob);
+							// For each file in the inner ZIP (e.g., tx_max.csv, metadata.txt), add it to the folder
+							await Promise.all(
+								Object.keys(innerZip.files).map(
+									async (innerFileName) => {
+										const fileData =
+											await innerZip.files[
+												innerFileName
+												].async('blob');
+										folder.file(innerFileName, fileData);
+									}
+								)
+							);
+						}
+						else {
+							const fileName = `${varName}.nc`;
+							folder.file(fileName, blob);
+						}
+
 					}
 				);
 
@@ -338,7 +347,7 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 				a.remove();
 				window.URL.revokeObjectURL(finalZipUrl); // Clean up the blob URL
 
-				return null; // Download has already been triggered
+				return null;
 			}
 		}
 		return null;

@@ -296,23 +296,61 @@ const Steps: React.FC = () => {
 					const fileFormat = climateVariable.getFileFormat?.() ?? '';
 					const fileName = climateVariable.getId() ?? 'file';
 
-					// Generate the file to be downloaded.
+					// Get a reference to the "Next Step" button
+					const button = document.getElementById('nextStepBtn');
+					let originalButtonText: string | null = null;
+
+					if (button) {
+						// Store the original button text so we can restore it later
+						originalButtonText = button.textContent;
+
+						// Update the button UI to indicate loading state
+						button.textContent = __('Loading...');
+						button.setAttribute('disabled', 'true');
+						button.classList.add('cursor-not-allowed');
+					}
+
+// Generate the file to be downloaded
 					climateVariable.getDownloadUrl()
 						.then((url) => {
-							const file: DownloadFile = {
-								url: url ?? '',
-								label: fileName + (fileFormat === FileFormatType.NetCDF ? '.nc' : '.zip'),
-							};
+							// If a valid URL is returned, create a download file object
+							if (url) {
+								const file: DownloadFile = {
+									url: url,
+									label: fileName + (fileFormat === FileFormatType.NetCDF ? '.nc' : '.zip'),
+								};
+								dispatch(setDownloadLinks([file])); // Save the generated download link
+							}
 
-							dispatch(setDownloadLinks([file]));
+							// Update UI to indicate success
 							dispatch(setRequestStatus('success'));
 
-							goToNextStep();
+							// Restore the button to its original state
+							if (button) {
+								button.textContent = originalButtonText;
+								button.removeAttribute('disabled');
+								button.classList.remove('cursor-not-allowed');
+							}
+
+							// Automatically proceed to the next step, unless all variables were selected
+							if (climateVariable.getThreshold() !== 'all') {
+								goToNextStep();
+							}
 						})
 						.catch(() => {
+							// In case of an error, update the request status and clear any links
 							dispatch(setRequestStatus('error'));
 							dispatch(setDownloadLinks(undefined));
+
+							// Restore the button to its original state
+							if (button) {
+								button.textContent = originalButtonText;
+								button.removeAttribute('disabled');
+								button.classList.remove('cursor-not-allowed');
+							}
 						});
+
+
 				} else {
 					// TODO: make sure this is correct.. msc climate normals is a different datasetType than
 					// 	the rest of variables that would fall in this condition which all are 'ahccd'
@@ -365,7 +403,6 @@ const Steps: React.FC = () => {
 	};
 
 	const StepComponent = steps[currentStep - 1] as React.ElementType;
-
 	return (
 		<div className="steps flex flex-col px-4">
 			<StepNavigation totalSteps={steps.length} />
@@ -387,6 +424,7 @@ const Steps: React.FC = () => {
 			</div>
 			{!isLastStep && (
 				<button
+					id="nextStepBtn"
 					type="button"
 					onClick={handleNext}
 					disabled={!isStepValid || requestStatus === 'loading'}

@@ -22,10 +22,8 @@ function _show_help {
   echo ""
   echo "  Portal:"
   echo "    portal-shell            Start a shell on the 'portal' container"
-  echo "    wp-cli <arg>...         Execute a 'wp-cli' command in the 'Portal' container. All <arg> are passed to wp-cli."
-  echo ""
-  echo "  Nginx:"
-  echo "    nginx <arg>...          Execute a 'nginx' command in the 'Portal' container. All <arg> are passed to nginx."
+  echo "    wp-cli <args>...        Execute a 'wp-cli' command in the 'Portal' container. All <args> are passed to wp-cli."
+  echo "    nginx <args>...         Execute a 'nginx' command in the 'Portal' container. All <args> are passed to nginx."
   echo ""
   echo "  Database:"
   echo "    db-shell                Start a shell on the 'database' container"
@@ -34,6 +32,9 @@ function _show_help {
   echo ""
   echo "  Task runner:"
   echo "    task-runner-shell       Start a shell on the 'Task runner' container"
+  echo ""
+  echo "  Other:"
+  echo "    download-docker-assets <URL>   Download the required Docker assets from the given URL"
 }
 
 # Switch to the real directory of the script, so it still works when used from

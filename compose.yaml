@@ -37,7 +37,7 @@ services:
         target: /etc/nginx/ssl
     ports:
      - "443:443"
-     - "80:80"  # Requests to port 80 will simply redirect the user to HTTPS
+     - "80:80"
     environment:
       # Note: to set a boolean value, always quote the words "true" and "false",
       # else the YAML parser may transform them to 1 and 0. Example:
@@ -57,7 +57,7 @@ services:
       WP_LOGGED_IN_SALT: 'i=GdI3/!VdU,+Y T-f?kr-.0(Q4kxiqZ[Hu*tB3TY(@W5M3mee/XRI-~[cHNOZ&j'
       WP_NONCE_SALT: 'Up<Q /#k4>;p)GYi)+--Pls<>-7NywT.JVmrW9C,bET(F@Tz*Bkp+kHtN)87<5 l'
       WP_WP_DEBUG: "true"
-      # Required, for the login page to work correctly
+      # Required for the login page to work correctly
       WP_WP_SITEURL: https://dev-en.climatedata.ca/
       WP_WP_HOME: https://dev-en.climatedata.ca/
 
@@ -81,6 +81,7 @@ services:
       tags:
         - climatedata-task-runner:dev
     command: ["bash", "-c", "watch-fe.sh /app"]
+    # The dev.sh script defines the USER_ID and GROUP_ID environment variables
     user: "${USER_ID}:${GROUP_ID}"
     volumes:
       - ".:/app"

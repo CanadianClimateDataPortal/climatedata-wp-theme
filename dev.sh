@@ -18,7 +18,7 @@ function _show_help {
   echo "    start                   Start the app's Docker Compose stack"
   echo "    stop                    Stop the app's Docker Compose stack"
   echo "    restart                 Restart the app's Docker Compose stack"
-  echo "    download-docker-assets <URL>   Download the required Docker assets from the given URL"
+  echo "    compose <args>          Execute a docker compose command. All <args> are passed to docker compose."
   echo ""
   echo "  Portal:"
   echo "    portal-shell            Start a shell on the 'portal' container"
@@ -62,6 +62,10 @@ function stop {
 function restart {
   stop
   start
+}
+
+function compose {
+  _docker_compose "$@"
 }
 
 function download-docker-assets {

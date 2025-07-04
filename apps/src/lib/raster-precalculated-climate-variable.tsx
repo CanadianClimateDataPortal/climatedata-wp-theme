@@ -1,4 +1,5 @@
 import ClimateVariableBase from "@/lib/climate-variable-base";
+import { ClimateVariables } from '@/config/climate-variables.config';
 import {
 	AveragingType,
 	DateRangeConfig,
@@ -13,6 +14,7 @@ import {
 	ScenariosConfig
 } from "@/types/climate-variable-interface";
 import RasterPrecalcultatedClimateVariableValues from '../components/map-layers/raster-precalculated-climate-variable-values'
+import { getFrequencyCode } from '@/lib/utils.ts';
 
 interface DownloadPayloadProps {
 	dataset_name: string | null;
@@ -223,6 +225,7 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 				frequencyCode = this.getFrequency();
 		}
 
+
 		const selectedRegion = this.getSelectedRegion?.(); // For a drawn region
 		const selectedPoints = this.getSelectedPoints?.(); // For selected points/cells
 
@@ -266,12 +269,27 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 
 			// Create a list of promises for each variable's download request
 			const downloadPromises = allCanDcsVars.map(async (allCanDcsVar) => {
-				const payloadCopy = { ...payload, var: allCanDcsVar };
-				return this.fetchDownloadUrl(payloadCopy); // This returns a blob URL or null
+				let frequencyCode = '';
+				let matchedConfig: typeof ClimateVariables[number] | undefined;
+
+				if (payload.month) {
+					frequencyCode = getFrequencyCode(payload.month);
+					matchedConfig = ClimateVariables.find(
+						(config) =>
+							config.temporalThresholdConfig?.thresholds?.[allCanDcsVar]?.[frequencyCode] !== undefined
+					);
+				}
+
+				if (matchedConfig && matchedConfig.temporalThresholdConfig?.thresholds?.[allCanDcsVar]?.[frequencyCode]) {
+					const payloadCopy = { ...payload, var: allCanDcsVar };
+					return this.fetchDownloadUrl(payloadCopy); // Returns a blob URL or null
+				}
+
+				return null;
 			});
 
 			// Wait for all download requests to resolve
-			const downloadUrls = await Promise.all(downloadPromises);
+			const downloadUrls = (await Promise.all(downloadPromises));
 
 			// Remove any null results (e.g., failed requests)
 			const validUrls = downloadUrls.filter(
@@ -335,6 +353,7 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 				// Generate the final ZIP blob and create a URL for it
 				const finalZipBlob = await finalZip.generateAsync({
 					type: 'blob',
+					compression: 'DEFLATE',
 				});
 				const finalZipUrl = window.URL.createObjectURL(finalZipBlob);
 

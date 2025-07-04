@@ -48,20 +48,6 @@ done
 # Change to apps directory
 cd "${src}/apps" || error "Apps directory not found"
 
-# Setup correct Node environment
-log "Setting up Node.js environment..."
-
-if [ -f "$NVM_DIR/nvm.sh" ]; then
-    . "$NVM_DIR/nvm.sh" --no-use >/dev/null 2>&1
-
-    if [ -f ".nvmrc" ]; then
-        nvm install || error "Failed to install Node.js version"
-        nvm use || error "Failed to use Node.js version"
-    fi
-else
-    error "NVM not found"
-fi
-
 log "Installing dependencies..."
 npm ci
 

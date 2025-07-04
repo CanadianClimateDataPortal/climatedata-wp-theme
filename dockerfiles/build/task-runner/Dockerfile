@@ -11,7 +11,6 @@
 FROM node:23.5-bookworm
 
 # Define environment variables
-ENV NVM_DIR=/home/node/.nvm
 ENV NPM_CONFIG_LOGLEVEL=info
 
 # For `dumb-init`, see point #5 in:
@@ -36,8 +35,8 @@ COPY --chmod=755 dockerfiles/build/task-runner/bin /usr/local/bin
 
 USER node
 
-# Install NVM
+WORKDIR /app/apps
 
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+COPY --chown=node apps/package*.json .
 
-WORKDIR /home/node/app
+RUN npm ci

@@ -80,9 +80,11 @@ services:
       dockerfile: dockerfiles/build/task-runner/Dockerfile
       tags:
         - climatedata-task-runner:dev
+      # The dev.sh script defines the USER_ID and GROUP_ID environment variables
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
     command: ["bash", "-c", "watch-fe.sh /app"]
-    # The dev.sh script defines the USER_ID and GROUP_ID environment variables
-    user: "${USER_ID}:${GROUP_ID}"
     volumes:
       - ".:/app"
 

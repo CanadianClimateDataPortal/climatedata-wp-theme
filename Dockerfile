@@ -44,9 +44,9 @@ ARG TASK_RUNNER_IMAGE
 
 FROM ${TASK_RUNNER_IMAGE} AS task-runner
 
-COPY --chown=node apps  /app/apps
-COPY --chown=node framework  /app/framework
-COPY --chown=node fw-child  /app/fw-child
+COPY --chown=taskrunner apps /app/apps
+COPY --chown=taskrunner framework /app/framework
+COPY --chown=taskrunner fw-child /app/fw-child
 
 RUN build-fe.sh /app/
 

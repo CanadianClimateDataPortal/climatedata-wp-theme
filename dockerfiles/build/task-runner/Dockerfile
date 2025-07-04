@@ -8,6 +8,9 @@
 # This Dockerfile assumes that the context directory is the root of the project.
 # So, when building the image, make sure to build it from the project's root.
 #
+# A `taskrunner` user is created and used as the main user. It's possible to set
+# this user's ID and group ID with the build arguments `USER_ID` and `GROUP_ID`.
+#
 # Note that the package files are the only files copied from the source
 # directory. The Docker image is not intended to be built with a copy of all the
 # source files. This prevents having to rebuild the image everytime the source
@@ -37,10 +40,16 @@ RUN npm install -g concurrently sass
 
 COPY --chmod=755 dockerfiles/build/task-runner/bin /usr/local/bin
 
-USER node
+ARG USER_ID=10000
+ARG GROUP_ID=10001
+
+RUN addgroup --gid $GROUP_ID taskrunner && \
+    adduser --uid $USER_ID --gid $GROUP_ID --disabled-password taskrunner
+
+USER taskrunner
 
 WORKDIR /app/apps
 
-COPY --chown=node apps/package*.json .
+COPY --chown=taskrunner apps/package*.json .
 
 RUN npm ci

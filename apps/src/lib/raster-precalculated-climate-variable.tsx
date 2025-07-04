@@ -267,8 +267,8 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 			// Get the full list of variables to download (e.g., tx_max, rx5day, etc.)
 			const allCanDcsVars = this.getAllCanDCSVariable();
 
-			// Create a list of promises for each variable's download request
-			const downloadPromises = allCanDcsVars.map(async (allCanDcsVar) => {
+			// Filter the list of allCanDcsVars to only include those with available configuration
+			const availableVars = allCanDcsVars.filter((allCanDcsVar) => {
 				let frequencyCode = '';
 				let matchedConfig: typeof ClimateVariables[number] | undefined;
 
@@ -280,31 +280,27 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 					);
 				}
 
-				if (matchedConfig && matchedConfig.temporalThresholdConfig?.thresholds?.[allCanDcsVar]?.[frequencyCode]) {
+				return matchedConfig !== undefined;
+			});
+			// Create a list of promises for each variable's download request
+			const downloadPromises = availableVars.map(async (allCanDcsVar) => {
 					const payloadCopy = { ...payload, var: allCanDcsVar };
 					return this.fetchDownloadUrl(payloadCopy); // Returns a blob URL or null
-				}
-
-				return null;
 			});
 
 			// Wait for all download requests to resolve
-			const downloadUrls = (await Promise.all(downloadPromises));
+			const downloadUrls = await Promise.all(downloadPromises);
 
-			// Remove any null results (e.g., failed requests)
-			const validUrls = downloadUrls.filter(
-				(url): url is string => url !== null
-			);
 
 			// If more than one valid file was downloaded, combine them into a single ZIP
-			if (validUrls.length > 1) {
+			if (downloadUrls.length > 1) {
 				const JSZip = (await import('jszip')).default;
 				const finalZip = new JSZip();
 
 				// For each variable and its corresponding download URL:
-				const fetchAndUnzip = allCanDcsVars.map(
+				const fetchAndUnzip = availableVars.map(
 					async (varName, index) => {
-						const url = validUrls[index];
+						const url = downloadUrls[index];
 						if (!url) return;
 
 						// Fetch the ZIP blob from the URL

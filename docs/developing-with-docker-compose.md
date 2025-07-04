@@ -3,7 +3,7 @@
 This documentation explains the recommended development setup when developing
 for the portal site (i.e., the _Climate Data_ website).
 
-## Simple setup
+## Setup
 
 1. You need a GitLab access token to the Docker Container Registry. Ask the tech
    lead for details.
@@ -62,17 +62,66 @@ contains examples of various custom setups.
 
 ## Development process
 
-The themes' files are mounted to the running container, so any change to any
-file is immediately available on the server.
+### Theme files
 
-Files built from assets (like CSS files built from SASS files or JavaScript
-files built from TypeScript files) are automatically rebuilt by the _Task
-Runner_ service.
+The WordPress theme files are in the `fw-child/` and `framework/` directories.
+For most theme files (especially PHP files), modify the files and reload the
+page to instantly see the changes.
 
-The _Portal_ image contains [wp-cli](https://wp-cli.org/). Use it with `./dev.sh wp-cli <args>`
+### wp-cli
 
-The port `3306` on the host is mapped to the same port on the database
-container.
+The Portal container contains [wp-cli](https://wp-cli.org/) if you need it.
+
+Use it with `./dev.sh wp-cli <args>`
+
+### SASS files
+
+The styles for the themes are SASS files that are compiled to CSS.
+
+The SASS files are found in `fw-child/resources/scss` and some in
+`framework/resources/scss`.
+
+The _Task Runner_ container automatically builds the CSS files from the SASS
+file when they change (look at the log of the _Task Runner_ container to see the
+compilation).
+
+### TypeScript files in apps/
+
+The source files of the _Maps_ and _Download_ pages are in the `apps/`
+directory.
+
+The _Task Runner_ automatically rebuilds the JavaScript files when
+TypeScript files in the `apps/` directory change (they are rebuilt and put in
+the `fw-child/apps/dist/` directory).
+
+### Database access
+
+The database container has the port `3306` opened, so you can connect to it
+using your IDE or any other database management tool (using `localhost` as the
+server host).
+
+## Committing changes
+
+### Validate the TypeScript code
+
+Before commiting changes to TypeScript files, make sure a "production build"
+can be compiled without errors (else the CICD pipeline will fail).
+
+From the Task Runner container, trigger a production build. It will check for
+any issues.
+
+```shell
+./dev.sh task-runner-shell
+# Then, from the shell in the Task Runner:
+build-fe.sh /app
+```
+
+If it ends without any error (i.e., it shows `[APPS] npm run build exited with
+code 0`), you can commit and push.
+
+### Git branching process
+
+See the documentation for the [Git branching strategy](./git-branching-strategy.md).
 
 ### Setting WordPress constants
 

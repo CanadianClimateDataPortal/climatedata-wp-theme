@@ -1,6 +1,7 @@
-# Map and Download apps
+# Maps and Download apps
 
-This directory contains the source code of the "App" and "Download" apps.
+This directory contains the source code of the "Maps" and "Download" single page
+apps.
 
 The apps are built using **TypeScript**, **React**, and **Vite**.
 

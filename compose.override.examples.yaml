@@ -2,11 +2,26 @@
 
 ###
 # Scenario:
+#   Disable access to the administration section of WordPress. For example, to
+#   prevent changes to the site's content.
+#
+# Solution:
+#   Set the `APP_DISABLE_WP_ADMIN` environment variable to "true".
+#
+# services:
+#   portal:
+#     environment:
+#       APP_DISABLE_WP_ADMIN: "true"
+
+###
+# Scenario:
 #   Serve the website over HTTP instead of HTTPS.
 #   Note: all URLs in the database will also need to be updated to use HTTP
 #   instead of HTTPS.
 #
 # Solution:
+#   Replace the site's Nginx configuration with the (already existing)
+#   non-HTTPS configuration file.
 #
 # services:
 #   portal:
@@ -14,8 +29,6 @@
 #       - type: bind
 #         source: dockerfiles/dev/www/configs/nginx/climatedata-site-no-ssl.conf
 #         target: /etc/nginx/sites-available/climatedata-site.conf
-#     ports:
-#       - "80:80"
 
 ###
 # Scenario:

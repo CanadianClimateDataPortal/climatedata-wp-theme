@@ -75,11 +75,6 @@ The directory must be inside the build context (you can use the `dockerfiles/mou
 directory for this, see [its documentation](../dockerfiles/mounts)), and the
 path must be relative to the build context.
 
-**Note:** A script ([_download-docker-assets.sh_](../dockerfiles/tools/download-docker-assets.sh))
-can be used to download the required "local plugins" files from a central
-server. See [developing-with-docker-compose.md](./developing-with-docker-compose.md)
-for details.
-
 ### Complete example:
 
 ```shell

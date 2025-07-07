@@ -12,9 +12,6 @@ The [**_Git branching strategy_**](./docs/git-branching-strategy.md) explains
 how we use Git and branches for development, when releasing versions, when
 developing hot fixes, etc.
 
-The [**_Translate the site_**](./docs/translate-the-site.md) document explains
-how to create and update translations.
-
 ## Pull requests
 
 The [**_Pull requests process_**](./docs/pull-request-process.md) document

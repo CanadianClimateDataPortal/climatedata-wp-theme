@@ -55,8 +55,9 @@ docker build \
 
 ## Available tools
 
-The _Task Runner_ contains scripts to perform the most common tasks.
+The _Task Runner_ image has the following tools available on the command line:
 
-The scripts are in the `dockerfiles/build/task-runner/bin/` directory. Inside
-the image, all those scripts are available globally (i.e., you can run directly
-`build-fe.sh`).
+* [`compile-sass.sh`](../dockerfiles/build/task-runner/bin/compile-sass.sh)
+  to compile the SASS files of the themes.
+* [`watch-sass.sh`](../dockerfiles/build/task-runner/bin/watch-sass.sh)
+  to continually watch the themes' SASS files and recompile them when changed.

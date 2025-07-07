@@ -1,7 +1,13 @@
-import { clsx, type ClassValue } from 'clsx';
+import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
-import { FrequencyConfig, FrequencyDisplayModeOption, FrequencyType, InteractiveRegionOption } from '@/types/climate-variable-interface';
+import {
+	FrequencyConfig,
+	FrequencyDisplayModeOption,
+	FrequencyType,
+	InteractiveRegionOption,
+} from '@/types/climate-variable-interface';
+import { __ } from "@/context/locale-provider";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -269,4 +275,37 @@ export function getFeatureColor(
 			: (layerData?.[featureId] ?? 0);
 
 	return getColor(value);
+}
+
+/**
+ * Return the translated display name for a unit from its technical code.
+ * 
+ * To be used when displaying only the unit's name, not a value followed by a
+ * unit. In that case, use `formatValue()` instead.
+ */
+export function getUnitName(unit: string): string {
+	switch (unit) {
+		case 'DoY':
+			return __('Day');
+		case 'degC':
+			return __('°C');
+		case 'mm':
+			return __('mm');
+		case 'cm':
+			return __('cm');
+		case 'days':
+			return __('Days');
+		case 'periods':
+			return __('Periods');
+		case 'events':
+			return __('Events');
+		case 'mm/day':
+			return __('mm/day');
+		case 'degree_days':
+			return __('Degree Days');
+		case 'zone':
+			return __('Zone');
+		default:
+			return unit;
+	}
 }

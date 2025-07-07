@@ -1,13 +1,13 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Highcharts, {
-	Options,
-	SeriesOptionsType,
-	SeriesLineOptions,
-	SeriesArearangeOptions,
-	SeriesColumnOptions,
 	numberFormat,
+	Options,
 	Point,
 	Series,
+	SeriesArearangeOptions,
+	SeriesColumnOptions,
+	SeriesLineOptions,
+	SeriesOptionsType,
 } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsStock from 'highcharts/modules/stock';
@@ -23,7 +23,7 @@ import { __ } from '@/context/locale-provider';
 import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import appConfig from '@/config/app.config';
-import { doyFormatter } from '@/lib/format';
+import { doyFormatter, formatValue } from '@/lib/format';
 import { getChartDataOptions, getSeriesObject } from '@/config/chart-config';
 import { AveragingType } from "@/types/climate-variable-interface";
 
@@ -86,24 +86,29 @@ const ClimateDataChart: React.FC<{
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
 
 	// Tooltip format value helper
-	const formatValue = (value: number | undefined, isDelta:boolean = false) => {
+	const valueFormatter = (
+		value: number | undefined,
+		{ unitOverride, isDelta, isRangeStart }: {
+			unitOverride?: string | undefined;
+			isDelta?: boolean | undefined;
+			isRangeStart?: boolean | undefined;
+		} = {}
+	) => {
 		if (value === undefined) return '';
 
-		if (unit === "doy" && !isDelta) {
-			return doyFormatter(Number(value), locale);
-		} else {
-			const formattedValue = Number(value).toFixed(decimals);
+		isDelta = isDelta === true;
+		isRangeStart = isRangeStart === true;
+		let actualUnit = typeof unitOverride == 'string' ? unitOverride : unit;
 
-			// Since we're showing the delta, a "doy" unit should not be formatted.
-			// Instead, we'll show the number of days.
-			const _unit = unit === "doy" ? "Days" : (unit ?? '')
-
-			// Add "+" prefix for positive delta values
-			if (isDelta && Number(value) > 0) {
-				return `+${formattedValue} ${__(_unit)}`;
-			}
-			return `${formattedValue} ${__(_unit)}`;
+		if (actualUnit === 'DoY' && !isDelta) {
+			return doyFormatter(value, locale);
 		}
+		
+		if (isRangeStart) {
+			actualUnit = '';
+		}
+
+		return formatValue(value, actualUnit, decimals, locale, isDelta);
 	};
 
 	const thresholds = climateVariable?.getThresholds() ?? [];
@@ -185,9 +190,9 @@ const ClimateDataChart: React.FC<{
 				if (!timestampData) return;
 
 				if (chartDataOptions[dataKey].type === 'arearange') {
-					tooltip += `<span style="color:${chartDataOptions[dataKey].color}">&bull;</span> ${chartDataOptions[dataKey].name}: <b>${formatValue(timestampData[0], isDelta)}</b> - <b>${formatValue(timestampData[1], isDelta)}</b><br/>`;
+					tooltip += `<span style="color:${chartDataOptions[dataKey].color}">&bull;</span> ${chartDataOptions[dataKey].name}: <b>${valueFormatter(timestampData[0], { isDelta, isRangeStart: true })}</b> - <b>${valueFormatter(timestampData[1], { isDelta })}</b><br/>`;
 				} else {
-					tooltip += `<span style="color:${chartDataOptions[dataKey].color}">&bull;</span> ${chartDataOptions[dataKey].name}: <b>${formatValue(timestampData[0], isDelta)}</b><br/>`;
+					tooltip += `<span style="color:${chartDataOptions[dataKey].color}">&bull;</span> ${chartDataOptions[dataKey].name}: <b>${valueFormatter(timestampData[0], { isDelta })}</b><br/>`;
 				}
 			});
 
@@ -210,7 +215,7 @@ const ClimateDataChart: React.FC<{
 						return `<b>${months[this.x]}</b><br/>` +
 							points?.map((point: TooltipPoint) => {
 								const unit = point.series.type === 'column' ? 'mm' : '°C';
-								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.y)} ${__(unit)}</b><br/>`;
+								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${valueFormatter(point.y, { unitOverride: unit })}</b><br/>`;
 							}).join('') || '';
 					}
 
@@ -218,9 +223,9 @@ const ClimateDataChart: React.FC<{
 					return `<b>${year}</b><br/>` +
 						points?.map((point: TooltipPoint) => {
 							if (point.series.type === 'arearange') {
-								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.low)}</b> - <b>${formatValue(point.high)}</b><br/>`;
+								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${valueFormatter(point.low, { isRangeStart: true })}</b> - <b>${valueFormatter(point.high)}</b><br/>`;
 							} else {
-								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.y)}</b><br/>`;
+								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${valueFormatter(point.y)}</b><br/>`;
 							}
 						}).join('') || '';
 				}
@@ -515,13 +520,7 @@ const ClimateDataChart: React.FC<{
 					align: 'left',
 					formatter: function () {
 						const unit = climateVariable?.getUnit();
-
-						switch (unit) {
-							case "doy":
-									return doyFormatter(Number(this.value), locale);
-							default:
-									return Number(this.value).toFixed(decimals) + ' ' + __(unit ?? '');
-						}
+						return valueFormatter(Number(this.value), { unitOverride: unit });
 					}
 				},
 			},
@@ -672,7 +671,7 @@ const ClimateDataChart: React.FC<{
 									(dataCopy[key] as (number | string)[][]).forEach((item) => {
 										if (item.length > 1) {
 											switch (unit) {
-												case "doy":
+												case "DoY":
 													item[1] = doyFormatter(Number(item[1]), locale);
 													break;
 												default:
@@ -682,7 +681,7 @@ const ClimateDataChart: React.FC<{
 										}
 										if (isRange && item.length > 2) {
 											switch (unit) {
-												case "doy":
+												case "DoY":
 													item[2] = doyFormatter(Number(item[2]), locale);
 													break;
 												default:

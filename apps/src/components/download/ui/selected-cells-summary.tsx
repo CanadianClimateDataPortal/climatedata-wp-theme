@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 import { ControlTitle } from '@/components/ui/control-title';
 import { cn } from '@/lib/utils';
+import { sprintf } from '@wordpress/i18n';
 
 /**
  * SelectedCellsSummary
@@ -41,7 +42,7 @@ const SelectedCellsSummary: React.FC<SelectedCellsSummaryProps> = ({ selectedCel
             selectedCells > 0 ? 'text-brand-blue' : 'text-neutral-grey-medium'
           )}
         >
-          {_n('1 Cell', `%d Cells`, selectedCells).replace('%d', String(selectedCells))}
+          {sprintf(_n('%d Cell', `%d Cells`, selectedCells), selectedCells)}
         </div>
       </div>
     </>

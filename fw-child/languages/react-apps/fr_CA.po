@@ -201,9 +201,9 @@ msgstr "Options de variable"
 msgid "Location or area"
 msgstr "Lieu ou région"
 
-msgid "1 selected"
+msgid "%d selected"
 msgid_plural "%d selected"
-msgstr[0] "1 sélection"
+msgstr[0] "%d sélection"
 msgstr[1] "%d sélections"
 
 msgid "Additional details"
@@ -218,9 +218,9 @@ msgstr "Date de fin"
 msgid "All percentiles"
 msgstr "Tous les percentiles"
 
-msgid "1 percentile"
+msgid "%d percentile"
 msgid_plural "%d percentiles"
-msgstr[0] "1 percentile"
+msgstr[0] "%d percentile"
 msgstr[1] "%d percentiles"
 
 msgid "Unselect all to receive output from individual models"
@@ -265,9 +265,9 @@ msgstr "Types de sélection sur la carte"
 msgid "You selected:"
 msgstr "Vous avez sélectionné :"
 
-msgid "1 Cell"
+msgid "%d Cell"
 msgid_plural "%d Cells"
-msgstr[0] "1 cellule"
+msgstr[0] "%d cellule"
 msgstr[1] "%d cellules"
 
 msgid "Clear"
@@ -784,8 +784,46 @@ msgstr "Delta de la période 1971-2000"
 msgid "Delta is the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model. The reference period used here is 1971-2000."
 msgstr "Le delta est la différence entre la valeur future et la valeur de la période de référence d'une variable climatique, telle que simulée par un modèle climatique. La période de référence utilisée ici est 1971-2000."
 
-msgid "days"
-msgstr ""
+msgid "Day"
+msgstr "Jour"
 
 msgid "Days"
-msgstr ""
+msgstr "Jours"
+
+msgid "days"
+msgstr "jours"
+
+msgid "Periods"
+msgstr "Périodes"
+
+msgid "Events"
+msgstr "Événements"
+
+msgid "mm/day"
+msgstr "mm/jour"
+
+msgid "Degree Days"
+msgstr "Degrés-jours"
+
+msgid "%s day"
+msgid_plural "%s days"
+msgstr[0] "%s jour"
+msgstr[1] "%s jours"
+
+msgid "%s period"
+msgid_plural "%s periods"
+msgstr[0] "%s période"
+msgstr[1] "%s périodes"
+
+msgid "%s event"
+msgid_plural "%s events"
+msgstr[0] "%s événement"
+msgstr[1] "%s événements"
+
+msgid "%s mm/day"
+msgstr "%s mm/jour"
+
+msgid "%s degree day"
+msgid_plural "%s degree days"
+msgstr[0] "%s degré-jour"
+msgstr[1] "%s degrés-jours"

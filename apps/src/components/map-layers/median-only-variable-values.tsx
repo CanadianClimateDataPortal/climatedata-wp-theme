@@ -1,9 +1,11 @@
-import React, { useEffect, useState, useMemo, useContext } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { __ } from '@/context/locale-provider';
 import L from 'leaflet';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useLocale } from "@/hooks/use-locale";
 import { fetchDeltaValues } from '@/services/services';
 import SectionContext from "@/context/section-provider";
+import { formatValue } from "@/lib/format.ts";
 
 interface MedianOnlyVariableValuesProps {
 	latlng: L.LatLng;
@@ -33,6 +35,7 @@ const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 		return climateVariable?.getDateRange() ?? ["2040", "2050"];
 	}, [climateVariable]);
 	const section = useContext(SectionContext);
+	const { locale } = useLocale();
 
 	const [ median, setMedian ] = useState<number | null>(null);
 	const [ noDataAvailable, setNoDataAvailable ] = useState<boolean>(false);
@@ -99,7 +102,7 @@ const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 	// Value formatter (for units)
 	const valueFormatter = (value: number) => {
 		const unit = climateVariable?.getUnit();
-		return `${value.toFixed(decimals)} ${unit}`;
+		return formatValue(value, unit, decimals, locale);
 	};
 
 	// Generate median div

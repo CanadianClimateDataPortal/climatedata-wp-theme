@@ -1,15 +1,17 @@
 import { cva } from 'class-variance-authority';
 import {
-	WMSLegendData,
-	TransformedLegendEntry,
-	PostData,
 	ApiPostData,
-	MultilingualField,
-	TermItem,
 	Locale,
+	MultilingualField,
+	PostData,
+	TermItem,
+	TransformedLegendEntry,
+	WMSLegendData,
 } from '@/types/types';
 import { TemporalRange } from '@/types/climate-variable-interface';
 import React from 'react';
+import { __, _n } from "@/context/locale-provider";
+import { sprintf } from '@wordpress/i18n';
 
 export async function transformLegendData(
 	input: WMSLegendData,
@@ -243,3 +245,66 @@ export const buttonVariants = cva(
 		},
 	}
 );
+
+/**
+ * Return a formatted and translated string of a value followed by a unit.
+ * 
+ * This function doesn't format "Day of Year" units (ex: formatting a day number `187` to the string
+ * "July 7"). For this, use `doyFormatter()`.
+ *
+ * @param value The numerical value.
+ * @param unit The unit. If empty or undefined, no unit will be outputted.
+ * @param decimals The number of decimals in the formatted value.
+ * @param locale The locale to use for number formatting.
+ * @param relative If true, precede the value with a + or -.
+ */
+export function formatValue(value: number, unit: string | undefined, decimals: number, locale: string, relative: boolean = false): string {
+	const formatter = new Intl.NumberFormat(
+		locale,
+		{
+			minimumFractionDigits: decimals,
+			maximumFractionDigits: decimals,
+			signDisplay: relative ? 'exceptZero' : 'negative',
+			useGrouping: false,
+		}
+	);
+	let valuePattern = `%s`;
+
+	if (unit) {
+		valuePattern = `%s ${unit}`;
+
+		switch (unit) {
+			case 'DoY':
+				if (relative) {
+					valuePattern = _n(`%s day`, `%s days`, value);
+				}
+				break;
+			case 'degC':
+				valuePattern = __(`%s °C`);
+				break;
+			case 'mm':
+				valuePattern = __(`%s mm`);
+				break;
+			case 'cm':
+				valuePattern = __(`%s cm`);
+				break;
+			case 'days':
+				valuePattern = _n(`%s day`, `%s days`, value);
+				break;
+			case 'periods':
+				valuePattern = _n(`%s period`, `%s periods`, value);
+				break;
+			case 'events':
+				valuePattern = _n(`%s event`, `%s events`, value);
+				break;
+			case 'mm/day':
+				valuePattern = __(`%s mm/day`);
+				break;
+			case 'degree_days':
+				valuePattern = _n(`%s degree day`, `%s degree days`, value);
+				break;
+		}
+	}
+
+	return sprintf(valuePattern, formatter.format(value));
+}

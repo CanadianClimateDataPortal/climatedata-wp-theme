@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useMemo, useContext } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { __ } from '@/context/locale-provider';
 import L from 'leaflet';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useLocale } from '@/hooks/use-locale';
 import { fetchDeltaValues, generateChartData } from '@/services/services';
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
-import { doyFormatter } from '@/lib/format';
+import { doyFormatter, formatValue } from '@/lib/format';
 import { getDefaultFrequency } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
 
@@ -171,28 +171,12 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	}, [climateVariable, decimals, dateRange, featureId, latlng, section, scenario]);
 
 	// Value formatter (for delta, for units)
-	const valueFormatter = (value: number, delta: boolean = (climateVariable?.getDataValue() === 'delta')) => {
-		let str = '';
-
-		switch (unit) {
-			case 'doy':
-				if (delta) {
-					str = `${value.toFixed(decimals)} ${__('Days')}`;
-				} else {
-					str = doyFormatter(value, locale);
-				}
-				break;
-			default:
-				str = `${value.toFixed(decimals)} ${__(unit ?? '')}`;
-				break;
+	const valueFormatter = (value: number, isRangeStart = false, delta: boolean = (climateVariable?.getDataValue() === 'delta')) => {
+		if (unit === 'DoY' && !delta) {
+			return doyFormatter(value, locale);
 		}
 
-		// If delta, we add a "+" for positive values
-		if(delta && value > 0) {
-			str = '+' + str;
-		}
-
-		return str;
+		return formatValue(value, isRangeStart ? '' : unit, decimals, locale, delta);
 	};
 
 	// Generate display dateRange for UI only (year starting with 1 instead of 0)
@@ -228,7 +212,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 	// Generate relative to base div
 	const generateRelativeToBaselineDiv = (relativeToBaseline: number) => {
-		const formattedRelativeToBaseline = valueFormatter(relativeToBaseline, true);
+		const formattedRelativeToBaseline = valueFormatter(relativeToBaseline, false, true);
 
 		return (
 			<div className={mode === "modal" ? "w-1/2" : ""}>
@@ -249,7 +233,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 	// Generate range div
 	const generateRangeDiv = (rangeStartValue: number, rangeEndValue: number) => {
-		const rangeStart = valueFormatter(rangeStartValue);
+		const rangeStart = valueFormatter(rangeStartValue, true);
 		const rangeEnd = valueFormatter(rangeEndValue);
 
 		return (

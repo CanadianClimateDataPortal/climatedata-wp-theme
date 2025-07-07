@@ -298,50 +298,40 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 				const finalZip = new JSZip();
 
 				// For each variable and its corresponding download URL:
-				const fetchAndUnzip = availableVars.map(
-					async (varName, index) => {
-						const url = downloadUrls[index];
-						if (!url) return;
+				const fetchAndUnzip = availableVars.map(async (varName, index) => {
+					const url = downloadUrls[index];
+					if (!url) return;
 
-						// Fetch the ZIP blob from the URL
-						const response = await fetch(url);
-						const blob = await response.blob();
+					// Fetch the blob from the URL
+					const response = await fetch(url);
+					const blob = await response.blob();
 
+					// Check if the blob is a ZIP file
+					const isZip = blob.type.includes('zip');
+
+					if (isZip) {
 						// Create a folder in the final ZIP named after the variable (e.g., tx_max/)
 						const folder = finalZip.folder(varName);
 						if (!folder) {
-							console.warn(
-								`Could not create folder for variable: ${varName}`
-							);
+							console.warn(`Could not create folder for variable: ${varName}`);
 							return;
 						}
 
-						// Check if the blob is a ZIP file and extract its contents before adding it.
-						// If not, add the file directly.
-						const isZip = blob.type.includes('zip');
-						if (isZip) {
-							// Load the ZIP contents using JSZip
-							const innerZip = await JSZip.loadAsync(blob);
-							// For each file in the inner ZIP (e.g., tx_max.csv, metadata.txt), add it to the folder
-							await Promise.all(
-								Object.keys(innerZip.files).map(
-									async (innerFileName) => {
-										const fileData =
-											await innerZip.files[
-												innerFileName
-												].async('blob');
-										folder.file(innerFileName, fileData);
-									}
-								)
-							);
-						}
-						else {
-							const fileName = `${varName}.nc`;
-							folder.file(fileName, blob);
-						}
-
+						// Unzip the inner contents and place them into the folder
+						const innerZip = await JSZip.loadAsync(blob);
+						await Promise.all(
+							Object.keys(innerZip.files).map(async (innerFileName) => {
+								const fileData = await innerZip.files[innerFileName].async('blob');
+								folder.file(innerFileName, fileData);
+							})
+						);
+					} else {
+						// File is not a ZIP — place it at the root of the final ZIP
+						const fileName = `${varName}.nc`;
+						finalZip.file(fileName, blob); // Added at root
 					}
-				);
+				});
+
 
 				// Wait for all folders/files to be processed
 				await Promise.all(fetchAndUnzip);

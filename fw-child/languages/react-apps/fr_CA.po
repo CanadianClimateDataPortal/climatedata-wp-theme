@@ -1,5 +1,10 @@
 # For how to use this file, see /docs/react-apps-translation.md
 
+msgid ""
+msgstr ""
+"Language: fr_CA\n"
+"Plural-Forms: nplurals=2; plural=n>=2 ? 1 : n<0;\n"
+
 msgid "Final Step"
 msgstr "Étape finale"
 

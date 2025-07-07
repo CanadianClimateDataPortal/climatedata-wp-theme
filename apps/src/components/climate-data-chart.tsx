@@ -108,7 +108,7 @@ const ClimateDataChart: React.FC<{
 			actualUnit = '';
 		}
 
-		return formatValue(value, locale, decimals, actualUnit, isDelta);
+		return formatValue(value, actualUnit, decimals, locale, isDelta);
 	};
 
 	const thresholds = climateVariable?.getThresholds() ?? [];

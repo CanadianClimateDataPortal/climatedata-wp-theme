@@ -102,7 +102,7 @@ const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 	// Value formatter (for units)
 	const valueFormatter = (value: number) => {
 		const unit = climateVariable?.getUnit();
-		return formatValue(value, locale, decimals, unit);
+		return formatValue(value, unit, decimals, locale);
 	};
 
 	// Generate median div

@@ -247,14 +247,18 @@ export const buttonVariants = cva(
 );
 
 /**
- * TODO: Not to format date (use doyFormatter instead), but to format a value with a unit.
- * @param value
- * @param locale
- * @param decimals
- * @param unit
- * @param relative
+ * Return a formatted and translated string of a value followed by a unit.
+ * 
+ * This function doesn't format "Day of Year" units (ex: formatting a day number `187` to the string
+ * "July 7"). For this, use `doyFormatter()`.
+ *
+ * @param value The numerical value.
+ * @param unit The unit. If empty or undefined, no unit will be outputted.
+ * @param decimals The number of decimals in the formatted value.
+ * @param locale The locale to use for number formatting.
+ * @param relative If true, precede the value with a + or -.
  */
-export function formatValue(value: number, locale: string, decimals: number, unit: string | undefined, relative: boolean = false): string {
+export function formatValue(value: number, unit: string | undefined, decimals: number, locale: string, relative: boolean = false): string {
 	const formatter = new Intl.NumberFormat(
 		locale,
 		{

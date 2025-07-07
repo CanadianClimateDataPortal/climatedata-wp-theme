@@ -176,7 +176,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			return doyFormatter(value, locale);
 		}
 
-		return formatValue(value, locale, decimals, isRangeStart ? '' : unit, delta);
+		return formatValue(value, isRangeStart ? '' : unit, decimals, locale, delta);
 	};
 
 	// Generate display dateRange for UI only (year starting with 1 instead of 0)

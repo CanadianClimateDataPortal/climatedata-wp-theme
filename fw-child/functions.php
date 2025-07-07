@@ -968,3 +968,39 @@ function cdc_html_title ( $title_array ) {
 
 	return $title_array;
 }
+
+/**
+ * Extract locale data from a domain's translation files (.mo files).
+ * 
+ * Translation files must be situated in the `languages/{domain}` directory of the theme.
+ *
+ * @param string $domain Domain for which to extract translation data.
+ * @param string $locale Locale to load in the domain
+ * @return array The structured translation data in JED-compatible format.
+ */
+function cdc_extract_locale_data( $domain, $locale ) {
+    $translation_base_path = get_stylesheet_directory() . '/languages/' . $domain . '/';
+    $data = [];
+
+    $mofile = $translation_base_path . $locale . '.mo';
+
+    if ( file_exists( $mofile ) ) {
+        $mo = new MO();
+
+        if ( $mo->import_from_file( $mofile ) ) {
+            $data[ "" ] = [
+                'domain' => $domain,
+                'lang'   => $mo->headers['Language'] ?? 'en',
+                'plural_forms' => $mo->headers['Plural-Forms'] ?? 'nplurals=2; plural=(n != 1);',
+            ];
+            foreach ( $mo->entries as $original => $translation_entry ) {
+                if ( ! empty( $original ) ) {
+                    // $translation_entry->translations is an array of translated strings
+                    $data[ $original ] = $translation_entry->translations;
+                }
+            }
+        }
+    }
+
+    return $data;
+}

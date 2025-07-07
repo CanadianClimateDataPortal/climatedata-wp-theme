@@ -327,8 +327,8 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 						);
 					} else {
 						// File is not a ZIP — place it at the root of the final ZIP
-						const fileName = `${varName}.nc`; // or `.csv` depending on your logic
-						finalZip.file(fileName, blob); // <-- added at root
+						const fileName = `${varName}.nc`;
+						finalZip.file(fileName, blob); // Added at root
 					}
 				});
 

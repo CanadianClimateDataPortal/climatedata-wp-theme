@@ -778,7 +778,7 @@ const ClimateDataChart: React.FC<{
 							key={tab.value}
 							className={cn(
 								'text-xs font-semibold uppercase cursor-pointer border py-1 px-2 sm:px-4 transition-colors duration-300 ease-out whitespace-nowrap flex-shrink-0',
-								'sm:w-44',
+								'sm:w-46',
 								activeTab === tab.value
 									? 'bg-dark-purple text-white border-dark-purple'
 									: 'bg-white text-dark-purple border-white ',

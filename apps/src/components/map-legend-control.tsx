@@ -31,7 +31,11 @@ const MapLegendControl: React.FC<{
 	const [legendHeight, setLegendHeight] = useState<number | undefined>(undefined);
 	const svgRef = useRef<SVGSVGElement>(null);
 	const isBlocksGradient = isCategorical || colourType === ColourType.DISCRETE;
-	const unitName = getUnitName(unit ?? '');
+	let unitName = getUnitName(unit ?? '');
+	
+	if (unit === 'DoY' && isDelta) {
+		unitName = getUnitName('days');
+	}
 
 	// Calculate dynamic height based on number of labels and minimum spacing
 	const totalLabels = data.length;

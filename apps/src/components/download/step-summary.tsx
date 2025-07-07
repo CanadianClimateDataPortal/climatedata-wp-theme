@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 
 import appConfig from '@/config/app.config';
 import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
+import { sprintf } from "@wordpress/i18n";
 
 const VariableOptionsSummary: React.FC = () => {
 	const { climateVariable } = useClimateVariable();
@@ -77,7 +78,7 @@ const StepSummary: React.FC = () => {
 						? climateVariable?.getSelectedRegion()?.cellCount ?? 0
 						: climateVariable?.getSelectedPointsCount() ?? 0;
 
-					return _n('1 selected', '%d selected', selectedCount).replace('%d', String(selectedCount));
+					return sprintf(_n('%d selected', `%d selected`, selectedCount), selectedCount);
 				})(),
 			})
 		}
@@ -124,10 +125,7 @@ const StepSummary: React.FC = () => {
 						data.push(
 							percentiles.length === climateVariable?.getPercentileOptions().length
 								? __('All percentiles')
-								: _n('1 percentile', '%d percentiles', percentiles.length).replace(
-									'%d',
-									String(percentiles.length)
-								)
+								: sprintf(_n('%d percentile', '%d percentiles', percentiles.length), percentiles.length)
 						);
 					}
 

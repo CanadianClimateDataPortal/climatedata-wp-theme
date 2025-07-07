@@ -1,3 +1,8 @@
-# Climatedata-wp-theme
+# ClimateData.ca portal
 
-WordPress theme of the Climate Data Portal.
+Source code of the [ClimateData.ca](https://www.climatedata.ca/) portal, a
+WordPress theme.
+
+## Contributing
+
+See the [CONTRIBUTING.md](./CONTRIBUTING.md) file for development instructions.

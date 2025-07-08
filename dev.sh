@@ -51,7 +51,34 @@ function _docker_compose {
   USER_ID=$(id -u) GROUP_ID=$(id -g) docker compose "$@"
 }
 
+function _check_for_required_build_assets {
+  local required_dirs=("dockerfiles/mounts/wp-plugins" "dockerfiles/mounts/ssl")
+  local error_found=false
+  
+  for dir in "${required_dirs[@]}"; do
+    if [[ ! -d "$dir" ]]; then
+      error_found=true
+      break
+    elif [[ -z "$(ls -A "$dir" 2>/dev/null)" ]]; then
+      error_found=true
+      break
+    fi
+  done
+  
+  if [[ "$error_found" == true ]]; then
+    echo    "[WARNING] Some assets are required to build the Portal image, but they cannot be found. To download those assets, cancel this process and run:"
+    echo    "            ./dev.sh download-docker-assets <URL>"
+    read -p "          Do you want to cancel this process? [Y/n]? " -n 1 -r
+    
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+      echo "Cancelled."
+      exit 1
+    fi
+  fi
+}
+
 function start {
+  _check_for_required_build_assets
   _docker_compose up -d
 }
 

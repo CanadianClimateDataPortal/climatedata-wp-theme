@@ -272,7 +272,7 @@ const Steps: React.FC = () => {
 					const data = await response.json();
 					if (data.status === 'captcha failed') {
 						dispatch(setRequestStatus('error'));
-						dispatch(setRequestError('Captcha failed. Please try again.'));
+						dispatch(setRequestError(__('Captcha failed. Please try again.')));
 						dispatch(setCaptchaValue(''));
 						return;
 					}

@@ -158,6 +158,9 @@ msgstr "Entrer les caractères qui apparaissent ici"
 msgid "Refresh Captcha"
 msgstr "Rafraîchir le Captcha"
 
+msgid "Captcha failed. Please try again."
+msgstr "Captcha échoué. Veuillez réessayer."
+
 msgid "Your request has been sent."
 msgstr "Votre requête a été envoyée."
 

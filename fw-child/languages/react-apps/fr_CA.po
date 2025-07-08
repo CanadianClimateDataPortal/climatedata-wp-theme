@@ -174,20 +174,14 @@ msgstr "Votre fichier est prêt à être téléchargé."
 msgid "Download"
 msgstr "Télécharger"
 
-msgid "Additional Climate Normals variables are available from the"
-msgstr "Les variables additionnelles des normales climatiques sont disponibles sur les sites Web du"
-
-msgid "Canadian Centre for Climate Services"
-msgstr "Centre canadien des services climatiques"
-
-msgid "and the"
-msgstr "et sur celui des"
-
-msgid "Government of Canada Historical Climate Data"
-msgstr "normales climatiques du gouvernement du Canada"
-
-msgid "websites."
-msgstr "."
+msgid "Additional Climate Normals variables are available from the "
+"<a href=\"https://climate-change.canada.ca/climate-data/#/climate-normals\" %s>Canadian Centre for Climate Services</a> "
+"and the <a href=\"https://climate.weather.gc.ca/climate_normals/index_e.html\" %s>Government of Canada Historical "
+"Climate Data</a> websites."
+msgstr "Les variables additionnelles des normales climatiques sont disponibles sur les sites Web du "
+"<a href=\"https://changements-climatiques.canada.ca/donnees-climatiques/#/normales-climatiques\" %s>Centre canadien "
+"des services climatiques</a> et sur celui des <a href=\"https://climat.meteo.gc.ca/climate_normals/index_f.html\" %s>"
+"normales climatiques du gouvernement du Canada</a>."
 
 msgid "Dataset"
 msgstr "Jeu de données"

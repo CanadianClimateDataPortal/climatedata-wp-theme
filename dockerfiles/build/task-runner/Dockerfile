@@ -22,6 +22,16 @@ FROM node:23.5-bookworm
 # Define environment variables
 ENV NPM_CONFIG_LOGLEVEL=info
 
+# The default `node` user has user and group id `1000` and `1000`. But since we
+# may want to set the ids of the new user `taskrunner` (created below) to those
+# same ids, we change the ids of the `node` user to some less used ids.
+ARG NODE_USER_ID=31865
+ARG NODE_GROUP_ID=43478
+
+RUN groupmod -g ${NODE_GROUP_ID} node \
+    && usermod -u ${NODE_USER_ID} -g ${NODE_GROUP_ID} node \
+    && chown -R node:node /home/node
+
 # For `dumb-init`, see point #5 in:
 #   https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker/
 #   also see: https://github.com/Yelp/dumb-init
@@ -39,6 +49,8 @@ RUN npm install -g concurrently sass
 # Install custom scripts
 
 COPY --chmod=755 dockerfiles/build/task-runner/bin /usr/local/bin
+
+# Create a new user `taskrunner` that will be the main user
 
 ARG USER_ID=10000
 ARG GROUP_ID=10001

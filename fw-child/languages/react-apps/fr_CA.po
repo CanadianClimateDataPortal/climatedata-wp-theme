@@ -14,7 +14,7 @@ msgstr "Étape"
 msgid "Select a Dataset"
 msgstr "Sélectionnez un jeu de données"
 
-msgid "Select dataset to begin building your download request. Several options will be available after this selection."
+msgid "Select a dataset to begin building your download request. Several options will be available after this selection."
 msgstr "Sélectionnez un jeu de données pour commencer à élaborer votre demande de téléchargement. Plusieurs options seront disponibles après cette sélection."
 
 msgid "Learn more"
@@ -56,8 +56,8 @@ msgstr "Sélectionnez une version du jeu de données"
 msgid "Set your variable options"
 msgstr "Définissez les options de la variable"
 
-msgid "Please set your variables options to your needs."
-msgstr "Veuillez définir les options de vos variables en fonction de vos besoins."
+msgid "Please set the variable options as needed."
+msgstr "Veuillez définir les options de la variable en fonction de vos besoins."
 
 msgid "Select a location or area"
 msgstr "Sélectionnez un lieu ou une région"

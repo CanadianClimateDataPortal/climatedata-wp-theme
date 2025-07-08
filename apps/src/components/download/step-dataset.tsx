@@ -46,7 +46,7 @@ const StepDataset = React.forwardRef<StepComponentRef>((_, ref) => {
 		<StepContainer title={__('Select a Dataset')}>
 			<StepContainerDescription>
 				{__(
-					'Select dataset to begin building your download request. Several options will be available after this selection.'
+					'Select a dataset to begin building your download request. Several options will be available after this selection.'
 				)}
 			</StepContainerDescription>
 			<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 auto-rows-fr">

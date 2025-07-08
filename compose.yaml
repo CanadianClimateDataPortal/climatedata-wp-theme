@@ -12,6 +12,9 @@ services:
         # downloaded using the `dockerfiles/tools/download-docker-assets.sh`
         # script.
         LOCAL_WP_PLUGINS_DIR: dockerfiles/mounts/wp-plugins
+        # The dev.sh script defines the USER_ID and GROUP_ID environment variables
+        WEB_SERVER_USER_ID: ${USER_ID}
+        WEB_SERVER_GROUP_ID: ${GROUP_ID}
     depends_on:
       - task_runner
     volumes:

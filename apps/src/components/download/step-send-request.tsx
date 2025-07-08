@@ -27,8 +27,8 @@ const Captcha: React.FC<{
 	dispatch: any;
 	__: (text: string) => string;
 }> = ({ analysisNamespace, captchaValue, captchaRefresh, setCaptchaRefresh, dispatch, __ }) => (
-	<div className="mb-4">
-		<p className="text-sm text-neutral-grey-medium leading-5 mb-2">
+	<div className="flex flex-col gap-2">
+		<p className="text-sm text-neutral-grey-medium leading-5">
 			{__('Enter the characters shown:')}
 		</p>
 		<div className="flex items-center space-x-3">
@@ -36,7 +36,7 @@ const Captcha: React.FC<{
 				id="captcha_img"
 				src={`/assets/themes/fw-child/resources/php/securimage/securimage_show.php?namespace=${analysisNamespace}&${captchaRefresh}`}
 				alt="CAPTCHA"
-				className="w-20 h-10 border border-gray-300 rounded"
+				className="w-40 h-20 border border-gray-300 rounded"
 			/>
 			<button
 				type="button"
@@ -50,6 +50,8 @@ const Captcha: React.FC<{
 			>
 				↻
 			</button>
+		</div>
+		<div>
 			<input
 				type="text"
 				placeholder="XXXX"
@@ -57,7 +59,7 @@ const Captcha: React.FC<{
 				onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 					dispatch(setCaptchaValue(e.target.value))
 				}
-				className="border bg-white border-gray-300 rounded px-2 py-1 text-sm placeholder:text-neutral-grey-medium"
+				className="border bg-white border-gray-300 rounded px-2 py-1 text-sm placeholder:text-neutral-grey-medium w-20"
 			/>
 		</div>
 	</div>

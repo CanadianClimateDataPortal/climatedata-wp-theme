@@ -3,19 +3,11 @@ import { __ } from '@/context/locale-provider';
 
 import { CheckboxFactory } from '@/components/ui/checkbox';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
-import {
-	StepContainer,
-	StepContainerDescription,
-} from '@/components/download/step-container';
+import { StepContainer, StepContainerDescription } from '@/components/download/step-container';
 import { EmissionScenariosTooltip } from '@/components/sidebar-menu-items/emission-scenarios-control';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import {
-	AveragingType,
-	DownloadType,
-	FrequencyConfig,
-	FrequencyType,
-} from "@/types/climate-variable-interface";
+import { AveragingType, DownloadType, FrequencyConfig, FrequencyType } from "@/types/climate-variable-interface";
 import { StepComponentRef, StepResetPayload } from "@/types/download-form-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
@@ -23,6 +15,7 @@ import { YearRange } from "@/components/year-range";
 import { DateRangePicker } from "@/components/date-range-picker";
 import appConfig from "@/config/app.config";
 import { useLocale } from '@/hooks/use-locale';
+import { sprintf } from "@wordpress/i18n";
 
 const modelLabels: Record<string, string> = {
 	'pcic12': __('PCIC12 (Ensemble)'),
@@ -261,15 +254,22 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 							name="percentiles"
 							title={__('Percentiles')}
 							tooltip={
-								<span>
-									<a href={__("/glossary/#def-13396")} target="_blank" rel="noopener noreferrer" className='text-dark-purple underline'>
-										{__('The percentiles')}
-									</a>
-									{__(' are statistics used to summarize large datasets (in this case, information from 20+ models). ' +
-										'On the ClimateData.ca time series plots, the range of the model results are represented by the 10th, 50th (median) and 90th percentiles. ' +
-										'Select the percentiles you wish to use to summarize this multi-model ensemble. ' +
-										'If you would like to receive information for all models individually, do not select any percentiles.')}
-								</span>
+								<span dangerouslySetInnerHTML={{
+									__html:
+										sprintf(
+											__(
+												'<a href="/glossary/#def-13396" %s>Percentiles</a> are statistics ' +
+												'used to summarize large datasets (in this case, information from ' +
+												'20+ models). On the ClimateData.ca time series plots, the range of ' +
+												'the model results are represented by the 10th, 50th (median) and ' +
+												'90th percentiles. Select the percentiles you wish to use to ' +
+												'summarize this multi-model ensemble. If you would like to receive ' +
+												'information for all models individually, do not select any ' +
+												'percentiles.'
+											),
+											'target="_blank" rel="noopener noreferrer" class="text-dark-purple underline"',
+									)
+								}} />
 							}
 							orientation="horizontal"
 							className="max-w-md"

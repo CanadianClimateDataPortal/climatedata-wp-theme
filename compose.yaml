@@ -16,7 +16,7 @@ services:
         WEB_SERVER_USER_ID: ${USER_ID}
         WEB_SERVER_GROUP_ID: ${GROUP_ID}
     depends_on:
-      - task_runner
+      - task-runner
     volumes:
       # Source files of the themes
       - "./framework:/var/www/html/assets/themes/framework"
@@ -77,7 +77,7 @@ services:
       MARIADB_PASSWORD: climatedata
     command: --innodb-buffer-pool-size=128M --innodb-log-buffer-size=64M --innodb-doublewrite=0 --innodb-flush-log-at-trx-commit=0
 
-  task_runner:
+  task-runner:
     build:
       context: .
       dockerfile: dockerfiles/build/task-runner/Dockerfile

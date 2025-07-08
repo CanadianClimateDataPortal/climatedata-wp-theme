@@ -110,7 +110,7 @@ function nginx {
 }
 
 function task-runner-shell {
-  _docker_compose exec -it task_runner bash
+  _docker_compose exec -it task-runner bash
 }
 
 ####

@@ -146,8 +146,8 @@ msgstr "Veuillez saisir votre adresse courriel pour recevoir un lien de téléch
 msgid "Email Address"
 msgstr "Adresse courriel"
 
-msgid "john.doe@gmail.com"
-msgstr "john.doe@gmail.com"
+msgid "your.email@example.com"
+msgstr "votre.courriel@exemple.com"
 
 msgid "I would like to subscribe to ClimateData Newsletter"
 msgstr "J'aimerais m'inscrire à l’infolettre de DonneesClimatiques.ca"

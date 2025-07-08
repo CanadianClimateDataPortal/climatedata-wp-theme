@@ -205,7 +205,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 					<Input
 						type="email"
 						className="sm:w-64 mb-2"
-						placeholder={__('john.doe@gmail.com')}
+						placeholder={__('your.email@example.com')}
 						value={email}
 						onChange={(e) => {
 							dispatch(setEmail(e.target.value));

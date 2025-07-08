@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { __ } from '@/context/locale-provider';
 
-import {
-	StepContainer,
-	StepContainerDescription,
-} from '@/components/download/step-container';
+import { StepContainer, StepContainerDescription } from '@/components/download/step-container';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { DownloadType, DownloadFile } from '@/types/climate-variable-interface';
+import { DownloadFile, DownloadType } from '@/types/climate-variable-interface';
 import { cn } from '@/lib/utils';
 import { useAppSelector } from '@/app/hooks';
+import { sprintf } from "@wordpress/i18n";
 
 /**
  * Result step, the final one, allows the user to make download file or see a success message.
@@ -72,9 +70,20 @@ const StepResult = React.forwardRef(() => {
 					</div>
 				)}
 				{climateVariable?.getId() === 'msc_climate_normals' && (
-					<p>
-						{__('Additional Climate Normals variables are available from the')} <a href="https://climate-change.canada.ca/climate-data/#/climate-normals" target="_blank" className='text-dark-purple'>{__('Canadian Centre for Climate Services')}</a> {__('and the')} <a href="https://climate.weather.gc.ca/climate_normals/index_e.html" target="_blank" className='text-dark-purple'>{__('Government of Canada Historical Climate Data')}</a> {__('websites.')}
-					</p>
+					<p dangerouslySetInnerHTML={{ __html:
+							sprintf(
+								__(
+									'Additional Climate Normals variables are available from the ' +
+									'<a href="https://climate-change.canada.ca/climate-data/#/climate-normals" %s>' +
+									'Canadian Centre for Climate Services</a> and the ' +
+									'<a href="https://climate.weather.gc.ca/climate_normals/index_e.html" %s>' +
+									'Government of Canada Historical Climate Data</a> websites.'
+								),
+								'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
+								'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
+							)
+					}}
+					/>
 				)}
 			</div>
 		</StepContainer>

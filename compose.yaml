@@ -9,8 +9,7 @@ services:
       args:
         TASK_RUNNER_IMAGE: climatedata-task-runner:dev
         # Directory containing local WordPress plugins. Those files can be
-        # downloaded using the `dockerfiles/tools/download-docker-assets.sh`
-        # script.
+        # downloaded using `./dev.sh download-docker-assets`.
         LOCAL_WP_PLUGINS_DIR: dockerfiles/mounts/wp-plugins
         # The dev.sh script defines the USER_ID and GROUP_ID environment variables
         WEB_SERVER_USER_ID: ${USER_ID}
@@ -37,8 +36,8 @@ services:
       - type: bind
         source: dockerfiles/dev/www/configs/php/php-development.ini
         target: /usr/local/etc/php/conf.d/php-development.ini
-      # Mount the SSL certificate files. Those files can be downloaded using the
-      # `dockerfiles/tools/download-docker-assets.sh`
+      # Mount the SSL certificate files. Those files can be downloaded using
+      # `./dev.sh download-docker-assets`.
       - type: bind
         source: dockerfiles/mounts/ssl
         target: /etc/nginx/ssl

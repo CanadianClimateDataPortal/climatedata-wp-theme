@@ -438,13 +438,13 @@ msgstr "Impossible de récupérer votre emplacement."
 msgid "Change from "
 msgstr "Changement par rapport à "
 
-msgid "Annual Values"
+msgid "Annual values"
 msgstr "Valeurs annuelles"
 
-msgid "30 Year Averages"
+msgid "30 year averages"
 msgstr "Moyennes sur 30 ans"
 
-msgid "30 Year Changes"
+msgid "30 year changes"
 msgstr "Changements sur 30 ans"
 
 msgid "Export failed. Please try again."

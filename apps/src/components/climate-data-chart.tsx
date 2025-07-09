@@ -375,17 +375,17 @@ const ClimateDataChart: React.FC<{
 	const tabs: Tab[] = useMemo(() => [
 		{
 			value: 'annual-values',
-			label: __('Annual Values'),
+			label: __('Annual values'),
 			enabled: true,
 		},
 		{
 			value: '30-year-averages',
-			label: __('30 Year Averages'),
+			label: __('30 year averages'),
 			enabled: isThirtyYearAveragingEnabled(),
 		},
 		{
 			value: '30-year-changes',
-			label: __('30 Year Changes'),
+			label: __('30 year changes'),
 			enabled: isThirtyYearAveragingEnabled(),
 		},
 	], [isThirtyYearAveragingEnabled, __]);

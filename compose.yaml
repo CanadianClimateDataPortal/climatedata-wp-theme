@@ -3,27 +3,47 @@ name: climatedata-dev
 services:
 
   portal:
-    image: climatedata-portal:dev
     build:
       context: .
       target: development
       args:
-        TASK_RUNNER_IMAGE: climatedata-task-runner
+        TASK_RUNNER_IMAGE: climatedata-task-runner:dev
+        # Directory containing local WordPress plugins. Those files can be
+        # downloaded using `./dev.sh download-docker-assets`.
+        LOCAL_WP_PLUGINS_DIR: dockerfiles/mounts/wp-plugins
+        # The dev.sh script defines the USER_ID and GROUP_ID environment variables
+        WEB_SERVER_USER_ID: ${USER_ID}
+        WEB_SERVER_GROUP_ID: ${GROUP_ID}
     depends_on:
-      - task_runner
+      - task-runner
     volumes:
+      # Source files of the themes
       - type: bind
         source: ./framework
         target: /var/www/html/assets/themes/framework
       - type: bind
         source: ./fw-child
         target: /var/www/html/assets/themes/fw-child
+      # Add an HTTP header to prevent static files caching by the browser
       - type: bind
         source: dockerfiles/dev/www/configs/nginx/site-extra/no-static-cache.conf
         target: /etc/nginx/conf.d/climatedata-site/no-static-cache.conf
+      # Proxy all requests to /assets/uploads to a central server containing the files
+      - type: bind
+        source: dockerfiles/dev/www/configs/nginx/site-extra/proxy-uploads.conf
+        target: /etc/nginx/conf.d/climatedata-site/proxy-uploads.conf
+      # Use a development PHP configuration
       - type: bind
         source: dockerfiles/dev/www/configs/php/php-development.ini
         target: /usr/local/etc/php/conf.d/php-development.ini
+      # Mount the SSL certificate files. Those files can be downloaded using
+      # `./dev.sh download-docker-assets`.
+      - type: bind
+        source: dockerfiles/mounts/ssl
+        target: /etc/nginx/ssl
+    ports:
+     - "443:443"
+     - "80:80"
     environment:
       # Note: to set a boolean value, always quote the words "true" and "false",
       # else the YAML parser may transform them to 1 and 0. Example:
@@ -43,7 +63,7 @@ services:
       WP_LOGGED_IN_SALT: 'i=GdI3/!VdU,+Y T-f?kr-.0(Q4kxiqZ[Hu*tB3TY(@W5M3mee/XRI-~[cHNOZ&j'
       WP_NONCE_SALT: 'Up<Q /#k4>;p)GYi)+--Pls<>-7NywT.JVmrW9C,bET(F@Tz*Bkp+kHtN)87<5 l'
       WP_WP_DEBUG: "true"
-      # Required, for the login page to work correctly
+      # Required for the login page to work correctly
       WP_WP_SITEURL: https://dev-en.climatedata.ca/
       WP_WP_HOME: https://dev-en.climatedata.ca/
 
@@ -51,6 +71,8 @@ services:
     image: registry.gitlab.com/crim.ca/clients/ccdp/portal/deployment/db:dev
     volumes:
       - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
     environment:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: climatedata
@@ -58,11 +80,16 @@ services:
       MARIADB_PASSWORD: climatedata
     command: --innodb-buffer-pool-size=128M --innodb-log-buffer-size=64M --innodb-doublewrite=0 --innodb-flush-log-at-trx-commit=0
 
-  task_runner:
-    image: climatedata-task-runner
+  task-runner:
     build:
       context: .
       dockerfile: dockerfiles/build/task-runner/Dockerfile
+      tags:
+        - climatedata-task-runner:dev
+      # The dev.sh script defines the USER_ID and GROUP_ID environment variables
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
     command: ["bash", "-c", "watch-fe.sh /app"]
     volumes:
       - ".:/app"

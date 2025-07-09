@@ -31,11 +31,14 @@ by WordPress.
 When you add or modify a string in the PHP files, you need to update the
 `.pot` file that contains all the strings to be translated.
 
-> Note that this step is not required if you didn't add a new, or removed a
+> Note that this step is not required if you didn't add a new, or removed, a
 > new string to translate (skip to "Compiling translations").
 
 1. Start the development environment.
-2. Once the `portal` container is running, start a Bash terminal on it.
+2. Once the `portal` container is running, open a terminal on it:
+   ```shell
+   ./dev.sh portal-shell
+   ```
 3. From this terminal, execute the following commands:
    ```shell
    cd /var/www/html/assets/themes/fw-child
@@ -48,7 +51,10 @@ From an updated `.pot` file, you can then update the translation files for the
 French language.
 
 1. Start the development environment.
-2. Once the `portal` container is running, start a Bash terminal on it.
+2. Once the `portal` container is running, open a terminal on it:
+   ```shell
+   ./dev.sh portal-shell
+   ```
 3. From this terminal, execute the following commands:
    ```shell
    cd /var/www/html/assets/themes/fw-child
@@ -70,7 +76,7 @@ file.
    wp --allow-root i18n make-mo languages/cdc/fr_CA.po
    ```
 
-New translations should now be available in the site.
+New translations should now be available on the site.
 
 Commit all the modified files to the repository (`.pot`, `.po`, `.mo`).
 
@@ -107,7 +113,7 @@ Note that the same translation file is used for both the map and download apps.
    wp --allow-root i18n make-mo languages/react-apps/fr_CA.po
    ```
 
-New translations should now be available in the site.
+New translations should now be available on the site.
 
 Commit the modified
 `.po` and `.mo` files to the repository.

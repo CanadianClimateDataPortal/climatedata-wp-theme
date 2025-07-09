@@ -402,6 +402,9 @@ msgstr "Saisonnière"
 msgid "Annual"
 msgstr "Annuelle"
 
+msgid "Annual (January to December)"
+msgstr "Annuelle (janvier à décembre)"
+
 msgid "Annual (July to June)"
 msgstr "Annuelle (juillet à juin)"
 

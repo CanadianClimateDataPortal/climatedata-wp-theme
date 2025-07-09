@@ -100,7 +100,7 @@ const appConfig = {
 	frequencies: [
 		{
 			value: "ann",
-			label: "Annual",
+			label: "Annual (January to December)",
 		},
 		{
 			value: "annual_jul_jun",

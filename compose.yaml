@@ -19,8 +19,12 @@ services:
       - task-runner
     volumes:
       # Source files of the themes
-      - "./framework:/var/www/html/assets/themes/framework"
-      - "./fw-child:/var/www/html/assets/themes/fw-child"
+      - type: bind
+        source: ./framework
+        target: /var/www/html/assets/themes/framework
+      - type: bind
+        source: ./fw-child
+        target: /var/www/html/assets/themes/fw-child
       # Add an HTTP header to prevent static files caching by the browser
       - type: bind
         source: dockerfiles/dev/www/configs/nginx/site-extra/no-static-cache.conf

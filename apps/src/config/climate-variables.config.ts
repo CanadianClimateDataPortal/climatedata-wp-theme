@@ -1177,7 +1177,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "select",
 				label: __('Temperature Comparison Operator'),
 				description: __('Choose whether to accumulate degree-days when the temperature is greater than or less than the threshold.'),
-				help: __('Select ">" to accumulate degree-days on days warmer than the threshold, or "<" for colder days.'),
+				help: __("Select '>' to accumulate degree-days on days warmer than the threshold, or '<' for colder days."),
 				attributes: {
 					placeholder: ">",
 				},
@@ -1209,7 +1209,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: __('Start Date (MM-DD)'),
 				description: __('Specify the date to begin accumulating degree-days.'),
-				help: __('Use a date like "09-01" to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models.'),
+				help: __("Use a date like '09-01' to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models."),
 				format: "MM-DD",
 				attributes: {
 					type: "date",

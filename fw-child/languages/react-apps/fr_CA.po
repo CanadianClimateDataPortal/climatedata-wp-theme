@@ -885,7 +885,7 @@ msgid "Only days with a daily maximum Humidex (HXMax) greater than this threshol
 msgstr "Seuls les jours avec un Humidex maximum quotidien (HXMax) supérieur à ce seuil seront inclus."
 
 msgid "Degree-Day Total Threshold (K days)"
-msgstr "Seuil total de degrés-jours (K days)"
+msgstr "Seuil total de degrés-jours (K jours)"
 
 msgid "This value defines the cumulative degree-day target. The result will be the day of the year when this threshold is surpassed."
 msgstr "Cette valeur définit l'objectif de degrés-jours cumulés. Le résultat correspond au jour de l'année où ce seuil est dépassé."
@@ -893,17 +893,17 @@ msgstr "Cette valeur définit l'objectif de degrés-jours cumulés. Le résultat
 msgid "Temperature Comparison Operator"
 msgstr "Opérateur de comparaison de température"
 
-msgid 'Select ">" to accumulate degree-days on days warmer than the threshold, or "<" for colder days.'
-msgstr "Sélectionnez « > » pour accumuler les degrés-jours les jours plus chauds que le seuil, ou « < » pour les jours plus froids."
+msgid "Select '>' to accumulate degree-days on days warmer than the threshold, or '<' for colder days."
+msgstr "Sélectionnez « > » pour accumuler les degrés-jours pour les jours plus chauds que le seuil, ou « < » pour les jours plus froids."
 
 msgid "Start Date (MM-DD)"
-msgstr "Date de début (MM-DD)"
+msgstr "Date de début (MM-JJ)"
 
-msgid 'Use a date like "09-01" to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models.'
+msgid "Use a date like '09-01' to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models."
 msgstr "Utilisez une date comme « 09-01 » pour commencer à partir du 1er septembre. Évitez les dates de fin de mois en raison des incohérences de certains modèles climatiques."
 
 msgid "Precipitation Threshold (mm/day)"
-msgstr "Seuil de précipitation (mm/day)"
+msgstr "Seuil de précipitation (mm/jour)"
 
 msgid "Only days with daily precipitation less than this threshold will be included."
 msgstr "Seuls les jours avec des précipitations quotidiennes inférieures à ce seuil seront inclus."
@@ -918,7 +918,7 @@ msgid "Only days with a daily minimum temperature greater than this value will b
 msgstr "Seuls les jours avec une température minimale quotidienne supérieure à cette valeur seront inclus."
 
 msgid "Number of Wet Days (mm/day)"
-msgstr "Nombre de jours pluvieux (mm/day)"
+msgstr "Nombre de jours pluvieux (mm/jour)"
 
 msgid "Only days with daily precipitation greater than or equal to this value will be included."
 msgstr "Seuls les jours avec des précipitations quotidiennes supérieures ou égales à cette valeur seront inclus."

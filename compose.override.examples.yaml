@@ -2,6 +2,32 @@
 
 ###
 # Scenario:
+#   Have the Portal services (PHP, Nginx, Supervisor) output their logs to a
+#   local directory. This gives easier access to the logs and allows keeping
+#   them after stopping or restarting the Portal service.
+#
+# Solution:
+#   First create the local directories where you want to have the log files,
+#   then mount them to the associated log directories in the Portal.
+#
+# services:
+#   portal:
+#     volumes:
+#       # PHP logs
+#       - type: bind
+#         source: dockerfiles/mounts/logs/php
+#         target: /var/log/php
+#       # Nginx logs
+#       - type: bind
+#         source: dockerfiles/mounts/logs/nginx
+#         target: /var/log/nginx
+#       # Supervisor logs
+#       - type: bind
+#         source: dockerfiles/mounts/logs/supervisord
+#         target: /var/log/supervisord
+
+###
+# Scenario:
 #   Disable access to the administration section of WordPress. For example, to
 #   prevent changes to the site's content.
 #

@@ -104,7 +104,7 @@ function portal-shell {
 }
 
 function wp-cli {
-  _docker_compose exec -w /var/www/html portal wp --allow-root "$@"
+  _docker_compose exec -w /var/www/html portal wp "$@"
 }
 
 function db-shell {

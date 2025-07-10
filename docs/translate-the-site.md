@@ -42,7 +42,7 @@ When you add or modify a string in the PHP files, you need to update the
 3. From this terminal, execute the following commands:
    ```shell
    cd /var/www/html/assets/themes/fw-child
-   wp --allow-root i18n make-pot --skip-js . languages/cdc/cdc.pot --domain=cdc
+   wp i18n make-pot --skip-js . languages/cdc/cdc.pot --domain=cdc
    ```
 
 ### Generate the translation files (.mo and .po)
@@ -58,7 +58,7 @@ French language.
 3. From this terminal, execute the following commands:
    ```shell
    cd /var/www/html/assets/themes/fw-child
-   wp --allow-root i18n update-po languages/cdc/cdc.pot
+   wp i18n update-po languages/cdc/cdc.pot
    ```
 
 Then do your translations in the `languages/cdc/fr_CA.po` file.
@@ -73,7 +73,7 @@ file.
 3. From this terminal, execute the following commands:
    ```shell
    cd /var/www/html/assets/themes/fw-child
-   wp --allow-root i18n make-mo languages/cdc/fr_CA.po
+   wp i18n make-mo languages/cdc/fr_CA.po
    ```
 
 New translations should now be available on the site.
@@ -110,7 +110,7 @@ Note that the same translation file is used for both the map and download apps.
 3. From this terminal, execute the following commands:
    ```shell
    cd /var/www/html/assets/themes/fw-child
-   wp --allow-root i18n make-mo languages/react-apps/fr_CA.po
+   wp i18n make-mo languages/react-apps/fr_CA.po
    ```
 
 New translations should now be available on the site.

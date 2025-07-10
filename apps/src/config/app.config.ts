@@ -11,10 +11,6 @@ const appConfig = {
 			label: "CMIP6",
 		},
 		{
-			value: "humidex",
-			label: "Humidex",
-		},
-		{
 			value: "ahccd",
 			label: "AHCCD",
 		},

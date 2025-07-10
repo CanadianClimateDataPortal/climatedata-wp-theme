@@ -377,6 +377,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	getFinch(): string {
 		return this._config.finch ?? this.getId();
 	}
+	
+	getFinchDataset(): string | null {
+		return this.getVersion();
+	}
 
 	getAhccdDownloadRequiredVariables(): string[] {
 		return this._config.ahccdDownloadRequiredVariables ?? [];

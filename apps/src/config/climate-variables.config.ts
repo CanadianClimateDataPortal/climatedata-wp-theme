@@ -466,7 +466,8 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Days with Humidex above threshold */
 	{
 		id: "days_humidex_above_threshold",
-		class: "RasterPrecalculatedClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
+		finch: "hxmax_days_above",
 		versions: [ "cmip6" ],
 		gridType: "era5landgrid",
 		scenarios: {
@@ -490,8 +491,27 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "> 40",
 			},
 		],
+		analysisFields: [
+			{
+				key: "threshold",
+				type: "input",
+				label: 'Daily Maximum Humidex Threshold (HXMax)',
+				description: 'Set the minimum daily maximum Humidex (HXMax) value that must be exceeded for a day to be included in the analysis.',
+				help: 'Only days where the daily maximum Humidex (HXMax) exceeds this threshold will be counted.',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
+		defaultDateRange: [
+			"1980",
+			"2010",
+		],
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
@@ -886,41 +906,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"tas",
 		],
 		stationTypeFilter: ['T'],
-	},
-	/** Days above HXmax */
-	{
-		id: "days_above_hxmax",
-		finch: "hxmax_days_above",
-		class: "RasterAnalyzeClimateVariable",
-		hasDelta: false,
-		versions: [ "humidex" ],
-		scenarios: {
-			humidex: [
-				"ssp126",
-				"ssp245",
-				"ssp585",
-			],
-		},
-		gridType: "era5landgrid",
-		unit: "days",
-		analysisFields: [
-			{
-				key: "threshold",
-				type: "input",
-				label: 'Daily Maximum Humidex Threshold (HXMax)',
-				description: 'Set the minimum daily maximum Humidex (HXMax) value that must be exceeded for a day to be included in the analysis.',
-				help: 'Only days where the daily maximum Humidex (HXMax) exceeds this threshold will be counted.',
-				comparison: '>',
-				attributes: {
-					type: "number",
-					placeholder: "0",
-				}
-			},
-		],
-		defaultDateRange: [
-			"1980",
-			"2010",
-		],
 	},
 	/** Days above Tmax */
 	{

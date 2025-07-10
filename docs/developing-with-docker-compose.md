@@ -39,6 +39,14 @@ To ease your development, be sure to check the available commands in `dev.sh`:
 ./dev.sh --help
 ```
 
+### WordPress administration
+
+A development user is created for the WordPress administration:
+
+* https://dev-en.climatedata.ca/wp-admin
+* Username: `dev`
+* Password: `climatedata`
+
 ### Created Docker services
 
 This setup creates three Docker services:

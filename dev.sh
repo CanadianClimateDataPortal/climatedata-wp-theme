@@ -79,6 +79,10 @@ function _check_for_required_build_assets {
 
 function start {
   _check_for_required_build_assets
+  # The Task Runner image must be built before building the Portal image, so
+  # we start it (i.e. build it, if required) first before starting the other
+  # services.
+  _docker_compose up -d task-runner
   _docker_compose up -d
 }
 

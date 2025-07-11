@@ -110,9 +110,9 @@ const AnalyzedDownloadFields: React.FC = () => {
 						key={key}
 						keyName={key}
 						type={type}
-						label={label}
-						description={description}
-						help={help}
+						label={__(label)}
+						description={__(description ?? "")}
+						help={__(help ?? "")}
 						attributeType={attributeType}
 						placeholder={placeholder}
 						format={format}

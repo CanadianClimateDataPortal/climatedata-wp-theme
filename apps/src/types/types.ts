@@ -15,7 +15,7 @@ export type Locale = 'en' | 'fr';
 /**
  * Represents valid dataset keys.
  */
-export type DatasetKey = 'cmip5' | 'cmip6' | 'humidex';
+export type DatasetKey = 'cmip5' | 'cmip6';
 
 /**
  * Represents a field with multilingual support.

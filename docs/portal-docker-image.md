@@ -88,7 +88,7 @@ cp ~/plugin-a-pro-1.2.3.zip ~/plugin-b-5.2.1.zip dockerfiles/mounts/wp-plugins
 
 docker build \
   --target production \
-  --build-arg TASK_RUNNER_IMAGE=registry.example.com/task_runner:demo \
+  --build-arg TASK_RUNNER_IMAGE=registry.example.com/task-runner:demo \
   --build-arg LOCAL_WP_PLUGINS_DIR=dockerfiles/mounts/wp-plugins \
   .
 ```

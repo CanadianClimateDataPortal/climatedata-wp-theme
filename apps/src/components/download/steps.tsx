@@ -13,7 +13,7 @@ import {
 } from '@/features/download/download-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { cn } from '@/lib/utils';
-import { DATASETS, FINCH_DATASET_CMIP6_SSP370, FINCH_FREQUENCY_NAMES, GEOSERVER_BASE_URL } from '@/lib/constants';
+import { FINCH_FREQUENCY_NAMES, GEOSERVER_BASE_URL } from '@/lib/constants';
 import { StepComponentRef } from '@/types/download-form-interface';
 import {
 	DownloadFile,
@@ -144,18 +144,7 @@ const Steps: React.FC = () => {
 					inputs.push({ id: 'ensemble_percentiles', data: '' });
 				}
 
-				// Add dataset using Finch name from DATASETS
-				const datasetKey = climateVariable.getVersion?.();
-				let datasetFinchName = datasetKey;
-
-				if (datasetKey && DATASETS && (datasetKey as keyof typeof DATASETS) in DATASETS && DATASETS[datasetKey as keyof typeof DATASETS].finch_name) {
-					if (datasetKey === 'cmip6' && scenarios.includes('ssp370')) {
-						// Special case: if SSP3-7.0 is selected, use a special dataset name
-						datasetFinchName = FINCH_DATASET_CMIP6_SSP370;
-					} else {
-						datasetFinchName = DATASETS[datasetKey as keyof typeof DATASETS].finch_name;
-					}
-				}
+				const datasetFinchName = climateVariable.getFinchDataset();
 
 				if (datasetFinchName) {
 					inputs.push({ id: 'dataset', data: datasetFinchName });

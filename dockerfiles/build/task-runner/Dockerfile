@@ -7,12 +7,30 @@
 #
 # This Dockerfile assumes that the context directory is the root of the project.
 # So, when building the image, make sure to build it from the project's root.
+#
+# A `taskrunner` user is created and used as the main user. It's possible to set
+# this user's ID and group ID with the build arguments `USER_ID` and `GROUP_ID`.
+#
+# Note that the package files are the only files copied from the source
+# directory. The Docker image is not intended to be built with a copy of all the
+# source files. This prevents having to rebuild the image everytime the source
+# file changes when generally only the packages it contains are to be used. If
+# the other source files are required, mount them when running the image.
 
 FROM node:23.5-bookworm
 
 # Define environment variables
-ENV NVM_DIR=/home/node/.nvm
 ENV NPM_CONFIG_LOGLEVEL=info
+
+# The default `node` user has user and group id `1000` and `1000`. But since we
+# may want to set the ids of the new user `taskrunner` (created below) to those
+# same ids, we change the ids of the `node` user to some less used ids.
+ARG NODE_USER_ID=31865
+ARG NODE_GROUP_ID=43478
+
+RUN groupmod -g ${NODE_GROUP_ID} node \
+    && usermod -u ${NODE_USER_ID} -g ${NODE_GROUP_ID} node \
+    && chown -R node:node /home/node
 
 # For `dumb-init`, see point #5 in:
 #   https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker/
@@ -32,12 +50,18 @@ RUN npm install -g concurrently sass
 
 COPY --chmod=755 dockerfiles/build/task-runner/bin /usr/local/bin
 
-# Switch to the `node` user
+# Create a new user `taskrunner` that will be the main user
 
-USER node
+ARG USER_ID=10000
+ARG GROUP_ID=10001
 
-# Install NVM
+RUN addgroup --gid $GROUP_ID taskrunner && \
+    adduser --uid $USER_ID --gid $GROUP_ID --disabled-password taskrunner
 
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+USER taskrunner
 
-WORKDIR /home/node/app
+WORKDIR /app/apps
+
+COPY --chown=taskrunner apps/package*.json .
+
+RUN npm ci

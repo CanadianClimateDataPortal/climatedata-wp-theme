@@ -493,6 +493,8 @@ export interface ClimateVariableInterface {
 
 	getFinch(): string;
 
+	getFinchDataset(): string | null;
+
 	getAhccdDownloadRequiredVariables(): string[];
 
 	getSelectedPoints(): GridCoordinates | null;

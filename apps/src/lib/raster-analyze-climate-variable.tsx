@@ -62,6 +62,30 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 				FileFormatType.NetCDF,
 			];
 	}
+	
+	getFinchDataset(): string | null {
+		const version = this.getVersion();
+		const finchID = this.getFinch();
+		const scenarios = this.getAnalyzeScenarios();
+
+		if (finchID === 'hxmax_days_above') {
+			return 'humidex-daily';
+		}
+
+		if (version === 'cmip6' && scenarios.includes('ssp370')) {
+			return 'candcs-m6-24';
+		}
+
+		if (version === 'cmip5') {
+			return 'candcs-u5';
+		}
+
+		if (version === 'cmip6') {
+			return 'candcs-m6';
+		}
+
+		return version;
+	}
 
 	getDownloadType(): DownloadType | null {
 		return ClimateVariableBase.prototype.getDownloadType.call(this) ?? DownloadType.ANALYZED;
@@ -85,7 +109,7 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 		} else {
 			if (this.getVersion() === "cmip5") {
 				return [ "pcic12", "24models" ];
-			} else if (this.getVersion() === "humidex") {
+			} else if (this.getFinch() === "hxmax_days_above") {
 				return [ "humidex_models" ];
 			} else {
 				return [ "26models" ];

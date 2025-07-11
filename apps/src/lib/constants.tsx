@@ -69,7 +69,6 @@ export const DATASETS: Record<
 			correlations?: Partial<Record<DatasetKey, string>>;
 		}[];
 		grid: string;
-		finch_name: string;
 		model_lists: {
 			name: string;
 			label: string;
@@ -105,7 +104,6 @@ export const DATASETS: Record<
 		],
 		layer_prefix: '',
 		grid: 'canadagrid',
-		finch_name: 'candcs-u5',
 		model_lists: [
 			{ name: 'pcic12', label: 'PCIC12 (Ensemble)' },
 			{ name: '24models', label: 'All models' },
@@ -140,36 +138,9 @@ export const DATASETS: Record<
 		],
 		layer_prefix: 'cmip6-',
 		grid: 'canadagrid',
-		finch_name: 'candcs-m6',
 		model_lists: [{ name: '26models', label: 'All models' }],
 	},
-	humidex: {
-		scenarios: [
-			{
-				name: 'ssp126',
-				label: 'SSP1-2.6',
-				chart_color: '#00F',
-			},
-			{
-				name: 'ssp245',
-				label: 'SSP2-4.5',
-				chart_color: '#00640c',
-			},
-			{
-				name: 'ssp585',
-				label: 'SSP5-8.5',
-				chart_color: '#F00',
-			},
-		],
-		layer_prefix: '',
-		grid: 'era5landgrid',
-		finch_name: 'humidex-daily',
-		model_lists: [{ name: 'humidex_models', label: 'All models' }],
-	},
 };
-
-// Special Finch dataset name for SSP3-7.0 scenario
-export const FINCH_DATASET_CMIP6_SSP370: string = 'candcs-m6-24';
 
 // Frequency names to use for the Finch request.
 export const FINCH_FREQUENCY_NAMES: Partial<Record<FrequencyType, string>> = {

@@ -799,7 +799,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: "Average Daily Precipitation on Wet Days (mm/day)",
 				description: 'Set the minimum precipitation required for a day to be classified as wet.',
-				help: 'Days with precipitation greater than or equal to this value will be included in the average calculation of wet day precipitation.',
+				help: 'Only days with daily precipitation greater than or equal to this value will be included.',
 				comparison: '>=',
 				unit: 'mm/day',
 				attributes: {
@@ -841,7 +841,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Temperature Threshold (°C)',
 				description: 'Set the maximum mean daily temperature allowed for a day to be counted in a cold spell.',
-				help: 'Days with a mean daily temperature below this threshold are considered part of a cold spell.',
+				help: 'Only days with a mean daily temperature less than this threshold will be included.',
 				unit: 'degC',
 				comparison: '<',
 				attributes: {
@@ -893,7 +893,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Mean Daily Temperature Threshold (°C)',
 				description: 'Set the maximum mean daily temperature for accumulating degree days.',
-				help: 'Degree days will be accumulated on days where the mean daily temperature is less than this threshold in degrees Celsius.',
+				help: 'Degree days will be accumulated on days where the mean daily temperature is less than this value.',
 				unit: 'degC',
 				comparison: '>',
 				attributes: {
@@ -940,7 +940,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Temperature Threshold (°C)',
 				description: 'Set the minimum daily maximum temperature required for a day to be included in the count.',
-				help: 'Days with a maximum temperature greater than this threshold will be counted in the analysis.',
+				help: 'Only days with a daily maximum temperature greater than this threshold will be included.',
 				unit: 'degC',
 				comparison: '>',
 				attributes: {
@@ -1036,7 +1036,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Minimum Temperature Threshold (°C)',
 				description: 'Set the threshold for daily minimum temperature.',
-				help: 'Only days where the minimum temperature exceeds this value will be included in the analysis.',
+				help: 'Only days with a daily minimum temperature greater than this value will be included.',
 				unit: 'degC',
 				comparison: '>',
 				attributes: {
@@ -1049,7 +1049,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Maximum Temperature Threshold (°C)',
 				description: 'Set the threshold for daily maximum temperature.',
-				help: 'Only days where the maximum temperature exceeds this value will be included in the analysis.',
+				help: 'Only days with a daily maximum temperature greater than this value will be included.',
 				unit: 'degC',
 				comparison: '>',
 				attributes: {
@@ -1089,7 +1089,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Minimum Temperature Threshold (°C)',
 				description: 'Set the threshold for daily minimum temperature.',
-				help: 'Only days where the minimum temperature exceeds this value will be included in the analysis.',
+				help: 'Only days with a daily minimum temperature less than this value will be included.',
 				unit: 'degC',
 				comparison: '>',
 				attributes: {
@@ -1227,7 +1227,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Maximum Temperature Threshold (°C)',
 				description: 'Set the threshold for daily maximum temperature.',
-				help: 'Only days where the maximum temperature satisfies the comparison condition will be included in the analysis.',
+				help: 'Only days with a daily maximum temperature greater than this value will be included.',
 				unit: 'degC',
 				comparison: '>',
 				attributes: {
@@ -1240,7 +1240,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Minimum Temperature Threshold (°C)',
 				description: 'Set the threshold for daily minimum temperature.',
-				help: 'Only days where the minimum temperature satisfies the comparison condition will be included in the analysis.',
+				help: 'Only days with a daily minimum temperature less than or equal to this value will be included.',
 				unit: 'degC',
 				comparison: '<',
 				attributes: {
@@ -1291,7 +1291,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Minimum Temperature Threshold (°C)',
 				description: 'Set the minimum temperature required for a day to be included in a heat wave.',
-				help: 'Only days where the daily minimum temperature is above this threshold will count toward a heat wave.',
+				help: 'Only days with a daily minimum temperature greater than this value will be included.',
 				unit: 'degC',
 				comparison: '<',
 				attributes: {
@@ -1304,7 +1304,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Maximum Temperature Threshold (°C)',
 				description: 'Set the maximum temperature required for a day to be included in a heat wave.',
-				help: 'Only days where the daily maximum temperature is above this threshold will count toward a heat wave.',
+				help: 'Only days with a daily maximum temperature greater than this value will be included.',
 				unit: 'degC',
 				comparison: '>',
 				attributes: {
@@ -1317,7 +1317,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Minimum Consecutive Days (Days)',
 				description: 'Set the number of consecutive qualifying days required to define a heat wave.',
-				help: 'A heat wave is defined as a sequence of consecutive days that meet both temperature thresholds. This value controls how many days must be in that sequence.',
+				help: 'A heat wave is defined as a sequence of consecutive days that meet both temperature thresholds. This value controls the minimum number of days in that sequence.',
 				attributes: {
 					type: "number",
 					placeholder: "0",
@@ -1343,7 +1343,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Minimum Consecutive Days (Days)',
 				description: 'Set the number of consecutive hot days required to define a heat wave.',
-				help: 'A heat wave is defined as a sequence of consecutive days where the maximum temperature meets the threshold. This value determines how long that sequence must be.',
+				help: 'A heat wave is defined as a sequence of consecutive days where the maximum temperature meets the threshold. This value controls the minimum number of days in that sequence.',
 				attributes: {
 					type: "number",
 					placeholder: "0",
@@ -1354,7 +1354,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Maximum Temperature Threshold (°C)',
 				description: 'Set the maximum temperature required for a day to be counted in a heat wave.',
-				help: 'Only days where the daily maximum temperature exceeds this threshold will be included in the heat wave calculation.',
+				help: 'Only days with a daily maximum temperature greater than this value will be included.',
 				unit: 'degC',
 				comparison: '>',
 				attributes: {
@@ -1384,8 +1384,8 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				key: "thresh_tasmin",
 				type: "input",
 				label: 'Minimum Temperature Threshold (°C)',
-				description: 'Set the minimum daily temperature that must be exceeded for a day to be considered part of a heat wave event',
-				help: 'Only days where the daily minimum temperature exceeds this threshold will be included when calculating heat wave events.',
+				description: 'Set the minimum daily temperature that must be exceeded for a day to be considered part of a heat wave event.',
+				help: 'Only days with a daily minimum temperature greater than this value will be included.',
 				unit: 'degC',
 				comparison: '<',
 				attributes: {
@@ -1398,7 +1398,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Maximum Temperature Threshold (°C)',
 				description: 'Set the maximum daily temperature that must be exceeded for a day to be considered part of a heat wave event.',
-				help: 'Only days where the daily maximum temperature exceeds this threshold will be included when calculating heat wave events.',
+				help: 'Only days with a daily maximum temperature greater than this value will be included.',
 				unit: 'degC',
 				comparison: '>',
 				attributes: {
@@ -1411,7 +1411,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Minimum Consecutive Days (Days)',
 				description: 'Set the minimum number of consecutive qualifying days required to define a heat wave event.',
-				help: 'A heat wave event is defined as a sequence of consecutive days that meet both the minimum and maximum temperature thresholds for this many days or more.',
+				help: 'A heat wave is defined as a sequence of consecutive days that meet both temperature thresholds. This value controls the minimum number of days in that sequence.',
 				attributes: {
 					type: "number",
 					placeholder: "0",
@@ -1447,7 +1447,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Mean Daily Temperature Threshold (°C)',
 				description: 'Set the maximum mean daily temperature for accumulating degree days.',
-				help: 'Degree days will be accumulated on days where the mean daily temperature is less than this threshold in degrees Celsius.',
+				help: 'Degree days will be accumulated on days where the mean daily temperature is less than this value.',
 				unit: 'degC',
 				comparison: '>',
 				attributes: {
@@ -1484,7 +1484,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Precipitation Threshold (mm/day)',
 				description: 'Set the maximum daily precipitation allowed for a day to be considered dry.',
-				help: 'Only days where precipitation is below this threshold will be considered in the dry spell analysis.',
+				help: 'Only days with daily precipitation less than this threshold will be included.',
 				unit: 'mm/day',
 				comparison: '<',
 				attributes: {
@@ -1515,7 +1515,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Precipitation Threshold (mm/day)',
 				description: 'Set the minimum daily precipitation required to count a day as wet.',
-				help: 'Only days with precipitation above this threshold are included in the wet day streak calculation.',
+				help: 'Only days with daily precipitation greater than this threshold will be included.',
 				unit: 'mm/day',
 				comparison: '>',
 				attributes: {
@@ -1609,7 +1609,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Days above Tmin (°C)',
 				description: 'Set the minimum daily temperature that must be exceeded for a day to be included in the analysis.',
-				help: 'Only days where the daily minimum temperature exceeds this threshold in degrees Celsius will be counted.',
+				help: 'Only days with a daily minimum temperature greater than this value will be included.',
 				unit: 'degC',
 				comparison: '>',
 				attributes: {
@@ -1634,7 +1634,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: "Number of Wet Days (mm/day)",
 				description: 'Set the precipitation value that defines a wet day.',
-				help: 'Days with precipitation greater than this threshold will be counted as wet days in the analysis.',
+				help: 'Only days with daily precipitation greater than or equal to this value will be included.',
 				comparison: '>',
 				unit: 'mm/day',
 				attributes: {

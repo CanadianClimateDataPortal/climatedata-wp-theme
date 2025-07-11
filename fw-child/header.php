@@ -1,20 +1,3 @@
-<?php
-
-	if ( current_user_can ( 'administrator' ) ) {
-		echo '<!--';
-		echo "\n\n";
-		echo 'vars';
-		echo "\n\n";
-		print_r ( $GLOBALS['vars'] );
-		echo "\n\n";
-		echo 'fw';
-		echo "\n\n";
-		print_r ( $GLOBALS['fw'] );
-		echo "\n";
-		echo '-->';
-	}
-	
-?>
 <!doctype html>
 <html lang="<?php echo $GLOBALS['fw']['current_lang_code']; ?>" class="no-js">
 	<head>

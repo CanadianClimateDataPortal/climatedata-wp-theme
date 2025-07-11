@@ -1149,7 +1149,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Degree-Day Total Threshold (K days)',
 				description: 'Set the degree-day total (in thousands) that must be exceeded to trigger the result.',
-				help: 'This value defines the cumulative degree-day target. The result will be the day of year when this threshold is surpassed.',
+				help: 'This value defines the cumulative degree-day target. The result will be the day of the year when this threshold is surpassed.',
 				unit: 'K days',
 				attributes: {
 					type: "number",

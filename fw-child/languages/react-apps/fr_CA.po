@@ -893,13 +893,13 @@ msgstr "Cette valeur définit l'objectif de degrés-jours cumulés. Le résultat
 msgid "Temperature Comparison Operator"
 msgstr "Opérateur de comparaison de température"
 
-msgid "Select '>' to accumulate degree-days on days warmer than the threshold, or '<' for colder days."
+msgid "Select \">\" to accumulate degree-days on days warmer than the threshold, or \"<\" for colder days."
 msgstr "Sélectionnez « > » pour accumuler les degrés-jours pour les jours plus chauds que le seuil, ou « < » pour les jours plus froids."
 
 msgid "Start Date (MM-DD)"
 msgstr "Date de début (MM-JJ)"
 
-msgid "Use a date like '09-01' to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models."
+msgid "Use a date like \"09-01\" to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models."
 msgstr "Utilisez une date comme « 09-01 » pour commencer à partir du 1er septembre. Évitez les dates de fin de mois en raison des incohérences de certains modèles climatiques."
 
 msgid "Precipitation Threshold (mm/day)"

@@ -102,6 +102,23 @@ The _Task Runner_ automatically rebuilds the JavaScript files when
 TypeScript files in the `apps/` directory change (they are rebuilt and put in
 the `fw-child/apps/dist/` directory).
 
+#### TypeScript tests
+
+It's (highly) encouraged to develop tests for new (and existing) TypeScript
+code. The [vitest](https://vitest.dev/guide/) framework is used.
+
+Create tests in the same directory as the file you want to test, using the
+same file name with the `.test` suffix added.
+
+For example, if you want to create tests for a function in the
+`apps/src/lib/utils.ts` file, put it in the file `apps/src/lib/utils.test.ts`.
+
+Run the tests with:
+
+```shell
+./dev.sh test-apps
+```
+
 ### Database access
 
 The database container has the port `3306` opened, so you can connect to it

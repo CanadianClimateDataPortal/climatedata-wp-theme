@@ -20,6 +20,9 @@ function _show_help {
   echo "    restart                 Restart the app's Docker Compose stack."
   echo "    compose <args...>       Execute a docker compose command. All <args...> are passed to docker compose."
   echo ""
+  echo "  Developer tools:"
+  echo "    test-apps               Run TypeScript tests in /apps/."
+  echo ""
   echo "  Portal:"
   echo "    portal-shell            Start a shell on the 'portal' container."
   echo "    wp-cli <args...>        Execute a 'wp-cli' command in the 'Portal' container. All <args...> are passed to wp-cli."
@@ -97,6 +100,10 @@ function restart {
 
 function compose {
   _docker_compose "$@"
+}
+
+function test-apps {
+  _docker_compose exec task-runner apps-test.sh /app/
 }
 
 function download-docker-assets {

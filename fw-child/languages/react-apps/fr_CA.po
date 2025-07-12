@@ -56,8 +56,8 @@ msgstr "Sélectionnez une version du jeu de données"
 msgid "Set your variable options"
 msgstr "Définissez les options de la variable"
 
-msgid "Please set the variable options as needed."
-msgstr "Veuillez définir les options de la variable en fonction de vos besoins."
+msgid "Set options to adjust your variable to your needs."
+msgstr "Définissez des options pour ajuster votre variable à vos besoins."
 
 msgid "Select a location or area"
 msgstr "Sélectionnez un lieu ou une région"
@@ -823,3 +823,102 @@ msgid "%s degree day"
 msgid_plural "%s degree days"
 msgstr[0] "%s degré-jour"
 msgstr[1] "%s degrés-jours"
+
+msgid "Average Daily Precipitation on Wet Days (mm/day)"
+msgstr "Précipitations quotidiennes moyennes les jours de pluie (mm/jour)"
+
+msgid "Only days with daily precipitation greater than or equal to this value will be included."
+msgstr "Seuls les jours avec des précipitations quotidiennes supérieures ou égales à cette valeur seront inclus."
+
+msgid "Minimum Consecutive Days (Days)"
+msgstr "Nombre minimum de jours consécutifs (jours)"
+
+msgid "This value determines how many consecutive days must meet the temperature condition for the period to be considered a cold spell."
+msgstr "Cette valeur détermine combien de jours consécutifs doivent respecter la condition de température pour que la période soit considérée comme une vague de froid."
+
+msgid "A heat wave is defined as a sequence of consecutive days that meet both temperature thresholds. This value controls the minimum number of days in that sequence."
+msgstr "Une vague de chaleur est définie comme une séquence de jours consécutifs où les deux seuils de température sont atteints. Cette valeur détermine le nombre minimal de jours dans cette séquence."
+
+msgid "A heat wave is defined as a sequence of consecutive days where the maximum temperature meets the threshold. This value controls the minimum number of days in that sequence."
+msgstr "Une vague de chaleur se définit comme une séquence de jours consécutifs où la température maximale atteint un seuil. Cette valeur détermine le nombre minimal de jours de cette séquence."
+
+msgid "Temperature Threshold (°C)"
+msgstr "Seuil de température (°C)"
+
+msgid "Only days with a mean daily temperature less than this threshold will be included."
+msgstr "Seuls les jours avec une température moyenne quotidienne inférieure à ce seuil seront inclus."
+
+msgid "Only days with a daily maximum temperature greater than this threshold will be included."
+msgstr "Seuls les jours avec une température maximale quotidienne supérieure à ce seuil seront inclus."
+
+msgid "Mean Daily Temperature Threshold (°C)"
+msgstr "Seuil de température moyenne quotidienne (°C)"
+
+msgid "Degree days will be accumulated on days where the mean daily temperature is less than this value."
+msgstr "Les degrés-jours seront accumulés les jours où la température moyenne quotidienne est inférieure à cette valeur."
+
+msgid "Only days where the mean daily temperature satisfies the comparison condition will contribute to the degree-day total."
+msgstr "Seuls les jours où la température moyenne quotidienne satisfait la condition de comparaison contribueront au total des degrés-jours."
+
+msgid "Minimum Temperature Threshold (°C)"
+msgstr "Seuil de température minimum (°C)"
+
+msgid "Only days with a daily minimum temperature greater than this value will be included."
+msgstr "Seuls les jours avec une température minimale quotidienne supérieure à cette valeur seront inclus."
+
+msgid "Only days with a daily minimum temperature less than this value will be included."
+msgstr "Seuls les jours avec une température minimale quotidienne inférieure à cette valeur seront inclus."
+
+msgid "Only days with a daily minimum temperature less than or equal to this value will be included."
+msgstr "Seuls les jours avec une température minimale quotidienne inférieure ou égale à cette valeur seront inclus."
+
+msgid "Maximum Temperature Threshold (°C)"
+msgstr "Seuil de température maximal (°C)"
+
+msgid "Only days with a daily maximum temperature greater than this value will be included."
+msgstr "Seuls les jours avec une température maximale quotidienne supérieure à cette valeur seront inclus."
+
+msgid "Daily Maximum Humidex Threshold (HXMax)"
+msgstr "Seuil humidex maximal quotidien (HXMax)"
+
+msgid "Only days with a daily maximum Humidex (HXMax) greater than this threshold will be included."
+msgstr "Seuls les jours avec un Humidex maximum quotidien (HXMax) supérieur à ce seuil seront inclus."
+
+msgid "Degree-Day Total Threshold (K days)"
+msgstr "Seuil total de degrés-jours (K jours)"
+
+msgid "This value defines the cumulative degree-day target. The result will be the day of the year when this threshold is surpassed."
+msgstr "Cette valeur définit l'objectif de degrés-jours cumulés. Le résultat correspond au jour de l'année où ce seuil est dépassé."
+
+msgid "Temperature Comparison Operator"
+msgstr "Opérateur de comparaison de température"
+
+msgid "Select \">\" to accumulate degree-days on days warmer than the threshold, or \"<\" for colder days."
+msgstr "Sélectionnez « > » pour accumuler les degrés-jours pour les jours plus chauds que le seuil, ou « < » pour les jours plus froids."
+
+msgid "Start Date (MM-DD)"
+msgstr "Date de début (MM-JJ)"
+
+msgid "Use a date like \"09-01\" to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models."
+msgstr "Utilisez une date comme « 09-01 » pour commencer à partir du 1er septembre. Évitez les dates de fin de mois en raison des incohérences de certains modèles climatiques."
+
+msgid "Precipitation Threshold (mm/day)"
+msgstr "Seuil de précipitation (mm/jour)"
+
+msgid "Only days with daily precipitation less than this threshold will be included."
+msgstr "Seuls les jours avec des précipitations quotidiennes inférieures à ce seuil seront inclus."
+
+msgid "Only days with daily precipitation greater than this threshold will be included."
+msgstr "Seuls les jours avec des précipitations quotidiennes supérieures à ce seuil seront inclus."
+
+msgid "Days above Tmin (°C)"
+msgstr "Jours au-dessus de la température minimale (°C)"
+
+msgid "Only days with a daily minimum temperature greater than this value will be included."
+msgstr "Seuls les jours avec une température minimale quotidienne supérieure à cette valeur seront inclus."
+
+msgid "Number of Wet Days (mm/day)"
+msgstr "Nombre de jours pluvieux (mm/jour)"
+
+msgid "Only days with daily precipitation greater than or equal to this value will be included."
+msgstr "Seuls les jours avec des précipitations quotidiennes supérieures ou égales à cette valeur seront inclus."

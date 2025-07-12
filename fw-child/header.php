@@ -16,5 +16,6 @@
 		<?php
 		
 			wp_body_open();
+			include ( locate_template ( 'template/site-banner.php' ) );
 			
 		?>

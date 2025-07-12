@@ -47,8 +47,5 @@ done
 # Change to apps directory
 cd "${src}/apps" || error "Apps directory not found"
 
-log "Installing dependencies..."
-npm install
-
 log "Running formatter..."
 npm run format

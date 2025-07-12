@@ -48,9 +48,6 @@ done
 # Change to apps directory
 cd "${src}/apps" || error "Apps directory not found"
 
-log "Installing dependencies..."
-npm ci
-
 log "Compiling frontend assets..."
 concurrently \
     --names "APPS,THEMES" \

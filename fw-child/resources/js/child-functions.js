@@ -22,7 +22,7 @@ const $ = jQuery;
     const $site_banner = $( '#site-banner' );
     if ( $site_banner.length ) {
       $site_banner.find( '.close' ).click( function () {
-        $site_banner.hide();
+        $site_banner.slideUp( 400 );
         document.cookie = "cdc-site-banner-closed=1; path=/";
       });
     }

@@ -79,7 +79,7 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 	return (
 		<StepContainer title={__('Set your variable options')}>
 			<StepContainerDescription>
-				{__('Please set the variable options as needed.')}
+				{__('Set options to adjust your variable to your needs.')}
 			</StepContainerDescription>
 			<div className="gap-4">
 				{version && (

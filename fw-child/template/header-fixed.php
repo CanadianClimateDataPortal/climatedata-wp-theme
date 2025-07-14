@@ -1,6 +1,6 @@
 
-<div class="fixed-top col-2 col-sm-1">
-	<div id="floating-header" class="header-fixed-menu me-1">
+<div class="sticky-top col-2 col-sm-1">
+	<div id="floating-header" class="header-fixed-menu pe-1 w-100 position-absolute">
 		<?php 
 		
 			// LOGO

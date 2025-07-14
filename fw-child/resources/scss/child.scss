@@ -436,9 +436,26 @@ $control-slider-handle-width: 2.75rem;
 // STRUCTURE
 //
 
+#site-banner {
+  a {
+    color: inherit;
+    text-decoration: underline;
+    transition: opacity 0.1s;
+    
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.fw-page {
+  position: relative;
+}
+
 #hero {
   color: $white;
   font-size: 1rem;
+  position: relative;
 
   h1 {
     @include font-size(5rem);

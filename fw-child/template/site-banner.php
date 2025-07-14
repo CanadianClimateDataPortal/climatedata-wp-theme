@@ -1,4 +1,13 @@
 <?php
+/**
+ * Display the "news banner" at the top of the site.
+ * 
+ * The banner is displayed only if:
+ * - It's enabled
+ * - We are in the date range when to show the banner
+ * - The "hide the news banner" cookie is NOT set
+ */
+
 if ( ! get_field( 'site_banner_enabled', 'option' ) ) {
     return;
 }
@@ -34,7 +43,7 @@ $content_field = $current_lang === 'fr' ? 'banner_content_fr' : 'banner_content_
     <div class="row">
         <div class="col offset-2">
             <div class="d-flex align-items-center py-4 fs-5">
-                <div class="flex-grow-1">
+                <div class="flex-grow-1 pe-3">
                     <?php the_field( $content_field, 'option' ); ?>
                 </div>
                 <div class="pe-4 fs-5">

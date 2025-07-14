@@ -1,6 +1,6 @@
 <?php
 /**
- * Display the "news banner" at the top of the site.
+ * Display the banner (i.e. "news" banner) at the top of the site.
  * 
  * The banner is displayed only if:
  * - It's enabled
@@ -36,7 +36,7 @@ if ( isset( $GLOBALS['fw'] ) && isset( $GLOBALS['fw']['current_lang_code'] ) ) {
     $current_lang = $GLOBALS['fw']['current_lang_code'];
 }
 
-$content_field = $current_lang === 'fr' ? 'banner_content_fr' : 'banner_content_en';
+$content_field = $current_lang === 'fr' ? 'site_banner_content_fr' : 'site_banner_content_en';
 
 ?>
 <div id="site-banner" class="bg-secondary text-white container-fluid">

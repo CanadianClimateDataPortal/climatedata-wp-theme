@@ -106,7 +106,7 @@
         {
             "key": "field_68716d654e103",
             "label": "Banner content",
-            "name": "banner_content_en",
+            "name": "site_banner_content_en",
             "aria-label": "",
             "type": "wysiwyg",
             "instructions": "",
@@ -161,7 +161,7 @@
         {
             "key": "field_68716d974e105",
             "label": "Banner content",
-            "name": "banner_content_fr",
+            "name": "site_banner_content_fr",
             "aria-label": "",
             "type": "wysiwyg",
             "instructions": "",
@@ -206,5 +206,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1752267439
+    "modified": 1752500928
 }

@@ -11,6 +11,7 @@
  * Each step component must implement the StepComponentRef interface which includes:
  * - isValid(): boolean - Determines if the step's data is valid
  * - getResetPayload(): StepResetPayload - Returns the data that should be reset when navigating backwards
+ * - reset(): void - Execution of any other operation required to reset this step
  *
  * Step Registration:
  * Steps are dynamically registered when they mount using the registerStepRef function.
@@ -32,6 +33,7 @@
  *   React.useImperativeHandle(ref, () => ({
  *     isValid: () => boolean,
  *     getResetPayload: () => ({ field: null })
+ *     reset: () => { dispatch(setRequestError(undefined) }
  *   }));
  *   ...
  * });
@@ -145,6 +147,12 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 			dispatch(setClimateVariable(null));
 			return;
 		}
+
+		stepsToReset.forEach(([_, ref]) => {
+			if (ref.reset) {
+				ref.reset();
+			}
+		});
 
 		// For other steps, collect and apply reset payloads
 		const resetPayload = stepsToReset.reduce((payload, [_, ref]) => {

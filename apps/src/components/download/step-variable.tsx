@@ -34,10 +34,9 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
         ref,
         () => ({
             isValid: () => Boolean(climateVariable?.getId()),
-            getResetPayload: () => {
+            reset: () => {
                 // Resetting makes the first variable selected
                 selectClimateVariable(variableList[0]);
-                return {};
             },
         }),
         [climateVariable]

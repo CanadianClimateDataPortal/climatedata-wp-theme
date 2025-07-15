@@ -23,10 +23,11 @@ const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
 	React.useImperativeHandle(ref, () => ({
 		isValid: () =>
 			(climateVariable?.getSelectedPointsCount() ?? 0) > 0 || Boolean(climateVariable?.getSelectedRegion()),
-		getResetPayload: () => {
-			// Reset also the selection mode
+		reset: () => {
+			// Reset the selection mode
 			dispatch(setSelectionMode('cells'));
-
+		},
+		getResetPayload: () => {
 			return {
 				selectedPoints: {},
 				selectedRegion: null,

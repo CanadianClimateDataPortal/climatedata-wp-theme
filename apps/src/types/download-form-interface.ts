@@ -14,4 +14,6 @@ export interface StepComponentRef {
 	isValid: () => boolean;
 	/** Returns the data that should be reset when navigating backwards */
 	getResetPayload?: () => StepResetPayload;
+	/** Execute any other operations to reset the step. */
+	reset?: () => void;
 } 

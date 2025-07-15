@@ -124,30 +124,6 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 		else if(this.getId() === 'short_duration_rainfall_idf_data') {
 			if(!props?.stationId) return [];
 
-			const isDev = window.location.hostname.includes('localhost') || window.location.hostname.includes('dev-en') || window.location.hostname.includes('dev-fr');
-
-			// For DEV environments, use dummy files.
-			if (isDev) {
-				const dummyFileUrl = "data:application/zip;base64,UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==";
-				const dummyFiles = [
-					{
-						label: "Historical IDF (ZIP)",
-						url: dummyFileUrl,
-					}, {
-						label: "Climate Change-Scaled IDF - CMIP5 (ZIP)",
-						url: dummyFileUrl,
-					}, {
-						label: "Climate Change-Scaled IDF - CMIP6 (ZIP)",
-						url: dummyFileUrl,
-					}, {
-						label: "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)",
-						url: dummyFileUrl,
-					}
-				];
-
-				return Promise.resolve(dummyFiles);
-			}
-
 			const url = `${WP_API_DOMAIN}/wp-json/cdc/v3/idf-station-files?station=${props?.stationId}`;
 
 			try {

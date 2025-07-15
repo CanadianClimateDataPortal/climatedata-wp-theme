@@ -43,8 +43,6 @@ const Steps: React.FC = () => {
 	const isSecondToLastStep = currentStep === steps.length - 1;
 	const showSendRequestButtonText = (isLastStep || isSecondToLastStep) && climateVariable?.getDownloadType() === DownloadType.ANALYZED;
 
-	// TODO: need a better logic to determine which button text to show and what will happen when the button is pressed
-
 	let buttonText = __('Next Step');
 	if (showSendRequestButtonText) {
 		buttonText = __('Send Request');
@@ -345,9 +343,6 @@ const Steps: React.FC = () => {
 
 
 				} else {
-					// TODO: make sure this is correct.. msc climate normals is a different datasetType than
-					// 	the rest of variables that would fall in this condition which all are 'ahccd'
-					// 	should msc climate normals behave differently than the others?
 					// For station variables
 					const selectedPoints = climateVariable.getSelectedPoints?.() ?? {};
 					const fileFormat = climateVariable.getFileFormat?.() ?? null;

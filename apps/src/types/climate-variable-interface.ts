@@ -172,6 +172,7 @@ export interface StationDownloadUrlsProps {
 export interface DownloadFile {
 	label: string;
 	url: string;
+	fileName?: string;
 }
 
 export interface LocationModalContentParams {

@@ -1,11 +1,12 @@
 import {
-	FrequencyConfig,
 	DateRangeConfig,
-	FileFormatType,
-	StationDownloadUrlsProps,
 	DownloadFile,
+	FileFormatType,
+	FrequencyConfig,
+	StationDownloadUrlsProps,
 } from "@/types/climate-variable-interface";
 import StationClimateVariable from "@/lib/station-climate-variable";
+import { __ } from "@/context/locale-provider";
 
 class StationDataClimateVariable extends StationClimateVariable {
 
@@ -54,7 +55,7 @@ class StationDataClimateVariable extends StationClimateVariable {
 		const url = `https://api.weather.gc.ca/collections/climate-daily/items?datetime=${start}/${end}&STN_ID=${stations}&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=${fileFormat}&limit=150000&offset=0`;
 
 		return [{
-			label: '',
+			label: __('Download'),
 			url: url
 		}];
 	}

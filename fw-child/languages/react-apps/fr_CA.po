@@ -173,6 +173,9 @@ msgstr "Votre fichier est prêt à être téléchargé."
 msgid "Download"
 msgstr "Télécharger"
 
+msgid "Download %s"
+msgstr "Télécharger %s"
+
 msgid "Historical IDF (ZIP)"
 msgstr "Données IDF historiques (ZIP)"
 

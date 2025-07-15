@@ -59,18 +59,18 @@ const StepResult = React.forwardRef(() => {
 							<p key={index} className="mb-2">
 								<a
 									href={file.url}
-									download={file.label}
+									download={file.fileName}
 									className={cn('text-lg font-semibold text-brand-blue underline ')}
 									target="_blank"
 								>
-									{__('Download')} {file.label}
+									{file.label}
 								</a>
 							</p>
 						))}
 					</div>
 				)}
 				{climateVariable?.getId() === 'msc_climate_normals' && (
-					<p dangerouslySetInnerHTML={{ __html:
+					<p className="mt-4" dangerouslySetInnerHTML={{ __html:
 							sprintf(
 								__(
 									'Additional Climate Normals variables are available from the ' +

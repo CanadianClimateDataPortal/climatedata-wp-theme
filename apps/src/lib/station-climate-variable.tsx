@@ -2,6 +2,8 @@ import ClimateVariableBase from "@/lib/climate-variable-base";
 import RasterPrecalculatedClimateVariable from "@/lib/raster-precalculated-climate-variable";
 import {
 	AveragingType,
+	DateRangeConfig,
+	DownloadFile,
 	DownloadType,
 	FileFormatType,
 	FrequencyConfig,
@@ -9,11 +11,9 @@ import {
 	FrequencyType,
 	InteractiveMode,
 	ScenariosConfig,
-	DateRangeConfig,
 	StationDownloadUrlsProps,
-	DownloadFile,
 } from "@/types/climate-variable-interface";
-import {WP_API_DOMAIN} from "@/lib/constants";
+import { WP_API_DOMAIN } from "@/lib/constants";
 import { __ } from "@/context/locale-provider";
 
 class StationClimateVariable extends RasterPrecalculatedClimateVariable {
@@ -90,7 +90,7 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 			const url = `https://api.weather.gc.ca/collections/climate-normals/items?CLIMATE_IDENTIFIER=${stations}&sortby=MONTH&f=${fileFormat}&limit=150000&offset=0`;
 
 			return [{
-				label: '',
+				label: __('Download'),
 				url: url
 			}];
 		}
@@ -102,7 +102,7 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 			const url = `${window.DATA_URL}/download-ahccd?format=${props?.fileFormat}&zipped=true&stations=${stations}`;
 
 			return [{
-				label: '',
+				label: __('Download'),
 				url: url
 			}];
 		}
@@ -116,7 +116,7 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 			const url = `${window.DATA_URL}/fileserver/bdv/${locale}/${filename}`;
 
 			return [{
-				label: '',
+				label: __('Download'),
 				url: url
 			}];
 		}

@@ -24,6 +24,7 @@ import {
 	StationDownloadUrlsProps,
 } from '@/types/climate-variable-interface';
 import { useLocale } from "@/hooks/use-locale";
+import { sprintf } from "@wordpress/i18n";
 
 /**
  * The Steps component dynamically renders the current step component from the STEPS configuration.
@@ -298,6 +299,8 @@ const Steps: React.FC = () => {
 						button.setAttribute('disabled', 'true');
 						button.classList.add('cursor-not-allowed');
 					}
+					
+					const downloadFileName = fileName + (fileFormat === FileFormatType.NetCDF ? '.nc' : '.zip');
 
 // Generate the file to be downloaded
 					climateVariable.getDownloadUrl()
@@ -306,7 +309,8 @@ const Steps: React.FC = () => {
 							if (url) {
 								const file: DownloadFile = {
 									url: url,
-									label: fileName + (fileFormat === FileFormatType.NetCDF ? '.nc' : '.zip'),
+									label: sprintf(__(`Download %s`), downloadFileName),
+									fileName: downloadFileName,
 								};
 								dispatch(setDownloadLinks([file])); // Save the generated download link
 							}

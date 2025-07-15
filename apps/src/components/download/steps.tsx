@@ -76,6 +76,7 @@ const Steps: React.FC = () => {
 				dispatch(setRequestStatus('loading'));
 				dispatch(setRequestError(null));
 				dispatch(setRequestResult(undefined));
+				dispatch(setDownloadLinks(undefined));
 
 				const ahccdDownloadRequiredVariables = climateVariable.getAhccdDownloadRequiredVariables?.() ?? [];
 				const analysisNamespace = climateVariable.getDatasetType() === 'ahccd' ? 'analyze-stations' : 'analyze';

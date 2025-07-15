@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { __ } from '@/context/locale-provider';
 
-import { StepContainer, StepContainerDescription, } from '@/components/download/step-container';
+import { StepContainer, StepContainerDescription } from '@/components/download/step-container';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
 import { ControlTitle } from '@/components/ui/control-title';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,13 @@ import { cn, isValidEmail } from '@/lib/utils';
 import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setEmail, setSubscribe, setCaptchaValue, setRequestError } from '@/features/download/download-slice';
+import {
+	resetRequestState,
+	setCaptchaValue,
+	setEmail,
+	setRequestError,
+	setSubscribe,
+} from '@/features/download/download-slice';
 import { StepComponentRef } from "@/types/download-form-interface";
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
@@ -104,13 +110,10 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 
 			return validations.every(Boolean);
 		},
-		getResetPayload: () => {
-			// reset the email and subscribe state from the download slice
-			dispatch(setEmail(''));
-			dispatch(setSubscribe(false));
-
-			return {};
-		}
+		reset: () => {
+			// Reset the download request state
+			dispatch(resetRequestState());
+		},
 	}), [climateVariable, email]);
 
 

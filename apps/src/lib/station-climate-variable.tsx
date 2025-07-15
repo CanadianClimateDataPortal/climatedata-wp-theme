@@ -15,6 +15,7 @@ import {
 } from "@/types/climate-variable-interface";
 import { WP_API_DOMAIN } from "@/lib/constants";
 import { __ } from "@/context/locale-provider";
+import { sprintf } from "@wordpress/i18n";
 
 class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 
@@ -87,12 +88,27 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 
 			const stations = props?.stationIds?.map(stationId => stationId).join('|');
 			const fileFormat = props?.fileFormat === FileFormatType.GeoJSON ? 'json' : props?.fileFormat;
-			const url = `https://api.weather.gc.ca/collections/climate-normals/items?CLIMATE_IDENTIFIER=${stations}&sortby=MONTH&f=${fileFormat}&limit=150000&offset=0`;
 
-			return [{
-				label: __('Download'),
-				url: url
-			}];
+			const url = `${window.DATA_URL}/get-geomet-collection-items-links/climate-normals?CLIMATE_IDENTIFIER=${stations}&sortby=MONTH&f=${fileFormat}`;
+
+			const response = await fetch(url);
+
+			if (!response.ok) {
+				console.error(`Error fetching data: ${response.status}`);
+				return [];
+			}
+
+			const links = await response.json();
+
+			if (!Array.isArray(links)) {
+				console.error(`Unexpected data received. Was expecting an array, received: ${links}`);
+				return [];
+			}
+
+			return links.map(link => ({
+				label: sprintf(__('Download Records %d to %d'), link.start_index + 1, link.end_index + 1),
+				url: link.url,
+			}));
 		}
 		// For Daily AHCCD Temperature and Precipitation
 		else if(this.getId() === 'daily_ahccd_temperature_and_precipitation') {

@@ -54,7 +54,7 @@ const StepResult = React.forwardRef(() => {
 
 			<div className="step-result">
 				{downloadLinks && downloadLinks.length > 0 && (
-					<div className="mt-4">
+					<div className="mt-4 overflow-auto" style={{ maxHeight: '50vh' }}>
 						{downloadLinks.map((file, index) => (
 							<p key={index} className="mb-2">
 								<a

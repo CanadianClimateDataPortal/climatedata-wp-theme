@@ -173,6 +173,18 @@ msgstr "Votre fichier est prêt à être téléchargé."
 msgid "Download"
 msgstr "Télécharger"
 
+msgid "Historical IDF (ZIP)"
+msgstr "Données IDF historiques (ZIP)"
+
+msgid "Climate Change-Scaled IDF - CMIP5 (ZIP)"
+msgstr "Données IDF tenant compte des changements climatiques - CMIP5 (ZIP)"
+
+msgid "Climate Change-Scaled IDF - CMIP6 (ZIP)"
+msgstr "Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
+
+msgid "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)"
+msgstr "Démarrage rapide - Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
+
 msgid "Additional Climate Normals variables are available from the "
 "<a href=\"https://climate-change.canada.ca/climate-data/#/climate-normals\" %s>Canadian Centre for Climate Services</a> "
 "and the <a href=\"https://climate.weather.gc.ca/climate_normals/index_e.html\" %s>Government of Canada Historical "

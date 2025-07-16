@@ -434,6 +434,47 @@
         //
         // UX ELEMENTS
         //
+        
+        // Error banner
+        
+        let error_banner_closed = false;
+        
+        function initErrorBanner() {
+            const $banner = $('#map-error-banner');
+            const $popup = $('#map-error-popup');
+            
+            $banner.find('.close-btn').on('click', closeErrorBanner);
+
+            $banner.find('.read-more-btn').on('click', function() {
+                $popup.show();
+            });
+
+            $popup.find('.close-btn').on('click', function() {
+                $popup.hide();
+            });
+        }
+        
+        function displayErrorBanner() {
+            if (!error_banner_closed) {
+                $('#map-error-banner').show();
+            }
+        }
+        
+        function closeErrorBanner() {
+            $('#map-error-banner').fadeOut(300);
+            error_banner_closed = true;
+        }
+        
+        function hideErrorWarning() {
+            $('#map-error-banner').hide();
+            $('#map-error-popup').hide();
+        }
+
+        initErrorBanner();
+        
+        if ( dataset !== 'cmip6' ) {
+            hideErrorWarning();
+        }
 
         // ION SLIDER
 
@@ -1696,6 +1737,12 @@
             update_query_string();
             buildFilterMenu();
             changeLayers();
+
+            if ( dataset_name === 'cmip6' ) {
+                displayErrorBanner();
+            } else {
+                hideErrorWarning();
+            }
         });
 
 

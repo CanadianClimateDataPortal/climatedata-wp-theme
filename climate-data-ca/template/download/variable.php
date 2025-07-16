@@ -172,6 +172,32 @@
 
             <div id="download-map-variable" class="download-map"></div>
 
+            <div id="download-map-error-banner" class="justify-content-center" style="display: flex;">
+                <div class="alert alert-warning d-flex justify-content-center align-items-center shadow-sm">
+                    <span class="flex-grow-1 pr-3">
+                        <i class="fas fa-info-circle pr-1"></i>
+                        <?php _e('Note: Issue with St. Lawrence River CMIP6 Relative Sea Level Change', 'cdc') ?>
+                    </span>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <span class="read-more-btn mr-2 text-nowrap"><?php _e('Read more', 'cdc') ?></span>
+                        <span class="close-btn">×</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="download-map-error-popup" class="justify-content-center align-items-center" style="display:none;">
+                <div class="shadow-sm bg-white border rounded h-100 overflow-auto">
+                    <div class="px-4 py-2 d-flex justify-content-between align-items-center border-bottom">
+                        <strong><?php _e('Note: Issue with St. Lawrence River CMIP6 Relative Sea Level Change', 'cdc') ?></strong>
+                        <span class="close-btn p-4">×</span>
+                    </div>
+                    <div class="body p-4">
+                        <p><?php _e('The ClimateData.ca team has been made aware of an error in the CMIP6 Relative Sea Level change data. This error affects only those data in the St. Lawrence River south of Rimouski. During data processing, the contribution of ocean dynamics to sea level change was not applied in this area due to its proximity to land. We are working with the data owners to address this as soon as possible. In the meantime, the CMIP5 projections can be used in this area.', 'cdc'); ?></p>
+                        <p><?php _e( 'We’re here to help. For further details, please contact <a href="/feedback/">the Climate Services Support Desk</a>.', 'cdc' ); ?></p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 

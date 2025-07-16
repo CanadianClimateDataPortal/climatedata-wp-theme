@@ -333,8 +333,54 @@
             e.preventDefault()
             $('#map-overlay').fadeOut()
         })
+        
+        //
+        // Error banner
+        //
 
+        let error_banner_closed = false;
 
+        function initErrorBanner() {
+            const $banner = $('#download-map-error-banner');
+            const $popup = $('#download-map-error-popup');
+
+            $banner.find('.close-btn').on('click', closeErrorBanner);
+
+            $banner.find('.read-more-btn').on('click', function() {
+                $popup.show();
+            });
+
+            $popup.find('.close-btn').on('click', function() {
+                $popup.hide();
+            });
+
+            $('#download-variable').on('select2:select', function() {
+                toggleErrorBanner();
+            });
+        }
+        
+        function toggleErrorBanner() {
+            const selectedVariable = $('#download-variable').val();
+            const selectedDataset = $('input[name="download-dataset"]:checked').val();
+            
+            const showError = selectedVariable === 'slr' && selectedDataset === 'cmip6';
+            
+            if (showError && !error_banner_closed) {
+                $('#download-map-error-banner').show();
+            } else {
+                hideErrorWarning();
+            }
+        }
+
+        function closeErrorBanner() {
+            $('#download-map-error-banner').fadeOut(300);
+            error_banner_closed = true;
+        }
+
+        function hideErrorWarning() {
+            $('#download-map-error-banner').hide();
+            $('#download-map-error-popup').hide();
+        }
 
         //
         // VARIABLE
@@ -372,6 +418,8 @@
                 bbox_layer.on('pm:edit', handle_bbox_event);
                 handle_bbox_event(e);
             });
+
+            initErrorBanner();
         }
 
         function addGrid(gridName) {

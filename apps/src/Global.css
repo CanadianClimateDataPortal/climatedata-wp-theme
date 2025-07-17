@@ -307,7 +307,7 @@
 }
 
 .popover-content {
-	max-width: min(500px, var(--radix-popover-content-available-width));
+	max-width: min(500px, calc( var(--radix-popover-content-available-width) - 20px ));
 
 	/*
 	The maximum height is: the available height (as defined by Radix in the CSS variable)

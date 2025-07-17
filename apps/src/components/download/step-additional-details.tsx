@@ -24,6 +24,60 @@ const modelLabels: Record<string, string> = {
 	'humidex_models': __('Full ensemble'),
 }
 
+function MissingDataTooltip(): React.ReactElement {
+	return (
+		<div className="formatted-content">
+			<h3>{__('Missing Value Options')}</h3>
+			<p dangerouslySetInnerHTML={{
+				__html:
+				sprintf(
+					__('For a variety of reasons, meteorological station records are generally not complete. Missing ' +
+						'data can affect how useful a station dataset is for calculating, for example, monthly ' +
+						'averages and <a href="/resource/30-years-data/" %s>climate normals</a> (30-year averages). ' +
+						'There are <a href="https://library.wmo.int/records/item/55797-wmo-guidelines-on-the-calculation-of-climate-normals" %s>standards</a> ' +
+						'related to the amount of missing data allowed in calculations, but rigid adherence to these ' +
+						'can sometimes result in a lot of data being discounted, and this can be a problem, ' +
+						'particularly in areas where data are sparse.'),
+					'target="_blank"',
+					'target="_blank" rel="noopener noreferrer"',
+				)
+			}} />
+			<p>
+				{__('We provide four missing data options for the analysis of observed station data. These permit ' +
+					'you to control how much missing data is acceptable in your custom analysis:')}
+			</p>
+			<ol>
+			<li>{__('5%')}</li>
+			<li>{__('10%')}</li>
+			<li>{__('15%')}</li>
+			<li>{__('WMO parameters')}</li>
+			</ol>
+			<p>
+				{__('For options 1-3, the percentage of missing data allowed is calculated for each period of the ' +
+					'station record (month, year or season, depending on your selection). This means that for the ' +
+					'annual calculations the missing values could be spread throughout the year, or occur all at ' +
+					'once. For example, if you select the 5% missing data option, this means that as many as 18 ' +
+					'missing values would be allowed in a year – they could be spread throughout the year or there ' +
+					'could be a whole month missing.')}
+			</p>
+			<p>
+				{__('For option 4, the WMO (World Meteorological Organization) parameters, the criteria are applied ' +
+					'for each month regardless of whether monthly, seasonal or annual calculations are selected, ' +
+					'which makes the calculations for this option slightly slower than those for options 1-3. A ' +
+					'given month is considered missing or invalid if either of the following two criteria are met:')}
+			</p>
+			<ol type="a">
+			<li>{__('Observations are missing for 11 or more days during the month;')}</li>
+			<li>{__('Observations are missing for a period of 5 or more consecutive days during the month.')}</li>
+			</ol>
+			<p>
+				{__('Presence of a single invalid month within an annual or seasonal calculation will result in a ' +
+					'no-data (NaN) value in the output.')}
+			</p>
+		</div>
+	);
+}
+
 /**
  * Additional details step will allow the user to customize the download request
  */
@@ -290,7 +344,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				&& <RadioGroupFactory
 					name="missingDataOptions"
 					title={__('Missing data options')}
-					tooltip={__('Select missing data options')}
+					tooltip={<MissingDataTooltip />}
 					orientation="horizontal"
 					className="max-w-md mb-8"
 					optionClassName="w-1/4"

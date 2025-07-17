@@ -111,8 +111,8 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 			return validations.every(Boolean);
 		},
 		reset: () => {
-			// Reset the download request state
 			dispatch(resetRequestState());
+			dispatch(setCaptchaValue(''));
 		},
 	}), [climateVariable, email]);
 

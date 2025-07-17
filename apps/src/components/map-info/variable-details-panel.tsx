@@ -55,13 +55,13 @@ const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
 				</div>
 
                 {mapInfo?.fullDescription?.[locale] && (
-                  <div className="py-4">
+                  <div className="py-4 formatted-content">
                     <SectionHeading>{__('Description')}</SectionHeading>
                     <SectionText content={mapInfo.fullDescription[locale]} />
                   </div>
                 )}
                 {mapInfo?.techDescription?.[locale] && (
-                  <div className="py-4">
+                  <div className="py-4 formatted-content">
                     <SectionHeading>
                       {__('Technical description')}
                     </SectionHeading>
@@ -70,7 +70,7 @@ const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
                 )}
 
 				{mapInfo.relevantSectors?.length > 0 && (
-					<div className="py-4">
+					<div className="py-4 formatted-content">
 						<SectionHeading>
 							{__('Relevant sectors')}
 						</SectionHeading>
@@ -84,7 +84,7 @@ const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
 				)}
 
 				{mapInfo.relevantTrainings?.length > 0 && (
-					<div className="py-4">
+					<div className="py-4 formatted-content">
 						<SectionHeading>
 							{__('Relevant articles')}
 						</SectionHeading>
@@ -109,12 +109,7 @@ const SectionHeading: React.FC<{
 	className?: string;
 	children: React.ReactNode;
 }> = ({ as: Tag = 'h3', children, className }) => (
-	<Tag
-		className={cn(
-			'font-semibold text-sm text-dark-purple uppercase mb-2',
-			className
-		)}
-	>
+	<Tag className={className}>
 		{children}
 	</Tag>
 );
@@ -133,25 +128,19 @@ const SectionText: React.FC<{
 
 	// base class name for both plain text and html content
 	const baseClassName =
-		'text-sm text-neutral-grey-medium leading-5 space-y-4';
+		'text-sm text-neutral-grey-medium';
 
 	// then we want to apply specific class names for plain strings and html
 	if (typeof parsedContent === 'string') {
 		return (
-			<p className={cn(baseClassName, 'mb-4 last:mb-0', className)}>
+			<p className={cn(baseClassName, className)}>
 				{parsedContent}
 			</p>
 		);
 	}
 
 	return (
-		<div
-			className={cn(
-				baseClassName,
-				'[&>p]:mb-4 [&>p:last-child]:mb-0 [&>p:empty]:hidden',
-				className
-			)}
-		>
+		<div className={cn(baseClassName, '[&>p:empty]:hidden', className)}>
 			{parsedContent}
 		</div>
 	);
@@ -167,7 +156,7 @@ const RelevantTrainings: React.FC<{ items: Training[] }> = ({
 }) => {
     const { locale } = useLocale();
     return (
-    <ul className="list-disc list-inside text-sm ms-4 marker:text-brand-blue">
+    <ul className="ms-4 marker:text-brand-blue">
         {items.map((item: Training, index: number) => (
             <li key={index} className='my-2'>
                 <Button

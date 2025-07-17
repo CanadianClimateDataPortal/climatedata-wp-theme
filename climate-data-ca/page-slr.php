@@ -106,7 +106,7 @@ if (have_posts()) : while (have_posts()) : the_post();
         </div>
 
         <div id="map-error-banner" class="justify-content-center px-4" style="display: flex;">
-            <div class="alert alert-warning d-flex justify-content-center align-items-center shadow-sm">
+            <div class="alert alert-warning d-flex justify-content-center align-items-center shadow-sm text-body">
                 <span class="flex-grow-1 pr-3">
                     <i class="fas fa-info-circle pr-1"></i>
                     <?php _e('Note: Issue with St. Lawrence River CMIP6 Relative Sea Level Change', 'cdc') ?>

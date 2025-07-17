@@ -462,6 +462,7 @@
         
         function closeErrorBanner() {
             $('#map-error-banner').fadeOut(300);
+            $('#map-error-popup').hide();
             error_banner_closed = true;
         }
         

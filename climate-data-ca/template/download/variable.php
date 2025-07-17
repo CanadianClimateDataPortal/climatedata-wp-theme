@@ -173,7 +173,7 @@
             <div id="download-map-variable" class="download-map"></div>
 
             <div id="download-map-error-banner" class="justify-content-center" style="display: flex;">
-                <div class="alert alert-warning d-flex justify-content-center align-items-center shadow-sm">
+                <div class="alert alert-warning d-flex justify-content-center align-items-center shadow-sm text-body">
                     <span class="flex-grow-1 pr-3">
                         <i class="fas fa-info-circle pr-1"></i>
                         <?php _e('Note: Issue with St. Lawrence River CMIP6 Relative Sea Level Change', 'cdc') ?>

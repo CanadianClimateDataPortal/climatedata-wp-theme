@@ -374,6 +374,7 @@
 
         function closeErrorBanner() {
             $('#download-map-error-banner').fadeOut(300);
+            $('#download-map-error-popup').hide();
             error_banner_closed = true;
         }
 

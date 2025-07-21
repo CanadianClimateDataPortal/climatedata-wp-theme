@@ -26,7 +26,11 @@ export const initialState: DownloadState = {
 	currentStep: 1,
 	downloadLinks: undefined,
 	selectedStation: undefined,
-	messagesDisplayed: {},
+	/**
+	 * Display state of various messages. The key is the message's name, and
+	 * the value is a boolean indicating if the message should be displayed.
+	 */
+	messageDisplayStates: {},
 };
 
 // Create the slice
@@ -95,7 +99,7 @@ const downloadSlice = createSlice({
 			state.downloadLinks = undefined;
 		},
 		setMessageDisplay(state, action: PayloadAction<{ message: string; displayed: boolean }>) {
-			state.messagesDisplayed[action.payload.message] = action.payload.displayed;
+			state.messageDisplayStates[action.payload.message] = action.payload.displayed;
 		},
 	},
 });

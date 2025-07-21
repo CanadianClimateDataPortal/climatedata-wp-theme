@@ -24,9 +24,9 @@ export default function MarineMap(): React.ReactElement {
 	const { climateVariable } = useClimateVariable();
 	const dispatch = useAppDispatch();
 
-	const messagesDisplayed = useAppSelector(state => state.map.messagesDisplayed);
+	const messageDisplayStates = useAppSelector(state => state.map.messageDisplayStates);
 	const warningRSLCCMIP6Id = 'warningRSLCCMIP6';
-	const warningRSLCCMIP6Displayed = messagesDisplayed[warningRSLCCMIP6Id] ?? true;
+	const warningRSLCCMIP6Displayed = messageDisplayStates[warningRSLCCMIP6Id] ?? true;
 
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const mapRef = useRef<L.Map | null>(null);
@@ -99,7 +99,7 @@ export default function MarineMap(): React.ReactElement {
 			)}
 		>
 			<WarningRSLCCMIP6
-				className="absolute top-48 md:top-40 z-20 w-full"
+				className="absolute top-48 md:top-40 z-20 w-full px-4"
 				displayed={warningRSLCCMIP6Displayed}
 				onHide={handleHideWarning}
 			/>

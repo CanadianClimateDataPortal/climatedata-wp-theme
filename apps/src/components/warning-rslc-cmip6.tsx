@@ -8,6 +8,17 @@ interface WarningRSLCCMIP6Props extends React.HTMLProps<HTMLDivElement> {
 	onHide?: () => void;
 }
 
+/**
+ * Warning banner specific to the RSLC CMIP6 issue.
+ *
+ * Renders a "warning banner" with a message and modal content specific to the
+ * RSLC CMIP6 issue. Can be used in both "Maps" and "Download" apps.
+ *
+ * @param displayed Display the banner if true. But the banner will display only
+ *                  if the selected variable is RSLC and the version is CMIP6.
+ * @param onHide Callback called when the user clicks the banner's close button.
+ * @param className Classes for the banner container (passed to <WarningBanner>)
+ */
 export default function WarningRSLCCMIP6({
 	displayed,
 	onHide = () => {},

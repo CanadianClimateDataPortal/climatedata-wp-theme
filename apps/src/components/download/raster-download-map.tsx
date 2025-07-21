@@ -36,11 +36,11 @@ export default function RasterDownloadMap(): React.ReactElement {
 	const { zoom, center, selectionMode } = useAppSelector(
 		(state) => state.download
 	);
-	const messagesDisplayed = useAppSelector(state => state.download.messagesDisplayed);
+	const messageDisplayStates = useAppSelector(state => state.download.messageDisplayStates);
 	const dispatch = useAppDispatch();
 
 	const warningRSLCCMIP6Id = 'warningRSLCCMIP6';
-	const warningRSLCCMIP6Displayed = messagesDisplayed[warningRSLCCMIP6Id] ?? true;
+	const warningRSLCCMIP6Displayed = messageDisplayStates[warningRSLCCMIP6Id] ?? true;
 
 	let stationTypeFilters = climateVariable?.getStationTypeFilter() ?? ['T', 'P', 'B'];
 	// Add B if not included to the default enabled filters.
@@ -264,7 +264,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 			<div className="h-[560px] font-sans relative">
 				<WarningRSLCCMIP6
-					className="absolute top-20 z-30 w-full"
+					className="absolute top-20 z-30 w-full px-4"
 					displayed={warningRSLCCMIP6Displayed}
 					onHide={handleHideWarning}
 				/>

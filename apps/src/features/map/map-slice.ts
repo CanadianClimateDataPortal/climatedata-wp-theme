@@ -67,7 +67,11 @@ const initialState: MapState = {
 		lng: Array.isArray(CANADA_CENTER) ? CANADA_CENTER[1] : -98.48144531250001,
 		zoom: DEFAULT_ZOOM
 	},
-	messagesDisplayed: {},
+	/**
+	 * Display state of various messages. The key is the message's name, and
+	 * the value is a boolean indicating if the message should be displayed.
+	 */
+	messageDisplayStates: {},
 };
 
 // Create the slice
@@ -147,7 +151,7 @@ const mapSlice = createSlice({
 			state.mapCoordinates = action.payload;
 		},
 		setMessageDisplay(state, action: PayloadAction<{ message: string; displayed: boolean }>) {
-			state.messagesDisplayed[action.payload.message] = action.payload.displayed;
+			state.messageDisplayStates[action.payload.message] = action.payload.displayed;
 		},
 	},
 });

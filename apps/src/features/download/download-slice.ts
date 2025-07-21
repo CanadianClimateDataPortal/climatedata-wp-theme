@@ -25,7 +25,12 @@ export const initialState: DownloadState = {
 	captchaValue: '',
 	currentStep: 1,
 	downloadLinks: undefined,
-	selectedStation: undefined
+	selectedStation: undefined,
+	/**
+	 * Display state of various messages. The key is the message's name, and
+	 * the value is a boolean indicating if the message should be displayed.
+	 */
+	messageDisplayStates: {},
 };
 
 // Create the slice
@@ -93,6 +98,9 @@ const downloadSlice = createSlice({
 		resetDownloadLinks(state) {
 			state.downloadLinks = undefined;
 		},
+		setMessageDisplay(state, action: PayloadAction<{ message: string; displayed: boolean }>) {
+			state.messageDisplayStates[action.payload.message] = action.payload.displayed;
+		},
 	},
 });
 
@@ -117,6 +125,7 @@ export const {
 	setDownloadLinks,
 	resetDownloadLinks,
 	setSelectedStation,
+	setMessageDisplay,
 } = downloadSlice.actions;
 
 // Export reducer

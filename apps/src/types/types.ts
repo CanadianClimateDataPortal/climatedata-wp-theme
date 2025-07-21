@@ -193,6 +193,7 @@ export interface MapState {
 	variableList: PostData[];
 	variableListLoading: boolean;
 	mapCoordinates: MapCoordinates;
+	messageDisplayStates: {[key: string]: boolean}
 }
 
 /**
@@ -215,6 +216,7 @@ export interface DownloadState {
 	downloadLinks?: DownloadFile[];
 	currentStep: number;
 	selectedStation?: Station;
+	messageDisplayStates: {[key: string]: boolean}
 }
 
 /**

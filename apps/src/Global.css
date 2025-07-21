@@ -66,6 +66,10 @@
 		--grey-dark: 210 11.1% 13.1%;
 		--neutral-grey-medium: 0 0% 46.27%;
 		--neutral-grey-light: 0 0% 97.8%;
+		--warning: 45, 96%, 21%;
+		--warning-foreground: 45, 96%, 21%;
+		--warning-background: 46, 100%, 90%;
+		--warning-border: 45, 100%, 86%;
 	}
 
 	.dark {
@@ -345,6 +349,10 @@
 	}
 	
 	h3 {
-		@apply font-semibold text-sm text-dark-purple uppercase mb-2;
+		@apply font-semibold text-sm text-dark-purple uppercase mb-4;
+	}
+
+	h4 {
+		@apply font-semibold text-cdc-black mb-4;
 	}
 }

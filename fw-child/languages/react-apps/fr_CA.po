@@ -899,8 +899,8 @@ msgstr "Seuil humidex maximal quotidien (HXMax)"
 msgid "Only days with a daily maximum Humidex (HXMax) greater than this threshold will be included."
 msgstr "Seuls les jours avec un Humidex maximum quotidien (HXMax) supérieur à ce seuil seront inclus."
 
-msgid "Degree-Day Total Threshold (K days)"
-msgstr "Seuil total de degrés-jours (K jours)"
+msgid "Degree-Day Total Threshold (degree-days)"
+msgstr "Seuil total de degrés-jours (degrés-jours)"
 
 msgid "This value defines the cumulative degree-day target. The result will be the day of the year when this threshold is surpassed."
 msgstr "Cette valeur définit l'objectif de degrés-jours cumulés. Le résultat correspond au jour de l'année où ce seuil est dépassé."

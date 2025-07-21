@@ -1068,9 +1068,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		stationTypeFilter: ['T'],
 	},
-	/** Days below temperature threshold */
+	/** Days below Tmin*/
 	{
-		id: "days_below_temperature_threshold",
+		id: "days_below_tmin",
 		finch: "tn_days_below",
 		class: "RasterAnalyzeClimateVariable",
 		thresholds: [

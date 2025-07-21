@@ -25,7 +25,8 @@ export const initialState: DownloadState = {
 	captchaValue: '',
 	currentStep: 1,
 	downloadLinks: undefined,
-	selectedStation: undefined
+	selectedStation: undefined,
+	messagesDisplayed: {},
 };
 
 // Create the slice
@@ -93,6 +94,9 @@ const downloadSlice = createSlice({
 		resetDownloadLinks(state) {
 			state.downloadLinks = undefined;
 		},
+		setMessageDisplay(state, action: PayloadAction<{ message: string; displayed: boolean }>) {
+			state.messagesDisplayed[action.payload.message] = action.payload.displayed;
+		},
 	},
 });
 
@@ -117,6 +121,7 @@ export const {
 	setDownloadLinks,
 	resetDownloadLinks,
 	setSelectedStation,
+	setMessageDisplay,
 } = downloadSlice.actions;
 
 // Export reducer

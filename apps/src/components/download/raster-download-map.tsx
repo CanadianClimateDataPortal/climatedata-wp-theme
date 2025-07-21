@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { setSelectedStation, setSelectionMode } from '@/features/download/download-slice';
+import { setMessageDisplay, setSelectedStation, setSelectionMode } from '@/features/download/download-slice';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import MapEvents from '@/components/map-layers/map-events';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
@@ -24,6 +24,7 @@ import {
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
 } from '@/lib/constants';
+import WarningRSLCCMIP6 from '@/components/warning-rslc-cmip6';
 
 export default function RasterDownloadMap(): React.ReactElement {
 	const interactiveLayerRef = useRef<{
@@ -35,7 +36,11 @@ export default function RasterDownloadMap(): React.ReactElement {
 	const { zoom, center, selectionMode } = useAppSelector(
 		(state) => state.download
 	);
+	const messagesDisplayed = useAppSelector(state => state.download.messagesDisplayed);
 	const dispatch = useAppDispatch();
+
+	const warningRSLCCMIP6Id = 'warningRSLCCMIP6';
+	const warningRSLCCMIP6Displayed = messagesDisplayed[warningRSLCCMIP6Id] ?? true;
 
 	let stationTypeFilters = climateVariable?.getStationTypeFilter() ?? ['T', 'P', 'B'];
 	// Add B if not included to the default enabled filters.
@@ -145,6 +150,10 @@ export default function RasterDownloadMap(): React.ReactElement {
 		interactiveLayerRef.current?.clearSelection();
 	};
 
+	const handleHideWarning = () => {
+		dispatch(setMessageDisplay({message: warningRSLCCMIP6Id, displayed: false}));
+	}
+
 	const renderInteractiveLayer = useCallback(() => {
 		// For station type maps
 		if (isInteractiveModeStation) {
@@ -253,37 +262,45 @@ export default function RasterDownloadMap(): React.ReactElement {
 				</div>
 			)}
 
-			<MapContainer
-				attributionControl={false}
-				center={center}
-				zoomControl={false}
-				zoom={zoom}
-				minZoom={DEFAULT_MIN_ZOOM}
-				maxZoom={DEFAULT_MAX_ZOOM}
-				scrollWheelZoom={true}
-				className="h-[560px] font-sans"
-			>
-				<MapEvents onMapReady={(map: L.Map) => setMap(map)} />
-				<CustomPanesLayer />
-				<ZoomControl />
-				<SearchControl className="top-6 left-6" />
+			<div className="h-[560px] font-sans relative">
+				<WarningRSLCCMIP6
+					className="absolute top-20 z-30 w-full"
+					displayed={warningRSLCCMIP6Displayed}
+					onHide={handleHideWarning}
+				/>
 
-				{renderInteractiveLayer()}
-
-				{/* Basemap TileLayer */}
-				<TileLayer
-					url="//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png"
-					attribution=""
-					subdomains="abcd"
-					pane="basemap"
+				<MapContainer
+					attributionControl={false}
+					center={center}
+					zoomControl={false}
+					zoom={zoom}
+					minZoom={DEFAULT_MIN_ZOOM}
 					maxZoom={DEFAULT_MAX_ZOOM}
-				/>
+					scrollWheelZoom={true}
+					className="h-full"
+				>
+					<MapEvents onMapReady={(map: L.Map) => setMap(map)} />
+					<CustomPanesLayer />
+					<ZoomControl />
+					<SearchControl className="top-6 left-6" />
 
-				<TileLayer
-					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-				/>
-			</MapContainer>
+					{renderInteractiveLayer()}
+
+					{/* Basemap TileLayer */}
+					<TileLayer
+						url="//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png"
+						attribution=""
+						subdomains="abcd"
+						pane="basemap"
+						maxZoom={DEFAULT_MAX_ZOOM}
+					/>
+
+					<TileLayer
+						attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+						url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+					/>
+				</MapContainer>
+			</div>
 		</>
 	);
 }

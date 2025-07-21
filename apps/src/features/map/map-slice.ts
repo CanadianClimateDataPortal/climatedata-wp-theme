@@ -67,6 +67,7 @@ const initialState: MapState = {
 		lng: Array.isArray(CANADA_CENTER) ? CANADA_CENTER[1] : -98.48144531250001,
 		zoom: DEFAULT_ZOOM
 	},
+	messagesDisplayed: {},
 };
 
 // Create the slice
@@ -145,6 +146,9 @@ const mapSlice = createSlice({
 		setMapCoordinates(state, action: PayloadAction<MapCoordinates>) {
 			state.mapCoordinates = action.payload;
 		},
+		setMessageDisplay(state, action: PayloadAction<{ message: string; displayed: boolean }>) {
+			state.messagesDisplayed[action.payload.message] = action.payload.displayed;
+		},
 	},
 });
 
@@ -167,6 +171,7 @@ export const {
 	clearTransformedLegendEntry,
 	setOpacity,
 	setMapCoordinates,
+	setMessageDisplay,
 } = mapSlice.actions;
 
 // Export reducer

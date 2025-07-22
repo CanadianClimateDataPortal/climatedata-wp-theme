@@ -372,27 +372,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			},
 		},
 	},
-	/** Maximum Number of Consecutive Dry Days */
-	{
-		id: "max_number_consecutive_dry_days",
-		class: "RasterPrecalculatedClimateVariable",
-		threshold: "cdd",
-		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-		},
-		unit: "days",
-		temporalThresholdConfig: {
-			thresholds: {
-				cdd: {
-					ys: {
-						absolute: { low: 10.0, high: 100.0 },
-						delta: { low: -40.0, high: 9.0 },
-						unit: 'days',
-					},
-				},
-			},
-		},
-	},
 	/** Maximum 1-Day Total Precipitation */
 	{
 		id: "max_1d_total_precipitation",
@@ -1477,8 +1456,26 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "maximum_consecutive_dry_days",
 		finch: "cdd",
 		class: "RasterAnalyzeClimateVariable",
-		hasDelta: false,
+		threshold: "cdd",
 		unit: "days",
+		temporalThresholdConfig: {
+			thresholds: {
+				cdd: {
+					ys: {
+						absolute: { low: 10.0, high: 100.0 },
+						delta: { low: -40.0, high: 9.0 },
+						unit: 'days',
+					},
+				},
+			},
+		},
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
 		analysisFields: [
 			{
 				key: "thresh",
@@ -1494,14 +1491,14 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
-		defaultDateRange: [
-			"1980",
-			"2010",
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
 		],
 		ahccdDownloadRequiredVariables: [
 			"pr",
 		],
-		stationTypeFilter: ['T'],
+		stationTypeFilter: ['P'],
 	},
 	/** Maximum Consecutive Wet Days */
 	{

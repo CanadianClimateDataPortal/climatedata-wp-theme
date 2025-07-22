@@ -358,6 +358,8 @@ export interface ClimateVariableConfigInterface {
 
 	selectedRegion?: GridRegion | null;
 
+	/** For AHCCD stations, if this variable should be shown for stations with
+	 * "precipitation" ('P') or "temperature" ('T') data. */
 	stationTypeFilter?: string[];
 }
 

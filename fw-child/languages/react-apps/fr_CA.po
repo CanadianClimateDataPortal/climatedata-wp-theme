@@ -842,11 +842,26 @@ msgstr[1] "%s degrés-jours"
 msgid "Average Daily Precipitation on Wet Days (mm/day)"
 msgstr "Précipitations quotidiennes moyennes les jours de pluie (mm/jour)"
 
+msgid "Set the minimum daily precipitation required to count a day as wet."
+msgstr ""
+
 msgid "Only days with daily precipitation greater than or equal to this value will be included."
 msgstr "Seuls les jours avec des précipitations quotidiennes supérieures ou égales à cette valeur seront inclus."
 
 msgid "Minimum Consecutive Days (Days)"
 msgstr "Nombre minimum de jours consécutifs (jours)"
+
+msgid "Set the minimum number of consecutive days required to define a cold spell."
+msgstr ""
+
+msgid "Set the number of consecutive qualifying days required to define a heat wave."
+msgstr ""
+
+msgid "Set the minimum number of consecutive hot days required to define a heat wave."
+msgstr "Définit le nombre minimum de jours chauds consécutifs requis pour définir une vague de chaleur."
+
+msgid "Set the minimum number of consecutive qualifying days required to define a heat wave event."
+msgstr ""
 
 msgid "This value determines how many consecutive days must meet the temperature condition for the period to be considered a cold spell."
 msgstr "Cette valeur détermine combien de jours consécutifs doivent respecter la condition de température pour que la période soit considérée comme une vague de froid."
@@ -860,6 +875,15 @@ msgstr "Une vague de chaleur se définit comme une séquence de jours consécuti
 msgid "Temperature Threshold (°C)"
 msgstr "Seuil de température (°C)"
 
+msgid "Set the maximum mean daily temperature required for a day to be counted in a cold spell."
+msgstr "Définir la température moyenne journalière maximale requise pour qu'un jour soit comptabilisé dans une vague de froid."
+
+msgid "Set the daily maximum temperature required for a day to be included in the count."
+msgstr "Définissez la température maximale quotidienne requise pour qu'un jour soit inclus dans le décompte."
+
+msgid "Set the daily minimum temperature required for a day to be included in the count."
+msgstr "Définissez la température minimale quotidienne requise pour qu'un jour soit inclus dans le décompte."
+
 msgid "Only days with a mean daily temperature less than this threshold will be included."
 msgstr "Seuls les jours avec une température moyenne quotidienne inférieure à ce seuil seront inclus."
 
@@ -869,6 +893,12 @@ msgstr "Seuls les jours avec une température maximale quotidienne supérieure �
 msgid "Mean Daily Temperature Threshold (°C)"
 msgstr "Seuil de température moyenne quotidienne (°C)"
 
+msgid "Set the maximum mean daily temperature for accumulating degree days."
+msgstr ""
+
+msgid "Set the temperature threshold used to calculate daily degree-days."
+msgstr ""
+
 msgid "Degree days will be accumulated on days where the mean daily temperature is less than this value."
 msgstr "Les degrés-jours seront accumulés les jours où la température moyenne quotidienne est inférieure à cette valeur."
 
@@ -877,6 +907,18 @@ msgstr "Seuls les jours où la température moyenne quotidienne satisfait la con
 
 msgid "Minimum Temperature Threshold (°C)"
 msgstr "Seuil de température minimum (°C)"
+
+msgid "Set the daily minimum temperature threshold."
+msgstr "Définissez le seuil de température minimale quotidienne."
+
+msgid "Set the threshold for daily minimum temperature."
+msgstr ""
+
+msgid "Set the minimum temperature required for a day to be included in a heat wave."
+msgstr ""
+
+msgid "Set the minimum daily temperature that must be exceeded for a day to be considered part of a heat wave event."
+msgstr ""
 
 msgid "Only days with a daily minimum temperature greater than this value will be included."
 msgstr "Seuls les jours avec une température minimale quotidienne supérieure à cette valeur seront inclus."
@@ -890,11 +932,29 @@ msgstr "Seuls les jours avec une température minimale quotidienne inférieure o
 msgid "Maximum Temperature Threshold (°C)"
 msgstr "Seuil de température maximal (°C)"
 
+msgid "Set the daily maximum temperature threshold."
+msgstr "Définissez le seuil de température maximale quotidienne."
+
+msgid "Set the threshold for daily maximum temperature."
+msgstr ""
+
+msgid "Set the maximum temperature required for a day to be included in a heat wave."
+msgstr ""
+
+msgid "Set the maximum temperature required for a day to be counted in a heat wave."
+msgstr ""
+
+msgid "Set the maximum daily temperature that must be exceeded for a day to be considered part of a heat wave event."
+msgstr ""
+
 msgid "Only days with a daily maximum temperature greater than this value will be included."
 msgstr "Seuls les jours avec une température maximale quotidienne supérieure à cette valeur seront inclus."
 
 msgid "Daily Maximum Humidex Threshold (HXMax)"
 msgstr "Seuil humidex maximal quotidien (HXMax)"
+
+msgid "Set the daily maximum Humidex (HXMax) value that must be exceeded for a day to be included in the analysis."
+msgstr "Définir la valeur maximale quotidienne d'Humidex (HXMax) qui doit être dépassée pour qu'un jour soit inclus dans l'analyse."
 
 msgid "Only days with a daily maximum Humidex (HXMax) greater than this threshold will be included."
 msgstr "Seuls les jours avec un Humidex maximum quotidien (HXMax) supérieur à ce seuil seront inclus."
@@ -902,11 +962,17 @@ msgstr "Seuls les jours avec un Humidex maximum quotidien (HXMax) supérieur à 
 msgid "Degree-Day Total Threshold (degree-days)"
 msgstr "Seuil total de degrés-jours (degrés-jours)"
 
+msgid "This analysis returns the day of year when the accumulated degree-day total exceeds :"
+msgstr "Cette analyse renvoie le jour de l'année où le total cumulé des degrés-jours excède :"
+
 msgid "This value defines the cumulative degree-day target. The result will be the day of the year when this threshold is surpassed."
 msgstr "Cette valeur définit l'objectif de degrés-jours cumulés. Le résultat correspond au jour de l'année où ce seuil est dépassé."
 
 msgid "Temperature Comparison Operator"
 msgstr "Opérateur de comparaison de température"
+
+msgid "Choose whether to accumulate degree-days when the temperature is greater than or less than the threshold."
+msgstr ""
 
 msgid "Select \">\" to accumulate degree-days on days warmer than the threshold, or \"<\" for colder days."
 msgstr "Sélectionnez « > » pour accumuler les degrés-jours pour les jours plus chauds que le seuil, ou « < » pour les jours plus froids."
@@ -914,11 +980,22 @@ msgstr "Sélectionnez « > » pour accumuler les degrés-jours pour les jours pl
 msgid "Start Date (MM-DD)"
 msgstr "Date de début (MM-JJ)"
 
+msgid "Specify the date to begin accumulating degree-days. If you want the calculations to include the complete winter season, "
+"set “Temporal Frequency” in the Step 5 (Additional Details) Section to Annual (July to June), rather than Annual (January to December)."
+msgstr "Spécifiez la date à laquelle vous commencez à accumuler les degrés-jours. Si vous souhaitez que les calculs portent sur l'ensemble de la saison hivernale, "
+"réglez la « Fréquence temporelle » dans la section Étape 5 (Détails supplémentaires) sur Annuel (juillet à juin), plutôt que sur Annuel (janvier à décembre)."
+
 msgid "Use a date like \"09-01\" to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models."
 msgstr "Utilisez une date comme « 09-01 » pour commencer à partir du 1er septembre. Évitez les dates de fin de mois en raison des incohérences de certains modèles climatiques."
 
-msgid "Precipitation Threshold (mm/day)"
-msgstr "Seuil de précipitation (mm/jour)"
+msgid "Precipitation Threshold (mm)"
+msgstr "Seuil de précipitation (mm)"
+
+msgid "Set the maximum daily precipitation allowed to count a day as dry."
+msgstr "Définit la précipitation journalière maximale requise pour qu'un jour soit considéré comme sec."
+
+msgid "Set the minimum daily precipitation required to count a day as wet."
+msgstr "Définit les précipitations quotidiennes minimales requises pour qu'un jour soit considéré comme humide."
 
 msgid "Only days with daily precipitation less than this threshold will be included."
 msgstr "Seuls les jours avec des précipitations quotidiennes inférieures à ce seuil seront inclus."
@@ -929,11 +1006,17 @@ msgstr "Seuls les jours avec des précipitations quotidiennes supérieures à ce
 msgid "Days above Tmin (°C)"
 msgstr "Jours au-dessus de la température minimale (°C)"
 
+msgid "Set the minimum daily temperature that must be exceeded for a day to be included in the analysis."
+msgstr ""
+
 msgid "Only days with a daily minimum temperature greater than this value will be included."
 msgstr "Seuls les jours avec une température minimale quotidienne supérieure à cette valeur seront inclus."
 
 msgid "Number of Wet Days (mm/day)"
 msgstr "Nombre de jours pluvieux (mm/jour)"
+
+msgid "Set the precipitation value that defines a wet day."
+msgstr ""
 
 msgid "Only days with daily precipitation greater than or equal to this value will be included."
 msgstr "Seuls les jours avec des précipitations quotidiennes supérieures ou égales à cette valeur seront inclus."

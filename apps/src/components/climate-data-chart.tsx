@@ -48,6 +48,38 @@ interface TooltipPoint extends Point {
 }
 
 /**
+ * Update a Highcharts options object to show "Climate Zone" colored bands.
+ *
+ * @param options The Highcharts options object to update.
+ */
+function addClimateZonePlotBands(options: Options) {
+	if (!options.yAxis) {
+		return;
+	}
+
+	const zones = [
+		['4',  2000, 2999,  'rgba(201, 0, 0, 0.2)'],
+		['5',  3000, 3999,  'rgba(250, 238, 2, 0.2)'],
+		['6',  4000, 4999,  'rgba(0, 201, 54, 0.2)'],
+		['7A', 5000, 5999,  'rgba(0, 131, 201, 0.2)'],
+		['7B', 6000, 6999,  'rgba(20, 0, 201, 0.2)'],
+		['8',  7000, 99999, 'rgba(127, 0, 201, 0.2)'],
+	];
+
+	const yAxis = options.yAxis as Highcharts.YAxisOptions;
+	yAxis.plotBands = zones.map(([zone, from, to, color]) => (
+		{
+			from,
+			to,
+			color,
+			label: { text: sprintf(__('Climate Zone %s'), zone) }
+		}
+	)) as Highcharts.YAxisPlotBandsOptions[];
+
+	yAxis.gridLineWidth = 0;
+}
+
+/**
  * Component to render a chart using Highcharts with climate data.
  */
 const ClimateDataChart: React.FC<{
@@ -168,6 +200,7 @@ const ClimateDataChart: React.FC<{
 			from: Date.UTC(startYear, 0, 1),
 			to: Date.UTC(startYear + 29, 11, 31),
 			id: '30y-plot-band',
+			color: 'rgba(51,63,80,0.1)',
 		});
 
 		// Tooltip content
@@ -392,7 +425,7 @@ const ClimateDataChart: React.FC<{
 
 	// Chart options
 	const chartOptions = useMemo<Options>(() => {
-		return {
+		const options: Options = {
 			chart: {
 				backgroundColor: 'transparent',
 				numberFormatter: function (num) {
@@ -402,7 +435,9 @@ const ClimateDataChart: React.FC<{
 					fontFamily: 'CDCSans',
 				},
 				marginTop: 30,
-				zoomType: 'x',
+				zooming: {
+					type: 'x'
+				},
 				panning: {
 					enabled: true,
 					type: 'x'
@@ -460,7 +495,6 @@ const ClimateDataChart: React.FC<{
 				enabled: false, // disable highcharts range selector, which shows zoom controls and range buttons
 			},
 			subtitle: {
-				align: 'left',
 				text: '',
 			},
 			title: {
@@ -579,7 +613,13 @@ const ClimateDataChart: React.FC<{
 				return baseSeries as SeriesOptionsType;
 			}),
 		};
-	}, [climateVariable, locale, title, filteredSeries, activeChartTooltip, activeChartPlotOptions]);
+
+		if (climateVariableId === 'building_climate_zones') {
+			addClimateZonePlotBands(options);
+		}
+
+		return options;
+	}, [climateVariable, climateVariableId, locale, title, filteredSeries, activeChartTooltip, activeChartPlotOptions]);
 
 	// Export CSV from data
 	const exportCsvFromData = (data: Record<string, Record<string, number[]>>): string => {

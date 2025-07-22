@@ -1107,3 +1107,6 @@ msgstr "Nous sommes là pour vous aider. Pour plus de détails, veuillez contact
 
 msgid "Read more"
 msgstr "Lire plus"
+
+msgid "Climate Zone %s"
+msgstr "Zone climatique %s"

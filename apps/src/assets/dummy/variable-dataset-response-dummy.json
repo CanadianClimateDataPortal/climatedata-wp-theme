@@ -46,9 +46,9 @@
 	},
 	{
 		"id": 188,
-		"name": "Days below temperature threshold",
-		"slug": "days-below-temperature-threshold",
-		"link": "https://climatedata2.crim.ca/variable-dataset/days-below-temperature-threshold/",
+		"name": "Days below Tmin",
+		"slug": "days-below-tmin",
+		"link": "https://climatedata2.crim.ca/variable-dataset/days-below-tmin/",
 		"description": "Warmest daytime temperature in the selected time period.",
 		"meta": [],
 		"acf": []

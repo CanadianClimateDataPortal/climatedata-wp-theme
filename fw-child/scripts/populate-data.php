@@ -117,9 +117,9 @@ $var_id_post_id_mapping = array(
 			"Adjusted and Homogenized Canadian Climate Data (AHCCD)"
 		)
 	),
-	"Days below temperature threshold"                                => array(
+	"Days below Tmin"                                => array(
 		517,
-		"days_below_temperature_threshold",
+		"days_below_tmin",
 		true,
 		true,
 		array(

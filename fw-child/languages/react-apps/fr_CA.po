@@ -627,7 +627,7 @@ msgstr "Des projections climatiques sont disponibles pour plusieurs scénarios d
 msgid "Compare scenarios"
 msgstr "Comparer des scénarios"
 
-msgid "Multiple threshold options are available for some variables, e.g., “Days above Tmax”. Select a threshold from the options available in the dropdown menu."
+msgid "Multiple threshold options are available for some variables, e.g., \"Days above Tmax\". Select a threshold from the options available in the dropdown menu."
 msgstr "Plusieurs options de seuil sont disponibles pour certaines variables, par exemple « Jours au-dessus de Tmax ». Sélectionnez un seuil parmi les options du menu déroulant."
 
 msgid "Threshold Values"
@@ -962,7 +962,7 @@ msgstr "Seuls les jours avec un Humidex maximum quotidien (HXMax) supérieur à 
 msgid "Degree-Day Total Threshold (degree-days)"
 msgstr "Seuil total de degrés-jours (degrés-jours)"
 
-msgid "This analysis returns the day of year when the accumulated degree-day total exceeds :"
+msgid "This analysis returns the day of year when the accumulated degree-day total exceeds:"
 msgstr "Cette analyse renvoie le jour de l'année où le total cumulé des degrés-jours excède :"
 
 msgid "This value defines the cumulative degree-day target. The result will be the day of the year when this threshold is surpassed."
@@ -981,7 +981,7 @@ msgid "Start Date (MM-DD)"
 msgstr "Date de début (MM-JJ)"
 
 msgid "Specify the date to begin accumulating degree-days. If you want the calculations to include the complete winter season, "
-"set “Temporal Frequency” in the Step 5 (Additional Details) Section to Annual (July to June), rather than Annual (January to December)."
+"set \"Temporal Frequency\" in the Step 5 (Additional Details) Section to Annual (July to June), rather than Annual (January to December)."
 msgstr "Spécifiez la date à laquelle vous commencez à accumuler les degrés-jours. Si vous souhaitez que les calculs portent sur l'ensemble de la saison hivernale, "
 "réglez la « Fréquence temporelle » dans la section Étape 5 (Détails supplémentaires) sur Annuel (juillet à juin), plutôt que sur Annuel (janvier à décembre)."
 

@@ -1148,7 +1148,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				key: "sum_thresh",
 				type: "input",
 				label: 'Degree-Day Total Threshold (degree-days)',
-				description: 'This analysis returns the day of year when the accumulated degree-day total exceeds :',
+				description: 'This analysis returns the day of year when the accumulated degree-day total exceeds:',
 				help: 'This value defines the cumulative degree-day target. The result will be the day of the year when this threshold is surpassed.',
 				unit: 'K days',
 				attributes: {
@@ -1193,7 +1193,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				type: "input",
 				label: 'Start Date (MM-DD)',
 				description: 'Specify the date to begin accumulating degree-days. If you want the calculations to include the complete winter season, ' +
-					'set “Temporal Frequency” in the Step 5 (Additional Details) Section to Annual (July to June), rather than Annual (January to December).',
+					'set "Temporal Frequency" in the Step 5 (Additional Details) Section to Annual (July to June), rather than Annual (January to December).',
 				help: 'Use a date like "09-01" to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models.',
 				format: "MM-DD",
 				attributes: {

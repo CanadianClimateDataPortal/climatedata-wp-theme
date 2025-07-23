@@ -44,7 +44,7 @@ import { useDownloadUrlSync } from '@/hooks/use-download-url-sync';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { TaxonomyData } from '@/types/types';
 import { StepComponentRef } from '@/types/download-form-interface';
-import { updateClimateVariable, setClimateVariable } from '@/store/climate-variable-slice';
+import { updateClimateVariable } from '@/store/climate-variable-slice';
 import { setCurrentStep } from '@/features/download/download-slice';
 import { STEPS } from '@/components/download/config';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
@@ -142,12 +142,6 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 			.filter(([step]) => step > targetStep)
 			.sort(([stepA], [stepB]) => stepA - stepB);
 
-		// For step 1 we'll reset everything anyway
-		if (targetStep === 1) {
-			dispatch(setClimateVariable(null));
-			return;
-		}
-
 		stepsToReset.forEach(([_, ref]) => {
 			if (ref.reset) {
 				ref.reset();
@@ -171,6 +165,16 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	}, [dispatch]);
 
 	/**
+	 * Remove from the steps ref all steps after a specific step number.
+	 */
+	const removeStepsAfter = useCallback((targetStep: number) => {
+		const stepsToRemove = Array.from(stepRefs.current.keys())
+			.filter((step) => step > targetStep);
+
+		stepsToRemove.map((step) => { registerStepRef(step, null); });
+	}, [registerStepRef]);
+
+	/**
 	 * Navigates to the next step in the form.
 	 */
 	const goToNextStep = useCallback(
@@ -188,6 +192,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 		if (step < currentStep) {
 			setCurrentStepLocal(step);
 			resetStepsAfter(step);
+			removeStepsAfter(step);
 		} else {
 			setCurrentStepLocal(step);
 		}

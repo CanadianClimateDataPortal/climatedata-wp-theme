@@ -78,7 +78,7 @@ Captcha.displayName = 'Captcha';
 const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	const captchaValue = useAppSelector((state) => state.download.captchaValue) || '';
 	const [captchaRefresh, setCaptchaRefresh] = useState(Math.random());
-	const { climateVariable, setFileFormat, setDecimalPlace } = useClimateVariable();
+	const {climateVariable, setFileFormat, resetFileFormat, setDecimalPlace} = useClimateVariable();
 
 	const { email, subscribe, requestStatus, requestError } = useAppSelector(
 		(state) => state.download
@@ -111,6 +111,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 			return validations.every(Boolean);
 		},
 		reset: () => {
+			resetFileFormat();
 			dispatch(resetRequestState());
 			dispatch(setCaptchaValue(''));
 		},

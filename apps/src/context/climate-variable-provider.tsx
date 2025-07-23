@@ -48,6 +48,7 @@ export type ClimateVariableContextType = {
 	setMissingData: (missingData: string) => void;
 	setModel: (model: string) => void;
 	setFileFormat: (fileFormat: FileFormatType) => void;
+	resetFileFormat: () => void;
 	setDecimalPlace: (decimalPlace: number) => void;
 	setSelectedPoints: (gridCoordinates: GridCoordinates) => void;
 	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
@@ -353,6 +354,17 @@ export const ClimateVariableProvider: React.FC<{
 		[dispatch]
 	);
 
+	const resetFileFormat = useCallback(
+		() => {
+			dispatch(
+				updateClimateVariable({
+					fileFormat: null,
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const setDecimalPlace = useCallback(
 		(decimalPlace: number) => {
 			dispatch(updateClimateVariable({ decimalPlace }));
@@ -458,6 +470,7 @@ export const ClimateVariableProvider: React.FC<{
 		setMissingData,
 		setModel,
 		setFileFormat,
+		resetFileFormat,
 		setDecimalPlace,
 		setSelectedPoints,
 		addSelectedPoints,

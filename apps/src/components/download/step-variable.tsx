@@ -1,7 +1,7 @@
 import React, { useContext, useMemo, useState, useEffect } from 'react';
 import { __ } from '@/context/locale-provider';
-import { useAppSelector } from '@/app/hooks';
-import { selectSearchQuery } from '@/store/climate-variable-slice';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { selectSearchQuery, setClimateVariable } from '@/store/climate-variable-slice';
 import { PostData } from '@/types/types';
 
 import {
@@ -26,6 +26,7 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
     const [varType, setVarType] = useState<string>('');
     const [sector, setSector] = useState<string>('');
     const section = useContext(SectionContext);
+    const dispatch = useAppDispatch();
     const { dataset } = useAppSelector((state) => state.download);
     const { variableList } = useAppSelector((state) => state.map);
     const searchQuery = useAppSelector(selectSearchQuery);
@@ -35,8 +36,7 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
         () => ({
             isValid: () => Boolean(climateVariable?.getId()),
             reset: () => {
-                // Resetting makes the first variable selected
-                selectClimateVariable(variableList[0]);
+                dispatch(setClimateVariable(null));
             },
         }),
         [climateVariable]

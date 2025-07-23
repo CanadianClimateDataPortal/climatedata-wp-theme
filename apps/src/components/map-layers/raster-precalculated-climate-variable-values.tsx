@@ -88,7 +88,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
 				medianRangeEndpoint = `get-delta-30y-gridded-values/${lat}/${lng}`;
 			} else {
-				if (featureId) {
+				if (featureId != null) {
 					medianRangeEndpoint = `get-delta-30y-regional-values/${interactiveRegion}/${featureId}`;
 				}
 			}

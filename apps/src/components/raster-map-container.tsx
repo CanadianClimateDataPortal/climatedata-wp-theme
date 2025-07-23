@@ -142,7 +142,7 @@ export default function RasterMapContainer({
 			const { featureId } = selectedLocation;
 
 			// To properly show the modal for non-grid interactive region, the feature ID must be present.
-			return !(interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA && !featureId);
+			return !(interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA && featureId == null);
 		}
 
 		// If we have a station

@@ -477,7 +477,7 @@ export const fetchChoroValues = async (options: ChoroValuesOptions) => {
 	].join('&');
 
 	return await fetch(
-		`${GEOSERVER_BASE_URL}/get-choro-values/${urlPath}?${urlQuery}`
+		`${GEOSERVER_BASE_URL}/get-choro-values/${urlPath}/?${urlQuery}`
 	)
 		.then((res) => {
 			if (!res.ok) {

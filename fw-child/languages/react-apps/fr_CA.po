@@ -1110,3 +1110,6 @@ msgstr "Lire plus"
 
 msgid "Climate Zone %s"
 msgstr "Zone climatique %s"
+
+msgid "around"
+msgstr "environ"

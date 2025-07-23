@@ -74,11 +74,16 @@ const StepSummary: React.FC = () => {
 			summaryData.push({
 				title: __('Location or area'),
 				content: (() => {
-					const selectedCount = climateVariable?.getSelectedRegion()
+					const isRegion = Boolean(climateVariable?.getSelectedRegion());
+
+					const selectedCount = isRegion
 						? climateVariable?.getSelectedRegion()?.cellCount ?? 0
 						: climateVariable?.getSelectedPointsCount() ?? 0;
 
-					return sprintf(_n('%d selected', `%d selected`, selectedCount), selectedCount);
+					return (
+						(isRegion ? '~ ' : '') +
+						sprintf(_n('%d selected', `%d selected`, selectedCount), selectedCount)
+					);
 				})(),
 			})
 		}

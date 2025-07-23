@@ -12,37 +12,49 @@ import { sprintf } from '@wordpress/i18n';
  */
 export interface SelectedCellsSummaryProps {
   selectedCells: number;
+  isEstimate: boolean;
   onClear: () => void;
   __: (msg: string) => string;
   _n: (singular: string, plural: string, count: number) => string;
   showClearButton?: boolean;
 }
 
-const SelectedCellsSummary: React.FC<SelectedCellsSummaryProps> = ({ selectedCells, onClear, __, _n, showClearButton }) => {
+const SelectedCellsSummary: React.FC<SelectedCellsSummaryProps> = (
+    { selectedCells, isEstimate, onClear, __, _n, showClearButton }
+) => {
   return (
     <>
-      {showClearButton && (
-        <Button
-          variant="ghost"
-          className="text-xs text-brand-red font-semibold leading-4 tracking-wider uppercase h-auto p-0"
-          onClick={onClear}
-        >
-          <RefreshCw size={16} />
-          {__("Clear")}
-        </Button>
-      )}
-      <div>
-        <ControlTitle
-          title={__("You selected:")}
-          className="my-0"
-        />
-        <div
-          className={cn(
-            'text-2xl font-semibold leading-7 text-right',
-            selectedCells > 0 ? 'text-brand-blue' : 'text-neutral-grey-medium'
+      <div className="flex flex-col items-end">
+        <div className="flex gap-4 items-center">
+          {showClearButton && (
+              <Button
+                  variant="ghost"
+                  className="text-xs text-brand-red font-semibold leading-4 tracking-wider uppercase h-auto p-0"
+                  onClick={onClear}
+              >
+                <RefreshCw size={16} />
+                {__("Clear")}
+              </Button>
           )}
-        >
-          {sprintf(_n('%d Cell', `%d Cells`, selectedCells), selectedCells)}
+          <ControlTitle
+            title={__("You selected:")}
+            className="my-0"
+          />
+        </div>
+        <div className="flex gap-2 items-baseline">
+          {isEstimate &&
+            <div className="font-semibold text-xs text-neutral-grey-medium">
+              {__('around')}
+            </div>
+          }
+          <div
+            className={cn(
+              'text-2xl font-semibold leading-7 text-right',
+              selectedCells > 0 ? 'text-brand-blue' : 'text-neutral-grey-medium'
+            )}
+          >
+            {sprintf(_n('%d Cell', `%d Cells`, selectedCells), selectedCells)}
+          </div>
         </div>
       </div>
     </>

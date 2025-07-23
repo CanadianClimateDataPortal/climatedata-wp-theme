@@ -71,6 +71,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 	const showStationTypesFilter = climateVariable?.getId() === 'daily_ahccd_temperature_and_precipitation' || climateVariable?.getDatasetType() === 'ahccd';
 	const isInteractiveModeStation = climateVariable?.getInteractiveMode() === 'station' || climateVariable?.getDatasetType() === 'ahccd';
+	const isInteractiveGridMode = !isInteractiveModeStation && climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA;
 	const multipleStationSelect = ! [
 		'future_building_design_value_summaries',
 		'short_duration_rainfall_idf_data'
@@ -179,7 +180,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 			);
 		}
 
-		if (climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA) {
+		if (isInteractiveGridMode) {
 			return selectionMode === 'cells'
 				? <SelectableCellsGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />
 				: <SelectableRectangleGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />;
@@ -190,6 +191,10 @@ export default function RasterDownloadMap(): React.ReactElement {
 	}, [climateVariable, selectionMode, ahccdStationTypes]);
 
 	const selectionModeOptions = useMemo(() => {
+		if (!isInteractiveGridMode) {
+			return [];
+		}
+
 		const selectionModes = [
 			{
 				value: 'cells',
@@ -205,7 +210,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 		}
 
 		return selectionModes;
-	}, [climateVariable]);
+	}, [climateVariable, isInteractiveGridMode]);
 
 	return (
 		<>
@@ -230,14 +235,14 @@ export default function RasterDownloadMap(): React.ReactElement {
 					<div className="sm:w-64">
 						<InteractiveRegionSelect
 							onChange={(_) => {
-								resetSelectedPoints();
+								clearSelection();
 							}}
 						/>
 					</div>
 				)}
 			</div>
 
-			{!isInteractiveModeStation && (
+			{selectionModeOptions.length > 0 && (
 				<div className="mb-4">
 					<div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
 						<SelectionModeControls

@@ -31,7 +31,7 @@ const VariableOptionsSummary: React.FC = () => {
 
 					return (
 						<li className="summary-item" key={key}>
-							<span className='text-gray-600 text-sm'>{label}</span>: <span className="uppercase">{value}</span>
+							<span className='text-gray-600 text-sm'>{__(label)}</span>: <span className="uppercase">{value}</span>
 						</li>
 					);
 				})}

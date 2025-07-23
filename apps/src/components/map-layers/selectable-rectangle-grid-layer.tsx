@@ -103,7 +103,9 @@ const SelectableRectangleGridLayer = forwardRef<{
 
 			if (cellCount > maxCellsAllowed) {
 				map.removeLayer(layer);
-				map.pm.enableDraw('Rectangle');
+				requestAnimationFrame(() => {
+					map.pm.enableDraw('Rectangle');
+				});
 				return;
 			}
 

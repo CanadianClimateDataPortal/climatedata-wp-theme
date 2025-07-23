@@ -179,7 +179,6 @@ export default function RasterDownloadMap(): React.ReactElement {
 			);
 		}
 
-		// TODO: is this condition correct?
 		if (climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA) {
 			return selectionMode === 'cells'
 				? <SelectableCellsGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />

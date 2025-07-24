@@ -484,10 +484,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
-		defaultDateRange: [
-			"1980",
-			"2010",
-		],
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,

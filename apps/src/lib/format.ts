@@ -13,6 +13,8 @@ import React from 'react';
 import { __, _n } from "@/context/locale-provider";
 import { sprintf } from '@wordpress/i18n';
 
+export type MonthFormat = "long" | "numeric" | "2-digit" | "short" | "narrow";
+
 export async function transformLegendData(
 	input: WMSLegendData,
 	colourScheme: string,
@@ -201,7 +203,7 @@ export const normalizePostData = async (
 		.filter(Boolean);
 };
 
-export const doyFormatter = (value: number, language: string, monthFormat: "long" | "numeric" | "2-digit" | "short" | "narrow" | undefined = 'long') => {
+export const doyFormatter = (value: number, language: string, monthFormat: MonthFormat | undefined = 'long') => {
 	// First day of the year (UTC)
 	const firstDayOfYear = Date.UTC(2019, 0, 1);
 

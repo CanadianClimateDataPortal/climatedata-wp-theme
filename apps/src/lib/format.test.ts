@@ -1,5 +1,5 @@
 import { expect, test, describe } from 'vitest'
-import { doyFormatter } from './format';
+import { doyFormatter, MonthFormat } from './format';
 
 describe('doyFormatter', () => {
     test('returns correct first day of the year', () => {
@@ -42,7 +42,7 @@ describe('doyFormatter', () => {
         ['short', 'Apr 11'],
         ['narrow', 'A 11'],
     ])('returns "%s" format', (format, expected) => {
-        const output = doyFormatter(100, 'en-CA', format);
+        const output = doyFormatter(100, 'en-CA', format as MonthFormat);
         expect(output).toEqual(expected);
     });
 });

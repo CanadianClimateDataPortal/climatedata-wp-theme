@@ -34,7 +34,7 @@ export function useColorMap() {
     return {
       colours: legendColourMapEntries.map((entry) => entry.color) ?? [],
       quantities: legendColourMapEntries.map((entry) => Number(entry.quantity)) ?? [],
-      schemeType: ColourType.CONTINUOUS,
+      schemeType: ColourType.DISCRETE,
       isDivergent: false,
     };
   }, [climateVariable, legendData]);

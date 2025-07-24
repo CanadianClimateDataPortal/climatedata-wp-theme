@@ -3,6 +3,7 @@ import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { ColourType } from "@/types/climate-variable-interface";
 import { generateColourScheme } from "@/lib/colour-scheme";
+import { findCeilingIndex } from '@/lib/utils.ts';
 
 export function useColorMap() {
   const { legendData } = useAppSelector((state) => state.map);
@@ -74,26 +75,7 @@ export function useColorMap() {
 
       const { colours, quantities, schemeType } = colorMap;
 
-      // Binary search for value position
-      const indexOfGT = (arr: number[], target: number): number => {
-        let start = 0,
-          end = arr.length - 1;
-        let ans = -1;
-
-        while (start <= end) {
-          const mid = Math.floor((start + end) / 2);
-
-          if (arr[mid] <= target) {
-            start = mid + 1;
-          } else {
-            ans = mid;
-            end = mid - 1;
-          }
-        }
-        return ans;
-      };
-
-      const index = indexOfGT(quantities, value);
+      const index = findCeilingIndex(quantities, value);
 
       // Use last color if value is greater than all
       if (index === -1) {

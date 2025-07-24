@@ -309,3 +309,43 @@ export function getUnitName(unit: string): string {
 			return unit;
 	}
 }
+
+/**
+ * Return the index of a number in a sorted array, or of the next closest number.
+ *
+ * @param values Array of numbers. Must already be sorted.
+ * @param value The number to search
+ * @return The index of the number, if present, or the index of its next
+ *         closest. -1 is returned if the number is higher than the highest
+ *         number.
+ */
+export function findCeilingIndex(values: number[], value: number): number {
+	if (values.length === 0) {
+		return -1;
+	}
+
+	let left = 0;
+	let right = values.length - 1;
+
+	if (value > values[right]) {
+		return -1;
+	}
+
+	if (value <= values[left]) {
+		return left;
+	}
+
+	while (left <= right) {
+		const mid = Math.floor((left + right) / 2);
+
+		if (values[mid] === value) {
+			return mid;
+		} else if (values[mid] < value) {
+			left = mid + 1;
+		} else {
+			right = mid - 1;
+		}
+	}
+
+	return left < values.length ? left : -1;
+}

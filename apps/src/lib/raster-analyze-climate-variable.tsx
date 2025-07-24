@@ -9,7 +9,10 @@ import {
 	FrequencyDisplayModeOption,
 	FrequencyType,
 	InteractiveMode,
-} from "@/types/climate-variable-interface";
+	InteractiveRegionConfig,
+	InteractiveRegionDisplay,
+	InteractiveRegionOption,
+} from '@/types/climate-variable-interface';
 
 class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 
@@ -31,6 +34,17 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 			max: "2100",
 			interval: 5
 		};
+	}
+
+	getInteractiveRegionConfig(): InteractiveRegionConfig | null {
+		return ClimateVariableBase.prototype.getInteractiveRegionConfig.call(this) ?
+			ClimateVariableBase.prototype.getInteractiveRegionConfig.call(this)
+			: {
+				[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
+				[InteractiveRegionOption.CENSUS]: InteractiveRegionDisplay.ALWAYS,
+				[InteractiveRegionOption.HEALTH]: InteractiveRegionDisplay.ALWAYS,
+				[InteractiveRegionOption.WATERSHED]: InteractiveRegionDisplay.ALWAYS,
+			};
 	}
 
 	getFrequencyConfig(): FrequencyConfig | null {

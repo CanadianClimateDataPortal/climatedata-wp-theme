@@ -6,8 +6,9 @@ import {
 	FileFormatType,
 	FrequencyDisplayModeOption,
 	FrequencyType,
+	InteractiveRegionDisplay,
 	InteractiveRegionOption,
-} from "@/types/climate-variable-interface";
+} from '@/types/climate-variable-interface';
 
 export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Test variable */
@@ -38,10 +39,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			],
 		},
 		interactiveRegionConfig: {
-			[InteractiveRegionOption.GRIDDED_DATA]: true,
-			[InteractiveRegionOption.CENSUS]: true,
-			[InteractiveRegionOption.HEALTH]: true,
-			[InteractiveRegionOption.WATERSHED]: true
+			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
+			[InteractiveRegionOption.CENSUS]: InteractiveRegionDisplay.ALWAYS,
+			[InteractiveRegionOption.HEALTH]: InteractiveRegionDisplay.ALWAYS,
+			[InteractiveRegionOption.WATERSHED]: InteractiveRegionDisplay.ALWAYS,
 		},
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
@@ -571,10 +572,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		interactiveRegionConfig: {
-			[InteractiveRegionOption.GRIDDED_DATA]: true,
-			[InteractiveRegionOption.CENSUS]: false,
-			[InteractiveRegionOption.HEALTH]: false,
-			[InteractiveRegionOption.WATERSHED]: false
+			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.MAP,
 		},
 		hasDelta: false,
 		enableColourOptions: false,
@@ -690,10 +688,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		interactiveRegionConfig: {
-			[InteractiveRegionOption.GRIDDED_DATA]: true,
-			[InteractiveRegionOption.CENSUS]: false,
-			[InteractiveRegionOption.HEALTH]: false,
-			[InteractiveRegionOption.WATERSHED]: false
+			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
 		},
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
@@ -714,10 +709,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		interactiveRegionConfig: {
-			[InteractiveRegionOption.GRIDDED_DATA]: true,
-			[InteractiveRegionOption.CENSUS]: false,
-			[InteractiveRegionOption.HEALTH]: false,
-			[InteractiveRegionOption.WATERSHED]: false
+			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
 		},
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
@@ -1735,10 +1727,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		isTimePeriodARange: false,
 		interactiveRegionConfig: {
-			[InteractiveRegionOption.GRIDDED_DATA]: true,
-			[InteractiveRegionOption.CENSUS]: false,
-			[InteractiveRegionOption.HEALTH]: false,
-			[InteractiveRegionOption.WATERSHED]: false
+			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
 		},
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
@@ -1779,10 +1768,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		enableColourOptions: false,
 		versions: [ "cmip6" ],
 		interactiveRegionConfig: {
-			[InteractiveRegionOption.GRIDDED_DATA]: true,
-			[InteractiveRegionOption.CENSUS]: false,
-			[InteractiveRegionOption.HEALTH]: false,
-			[InteractiveRegionOption.WATERSHED]: false
+			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
 		},
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,

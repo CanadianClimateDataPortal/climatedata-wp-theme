@@ -18,7 +18,7 @@ import { __, _n } from '@/context/locale-provider';
 import { useMap } from '@/hooks/use-map';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { DownloadType, InteractiveRegionOption } from '@/types/climate-variable-interface';
+import { DownloadType, InteractiveRegionDisplay, InteractiveRegionOption } from '@/types/climate-variable-interface';
 import { Station } from '@/types/types';
 import {
 	DEFAULT_MAX_ZOOM,
@@ -234,6 +234,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 				) : (
 					<div className="sm:w-64">
 						<InteractiveRegionSelect
+							displayMode={InteractiveRegionDisplay.DOWNLOAD}
 							onChange={(_) => {
 								clearSelection();
 							}}

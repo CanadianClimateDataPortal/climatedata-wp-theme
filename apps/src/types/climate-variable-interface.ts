@@ -23,8 +23,15 @@ export enum InteractiveRegionOption {
 	WATERSHED = "watershed",
 }
 
+export enum InteractiveRegionDisplay {
+	MAP = "map",
+	DOWNLOAD = "download",
+	ALWAYS = "always",
+	NONE = "none",
+}
+
 export type InteractiveRegionConfig = {
-	[K in InteractiveRegionOption]: boolean;
+	[K in InteractiveRegionOption]?: InteractiveRegionDisplay;
 }
 
 export enum FrequencyDisplayModeOption {

@@ -9,10 +9,11 @@ import {
 	FrequencyDisplayModeOption,
 	FrequencyType,
 	InteractiveRegionConfig,
+	InteractiveRegionDisplay,
 	InteractiveRegionOption,
 	LocationModalContentParams,
-	ScenariosConfig
-} from "@/types/climate-variable-interface";
+	ScenariosConfig,
+} from '@/types/climate-variable-interface';
 import RasterPrecalcultatedClimateVariableValues from '../components/map-layers/raster-precalculated-climate-variable-values'
 import { getFrequencyCode } from '@/lib/utils.ts';
 
@@ -60,10 +61,10 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		return super.getInteractiveRegionConfig()
 			? super.getInteractiveRegionConfig()
 			: {
-				[InteractiveRegionOption.GRIDDED_DATA]: true,
-				[InteractiveRegionOption.CENSUS]: true,
-				[InteractiveRegionOption.HEALTH]: true,
-				[InteractiveRegionOption.WATERSHED]: true
+				[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
+				[InteractiveRegionOption.CENSUS]: InteractiveRegionDisplay.MAP,
+				[InteractiveRegionOption.HEALTH]: InteractiveRegionDisplay.MAP,
+				[InteractiveRegionOption.WATERSHED]: InteractiveRegionDisplay.MAP,
 			};
 	}
 

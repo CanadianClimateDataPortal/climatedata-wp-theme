@@ -490,7 +490,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
-			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		unit: "days",
 		temporalThresholdConfig: {

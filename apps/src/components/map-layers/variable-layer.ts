@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 import { useAppSelector } from '@/app/hooks';
 import SectionContext from '@/context/section-provider';
-import { CANADA_BOUNDS, GEOSERVER_BASE_URL, OWS_FORMAT } from '@/lib/constants';
+import { CANADA_BOUNDS, DEFAULT_COLOUR_SCHEMES, GEOSERVER_BASE_URL, OWS_FORMAT } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import {
 	ColourType,
@@ -11,6 +11,7 @@ import {
 } from "@/types/climate-variable-interface";
 import { generateColourScheme } from "@/lib/colour-scheme";
 import { VariableLayerProps, WMSParams } from '@/types/types';
+import { useColorMap } from '@/hooks/use-color-map.ts';
 
 /**
  * Variable layer Component
@@ -33,6 +34,7 @@ export default function VariableLayer({
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
+	const { colorMapNew } = useColorMap();
 	const transformedLegendEntry = useAppSelector((state) => state.map.transformedLegendEntry);
 
 	const section = useContext(SectionContext);
@@ -47,15 +49,17 @@ export default function VariableLayer({
 
 	const {
 		startYear,
-		colourScheme,
+		hasCustomColorScheme,
 		colourMapType,
 		datasetVersion,
 		layerStyles,
 		interactiveRegion,
 	} = useMemo(() => {
+		const colourScheme = climateVariable?.getColourScheme();
+
 		return {
 			startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
-			colourScheme: climateVariable ? generateColourScheme(climateVariable) : undefined,
+			hasCustomColorScheme: colourScheme && colourScheme in DEFAULT_COLOUR_SCHEMES,
 			colourMapType: climateVariable?.getColourType() ?? ColourType.CONTINUOUS,
 			datasetVersion: climateVariable?.getVersion(),
 			layerStyles: climateVariable?.getLayerStyles(),
@@ -71,27 +75,12 @@ export default function VariableLayer({
 	 * ramp quantities, and layer value.
 	 */
 	const generateSLD = useCallback(() => {
-		let colours, quantities;
-
-		if(isComparisonMap && climateVariable?.getId() === "sea_level" && transformedLegendEntry.length > 0) {
-			// If it's the sea level comparison map -> we override colors to match legend
-
-			colours = transformedLegendEntry.map((entry) => entry.color).reverse() ?? [];
-      quantities = transformedLegendEntry.map((entry) => Number(entry.quantity)).reverse() ?? [];
-		} else {
-			// Else (if we have a selected custom palette)
-
-			if (!colourScheme) {
-				return;
-			}
-
-			colours = colourScheme.colours;
-			quantities = colourScheme.quantities;
+		if (!colorMapNew || !hasCustomColorScheme) {
+			return;
 		}
 
-		if (!quantities || !quantities.length) {
-			return
-		}
+		const colors = colorMapNew.colors;
+		const quantities = colorMapNew.quantities;
 
 		let sldBody = `<?xml version="1.0" encoding="UTF-8"?>
 			<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
@@ -100,8 +89,8 @@ export default function VariableLayer({
 			<NamedLayer><Name>${layerValue}</Name><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
 			<Opacity>1.0</Opacity><ColorMap type="${colourMapType}">`;
 
-		for (let i = 0; i < colours.length; i++) {
-			sldBody += `<ColorMapEntry color="${colours[i]}" quantity="${quantities[i]}"/>`;
+		for (let i = 0; i < colors.length; i++) {
+			sldBody += `<ColorMapEntry color="${colors[i]}" quantity="${quantities[i]}"/>`;
 		}
 		sldBody +=
 			'</ColorMap></RasterSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>';
@@ -109,7 +98,7 @@ export default function VariableLayer({
 		return sldBody;
 	}, [
 		colourMapType,
-		colourScheme,
+		hasCustomColorScheme,
 		layerValue,
 		isComparisonMap,
 		climateVariable,

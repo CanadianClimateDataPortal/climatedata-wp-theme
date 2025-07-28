@@ -105,12 +105,6 @@ export enum ColourType {
 	DISCRETE = "intervals",
 }
 
-export interface ColorMap {
-	colours: string[];
-	quantities: number[];
-	schemeType: ColourType;
-}
-
 export interface TemporalRange {
 	low: number;
 	high: number;

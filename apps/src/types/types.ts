@@ -588,6 +588,13 @@ export interface ColourScheme {
 	isDivergent?: boolean;
 }
 
+export interface ColorMap {
+	type: string;
+	colors: string[];
+	quantities: number[];
+	isDivergent: boolean;
+}
+
 // A translatable string object with English and French variants
 export interface LocalizedString {
 	en: string;
@@ -811,4 +818,8 @@ export interface SelectedLocationInfo {
 	featureId: number;
 	title: string;
 	latlng: L.LatLng;
+}
+
+export interface FetchOptions {
+	signal?: AbortSignal;
 }

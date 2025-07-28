@@ -8,7 +8,7 @@ import {
 	ApiPostData,
 	ChartDataOptions,
 	DeltaValuesOptions,
-	ChoroValuesOptions,
+	ChoroValuesOptions, FetchOptions,
 } from '@/types/types';
 import L from 'leaflet';
 
@@ -23,7 +23,7 @@ const apiCache = new Map<string, any>();
  * Processes and normalizes the response into a structured MapInfoData object,
  * including sectors, trainings, featured image, and dataset taxonomy terms.
  */
-export const fetchWPData = async (postId: number) => {
+export const fetchWPData = async (postId: number, fetchOptions?: FetchOptions) => {
 	try {
 		const cacheKey = `wp_data_${postId}`;
 
@@ -41,6 +41,7 @@ export const fetchWPData = async (postId: number) => {
 					Accept: 'application/json',
 					'Content-Type': 'application/json',
 				},
+				...fetchOptions,
 			}
 		);
 
@@ -106,27 +107,27 @@ export const fetchWPData = async (postId: number) => {
 	}
 };
 
-export const fetchLegendData = async (url: string) => {
-	return await fetch(url)
-		.then((res) => {
-			if (!res.ok) {
-				throw new Error('Failed to fetch data');
-			}
-			return res.json();
-		})
-		.then((json) => json);
+export const fetchLegendData = async (url: string, fetchOptions?: FetchOptions) => {
+	const res = await fetch(url, { ...fetchOptions });
+	if (!res.ok) {
+		throw new Error('Failed to fetch data');
+	}
+	return res.json();
 };
 
 /**
  * Fetches taxonomy data from the API
+ *
  * @param slug - the taxonomy slug
  * @param app - the section where to load the terms
  * @param filters - the filters to apply to the data
+ * @param fetchOptions Any other options to pass to fetch (like a signal)
  */
 export const fetchTaxonomyData = async (
 	slug: string,
 	app: 'map'|'download' = 'map',
 	filters?: Record<string, string | number | null>,
+	fetchOptions?: FetchOptions
 ): Promise<TaxonomyData[]> => {
 	try {
 		// Create cache key based on slug and filters
@@ -149,6 +150,7 @@ export const fetchTaxonomyData = async (
 						Accept: 'application/json',
 						'Content-Type': 'application/json',
 					},
+					...fetchOptions,
 				}
 			);
 
@@ -174,6 +176,7 @@ export const fetchTaxonomyData = async (
 						Accept: 'application/json',
 						'Content-Type': 'application/json',
 					},
+					...fetchOptions,
 				}
 			);
 
@@ -222,6 +225,7 @@ export const fetchTaxonomyData = async (
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
 			},
+			...fetchOptions,
 		});
 
 		if (!response.ok) {
@@ -270,12 +274,14 @@ export const fetchTaxonomyData = async (
  * @param dataset - the dataset
  * @param filters - the filters to apply to the data
  * @param section - the section we are in (e.g. map, download)
+ * @param fetchOptions - any other options to pass to fetch() requests
  */
 export const fetchPostsData = async (
 	postType: string,
 	section: string,
 	dataset: TaxonomyData,
-	filters: Record<string, string | number | null>
+	filters: Record<string, string | number | null>,
+	fetchOptions?: FetchOptions
 ): Promise<ApiPostData[]> => {
 	try {
 		const { term_id } = dataset;
@@ -312,6 +318,7 @@ export const fetchPostsData = async (
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
 			},
+			...fetchOptions,
 		});
 
 		if (!response.ok) {
@@ -349,7 +356,10 @@ export const clearApiCache = (key?: string): void => {
  *
  * @param latlng Latitude and Longitude of the location
  */
-export const fetchLocationByCoords = async (latlng: L.LatLng | { lat: number; lng: number }) => {
+export const fetchLocationByCoords = async (
+	latlng: L.LatLng | { lat: number; lng: number },
+	fetchOptions?: FetchOptions
+) => {
 	try {
 		// Make the Fetch request.
 		const response = await fetch(`${WP_API_DOMAIN}${WP_API_LOCATION_BY_COORDS_PATH}?lat=${latlng.lat}&lng=${latlng.lng}&sealevel=false`, {
@@ -358,6 +368,7 @@ export const fetchLocationByCoords = async (latlng: L.LatLng | { lat: number; ln
 				'Accept': 'application/json',
 				'Content-Type': 'application/json',
 			},
+			...fetchOptions,
 		});
 
 		// Handle HTTP errors
@@ -379,7 +390,7 @@ export const fetchLocationByCoords = async (latlng: L.LatLng | { lat: number; ln
  *
  * @param options Options to pass to the API
  */
-export const generateChartData = async (options: ChartDataOptions) => {
+export const generateChartData = async (options: ChartDataOptions, fetchOptions?: FetchOptions) => {
 	const { 
 		interactiveRegion,
 		latlng,
@@ -406,7 +417,7 @@ export const generateChartData = async (options: ChartDataOptions) => {
 	}
 
 	fetchUrl += `/${variable}/${frequency}?decimals=${unitDecimals}&dataset_name=${dataset}`;
-	const response = await fetch(fetchUrl);
+	const response = await fetch(fetchUrl, { ...fetchOptions });
 
 	if (!response.ok) {
 		throw new Error('Failed to fetch data');
@@ -420,8 +431,11 @@ export const generateChartData = async (options: ChartDataOptions) => {
  *
  * @param options Options to pass to the API
  */
-export const fetchMSCClimateNormalsChartData = async (stationId: string, normalId: number) => {
-	const response = await fetch(`https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=${stationId}&NORMAL_ID=${normalId}&sortby=MONTH`);
+export const fetchMSCClimateNormalsChartData = async (stationId: string, normalId: number, fetchOptions?: FetchOptions) => {
+	const response = await fetch(
+		`https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=${stationId}&NORMAL_ID=${normalId}&sortby=MONTH`,
+		{ ...fetchOptions }
+	);
 
 	if (!response.ok) {
 		throw new Error('Failed to fetch data');
@@ -435,7 +449,7 @@ export const fetchMSCClimateNormalsChartData = async (stationId: string, normalI
  *
  * @param options Options to pass to the API
  */
-export const fetchDeltaValues = async (options: DeltaValuesOptions) => {
+export const fetchDeltaValues = async (options: DeltaValuesOptions, fetchOptions?: FetchOptions) => {
 	try {
 		const { endpoint, varName, frequency, params } = options;
 		let url = `${GEOSERVER_BASE_URL}/${endpoint}`;
@@ -443,7 +457,7 @@ export const fetchDeltaValues = async (options: DeltaValuesOptions) => {
 		if(frequency !== null) url += `/${frequency}`;
 		url += `?${params}`;
 
-		const response = await fetch(url);
+		const response = await fetch(url, { ...fetchOptions });
 
 		if (!response.ok) {
 			throw new Error(response.statusText);
@@ -461,7 +475,7 @@ export const fetchDeltaValues = async (options: DeltaValuesOptions) => {
  *
  * @param options Options to pass to the API
  */
-export const fetchChoroValues = async (options: ChoroValuesOptions) => {
+export const fetchChoroValues = async (options: ChoroValuesOptions, fetchOptions?: FetchOptions) => {
 	const urlPath = [
 		options.interactiveRegion,
 		options.variable,
@@ -476,16 +490,14 @@ export const fetchChoroValues = async (options: ChoroValuesOptions) => {
 		`delta7100=${options.isDelta7100 ? 'true' : 'false'}`,
 	].join('&');
 
-	return await fetch(
-		`${GEOSERVER_BASE_URL}/get-choro-values/${urlPath}/?${urlQuery}`
+	const res = await fetch(
+		`${GEOSERVER_BASE_URL}/get-choro-values/${urlPath}/?${urlQuery}`,
+		{ ...fetchOptions },
 	)
-		.then((res) => {
-			if (!res.ok) {
-				throw new Error('Failed to fetch data');
-			}
-			return res.json();
-		})
-		.then((json) => json);
+	if (!res.ok) {
+		throw new Error('Failed to fetch data');
+	}
+	return res.json();
 };
 
 /**
@@ -493,7 +505,7 @@ export const fetchChoroValues = async (options: ChoroValuesOptions) => {
  *
  * @returns A list of stations with their names, ids and coords.
  */
-export const fetchStationsList = async ({ threshold }: { threshold?: string }) => {
+export const fetchStationsList = async ({ threshold }: { threshold?: string }, fetchOptions?: FetchOptions) => {
 	try {
 		let data: any;
 
@@ -504,6 +516,7 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }) =
 					Accept: 'application/json',
 					'Content-Type': 'application/json',
 				},
+				...fetchOptions,
 			});
 			if (!response.ok) {
 				throw new Error(`Failed to fetch stations list: ${response.statusText}`);

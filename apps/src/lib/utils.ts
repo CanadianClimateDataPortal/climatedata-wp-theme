@@ -349,3 +349,30 @@ export function findCeilingIndex(values: number[], value: number): number {
 
 	return left < values.length ? left : -1;
 }
+
+/**
+ * Equivalent to np.linspace
+ * @param a
+ * @param b
+ * @param n
+ */
+export function generateRange(a: number, b: number, n: number): number[] {
+	if (n <= 0) {
+		return [];
+	}
+
+	if (n === 1) {
+		return [a];
+	}
+
+	const step = (b - a) / (n - 1);
+	const result: number[] = [];
+
+	for (let i = 0; i < n; i++) {
+		result.push(a + i * step);
+	}
+
+	result[result.length - 1] = b;
+
+	return result;
+}

@@ -22,13 +22,13 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 	isComparisonMap = false,
 }) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const [rawLegendData, setRawLegendData] = useState<WMSLegendData | null>(null);
+	// const [rawLegendData, setRawLegendData] = useState<WMSLegendData | null>(null);
 	const [transformedLegendData, setTransformedLegendData] = useState<TransformedLegendEntry[] | null>(null);
 
 	const map = useMap();
 	const dispatch = useAppDispatch();
 	const { climateVariable } = useClimateVariable();
-	const { colorMap } = useColorMap();
+	const { colorMap, colorMapNew } = useColorMap();
 	const transformedLegendEntry = useAppSelector((state) => state.map.transformedLegendEntry);
 
 	const { locale } = useLocale();
@@ -36,12 +36,12 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 	const unit = climateVariable?.getUnitLegend();
 	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
 	const colourScheme = climateVariable?.getColourScheme() ?? 'default';
-	const isCategorical = climateVariable?.getCustomColourSchemes()?.default?.categorical ?? false;
+	const isCategorical = climateVariable?.getColourType() !== ColourType.CONTINUOUS;
 	const customColors = climateVariable?.getCustomColourSchemes()?.default?.colours;
 	const temporalRange = climateVariable?.getCurrentTemporalRange() ?? null;
 
 	// Fetch legend data from the API
-	useEffect(() => {
+	/*useEffect(() => {
 		(async () => {
 			const data = await fetchLegendData(url);
 
@@ -50,11 +50,13 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 
 			setRawLegendData(data);
 		})();
-	}, [url, climateVariable, dispatch]);
+	}, [url, climateVariable, dispatch]);*/
 
 	// This is what updates the legend colors when selecting a new color scheme
-	useEffect(() => {
-		if (!rawLegendData || !colorMap) return;
+	/*useEffect(() => {
+		if (!colorMapNew) {
+			return;
+		}
 
 		if (customColors) {
 			const commonPrefix = getCommonPrefix(customColors.map(item => item.label))
@@ -92,10 +94,10 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 				setTransformedLegendData(transformedData);
 			}
 		})();
-	}, [rawLegendData, colourScheme, colorMap, isCategorical, climateVariable, isComparisonMap]);
+	}, [rawLegendData, colourScheme, colorMap, isCategorical, climateVariable, isComparisonMap]);*/
 
 	// Listen for changes to transformedLegendEntry for sea level comparison map and update the legend entries
-	useEffect(() => {
+	/*useEffect(() => {
 		if (
 			isComparisonMap &&
 			climateVariable?.getId() === "sea_level" &&
@@ -103,20 +105,18 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 		) {
 			setTransformedLegendData(transformedLegendEntry);
 		}
-	}, [isComparisonMap, climateVariable, transformedLegendEntry]);
+	}, [isComparisonMap, climateVariable, transformedLegendEntry]);*/
 
 	useEffect(() => {
-		if (!transformedLegendData) {
+		if (!colorMapNew) {
 			return;
 		}
 
 		const legend = new L.Control({ position: 'topright' });
 
-		const colourType = climateVariable?.getColourType()
-			?? rawLegendData?.Legend?.[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap?.type
-			?? ColourType.CONTINUOUS;
+		const colourType = colorMapNew.type;
 
-		const hasCustomScheme = Boolean(customColors);
+		const hasCustomScheme = false; // Boolean(customColors);
 		legend.onAdd = () => {
 			const container = L.DomUtil.create(
 				'div',
@@ -126,7 +126,7 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 
 			root.render(
 				<MapLegendControl
-					data={transformedLegendData ?? []}
+					data={colorMapNew}
 					isOpen={isOpen}
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 					isCategorical={isCategorical}
@@ -151,7 +151,7 @@ const MapLegend: React.FC<{ url: string; isComparisonMap?: boolean }> = ({
 		return () => {
 			legend.remove();
 		};
-	}, [map, transformedLegendData, isOpen]);
+	}, [map, colorMapNew, isOpen, isCategorical]);
 
 	return null;
 };

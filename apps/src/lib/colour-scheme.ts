@@ -1,7 +1,31 @@
-import { ClimateVariableInterface, TemporalScaleConfig } from "@/types/climate-variable-interface";
+import { ClimateVariableInterface, TemporalRange, TemporalScaleConfig } from '@/types/climate-variable-interface';
 import { DEFAULT_COLOUR_SCHEMES } from "@/lib/constants";
-import { ColourScheme } from "@/types/types";
-import { getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
+import { ColorMap, ColourScheme } from '@/types/types';
+import { generateDivergentRange, generateRange, getDefaultFrequency, getFrequencyCode } from '@/lib/utils';
+
+export function generateColorMap(temporalRange: TemporalRange | null, colorScheme: ColourScheme): ColorMap | null {
+	const { colours: colors, type } = colorScheme;
+	const isDivergent = (type === 'divergent');
+	let quantities;
+
+	if (!temporalRange) {
+		return null;
+	}
+
+	if (isDivergent) {
+		const absMax = Math.max(Math.abs(temporalRange.low), Math.abs(temporalRange.high));
+		quantities = generateRange(-absMax, absMax, colors.length);
+	} else {
+		quantities = generateRange(temporalRange.low, temporalRange.high, colors.length);
+	}
+
+	return {
+		colors: colors,
+		type,
+		quantities,
+		isDivergent,
+	}
+}
 
 export function generateColourScheme(
 	climateVariable: ClimateVariableInterface

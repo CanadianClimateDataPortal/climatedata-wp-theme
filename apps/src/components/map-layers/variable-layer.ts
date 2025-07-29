@@ -9,7 +9,6 @@ import {
 	ColourType,
 	InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
-import { generateColourScheme } from "@/lib/colour-scheme";
 import { VariableLayerProps, WMSParams } from '@/types/types';
 import { useColorMap } from '@/hooks/use-color-map.ts';
 
@@ -34,7 +33,7 @@ export default function VariableLayer({
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
-	const { colorMapNew } = useColorMap();
+	const { colorMap } = useColorMap();
 	const transformedLegendEntry = useAppSelector((state) => state.map.transformedLegendEntry);
 
 	const section = useContext(SectionContext);
@@ -75,12 +74,12 @@ export default function VariableLayer({
 	 * ramp quantities, and layer value.
 	 */
 	const generateSLD = useCallback(() => {
-		if (!colorMapNew || !hasCustomColorScheme) {
+		if (!colorMap || !hasCustomColorScheme) {
 			return;
 		}
 
-		const colors = colorMapNew.colors;
-		const quantities = colorMapNew.quantities;
+		const colors = colorMap.colours;
+		const quantities = colorMap.quantities;
 
 		let sldBody = `<?xml version="1.0" encoding="UTF-8"?>
 			<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"

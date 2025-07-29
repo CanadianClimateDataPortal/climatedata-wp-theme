@@ -1,5 +1,5 @@
 import React from "react";
-import { MultilingualField } from "./types";
+import { MapDisplayType, MultilingualField } from './types';
 
 export interface variableClassMap {
 	[key: string]: string;
@@ -8,6 +8,19 @@ export interface variableClassMap {
 export interface ScenariosConfig {
 	[key: string]: string[];
 }
+
+export type LegendConfigSet = {
+	[key: MapDisplayType]: LegendConfig;
+};
+
+export type LegendConfig = {
+	unit?: string;
+	decimals?: number;
+	addTopPadding?: boolean;
+	hideTopValue?: boolean;
+	hideBottomValue?: boolean;
+	valuesInKelvin?: boolean;
+};
 
 export interface ThresholdInterface {
 	value: string;
@@ -103,30 +116,6 @@ export enum FileFormatType {
 export enum ColourType {
 	CONTINUOUS = "ramp",
 	DISCRETE = "intervals",
-}
-
-export interface TemporalRange {
-	low: number;
-	high: number;
-}
-
-export interface TemporalScaleConfig {
-	absolute: TemporalRange;
-	delta: TemporalRange;
-	unit: string;
-}
-
-export interface TemporalScales {
-	[key: string]: TemporalScaleConfig;
-}
-
-export interface TemporalThresholds {
-	[key: string]: TemporalScales;
-}
-
-export interface TemporalThresholdConfig {
-	thresholds: TemporalThresholds;
-	decimals?: number;
 }
 
 export interface CustomColourSchemeColour {
@@ -241,6 +230,9 @@ export interface ClimateVariableConfigInterface {
 	/** Unit legend */
 	unitLegend?: string;
 
+	/** Legend display configuration */
+	legendConfigs?: LegendConfigSet;
+
 	/** InteractiveMode */
 	interactiveMode?: InteractiveMode;
 
@@ -276,9 +268,6 @@ export interface ClimateVariableConfigInterface {
 
 	/** The type of colour map selected (e.g. continuous, discrete) */
 	colourType?: string;
-
-	/** Defines data ranges and units for different temporal scales (e.g. ys, ms, etc) */
-	temporalThresholdConfig?: TemporalThresholdConfig;
 
 	/** An array of FieldConfigs used in the Download section */
 	analysisFields?: FieldConfig[];
@@ -409,6 +398,10 @@ export interface ClimateVariableInterface {
 
 	getUnitLegend(): string;
 
+	getLegendConfigs(): LegendConfigSet;
+
+	getLegendConfig(type: MapDisplayType): LegendConfig;
+
 	getInteractiveMode(): InteractiveMode;
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null;
@@ -432,10 +425,6 @@ export interface ClimateVariableInterface {
 	getColourOptionsStatus(): boolean;
 
 	getColourType(): string | null;
-
-	getTemporalThresholdConfig(): TemporalThresholdConfig | null;
-
-	getCurrentTemporalRange(): TemporalRange | null;
 
 	getAnalysisFields(): FieldConfig[];
 

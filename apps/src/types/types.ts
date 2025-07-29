@@ -581,16 +581,21 @@ export interface ChoroValuesOptions {
 	isDelta7100: boolean;
 }
 
+export enum ColourSchemeType {
+	SEQUENTIAL = 'sequential',
+	DIVERGENT = 'divergent',
+}
+
 export interface ColourScheme {
-	type: string;
+	type: ColourSchemeType;
 	colours: string[];
 	quantities?: number[];
 	isDivergent?: boolean;
 }
 
-export interface ColorMap {
-	type: string;
-	colors: string[];
+export interface ColourMap {
+	type: ColourSchemeType;
+	colours: string[];
 	quantities: number[];
 	isDivergent: boolean;
 }
@@ -822,4 +827,9 @@ export interface SelectedLocationInfo {
 
 export interface FetchOptions {
 	signal?: AbortSignal;
+}
+
+export enum MapDisplayType {
+	ABSOLUTE = 'absolute',
+	DELTA = 'delta',
 }

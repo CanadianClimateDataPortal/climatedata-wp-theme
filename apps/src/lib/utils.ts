@@ -255,29 +255,6 @@ export const getFeatureId = (properties: {
 };
 
 /**
- * Returns the color for a given feature based on the interactive region and color map.
- */
-export function getFeatureColor(
-	featureId: number,
-	interactiveRegion: string,
-	layerData: Record<number, number> | null,
-	colorMap: { quantities: number[]; colours: string[] } | null,
-	getColor: (value: number) => string
-): string {
-	if (!colorMap || !colorMap.quantities || !colorMap.colours) {
-		return '#fff';
-	}
-
-	// Extract value based on interactive region type
-	const value =
-		interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
-			? featureId
-			: (layerData?.[featureId] ?? 0);
-
-	return getColor(value);
-}
-
-/**
  * Return the translated display name for a unit from its technical code.
  * 
  * To be used when displaying only the unit's name, not a value followed by a

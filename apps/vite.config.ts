@@ -67,6 +67,9 @@ export default defineConfig({
                 path.resolve(__dirname, '../fw-child/resources/fonts') // allow access to the fonts folder
             ]
         },
-    }
+    },
+    test: {
+        environment: 'jsdom',
+    },
 
 })

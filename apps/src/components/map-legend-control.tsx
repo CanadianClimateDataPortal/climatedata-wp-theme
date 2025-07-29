@@ -2,33 +2,32 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { __ } from '@/context/locale-provider';
 
-import { TransformedLegendEntry } from '@/types/types';
-import { ColourType } from '@/types/climate-variable-interface';
-import { ColorMap } from '@/types/types';
-import { getUnitName } from "@/lib/utils";
+import { ColourType, LegendConfig } from '@/types/climate-variable-interface';
+import { ColourMap } from '@/types/types';
+import { getUnitName } from '@/lib/utils';
+import { doyFormatter, formatValue } from '@/lib/format.ts';
 
 const GRADIENT_WIDTH = 22;
 const TICK_WIDTH = 10;
 const MIN_LABEL_SPACING = 30; // Minimum spacing between labels
 
 interface MapLegendControlProps {
-	data: ColorMap;
+	data: ColourMap;
 	isOpen: boolean;
 	toggleOpen: () => void;
 	isCategorical?: boolean;
 	isDelta: boolean;
-	isDefaultColourScheme: boolean;
-	isSeaLevel: boolean;
-	hasCustomScheme?: boolean;
 	unit?: string;
+	legendConfig?: LegendConfig;
 	colourType?: string;
+	locale?: string;
 }
 
 /**
  * Map legend control component, displays the toggle button to collapse/expand the svg legend element.
  */
 const MapLegendControl: React.FC<MapLegendControlProps> = (
-	{ data, isOpen, toggleOpen, isCategorical, isDelta, isDefaultColourScheme, isSeaLevel, hasCustomScheme, unit, colourType }
+	{ data, isOpen, toggleOpen, isCategorical, isDelta, unit, legendConfig, colourType, locale = 'en' }
 ) => {
 	const [svgWidth, setSvgWidth] = useState(0);
 	const [legendHeight, setLegendHeight] = useState<number | undefined>(undefined);
@@ -36,14 +35,29 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 	const isBlocksGradient = isCategorical || colourType === ColourType.DISCRETE;
 	let unitName = getUnitName(unit ?? '');
 	const legendValues = [...data.quantities].reverse();
-	const legendColors = [...data.colors].reverse();
+	const legendColors = [...data.colours].reverse();
 
 	// We add an extra value and color at the top of the legend, to show a color
 	// exceeding the maximum value. The value won't be shown (hence it's NaN)
-	legendValues.unshift(NaN);
-	legendColors.unshift(legendColors[0]);
+	if (legendConfig?.addTopPadding) {
+		legendValues.unshift(NaN);
+		legendColors.unshift(legendColors[0]);
+	}
 
-	
+	if (legendConfig?.hideBottomValue) {
+		legendValues[legendValues.length - 1] = NaN;
+	}
+
+	if (legendConfig?.hideTopValue) {
+		legendValues[0] = NaN;
+	}
+
+	if (legendConfig?.valuesInKelvin) {
+		legendValues.forEach((value, index) => {
+			legendValues[index] -= 273.15;
+		});
+	}
+
 	if (unit === 'DoY' && isDelta) {
 		unitName = getUnitName('days');
 	}
@@ -60,32 +74,14 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 	const lineEndX = gradientX;
 
 	// Used to skip a legend label if it's the same as the previous one
-	let previousLabel = '';
+	let previousValue = NaN;
 
-	// If first or last color should be bigger
-	//const [maxItemExtra, setMaxItemExtra] = useState<number>(0);
 	const [itemHeight, setItemHeight] = useState<number>(0);
-	//const [maxItemHeight, setMaxItemHeight] = useState<number>(0);
-	//const [minItemHeight, setMinItemHeight] = useState<number>(0);
 
 	useEffect(() => {
-		//const currentMaxItemExtra = isCategorical || !isDefaultColourScheme || (isDefaultColourScheme && isDelta) || isSeaLevel ? 0 : 0.5;
-		//const currentMinItemExtra = isCategorical || (isDefaultColourScheme && isDelta) || isSeaLevel
-		//	? 0 :
-		//	(isDefaultColourScheme && !isDelta)
-		//		? 0.5
-		//		: 1;
-
-		//const currentItemHeight = GRADIENT_HEIGHT / (totalLabels + currentMaxItemExtra + currentMinItemExtra);
 		const currentItemHeight = GRADIENT_HEIGHT / totalLabels;
-		//const currentMaxItemHeight = currentItemHeight * (1 + currentMaxItemExtra);
-		//const currentMinItemHeight = currentItemHeight * (1 + currentMinItemExtra);
-
-		//setMaxItemExtra(currentMaxItemExtra)
 		setItemHeight(currentItemHeight);
-		//setMaxItemHeight(currentMaxItemHeight);
-		//setMinItemHeight(currentMinItemHeight);
-	}, [isCategorical, isDefaultColourScheme, isDelta, GRADIENT_HEIGHT, totalLabels]);
+	}, [GRADIENT_HEIGHT, totalLabels]);
 
 	useEffect(() => {
 		if (svgRef.current) {
@@ -132,27 +128,14 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 						{isBlocksGradient ? (
 							<g>
 								{legendColors.map((color, index) => {
-									let height = itemHeight;
-									/*if (index === 0) {
-										height = maxItemHeight;
-									} else if (index === legendColors.length - 1) {
-										height = minItemHeight;
-									}*/
-
-									// let paddingTop = PADDING_TOP;
-									const rectY = index * itemHeight;
-									/*if(index > 0) {
-										paddingTop += maxItemHeight + (index - 1) * itemHeight;
-									}*/
-
 									return (
 										<rect
 											key={index}
 											width={GRADIENT_WIDTH}
-											height={height}
+											height={itemHeight}
 											fill={color}
 											x={gradientX}
-											y={rectY}
+											y={index * itemHeight}
 										/>
 									);
 								})}
@@ -165,11 +148,7 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 										gradientTransform="rotate(90)"
 									>
 										{legendColors.map((color, index) => {
-											// let offset = 0;
-											let offset = (index  / totalLabels) * 100;
-											/*if(index > 0) {
-												offset = ((index + maxItemExtra) / totalLabels) * 100;
-											}*/
+											const offset = (index  / totalLabels) * 100;
 
 											return (
 												<stop
@@ -191,34 +170,27 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 							</>
 						)}
 
-						{legendValues.map((quantity, index) => {
+						{legendValues.map((value, index) => {
+
+							if (Number.isNaN(value)) {
+								return;
+							}
+
+							if (value === previousValue) {
+								return;
+							}
+							previousValue = value;
+
+							let label;
+
+							if (unit === 'DoY' && !isDelta) {
+								label = doyFormatter(value, locale, 'short');
+							} else {
+								const decimals = legendConfig?.decimals ?? 0;
+								label = formatValue(value, undefined, decimals, locale, isDelta);
+							}
+
 							const labelY = index * itemHeight;
-							let parsedLabel = '';
-
-							if (!Number.isNaN(quantity)) {
-								parsedLabel = String(quantity);
-								// Add '+' for delta values
-								const prefix = isDelta && quantity > 0 ? '+' : '';
-								parsedLabel = prefix + String(parsedLabel);
-							}
-
-							// Custom scheme variables like "building_climate_zones" may have labels that can be parsed but shouldn't
-							//  eg. 7A, 7B, 8 -- so those even if parseable we should keep them as they are
-
-							/*let parsedLabel = hasCustomScheme
-								? entry.label
-								: parseFloat(String(entry.label));*/
-							// Still getting NaN for labels like dates -- Jul 01, Jun 21, etc so fall back to the received label instead
-							/*if (isNaN(Number(parsedLabel))) {
-								parsedLabel = entry.label;
-							}*/
-
-
-							// Skip if the current parsedLabel is the same as the previous one
-							if (parsedLabel === previousLabel) {
-								return null;
-							}
-							previousLabel = parsedLabel;
 
 							return (
 								<g key={index}>
@@ -229,7 +201,7 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 										dominantBaseline="middle"
 										textAnchor="end"
 									>
-										{parsedLabel}
+										{label}
 									</text>
 									<line
 										x1={lineStartX}

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
@@ -6,27 +6,26 @@ import {
 	ColourType,
 	CustomColourSchemes,
 	DateRangeConfig,
+	DownloadFile,
 	DownloadType,
 	FieldConfig,
 	FieldValues,
 	FileFormatType,
 	FrequencyConfig,
+	FrequencyType,
 	GridCoordinates,
 	GridRegion,
 	InteractiveMode,
 	InteractiveRegionConfig,
-	InteractiveRegionOption,
-	ScenariosConfig,
-	TemporalThresholdConfig,
-	ThresholdInterface,
-	DownloadFile,
-	FrequencyType,
-	TemporalRange,
+	InteractiveRegionOption, LegendConfig, LegendConfigSet,
 	LocationModalContentParams,
-} from "@/types/climate-variable-interface";
-import RasterMap from "@/components/raster-map";
-import RasterDownloadMap from "@/components/download/raster-download-map";
-import { getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
+	ScenariosConfig,
+	ThresholdInterface,
+} from '@/types/climate-variable-interface';
+import RasterMap from '@/components/raster-map';
+import RasterDownloadMap from '@/components/download/raster-download-map';
+import { getDefaultFrequency, getFrequencyCode } from '@/lib/utils';
+import { MapDisplayType } from '@/types/types';
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -149,6 +148,15 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.unitLegend ?? this.getUnit();
 	}
 
+	getLegendConfigs(): LegendConfigSet {
+		return this._config.legendConfigs ?? {};
+	}
+
+	getLegendConfig(type: MapDisplayType): LegendConfig {
+		const configs = this.getLegendConfigs();
+		return configs?.[type] ?? {};
+	}
+
 	getInteractiveMode(): InteractiveMode {
 		return this._config.interactiveMode ?? 'region';
 	}
@@ -211,31 +219,6 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getColourType(): string | null {
 		return this._config.colourType ?? ColourType.CONTINUOUS;
-	}
-
-	getTemporalThresholdConfig(): TemporalThresholdConfig | null {
-		return this._config.temporalThresholdConfig ?? null;
-	}
-
-	getCurrentTemporalRange(): TemporalRange | null {
-		const temporalThresholdConfig = this.getTemporalThresholdConfig();
-		if (!temporalThresholdConfig) return null;
-
-		const frequencyConfig = this.getFrequencyConfig();
-		if (!frequencyConfig) return null;
-
-		const frequency = this.getFrequency() ?? getDefaultFrequency(frequencyConfig, 'map');
-		if (frequency === undefined) return null;
-
-		const frequencyCode = getFrequencyCode(frequency);
-		const threshold = this.getThreshold();
-		if (!threshold) return null;
-
-		const useDelta = this.hasDelta?.() ?? false;
-		const dataType = useDelta && this.getDataValue() === 'delta' ? 'delta' : 'absolute';
-
-		const temporalRange = temporalThresholdConfig.thresholds?.[threshold]?.[frequencyCode]?.[dataType];
-		return temporalRange ?? null;
 	}
 
 	getAnalysisFields(): FieldConfig[] {

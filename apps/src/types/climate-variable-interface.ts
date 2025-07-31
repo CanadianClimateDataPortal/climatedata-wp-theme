@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import { MapDisplayType, MultilingualField } from './types';
 import { WMSParams } from '@/types/types';
 

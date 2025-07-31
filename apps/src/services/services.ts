@@ -2,17 +2,23 @@
 // For example any external request to an API, or any kind of data manipulation.
 
 import {
+	ApiPostData,
+	ChartDataOptions,
+	ChoroValuesOptions,
+	DeltaValuesOptions,
+	FetchOptions,
 	MapInfoData,
 	Sector,
 	TaxonomyData,
-	ApiPostData,
-	ChartDataOptions,
-	DeltaValuesOptions,
-	ChoroValuesOptions, FetchOptions,
 } from '@/types/types';
 import L from 'leaflet';
 
-import {GEOSERVER_BASE_URL, WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH} from '@/lib/constants';
+import {
+	GEOSERVER_BASE_URL,
+	WP_API_DOMAIN,
+	WP_API_LOCATION_BY_COORDS_PATH,
+	WP_API_VARIABLE_PATH,
+} from '@/lib/constants';
 import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 
 // Cache for API responses to avoid duplicate requests
@@ -121,13 +127,13 @@ export const fetchLegendData = async (url: string, fetchOptions?: FetchOptions) 
  * @param slug - the taxonomy slug
  * @param app - the section where to load the terms
  * @param filters - the filters to apply to the data
- * @param fetchOptions Any other options to pass to fetch (like a signal)
+ * @param fetchOptions Any other options to pass to fetch (ex: `signal`)
  */
 export const fetchTaxonomyData = async (
 	slug: string,
 	app: 'map'|'download' = 'map',
 	filters?: Record<string, string | number | null>,
-	fetchOptions?: FetchOptions
+	fetchOptions?: FetchOptions,
 ): Promise<TaxonomyData[]> => {
 	try {
 		// Create cache key based on slug and filters
@@ -274,14 +280,14 @@ export const fetchTaxonomyData = async (
  * @param dataset - the dataset
  * @param filters - the filters to apply to the data
  * @param section - the section we are in (e.g. map, download)
- * @param fetchOptions - any other options to pass to fetch() requests
+ * @param fetchOptions - any other options to pass to fetch() requests (ex: `signal`)
  */
 export const fetchPostsData = async (
 	postType: string,
 	section: string,
 	dataset: TaxonomyData,
 	filters: Record<string, string | number | null>,
-	fetchOptions?: FetchOptions
+	fetchOptions?: FetchOptions,
 ): Promise<ApiPostData[]> => {
 	try {
 		const { term_id } = dataset;
@@ -355,10 +361,11 @@ export const clearApiCache = (key?: string): void => {
  * Fetches location data from the API
  *
  * @param latlng Latitude and Longitude of the location
+ * @param fetchOptions Any other options to pass to fetch (ex: `signal`)
  */
 export const fetchLocationByCoords = async (
 	latlng: L.LatLng | { lat: number; lng: number },
-	fetchOptions?: FetchOptions
+	fetchOptions?: FetchOptions,
 ) => {
 	try {
 		// Make the Fetch request.
@@ -389,6 +396,7 @@ export const fetchLocationByCoords = async (
  * Generates chart data from the API
  *
  * @param options Options to pass to the API
+ * @param fetchOptions Any other options to pass to fetch (ex: `signal`)
  */
 export const generateChartData = async (options: ChartDataOptions, fetchOptions?: FetchOptions) => {
 	const { 
@@ -429,7 +437,9 @@ export const generateChartData = async (options: ChartDataOptions, fetchOptions?
 /**
  * Generates chart data from the API
  *
- * @param options Options to pass to the API
+ * @param stationId Station for which to fetch data
+ * @param normalId ID of the normal data to fetch
+ * @param fetchOptions Any other options to pass to fetch (ex: `signal`)
  */
 export const fetchMSCClimateNormalsChartData = async (stationId: string, normalId: number, fetchOptions?: FetchOptions) => {
 	const response = await fetch(
@@ -448,6 +458,7 @@ export const fetchMSCClimateNormalsChartData = async (stationId: string, normalI
  * Fetches delta values from the API, used to give data to a map cell tooltip.
  *
  * @param options Options to pass to the API
+ * @param fetchOptions Any other options to pass to fetch (ex: `signal`)
  */
 export const fetchDeltaValues = async (options: DeltaValuesOptions, fetchOptions?: FetchOptions) => {
 	try {
@@ -474,6 +485,7 @@ export const fetchDeltaValues = async (options: DeltaValuesOptions, fetchOptions
  * Fetches choro values from the API.
  *
  * @param options Options to pass to the API
+ * @param fetchOptions Any other options to pass to fetch (ex: `signal`)
  */
 export const fetchChoroValues = async (options: ChoroValuesOptions, fetchOptions?: FetchOptions) => {
 	const urlPath = [

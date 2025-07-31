@@ -14,7 +14,7 @@ import { ColourType, InteractiveRegionOption } from '@/types/climate-variable-in
 import { getDefaultFrequency } from '@/lib/utils';
 import SectionContext from '@/context/section-provider';
 import { useColorMap } from '@/hooks/use-color-map';
-import { getColour } from '@/lib/colour-scheme.ts';
+import { getColour } from '@/lib/colour-scheme';
 
 interface InteractiveRegionsLayerProps {
 	scenario: string;

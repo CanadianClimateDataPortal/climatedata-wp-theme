@@ -3,16 +3,16 @@ import 'leaflet.sync';
 
 // components
 import MarineMapContainer from '@/components/marine-map-container';
-import WarningRSLCCMIP6 from "@/components/warning-rslc-cmip6";
+import WarningRSLCCMIP6 from '@/components/warning-rslc-cmip6';
 
 // other
 import { cn } from '@/lib/utils';
 import { useMap } from '@/hooks/use-map';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { useMapInteractions } from "@/hooks/use-map-interactions.tsx";
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { useMapInteractions } from '@/hooks/use-map-interactions';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setMessageDisplay } from '@/features/map/map-slice';
-import L from "leaflet";
+import L from 'leaflet';
 
 /**
  * Renders a Leaflet map specifically for marine variables.

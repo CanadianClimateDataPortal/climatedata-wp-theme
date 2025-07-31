@@ -4,27 +4,24 @@ import { useMap } from 'react-leaflet';
 import { useAppSelector } from '@/app/hooks';
 import SectionContext from '@/context/section-provider';
 import { CANADA_BOUNDS, DEFAULT_COLOUR_SCHEMES, GEOSERVER_BASE_URL, OWS_FORMAT } from '@/lib/constants';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
-import {
-	ColourType,
-	InteractiveRegionOption,
-} from "@/types/climate-variable-interface";
-import { VariableLayerProps, WMSParams } from '@/types/types';
-import { useColorMap } from '@/hooks/use-color-map.ts';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { ColourType, InteractiveRegionOption } from '@/types/climate-variable-interface';
+import { WMSParams } from '@/types/types';
+import { useColorMap } from '@/hooks/use-color-map';
+
+type VariableLayerProps = {
+	isComparisonMap?: boolean;
+}
 
 /**
  * Variable layer Component
  *
  * This component displays the variable main layer on the map.
  * It works with both standard and sea level visualization approaches.
- *
- * @param {Object} props
- * @returns {null}
  */
-
-export default function VariableLayer({
-	isComparisonMap = false,
-}: VariableLayerProps): null {
+export default function VariableLayer(
+	{ isComparisonMap = false }: VariableLayerProps
+) {
 	const map = useMap();
 	const {
 		opacity: { mapData },

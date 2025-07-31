@@ -5,13 +5,13 @@ import { __ } from '@/context/locale-provider';
 import { ColourType, LegendConfig } from '@/types/climate-variable-interface';
 import { ColourMap } from '@/types/types';
 import { getUnitName } from '@/lib/utils';
-import { doyFormatter, formatValue } from '@/lib/format.ts';
+import { doyFormatter, formatValue } from '@/lib/format';
 
 const GRADIENT_WIDTH = 22;
 const TICK_WIDTH = 10;
 const MIN_LABEL_SPACING = 30; // Minimum spacing between labels
 
-interface MapLegendControlProps {
+type MapLegendControlProps = {
 	data: ColourMap;
 	isOpen: boolean;
 	toggleOpen: () => void;
@@ -23,23 +23,19 @@ interface MapLegendControlProps {
 	locale?: string;
 }
 
-/**
- * Map legend control component, displays the toggle button to collapse/expand the svg legend element.
- */
 const MapLegendControl: React.FC<MapLegendControlProps> = (
 	{ data, isOpen, toggleOpen, isCategorical, isDelta, unit, legendConfig, colourType, locale = 'en' }
 ) => {
 	const [svgWidth, setSvgWidth] = useState(0);
-	const [legendHeight, setLegendHeight] = useState<number | undefined>(undefined);
+	const [availableHeight, setAvailableHeight] = useState<number | undefined>(undefined);
 	const svgRef = useRef<SVGSVGElement>(null);
 	const isBlocksGradient = isCategorical || colourType === ColourType.DISCRETE;
 	let unitName = getUnitName(unit ?? '');
 	const legendValues = [...data.quantities].reverse();
 	const legendColors = [...data.colours].reverse();
 
-	// We add an extra value and color at the top of the legend, to show a color
-	// exceeding the maximum value. The value won't be shown (hence it's NaN)
 	if (legendConfig?.addTopPadding) {
+		// A label won't be generated for an NaN value.
 		legendValues.unshift(NaN);
 		legendColors.unshift(legendColors[0]);
 	}
@@ -62,10 +58,9 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 		unitName = getUnitName('days');
 	}
 
-	// Calculate dynamic height based on number of labels and minimum spacing
+	// Calculate dynamic height based on the number of labels and minimum spacing
 	const totalLabels = legendValues.length;
-	const GRADIENT_HEIGHT = legendHeight !== undefined ? legendHeight : totalLabels * MIN_LABEL_SPACING;
-	const LEGEND_HEIGHT = GRADIENT_HEIGHT;
+	const legendHeight = availableHeight !== undefined ? availableHeight : totalLabels * MIN_LABEL_SPACING;
 
 	// Position gradient box, label and line horizontally
 	const gradientX = svgWidth - GRADIENT_WIDTH;
@@ -79,9 +74,9 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 	const [itemHeight, setItemHeight] = useState<number>(0);
 
 	useEffect(() => {
-		const currentItemHeight = GRADIENT_HEIGHT / totalLabels;
+		const currentItemHeight = legendHeight / totalLabels;
 		setItemHeight(currentItemHeight);
-	}, [GRADIENT_HEIGHT, totalLabels]);
+	}, [legendHeight, totalLabels]);
 
 	useEffect(() => {
 		if (svgRef.current) {
@@ -94,7 +89,7 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 			if (svgRef.current) {
 				const svgTop = svgRef.current.getBoundingClientRect().y;
 				const available = window.innerHeight - svgTop - 15; // 15px leaflet banner.
-				setLegendHeight(available);
+				setAvailableHeight(available);
 			}
 		}
 		updateLegendHeight();
@@ -124,7 +119,7 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 					<div className="font-sans text-zinc-900 font-semibold text-lg leading-5 text-right">
 						{unitName}
 					</div>
-					<svg ref={svgRef} height={LEGEND_HEIGHT} className="w-full">
+					<svg ref={svgRef} height={legendHeight} className="w-full">
 						{isBlocksGradient ? (
 							<g>
 								{legendColors.map((color, index) => {
@@ -163,7 +158,7 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 
 								<rect
 									width={GRADIENT_WIDTH}
-									height={GRADIENT_HEIGHT}
+									height={legendHeight}
 									fill="url(#temperatureGradient)"
 									x={gradientX}
 								/>

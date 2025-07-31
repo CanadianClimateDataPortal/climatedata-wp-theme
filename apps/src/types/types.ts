@@ -810,13 +810,6 @@ export interface WMSParams {
 	sld_body?: string;
 }
 
-/**
- * Props for the variable layer component.
- */
-export interface VariableLayerProps {
-	isComparisonMap?: boolean;
-}
-
 export interface SelectedLocationInfo {
 	featureId: number;
 	title: string;

@@ -9,7 +9,7 @@ import { useColorMap } from '@/hooks/use-color-map';
 import { ColourType } from '@/types/climate-variable-interface';
 import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
-import { useAppSelector } from '@/app/hooks.ts';
+import { useAppSelector } from '@/app/hooks';
 
 const MapLegend: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -53,10 +53,10 @@ const MapLegend: React.FC = () => {
 					isOpen={isOpen}
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 					isCategorical={isCategorical}
-					colourType={colourType}
-					legendConfig={legendConfig}
-					unit={unit}
 					isDelta={isDelta}
+					colourType={colourType}
+					unit={unit}
+					legendConfig={legendConfig}
 					locale={locale}
 				/>
 			);

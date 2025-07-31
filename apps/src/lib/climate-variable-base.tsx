@@ -17,7 +17,9 @@ import {
 	GridRegion,
 	InteractiveMode,
 	InteractiveRegionConfig,
-	InteractiveRegionOption, LegendConfig, LegendConfigSet,
+	InteractiveRegionOption,
+	LegendConfig,
+	LegendConfigSet,
 	LocationModalContentParams,
 	ScenariosConfig,
 	ThresholdInterface,
@@ -25,8 +27,7 @@ import {
 import RasterMap from '@/components/raster-map';
 import RasterDownloadMap from '@/components/download/raster-download-map';
 import { getDefaultFrequency, getFrequencyCode } from '@/lib/utils';
-import { MapDisplayType } from '@/types/types';
-import { WMSParams } from '@/types/types';
+import { MapDisplayType, WMSParams } from '@/types/types';
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods

@@ -323,10 +323,13 @@ export function findCeilingIndex(values: number[], value: number): number {
 }
 
 /**
- * Equivalent to np.linspace
- * @param a
- * @param b
- * @param n
+ * Generate `n` numbers equally distributed between `a` and `b`, inclusive.
+ *
+ * The first number will be `a` and the last number will be `b`.
+ *
+ * @param a Start of the range, will be the first number.
+ * @param b End of the range, will be the last number.
+ * @param n Number of numbers to generate, including the first and the last.
  */
 export function generateRange(a: number, b: number, n: number): number[] {
 	if (n <= 0) {

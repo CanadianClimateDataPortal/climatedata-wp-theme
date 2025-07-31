@@ -11,7 +11,7 @@ import { ColourMap, ColourSchemeType } from '@/types/types';
 export function useColorMap() {
 	const dispatch = useAppDispatch();
 	const { legendData } = useAppSelector((state) => state.map);
-	const {climateVariable} = useClimateVariable();
+	const { climateVariable } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const colorScheme = climateVariable?.getColourScheme();
 	const scenario = climateVariable?.getScenario();

@@ -104,7 +104,6 @@ export default function MarineMap(): React.ReactElement {
 				onHide={handleHideWarning}
 			/>
 			<MarineMapContainer
-				scenario={climateVariable?.getScenario() ?? ''}
 				onMapReady={handleMapReady}
 				onUnmount={handleUnmount}
 				isComparisonMap={false}
@@ -117,7 +116,6 @@ export default function MarineMap(): React.ReactElement {
 			/>
 			{showComparisonMap && (
 				<MarineMapContainer
-					scenario={climateVariable?.getScenarioCompareTo() ?? ''}
 					onMapReady={handleComparisonMapReady}
 					onUnmount={unsyncMaps}
 					isComparisonMap={true}

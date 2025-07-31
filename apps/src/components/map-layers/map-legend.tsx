@@ -9,6 +9,7 @@ import { useColorMap } from '@/hooks/use-color-map';
 import { ColourType } from '@/types/climate-variable-interface';
 import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
+import { useAppSelector } from '@/app/hooks.ts';
 
 const MapLegend: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -18,10 +19,18 @@ const MapLegend: React.FC = () => {
 	const { climateVariable } = useClimateVariable();
 	const { colorMap } = useColorMap();
 
+	const { legendData } = useAppSelector((state) => state.map);
+	const colourScheme = climateVariable?.getColourScheme();
 	const isDelta = climateVariable?.getDataValue() === 'delta';
 	const unit = climateVariable?.getUnitLegend();
-	const isCategorical = climateVariable?.getColourType() !== ColourType.CONTINUOUS;
 	const legendConfig = climateVariable?.getLegendConfig(isDelta ? MapDisplayType.DELTA : MapDisplayType.ABSOLUTE);
+	let isCategorical = climateVariable?.getColourType() !== ColourType.CONTINUOUS;
+
+	// For the default colour palette, isCategorical defaults to the default legend's type
+	if ((colourScheme === null || colourScheme === 'default') && legendData && legendData.Legend) {
+		const type = legendData.Legend[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap?.type;
+		isCategorical = (type === ColourType.DISCRETE);
+	}
 
 	useEffect(() => {
 		if (!colorMap) {
@@ -29,7 +38,6 @@ const MapLegend: React.FC = () => {
 		}
 
 		const legend = new L.Control({ position: 'topright' });
-
 		const colourType = colorMap.type;
 
 		legend.onAdd = () => {
@@ -65,7 +73,7 @@ const MapLegend: React.FC = () => {
 		return () => {
 			legend.remove();
 		};
-	}, [map, colorMap, isOpen, isCategorical, legendConfig]);
+	}, [map, colorMap, isOpen, isCategorical, legendConfig, isDelta, unit, locale]);
 
 	return null;
 };

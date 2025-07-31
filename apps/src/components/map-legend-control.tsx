@@ -44,18 +44,18 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 		legendColors.unshift(legendColors[0]);
 	}
 
-	if (legendConfig?.hideBottomValue) {
+	if (legendConfig?.hideBottomLabel) {
 		legendValues[legendValues.length - 1] = NaN;
 	}
 
-	if (legendConfig?.hideTopValue) {
+	if (legendConfig?.hideTopLabel) {
 		legendValues[0] = NaN;
 	}
 
 	if (legendConfig?.valuesInKelvin) {
-		legendValues.forEach((value, index) => {
-			legendValues[index] -= 273.15;
-		});
+		for (let i = 0; i < legendValues.length; i++) {
+			legendValues[i] -= 273.15;
+		}
 	}
 
 	if (unit === 'DoY' && isDelta) {
@@ -74,7 +74,7 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 	const lineEndX = gradientX;
 
 	// Used to skip a legend label if it's the same as the previous one
-	let previousValue = NaN;
+	let previousLabel = '';
 
 	const [itemHeight, setItemHeight] = useState<number>(0);
 
@@ -176,21 +176,31 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 								return;
 							}
 
-							if (value === previousValue) {
-								return;
-							}
-							previousValue = value;
+							let label = '';
 
-							let label;
-
-							if (unit === 'DoY' && !isDelta) {
+							if (legendConfig?.labels && legendConfig?.labels[index]) {
+								// The values' list was reversed, so we have to take the reverse of the custom labels
+								const customLabel = legendConfig.labels[legendValues.length - 1 - index];
+								if (customLabel != undefined) {
+									label = __(customLabel);
+								}
+							} else if (unit === 'DoY' && !isDelta) {
 								label = doyFormatter(value, locale, 'short');
 							} else {
 								const decimals = legendConfig?.decimals ?? 0;
 								label = formatValue(value, undefined, decimals, locale, isDelta);
 							}
 
-							const labelY = index * itemHeight;
+							if (label === previousLabel) {
+								return;
+							}
+							previousLabel = label;
+
+							let labelY = index * itemHeight;
+
+							if (legendConfig?.centerLabels) {
+								labelY += itemHeight / 2;
+							}
 
 							return (
 								<g key={index}>

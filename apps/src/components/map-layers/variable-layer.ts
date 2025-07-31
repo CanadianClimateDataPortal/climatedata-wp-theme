@@ -19,12 +19,10 @@ import { useColorMap } from '@/hooks/use-color-map.ts';
  * It works with both standard and sea level visualization approaches.
  *
  * @param {Object} props
- * @param {string} props.scenario - The scenario to use for the layer
  * @returns {null}
  */
 
 export default function VariableLayer({
-	scenario,
 	isComparisonMap = false,
 }: VariableLayerProps): null {
 	const map = useMap();
@@ -34,7 +32,9 @@ export default function VariableLayer({
 
 	const { climateVariable } = useClimateVariable();
 	const { colorMap } = useColorMap();
-	const transformedLegendEntry = useAppSelector((state) => state.map.transformedLegendEntry);
+	const scenario = isComparisonMap ?
+		(climateVariable?.getScenarioCompareTo() ?? '') :
+		(climateVariable?.getScenario() ?? '');
 
 	const section = useContext(SectionContext);
 
@@ -63,7 +63,6 @@ export default function VariableLayer({
 			datasetVersion: climateVariable?.getVersion(),
 			layerStyles: climateVariable?.getLayerStyles(),
 			interactiveRegion: climateVariable?.getInteractiveRegion(),
-			layerValue: layerValue
 		};
 	}, [climateVariable]);
 
@@ -96,22 +95,25 @@ export default function VariableLayer({
 
 		return sldBody;
 	}, [
+		colorMap,
 		colourMapType,
 		hasCustomColorScheme,
 		layerValue,
-		isComparisonMap,
-		climateVariable,
-		transformedLegendEntry,
-	])
+	]);
 
 	useEffect(() => {
+		// Until we have loaded legend data, we don't show the layer
+		if (hasCustomColorScheme && !colorMap) {
+			return;
+		}
+
 		if (layerRef.current) {
 			map.removeLayer(layerRef.current);
 		}
 
 		const sld = generateSLD();
 
-		const params: WMSParams = {
+		let params: WMSParams = {
 			format: OWS_FORMAT,
 			transparent: true,
 			tiled: true,
@@ -121,17 +123,15 @@ export default function VariableLayer({
 			opacity: 1,
 			pane: pane,
 			bounds: CANADA_BOUNDS,
+			TIME: parseInt(startYear) + '-01-00T00:00:00Z',
 		};
-
-		// TODO: this should be moved to the climate variable config, this "enhanced scenario"
-		//  also has custom logic in time-periods-control-for-sea-level.tsx for the slider
-		const excludeTimeParam = scenario === 'rcp85plus65-p50';
-		if (!excludeTimeParam) {
-			params.TIME = parseInt(startYear) + '-01-00T00:00:00Z';
-		}
 
 		if (sld) {
 			params.sld_body = sld;
+		}
+
+		if (climateVariable?.updateMapWMSParams) {
+			params = climateVariable.updateMapWMSParams(params, !!isComparisonMap);
 		}
 
 		// Create a new layer to override the previous one so changes on the layer can be seen on the map.
@@ -145,6 +145,8 @@ export default function VariableLayer({
 			layerRef.current = newLayer;
 		}
 	}, [
+		hasCustomColorScheme,
+		colorMap,
 		datasetVersion,
 		generateSLD,
 		interactiveRegion,
@@ -153,6 +155,9 @@ export default function VariableLayer({
 		map,
 		pane,
 		startYear,
+		climateVariable,
+		isComparisonMap,
+		mapData,
 	]);
 
 	useEffect(() => {

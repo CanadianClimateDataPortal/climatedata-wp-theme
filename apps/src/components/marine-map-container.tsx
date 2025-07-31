@@ -1,6 +1,6 @@
-import React, { useContext, useMemo, useState, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, WMSTileLayer } from 'react-leaflet';
-import { MAP_CONFIG, LAYER_KEYS, WMS_PARAMS } from '@/config/map.config';
+import { LAYER_KEYS, MAP_CONFIG, WMS_PARAMS } from '@/config/map.config';
 import 'leaflet.vectorgrid';
 import L from 'leaflet';
 
@@ -19,19 +19,13 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { generateChartData } from '@/services/services';
-import { cn, getDefaultFrequency, remToPx } from "@/lib/utils";
-import SectionContext from "@/context/section-provider";
-import appConfig from "@/config/app.config";
-import {
-	DEFAULT_MIN_ZOOM,
-	DEFAULT_MAX_ZOOM,
-	GEOSERVER_BASE_URL,
-	CANADA_BOUNDS,
-	SIDEBAR_WIDTH,
-} from '@/lib/constants';
+import { cn, getDefaultFrequency, remToPx } from '@/lib/utils';
+import SectionContext from '@/context/section-provider';
+import appConfig from '@/config/app.config';
+import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM, GEOSERVER_BASE_URL, SIDEBAR_WIDTH } from '@/lib/constants';
 import { LocationModalContent } from '@/components/map-layers/location-modal-content';
 import { SelectedLocationInfo } from '@/types/types';
-import { InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 
 /**
  * Renders a Leaflet map for marine variables with a specialized approach:
@@ -42,7 +36,6 @@ import { InteractiveRegionOption } from "@/types/climate-variable-interface";
  * 5. Labels layer on top
  */
 export default function MarineMapContainer({
-	scenario,
 	onMapReady,
 	onUnmount,
 	isComparisonMap = false,
@@ -53,7 +46,6 @@ export default function MarineMapContainer({
 	clearSelectedLocation,
 	layerRef,
 }: {
-	scenario: string;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 	isComparisonMap?: boolean;
@@ -66,7 +58,6 @@ export default function MarineMapContainer({
 }) {
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
 
-
 	const {
 		opacity: { labels: labelsOpacity },
 		mapCoordinates
@@ -77,16 +68,11 @@ export default function MarineMapContainer({
 	const isMobile = useIsMobile();
 
 	const section = useContext(SectionContext);
+	const scenario = isComparisonMap ?
+		(climateVariable?.getScenarioCompareTo() ?? '') :
+		(climateVariable?.getScenario() ?? '');
 
 	const scenarioLabel = appConfig.scenarios.find(item => item.value === scenario)?.label ?? scenario;
-
-	const layerValue = useMemo(() => {
-		return climateVariable?.getLayerValue(scenario, section) ?? '';
-	}, [climateVariable, scenario, section]);
-
-	// const handleLocationModalOpen = (content: React.ReactNode) => {
-	// 	setLocationModalContent(content);
-	// };
 
 	const handleLocationModalClose = () => {
 		clearSelectedLocation();
@@ -154,7 +140,7 @@ export default function MarineMapContainer({
 		else {
 			setLocationModalContent(null);
 		}
-	}, [selectedLocation, setLocationModalContent, scenario]);
+	}, [selectedLocation, setLocationModalContent, scenario, handleDetailsClick]);
 
 	useEffect(() => {
 		if (mapRef.current) {
@@ -183,21 +169,14 @@ export default function MarineMapContainer({
 				onUnmount={onUnmount}
 			/>
 			{climateVariable?.getInteractiveMode() === 'region' && (
-				<MapLegend 
-					url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`}
-					isComparisonMap={isComparisonMap}
-				/>
+				<MapLegend />
 			)}
 
 			{/* Use the unified custom panes with 'marine' mode */}
 			<CustomPanesLayer mode="marine" />
 
 			{/* Use the unified variable layer */}
-			<VariableLayer 
-				layerValue={layerValue}
-				scenario={scenario}
-				isComparisonMap={isComparisonMap}
-			/>
+			<VariableLayer isComparisonMap={isComparisonMap} />
 
 			<ZoomControl />
 

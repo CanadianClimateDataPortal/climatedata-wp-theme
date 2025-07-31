@@ -26,6 +26,7 @@ import RasterMap from '@/components/raster-map';
 import RasterDownloadMap from '@/components/download/raster-download-map';
 import { getDefaultFrequency, getFrequencyCode } from '@/lib/utils';
 import { MapDisplayType } from '@/types/types';
+import { WMSParams } from '@/types/types';
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -434,6 +435,23 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getStationTypeFilter(): string[] {
 		return this._config.stationTypeFilter ?? ['T', 'P', 'B'];
+	}
+
+	/**
+	 * Update the WMS parameters of the data layer.
+	 *
+	 * Can be used to update, add, or delete parameters specifically for this variable.
+	 *
+	 * By default, simply returns the parameters unchanged.
+	 *
+	 * @param params WMS parameters used for the data layer request
+	 * @param isComparisonMap If true, the parameters will be used to render the comparison map
+	 * @return Updated WMS parameters
+	 */
+	// @ts-expect-error The `isComparisonMap` is not used here, but it's used in implementations
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	updateMapWMSParams(params: WMSParams, isComparisonMap: boolean): WMSParams {
+		return params;
 	}
 }
 

@@ -16,29 +16,22 @@ import LocationModal from '@/components/map-layers/location-modal';
 import LocationInfoPanel from '@/components/map-info/location-info-panel';
 
 import { useAppSelector } from '@/app/hooks';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { generateChartData } from '@/services/services';
-import { cn, getDefaultFrequency, remToPx } from "@/lib/utils";
-import SectionContext from "@/context/section-provider";
-import appConfig from "@/config/app.config";
-import {
-	CANADA_BOUNDS,
-	DEFAULT_MAX_ZOOM,
-	DEFAULT_MIN_ZOOM,
-	GEOSERVER_BASE_URL,
-	SIDEBAR_WIDTH,
-} from '@/lib/constants';
+import { cn, getDefaultFrequency, remToPx } from '@/lib/utils';
+import SectionContext from '@/context/section-provider';
+import appConfig from '@/config/app.config';
+import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM, SIDEBAR_WIDTH } from '@/lib/constants';
 import { LocationModalContent } from '@/components/map-layers/location-modal-content';
 import { SelectedLocationInfo, Station } from '@/types/types';
-import { InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
 export default function RasterMapContainer({
-	scenario,
 	onMapReady,
 	onUnmount,
 	isComparisonMap = false,
@@ -49,7 +42,6 @@ export default function RasterMapContainer({
 	clearSelectedLocation,
 	layerRef,
 }: {
-	scenario: string;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 	isComparisonMap?: boolean;
@@ -73,12 +65,11 @@ export default function RasterMapContainer({
 	const isMobile = useIsMobile();
 
 	const section = useContext(SectionContext);
+	const scenario = isComparisonMap ?
+		(climateVariable?.getScenarioCompareTo() ?? '') :
+		(climateVariable?.getScenario() ?? '');
 
 	const scenarioLabel = appConfig.scenarios.find(item => item.value === scenario)?.label ?? scenario;
-
-	const layerValue = useMemo(() => {
-		return climateVariable?.getLayerValue(scenario, section) ?? '';
-	}, [climateVariable, scenario, section]);
 
 	const handleLocationModalOpen = (content: React.ReactNode) => {
 		setLocationModalContent(content);
@@ -170,7 +161,7 @@ export default function RasterMapContainer({
 		else if(!selectedStation) {
 			setLocationModalContent(null);
 		}
-	}, [selectedLocation, setLocationModalContent, scenario, canShowModal]);
+	}, [selectedLocation, setLocationModalContent, scenario, canShowModal, selectedStation, selectedLocation]);
 
 	useEffect(() => {
 		if (mapRef.current) {
@@ -199,14 +190,14 @@ export default function RasterMapContainer({
 				onUnmount={onUnmount}
 			/>
 			{climateVariable?.getInteractiveMode() === 'region' && (
-				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
+				<MapLegend />
 			)}
 
 			{/* Use the unified CustomPanesLayer with 'standard' mode */}
 			<CustomPanesLayer mode="standard" />
 
 			{/* Use the unified VariableLayer */}
-			<VariableLayer layerValue={layerValue} scenario={scenario} />
+			<VariableLayer isComparisonMap={isComparisonMap} />
 
 			<ZoomControl />
 

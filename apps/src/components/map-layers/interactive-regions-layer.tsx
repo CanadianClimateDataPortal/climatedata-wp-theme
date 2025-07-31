@@ -164,7 +164,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		datasetVersion,
 		frequency,
 		interactiveRegion,
-		scenario ?? '',
+		scenario,
 		startYear,
 		threshold,
 		isDelta7100,
@@ -245,13 +245,15 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		onOver,
 		onOut,
 		layerRef,
+		getFeatureColor,
+		mapData,
 	]);
 
 	useEffect(() => {
 		if (layerRef?.current) {
 			layerRef.current.setOpacity(mapData);
 		}
-	}, [mapData]);
+	}, [mapData, layerRef]);
 
 	return null;
 };

@@ -1,5 +1,6 @@
 import React from "react";
 import { MapDisplayType, MultilingualField } from './types';
+import { WMSParams } from '@/types/types';
 
 export interface variableClassMap {
 	[key: string]: string;
@@ -10,16 +11,28 @@ export interface ScenariosConfig {
 }
 
 export type LegendConfigSet = {
-	[key: MapDisplayType]: LegendConfig;
+	[K in MapDisplayType]?: LegendConfig;
 };
 
 export type LegendConfig = {
-	unit?: string;
+	// If specified, overwrites the number of decimals for numerical values
 	decimals?: number;
+	// If true, "padding" will be added to the top of the legend, pushing the top label down. The "padding" space
+	// will have the same colour as the top label. Generally the inverse of `hideTopLabel`.
 	addTopPadding?: boolean;
-	hideTopValue?: boolean;
-	hideBottomValue?: boolean;
+	// If true, the top label will be hidden. Generally used when the top value is a big number to make sure the
+	// GeoServer correctly renders colours for values higher than the maximum. Generally the inverse of `addTopPadding`.
+	hideTopLabel?: boolean;
+	// If true, the bottom label will be hidden. Generally used when the bottom value is something like 0.00001 to
+	// prevent some issues on the GeoServer
+	hideBottomLabel?: boolean;
+	// If true, values will be converted from Kelvin to Celsius before being used as labels
 	valuesInKelvin?: boolean;
+	// Overwrite the label values. Must be the same size as the number of default labels
+	labels?: string[];
+	// If true, labels will be pushed down to be aligned with the middle of the colour block instead of being shown
+	// at the top. Note that it's used in both discrete and continuous mode.
+	centerLabels?: boolean;
 };
 
 export interface ThresholdInterface {
@@ -501,4 +514,6 @@ export interface ClimateVariableInterface {
 	getLocationModalContent({latlng, featureId, mode}: LocationModalContentParams): React.ReactNode | null;
 
 	getStationTypeFilter(): string[];
+
+	updateMapWMSParams(params: WMSParams, isComparisonMap: boolean): WMSParams;
 }

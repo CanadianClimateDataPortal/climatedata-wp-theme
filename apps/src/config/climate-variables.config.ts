@@ -127,7 +127,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				valuesInKelvin: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -145,7 +145,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				valuesInKelvin: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -159,10 +159,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 			},
 		},
 	},
@@ -175,10 +175,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -194,7 +194,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				addTopPadding: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 			},
 		},
 	},
@@ -207,10 +207,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -228,7 +228,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				addTopPadding: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -245,10 +245,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -267,7 +267,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				addTopPadding: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -285,10 +285,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 			},
 		},
 		frequencyConfig: {
@@ -305,7 +305,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				addTopPadding: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -323,10 +323,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -349,7 +349,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				valuesInKelvin: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -379,10 +379,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 			},
 		},
 		thresholds: [
@@ -441,6 +441,12 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		layerStyles: "CDC:building_climate_zones",
 		unit: "degree_days",
 		unitLegend: "zone",
+		legendConfigs: {
+			[MapDisplayType.ABSOLUTE]: {
+				labels: ['4', '5', '6', '7A', '7B', '8'],
+				centerLabels: true,
+			},
+		},
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
@@ -476,7 +482,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				valuesInKelvin: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -502,7 +508,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				valuesInKelvin: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -578,10 +584,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -677,10 +683,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -722,10 +728,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE] : {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA] : {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -829,10 +835,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -960,10 +966,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -1171,7 +1177,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				addTopPadding: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 			},
 		},
 		frequencyConfig: {
@@ -1222,7 +1228,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				addTopPadding: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -1289,10 +1295,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
-				hideBottomValue: true,
+				hideBottomLabel: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -1351,7 +1357,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				addTopPadding: true,
 			},
 			[MapDisplayType.DELTA]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 				decimals: 1,
 			},
 		},
@@ -1417,7 +1423,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
-				hideTopValue: true,
+				hideTopLabel: true,
 			},
 		},
 		frequencyConfig: {

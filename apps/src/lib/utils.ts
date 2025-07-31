@@ -1,13 +1,8 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
-import {
-	FrequencyConfig,
-	FrequencyDisplayModeOption,
-	FrequencyType,
-	InteractiveRegionOption,
-} from '@/types/climate-variable-interface';
-import { __ } from "@/context/locale-provider";
+import { FrequencyConfig, FrequencyDisplayModeOption, FrequencyType } from '@/types/climate-variable-interface';
+import { __ } from '@/context/locale-provider';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));

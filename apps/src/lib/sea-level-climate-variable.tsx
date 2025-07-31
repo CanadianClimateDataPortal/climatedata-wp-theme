@@ -1,6 +1,7 @@
 import MarineClimateVariable from "@/lib/marine-climate-variable";
 import { DateRangeConfig, LocationModalContentParams, ColourType } from "@/types/climate-variable-interface";
 import MedianOnlyVariableValues from "@/components/map-layers/median-only-variable-values";
+import { WMSParams } from '@/types/types.ts';
 
 class SeaLevelClimateVariable extends MarineClimateVariable {
 	getGridType(): string | null {
@@ -31,6 +32,37 @@ class SeaLevelClimateVariable extends MarineClimateVariable {
 
 	getColourType(): string | null {
 		return ColourType.DISCRETE;
+	}
+
+	/**
+	 * Update the data layer parameters of the map.
+	 *
+	 * For CMIP5, if we are in the comparison map, the layer style must be adjusted to use the
+	 * same colour map as the left map. Also, the "enhanced" scenario has no time attribute.
+	 */
+	updateMapWMSParams(params: WMSParams, isComparisonMap: boolean): WMSParams {
+		const updatedParams = { ...params };
+		const version = this.getVersion();
+		const scenario = isComparisonMap ?
+			(this.getScenarioCompareTo() ?? '') :
+			(this.getScenario() ?? '');
+
+		if (version === "cmip5") {
+
+			// There is no TIME attribute for the enhanced scenario
+			if (scenario === 'rcp85plus65-p50') {
+				delete updatedParams.TIME;
+			}
+
+			// For the comparison map, we force a layer style to have the same colours
+			// as the left map
+			if (isComparisonMap) {
+				const leftMapScenario = this.getScenario();
+				updatedParams.styles = `slr-${leftMapScenario}`;
+			}
+		}
+
+		return updatedParams;
 	}
 }
 

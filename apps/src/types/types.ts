@@ -812,3 +812,7 @@ export interface SelectedLocationInfo {
 	title: string;
 	latlng: L.LatLng;
 }
+
+export interface FetchOptions {
+	signal?: AbortSignal;
+}

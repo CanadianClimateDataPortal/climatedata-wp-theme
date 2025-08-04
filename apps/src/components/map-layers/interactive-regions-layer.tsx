@@ -8,17 +8,13 @@ import 'leaflet.vectorgrid';
 
 import { useAppSelector } from '@/app/hooks';
 import { fetchChoroValues } from '@/services/services';
-import {
-	CANADA_BOUNDS,
-	DEFAULT_MAX_ZOOM,
-	DEFAULT_MIN_ZOOM,
-	GEOSERVER_BASE_URL,
-} from '@/lib/constants';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { InteractiveRegionOption } from "@/types/climate-variable-interface";
-import { getDefaultFrequency } from "@/lib/utils";
-import SectionContext from "@/context/section-provider";
+import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM, GEOSERVER_BASE_URL } from '@/lib/constants';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { ColourType, InteractiveRegionOption } from '@/types/climate-variable-interface';
+import { getDefaultFrequency } from '@/lib/utils';
+import SectionContext from '@/context/section-provider';
 import { useColorMap } from '@/hooks/use-color-map';
+import { getColour } from '@/lib/colour-scheme';
 
 interface InteractiveRegionsLayerProps {
 	scenario: string;
@@ -44,7 +40,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
-	const { colorMap, getColor } = useColorMap();
+	const { colorMap } = useColorMap();
 
 	const {
 		threshold,
@@ -53,6 +49,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		interactiveRegion,
 		startYear,
 		isDelta7100,
+		isCategorical,
 	} = useMemo(() => ({
 		threshold: climateVariable?.getThreshold() ?? '',
 		datasetVersion: climateVariable?.getVersion() ?? '',
@@ -60,11 +57,12 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		interactiveRegion: climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA,
 		startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
 		isDelta7100: climateVariable?.getDataValue() === 'delta',
+		isCategorical: climateVariable?.getColourType() !== ColourType.CONTINUOUS,
 	}), [climateVariable]);
 
 	const getFeatureColor = useCallback(
 		(featureId: number) => {
-			if (!colorMap || !colorMap.quantities || !colorMap.colours) {
+			if (!colorMap) {
 				return '#fff';
 			}
 
@@ -74,9 +72,9 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 					? featureId
 					: (layerData?.[featureId] ?? 0);
 
-			return getColor(value);
+			return getColour(value, colorMap, isCategorical);
 		},
-		[interactiveRegion, layerData, colorMap, getColor]
+		[interactiveRegion, layerData, colorMap, isCategorical]
 	);
 
 	const frequency = useMemo(() => {
@@ -166,7 +164,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		datasetVersion,
 		frequency,
 		interactiveRegion,
-		scenario ?? '',
+		scenario,
 		startYear,
 		threshold,
 		isDelta7100,
@@ -219,17 +217,6 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 
 		layer.addTo(map);
 
-		// TODO: this was moved to the RasterMap component, but not sure if we should also clearLocations?
-		// // clear all existing markers from the map
-		// map.eachLayer(layer => {
-		// 	if (layer instanceof L.Marker) {
-		// 		map.removeLayer(layer);
-		// 	}
-		// });
-		//
-		// // clear recent locations
-		// dispatch(clearRecentLocations());
-
 		return () => {
 			map.removeLayer(layer);
 
@@ -247,15 +234,17 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		onOver,
 		onOut,
 		layerRef,
-		colorMap,
-		getColor
+		getFeatureColor,
+		// Even though `mapData` (data opacity) is used in this useEffect, we don't want
+		// to put it as a dependency here since any change to the data opacity by the user
+		// will regenerate the layer. The useEffect below takes care of managing the opacity.
 	]);
 
 	useEffect(() => {
 		if (layerRef?.current) {
 			layerRef.current.setOpacity(mapData);
 		}
-	}, [mapData]);
+	}, [mapData, layerRef]);
 
 	return null;
 };

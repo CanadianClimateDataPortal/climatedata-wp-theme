@@ -86,7 +86,6 @@ export default function RasterMap(): React.ReactElement {
 			)}
 		>
 			<RasterMapContainer
-				scenario={climateVariable?.getScenario() ?? ''}
 				onMapReady={handleMapReady}
 				onUnmount={handleUnmount}
 				isComparisonMap={false}
@@ -99,7 +98,6 @@ export default function RasterMap(): React.ReactElement {
 			/>
 			{showComparisonMap && (
 				<RasterMapContainer
-					scenario={climateVariable?.getScenarioCompareTo() ?? ''}
 					onMapReady={handleComparisonMapReady}
 					onUnmount={unsyncMaps}
 					isComparisonMap={true}

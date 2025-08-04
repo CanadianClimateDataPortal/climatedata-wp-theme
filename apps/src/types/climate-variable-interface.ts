@@ -1,5 +1,6 @@
-import React from "react";
-import { MultilingualField } from "./types";
+import React from 'react';
+import { MapDisplayType, MultilingualField } from './types';
+import { WMSParams } from '@/types/types';
 
 export interface variableClassMap {
 	[key: string]: string;
@@ -8,6 +9,31 @@ export interface variableClassMap {
 export interface ScenariosConfig {
 	[key: string]: string[];
 }
+
+export type LegendConfigSet = {
+	[K in MapDisplayType]?: LegendConfig;
+};
+
+export type LegendConfig = {
+	// If specified, overwrites the number of decimals for numerical values.
+	decimals?: number;
+	// If true, "padding" will be added to the top of the legend, pushing the top label down. The "padding" space
+	// will have the same colour as the top label. Generally the inverse of `hideTopLabel`.
+	addTopPadding?: boolean;
+	// If true, the top label will be hidden. Generally used when the top value is a quantity used in the GeoServer
+	// style that we don't want to show in the legend. Generally the inverse of `addTopPadding`.
+	hideTopLabel?: boolean;
+	// If true, the bottom label will be hidden. Generally used when the bottom value is a quantity used in the
+	// GeoServer style that we don't want to show in the legend.
+	hideBottomLabel?: boolean;
+	// If true, values will be converted from Kelvin to Celsius before being used as labels.
+	valuesInKelvin?: boolean;
+	// Overwrite the label values. Must be the same size as the number of default labels.
+	labels?: string[];
+	// If true, labels will be pushed down to be aligned with the middle of the colour block instead of being shown
+	// at the top of their corresponding block. Note that it's used in both discrete and continuous mode.
+	centerLabels?: boolean;
+};
 
 export interface ThresholdInterface {
 	value: string;
@@ -105,36 +131,6 @@ export enum ColourType {
 	DISCRETE = "intervals",
 }
 
-export interface ColorMap {
-	colours: string[];
-	quantities: number[];
-	schemeType: ColourType;
-}
-
-export interface TemporalRange {
-	low: number;
-	high: number;
-}
-
-export interface TemporalScaleConfig {
-	absolute: TemporalRange;
-	delta: TemporalRange;
-	unit: string;
-}
-
-export interface TemporalScales {
-	[key: string]: TemporalScaleConfig;
-}
-
-export interface TemporalThresholds {
-	[key: string]: TemporalScales;
-}
-
-export interface TemporalThresholdConfig {
-	thresholds: TemporalThresholds;
-	decimals?: number;
-}
-
 export interface CustomColourSchemeColour {
 	label: string;
 	colour: string;
@@ -187,6 +183,16 @@ export interface LocationModalContentParams {
 	featureId: number,
 	scenario?: string,
 	mode?: "modal" | "panel"
+}
+
+export enum FrequencyType {
+	YS = "ys",
+	MS = "ms",
+	QSDEC = "qsdec",
+}
+
+export type PreCalculatedCanDCSConfig = {
+	[key: string]: FrequencyType[],
 }
 
 export interface ClimateVariableConfigInterface {
@@ -247,6 +253,9 @@ export interface ClimateVariableConfigInterface {
 	/** Unit legend */
 	unitLegend?: string;
 
+	/** Legend display configuration */
+	legendConfigs?: LegendConfigSet;
+
 	/** InteractiveMode */
 	interactiveMode?: InteractiveMode;
 
@@ -282,9 +291,6 @@ export interface ClimateVariableConfigInterface {
 
 	/** The type of colour map selected (e.g. continuous, discrete) */
 	colourType?: string;
-
-	/** Defines data ranges and units for different temporal scales (e.g. ys, ms, etc) */
-	temporalThresholdConfig?: TemporalThresholdConfig;
 
 	/** An array of FieldConfigs used in the Download section */
 	analysisFields?: FieldConfig[];
@@ -368,6 +374,14 @@ export interface ClimateVariableConfigInterface {
 	/** For AHCCD stations, if this variable should be shown for stations with
 	 * "precipitation" ('P') or "temperature" ('T') data. */
 	stationTypeFilter?: string[];
+
+	/**
+	 * Configuration if the variable is available as a pre-calculated CanDCS variable.
+	 *
+	 * It's a dictionary where the key is the pre-calculated variable ids, and the
+	 * value is an array of the frequencies available (valid values are "ys", "ms" and "qsdec").
+	 */
+	preCalculatedCanDCSConfig?: PreCalculatedCanDCSConfig;
 }
 
 /**
@@ -415,6 +429,10 @@ export interface ClimateVariableInterface {
 
 	getUnitLegend(): string;
 
+	getLegendConfigs(): LegendConfigSet;
+
+	getLegendConfig(type: MapDisplayType): LegendConfig | null;
+
 	getInteractiveMode(): InteractiveMode;
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null;
@@ -438,10 +456,6 @@ export interface ClimateVariableInterface {
 	getColourOptionsStatus(): boolean;
 
 	getColourType(): string | null;
-
-	getTemporalThresholdConfig(): TemporalThresholdConfig | null;
-
-	getCurrentTemporalRange(): TemporalRange | null;
 
 	getAnalysisFields(): FieldConfig[];
 
@@ -518,4 +532,6 @@ export interface ClimateVariableInterface {
 	getLocationModalContent({latlng, featureId, mode}: LocationModalContentParams): React.ReactNode | null;
 
 	getStationTypeFilter(): string[];
+
+	updateMapWMSParams(params: WMSParams, isComparisonMap: boolean): WMSParams;
 }

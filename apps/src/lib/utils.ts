@@ -1,13 +1,8 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
-import {
-	FrequencyConfig,
-	FrequencyDisplayModeOption,
-	FrequencyType,
-	InteractiveRegionOption,
-} from '@/types/climate-variable-interface';
-import { __ } from "@/context/locale-provider";
+import { FrequencyConfig, FrequencyDisplayModeOption, FrequencyType } from '@/types/climate-variable-interface';
+import { __ } from '@/context/locale-provider';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -61,15 +56,15 @@ export const splitTextByMatch = (
 	return result.filter((part) => part.text.length > 0);
 };
 
-export const getFrequencyCode = (frequency: string) => {
-	let frequencyCode = '';
+export const getFrequencyType = (frequency: string): FrequencyType | undefined =>  {
+	let frequencyCode;
 
 	if (frequency === 'ann') {
-		frequencyCode = 'ys';
+		frequencyCode = FrequencyType.YS;
 	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
-		frequencyCode = 'ms';
+		frequencyCode = FrequencyType.MS;
 	} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
-		frequencyCode = 'qsdec';
+		frequencyCode = FrequencyType.QSDEC;
 	}
 
 	return frequencyCode;
@@ -255,29 +250,6 @@ export const getFeatureId = (properties: {
 };
 
 /**
- * Returns the color for a given feature based on the interactive region and color map.
- */
-export function getFeatureColor(
-	featureId: number,
-	interactiveRegion: string,
-	layerData: Record<number, number> | null,
-	colorMap: { quantities: number[]; colours: string[] } | null,
-	getColor: (value: number) => string
-): string {
-	if (!colorMap || !colorMap.quantities || !colorMap.colours) {
-		return '#fff';
-	}
-
-	// Extract value based on interactive region type
-	const value =
-		interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
-			? featureId
-			: (layerData?.[featureId] ?? 0);
-
-	return getColor(value);
-}
-
-/**
  * Return the translated display name for a unit from its technical code.
  * 
  * To be used when displaying only the unit's name, not a value followed by a
@@ -348,4 +320,34 @@ export function findCeilingIndex(values: number[], value: number): number {
 	}
 
 	return left < values.length ? left : -1;
+}
+
+/**
+ * Generate `n` numbers equally distributed between `a` and `b`, inclusive.
+ *
+ * The first number will be `a` and the last number will be `b`.
+ *
+ * @param a Start of the range, will be the first number.
+ * @param b End of the range, will be the last number.
+ * @param n Number of numbers to generate, including the first and the last.
+ */
+export function generateRange(a: number, b: number, n: number): number[] {
+	if (n <= 0) {
+		return [];
+	}
+
+	if (n === 1) {
+		return [a];
+	}
+
+	const step = (b - a) / (n - 1);
+	const result: number[] = [];
+
+	for (let i = 0; i < n; i++) {
+		result.push(a + i * step);
+	}
+
+	result[result.length - 1] = b;
+
+	return result;
 }

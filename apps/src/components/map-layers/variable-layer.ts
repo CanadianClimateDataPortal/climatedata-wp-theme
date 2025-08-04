@@ -3,37 +3,58 @@ import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 import { useAppSelector } from '@/app/hooks';
 import SectionContext from '@/context/section-provider';
-import { CANADA_BOUNDS, GEOSERVER_BASE_URL, OWS_FORMAT } from '@/lib/constants';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
-import {
-	ColourType,
-	InteractiveRegionOption,
-} from "@/types/climate-variable-interface";
-import { generateColourScheme } from "@/lib/colour-scheme";
-import { VariableLayerProps, WMSParams } from '@/types/types';
+import { CANADA_BOUNDS, DEFAULT_COLOUR_SCHEMES, GEOSERVER_BASE_URL, OWS_FORMAT } from '@/lib/constants';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { ColourType, InteractiveRegionOption } from '@/types/climate-variable-interface';
+import { WMSParams } from '@/types/types';
+import { useColorMap } from '@/hooks/use-color-map';
+
+type VariableLayerProps = {
+	isComparisonMap?: boolean;
+}
+
+/**
+ * Make sure that the highest quantity is a big enough number.
+ *
+ * The highest quantity must be big enough to cover values that could exceed
+ * the normally highest value in the legend. If not, holes could appear on the
+ * map.
+ *
+ * This function ensures that the last quantity is a "really large" value
+ * compared to the previous one. If not, the last quantity is made much higher.
+ *
+ * @param quantities An ordered list of quantities.
+ */
+function ensureHighQuantitiesCovered(quantities: number[]) {
+	const lastIndex = quantities.length - 1;
+	const lastDiff = quantities[lastIndex] - quantities[lastIndex - 1];
+	const secondLastDiff = quantities[lastIndex - 1] - quantities[lastIndex - 2];
+	const minDiffRatio = 100;
+
+	if (lastDiff / secondLastDiff < minDiffRatio) {
+		quantities[lastIndex] += lastDiff * minDiffRatio;
+	}
+}
 
 /**
  * Variable layer Component
  *
  * This component displays the variable main layer on the map.
  * It works with both standard and sea level visualization approaches.
- *
- * @param {Object} props
- * @param {string} props.scenario - The scenario to use for the layer
- * @returns {null}
  */
-
-export default function VariableLayer({
-	scenario,
-	isComparisonMap = false,
-}: VariableLayerProps): null {
+export default function VariableLayer(
+	{ isComparisonMap = false }: VariableLayerProps
+) {
 	const map = useMap();
 	const {
 		opacity: { mapData },
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
-	const transformedLegendEntry = useAppSelector((state) => state.map.transformedLegendEntry);
+	const { colorMap } = useColorMap();
+	const scenario = isComparisonMap ?
+		(climateVariable?.getScenarioCompareTo() ?? '') :
+		(climateVariable?.getScenario() ?? '');
 
 	const section = useContext(SectionContext);
 
@@ -47,20 +68,21 @@ export default function VariableLayer({
 
 	const {
 		startYear,
-		colourScheme,
+		hasCustomColorScheme,
 		colourMapType,
 		datasetVersion,
 		layerStyles,
 		interactiveRegion,
 	} = useMemo(() => {
+		const colourScheme = climateVariable?.getColourScheme();
+
 		return {
 			startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
-			colourScheme: climateVariable ? generateColourScheme(climateVariable) : undefined,
+			hasCustomColorScheme: colourScheme && colourScheme in DEFAULT_COLOUR_SCHEMES,
 			colourMapType: climateVariable?.getColourType() ?? ColourType.CONTINUOUS,
 			datasetVersion: climateVariable?.getVersion(),
 			layerStyles: climateVariable?.getLayerStyles(),
 			interactiveRegion: climateVariable?.getInteractiveRegion(),
-			layerValue: layerValue
 		};
 	}, [climateVariable]);
 
@@ -71,27 +93,14 @@ export default function VariableLayer({
 	 * ramp quantities, and layer value.
 	 */
 	const generateSLD = useCallback(() => {
-		let colours, quantities;
-
-		if(isComparisonMap && climateVariable?.getId() === "sea_level" && transformedLegendEntry.length > 0) {
-			// If it's the sea level comparison map -> we override colors to match legend
-
-			colours = transformedLegendEntry.map((entry) => entry.color).reverse() ?? [];
-      quantities = transformedLegendEntry.map((entry) => Number(entry.quantity)).reverse() ?? [];
-		} else {
-			// Else (if we have a selected custom palette)
-
-			if (!colourScheme) {
-				return;
-			}
-
-			colours = colourScheme.colours;
-			quantities = colourScheme.quantities;
+		if (!colorMap || !hasCustomColorScheme) {
+			return;
 		}
 
-		if (!quantities || !quantities.length) {
-			return
-		}
+		const colors = colorMap.colours;
+		const quantities = colorMap.quantities;
+
+		ensureHighQuantitiesCovered(quantities);
 
 		let sldBody = `<?xml version="1.0" encoding="UTF-8"?>
 			<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
@@ -100,30 +109,33 @@ export default function VariableLayer({
 			<NamedLayer><Name>${layerValue}</Name><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
 			<Opacity>1.0</Opacity><ColorMap type="${colourMapType}">`;
 
-		for (let i = 0; i < colours.length; i++) {
-			sldBody += `<ColorMapEntry color="${colours[i]}" quantity="${quantities[i]}"/>`;
+		for (let i = 0; i < colors.length; i++) {
+			sldBody += `<ColorMapEntry color="${colors[i]}" quantity="${quantities[i]}"/>`;
 		}
 		sldBody +=
 			'</ColorMap></RasterSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>';
 
 		return sldBody;
 	}, [
+		colorMap,
 		colourMapType,
-		colourScheme,
+		hasCustomColorScheme,
 		layerValue,
-		isComparisonMap,
-		climateVariable,
-		transformedLegendEntry,
-	])
+	]);
 
 	useEffect(() => {
+		// Until we have loaded legend data, we don't show the layer
+		if (hasCustomColorScheme && !colorMap) {
+			return;
+		}
+
 		if (layerRef.current) {
 			map.removeLayer(layerRef.current);
 		}
 
 		const sld = generateSLD();
 
-		const params: WMSParams = {
+		let params: WMSParams = {
 			format: OWS_FORMAT,
 			transparent: true,
 			tiled: true,
@@ -133,17 +145,15 @@ export default function VariableLayer({
 			opacity: 1,
 			pane: pane,
 			bounds: CANADA_BOUNDS,
+			TIME: parseInt(startYear) + '-01-00T00:00:00Z',
 		};
-
-		// TODO: this should be moved to the climate variable config, this "enhanced scenario"
-		//  also has custom logic in time-periods-control-for-sea-level.tsx for the slider
-		const excludeTimeParam = scenario === 'rcp85plus65-p50';
-		if (!excludeTimeParam) {
-			params.TIME = parseInt(startYear) + '-01-00T00:00:00Z';
-		}
 
 		if (sld) {
 			params.sld_body = sld;
+		}
+
+		if (climateVariable?.updateMapWMSParams) {
+			params = climateVariable.updateMapWMSParams(params, !!isComparisonMap);
 		}
 
 		// Create a new layer to override the previous one so changes on the layer can be seen on the map.
@@ -157,6 +167,8 @@ export default function VariableLayer({
 			layerRef.current = newLayer;
 		}
 	}, [
+		hasCustomColorScheme,
+		colorMap,
 		datasetVersion,
 		generateSLD,
 		interactiveRegion,
@@ -165,6 +177,11 @@ export default function VariableLayer({
 		map,
 		pane,
 		startYear,
+		climateVariable,
+		isComparisonMap,
+		// Even though `mapData` (data opacity) is used in this useEffect, we don't want
+		// to put it as a dependency here since any change to the data opacity by the user
+		// would regenerate the layer. The useEffect below takes care of managing the opacity.
 	]);
 
 	useEffect(() => {

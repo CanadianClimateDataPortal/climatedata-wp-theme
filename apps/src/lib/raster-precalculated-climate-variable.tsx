@@ -1,4 +1,4 @@
-import ClimateVariableBase from "@/lib/climate-variable-base";
+import ClimateVariableBase from '@/lib/climate-variable-base';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import {
 	AveragingType,
@@ -14,8 +14,9 @@ import {
 	LocationModalContentParams,
 	ScenariosConfig,
 } from '@/types/climate-variable-interface';
-import RasterPrecalcultatedClimateVariableValues from '../components/map-layers/raster-precalculated-climate-variable-values'
-import { getFrequencyCode } from '@/lib/utils.ts';
+import RasterPrecalcultatedClimateVariableValues
+	from '../components/map-layers/raster-precalculated-climate-variable-values';
+import { getFrequencyType } from '@/lib/utils.ts';
 
 interface DownloadPayloadProps {
 	dataset_name: string | null;
@@ -26,6 +27,37 @@ interface DownloadPayloadProps {
 	zipped: boolean;
 	bbox?: [number, number, number, number];
 	points?: [number, number][];
+}
+
+/**
+ * Return ids of pre-calculated CanDCS variables available for a specific request.
+ *
+ * The `preCalculatedCanDCSConfig` configuration is used to determine variables available
+ * for the request, and their pre-calculated id.
+ *
+ * @param version Dataset version of the request.
+ * @param frequency Frequency type of the request.
+ */
+function getCanDCSVariableIds(version: string, frequency: FrequencyType): string[] {
+	const variables: string[] = [];
+
+	ClimateVariables.forEach((variableConfig) => {
+		if (variableConfig.preCalculatedCanDCSConfig) {
+			const variableVersions = variableConfig.versions ?? ['cmip5', 'cmip6'];
+			if (!variableVersions.includes(version)) {
+				return;
+			}
+
+			const canDCSConfig = variableConfig.preCalculatedCanDCSConfig;
+			Object.entries(canDCSConfig).forEach(([variable, frequencies]) => {
+				if (frequencies.includes(frequency)) {
+					variables.push(variable);
+				}
+			});
+		}
+	});
+
+	return variables;
 }
 
 class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
@@ -131,44 +163,6 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		return super.getDownloadType() ?? DownloadType.PRECALCULATED;
 	}
 
-	getAllCanDCSVariable(): string[] {
-		return  [
-			'tx_max',
-			'tg_mean',
-			'tn_mean',
-			'tx_mean',
-			'tnlt_-15',
-			'tnlt_-25',
-			'txgt_25',
-			'txgt_27',
-			'txgt_29',
-			'txgt_30',
-			'txgt_32',
-			'tn_min',
-			'last_spring_frost',
-			'first_fall_frost',
-			'frost_free_season',
-			'r1mm',
-			'r10mm',
-			'r20mm',
-			'rx1day',
-			'prcptot',
-			'rx5day',
-			'cdd',
-			'nr_cdd',
-			'frost_days',
-			'dlyfrzthw_tx0_tn-1',
-			'cddcold_18',
-			'tr_18',
-			'tr_20',
-			'tr_22',
-			'gddgrow_5',
-			'gddgrow_0',
-			'hddheat_18',
-			'ice_days'
-		];
-	}
-
 	/**
 	 * Sends a POST request to the download endpoint with the provided payload,
 	 * receives a Blob in response (usually a ZIP file), and returns a temporary
@@ -265,24 +259,19 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		if (payload.var !== 'all') {
 			return await this.fetchDownloadUrl(payload);
 		} else {
-			// Get the full list of variables to download (e.g., tx_max, rx5day, etc.)
-			const allCanDcsVars = this.getAllCanDCSVariable();
 
-			// Filter the list of allCanDcsVars to only include those with available configuration
-			const availableVars = allCanDcsVars.filter((allCanDcsVar) => {
-				let frequencyCode = '';
-				let matchedConfig: typeof ClimateVariables[number] | undefined;
+			// Downloading "All CanDCS variables"
 
-				if (payload.month) {
-					frequencyCode = getFrequencyCode(payload.month);
-					matchedConfig = ClimateVariables.find(
-						(config) =>
-							config.temporalThresholdConfig?.thresholds?.[allCanDcsVar]?.[frequencyCode] !== undefined
-					);
+			let availableVars: string[] = [];
+			// Get the list of pre-calculated variable ids available for the current frequency
+			if (payload.month && payload.dataset_name) {
+				const frequencyType = getFrequencyType(payload.month);
+				const scenario = payload.dataset_name;
+				if (frequencyType) {
+					availableVars = getCanDCSVariableIds(scenario, frequencyType);
 				}
+			}
 
-				return matchedConfig !== undefined;
-			});
 			// Create a list of promises for each variable's download request
 			const downloadPromises = availableVars.map(async (allCanDcsVar) => {
 					const payloadCopy = { ...payload, var: allCanDcsVar };
@@ -332,7 +321,6 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 						finalZip.file(fileName, blob); // Added at root
 					}
 				});
-
 
 				// Wait for all folders/files to be processed
 				await Promise.all(fetchAndUnzip);

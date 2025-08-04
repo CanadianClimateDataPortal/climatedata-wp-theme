@@ -581,11 +581,23 @@ export interface ChoroValuesOptions {
 	isDelta7100: boolean;
 }
 
+export enum ColourSchemeType {
+	SEQUENTIAL = 'sequential',
+	DIVERGENT = 'divergent',
+}
+
 export interface ColourScheme {
-	type: string;
+	type: ColourSchemeType;
 	colours: string[];
 	quantities?: number[];
 	isDivergent?: boolean;
+}
+
+export interface ColourMap {
+	type: ColourSchemeType;
+	colours: string[];
+	quantities: number[];
+	isDivergent: boolean;
 }
 
 // A translatable string object with English and French variants
@@ -798,15 +810,6 @@ export interface WMSParams {
 	sld_body?: string;
 }
 
-/**
- * Props for the variable layer component.
- */
-export interface VariableLayerProps {
-	scenario: string | null | undefined;
-	layerValue: string;
-	isComparisonMap?: boolean;
-}
-
 export interface SelectedLocationInfo {
 	featureId: number;
 	title: string;
@@ -815,4 +818,9 @@ export interface SelectedLocationInfo {
 
 export interface FetchOptions {
 	signal?: AbortSignal;
+}
+
+export enum MapDisplayType {
+	ABSOLUTE = 'absolute',
+	DELTA = 'delta',
 }

@@ -14,6 +14,27 @@ type VariableLayerProps = {
 }
 
 /**
+ * Make sure that the highest quantity is a big enough number.
+ *
+ * The highest quantity must be big enough to cover values that could exceed
+ * the normally highest value in the legend. If not, holes could appear on the
+ * map.
+ *
+ * This function ensures that the last quantity is a "really large" value
+ * compared to the next one. If not, the last quantity is made much higher.
+ */
+function ensureHighQuantitiesCovered(quantities: number[]) {
+	const lastIndex = quantities.length - 1;
+	const lastDiff = quantities[lastIndex] - quantities[lastIndex - 1];
+	const secondLastDiff = quantities[lastIndex - 1] - quantities[lastIndex - 2];
+	const minDiffRatio = 100;
+
+	if (lastDiff / secondLastDiff < minDiffRatio) {
+		quantities[lastIndex] += lastDiff * minDiffRatio;
+	}
+}
+
+/**
  * Variable layer Component
  *
  * This component displays the variable main layer on the map.
@@ -76,6 +97,8 @@ export default function VariableLayer(
 
 		const colors = colorMap.colours;
 		const quantities = colorMap.quantities;
+
+		ensureHighQuantitiesCovered(quantities);
 
 		let sldBody = `<?xml version="1.0" encoding="UTF-8"?>
 			<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
@@ -154,7 +177,9 @@ export default function VariableLayer(
 		startYear,
 		climateVariable,
 		isComparisonMap,
-		mapData,
+		// Even though `mapData` (data opacity) is used in this useEffect, we don't want
+		// to put it as a dependency here since any change to the data opacity by the user
+		// will regenerate the layer. The useEffect below takes care of managing the opacity.
 	]);
 
 	useEffect(() => {

@@ -217,17 +217,6 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 
 		layer.addTo(map);
 
-		// TODO: this was moved to the RasterMap component, but not sure if we should also clearLocations?
-		// // clear all existing markers from the map
-		// map.eachLayer(layer => {
-		// 	if (layer instanceof L.Marker) {
-		// 		map.removeLayer(layer);
-		// 	}
-		// });
-		//
-		// // clear recent locations
-		// dispatch(clearRecentLocations());
-
 		return () => {
 			map.removeLayer(layer);
 
@@ -246,7 +235,9 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		onOut,
 		layerRef,
 		getFeatureColor,
-		mapData,
+		// Even though `mapData` (data opacity) is used in this useEffect, we don't want
+		// to put it as a dependency here since any change to the data opacity by the user
+		// will regenerate the layer. The useEffect below takes care of managing the opacity.
 	]);
 
 	useEffect(() => {

@@ -185,6 +185,16 @@ export interface LocationModalContentParams {
 	mode?: "modal" | "panel"
 }
 
+export enum FrequencyType {
+	YS = "ys",
+	MS = "ms",
+	QSDEC = "qsdec",
+}
+
+export type PreCalculatedCanDCSConfig = {
+	[key: string]: FrequencyType[],
+}
+
 export interface ClimateVariableConfigInterface {
 	/** Unique identifier for the climate variable */
 	id: string;
@@ -364,6 +374,14 @@ export interface ClimateVariableConfigInterface {
 	/** For AHCCD stations, if this variable should be shown for stations with
 	 * "precipitation" ('P') or "temperature" ('T') data. */
 	stationTypeFilter?: string[];
+
+	/**
+	 * Configuration if the variable is available as a pre-calculated CanDCS variable.
+	 *
+	 * It's a dictionary where the key is the pre-calculated variable ids, and the
+	 * value is an array of the frequencies available (valid values are "ys", "ms" and "qsdec")
+	 */
+	preCalculatedCanDCSConfig?: PreCalculatedCanDCSConfig;
 }
 
 /**

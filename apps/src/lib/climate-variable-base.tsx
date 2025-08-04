@@ -26,7 +26,7 @@ import {
 } from '@/types/climate-variable-interface';
 import RasterMap from '@/components/raster-map';
 import RasterDownloadMap from '@/components/download/raster-download-map';
-import { getDefaultFrequency, getFrequencyCode } from '@/lib/utils';
+import { getDefaultFrequency, getFrequencyType } from '@/lib/utils';
 import { MapDisplayType, WMSParams } from '@/types/types';
 
 /**
@@ -411,12 +411,12 @@ class ClimateVariableBase implements ClimateVariableInterface {
 			frequency = FrequencyType.ANNUAL;
 		}
 
-		const frequencyCode = getFrequencyCode(frequency);
+		const frequencyCode = getFrequencyType(frequency);
 
 		const valuesArr = [
 			version,
 			threshold,
-			frequencyCode,
+			frequencyCode as string || '',
 			scenario,
 		];
 

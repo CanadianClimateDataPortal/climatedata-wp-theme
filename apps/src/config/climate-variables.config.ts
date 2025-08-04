@@ -66,6 +66,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		hasDelta: true,
 		enableColourOptions: true,
+		preCalculatedCanDCSConfig: {
+			tx_max: [FrequencyType.YS, FrequencyType.MS],
+		},
 		analysisFields: [
 			{
 				key: "thresh",
@@ -131,6 +134,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				decimals: 1,
 			},
 		},
+		preCalculatedCanDCSConfig: {
+			tx_max: [ FrequencyType.YS, FrequencyType.MS ],
+		},
 	},
 	/** Coldest Day */
 	{
@@ -149,6 +155,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				decimals: 1,
 			},
 		},
+		preCalculatedCanDCSConfig: {
+			tn_min: [FrequencyType.YS, FrequencyType.MS],
+		},
 	},
 	/** Cumulative degree-days above 0°C */
 	{
@@ -164,6 +173,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[MapDisplayType.DELTA]: {
 				hideTopLabel: true,
 			},
+		},
+		preCalculatedCanDCSConfig: {
+			gddgrow_0: [FrequencyType.YS, FrequencyType.MS],
 		},
 	},
 	/** Maximum 5-Day Precipitation */
@@ -182,6 +194,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				decimals: 1,
 			},
 		},
+		preCalculatedCanDCSConfig: {
+			rx5day: [FrequencyType.YS, FrequencyType.MS],
+		},
 	},
 	/** Number of Periods with more than 5 Consecutive Dry Days */
 	{
@@ -196,6 +211,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[MapDisplayType.DELTA]: {
 				hideTopLabel: true,
 			},
+		},
+		preCalculatedCanDCSConfig: {
+			nr_cdd: [FrequencyType.YS, FrequencyType.MS],
 		},
 	},
 	/** Ice Days */
@@ -217,6 +235,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
+		preCalculatedCanDCSConfig: {
+			ice_days: [FrequencyType.YS],
+		},
 	},
 	/** First fall frost */
 	{
@@ -236,6 +257,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "DoY",
+		preCalculatedCanDCSConfig: {
+			first_fall_frost: [FrequencyType.YS],
+		},
 	},
 	/** Frost Days */
 	{
@@ -256,6 +280,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "days",
+		preCalculatedCanDCSConfig: {
+			frost_days: [FrequencyType.YS],
+		},
 	},
 	/** Frost free season */
 	{
@@ -275,6 +302,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "days",
+		preCalculatedCanDCSConfig: {
+			frost_free_season: [FrequencyType.YS],
+		},
 	},
 	/** Growing Degree Days (5°C) */
 	{
@@ -293,6 +323,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		preCalculatedCanDCSConfig: {
+			gddgrow_5: [FrequencyType.YS],
 		},
 	},
 	/** Last spring frost */
@@ -313,6 +346,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "DoY",
+		preCalculatedCanDCSConfig: {
+			last_spring_frost: [FrequencyType.YS],
+		},
 	},
 	/** Maximum 1-Day Total Precipitation */
 	{
@@ -337,6 +373,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "mm",
+		preCalculatedCanDCSConfig: {
+			rx1day: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
 	},
 	/** Mean Temperature */
 	{
@@ -361,6 +400,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		unit: "degC",
 		unitDecimalPlaces: 1,
+		preCalculatedCanDCSConfig: {
+			tg_mean: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
 	},
 	/** Days with Humidex above threshold */
 	{
@@ -421,6 +463,11 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		unit: "days",
+		preCalculatedCanDCSConfig: {
+			HXmax30: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+			HXmax35: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+			HXmax40: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
 	},
 	/** All CanDCS variables */
 	{
@@ -469,6 +516,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				categorical: true,
 			}
 		},
+		preCalculatedCanDCSConfig: {
+			hddheat_18: [FrequencyType.YS],
+		},
 	},
 	/** Maximum Temperature */
 	{
@@ -495,6 +545,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		unit: "degC",
 		unitDecimalPlaces: 1,
+		preCalculatedCanDCSConfig: {
+			tx_mean: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
 	},
 	/** Minimum Temperature */
 	{
@@ -521,6 +574,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		unit: "degC",
 		unitDecimalPlaces: 1,
+		preCalculatedCanDCSConfig: {
+			tn_mean: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
 	},
 	/** Standardized precipitation evapotranspiration index (12-months) */
 	{
@@ -599,6 +655,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		unit: "mm",
+		preCalculatedCanDCSConfig: {
+			prcptot: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
 	},
 	/** Average 'Wet Day' Precipitation Intensity */
 	{
@@ -700,6 +759,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
+		preCalculatedCanDCSConfig: {
+			cddcold_18: [FrequencyType.YS],
+		},
 		analysisFields: [
 			{
 				key: "thresh",
@@ -777,6 +839,13 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: "days",
+		preCalculatedCanDCSConfig: {
+			txgt_25: [FrequencyType.YS, FrequencyType.MS],
+			txgt_27: [FrequencyType.YS, FrequencyType.MS],
+			txgt_29: [FrequencyType.YS, FrequencyType.MS],
+			txgt_30: [FrequencyType.YS, FrequencyType.MS],
+			txgt_32: [FrequencyType.YS, FrequencyType.MS],
+		},
 		ahccdDownloadRequiredVariables: [
 			"tasmax",
 		],
@@ -872,6 +941,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: "days",
+		preCalculatedCanDCSConfig: {
+			"tnlt_-15": [FrequencyType.YS, FrequencyType.MS],
+			"tnlt_-25": [FrequencyType.YS, FrequencyType.MS],
+		},
 		ahccdDownloadRequiredVariables: [
 			"tasmin",
 		],
@@ -1012,6 +1085,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: "days",
+		preCalculatedCanDCSConfig: {
+			"dlyfrzthw_tx0_tn-1": [FrequencyType.YS],
+		},
 		ahccdDownloadRequiredVariables: [
 			"tasmin",
 			"tasmax",
@@ -1208,6 +1284,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		ahccdDownloadRequiredVariables: [
 			"tas",
 		],
+		preCalculatedCanDCSConfig: {
+			hddheat_18: [FrequencyType.YS],
+		},
 	},
 	/** Maximum Consecutive Dry Days */
 	{
@@ -1216,6 +1295,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		threshold: "cdd",
 		unit: "days",
+		preCalculatedCanDCSConfig: {
+			cdd: [FrequencyType.YS],
+		},
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
@@ -1327,6 +1409,11 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		unit: "days",
+		preCalculatedCanDCSConfig: {
+			tr_18: [FrequencyType.YS, FrequencyType.MS],
+			tr_20: [FrequencyType.YS, FrequencyType.MS],
+			tr_22: [FrequencyType.YS, FrequencyType.MS],
+		},
 		analysisFields: [
 			{
 				key: "thresh",
@@ -1401,6 +1488,11 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: "days",
+		preCalculatedCanDCSConfig: {
+			r1mm: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+			r10mm: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+			r20mm: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
 		ahccdDownloadRequiredVariables: [
 			"pr",
 		],

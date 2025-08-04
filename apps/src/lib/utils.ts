@@ -56,15 +56,15 @@ export const splitTextByMatch = (
 	return result.filter((part) => part.text.length > 0);
 };
 
-export const getFrequencyCode = (frequency: string) => {
-	let frequencyCode = '';
+export const getFrequencyType = (frequency: string): FrequencyType | undefined =>  {
+	let frequencyCode;
 
 	if (frequency === 'ann') {
-		frequencyCode = 'ys';
+		frequencyCode = FrequencyType.YS;
 	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
-		frequencyCode = 'ms';
+		frequencyCode = FrequencyType.MS;
 	} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
-		frequencyCode = 'qsdec';
+		frequencyCode = FrequencyType.QSDEC;
 	}
 
 	return frequencyCode;

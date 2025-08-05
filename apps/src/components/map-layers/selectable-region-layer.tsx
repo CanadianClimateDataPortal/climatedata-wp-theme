@@ -108,7 +108,7 @@ const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_,
 	const handleOver = useCallback(
 		(e: MapFeatureProps) => {
 			const featureId = getFeatureId(e.layer?.properties);
-			if (featureId && !selectedIds.includes(featureId)) {
+			if (featureId != null && !selectedIds.includes(featureId)) {
 				layerRef.current.setFeatureStyle(featureId, hoverStyles);
 			}
 		},
@@ -118,7 +118,7 @@ const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_,
 	const handleOut = useCallback(
 		(e: MapFeatureProps) => {
 			const featureId = getFeatureId(e.layer?.properties);
-			if (featureId && !selectedIds.includes(featureId)) {
+			if (featureId != null && !selectedIds.includes(featureId)) {
 				layerRef.current?.resetFeatureStyle(featureId);
 			}
 		},
@@ -129,12 +129,12 @@ const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_,
 		(e: MapFeatureProps) => {
 			const featureId = getFeatureId(e.layer?.properties);
 
-			if (!featureId) {
+			if (featureId == null) {
 				return;
 			}
 
 			// unselect the feature if it is already selected
-			if (featureId && selectedIds.includes(featureId)) {
+			if (selectedIds.includes(featureId)) {
 				layerRef.current?.resetFeatureStyle(featureId);
 				removeSelectedPoint(String(featureId));
 				return;

@@ -31,7 +31,7 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
     getFeatureColor: (featureId: number) => string
   ) => {
     const featureId = e.layer.properties.id ?? e.layer.properties.gid;
-    if (!featureId) {
+    if (featureId == null) {
       return;
     }
 

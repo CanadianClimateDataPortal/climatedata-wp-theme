@@ -34,11 +34,6 @@ const MapColorsDropdown: React.FC = () => {
 
 	const onColourSchemeChange = (value: string) => {
 		setColourScheme(value);
-
-		// also reset the colour type if the colour scheme is the default
-		if (value === 'default') {
-			setColourType(climateVariable?.getDataValue() === 'delta' ? ColourType.DISCRETE : ColourType.CONTINUOUS);
-		}
 	}
 
 	return (

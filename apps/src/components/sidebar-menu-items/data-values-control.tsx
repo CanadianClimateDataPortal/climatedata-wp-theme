@@ -9,16 +9,15 @@ import { __ } from '@/context/locale-provider';
 // components
 import { SidebarMenuItem } from '@/components/ui/sidebar';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 // other
-import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { ColourType } from '@/types/climate-variable-interface';
-import { InfoIcon } from "lucide-react";
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { InfoIcon } from 'lucide-react';
 
 const DataValuesControl: React.FC = () => {
-	const { climateVariable, setDataValue, setColourType } = useClimateVariable();
-	
+	const { climateVariable, setDataValue } = useClimateVariable();
+
 	const deltaLabel = (
 		<div className="flex items-center gap-x-1">
 			<span>{__('Delta')}</span>
@@ -51,11 +50,6 @@ const DataValuesControl: React.FC = () => {
 
 	const onDataValueChange = (value: string) => {
 		setDataValue(value);
-
-		// also, colour type should be set depending on the data value and the colour scheme
-		const colourScheme = climateVariable?.getColourScheme() ?? 'default';
-		const defaultsToDiscreteColourType = value === 'delta' && colourScheme === 'default';
-		setColourType(defaultsToDiscreteColourType ? ColourType.DISCRETE : ColourType.CONTINUOUS);
 	}
 
 	return (

@@ -42,6 +42,7 @@ $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
     <meta charset="<?php bloginfo( 'charset' ); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title><?php echo esc_html( wp_get_document_title() ); ?></title>
+    <?php include ( locate_template ( 'template/google-tags-head.php' ) ); ?>
 
 	<?php
 	// Add favicon.
@@ -95,6 +96,7 @@ $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
 	?>
 </head>
 <body>
+<?php include ( locate_template ( 'template/google-tags-body.php' ) ); ?>
 <div
     id="root"
     data-app-lang="<?php echo esc_attr( $current_lang ); ?>"

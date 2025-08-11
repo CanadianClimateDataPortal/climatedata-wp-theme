@@ -16,4 +16,12 @@ export interface StepComponentRef {
 	getResetPayload?: () => StepResetPayload;
 	/** Execute any other operations to reset the step. */
 	reset?: () => void;
-} 
+}
+
+/**
+ * Type for a member of the "inputs" fields in a Finch request.
+ */
+export type FinchRequestInput = {
+	id: string;
+	data: string;
+}

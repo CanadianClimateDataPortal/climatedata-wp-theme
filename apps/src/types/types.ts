@@ -824,3 +824,9 @@ export enum MapDisplayType {
 	ABSOLUTE = 'absolute',
 	DELTA = 'delta',
 }
+
+export type HighChartSeries = {
+	visible: boolean;
+	type: string;
+	name: string;
+}

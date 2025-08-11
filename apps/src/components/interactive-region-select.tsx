@@ -16,6 +16,7 @@ import {
 	InteractiveRegionDisplay,
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
+import { getInteractiveRegionName } from '@/lib/utils.ts';
 
 interface InteractiveRegionSelectProps {
 	onChange?: (value: InteractiveRegionOption) => void;
@@ -29,23 +30,14 @@ const InteractiveRegionSelect: React.FC<InteractiveRegionSelectProps> = ({
 	const { climateVariable, setInteractiveRegion } = useClimateVariable();
 
 	const options: { value: InteractiveRegionOption; label: string }[] = [
-		{
-			value: InteractiveRegionOption.GRIDDED_DATA,
-			label: __('Grid Cells'),
-		},
-		{
-			value: InteractiveRegionOption.CENSUS,
-			label: __('Census Subdivisions'),
-		},
-		{
-			value: InteractiveRegionOption.HEALTH,
-			label: __('Health Regions'),
-		},
-		{
-			value: InteractiveRegionOption.WATERSHED,
-			label: __('Watersheds'),
-		},
-	];
+		InteractiveRegionOption.GRIDDED_DATA,
+		InteractiveRegionOption.CENSUS,
+		InteractiveRegionOption.HEALTH,
+		InteractiveRegionOption.WATERSHED,
+	].map((type) => ({
+		value: type,
+		label: getInteractiveRegionName(type),
+	}));
 
 	const interactiveRegionConfig =
 		climateVariable?.getInteractiveRegionConfig() ??

@@ -1,6 +1,5 @@
 import React from 'react';
-import { MapDisplayType, MultilingualField } from './types';
-import { WMSParams } from '@/types/types';
+import { MapDisplayType, MultilingualField, WMSParams } from '@/types/types';
 
 export interface variableClassMap {
 	[key: string]: string;

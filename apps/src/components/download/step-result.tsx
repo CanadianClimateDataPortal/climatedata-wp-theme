@@ -3,10 +3,47 @@ import { __ } from '@/context/locale-provider';
 
 import { StepContainer, StepContainerDescription } from '@/components/download/step-container';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { DownloadFile, DownloadType } from '@/types/climate-variable-interface';
+import {
+	ClimateVariableInterface,
+	DownloadFile,
+	DownloadType,
+	FrequencyType,
+} from '@/types/climate-variable-interface';
 import { cn } from '@/lib/utils';
 import { useAppSelector } from '@/app/hooks';
 import { sprintf } from "@wordpress/i18n";
+import { trackIDFDownload, trackPrecalculatedDownload, trackStationDataDownload } from '@/lib/google-analytics.ts';
+
+function trackDownloadClick(climateVariable: ClimateVariableInterface | null, fileLink: DownloadFile, index: number) {
+	if (!climateVariable) {
+		return;
+	}
+
+	const downloadType = climateVariable.getDownloadType();
+	const frequency = climateVariable.getFrequency();
+	const mode = climateVariable?.getInteractiveMode();
+
+	const isPrecalculated = downloadType === DownloadType.PRECALCULATED && frequency !== FrequencyType.DAILY;
+	const isStation = (mode !== 'region');
+
+	if (!isPrecalculated) {
+		// Finch requests are tracked in the steps.tsx file, when clicking on the submit button
+		return;
+	}
+
+	if (isStation) {
+		if (climateVariable.getId() === 'short_duration_rainfall_idf_data') {
+			trackIDFDownload(fileLink.label, fileLink.url);
+		} else {
+			// We track only the first link
+			if (index === 0) {
+				trackStationDataDownload(climateVariable);
+			}
+		}
+	} else {
+		trackPrecalculatedDownload(climateVariable);
+	}
+}
 
 /**
  * Result step, the final one, allows the user to make download file or see a success message.
@@ -33,7 +70,7 @@ const StepResult = React.forwardRef(() => {
 			setContainerDescription(__('Click the button below to start the download.'));
 			setFiles(downloadLinks);
 		}
-	}, [climateVariable, requestResult, downloadLinks, __]);
+	}, [climateVariable, requestResult, downloadLinks]);
 
 	// Cleanup files when the component unmounts
 	useEffect(() => {
@@ -45,6 +82,10 @@ const StepResult = React.forwardRef(() => {
 			});
 		};
 	}, [files]);
+
+	function handleDownloadLinkClick(file: DownloadFile, index: number) {
+		trackDownloadClick(climateVariable, file, index)
+	}
 
 	return (
 		<StepContainer title={containerTitle ?? ''} isLastStep>
@@ -59,6 +100,7 @@ const StepResult = React.forwardRef(() => {
 							<p key={index} className="mb-2">
 								<a
 									href={file.url}
+									onClick={() => handleDownloadLinkClick(file, index)}
 									download={file.fileName}
 									className={cn('text-lg font-semibold text-brand-blue underline ')}
 									target="_blank"

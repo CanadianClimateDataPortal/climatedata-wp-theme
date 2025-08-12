@@ -434,6 +434,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "> 40",
 			},
 		],
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
 		analysisFields: [
 			{
 				key: "threshold",

@@ -48,7 +48,7 @@ interface TooltipPoint extends Point {
 }
 
 /**
- * Update a Highcharts options object to show "Climate Zone" colored bands.
+ * Update a Highcharts options object to show "Climate Zone" coloured bands.
  *
  * @param options The Highcharts options object to update.
  */
@@ -58,7 +58,7 @@ function addClimateZonePlotBands(options: Options) {
 	}
 
 	const zones = [
-		['4',  2000, 2999,  'rgba(201, 0, 0, 0.2)'],
+		['4',  0, 2999,  'rgba(201, 0, 0, 0.2)'],
 		['5',  3000, 3999,  'rgba(250, 238, 2, 0.2)'],
 		['6',  4000, 4999,  'rgba(0, 201, 54, 0.2)'],
 		['7A', 5000, 5999,  'rgba(0, 131, 201, 0.2)'],

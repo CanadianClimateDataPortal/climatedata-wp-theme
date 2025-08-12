@@ -48,6 +48,7 @@ COPY --chown=taskrunner apps /app/apps
 COPY --chown=taskrunner framework /app/framework
 COPY --chown=taskrunner fw-child /app/fw-child
 
+RUN npm ci
 RUN build-fe.sh /app/
 
 ###

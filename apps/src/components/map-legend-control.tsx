@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { __ } from '@/context/locale-provider';
 
@@ -13,6 +13,7 @@ const MIN_LABEL_SPACING = 30; // Minimum spacing between labels
 
 type MapLegendControlProps = {
 	data: ColourMap;
+	opacity: number;
 	isOpen: boolean;
 	toggleOpen: () => void;
 	isCategorical?: boolean;
@@ -24,11 +25,14 @@ type MapLegendControlProps = {
 }
 
 const MapLegendControl: React.FC<MapLegendControlProps> = (
-	{ data, isOpen, toggleOpen, isCategorical, isDelta, unit, legendConfig, colourType, locale = 'en' }
+	{ data, opacity, isOpen, toggleOpen, isCategorical, isDelta, unit, legendConfig, colourType, locale = 'en' }
 ) => {
 	const [svgWidth, setSvgWidth] = useState(0);
 	const [availableHeight, setAvailableHeight] = useState<number | undefined>(undefined);
-	const svgRef = useRef<SVGSVGElement>(null);
+	const [svgElement, setSvgElement] = useState<SVGSVGElement | null>(null);
+	const svgRef = useCallback((element: SVGSVGElement | null) => {
+		setSvgElement(element);
+	}, []);
 	const isBlocksGradient = isCategorical || colourType === ColourType.DISCRETE;
 	let unitName = getUnitName(unit ?? '');
 	const legendValues = [...data.quantities].reverse();
@@ -78,24 +82,40 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 		setItemHeight(currentItemHeight);
 	}, [legendHeight, totalLabels]);
 
+	/**
+	 * Save the SVG width when the legend is opened.
+	 */
 	useEffect(() => {
-		if (svgRef.current) {
-			setSvgWidth(svgRef.current.getBoundingClientRect().width);
+		if (!svgElement || !isOpen) {
+			return;
 		}
-	}, []);
 
+		const width = svgElement.getBoundingClientRect().width;
+		setSvgWidth(width);
+	}, [svgElement, isOpen]);
+
+	/**
+	 * Update the available height for the SVG element.
+	 */
 	useEffect(() => {
+		if (!svgElement) {
+			return;
+		}
+
 		function updateLegendHeight() {
-			if (svgRef.current) {
-				const svgTop = svgRef.current.getBoundingClientRect().y;
+			if (svgElement) {
+				const svgTop = svgElement.getBoundingClientRect().y;
 				const available = window.innerHeight - svgTop - 15; // 15px leaflet banner.
 				setAvailableHeight(available);
 			}
 		}
 		updateLegendHeight();
 		window.addEventListener('resize', updateLegendHeight);
-		return () => window.removeEventListener('resize', updateLegendHeight);
-	}, []);
+
+		return () => {
+			window.removeEventListener('resize', updateLegendHeight);
+		}
+	}, [svgElement]);
 
 	return (
 		<div className="space-y-[5px] w-[91px]">
@@ -121,7 +141,7 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 					</div>
 					<svg ref={svgRef} height={legendHeight} className="w-full">
 						{isBlocksGradient ? (
-							<g>
+							<g fillOpacity={opacity}>
 								{legendColors.map((color, index) => {
 									return (
 										<rect
@@ -161,6 +181,7 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 									height={legendHeight}
 									fill="url(#temperatureGradient)"
 									x={gradientX}
+									fillOpacity={opacity}
 								/>
 							</>
 						)}

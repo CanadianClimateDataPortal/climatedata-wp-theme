@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { createRoot } from 'react-dom/client';
+import React, { useEffect, useRef, useState } from 'react';
+import { createRoot, Root } from 'react-dom/client';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 
@@ -18,6 +18,9 @@ const MapLegend: React.FC = () => {
 	const { locale } = useLocale();
 	const { climateVariable } = useClimateVariable();
 	const { colorMap } = useColorMap();
+	const {
+		opacity: { mapData }
+	} = useAppSelector((state) => state.map);
 
 	const { legendData } = useAppSelector((state) => state.map);
 	const colourScheme = climateVariable?.getColourScheme();
@@ -34,34 +37,26 @@ const MapLegend: React.FC = () => {
 		isCategorical = (type === ColourType.DISCRETE);
 	}
 
+	const rootRef = useRef<Root | null>	(null);
+
+	/**
+	 * This hook creates the legend control once the map is ready. It only
+	 * creates the control, the content of the legend itself is rendered by
+	 * another hook (below) that depends on other attributes.
+	 */
 	useEffect(() => {
-		if (!colorMap) {
+		if (!map) {
 			return;
 		}
 
 		const legend = new L.Control({ position: 'topright' });
-		const colourType = colorMap.type;
 
 		legend.onAdd = () => {
 			const container = L.DomUtil.create(
 				'div',
 				'legend-wrapper top-[9rem] md:top-24 right-5 m-0 !mt-1.5 z-30'
 			);
-			const root = createRoot(container);
-
-			root.render(
-				<MapLegendControl
-					data={colorMap}
-					isOpen={isOpen}
-					toggleOpen={() => setIsOpen((prev) => !prev)}
-					isCategorical={isCategorical}
-					isDelta={isDelta}
-					colourType={colourType}
-					unit={unit}
-					legendConfig={legendConfig}
-					locale={locale}
-				/>
-			);
+			rootRef.current = createRoot(container);
 
 			// prevent interactions from affecting the map
 			L.DomEvent.disableClickPropagation(container);
@@ -73,9 +68,47 @@ const MapLegend: React.FC = () => {
 		legend.addTo(map);
 
 		return () => {
-			legend.remove();
+			try {
+				rootRef.current?.unmount();
+			} finally {
+				legend.remove();
+				rootRef.current = null;
+			}
+
 		};
-	}, [map, colorMap, isOpen, isCategorical, legendConfig, isDelta, unit, locale]);
+	}, [map]);
+
+	/**
+	 * This hook renders the legend content inside the legend control container
+	 * (created in the previous hook).
+	 */
+	useEffect(() => {
+		if (!rootRef.current) {
+			return;
+		}
+
+		if (!colorMap) {
+			rootRef.current.render(<></>);
+			return;
+		}
+
+		const colourType = colorMap.type;
+
+		rootRef.current.render(
+			<MapLegendControl
+				data={colorMap}
+				opacity={mapData}
+				isOpen={isOpen}
+				toggleOpen={() => setIsOpen((prev) => !prev)}
+				isCategorical={isCategorical}
+				isDelta={isDelta}
+				colourType={colourType}
+				unit={unit}
+				legendConfig={legendConfig}
+				locale={locale}
+			/>
+		);
+	}, [colorMap, mapData, isOpen, isCategorical, legendConfig, isDelta, unit, locale]);
 
 	return null;
 };

@@ -30,6 +30,11 @@ export const MAP_MARKER_CONFIG = {
 	}),
 };
 
+export const MAP_OPACITY_MIN = {
+	mapData: 10,
+	labels: 0,
+}
+
 /**
  * "29" as the length of the year window. Used in the timeControl slider component
  */

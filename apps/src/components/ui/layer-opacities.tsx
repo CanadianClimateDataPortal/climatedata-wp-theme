@@ -8,6 +8,7 @@ import { MapItemsOpacity } from '@/types/types';
 import { SliderLabelsMap } from '@/types/types';
 import * as Slider from '@radix-ui/react-slider';
 import { ReactElement } from 'react';
+import { MAP_OPACITY_MIN } from '@/lib/constants';
 
 /**
  * LayerOpacities Component
@@ -60,7 +61,7 @@ const LayerOpacities = (): ReactElement => {
 							)}
 							value={[value * 100]}
 							onValueChange={(value) => handleChange(value, key)}
-							min={0}
+							min={MAP_OPACITY_MIN[key] ?? 0}
 							max={100}
 							step={1}
 						>

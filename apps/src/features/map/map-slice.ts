@@ -34,7 +34,8 @@ import {
 	SLIDER_YEAR_WINDOW_SIZE,
 	REGION_GRID,
 	DEFAULT_ZOOM,
-	CANADA_CENTER
+	CANADA_CENTER,
+	MAP_OPACITY_MIN,
 } from '@/lib/constants';
 import { MapItemsOpacity } from '@/types/types';
 
@@ -145,7 +146,12 @@ const mapSlice = createSlice({
 			action: PayloadAction<{ key: keyof MapItemsOpacity; value: number }>
 		) {
 			const { key, value } = action.payload;
-			state.opacity[key] = value / 100;
+			if (key in MAP_OPACITY_MIN) {
+				const minValue = MAP_OPACITY_MIN[key];
+				if (value >= minValue && value <= 100) {
+					state.opacity[key] = value / 100;
+				}
+			}
 		},
 		setMapCoordinates(state, action: PayloadAction<MapCoordinates>) {
 			state.mapCoordinates = action.payload;

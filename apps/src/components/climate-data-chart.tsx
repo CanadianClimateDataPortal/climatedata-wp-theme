@@ -500,6 +500,12 @@ const ClimateDataChart: React.FC<{
 			title: {
 				text: '',
 			},
+			legend: {
+				itemHiddenStyle: {
+					color: '#cccccc',
+					textDecoration: 'none',
+				},
+			},
 			tooltip: activeChartTooltip,
 			plotOptions: activeChartPlotOptions,
 			xAxis: climateVariableId === 'msc_climate_normals' ? {

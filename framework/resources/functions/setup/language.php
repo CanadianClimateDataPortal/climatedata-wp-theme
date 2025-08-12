@@ -219,7 +219,13 @@ function fw_update_slugs_on_save ( $post_id, $post, $update ) {
 				}
 				
 				if ( $this_path == '' ) {
-					update_post_meta ( $post_id, 'path_' . $lang['code'], implode ( '/', translate_path ( $post_id, $lang['code'] ) ) );
+					$path_parts = translate_path ( $post_id, $lang['code'] );
+					// For "post" type posts, URL rewriting is specific, so we must not set a
+					// path prefix.
+					if ( $post->post_type === 'post' && $path_parts[0] === 'post' ) {
+						$path_parts = array_slice ( $path_parts, 1 );
+					}
+					update_post_meta ( $post_id, 'path_' . $lang['code'], implode ( '/', $path_parts ) );
 				}
 				
 			}

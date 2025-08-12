@@ -12,13 +12,16 @@ import {
 import { cn } from '@/lib/utils';
 import { useAppSelector } from '@/app/hooks';
 import { sprintf } from "@wordpress/i18n";
-import { trackIDFDownload, trackPrecalculatedDownload, trackStationDataDownload } from '@/lib/google-analytics.ts';
+import { trackIDFDownload, trackPrecalculatedDownload, trackStationDataDownload } from '@/lib/google-analytics';
 
-function trackDownloadClick(climateVariable: ClimateVariableInterface | null, fileLink: DownloadFile, index: number) {
-	if (!climateVariable) {
-		return;
-	}
-
+/**
+ * Track a Google Analytics event for a downloaded variable.
+ *
+ * @param climateVariable - The climate variable that has been downloaded.
+ * @param fileLink - The link object of the downloaded file.
+ * @param index - The index of the link in the list of links.
+ */
+function trackDownloadClick(climateVariable: ClimateVariableInterface, fileLink: DownloadFile, index: number) {
 	const downloadType = climateVariable.getDownloadType();
 	const frequency = climateVariable.getFrequency();
 	const mode = climateVariable?.getInteractiveMode();
@@ -84,7 +87,9 @@ const StepResult = React.forwardRef(() => {
 	}, [files]);
 
 	function handleDownloadLinkClick(file: DownloadFile, index: number) {
-		trackDownloadClick(climateVariable, file, index)
+		if (climateVariable) {
+			trackDownloadClick(climateVariable, file, index)
+		}
 	}
 
 	return (

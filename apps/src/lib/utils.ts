@@ -287,6 +287,11 @@ export function getUnitName(unit: string): string {
 	}
 }
 
+/**
+ * Return the translated display name for a frequency from its technical code.
+ *
+ * @param frequency - The frequency code to translate.
+ */
 export function getFrequencyName(frequency: string): string {
 	const nameMap: { [key: string]: string } = {
 		ann: __('Annual'),
@@ -311,6 +316,11 @@ export function getFrequencyName(frequency: string): string {
 	return nameMap[frequency] ?? frequency;
 }
 
+/**
+ * Return the translated display name for a region from its technical code.
+ *
+ * @param region - The region code to translate.
+ */
 export function getInteractiveRegionName(region: InteractiveRegionOption): string {
 	const nameMap = {
 		[InteractiveRegionOption.GRIDDED_DATA]: __('Grid Cells'),

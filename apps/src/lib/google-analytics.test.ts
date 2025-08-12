@@ -5,16 +5,19 @@ import {
 	getPrecalculatedVariableName,
 	gtag,
 	trackFinchDownload,
-	trackGraphExport, trackIDFDownload, trackPrecalculatedDownload, trackStationDataDownload,
+	trackGraphExport,
+	trackIDFDownload,
+	trackPrecalculatedDownload,
+	trackStationDataDownload,
 } from '@/lib/google-analytics';
 import {
 	FileFormatType,
 	GridCoordinates,
 	GridRegion,
 	InteractiveRegionOption,
-} from '@/types/climate-variable-interface.ts';
-import { getInteractiveRegionName } from '@/lib/utils.ts';
-import { HighChartSeries } from '@/types/types.ts';
+} from '@/types/climate-variable-interface';
+import { getInteractiveRegionName } from '@/lib/utils';
+import { HighChartSeries } from '@/types/types';
 
 vi.hoisted(() => {
 	vi.stubGlobal('gtag', vi.fn());
@@ -53,15 +56,20 @@ describe('getPrecalculatedVariableName', () => {
 	test.each([
 		['tnlt_-15', '-15C'],
 		['tnlt_-25', '-25C'],
-	])('correctly names days_below_tmin (%s)', (threshold, expectedNamePart) => {
-		const climateVariable = new ClimateVariableBase({
-			id: 'days_below_tmin',
-			class: 'ClimateVariableBase',
-			threshold: threshold,
-		});
-		const result = getPrecalculatedVariableName(climateVariable);
-		expect(result).toEqual(`Days-with-Tmin_LesserThan_${expectedNamePart}`);
-	});
+	])(
+		'correctly names days_below_tmin (%s)',
+		(threshold, expectedNamePart) => {
+			const climateVariable = new ClimateVariableBase({
+				id: 'days_below_tmin',
+				class: 'ClimateVariableBase',
+				threshold: threshold,
+			});
+			const result = getPrecalculatedVariableName(climateVariable);
+			expect(result).toEqual(
+				`Days-with-Tmin_LesserThan_${expectedNamePart}`
+			);
+		}
+	);
 
 	test.each([
 		['txgt_25', '25C'],
@@ -69,15 +77,20 @@ describe('getPrecalculatedVariableName', () => {
 		['txgt_29', '29C'],
 		['txgt_30', '30C'],
 		['txgt_32', '32C'],
-	])('correctly names days_above_tmax (%s)', (threshold, expectedNamePart) => {
-		const climateVariable = new ClimateVariableBase({
-			id: 'days_above_tmax',
-			class: 'ClimateVariableBase',
-			threshold: threshold,
-		});
-		const result = getPrecalculatedVariableName(climateVariable);
-		expect(result).toEqual(`Days-with-Tmax_GreaterThan_${expectedNamePart}`);
-	});
+	])(
+		'correctly names days_above_tmax (%s)',
+		(threshold, expectedNamePart) => {
+			const climateVariable = new ClimateVariableBase({
+				id: 'days_above_tmax',
+				class: 'ClimateVariableBase',
+				threshold: threshold,
+			});
+			const result = getPrecalculatedVariableName(climateVariable);
+			expect(result).toEqual(
+				`Days-with-Tmax_GreaterThan_${expectedNamePart}`
+			);
+		}
+	);
 
 	test.each([
 		['r1mm', '1mm'],
@@ -97,15 +110,20 @@ describe('getPrecalculatedVariableName', () => {
 		['tr_18', '18C'],
 		['tr_20', '20C'],
 		['tr_22', '22C'],
-	])('correctly names tropical_nights_days_with_tmin_above_threshold (%s)', (threshold, expectedNamePart) => {
-		const climateVariable = new ClimateVariableBase({
-			id: 'tropical_nights_days_with_tmin_above_threshold',
-			class: 'ClimateVariableBase',
-			threshold: threshold,
-		});
-		const result = getPrecalculatedVariableName(climateVariable);
-		expect(result).toEqual(`Tropical-Nights-Days-with-Tmin_GreaterThan_${expectedNamePart}`);
-	});
+	])(
+		'correctly names tropical_nights_days_with_tmin_above_threshold (%s)',
+		(threshold, expectedNamePart) => {
+			const climateVariable = new ClimateVariableBase({
+				id: 'tropical_nights_days_with_tmin_above_threshold',
+				class: 'ClimateVariableBase',
+				threshold: threshold,
+			});
+			const result = getPrecalculatedVariableName(climateVariable);
+			expect(result).toEqual(
+				`Tropical-Nights-Days-with-Tmin_GreaterThan_${expectedNamePart}`
+			);
+		}
+	);
 
 	test('returns null for an unsupported variable', () => {
 		const climateVariable = new ClimateVariableBase({
@@ -134,16 +152,19 @@ describe('trackGraphExport', () => {
 		['png', 'Image'],
 		['pdf', 'Image'],
 		['print', 'Image'],
-	])('sets the correct event name and format for "%s"', (format, expectedType) => {
-		trackGraphExport(format, 'test', [], climateVariable);
-		expect(mockGtag).toHaveBeenCalledWith(
-			expect.objectContaining({
-				'event': `Variable_Download-${expectedType}_Hottest-Day`,
-				'chart_data_event_type': `Variable_Download-${expectedType}_Hottest-Day`,
-				'chart_data_format': format,
-			})
-		);
-	});
+	])(
+		'sets the correct event name and format for "%s"',
+		(format, expectedType) => {
+			trackGraphExport(format, 'test', [], climateVariable);
+			expect(mockGtag).toHaveBeenCalledWith(
+				expect.objectContaining({
+					event: `Variable_Download-${expectedType}_Hottest-Day`,
+					chart_data_event_type: `Variable_Download-${expectedType}_Hottest-Day`,
+					chart_data_format: format,
+				})
+			);
+		}
+	);
 
 	test('gtag is not called if unknown format', () => {
 		trackGraphExport('unknown', 'test', [], climateVariable);
@@ -166,7 +187,7 @@ describe('trackGraphExport', () => {
 		trackGraphExport('csv', 'test', chartSeries, climateVariable);
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'chart_data_columns': 'Series 2, Series 4',
+				chart_data_columns: 'Series 2, Series 4',
 			})
 		);
 	});
@@ -177,7 +198,7 @@ describe('trackGraphExport', () => {
 		trackGraphExport('csv', 'Region name, QC', [], climateVariable);
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'chart_data_settings': 'Region name, QC; ssp370; Annual',
+				chart_data_settings: 'Region name, QC; ssp370; Annual',
 			})
 		);
 	});
@@ -187,17 +208,20 @@ describe('trackGraphExport', () => {
 		trackGraphExport('csv', 'test', [], climateVariable);
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'chart_data_dataset': 'cmip5',
+				chart_data_dataset: 'cmip5',
 			})
 		);
 	});
 
 	test('chart_data_view_by contains expected value', () => {
-		climateVariable.getInteractiveRegion = () => InteractiveRegionOption.CENSUS;
+		climateVariable.getInteractiveRegion = () =>
+			InteractiveRegionOption.CENSUS;
 		trackGraphExport('csv', 'test', [], climateVariable);
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'chart_data_view_by': getInteractiveRegionName(InteractiveRegionOption.CENSUS),
+				chart_data_view_by: getInteractiveRegionName(
+					InteractiveRegionOption.CENSUS
+				),
 			})
 		);
 	});
@@ -216,7 +240,10 @@ describe('getAnalyzeVariableName', () => {
 	test.each([
 		['days_humidex_above_threshold', 'HXMax-Days-Above-a-Threshold'],
 		['wet_days', 'Wet-Days'],
-		['average_wet_day_precipitation_intensity', 'Average-Wet-Day-Precipitation-Intensity'],
+		[
+			'average_wet_day_precipitation_intensity',
+			'Average-Wet-Day-Precipitation-Intensity',
+		],
 		['maximum_consecutive_wet_days', 'Maximum-Consecutive-Wet-Days'],
 		['maximum_consecutive_dry_days', 'Maximum-Consecutive-Dry-Days'],
 		['days_above_tmax_and_tmin', 'Days-above-Tmax-and-Tmin'],
@@ -240,7 +267,7 @@ describe('getAnalyzeVariableName', () => {
 		climateVariable.getId = () => 'unknown';
 		const result = getAnalyzeVariableName(climateVariable);
 		expect(result).toBeNull();
-	})
+	});
 });
 
 describe('trackFinchDownload', () => {
@@ -260,8 +287,8 @@ describe('trackFinchDownload', () => {
 		const expectedEventName = 'Analyze_BCCAQv2_Days-above-Tmax-and-Tmin';
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'event': expectedEventName,
-				'analyze_bccaqv2_event_type': expectedEventName,
+				event: expectedEventName,
+				analyze_bccaqv2_event_type: expectedEventName,
 			})
 		);
 	});
@@ -284,25 +311,31 @@ describe('trackFinchDownload', () => {
 		['thresh', 'thresh'],
 		['thresh_tasmin', 'threshold tasmin'],
 		['thresh_tasmax', 'threshold tasmax'],
-	])('correctly renames input parameter "%s"', (parameterId, expectedName) => {
-		trackFinchDownload(climateVariable, [{ id: parameterId, data: 'test-value' }]);
-		expect(mockGtag).toHaveBeenCalledWith(
-			expect.objectContaining({
-				'analyze_bccaqv2_parameters': `${expectedName}: test-value;`,
-			})
-		);
-	});
+	])(
+		'correctly renames input parameter "%s"',
+		(parameterId, expectedName) => {
+			trackFinchDownload(climateVariable, [
+				{ id: parameterId, data: 'test-value' },
+			]);
+			expect(mockGtag).toHaveBeenCalledWith(
+				expect.objectContaining({
+					analyze_bccaqv2_parameters: `${expectedName}: test-value;`,
+				})
+			);
+		}
+	);
 
 	test('correctly includes multiple input parameters', () => {
 		const inputParameters = [
 			{ id: 'ensemble_percentiles', data: '10' },
 			{ id: 'ensemble_percentiles', data: '50' },
-			{ id: 'thresh_tasmax', data: '10degC' }
+			{ id: 'thresh_tasmax', data: '10degC' },
 		];
 		trackFinchDownload(climateVariable, inputParameters);
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'analyze_bccaqv2_parameters': "ensemble percentiles: 10;  ensemble percentiles: 50;  threshold tasmax: 10degC;",
+				analyze_bccaqv2_parameters:
+					'ensemble percentiles: 10;  ensemble percentiles: 50;  threshold tasmax: 10degC;',
 			})
 		);
 	});
@@ -311,12 +344,12 @@ describe('trackFinchDownload', () => {
 		const inputParameters = [
 			{ id: 'unknown', data: '10' },
 			{ id: 'scenario', data: 'ssp370' },
-			{ id: 'another-unknown', data: '10degC' }
+			{ id: 'another-unknown', data: '10degC' },
 		];
 		trackFinchDownload(climateVariable, inputParameters);
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'analyze_bccaqv2_parameters': "scenario: ssp370;",
+				analyze_bccaqv2_parameters: 'scenario: ssp370;',
 			})
 		);
 	});
@@ -342,67 +375,74 @@ describe('trackPrecalculatedDownload', () => {
 
 	test('sets the correct event name', () => {
 		trackPrecalculatedDownload(climateVariable);
-		const expectedEventName = 'Download_Variable-Data_BCCAQv2_Mean-Temperature_Frequency_Location_Format';
+		const expectedEventName =
+			'Download_Variable-Data_BCCAQv2_Mean-Temperature_Frequency_Location_Format';
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'event': expectedEventName,
-				'variable_data_event_type': expectedEventName,
+				event: expectedEventName,
+				variable_data_event_type: expectedEventName,
 			})
 		);
 	});
 
 	test('sets the correct variable_data_location for gridded', () => {
 		const gridCells = {
-			'aaa': { lat: 1, lng: 2 },
+			aaa: { lat: 1, lng: 2 },
 			567: { lat: 3.122343425, lng: -4.5 },
 		} as GridCoordinates;
 		climateVariable.getSelectedPoints = () => gridCells;
 		trackPrecalculatedDownload(climateVariable);
-		const expectedDataLocation = 'GridID: 567, Lat: 3.122343425, Lng: -4.5 ; GridID: aaa, Lat: 1, Lng: 2';
+		const expectedDataLocation =
+			'GridID: 567, Lat: 3.122343425, Lng: -4.5 ; GridID: aaa, Lat: 1, Lng: 2';
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'variable_data_location': expectedDataLocation,
+				variable_data_location: expectedDataLocation,
 			})
 		);
 	});
 
 	test('sets correct variable_data_location for bbox', () => {
 		const gridRegion = {
-			bounds: [[1, 2], [3.543534534, -5.5]],
+			bounds: [
+				[1, 2],
+				[3.543534534, -5.5],
+			],
 			cellCount: 5,
 		} as GridRegion;
 		climateVariable.getSelectedRegion = () => gridRegion;
 		trackPrecalculatedDownload(climateVariable);
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'variable_data_location': 'BBox: 1,2,3.543534534,-5.5',
+				variable_data_location: 'BBox: 1,2,3.543534534,-5.5',
 			})
 		);
 	});
 
-	test.each([
-		FileFormatType.CSV, FileFormatType.JSON, FileFormatType.NetCDF
-	] )('sets correct variable_data_format for %s', (format) => {
-		climateVariable.getFileFormat = (): FileFormatType => format;
-		trackPrecalculatedDownload(climateVariable);
-		expect(mockGtag).toHaveBeenCalledWith(
-			expect.objectContaining({
-				'variable_data_format': format,
-			})
-		);
-	});
+	test.each([FileFormatType.CSV, FileFormatType.JSON, FileFormatType.NetCDF])(
+		'sets correct variable_data_format for %s',
+		(format) => {
+			climateVariable.getFileFormat = (): FileFormatType => format;
+			trackPrecalculatedDownload(climateVariable);
+			expect(mockGtag).toHaveBeenCalledWith(
+				expect.objectContaining({
+					variable_data_format: format,
+				})
+			);
+		}
+	);
 
-	test.each([
-		'cmip5', 'cmip6',
-	])('sets correct variable_data_dataset for %s', (version) => {
-		climateVariable.getVersion = () => version;
-		trackPrecalculatedDownload(climateVariable);
-		expect(mockGtag).toHaveBeenCalledWith(
-			expect.objectContaining({
-				'variable_data_dataset': version,
-			})
-		);
-	});
+	test.each(['cmip5', 'cmip6'])(
+		'sets correct variable_data_dataset for %s',
+		(version) => {
+			climateVariable.getVersion = () => version;
+			trackPrecalculatedDownload(climateVariable);
+			expect(mockGtag).toHaveBeenCalledWith(
+				expect.objectContaining({
+					variable_data_dataset: version,
+				})
+			);
+		}
+	);
 
 	test('gtag is not called for an unknown variable', () => {
 		climateVariable.getId = () => 'unknown';
@@ -431,22 +471,23 @@ describe('trackStationDataDownload', () => {
 		trackStationDataDownload(climateVariable);
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'event': `Download_${expectedName}`,
-				'download_station_data_event': `Download_${expectedName}`,
+				event: `Download_${expectedName}`,
+				download_station_data_event: `Download_${expectedName}`,
 			})
 		);
 	});
 
 	test('correctly sets download_station_data_list', () => {
 		climateVariable.getSelectedPoints = () => ({
-			'aaa': {lat: 1, lng: 2, name: 'Station A'},
-			'bbb': {lat: 3, lng: 4}, // no name
-			'ccc': {lat: 3, lng: 4, name: 'Station C'},
+			aaa: { lat: 1, lng: 2, name: 'Station A' },
+			bbb: { lat: 3, lng: 4 }, // no name
+			ccc: { lat: 3, lng: 4, name: 'Station C' },
 		});
 		trackStationDataDownload(climateVariable);
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'download_station_data_list': 'aaa -- Station A ; bbb ; ccc -- Station C',
+				download_station_data_list:
+					'aaa -- Station A ; bbb ; ccc -- Station C',
 			})
 		);
 	});
@@ -454,15 +495,18 @@ describe('trackStationDataDownload', () => {
 	test.each([
 		[FileFormatType.CSV, 'CSV'],
 		[FileFormatType.GeoJSON, 'GeoJSON'],
-	] as [FileFormatType, string][])('correctly sets download_station_file_extension to %s', (format, expected) => {
-		climateVariable.getFileFormat = () => format;
-		trackStationDataDownload(climateVariable);
-		expect(mockGtag).toHaveBeenCalledWith(
-			expect.objectContaining({
-				'download_station_file_extension': expected,
-			})
-		);
-	});
+	] as [FileFormatType, string][])(
+		'correctly sets download_station_file_extension to %s',
+		(format, expected) => {
+			climateVariable.getFileFormat = () => format;
+			trackStationDataDownload(climateVariable);
+			expect(mockGtag).toHaveBeenCalledWith(
+				expect.objectContaining({
+					download_station_file_extension: expected,
+				})
+			);
+		}
+	);
 
 	test('gtag is not called for other variables', () => {
 		climateVariable.getId = () => 'mean_temp';
@@ -470,7 +514,6 @@ describe('trackStationDataDownload', () => {
 		expect(mockGtag).not.toHaveBeenCalled();
 	});
 });
-
 
 describe('trackIDFDownload', () => {
 	const mockGtag = gtag as Mock;
@@ -480,19 +523,17 @@ describe('trackIDFDownload', () => {
 	});
 
 	test('sets the correct event name', () => {
-		trackIDFDownload(
-			'Lorem Ipsùm (dolor sit) - AMET',
-			'test.zip',
-		);
+		trackIDFDownload('Lorem Ipsùm (dolor sit) - AMET', 'test.zip');
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({
-				'event': 'Download_IDF-Curves_Lorem_Ipsùm_dolor_sit_-_AMET',
+				event: 'Download_IDF-Curves_Lorem_Ipsùm_dolor_sit_-_AMET',
 			})
 		);
 	});
 
 	test('sets the correct file name', () => {
-		const fileName = 'NORMAN_WELLS_CLIMATE_2202810_65.28_126.75_cmip6-quickstart.zip';
+		const fileName =
+			'NORMAN_WELLS_CLIMATE_2202810_65.28_126.75_cmip6-quickstart.zip';
 		trackIDFDownload('test', fileName);
 		expect(mockGtag).toHaveBeenCalledWith(
 			expect.objectContaining({

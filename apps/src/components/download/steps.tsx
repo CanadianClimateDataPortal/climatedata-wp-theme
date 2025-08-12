@@ -25,7 +25,7 @@ import {
 } from '@/types/climate-variable-interface';
 import { useLocale } from "@/hooks/use-locale";
 import { sprintf } from "@wordpress/i18n";
-import { trackFinchDownload } from '@/lib/google-analytics.ts';
+import { trackFinchDownload } from '@/lib/google-analytics';
 
 /**
  * The Steps component dynamically renders the current step component from the STEPS configuration.

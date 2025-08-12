@@ -16,7 +16,7 @@ import {
 	InteractiveRegionDisplay,
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
-import { getInteractiveRegionName } from '@/lib/utils.ts';
+import { getInteractiveRegionName } from '@/lib/utils';
 
 interface InteractiveRegionSelectProps {
 	onChange?: (value: InteractiveRegionOption) => void;

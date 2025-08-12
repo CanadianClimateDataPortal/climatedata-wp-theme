@@ -26,7 +26,7 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import appConfig from '@/config/app.config';
 import { doyFormatter, formatValue } from '@/lib/format';
 import { getChartDataOptions, getSeriesObject } from '@/config/chart-config';
-import { AveragingType } from '@/types/climate-variable-interface';
+import { AveragingType } from "@/types/climate-variable-interface";
 import { trackGraphExport } from '@/lib/google-analytics';
 
 type TabValue = 'annual-values' | '30-year-averages' | '30-year-changes';

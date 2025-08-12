@@ -4,46 +4,60 @@ import {
 	FrequencyConfig,
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
-import { getDefaultFrequency, getFrequencyName, getInteractiveRegionName } from '@/lib/utils.ts';
-import { FinchRequestInput } from '@/types/download-form-interface.ts';
-import { HighChartSeries } from '@/types/types.ts';
+import {
+	getDefaultFrequency,
+	getFrequencyName,
+	getInteractiveRegionName,
+} from '@/lib/utils.ts';
+import { FinchRequestInput } from '@/types/download-form-interface';
+import { HighChartSeries } from '@/types/types';
 
 declare global {
 	interface Window {
-		gtag: (...args: any[]) => void;
+		gtag: (...args: unknown[]) => void;
 	}
 }
 
+/**
+ * Default no-op function used in place of window.gtag when it is not available.
+ */
 function fallbackGtag() {
 	// Do nothing
 }
 
-export const gtag = (window?.gtag ?? fallbackGtag);
+export const gtag = window?.gtag ?? fallbackGtag;
 
-export function getPrecalculatedVariableName(climateVariable: ClimateVariableInterface): string | null {
+/**
+ * Get the "pre-calculated" name of a variable for Google Analytics tracking.
+ *
+ * @param climateVariable - The climate variable to get the name for.
+ */
+export function getPrecalculatedVariableName(
+	climateVariable: ClimateVariableInterface
+): string | null {
 	const threshold = climateVariable.getThreshold() ?? '';
 	const variableId = climateVariable.getId();
 
 	const nameMapForSimpleVariables: { [key: string]: string } = {
-		'all_candcs_variables': 'All',
-		'hottest_day': 'Hottest-Day',
-		'mean_temp': 'Mean-Temperature',
-		'minimum_temperature': 'Minimum-Temperature',
-		'maximum_temperature': 'Maximum-Temperature',
-		'coldest_day': 'Coldest-Day',
-		'max_1d_total_precipitation': 'Maximum-1-Day-Total-Precipitation',
-		'total_precipitation': 'Total-Precipitation',
-		'frost_days': 'Frost-Days',
-		'cooling_degree_days': 'Cooling-Degree-Days',
-		'cumulative_degree_days_above_0': 'Cumulative-degree-days-above-0C',
-		'growing_degree_days_5': 'Growing-Degree-Days-5C',
-		'heating_degree_days': 'Heating-degree-days',
-		'ice_days': 'Ice-Days',
-		'spei_3': 'SPEI(3-months)',
-		'spei_12': 'SPEI(12-months)',
-		'sea_level': 'Sea-Level_Change',
-		'msc_climate_normals': 'MSC-Climate-Normals',
-		'station_data': 'Station-Data',
+		all_candcs_variables: 'All',
+		hottest_day: 'Hottest-Day',
+		mean_temp: 'Mean-Temperature',
+		minimum_temperature: 'Minimum-Temperature',
+		maximum_temperature: 'Maximum-Temperature',
+		coldest_day: 'Coldest-Day',
+		max_1d_total_precipitation: 'Maximum-1-Day-Total-Precipitation',
+		total_precipitation: 'Total-Precipitation',
+		frost_days: 'Frost-Days',
+		cooling_degree_days: 'Cooling-Degree-Days',
+		cumulative_degree_days_above_0: 'Cumulative-degree-days-above-0C',
+		growing_degree_days_5: 'Growing-Degree-Days-5C',
+		heating_degree_days: 'Heating-degree-days',
+		ice_days: 'Ice-Days',
+		spei_3: 'SPEI(3-months)',
+		spei_12: 'SPEI(12-months)',
+		sea_level: 'Sea-Level_Change',
+		msc_climate_normals: 'MSC-Climate-Normals',
+		station_data: 'Station-Data',
 	};
 
 	if (nameMapForSimpleVariables[variableId]) {
@@ -86,11 +100,19 @@ export function getPrecalculatedVariableName(climateVariable: ClimateVariableInt
 	return null;
 }
 
-export function getAnalyzeVariableName(climateVariable: ClimateVariableInterface): string | null {
+/**
+ * Get the "analyze" name of a variable for Google Analytics tracking.
+ *
+ * @param climateVariable - The climate variable to get the name for.
+ */
+export function getAnalyzeVariableName(
+	climateVariable: ClimateVariableInterface
+): string | null {
 	const nameMap: { [key: string]: string } = {
 		days_humidex_above_threshold: 'HXMax-Days-Above-a-Threshold',
 		wet_days: 'Wet-Days',
-		average_wet_day_precipitation_intensity: 'Average-Wet-Day-Precipitation-Intensity',
+		average_wet_day_precipitation_intensity:
+			'Average-Wet-Day-Precipitation-Intensity',
 		maximum_consecutive_wet_days: 'Maximum-Consecutive-Wet-Days',
 		maximum_consecutive_dry_days: 'Maximum-Consecutive-Dry-Days',
 		days_above_tmax_and_tmin: 'Days-above-Tmax-and-Tmin',
@@ -109,7 +131,20 @@ export function getAnalyzeVariableName(climateVariable: ClimateVariableInterface
 	return nameMap[climateVariable.getId()] ?? null;
 }
 
-export function trackGraphExport(format: string, locationName: string, chartSeries: HighChartSeries[], climateVariable: ClimateVariableInterface) {
+/**
+ * Track a Google Analytics event for an export from the graph panel in the Map.
+ *
+ * @param format - The format of the export (e.g., "csv", "pdf", "png", "print").
+ * @param locationName - The name of the location that is shown in the graph.
+ * @param chartSeries - Series shown in the Highcharts graph.
+ * @param climateVariable - The variable shown in the graph.
+ */
+export function trackGraphExport(
+	format: string,
+	locationName: string,
+	chartSeries: HighChartSeries[],
+	climateVariable: ClimateVariableInterface
+) {
 	const eventVariableName = getPrecalculatedVariableName(climateVariable);
 	let eventName = '';
 
@@ -135,19 +170,25 @@ export function trackGraphExport(format: string, locationName: string, chartSeri
 	eventName += eventVariableName;
 
 	const scenario = climateVariable.getScenario() ?? '';
-	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
-	const frequency = climateVariable?.getFrequency() ?? getDefaultFrequency(frequencyConfig, 'map');
+	const frequencyConfig =
+		climateVariable?.getFrequencyConfig() ?? ({} as FrequencyConfig);
+	const frequency =
+		climateVariable?.getFrequency() ??
+		getDefaultFrequency(frequencyConfig, 'map');
 	const frequencyName = getFrequencyName(frequency ?? '');
 	const chartDataSettings = `${locationName}; ${scenario}; ${frequencyName}`;
 
-	const chartDataColumns: string[] = []
+	const chartDataColumns: string[] = [];
 
 	chartSeries.forEach((series) => {
 		if (series.visible && series.type != 'areaspline') {
 			chartDataColumns.push(series.name);
 		}
 	});
-	const chartDataViewBy = getInteractiveRegionName(climateVariable.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA);
+	const chartDataViewBy = getInteractiveRegionName(
+		climateVariable.getInteractiveRegion() ??
+			InteractiveRegionOption.GRIDDED_DATA
+	);
 
 	gtag({
 		event: eventName,
@@ -160,7 +201,16 @@ export function trackGraphExport(format: string, locationName: string, chartSeri
 	});
 }
 
-export function trackFinchDownload(climateVariable: ClimateVariableInterface, inputs: FinchRequestInput[]) {
+/**
+ * Track a Google Analytics event for an "analyze" variable download.
+ *
+ * @param climateVariable - The variable that has been downloaded.
+ * @param inputs - The "inputs" attributes sent in the Finch request.
+ */
+export function trackFinchDownload(
+	climateVariable: ClimateVariableInterface,
+	inputs: FinchRequestInput[]
+) {
 	const inputToNameMap: { [key: string]: string } = {
 		lat: 'latitude',
 		lon: 'longitude',
@@ -188,21 +238,28 @@ export function trackFinchDownload(climateVariable: ClimateVariableInterface, in
 	}
 
 	const eventName = `Analyze_BCCAQv2_${variableName}`;
-	let parameters: string[] = [];
+	const parameters: string[] = [];
 	inputs.forEach((input) => {
 		if (inputToNameMap[input.id]) {
-			parameters.push(`${inputToNameMap[input.id]}: ${input.data};`)
+			parameters.push(`${inputToNameMap[input.id]}: ${input.data};`);
 		}
-	})
+	});
 
 	gtag({
 		event: eventName,
 		analyze_bccaqv2_event_type: eventName,
 		analyze_bccaqv2_parameters: parameters.join('  '),
-	})
+	});
 }
 
-export function trackPrecalculatedDownload(climateVariable: ClimateVariableInterface) {
+/**
+ * Track a Google Analytics event for a "precalculated" variable download.
+ *
+ * @param climateVariable - The variable that has been downloaded.
+ */
+export function trackPrecalculatedDownload(
+	climateVariable: ClimateVariableInterface
+) {
 	const variableName = getPrecalculatedVariableName(climateVariable);
 
 	if (!variableName) {
@@ -218,29 +275,41 @@ export function trackPrecalculatedDownload(climateVariable: ClimateVariableInter
 
 	// For individual grid-cell selection
 	if (selectedPoints) {
-		const locationPoints = Object.entries(selectedPoints).map(([gridId, coordinates]) =>
-			`GridID: ${gridId}, Lat: ${coordinates.lat}, Lng: ${coordinates.lng}`
+		const locationPoints = Object.entries(selectedPoints).map(
+			([gridId, coordinates]) =>
+				`GridID: ${gridId}, Lat: ${coordinates.lat}, Lng: ${coordinates.lng}`
 		);
 		dataLocation = locationPoints.join(' ; ');
 	}
 
 	// For bounding-box selection
 	if (selectedRegion && selectedRegion.bounds) {
-		const bounds = selectedRegion.bounds as [[number, number], [number, number]];
-		dataLocation = `BBox: ${bounds[0][0]},${bounds[0][1]},${bounds[1][0]},${bounds[1][1]}`
+		const bounds = selectedRegion.bounds as [
+			[number, number],
+			[number, number],
+		];
+		dataLocation = `BBox: ${bounds[0][0]},${bounds[0][1]},${bounds[1][0]},${bounds[1][1]}`;
 	}
 
 	gtag({
-		'event': eventName,
-		'variable_data_event_type': eventName,
-		'variable_data_location': dataLocation,
-		'variable_data_format': fileFormat ?? '',
-		'variable_data_dataset': version ?? '',
+		event: eventName,
+		variable_data_event_type: eventName,
+		variable_data_location: dataLocation,
+		variable_data_format: fileFormat ?? '',
+		variable_data_dataset: version ?? '',
 	});
 }
 
-export function trackStationDataDownload(climateVariable: ClimateVariableInterface) {
-	const supportedVariableIds = ['station_data', 'msc_climate_normals']
+/**
+ * Track a Google Analytics event for a "station" variable download.
+ *
+ * @param climateVariable - The variable that has been downloaded.
+ *   Only "Station data" and "MSC climate normals" variables are supported.
+ */
+export function trackStationDataDownload(
+	climateVariable: ClimateVariableInterface
+) {
+	const supportedVariableIds = ['station_data', 'msc_climate_normals'];
 	if (!supportedVariableIds.includes(climateVariable.getId())) {
 		return;
 	}
@@ -248,7 +317,7 @@ export function trackStationDataDownload(climateVariable: ClimateVariableInterfa
 	const fileFormatNameMap: Partial<Record<FileFormatType, string>> = {
 		[FileFormatType.GeoJSON]: 'GeoJSON',
 		[FileFormatType.CSV]: 'CSV',
-	}
+	};
 
 	const variableName = getPrecalculatedVariableName(climateVariable);
 	const eventName = `Download_${variableName}`;
@@ -259,29 +328,43 @@ export function trackStationDataDownload(climateVariable: ClimateVariableInterfa
 		fileFormat = fileFormatNameMap[rawFileFormat];
 	}
 
-	let downloadStations = Object.entries(stations).map(([stationId, stationData]) => {
-		let stationDescription = stationId;
-		if (stationData.name) {
-			stationDescription += ` -- ${stationData.name}`;
+	const downloadStations = Object.entries(stations).map(
+		([stationId, stationData]) => {
+			let stationDescription = stationId;
+			if (stationData.name) {
+				stationDescription += ` -- ${stationData.name}`;
+			}
+			return stationDescription;
 		}
-		return stationDescription;
-	});
+	);
 
 	gtag({
-		'event': eventName,
-		'download_station_data_event': eventName,
-		'download_station_data_list': downloadStations.join(' ; '),
-		'download_station_file_extension': fileFormat,
+		event: eventName,
+		download_station_data_event: eventName,
+		download_station_data_list: downloadStations.join(' ; '),
+		download_station_file_extension: fileFormat,
 	});
 }
 
-export function trackIDFDownload(fileTitle: string, fileName: string) {
-	const formatedFileTitle = fileTitle.replace(/[()]/g, '').replaceAll(' ', '_');
+/**
+ * Track a Google Analytics event for an "IDF station" data download.
+ *
+ * @param fileTitle - The name of the file that is being downloaded.
+ * @param filePath - The path of the file that is being downloaded. Only the
+ *   last part of the path is used for the event name.
+ */
+export function trackIDFDownload(fileTitle: string, filePath: string) {
+	const formatedFileTitle = fileTitle
+		.replace(/[()]/g, '')
+		.replaceAll(' ', '_');
 	const eventName = `Download_IDF-Curves_${formatedFileTitle}`;
-	const fileNameParts = fileName.split('/');
+	const fileNameParts = filePath.split('/');
 
 	gtag({
-		'event': eventName,
-		'download-idf-curves-file': fileNameParts.length > 0 ? fileNameParts[fileNameParts.length - 1] : fileName,
+		event: eventName,
+		'download-idf-curves-file':
+			fileNameParts.length > 0
+				? fileNameParts[fileNameParts.length - 1]
+				: filePath,
 	});
 }

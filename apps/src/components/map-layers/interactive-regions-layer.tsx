@@ -50,6 +50,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		startYear,
 		isDelta7100,
 		isCategorical,
+		decimals,
 	} = useMemo(() => ({
 		threshold: climateVariable?.getThreshold() ?? '',
 		datasetVersion: climateVariable?.getVersion() ?? '',
@@ -58,6 +59,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
 		isDelta7100: climateVariable?.getDataValue() === 'delta',
 		isCategorical: climateVariable?.getColourType() !== ColourType.CONTINUOUS,
+		decimals: climateVariable?.getUnitDecimalPlaces() ?? 0,
 	}), [climateVariable]);
 
 	const getFeatureColor = useCallback(
@@ -151,7 +153,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 					frequency,
 					interactiveRegion,
 					emissionScenario: scenario ?? '',
-					decimals: 1,
+					decimals: decimals,
 					isDelta7100: isDelta7100,
 				});
 
@@ -168,6 +170,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		startYear,
 		threshold,
 		isDelta7100,
+		decimals,
 	]);
 
 	// Helper for click event

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, WMSTileLayer } from 'react-leaflet';
 import { LAYER_KEYS, MAP_CONFIG, WMS_PARAMS } from '@/config/map.config';
 import 'leaflet.vectorgrid';
@@ -80,7 +80,7 @@ export default function MarineMapContainer({
 	};
 
 	// Handle click on details button of a location (to open the chart panel)
-	const handleDetailsClick = async () => {
+	const handleDetailsClick = useCallback(async () => {
 		if (selectedLocation) {
 			const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 			const { title, latlng, featureId } = selectedLocation;
@@ -119,7 +119,7 @@ export default function MarineMapContainer({
 				}
 			);
 		}
-	}
+	}, [climateVariable, selectedLocation, togglePanel, isMobile, section, scenario]);
 
 	const mapRef = useRef<L.Map | null>(null);
 

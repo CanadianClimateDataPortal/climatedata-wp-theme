@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { MAP_CONFIG } from '@/config/map.config';
 import 'leaflet.vectorgrid';
@@ -82,7 +82,7 @@ export default function RasterMapContainer({
 	};
 
 	// Handle click on details button of a location (to open the chart panel)
-	const handleDetailsClick = async () => {
+	const handleDetailsClick = useCallback(async () => {
 		if (selectedLocation) {
 			const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 			const { title, latlng, featureId } = selectedLocation;
@@ -121,7 +121,7 @@ export default function RasterMapContainer({
 				}
 			);
 		}
-	}
+	}, [climateVariable, selectedLocation, togglePanel, isMobile, section, scenario]);
 
 	const mapRef = useRef<L.Map | null>(null);
 
@@ -161,7 +161,7 @@ export default function RasterMapContainer({
 		else if(!selectedStation) {
 			setLocationModalContent(null);
 		}
-	}, [selectedLocation, setLocationModalContent, scenario, canShowModal, selectedStation, selectedLocation]);
+	}, [selectedLocation, setLocationModalContent, scenario, canShowModal, selectedStation, handleDetailsClick]);
 
 	useEffect(() => {
 		if (mapRef.current) {

@@ -178,7 +178,9 @@ const ClimateDataChart: React.FC<{
 	const tooltip30yFormatter = (x: number, prefix: string, isDelta: boolean, currentActiveSeries: string[]) => {
 		// Chart reference
 		const chart = chartRef.current?.chart;
-		if (!chart) return;
+		if (!chart) {
+			return false;
+		}
 		// Remove previous plot band
 		chart.xAxis[0].removePlotBand('30y-plot-band',);
 
@@ -186,13 +188,17 @@ const ClimateDataChart: React.FC<{
 		const currentTimestamp = x;
 		const dataKey = prefix + scenario + '_median';
 		const dataRecord = data[dataKey];
-		if (!dataRecord) return '';
+		if (!dataRecord) {
+			return false;
+		}
 
 		const timestampKey = findClosetTimestamp(currentTimestamp, dataRecord as Record<string, number[]>);
-		if(timestampKey === null) return '';
+		if(timestampKey === null) {
+			return false;
+		}
 
 		// Displayed period
-		const startYear = new Date(timestampKey).getFullYear() + 1;
+		const startYear = new Date(timestampKey).getUTCFullYear();
 		const endYear = startYear + 29;
 
 		// Add plot band on 30 years range
@@ -253,7 +259,7 @@ const ClimateDataChart: React.FC<{
 							}).join('') || '';
 					}
 
-					const year = new Date(this.x).getFullYear() + 1;
+					const year = new Date(this.x).getUTCFullYear();
 					return `<b>${year}</b><br/>` +
 						points?.map((point: TooltipPoint) => {
 							if (point.series.type === 'arearange') {
@@ -442,7 +448,7 @@ const ClimateDataChart: React.FC<{
 					enabled: true,
 					type: 'x'
 				},
-				panKey: 'shift'
+				panKey: 'shift',
 			},
 			exporting: {
 				filename: getExportFilename(),
@@ -514,6 +520,8 @@ const ClimateDataChart: React.FC<{
 			} : {
 				crosshair: false,
 				type: 'datetime',
+				minPadding: 0,
+				maxPadding: 0,
 			},
 			yAxis: climateVariableId === 'msc_climate_normals' ? [
 				{
@@ -758,8 +766,8 @@ const ClimateDataChart: React.FC<{
 
 										acc[newKey] = Object.fromEntries(
 											Object.entries(dataCopy[key] ?? {}).map(([timestamp, value]) => {
-												const year = new Date(Number(timestamp)).getFullYear();
-												return [(year + 1) + "-" + (year + 30), value as number[]];
+												const year = new Date(Number(timestamp)).getUTCFullYear();
+												return [`${year} - ${year + 29}`, value as number[]];
 											})
 										);
 										return acc;

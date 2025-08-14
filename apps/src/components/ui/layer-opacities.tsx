@@ -1,14 +1,13 @@
 import { cn } from '@/lib/utils';
 import { ControlTitle } from '@/components/ui/control-title';
-import { useAppSelector } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { __ } from '@/context/locale-provider';
 import { setOpacity } from '@/features/map/map-slice';
-import { useAppDispatch } from '@/app/hooks';
-import { MapItemsOpacity } from '@/types/types';
-import { SliderLabelsMap } from '@/types/types';
+import { MapItemsOpacity, SliderLabelsMap } from '@/types/types';
 import * as Slider from '@radix-ui/react-slider';
 import { ReactElement } from 'react';
 import { MAP_OPACITY_MIN } from '@/lib/constants';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 /**
  * LayerOpacities Component
@@ -23,10 +22,16 @@ import { MAP_OPACITY_MIN } from '@/lib/constants';
 
 const LayerOpacities = (): ReactElement => {
 	const { opacity } = useAppSelector((state) => state.map);
-	const opacityMap = Object.entries(opacity) as [
+	const { climateVariable } = useClimateVariable();
+	const isStationMode = climateVariable?.getInteractiveMode() === 'station';
+	const allOpacityOptions = Object.entries(opacity) as [
 		keyof SliderLabelsMap,
 		number,
 	][];
+	const opacityOptions = allOpacityOptions.filter(
+		([key]) => (key !== 'mapData' || !isStationMode)
+	);
+
 	const dispatch = useAppDispatch();
 
 	const sliderLabelsMap: SliderLabelsMap = {
@@ -49,7 +54,7 @@ const LayerOpacities = (): ReactElement => {
 		<div className="layer-opacity-slider px-2">
 			<ControlTitle title={__('Layer opacities')} />
 			<div className="flex flex-col gap-y-3">
-				{opacityMap.map(([key, value]) => (
+				{opacityOptions.map(([key, value]) => (
 					<div key={key}>
 						<span className="text-sm text-dark-purple mb-2">
 							{sliderLabelsMap[key]}

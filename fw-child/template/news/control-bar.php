@@ -27,13 +27,13 @@
 						
 						<div class="control-tab-body query-container">
 							
-							<div class="fw-query-filter ms-3 py-4" data-filter-type="taxonomy" data-filter-key="post_tag" data-filter-multi="false">
-								<h5 class="fw-bold"><?php _e ( 'Tag', 'cdc' ); ?></h5>
+							<div class="fw-query-filter ms-3 py-4" data-filter-type="taxonomy" data-filter-key="news-topic" data-filter-multi="false">
+								<h5 class="fw-bold"><?php _e ( 'Topics', 'cdc' ); ?></h5>
 								
 								<?php
 								
 									$all_tags = get_terms ( array ( 
-										'taxonomy' => 'post_tag',
+										'taxonomy' => 'news-topic',
 										'hide_empty' => true
 									) );
 								
@@ -54,7 +54,7 @@
 
 									?>
 
-									<li class="filter-item" data-key="post_tag" data-value="<?php echo $tag->slug; ?>"><?php echo $tag_name; ?></li>
+									<li class="filter-item" data-key="news-topic" data-value="<?php echo $tag->slug; ?>"><?php echo $tag_name; ?></li>
 
 									<?php
 

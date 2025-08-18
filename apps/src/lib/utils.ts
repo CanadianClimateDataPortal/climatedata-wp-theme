@@ -3,6 +3,7 @@ import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
 import { FrequencyConfig, FrequencyDisplayModeOption, FrequencyType } from '@/types/climate-variable-interface';
 import { __ } from '@/context/locale-provider';
+import { ParsedLatLon } from '@/types/types';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -136,35 +137,6 @@ export const getCommonPrefix = (strings: string[]) => {
 }
 
 /**
- * Validates and parses a latitude,longitude string.
- *
- * @param str A string in the format "lat,lng"
- * @returns An object with parsed lat/lng values or nulls if invalid
- */
-export const isLatLong = (str: string) => {
-	// Regular expression to match a pair of decimal numbers separated by a comma
-	// Allows optional negative sign and optional decimal places, with optional space after comma
-	const regex = /^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$/;
-
-	// Attempt to match the input string with the regex
-	const match = str.match(regex);
-	if (!match) return { lat: null, lng: null }; // Return nulls if the format doesn't match
-
-	// Parse the matched latitude and longitude values
-	const lat = parseFloat(match[1]);
-	const lng = parseFloat(match[3]);
-
-	// Check if latitude and longitude are within valid geographic ranges
-	if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-		return { lat: lat, lng: lng }; // Return parsed coordinates if valid
-	}
-
-	// Return nulls if values are out of valid geographic range
-	return { lat: null, lng: null };
-};
-
-
-/**
  * Generates a hash code from a string using a basic bitwise algorithm.
  *
  * Note: This is a non-cryptographic hash function and should not be used for security purposes.
@@ -251,7 +223,7 @@ export const getFeatureId = (properties: {
 
 /**
  * Return the translated display name for a unit from its technical code.
- * 
+ *
  * To be used when displaying only the unit's name, not a value followed by a
  * unit. In that case, use `formatValue()` instead.
  */
@@ -350,4 +322,55 @@ export function generateRange(a: number, b: number, n: number): number[] {
 	result[result.length - 1] = b;
 
 	return result;
+}
+
+/**
+ * Parses the latitude and longitude from a coordinate string.
+ *
+ * Supports partial coordinates, e.g. where only the latitude is specified.
+ *
+ * @param text - The text to parse
+ * @returns An object with the parsed latitude and longitude, or null if the
+ *   input is not a string representing coordinates.
+ */
+export function parseLatLon(text: string): ParsedLatLon | null {
+	text = text.trim();
+
+	if (text === '') {
+		return null;
+	}
+
+	if (text === '-') {
+		return {
+			lat: Number.NaN,
+			lon: Number.NaN,
+			isPartial: true,
+		}
+	}
+
+	const regex = /^(-?\d+(?:[.,]\d*)?)(?:\s*[,;\s]\s*(-?\d+(?:[.,]\d*)?)?)?$/;
+	const result = regex.exec(text);
+
+	if (!result) {
+		return null;
+	}
+
+	const latNumber = parseFloat(result[1].replace(',', '.'));
+	const lonNumber = result[2] ?
+		parseFloat(result[2].replace(',', '.')) :
+		Number.NaN;
+
+	if (!Number.isNaN(latNumber) && Math.abs(latNumber) > 90) {
+		return null;
+	}
+
+	if (!Number.isNaN(latNumber) && Math.abs(lonNumber) > 180) {
+		return null;
+	}
+
+	return {
+		lat: latNumber,
+		lon: lonNumber,
+		isPartial: Number.isNaN(lonNumber),
+	}
 }

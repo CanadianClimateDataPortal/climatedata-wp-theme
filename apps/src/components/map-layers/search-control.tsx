@@ -3,7 +3,7 @@
  * This component allows users to search for locations using the OpenStreetMap Nominatim API and navigate the map to the selected location.
  */
 
-import React, { useState, useEffect, ReactElement, useCallback, useMemo } from 'react';
+import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 import { __ } from '@/context/locale-provider';
 import { Locate, LocateFixed } from 'lucide-react';
 import { useMap } from 'react-leaflet';
@@ -14,17 +14,10 @@ import 'leaflet-search/dist/leaflet-search.min.css';
 import 'leaflet-search';
 import mapPinIcon from '@/assets/map-pin.svg';
 
-import { cn, isLatLong } from '@/lib/utils';
+import { cn, parseLatLon } from '@/lib/utils';
 import { fetchLocationByCoords } from '@/services/services';
-import {
-	SearchControlLocationItem,
-	SearchControlResponse,
-} from '@/types/types';
-import {
-	SEARCH_PLACEHOLDER,
-	SEARCH_DEFAULT_ZOOM,
-	LOCATION_SEARCH_ENDPOINT,
-} from '@/lib/constants';
+import { SearchControlLocationItem, SearchControlResponse } from '@/types/types';
+import { LOCATION_SEARCH_ENDPOINT, SEARCH_DEFAULT_ZOOM, SEARCH_PLACEHOLDER } from '@/lib/constants';
 
 /**
  * SearchControl Component
@@ -67,8 +60,7 @@ export default function SearchControl({
 	const map = useMap();
 
 	const handleLocationChange = useCallback(
-		(latlng: any) => {
-
+		(latlng: L.LatLng) => {
 			// clear all existing markers from the map
 			map.eachLayer(layer => {
 				if (layer instanceof L.Marker) {
@@ -83,7 +75,7 @@ export default function SearchControl({
 				vectorLayer.fire('click', {
 					latlng: {
 						lat: latlng.lat,
-						lng: latlng.lon,
+						lng: latlng.lng,
 					}
 				})
 			}
@@ -105,9 +97,7 @@ export default function SearchControl({
 				(position) => {
 					const { latitude, longitude } = position.coords;
 					const title = __('Your current location');
-					handleLocationChange(
-						L.latLng(latitude, longitude)
-					);
+					handleLocationChange(L.latLng(latitude, longitude));
 					L.marker([latitude, longitude], {
 						title: title,
 						icon: L.icon({
@@ -125,7 +115,6 @@ export default function SearchControl({
 					setIsTracking(false);
 
 					console.error('Error fetching geolocation:', err);
-					// TODO: what do do if geolocation fails?
 					alert(__('Unable to retrieve your location.'));
 				}
 			);
@@ -170,7 +159,7 @@ export default function SearchControl({
 		// @ts-expect-error: suppress leaflet typescript error
 		const searchControl = new L.Control.Search({
 			url: LOCATION_SEARCH_ENDPOINT,
-			propertyLoc: ['lat', 'lon'],
+			propertyLoc: ['lat', 'lng'],
 			autoResize: false,
 			collapsed: false,
 			autoCollapse: false,
@@ -181,7 +170,7 @@ export default function SearchControl({
 			formatData: (response: SearchControlResponse) => {
 				const formattedData: Record<
 					string,
-					SearchControlLocationItem & { title: string; loc: number[] }
+					SearchControlLocationItem & { loc: number[]; lng: string; }
 				> = {};
 
 				response.items.forEach((item: SearchControlLocationItem) => {
@@ -189,7 +178,7 @@ export default function SearchControl({
 					const loc = [parseFloat(item.lat), parseFloat(item.lon)];
 					formattedData[title] = {
 						...item,
-						title, // explicitly set the title to make moving to a location be able to store the title to recent locations
+						lng: item.lon,
 						loc,
 					};
 				});
@@ -208,11 +197,11 @@ export default function SearchControl({
 					return;
 				}
 				// Check if the coordinates are valid if the location is empty.
-				const latLng = isLatLong(this._input.value);
+				const latLng = parseLatLon(this._input.value);
 				// If the coordinates are valid, move to that location.
-				if (latLng.lat && latLng.lng) {
+				if (latLng && !latLng.isPartial) {
 					// Fetch location data
-					const locationByCoords = await fetchLocationByCoords(latLng);
+					const locationByCoords = await fetchLocationByCoords({ lat: latLng.lat, lng: latLng.lon });
 					// Trigger show location.
 					this.showLocation(locationByCoords, locationByCoords.geo_id);
 				}

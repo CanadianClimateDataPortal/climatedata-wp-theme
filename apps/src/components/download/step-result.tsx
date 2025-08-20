@@ -19,9 +19,8 @@ import { trackIDFDownload, trackPrecalculatedDownload, trackStationDataDownload 
  *
  * @param climateVariable - The climate variable that has been downloaded.
  * @param fileLink - The link object of the downloaded file.
- * @param index - The index of the link in the list of links.
  */
-function trackDownloadClick(climateVariable: ClimateVariableInterface, fileLink: DownloadFile, index: number) {
+function trackDownloadClick(climateVariable: ClimateVariableInterface, fileLink: DownloadFile) {
 	const downloadType = climateVariable.getDownloadType();
 	const frequency = climateVariable.getFrequency();
 	const mode = climateVariable?.getInteractiveMode();
@@ -38,10 +37,7 @@ function trackDownloadClick(climateVariable: ClimateVariableInterface, fileLink:
 		if (climateVariable.getId() === 'short_duration_rainfall_idf_data') {
 			trackIDFDownload(fileLink.label, fileLink.url);
 		} else {
-			// We track only the first link
-			if (index === 0) {
-				trackStationDataDownload(climateVariable);
-			}
+			trackStationDataDownload(climateVariable);
 		}
 	} else {
 		trackPrecalculatedDownload(climateVariable);
@@ -86,9 +82,9 @@ const StepResult = React.forwardRef(() => {
 		};
 	}, [files]);
 
-	function handleDownloadLinkClick(file: DownloadFile, index: number) {
+	function handleDownloadLinkClick(file: DownloadFile) {
 		if (climateVariable) {
-			trackDownloadClick(climateVariable, file, index)
+			trackDownloadClick(climateVariable, file);
 		}
 	}
 
@@ -104,10 +100,14 @@ const StepResult = React.forwardRef(() => {
 						{downloadLinks.map((file, index) => (
 							<p key={index} className="mb-2">
 								<a
+									{...file.linkAttributes}
 									href={file.url}
-									onClick={() => handleDownloadLinkClick(file, index)}
+									onClick={() => handleDownloadLinkClick(file)}
 									download={file.fileName}
-									className={cn('text-lg font-semibold text-brand-blue underline ')}
+									className={cn(
+										'text-lg font-semibold text-brand-blue underline',
+										file.linkAttributes?.className ?? '',
+									)}
 									target="_blank"
 								>
 									{file.label}

@@ -843,30 +843,46 @@ const ClimateDataChart: React.FC<{
 						{__('Export')}
 					</span>
 					<div className="flex flex-wrap gap-1 sm:gap-2">
-						<button
-							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+						<a
+							className={cn(
+								'text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap',
+								// The next CSS class for Google Tag Manager event tracking
+								'chart-export-img'
+							)}
 							onClick={() => handleExport('pdf')}
 						>
 							{__('PDF')}
-						</button>
-						<button
-							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+						</a>
+						<a
+							className={cn(
+								'text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap',
+								// The next CSS class for Google Tag Manager event tracking
+								'chart-export-img'
+							)}
 							onClick={() => handleExport('png')}
 						>
 							{__('PNG')}
-						</button>
-						<button
-							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+						</a>
+						<a
+							className={cn(
+								'text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap',
+								// The next CSS class for Google Tag Manager event tracking
+								'chart-export-data'
+							)}
 							onClick={() => handleExport('csv')}
 						>
 							{__('CSV')}
-						</button>
-						<button
-							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+						</a>
+						<a
+							className={cn(
+								'text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap',
+								// The next CSS class for Google Tag Manager event tracking
+								'chart-export-img'
+							)}
 							onClick={() => handleExport('print')}
 						>
 							{__('Print')}
-						</button>
+						</a>
 					</div>
 				</div>
 			</div>

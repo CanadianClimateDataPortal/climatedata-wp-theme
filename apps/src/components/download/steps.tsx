@@ -67,6 +67,10 @@ const Steps: React.FC = () => {
 	};
 
 	const handleNext = async () => {
+		if (!isStepValid || requestStatus === 'loading') {
+			return;
+		}
+
 		if (!isLastStep && !isSecondToLastStep) {
 			goToNextStep();
 			return;
@@ -252,6 +256,10 @@ const Steps: React.FC = () => {
 
 				appendFormData(formData, request_data, 'request_data');
 
+				if (climateVariable.getDatasetType() !== 'ahccd') {
+					trackFinchDownload(climateVariable, inputs);
+				}
+
 				try {
 					const response = await fetch('/wp-json/cdc/v2/finch_submit/', {
 						method: 'POST',
@@ -265,10 +273,6 @@ const Steps: React.FC = () => {
 						dispatch(setRequestError(__('Captcha failed. Please try again.')));
 						dispatch(setCaptchaValue(''));
 						return;
-					}
-
-					if (climateVariable.getDatasetType() !== 'ahccd') {
-						trackFinchDownload(climateVariable, inputs);
 					}
 
 					dispatch(setRequestResult(data));
@@ -286,12 +290,12 @@ const Steps: React.FC = () => {
 				// and not daily frequency (daily frequency are analyzed)
 
 				if (climateVariable?.getInteractiveMode() === 'region') {
-					// Precalcultated variables (no station)
+					// Precalculated variables (no station)
 					const fileFormat = climateVariable.getFileFormat?.() ?? '';
 					const fileName = climateVariable.getId() ?? 'file';
 
 					// Get a reference to the "Next Step" button
-					const button = document.getElementById('nextStepBtn');
+					const button = document.querySelector('#step-navigation > button');
 					let originalButtonText: string | null = null;
 
 					if (button) {
@@ -314,6 +318,10 @@ const Steps: React.FC = () => {
 								const file: DownloadFile = {
 									url: url,
 									label: sprintf(__(`Download %s`), downloadFileName),
+									linkAttributes: {
+										// Class name for Google Tag Manager event tracking
+										className: 'download_variable_data_bccaqv2',
+									},
 									fileName: downloadFileName,
 								};
 								dispatch(setDownloadLinks([file])); // Save the generated download link
@@ -396,6 +404,15 @@ const Steps: React.FC = () => {
 		}
 	};
 
+	// The following is to set an ID used in Google Tag Manager event tracking
+	const nextButtonId = (
+		(isLastStep || isSecondToLastStep) &&
+		climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
+		climateVariable?.getDatasetType() !== 'ahccd'
+	) ?
+		'analyze-process' :
+		undefined;
+
 	const StepComponent = steps[currentStep - 1] as React.ElementType;
 	return (
 		<div className="steps flex flex-col px-4">
@@ -417,20 +434,22 @@ const Steps: React.FC = () => {
 				/>
 			</div>
 			{!isLastStep && (
-				<button
-					id="nextStepBtn"
-					type="button"
-					onClick={handleNext}
-					disabled={!isStepValid || requestStatus === 'loading'}
-					className={cn(
-						'w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase text-white tracking-wider',
-						!isStepValid
-							? 'bg-brand-red/25 cursor-not-allowed'
-							: 'bg-brand-red hover:bg-brand-red/75'
-					)}
-				>
-					{buttonText} &rarr;
-				</button>
+				<div id="step-navigation">
+					{/* The button is a <a> element to be compatible with Google Tag Manager event tracking*/}
+					<a
+						id={nextButtonId}
+						onClick={handleNext}
+						className={cn(
+							'inline-block w-64 mx-auto sm:mx-0 py-2 rounded-full cursor-pointer',
+							'uppercase text-white tracking-wider text-center',
+							!isStepValid
+								? 'bg-brand-red/25 cursor-not-allowed'
+								: 'bg-brand-red hover:bg-brand-red/75'
+						)}
+					>
+						{buttonText} &rarr;
+					</a>
+				</div>
 			)}
 		</div>
 	);

@@ -14,18 +14,9 @@ import { HighChartSeries } from '@/types/types';
 
 declare global {
 	interface Window {
-		gtag: (...args: unknown[]) => void;
+		dataLayer: unknown[];
 	}
 }
-
-/**
- * Default no-op function used in place of window.gtag when it is not available.
- */
-function fallbackGtag() {
-	// Do nothing
-}
-
-export const gtag = window?.gtag ?? fallbackGtag;
 
 /**
  * Get the "pre-calculated" name of a variable for Google Analytics tracking.
@@ -131,6 +122,12 @@ export function getAnalyzeVariableName(
 	return nameMap[climateVariable.getId()] ?? null;
 }
 
+export function trackEvent(eventObject: { [key: string]: string | null | undefined }) {
+	if (window.dataLayer) {
+		window.dataLayer.push(eventObject);
+	}
+}
+
 /**
  * Track a Google Analytics event for an export from the graph panel in the Map.
  *
@@ -190,7 +187,7 @@ export function trackGraphExport(
 			InteractiveRegionOption.GRIDDED_DATA
 	);
 
-	gtag({
+	trackEvent({
 		event: eventName,
 		chart_data_event_type: eventName,
 		chart_data_settings: chartDataSettings,
@@ -245,7 +242,7 @@ export function trackFinchDownload(
 		}
 	});
 
-	gtag({
+	trackEvent({
 		event: eventName,
 		analyze_bccaqv2_event_type: eventName,
 		analyze_bccaqv2_parameters: parameters.join('  '),
@@ -291,7 +288,7 @@ export function trackPrecalculatedDownload(
 		dataLocation = `BBox: ${bounds[0][0]},${bounds[0][1]},${bounds[1][0]},${bounds[1][1]}`;
 	}
 
-	gtag({
+	trackEvent({
 		event: eventName,
 		variable_data_event_type: eventName,
 		variable_data_location: dataLocation,
@@ -338,7 +335,7 @@ export function trackStationDataDownload(
 		}
 	);
 
-	gtag({
+	trackEvent({
 		event: eventName,
 		download_station_data_event: eventName,
 		download_station_data_list: downloadStations.join(' ; '),
@@ -360,7 +357,7 @@ export function trackIDFDownload(fileTitle: string, filePath: string) {
 	const eventName = `Download_IDF-Curves_${formatedFileTitle}`;
 	const fileNameParts = filePath.split('/');
 
-	gtag({
+	trackEvent({
 		event: eventName,
 		'download-idf-curves-file':
 			fileNameParts.length > 0

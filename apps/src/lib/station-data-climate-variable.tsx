@@ -69,8 +69,12 @@ class StationDataClimateVariable extends StationClimateVariable {
 			return [];
 		}
 		
-		return links.map(link => ({
+		return links.map((link) => ({
 			label: sprintf(__('Download Records %d to %d'), link.start_index + 1, link.end_index + 1),
+			linkAttributes: {
+				// id attributes for Google Tag Manager event tracking
+				id: 'station-process',
+			},
 			url: link.url,
 		}));
 	}

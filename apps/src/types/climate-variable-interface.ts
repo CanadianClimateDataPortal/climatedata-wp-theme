@@ -175,6 +175,7 @@ export interface DownloadFile {
 	label: string;
 	url: string;
 	fileName?: string;
+	linkAttributes?: { [key: string]: string | undefined | null };
 }
 
 export interface LocationModalContentParams {

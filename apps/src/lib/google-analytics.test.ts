@@ -1,9 +1,8 @@
-import { beforeEach, describe, expect, Mock, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import ClimateVariableBase from '@/lib/climate-variable-base';
 import {
 	getAnalyzeVariableName,
 	getPrecalculatedVariableName,
-	gtag,
 	trackFinchDownload,
 	trackGraphExport,
 	trackIDFDownload,
@@ -18,10 +17,6 @@ import {
 } from '@/types/climate-variable-interface';
 import { getInteractiveRegionName } from '@/lib/utils';
 import { HighChartSeries } from '@/types/types';
-
-vi.hoisted(() => {
-	vi.stubGlobal('gtag', vi.fn());
-});
 
 describe('getPrecalculatedVariableName', () => {
 	test.each([
@@ -137,14 +132,19 @@ describe('getPrecalculatedVariableName', () => {
 
 describe('trackGraphExport', () => {
 	let climateVariable: ClimateVariableBase;
-	const mockGtag = gtag as Mock;
+	const mockDataLayer: unknown[] = [];
 
 	beforeEach(() => {
 		climateVariable = new ClimateVariableBase({
 			id: 'hottest_day',
 			class: 'ClimateVariableBase',
 		});
-		mockGtag.mockClear();
+		mockDataLayer.length = 0;
+		vi.stubGlobal('dataLayer', mockDataLayer);
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
 	});
 
 	test.each([
@@ -156,7 +156,7 @@ describe('trackGraphExport', () => {
 		'sets the correct event name and format for "%s"',
 		(format, expectedType) => {
 			trackGraphExport(format, 'test', [], climateVariable);
-			expect(mockGtag).toHaveBeenCalledWith(
+			expect(mockDataLayer[0]).toEqual(
 				expect.objectContaining({
 					event: `Variable_Download-${expectedType}_Hottest-Day`,
 					chart_data_event_type: `Variable_Download-${expectedType}_Hottest-Day`,
@@ -166,15 +166,15 @@ describe('trackGraphExport', () => {
 		}
 	);
 
-	test('gtag is not called if unknown format', () => {
+	test('nothing added to dataLayer if unknown format', () => {
 		trackGraphExport('unknown', 'test', [], climateVariable);
-		expect(mockGtag).not.toHaveBeenCalled();
+		expect(mockDataLayer).toHaveLength(0);
 	});
 
-	test('gtag is not called for an unknown variable', () => {
+	test('nothing added to dataLayer for an unknown variable', () => {
 		climateVariable.getId = () => 'unknown';
 		trackGraphExport('csv', 'test', [], climateVariable);
-		expect(mockGtag).not.toHaveBeenCalled();
+		expect(mockDataLayer).toHaveLength(0);
 	});
 
 	test('chart_data_columns contains visible chart series', () => {
@@ -185,7 +185,7 @@ describe('trackGraphExport', () => {
 			{ name: 'Series 4', visible: true, type: 'line' },
 		] as HighChartSeries[];
 		trackGraphExport('csv', 'test', chartSeries, climateVariable);
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				chart_data_columns: 'Series 2, Series 4',
 			})
@@ -196,7 +196,7 @@ describe('trackGraphExport', () => {
 		climateVariable.getScenario = () => 'ssp370';
 		climateVariable.getFrequency = () => 'ann';
 		trackGraphExport('csv', 'Region name, QC', [], climateVariable);
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				chart_data_settings: 'Region name, QC; ssp370; Annual',
 			})
@@ -206,7 +206,7 @@ describe('trackGraphExport', () => {
 	test('chart_data_dataset contains expected value', () => {
 		climateVariable.getVersion = () => 'cmip5';
 		trackGraphExport('csv', 'test', [], climateVariable);
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				chart_data_dataset: 'cmip5',
 			})
@@ -217,7 +217,7 @@ describe('trackGraphExport', () => {
 		climateVariable.getInteractiveRegion = () =>
 			InteractiveRegionOption.CENSUS;
 		trackGraphExport('csv', 'test', [], climateVariable);
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				chart_data_view_by: getInteractiveRegionName(
 					InteractiveRegionOption.CENSUS
@@ -272,20 +272,25 @@ describe('getAnalyzeVariableName', () => {
 
 describe('trackFinchDownload', () => {
 	let climateVariable: ClimateVariableBase;
-	const mockGtag = gtag as Mock;
+	const mockDataLayer: unknown[] = [];
 
 	beforeEach(() => {
 		climateVariable = new ClimateVariableBase({
 			id: 'days_above_tmax_and_tmin',
 			class: 'ClimateVariableBase',
 		});
-		mockGtag.mockClear();
+		mockDataLayer.length = 0;
+		vi.stubGlobal('dataLayer', mockDataLayer);
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
 	});
 
 	test('sets the correct event name', () => {
 		trackFinchDownload(climateVariable, []);
 		const expectedEventName = 'Analyze_BCCAQv2_Days-above-Tmax-and-Tmin';
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				event: expectedEventName,
 				analyze_bccaqv2_event_type: expectedEventName,
@@ -317,7 +322,7 @@ describe('trackFinchDownload', () => {
 			trackFinchDownload(climateVariable, [
 				{ id: parameterId, data: 'test-value' },
 			]);
-			expect(mockGtag).toHaveBeenCalledWith(
+			expect(mockDataLayer[0]).toEqual(
 				expect.objectContaining({
 					analyze_bccaqv2_parameters: `${expectedName}: test-value;`,
 				})
@@ -332,7 +337,7 @@ describe('trackFinchDownload', () => {
 			{ id: 'thresh_tasmax', data: '10degC' },
 		];
 		trackFinchDownload(climateVariable, inputParameters);
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				analyze_bccaqv2_parameters:
 					'ensemble percentiles: 10;  ensemble percentiles: 50;  threshold tasmax: 10degC;',
@@ -347,37 +352,42 @@ describe('trackFinchDownload', () => {
 			{ id: 'another-unknown', data: '10degC' },
 		];
 		trackFinchDownload(climateVariable, inputParameters);
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				analyze_bccaqv2_parameters: 'scenario: ssp370;',
 			})
 		);
 	});
 
-	test('gtag is not called for an unknown variable', () => {
+	test('nothing added to dataLayer for an unknown variable', () => {
 		climateVariable.getId = () => 'unknown';
 		trackFinchDownload(climateVariable, []);
-		expect(mockGtag).not.toHaveBeenCalled();
+		expect(mockDataLayer).toHaveLength(0);
 	});
 });
 
 describe('trackPrecalculatedDownload', () => {
 	let climateVariable: ClimateVariableBase;
-	const mockGtag = gtag as Mock;
+	const mockDataLayer: unknown[] = [];
 
 	beforeEach(() => {
 		climateVariable = new ClimateVariableBase({
 			id: 'mean_temp',
 			class: 'ClimateVariableBase',
 		});
-		mockGtag.mockClear();
+		mockDataLayer.length = 0;
+		vi.stubGlobal('dataLayer', mockDataLayer);
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
 	});
 
 	test('sets the correct event name', () => {
 		trackPrecalculatedDownload(climateVariable);
 		const expectedEventName =
 			'Download_Variable-Data_BCCAQv2_Mean-Temperature_Frequency_Location_Format';
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				event: expectedEventName,
 				variable_data_event_type: expectedEventName,
@@ -394,7 +404,7 @@ describe('trackPrecalculatedDownload', () => {
 		trackPrecalculatedDownload(climateVariable);
 		const expectedDataLocation =
 			'GridID: 567, Lat: 3.122343425, Lng: -4.5 ; GridID: aaa, Lat: 1, Lng: 2';
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				variable_data_location: expectedDataLocation,
 			})
@@ -411,7 +421,7 @@ describe('trackPrecalculatedDownload', () => {
 		} as GridRegion;
 		climateVariable.getSelectedRegion = () => gridRegion;
 		trackPrecalculatedDownload(climateVariable);
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				variable_data_location: 'BBox: 1,2,3.543534534,-5.5',
 			})
@@ -423,7 +433,7 @@ describe('trackPrecalculatedDownload', () => {
 		(format) => {
 			climateVariable.getFileFormat = (): FileFormatType => format;
 			trackPrecalculatedDownload(climateVariable);
-			expect(mockGtag).toHaveBeenCalledWith(
+			expect(mockDataLayer[0]).toEqual(
 				expect.objectContaining({
 					variable_data_format: format,
 				})
@@ -436,7 +446,7 @@ describe('trackPrecalculatedDownload', () => {
 		(version) => {
 			climateVariable.getVersion = () => version;
 			trackPrecalculatedDownload(climateVariable);
-			expect(mockGtag).toHaveBeenCalledWith(
+			expect(mockDataLayer[0]).toEqual(
 				expect.objectContaining({
 					variable_data_dataset: version,
 				})
@@ -444,23 +454,28 @@ describe('trackPrecalculatedDownload', () => {
 		}
 	);
 
-	test('gtag is not called for an unknown variable', () => {
+	test('nothing added to dataLayer for an unknown variable', () => {
 		climateVariable.getId = () => 'unknown';
 		trackPrecalculatedDownload(climateVariable);
-		expect(mockGtag).not.toHaveBeenCalled();
+		expect(mockDataLayer).toHaveLength(0);
 	});
 });
 
 describe('trackStationDataDownload', () => {
 	let climateVariable: ClimateVariableBase;
-	const mockGtag = gtag as Mock;
+	const mockDataLayer: unknown[] = [];
 
 	beforeEach(() => {
 		climateVariable = new ClimateVariableBase({
 			id: 'station_data',
 			class: 'ClimateVariableBase',
 		});
-		mockGtag.mockClear();
+		mockDataLayer.length = 0;
+		vi.stubGlobal('dataLayer', mockDataLayer);
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
 	});
 
 	test.each([
@@ -469,7 +484,7 @@ describe('trackStationDataDownload', () => {
 	])('sets the correct event name', (variableId, expectedName) => {
 		climateVariable.getId = () => variableId;
 		trackStationDataDownload(climateVariable);
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				event: `Download_${expectedName}`,
 				download_station_data_event: `Download_${expectedName}`,
@@ -484,7 +499,7 @@ describe('trackStationDataDownload', () => {
 			ccc: { lat: 3, lng: 4, name: 'Station C' },
 		});
 		trackStationDataDownload(climateVariable);
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				download_station_data_list:
 					'aaa -- Station A ; bbb ; ccc -- Station C',
@@ -500,7 +515,7 @@ describe('trackStationDataDownload', () => {
 		(format, expected) => {
 			climateVariable.getFileFormat = () => format;
 			trackStationDataDownload(climateVariable);
-			expect(mockGtag).toHaveBeenCalledWith(
+			expect(mockDataLayer[0]).toEqual(
 				expect.objectContaining({
 					download_station_file_extension: expected,
 				})
@@ -511,20 +526,25 @@ describe('trackStationDataDownload', () => {
 	test('gtag is not called for other variables', () => {
 		climateVariable.getId = () => 'mean_temp';
 		trackStationDataDownload(climateVariable);
-		expect(mockGtag).not.toHaveBeenCalled();
+		expect(mockDataLayer).toHaveLength(0);
 	});
 });
 
 describe('trackIDFDownload', () => {
-	const mockGtag = gtag as Mock;
+	const mockDataLayer: unknown[] = [];
 
 	beforeEach(() => {
-		mockGtag.mockClear();
+		mockDataLayer.length = 0;
+		vi.stubGlobal('dataLayer', mockDataLayer);
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
 	});
 
 	test('sets the correct event name', () => {
 		trackIDFDownload('Lorem Ipsùm (dolor sit) - AMET', 'test.zip');
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				event: 'Download_IDF-Curves_Lorem_Ipsùm_dolor_sit_-_AMET',
 			})
@@ -535,7 +555,7 @@ describe('trackIDFDownload', () => {
 		const fileName =
 			'NORMAN_WELLS_CLIMATE_2202810_65.28_126.75_cmip6-quickstart.zip';
 		trackIDFDownload('test', fileName);
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				'download-idf-curves-file': fileName,
 			})
@@ -545,7 +565,7 @@ describe('trackIDFDownload', () => {
 	test('uses only the last part if a URL', () => {
 		const fileName = 'https://example.com/path/to/file.zip';
 		trackIDFDownload('test', fileName);
-		expect(mockGtag).toHaveBeenCalledWith(
+		expect(mockDataLayer[0]).toEqual(
 			expect.objectContaining({
 				'download-idf-curves-file': 'file.zip',
 			})

@@ -25,6 +25,7 @@ import {
 } from '@/types/climate-variable-interface';
 import { useLocale } from "@/hooks/use-locale";
 import { sprintf } from "@wordpress/i18n";
+import { trackFinchDownload } from '@/lib/google-analytics';
 
 /**
  * The Steps component dynamically renders the current step component from the STEPS configuration.
@@ -44,11 +45,23 @@ const Steps: React.FC = () => {
 	const showSendRequestButtonText = (isLastStep || isSecondToLastStep) && climateVariable?.getDownloadType() === DownloadType.ANALYZED;
 
 	let buttonText = __('Next Step');
-	if (showSendRequestButtonText) {
-		buttonText = __('Send Request');
+	if (requestStatus === 'loading') {
+		buttonText = __('Loading...');
+	} else if (showSendRequestButtonText) {
+		buttonText = __('Send Request') + ' →';
 	} else if (isSecondToLastStep) {
-		buttonText = __('Final Step');
+		buttonText = __('Final Step') + ' →';
 	}
+	const buttonIsEnabled = requestStatus !== 'loading' && isStepValid;
+
+	// The following is to set an ID used in Google Tag Manager event tracking
+	const buttonId = (
+		(isLastStep || isSecondToLastStep) &&
+		climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
+		climateVariable?.getDatasetType() !== 'ahccd'
+	) ?
+		'analyze-process' :
+		undefined;
 
 	// Flatten object into FormData with php-style bracket notation
 	const appendFormData = (formData: FormData, data: any, parentKey = ''): void => {
@@ -66,13 +79,17 @@ const Steps: React.FC = () => {
 	};
 
 	const handleNext = async () => {
+		if (!isStepValid || requestStatus === 'loading') {
+			return;
+		}
+
 		if (!isLastStep && !isSecondToLastStep) {
 			goToNextStep();
 			return;
 		}
 
 		if (climateVariable) {
-			if (climateVariable?.getDownloadType() === DownloadType.ANALYZED)  {
+			if (climateVariable?.getDownloadType() === DownloadType.ANALYZED) {
 				dispatch(setRequestStatus('loading'));
 				dispatch(setRequestError(null));
 				dispatch(setRequestResult(undefined));
@@ -251,6 +268,10 @@ const Steps: React.FC = () => {
 
 				appendFormData(formData, request_data, 'request_data');
 
+				if (climateVariable.getDatasetType() !== 'ahccd') {
+					trackFinchDownload(climateVariable, inputs);
+				}
+
 				try {
 					const response = await fetch('/wp-json/cdc/v2/finch_submit/', {
 						method: 'POST',
@@ -279,26 +300,12 @@ const Steps: React.FC = () => {
 			else if (climateVariable?.getDownloadType() === DownloadType.PRECALCULATED && climateVariable?.getFrequency() !== FrequencyType.DAILY) {
 				// Download precalculated climate variables
 				// and not daily frequency (daily frequency are analyzed)
+				dispatch(setRequestStatus('loading'));
 
 				if (climateVariable?.getInteractiveMode() === 'region') {
-					// Precalcultated variables (no station)
+					// Precalculated variables (no station)
 					const fileFormat = climateVariable.getFileFormat?.() ?? '';
 					const fileName = climateVariable.getId() ?? 'file';
-
-					// Get a reference to the "Next Step" button
-					const button = document.getElementById('nextStepBtn');
-					let originalButtonText: string | null = null;
-
-					if (button) {
-						// Store the original button text so we can restore it later
-						originalButtonText = button.textContent;
-
-						// Update the button UI to indicate loading state
-						button.textContent = __('Loading...');
-						button.setAttribute('disabled', 'true');
-						button.classList.add('cursor-not-allowed');
-					}
-					
 					const downloadFileName = fileName + (fileFormat === FileFormatType.NetCDF ? '.nc' : '.zip');
 
 // Generate the file to be downloaded
@@ -309,6 +316,10 @@ const Steps: React.FC = () => {
 								const file: DownloadFile = {
 									url: url,
 									label: sprintf(__(`Download %s`), downloadFileName),
+									linkAttributes: {
+										// Class name for Google Tag Manager event tracking
+										className: 'download_variable_data_bccaqv2',
+									},
 									fileName: downloadFileName,
 								};
 								dispatch(setDownloadLinks([file])); // Save the generated download link
@@ -316,13 +327,6 @@ const Steps: React.FC = () => {
 
 							// Update UI to indicate success
 							dispatch(setRequestStatus('success'));
-
-							// Restore the button to its original state
-							if (button) {
-								button.textContent = originalButtonText;
-								button.removeAttribute('disabled');
-								button.classList.remove('cursor-not-allowed');
-							}
 
 							// Automatically proceed to the next step, unless all variables were selected
 							if (climateVariable.getThreshold() !== 'all') {
@@ -333,13 +337,6 @@ const Steps: React.FC = () => {
 							// In case of an error, update the request status and clear any links
 							dispatch(setRequestStatus('error'));
 							dispatch(setDownloadLinks(undefined));
-
-							// Restore the button to its original state
-							if (button) {
-								button.textContent = originalButtonText;
-								button.removeAttribute('disabled');
-								button.classList.remove('cursor-not-allowed');
-							}
 						});
 
 
@@ -349,6 +346,7 @@ const Steps: React.FC = () => {
 					const fileFormat = climateVariable.getFileFormat?.() ?? null;
 					const stationIds = Object.keys(selectedPoints);
 					const stationDownloadUrlsProps: StationDownloadUrlsProps = {};
+					dispatch(setRequestStatus('loading'));
 
 					switch (climateVariable.getId()) {
 						case 'msc_climate_normals':
@@ -412,20 +410,23 @@ const Steps: React.FC = () => {
 				/>
 			</div>
 			{!isLastStep && (
-				<button
-					id="nextStepBtn"
-					type="button"
-					onClick={handleNext}
-					disabled={!isStepValid || requestStatus === 'loading'}
-					className={cn(
-						'w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase text-white tracking-wider',
-						!isStepValid
-							? 'bg-brand-red/25 cursor-not-allowed'
-							: 'bg-brand-red hover:bg-brand-red/75'
-					)}
-				>
-					{buttonText} &rarr;
-				</button>
+				<div>
+					{/* The button is a <a> element to be compatible with Google Tag Manager event tracking*/}
+					<a
+						id={buttonId}
+						onClick={handleNext}
+						className={cn(
+							'inline-block w-64 mx-auto sm:mx-0 py-2 rounded-full cursor-pointer',
+							'bg-brand-red',
+							'uppercase text-white tracking-wider text-center',
+							buttonIsEnabled ?
+								'hover:bg-brand-red/75':
+								'cursor-not-allowed opacity-35'
+						)}
+					>
+						{buttonText}
+					</a>
+				</div>
 			)}
 		</div>
 	);

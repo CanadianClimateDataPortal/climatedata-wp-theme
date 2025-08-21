@@ -161,6 +161,10 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 				return files.map((file: { type: string, url: string}) => {
 					return {
 						label: labels[file.type as keyof typeof labels] ? __(labels[file.type as keyof typeof labels]) : file.type,
+						linkAttributes: {
+							// CSS class for Google Tag Manager event tracking
+							className: 'download-idf-curves',
+						},
 						url: file.url,
 					}
 				});

@@ -27,6 +27,7 @@ import appConfig from '@/config/app.config';
 import { doyFormatter, formatValue } from '@/lib/format';
 import { getChartDataOptions, getSeriesObject } from '@/config/chart-config';
 import { AveragingType } from "@/types/climate-variable-interface";
+import { trackGraphExport } from '@/lib/google-analytics';
 
 type TabValue = 'annual-values' | '30-year-averages' | '30-year-changes';
 
@@ -792,6 +793,10 @@ const ClimateDataChart: React.FC<{
 				default:
 					console.warn(`Unsupported export format: ${format}`);
 			}
+
+			if (climateVariable) {
+				trackGraphExport(format, title, chart.series, climateVariable);
+			}
 		} catch (error) {
 			console.error('Export failed:', error);
 			alert(__('Export failed. Please try again.'));
@@ -852,30 +857,47 @@ const ClimateDataChart: React.FC<{
 						{__('Export')}
 					</span>
 					<div className="flex flex-wrap gap-1 sm:gap-2">
-						<button
-							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+						{/* The buttons must be <a> elements to work with Google Tag Manager event tracking */}
+						<a
+							className={cn(
+								'text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap',
+								// The next CSS class for Google Tag Manager event tracking
+								'chart-export-img'
+							)}
 							onClick={() => handleExport('pdf')}
 						>
 							{__('PDF')}
-						</button>
-						<button
-							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+						</a>
+						<a
+							className={cn(
+								'text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap',
+								// The next CSS class for Google Tag Manager event tracking
+								'chart-export-img'
+							)}
 							onClick={() => handleExport('png')}
 						>
 							{__('PNG')}
-						</button>
-						<button
-							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+						</a>
+						<a
+							className={cn(
+								'text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap',
+								// The next CSS class for Google Tag Manager event tracking
+								'chart-export-data'
+							)}
 							onClick={() => handleExport('csv')}
 						>
 							{__('CSV')}
-						</button>
-						<button
-							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+						</a>
+						<a
+							className={cn(
+								'text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap',
+								// The next CSS class for Google Tag Manager event tracking
+								'chart-export-img'
+							)}
 							onClick={() => handleExport('print')}
 						>
 							{__('Print')}
-						</button>
+						</a>
 					</div>
 				</div>
 			</div>

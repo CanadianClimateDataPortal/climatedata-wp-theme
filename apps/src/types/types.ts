@@ -825,6 +825,12 @@ export enum MapDisplayType {
 	DELTA = 'delta',
 }
 
+export type HighChartSeries = {
+	visible: boolean;
+	type: string;
+	name: string;
+}
+
 export type ParsedLatLon = {
 	lat: number;
 	lon: number;

@@ -1,6 +1,5 @@
 import React from 'react';
-import { MapDisplayType, MultilingualField } from './types';
-import { WMSParams } from '@/types/types';
+import { MapDisplayType, MultilingualField, WMSParams } from '@/types/types';
 
 export interface variableClassMap {
 	[key: string]: string;
@@ -176,6 +175,7 @@ export interface DownloadFile {
 	label: string;
 	url: string;
 	fileName?: string;
+	linkAttributes?: { [key: string]: string | undefined | null };
 }
 
 export interface LocationModalContentParams {

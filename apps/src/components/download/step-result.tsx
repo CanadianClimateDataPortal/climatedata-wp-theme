@@ -58,9 +58,13 @@ const StepResult = React.forwardRef(() => {
 						{downloadLinks.map((file, index) => (
 							<p key={index} className="mb-2">
 								<a
+									{...file.linkAttributes}
 									href={file.url}
 									download={file.fileName}
-									className={cn('text-lg font-semibold text-brand-blue underline ')}
+									className={cn(
+										'text-lg font-semibold text-brand-blue underline',
+										file.linkAttributes?.className,
+									)}
 									target="_blank"
 								>
 									{file.label}

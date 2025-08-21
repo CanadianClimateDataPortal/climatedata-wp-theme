@@ -14,7 +14,7 @@ import {
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { cn } from '@/lib/utils';
 import { FINCH_FREQUENCY_NAMES, GEOSERVER_BASE_URL } from '@/lib/constants';
-import { StepComponentRef } from '@/types/download-form-interface';
+import { FinchRequestInput, StepComponentRef } from '@/types/download-form-interface';
 import {
 	DownloadFile,
 	DownloadType,
@@ -123,7 +123,7 @@ const Steps: React.FC = () => {
 				}
 
 				// Build the inputs array for request_data
-				const inputs: { id: string, data: any }[] = [];
+				const inputs: FinchRequestInput[] = [];
 				if (latList) inputs.push({ id: 'lat', data: latList });
 				if (lonList) inputs.push({ id: 'lon', data: lonList });
 
@@ -200,7 +200,7 @@ const Steps: React.FC = () => {
 						if (fieldDef && fieldDef.unit && value !== undefined && value !== null && value !== '') {
 							dataValue = `${value} ${fieldDef.unit}`;
 						}
-						inputs.push({ id: key, data: dataValue });
+						inputs.push({ id: key, data: dataValue ?? '' });
 					}
 				});
 
@@ -208,7 +208,7 @@ const Steps: React.FC = () => {
 					inputs.push({ id: 'output_format', data: fileFormat });
 				}
 				if (typeof decimals === 'number') {
-					inputs.push({ id: 'csv_precision', data: decimals });
+					inputs.push({ id: 'csv_precision', data: decimals.toString() });
 				}
 
 				// Missing data

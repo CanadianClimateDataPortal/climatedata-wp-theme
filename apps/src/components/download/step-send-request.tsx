@@ -140,6 +140,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	);
 
 	const isEmailValid = isValidEmail(email);
+	const isDailyFrequency = climateVariable?.getFrequency() === 'daily';
 
 	/**
 	 * Shows captcha for analysis variables (those that make requests to Finch).
@@ -151,10 +152,9 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 		if (climateVariable.getId() === 'daily_ahccd_temperature_and_precipitation') {
 			return false;
 		}
-		
+
 		const isAnalysisVariable = climateVariable.getClass() === 'RasterAnalyzeClimateVariable';
-		const isDailyFrequency = climateVariable.getFrequency() === 'daily';
-		
+
 		return isAnalysisVariable || isDailyFrequency;
 	};
 
@@ -164,6 +164,9 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 			setDecimalPlace(0);
 		}
 	}, [fileFormat, decimalPlace, setDecimalPlace]);
+
+	const shouldShowEmailInput =
+		downloadType === DownloadType.ANALYZED || isDailyFrequency;
 
 	return (
 		<StepContainer title={__('Select file parameters')} isLastStep>
@@ -200,7 +203,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 				/>
 			)}
 
-			{downloadType === DownloadType.ANALYZED && (
+			{shouldShowEmailInput && (
 				<div className="flex flex-col gap-2">
 					<p className="text-sm text-neutral-grey-medium">
 						{__(

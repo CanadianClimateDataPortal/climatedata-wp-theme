@@ -633,6 +633,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
 		id: "total_precipitation",
 		class: "RasterPrecalculatedWithDailyFormatsClimateVariable",
+		finch: "pr",
 		threshold: "prcptot",
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {

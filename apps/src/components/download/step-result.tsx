@@ -65,7 +65,11 @@ const StepResult = React.forwardRef(() => {
 
 	// Set title, description and file
 	useEffect(() => {
-		if (climateVariable?.getDownloadType() === DownloadType.ANALYZED && requestResult) {
+		const isFinchRequest =
+			climateVariable?.getDownloadType() === DownloadType.ANALYZED ||
+			climateVariable?.getFrequency() === FrequencyType.DAILY;
+
+		if (isFinchRequest && requestResult) {
 			if (requestResult?.status === 'accepted') {
 				setContainerTitle(__('Your request has been sent.'));
 				setContainerDescription(__('It may take 30 to 90 minutes to complete, depending on available resources.'));

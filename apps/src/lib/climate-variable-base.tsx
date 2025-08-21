@@ -343,7 +343,11 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 		// If frequency is daily, it turns into analyze
 		if (this.getFrequency() === FrequencyType.DAILY) {
-			analysisUrl += 'subset_grid_point_dataset';
+			if (this.getSelectedRegion()) {
+				analysisUrl += 'subset_bbox_dataset';
+			} else {
+				analysisUrl += 'subset_grid_point_dataset';
+			}
 		} else {
 			// If projection
 			if (this.getDatasetType() === 'projection') {
@@ -362,9 +366,33 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	getFinch(): string {
 		return this._config.finch ?? this.getId();
 	}
-	
+
 	getFinchDataset(): string | null {
-		return this.getVersion();
+		const version = this.getVersion();
+		const frequency = this.getFrequency();
+		const finchID = this.getFinch();
+		const scenarios = this.getAnalyzeScenarios();
+
+		if (finchID === 'hxmax_days_above') {
+			return 'humidex-daily';
+		}
+
+		if (
+			version === 'cmip6' &&
+			(scenarios.includes('ssp370') || frequency === 'daily')
+		) {
+			return 'candcs-m6-24';
+		}
+
+		if (version === 'cmip5') {
+			return 'candcs-u5';
+		}
+
+		if (version === 'cmip6') {
+			return 'candcs-m6';
+		}
+
+		return version;
 	}
 
 	getAhccdDownloadRequiredVariables(): string[] {

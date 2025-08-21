@@ -19,7 +19,6 @@ import {
 	DownloadFile,
 	DownloadType,
 	FileFormatType,
-	FrequencyType,
 	InteractiveRegionOption,
 	StationDownloadUrlsProps,
 } from '@/types/climate-variable-interface';
@@ -42,12 +41,21 @@ const Steps: React.FC = () => {
 
 	const isLastStep = currentStep === steps.length;
 	const isSecondToLastStep = currentStep === steps.length - 1;
-	const showSendRequestButtonText = (isLastStep || isSecondToLastStep) && climateVariable?.getDownloadType() === DownloadType.ANALYZED;
+
+	const isDailyRequest = climateVariable?.getFrequency() === 'daily';
+	const isAnalyzeRequest = climateVariable?.getDownloadType() === DownloadType.ANALYZED;
+	const isPrecalculatedDownload =
+		climateVariable?.getDownloadType() === DownloadType.PRECALCULATED &&
+		!isDailyRequest;
+
+	const showSendRequestButton =
+		(isLastStep || isSecondToLastStep) &&
+		(isAnalyzeRequest || isDailyRequest);
 
 	let buttonText = __('Next Step');
 	if (requestStatus === 'loading') {
 		buttonText = __('Loading...');
-	} else if (showSendRequestButtonText) {
+	} else if (showSendRequestButton) {
 		buttonText = __('Send Request') + ' →';
 	} else if (isSecondToLastStep) {
 		buttonText = __('Final Step') + ' →';
@@ -57,7 +65,7 @@ const Steps: React.FC = () => {
 	// The following is to set an ID used in Google Tag Manager event tracking
 	const buttonId = (
 		(isLastStep || isSecondToLastStep) &&
-		climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
+		isAnalyzeRequest &&
 		climateVariable?.getDatasetType() !== 'ahccd'
 	) ?
 		'analyze-process' :
@@ -89,7 +97,7 @@ const Steps: React.FC = () => {
 		}
 
 		if (climateVariable) {
-			if (climateVariable?.getDownloadType() === DownloadType.ANALYZED) {
+			if (isAnalyzeRequest || isDailyRequest) {
 				dispatch(setRequestStatus('loading'));
 				dispatch(setRequestError(null));
 				dispatch(setRequestResult(undefined));
@@ -134,30 +142,58 @@ const Steps: React.FC = () => {
 						return;
 					}
 				} else if (selectedPoints && Object.keys(selectedPoints).length > 0) {
-					// TODO: is this correct? Fallback: use selected points as before
 					latList = Object.values(selectedPoints).map((c) => c.lat).join(',');
 					lonList = Object.values(selectedPoints).map((c) => c.lng).join(',');
 				}
 
 				// Build the inputs array for request_data
 				const inputs: FinchRequestInput[] = [];
-				if (latList) inputs.push({ id: 'lat', data: latList });
-				if (lonList) inputs.push({ id: 'lon', data: lonList });
+
+				if (isDailyRequest) {
+					const selectedRegion = climateVariable.getSelectedRegion();
+					if (selectedRegion) {
+						const bounds = selectedRegion.bounds as [
+							[number, number],
+							[number, number],
+						];
+						inputs.push({ id: 'lat0', data: bounds[0][0].toPrecision(14) });
+						inputs.push({ id: 'lon0', data: bounds[0][1].toPrecision(14) });
+						inputs.push({ id: 'lat1', data: bounds[1][0].toPrecision(14) });
+						inputs.push({ id: 'lon1', data: bounds[1][1].toPrecision(14) });
+					} else {
+						if (latList) {
+							inputs.push({ id: 'lat0', data: latList });
+						}
+						if (lonList) {
+							inputs.push({ id: 'lon0', data: lonList });
+						}
+					}
+				} else {
+					if (latList) {
+						inputs.push({ id: 'lat', data: latList });
+					}
+					if (lonList) {
+						inputs.push({ id: 'lon', data: lonList });
+					}
+				}
 
 				// Add average (True for any region except GRIDDED_DATA)
-				inputs.push({ id: 'average', data: interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA ? 'True' : 'False' });
+				if (!isDailyRequest) {
+					inputs.push({ id: 'average', data: interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA ? 'True' : 'False' });
+				}
 
 				// Add start_date and end_date
 				const dateRange = climateVariable.getDateRange?.();
-				if (dateRange && dateRange.length === 2) {
+				if (!isDailyRequest && dateRange && dateRange.length === 2) {
 					inputs.push({ id: 'start_date', data: dateRange[0] });
 					inputs.push({ id: 'end_date', data: dateRange[1] });
 				}
 
 				if (percentiles.length > 0) {
 					inputs.push({ id: 'ensemble_percentiles', data: percentiles.join(',') });
-				} else {
+				} else if (!isDailyRequest) {
 					// If no percentiles are selected, 'ensemble_percentiles' must still be in the request
+					// (except for a daily request)
 					inputs.push({ id: 'ensemble_percentiles', data: '' });
 				}
 
@@ -176,37 +212,41 @@ const Steps: React.FC = () => {
 				}
 
 				const freq = climateVariable.getFrequency?.();
-				let finchFreq = freq;
 
-				if (freq && FINCH_FREQUENCY_NAMES && (freq as keyof typeof FINCH_FREQUENCY_NAMES) in FINCH_FREQUENCY_NAMES) {
-					finchFreq = FINCH_FREQUENCY_NAMES[freq as keyof typeof FINCH_FREQUENCY_NAMES] ?? null;
-				}
-
-				if (finchFreq) {
-					inputs.push({ id: 'freq', data: finchFreq });
+				if (
+					!isDailyRequest &&
+					freq &&
+					(freq as keyof typeof FINCH_FREQUENCY_NAMES) in FINCH_FREQUENCY_NAMES
+				) {
+					const finchFreq = FINCH_FREQUENCY_NAMES[freq as keyof typeof FINCH_FREQUENCY_NAMES];
+					if (finchFreq) {
+						inputs.push({id: 'freq', data: finchFreq});
+					}
 				}
 
 				inputs.push({ id: 'data_validation', data: 'warn' });
 
-				// Add output_name (getFinch + region + name)
-				let outputName = climateVariable.getFinch?.() || 'download';
-				if (interactiveRegion && interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA) {
-					outputName += `_${interactiveRegion}`;
-					const selectedRegion = climateVariable.getSelectedRegion?.();
-					if (selectedRegion && (selectedRegion as any).name) {
-						outputName += `_${(selectedRegion as any).name}`;
-					} else if (selectedPoints && Object.keys(selectedPoints).length === 1) {
-						const regionId = Object.keys(selectedPoints)[0];
-						const regionPoint = selectedPoints[regionId];
-						if (regionPoint) {
-							const regionName = regionPoint?.name || '';
-							if (regionName) {
-								outputName += `_${regionName}`;
+				if (!isDailyRequest) {
+					// Add output_name (getFinch + region + name)
+					let outputName = climateVariable.getFinch?.() || 'download';
+					if (interactiveRegion && interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA) {
+						outputName += `_${interactiveRegion}`;
+						const selectedRegion = climateVariable.getSelectedRegion?.();
+						if (selectedRegion && (selectedRegion as any).name) {
+							outputName += `_${(selectedRegion as any).name}`;
+						} else if (selectedPoints && Object.keys(selectedPoints).length === 1) {
+							const regionId = Object.keys(selectedPoints)[0];
+							const regionPoint = selectedPoints[regionId];
+							if (regionPoint) {
+								const regionName = regionPoint?.name || '';
+								if (regionName) {
+									outputName += `_${regionName}`;
+								}
 							}
 						}
 					}
+					inputs.push({ id: 'output_name', data: outputName });
 				}
-				inputs.push({ id: 'output_name', data: outputName });
 
 				// Add all other analysisFieldValues as inputs, appending unit if present in analysisFields
 				Object.entries(analysisFieldValues).forEach(([key, value]) => {
@@ -224,7 +264,8 @@ const Steps: React.FC = () => {
 				if (fileFormat) {
 					inputs.push({ id: 'output_format', data: fileFormat });
 				}
-				if (typeof decimals === 'number') {
+
+				if (!isDailyRequest && typeof decimals === 'number') {
 					inputs.push({ id: 'csv_precision', data: decimals.toString() });
 				}
 
@@ -241,7 +282,12 @@ const Steps: React.FC = () => {
 					}
 				}
 
-				const request_data: { [key: string]: any } = {};
+				// Variable name, daily only
+				if (isDailyRequest) {
+					inputs.push({ id: 'variable', data: climateVariable.getFinch?.() || '' });
+				}
+
+				const request_data: { [key: string]: any; } = {};
 				request_data['inputs'] = inputs;
 				request_data['notification_email'] = email;
 				request_data['response'] = 'document';
@@ -297,7 +343,7 @@ const Steps: React.FC = () => {
 					dispatch(setCaptchaValue(''));
 				}
 			}
-			else if (climateVariable?.getDownloadType() === DownloadType.PRECALCULATED && climateVariable?.getFrequency() !== FrequencyType.DAILY) {
+			else if (isPrecalculatedDownload) {
 				// Download precalculated climate variables
 				// and not daily frequency (daily frequency are analyzed)
 				dispatch(setRequestStatus('loading'));

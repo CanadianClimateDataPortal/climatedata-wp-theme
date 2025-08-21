@@ -1,7 +1,12 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
-import { FrequencyConfig, FrequencyDisplayModeOption, FrequencyType } from '@/types/climate-variable-interface';
+import {
+	FrequencyConfig,
+	FrequencyDisplayModeOption,
+	FrequencyType,
+	InteractiveRegionOption,
+} from '@/types/climate-variable-interface';
 import { __ } from '@/context/locale-provider';
 import { ParsedLatLon } from '@/types/types';
 
@@ -252,6 +257,50 @@ export function getUnitName(unit: string): string {
 		default:
 			return unit;
 	}
+}
+
+/**
+ * Return the translated display name for a frequency from its technical code.
+ *
+ * @param frequency - The frequency code to translate.
+ */
+export function getFrequencyName(frequency: string): string {
+	const nameMap: { [key: string]: string } = {
+		ann: __('Annual'),
+		jan: __('January'),
+		feb: __('February'),
+		mar: __('March'),
+		apr: __('April'),
+		may: __('May'),
+		jun: __('June'),
+		jul: __('July'),
+		aug: __('August'),
+		sep: __('September'),
+		oct: __('October'),
+		nov: __('November'),
+		dec: __('December'),
+		spring: __('Spring'),
+		summer: __('Summer'),
+		fall: __('Fall'),
+		winter: __('Winter'),
+	}
+
+	return nameMap[frequency] ?? frequency;
+}
+
+/**
+ * Return the translated display name for a region from its technical code.
+ *
+ * @param region - The region code to translate.
+ */
+export function getInteractiveRegionName(region: InteractiveRegionOption): string {
+	const nameMap = {
+		[InteractiveRegionOption.GRIDDED_DATA]: __('Grid Cells'),
+		[InteractiveRegionOption.CENSUS]: __('Census Subdivisions'),
+		[InteractiveRegionOption.HEALTH]: __('Health Regions'),
+		[InteractiveRegionOption.WATERSHED]: __('Watersheds'),
+	}
+	return nameMap[region] ?? region;
 }
 
 /**

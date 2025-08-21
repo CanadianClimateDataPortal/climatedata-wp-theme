@@ -15,7 +15,7 @@ import {
 	FrequencyType,
 } from "@/types/climate-variable-interface";
 import { ControlTitle } from "@/components/ui/control-title";
-import { cn, isFrequencyEnabled } from "@/lib/utils";
+import { cn, getFrequencyName, isFrequencyEnabled } from '@/lib/utils';
 
 interface FrequencySelectProps {
 	config: FrequencyConfig;
@@ -77,26 +77,26 @@ const FrequencySelect = ({
 	}, [selectValue, value, onValueChange, hasMonths, hasAllMonths, hasSeasons, hasDaily, hasAnnual, hasAnnualJulJun]);
 
 	const months = [
-		{ label: __('January'), value: 'jan' },
-		{ label: __('February'), value: 'feb' },
-		{ label: __('March'), value: 'mar' },
-		{ label: __('April'), value: 'apr' },
-		{ label: __('May'), value: 'may' },
-		{ label: __('June'), value: 'jun' },
-		{ label: __('July'), value: 'jul' },
-		{ label: __('August'), value: 'aug' },
-		{ label: __('September'), value: 'sep' },
-		{ label: __('October'), value: 'oct' },
-		{ label: __('November'), value: 'nov' },
-		{ label: __('December'), value: 'dec' },
-	]
+		'jan',
+		'feb',
+		'mar',
+		'apr',
+		'may',
+		'jun',
+		'jul',
+		'aug',
+		'sep',
+		'oct',
+		'nov',
+		'dec',
+	].map(monthCode => ({ label: getFrequencyName(monthCode), value: monthCode }));
 
 	const seasons = [
-		{ label: __('Spring'), value: 'spring' },
-		{ label: __('Summer'), value: 'summer' },
-		{ label: __('Fall'), value: 'fall' },
-		{ label: __('Winter'), value: 'winter' },
-	]
+		'spring',
+		'summer',
+		'fall',
+		'winter',
+	].map(seasonCode => ({ label: getFrequencyName(seasonCode), value: seasonCode }));
 
 	const renderMonthlyOptions = () => {
 		if (!hasMonths && !hasAllMonths) {

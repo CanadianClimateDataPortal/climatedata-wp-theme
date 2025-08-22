@@ -25,6 +25,7 @@ import {
 	DEFAULT_MIN_ZOOM,
 } from '@/lib/constants';
 import WarningRSLCCMIP6 from '@/components/warning-rslc-cmip6';
+import { MAP_CONFIG } from '@/config/map.config';
 
 export default function RasterDownloadMap(): React.ReactElement {
 	const interactiveLayerRef = useRef<{
@@ -294,16 +295,17 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 					{/* Basemap TileLayer */}
 					<TileLayer
-						url="//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png"
+						url={MAP_CONFIG.baseTileUrl}
 						attribution=""
 						subdomains="abcd"
 						pane="basemap"
 						maxZoom={DEFAULT_MAX_ZOOM}
 					/>
 
+					{/* Labels TileLayer */}
 					<TileLayer
-						attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-						url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+						url={MAP_CONFIG.labelsTileUrl}
+						pane="labels"
 					/>
 				</MapContainer>
 			</div>

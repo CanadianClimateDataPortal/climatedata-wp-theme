@@ -8,9 +8,9 @@ function custom_global_vars()
 
     $vars['data_url'] = "https://dataclimatedata.crim.ca";
     $vars['pavics_url'] = "https://finch.crim.ca";
-    $vars['analytics_ua_en'] = "G-CPGH39EQSH"; // GA4 account valid for dev-(en|fr).climatedata.ca
-    $vars['analytics_ua_fr'] = "G-CPGH39EQSH";
-    $vars['googletag_id'] = "GTM-NJ7L4NR";
+    $vars['analytics_ua_en'] = "";
+    $vars['analytics_ua_fr'] = "";
+    $vars['googletag_id'] = "";
     $vars['ga_cross_domain'] = "";
 
     // CookieYes site ID (as found in the required script tag URL: https://cdn-cookieyes.com/client_data/<ID>/script.js)

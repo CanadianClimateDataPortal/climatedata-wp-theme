@@ -816,6 +816,10 @@ function build_message_body ( $form_data, $form_type ) {
 function build_feedback_body ( $form_data ) {
 	$body = '';
 
+	if ( isset( $form_data['phone'] ) ) {
+		$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Phone</span><span style="display: inline-block; vertical-align: top;">' . esc_html( $form_data['phone'] ) . '</span></p>';
+	}
+
 	if ( isset( $form_data['feedback-type'] ) ) {
 		$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Type</span><span style="display: inline-block; vertical-align: top;">' . esc_html( $form_data['feedback-type'] ) . '</span></p>';
 	}

@@ -93,7 +93,7 @@ export default function MarineMap(): React.ReactElement {
 			id='wrapper-map'
 			ref={wrapperRef}
 			className={cn(
-				'map-wrapper',
+				'map-wrapper to-raster',
 				'grid gap-4 h-full z-30',
 				showComparisonMap ? 'grid-cols-2' : 'grid-cols-1'
 			)}

@@ -200,15 +200,6 @@ export function prepareRaster(): void {
 
 	// Resize the window to force a layout update.
 	window.dispatchEvent(new Event('resize'));
-
-	// Add 'to-raster' class to the map container to adjust its appearance for raster output
-	const mapObjects = document.getElementById('wrapper-map');
-	if (mapObjects) {
-		setTimeout(() => {
-			// Give it three seconds to make sure everything is loaded.
-			mapObjects.classList.add('to-raster');
-		}, 3000);
-	}
 }
 
 /**

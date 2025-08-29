@@ -747,9 +747,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.NONE,
-			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
-			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.NONE,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
@@ -1014,10 +1014,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"1980",
 			"2010",
 		],
-		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.DOWNLOAD,
-			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
-		},
 		ahccdDownloadRequiredVariables: [
 			"tas",
 		],
@@ -1069,8 +1065,8 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.NONE,
-			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		averagingOptions: [
@@ -1252,7 +1248,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,
-			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		averagingOptions: [
@@ -1294,7 +1290,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
-			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
@@ -1397,7 +1392,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
-			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		unit: "days",
@@ -1512,7 +1507,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.NONE,
 		},
 		averagingOptions: [ AveragingType.ALL_YEARS ],
 		scenarios: {

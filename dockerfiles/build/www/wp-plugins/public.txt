@@ -11,3 +11,4 @@
 
 custom-taxonomy-order-ne=4.0.0
 simple-custom-post-order=2.5.11
+redirection=5.4.2

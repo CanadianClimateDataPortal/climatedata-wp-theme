@@ -365,12 +365,26 @@ add_action ( 'admin_bar_menu', function ( $admin_bar ) {
 	if ( !is_archive() ) {
 			
 		foreach ( get_option ( 'fw_langs') as $code => $lang ) {
+
+			if ( is_preview() ) {
+				$translation_URL = '/';
+
+				if ( $code != 'en' ) {
+					$translation_URL .= $code . '/';
+				}
+
+				if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
+					$translation_URL .= '?' . $_SERVER['QUERY_STRING'];
+				}
+			} else {
+				$translation_URL = translate_permalink ( $GLOBALS['vars']['current_url'], $GLOBALS['fw']['current_query']['ID'], $code );
+			}
 			
 			$admin_bar->add_menu ( array (
 				'id'    => 'fw-actions-item-lang-' . $code ,
 				'parent' => 'fw-actions-item-langs',
 				'title' => $lang['name'],
-				'href'  => translate_permalink ( $GLOBALS['vars']['current_url'], $GLOBALS['fw']['current_query']['ID'], $code ),
+				'href'  => $translation_URL,
 				'meta'  => array (
 					'class' => ''
 				),

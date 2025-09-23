@@ -29,6 +29,7 @@ function _show_help {
   echo "    nginx  <args...>        Execute a 'nginx' command in the 'Portal' container. All <args...> are passed to nginx."
   echo ""
   echo "  Database:"
+  echo "    db                      Enter 'mysql' client CLI to the default database to make queries."
   echo "    db-shell                Start a shell on the 'database' container."
   echo "    db-dump <database>      Dump to standard output the <database> database of the 'database' container."
   echo "    db-execute <database>   Execute the SQL script from standard input on the <database> database of the 'database' container."
@@ -116,6 +117,19 @@ function portal-shell {
 
 function wp-cli {
   _docker_compose exec -w /var/www/html portal wp "$@"
+}
+
+function db {
+  database="$1"
+  if [[ -z "$database" ]]; then
+    database="climatedata"
+  fi
+  echo "Connecting to MySQL '${database}' database. This should only work in development mode"
+  echo ""
+  echo "  Reminder: to exit, use CTRL+D key combination"
+  echo ""
+
+  _docker_compose exec -it db mysql -p'root' "$database"
 }
 
 function db-shell {

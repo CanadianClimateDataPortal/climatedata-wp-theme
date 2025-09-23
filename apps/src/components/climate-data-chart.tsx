@@ -156,7 +156,7 @@ const ClimateDataChart: React.FC<{
 	// Get the label for the current threshold, or null if not found.
 	const thresholdLabel = getLabelByValue(threshold);
 
-	// Tooltip: find closest timestamp for 30 years options
+	// Tooltip: find closest timestamp for 30-years options
 	const findClosetTimestamp = (timestamp: number, data: Record<string, number[]> | undefined) => {
 		if (!data) return null;
 		const sortedKeys = Object.keys(data)
@@ -175,7 +175,7 @@ const ClimateDataChart: React.FC<{
 		[data, version, climateVariableId, chartDataOptions]
 	);
 
-	// Tooltip formatter for 30 years averages and changes
+	// Tooltip formatter for 30-years averages and changes
 	const tooltip30yFormatter = (x: number, prefix: string, isDelta: boolean, currentActiveSeries: string[]) => {
 		// Chart reference
 		const chart = chartRef.current?.chart;
@@ -202,7 +202,7 @@ const ClimateDataChart: React.FC<{
 		const startYear = new Date(timestampKey).getUTCFullYear();
 		const endYear = startYear + 29;
 
-		// Add plot band on 30 years range
+		// Add plot band on 30-years range
 		chart.xAxis[0].addPlotBand({
 			from: Date.UTC(startYear, 0, 1),
 			to: Date.UTC(startYear + 29, 11, 31),

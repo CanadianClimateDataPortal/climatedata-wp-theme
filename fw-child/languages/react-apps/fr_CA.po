@@ -71,7 +71,7 @@ msgstr "Choisir la date"
 msgid "All years"
 msgstr "Toutes les années"
 
-msgid "30 years"
+msgid "30-years"
 msgstr "Moyennes sur 30 ans"
 
 msgid "WMO Parameters"
@@ -237,7 +237,7 @@ msgstr "Désélectionnez tout pour obtenir les résultats des modèles individue
 msgid "Temporal frequency"
 msgstr "Fréquence temporelle"
 
-msgid "30 years average"
+msgid "30-years average"
 msgstr "Moyennes sur 30 ans"
 
 msgid "Station type"
@@ -456,10 +456,10 @@ msgstr "Changement par rapport à "
 msgid "Annual values"
 msgstr "Valeurs annuelles"
 
-msgid "30 year averages"
+msgid "30-year averages"
 msgstr "Moyennes sur 30 ans"
 
-msgid "30 year changes"
+msgid "30-year changes"
 msgstr "Changements sur 30 ans"
 
 msgid "Export failed. Please try again."

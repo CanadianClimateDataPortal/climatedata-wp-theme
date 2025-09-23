@@ -420,12 +420,12 @@ const ClimateDataChart: React.FC<{
 		},
 		{
 			value: '30-year-averages',
-			label: __('30 year averages'),
+			label: __('30-year averages'),
 			enabled: isThirtyYearAveragingEnabled(),
 		},
 		{
 			value: '30-year-changes',
-			label: __('30 year changes'),
+			label: __('30-year changes'),
 			enabled: isThirtyYearAveragingEnabled(),
 		},
 	], [isThirtyYearAveragingEnabled, __]);

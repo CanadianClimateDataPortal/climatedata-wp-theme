@@ -164,7 +164,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		},
 		{
 			value: AveragingType.THIRTY_YEARS,
-			label: __('30 year averages'),
+			label: __('30-year averages'),
 		},
 	].filter((option) =>
 		climateVariable?.getAveragingOptions()?.includes(option.value)

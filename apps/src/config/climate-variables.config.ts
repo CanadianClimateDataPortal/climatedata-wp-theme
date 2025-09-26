@@ -1625,4 +1625,14 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			FileFormatType.GeoJSON,
 		],
 	},
+	/** S2D Mean Temperature */
+	{
+		id: 's2d_mean_temp',
+		class: 'SeasonalDecadalClimateVariable',
+	},
+	/** S2D Total Precipitation */
+	{
+		id: 's2d_precipitation',
+		class: 'SeasonalDecadalClimateVariable',
+	},
 ];

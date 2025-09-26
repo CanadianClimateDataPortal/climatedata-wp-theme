@@ -26,6 +26,7 @@ import SeaLevelClimateVariable from '@/lib/sea-level-climate-variable';
 import StationClimateVariable from '@/lib/station-climate-variable';
 import StationDataClimateVariable from "@/lib/station-data-climate-variable";
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
+import SeasonalDecadalClimateVariable from '@/lib/seasonal-decadal-climate-variable';
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
@@ -76,6 +77,7 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 	SeaLevelClimateVariable: SeaLevelClimateVariable,
 	StationClimateVariable: StationClimateVariable,
 	StationDataClimateVariable: StationDataClimateVariable,
+	SeasonalDecadalClimateVariable: SeasonalDecadalClimateVariable,
 };
 
 /**

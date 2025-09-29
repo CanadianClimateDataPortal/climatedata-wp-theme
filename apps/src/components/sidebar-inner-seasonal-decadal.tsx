@@ -1,9 +1,21 @@
 import { __ } from '@/context/locale-provider';
 
 import Dropdown from '@/components/ui/dropdown';
-import { SidebarSeparator } from '@/components/ui/sidebar';
+import TooltipWidget from '@/components/ui/tooltip-widget';
 
-import { useClimateVariable } from '@/hooks/use-climate-variable';
+import {
+	TimePeriodsControlSingle,
+} from '@/components/sidebar-menu-items/time-periods-control-single';
+import {
+	SidebarSeparator,
+} from '@/components/ui/sidebar';
+import {
+	Checkbox,
+} from '@/components/ui/checkbox';
+
+import {
+	useClimateVariable,
+} from '@/hooks/use-climate-variable';
 
 export default function SidebarInnerSeasonalDecadal() {
 	const { climateVariable } = useClimateVariable();
@@ -56,6 +68,7 @@ export default function SidebarInnerSeasonalDecadal() {
 				tooltip={<TooltipToCreate />}
 				onChange={() => void 0}
 			/>
+
 			<Dropdown
 				key={fieldForecastDisplay.key}
 				placeholder={placeholder}
@@ -65,7 +78,23 @@ export default function SidebarInnerSeasonalDecadal() {
 				tooltip={<TooltipToCreate />}
 				onChange={() => void 0}
 			/>
+			<div className="flex items-center space-x-2">
+				<Checkbox
+					id={fieldForecastDisplay.key + '_compare'}
+					className="text-brand-red"
+					onCheckedChange={() => void 0}
+				/>
+				<label
+					htmlFor={fieldForecastDisplay.key + '_compare'}
+					className="text-sm font-medium leading-none cursor-pointer"
+				>
+					{__('Mask Low Skill')}
+				</label>
+				<TooltipWidget tooltip={<TooltipToCreate />} />
+			</div>
+
 			<SidebarSeparator />
+
 			<Dropdown
 				key={fieldFrequencies.key}
 				placeholder={placeholder}
@@ -75,6 +104,10 @@ export default function SidebarInnerSeasonalDecadal() {
 				tooltip={<TooltipToCreate />}
 				onChange={() => void 0}
 			/>
+
+			<p>&nbsp;</p>
+
+			<TimePeriodsControlSingle />
 		</>
 	);
 }

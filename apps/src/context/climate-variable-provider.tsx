@@ -67,7 +67,7 @@ type ClassMapType = Record<
 /**
  * Maps climate variable class names to their corresponding class implementations.
  */
-const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
+const CLIMATE_VARIABLE_MAP = {
 	AllowanceClimateVariable: AllowanceClimateVariable,
 	ClimateVariableBase: ClimateVariableBase,
 	RasterPrecalculatedClimateVariable: RasterPrecalculatedClimateVariable,
@@ -79,6 +79,10 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 	StationDataClimateVariable: StationDataClimateVariable,
 	SeasonalDecadalClimateVariable: SeasonalDecadalClimateVariable,
 };
+
+export type ClimateVariableClassType = keyof typeof CLIMATE_VARIABLE_MAP;
+
+const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = CLIMATE_VARIABLE_MAP;
 
 /**
  * Provides the ClimateVariable context to the component tree.

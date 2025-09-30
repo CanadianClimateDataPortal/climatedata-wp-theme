@@ -2,6 +2,7 @@ import { __ } from '@/context/locale-provider';
 
 import Dropdown from '@/components/ui/dropdown';
 import TooltipWidget from '@/components/ui/tooltip-widget';
+import { SidebarMenuItem } from '@/components/ui/sidebar';
 
 import {
 	TimePeriodsControlSingle,
@@ -59,55 +60,63 @@ export default function SidebarInnerSeasonalDecadal() {
 
 	return (
 		<>
-			<Dropdown
-				key={fieldForecastTypes.key}
-				placeholder={placeholder}
-				options={fieldForecastTypes.options}
-				label={fieldForecastTypes.label}
-				value={fieldForecastTypes.options[0].value}
-				tooltip={<TooltipToCreate />}
-				onChange={() => void 0}
-			/>
-
-			<Dropdown
-				key={fieldForecastDisplay.key}
-				placeholder={placeholder}
-				options={fieldForecastDisplay.options}
-				label={fieldForecastDisplay.label}
-				value={fieldForecastDisplay.options[0].value}
-				tooltip={<TooltipToCreate />}
-				onChange={() => void 0}
-			/>
-			<div className="flex items-center space-x-2">
-				<Checkbox
-					id={fieldForecastDisplay.key + '_compare'}
-					className="text-brand-red"
-					onCheckedChange={() => void 0}
+			<SidebarMenuItem>
+				<Dropdown
+					key={fieldForecastTypes.key}
+					placeholder={placeholder}
+					options={fieldForecastTypes.options}
+					label={fieldForecastTypes.label}
+					value={fieldForecastTypes.options[0].value}
+					tooltip={<TooltipToCreate />}
+					onChange={() => void 0}
 				/>
-				<label
-					htmlFor={fieldForecastDisplay.key + '_compare'}
-					className="text-sm font-medium leading-none cursor-pointer"
-				>
-					{__('Mask Low Skill')}
-				</label>
-				<TooltipWidget tooltip={<TooltipToCreate />} />
-			</div>
+			</SidebarMenuItem>
+
+			<SidebarMenuItem>
+				<div className="flex flex-col gap-4">
+					<Dropdown
+						key={fieldForecastDisplay.key}
+						placeholder={placeholder}
+						options={fieldForecastDisplay.options}
+						label={fieldForecastDisplay.label}
+						value={fieldForecastDisplay.options[0].value}
+						tooltip={<TooltipToCreate />}
+						onChange={() => void 0}
+					/>
+					<div className="flex items-center space-x-2">
+						<Checkbox
+							id={fieldForecastDisplay.key + '_compare'}
+							className="text-brand-red"
+							onCheckedChange={() => void 0}
+						/>
+						<label
+							htmlFor={fieldForecastDisplay.key + '_compare'}
+							className="text-sm font-medium leading-none cursor-pointer"
+						>
+							{__('Mask Low Skill')}
+						</label>
+						<TooltipWidget tooltip={<TooltipToCreate />} />
+					</div>
+				</div>
+			</SidebarMenuItem>
 
 			<SidebarSeparator />
 
-			<Dropdown
-				key={fieldFrequencies.key}
-				placeholder={placeholder}
-				options={fieldFrequencies.options}
-				label={fieldFrequencies.label}
-				value={fieldFrequencies.options[0].value}
-				tooltip={<TooltipToCreate />}
-				onChange={() => void 0}
-			/>
+			<SidebarMenuItem>
+				<Dropdown
+					key={fieldFrequencies.key}
+					placeholder={placeholder}
+					options={fieldFrequencies.options}
+					label={fieldFrequencies.label}
+					value={fieldFrequencies.options[0].value}
+					tooltip={<TooltipToCreate />}
+					onChange={() => void 0}
+				/>
+			</SidebarMenuItem>
 
-			<p>&nbsp;</p>
-
-			<TimePeriodsControlSingle />
+			<SidebarMenuItem className="mt-4">
+				<TimePeriodsControlSingle />
+			</SidebarMenuItem>
 		</>
 	);
 }

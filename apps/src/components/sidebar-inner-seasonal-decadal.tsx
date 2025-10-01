@@ -14,6 +14,22 @@ import {
 	Checkbox,
 } from '@/components/ui/checkbox';
 
+import { 
+	S2D_FORECAST_DISPLAY,
+	S2D_FORECAST_TYPE,
+	S2D_FREQ,
+	seasonalDecadalActions,
+	S2DParamForecastDisplay,
+	S2DParamForecastType,
+	S2DParamFreq,
+} from '@/store';
+
+const {
+	setForecastDisplay,
+	setForecastType,
+	setFreq,
+} = seasonalDecadalActions
+
 export default function SidebarInnerSeasonalDecadal() {
 
 	const placeholder = __('Select an option');
@@ -25,29 +41,30 @@ export default function SidebarInnerSeasonalDecadal() {
 		label: __(
 			'Forecast Types'
 		) /* ^^^^^ But memories of other projects tells me that this might not be good thing to do here to __() like that */,
-		options: [
-			{ value: 'foo', label: __('Expected Conditions') },
-			{ value: 'bar', label: __('Unusual Conditions') },
-		],
+		options: [ ...S2D_FORECAST_TYPE ].map(([value, label]) => ({ value, label })),
+		onChange: (input: S2DParamForecastType): void => {
+			console.log('fieldForecastTypes.onChange', input)
+			setForecastType(input)
+		},
 	};
 
 	const fieldForecastDisplay = {
 		key: 'forecast_display',
 		label: __('Forecast Display'),
-		options: [
-			{ value: 'forecast', label: __('Forecast') },
-			{ value: 'climatology', label: __('Climatology') },
-		],
+		options: [ ...S2D_FORECAST_DISPLAY ].map(([value, label]) => ({ value, label })),
+		onChange: (input: S2DParamForecastDisplay): void => {
+			setForecastDisplay(input)
+		},
 	};
 
 	const fieldFrequencies = {
 		key: 'frequencies',
 		label: __('Frequencies'),
-		options: [
-			{ value: 'monthly', label: __('Monthly') },
-			{ value: 'seasonal', label: __('Seasonal (3 months)') },
-			{ value: 'decadal', label: __('Decadal (5 years)') },
-		],
+		options: [ ...S2D_FREQ ].map(([value, label]) => ({ value, label })),
+		onChange: (input: S2DParamFreq): void => {
+			console.log('fieldFrequencies.onChange', input)
+			setFreq(input)
+		},
 	};
 
 	return (
@@ -60,7 +77,7 @@ export default function SidebarInnerSeasonalDecadal() {
 					label={fieldForecastTypes.label}
 					value={fieldForecastTypes.options[0].value}
 					tooltip={<TooltipToCreate />}
-					onChange={() => void 0}
+					onChange={fieldForecastTypes.onChange}
 				/>
 			</SidebarMenuItem>
 
@@ -73,7 +90,7 @@ export default function SidebarInnerSeasonalDecadal() {
 						label={fieldForecastDisplay.label}
 						value={fieldForecastDisplay.options[0].value}
 						tooltip={<TooltipToCreate />}
-						onChange={() => void 0}
+						onChange={fieldForecastDisplay.onChange}
 					/>
 					<div className="flex items-center space-x-2">
 						<Checkbox
@@ -102,7 +119,7 @@ export default function SidebarInnerSeasonalDecadal() {
 					label={fieldFrequencies.label}
 					value={fieldFrequencies.options[0].value}
 					tooltip={<TooltipToCreate />}
-					onChange={() => void 0}
+					onChange={fieldFrequencies.onChange}
 				/>
 			</SidebarMenuItem>
 

@@ -108,7 +108,6 @@ const TimePeriodsControlSingle: React.FC<TimePeriodsControlSingleProps> = ({
 						<Slider.Range
 							className={cn(
 								'absolute rounded-full h-full',
-								'bg-[hsl(var(--destructive-red))]'
 							)}
 						/>
 					</Slider.Track>

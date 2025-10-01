@@ -10,6 +10,7 @@ import { configureStore } from '@reduxjs/toolkit';
 
 // Store Slices and Reducers
 import climateVariableReducer from '@/store/climate-variable-slice';
+import seasonalDecadal from '@/store/seasonal-decadal-slice';
 import mapReducer from '@/features/map/map-slice';
 import downloadReducer from '@/features/download/download-slice';
 import urlSyncReducer from '@/features/url-sync/url-sync-slice';
@@ -33,6 +34,7 @@ import { wpApiSlice } from '@/services/wp-node';
 export const store = configureStore({
 	reducer: {
 		climateVariable: climateVariableReducer,
+		seasonalDecadal,
 		map: mapReducer,
 		download: downloadReducer,
 		urlSync: urlSyncReducer,

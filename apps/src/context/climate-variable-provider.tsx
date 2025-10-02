@@ -26,6 +26,7 @@ import SeaLevelClimateVariable from '@/lib/sea-level-climate-variable';
 import StationClimateVariable from '@/lib/station-climate-variable';
 import StationDataClimateVariable from "@/lib/station-data-climate-variable";
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
+import SeasonalDecadalClimateVariable from '@/lib/seasonal-decadal-climate-variable';
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
@@ -66,7 +67,7 @@ type ClassMapType = Record<
 /**
  * Maps climate variable class names to their corresponding class implementations.
  */
-const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
+const CLIMATE_VARIABLE_MAP = {
 	AllowanceClimateVariable: AllowanceClimateVariable,
 	ClimateVariableBase: ClimateVariableBase,
 	RasterPrecalculatedClimateVariable: RasterPrecalculatedClimateVariable,
@@ -76,7 +77,12 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 	SeaLevelClimateVariable: SeaLevelClimateVariable,
 	StationClimateVariable: StationClimateVariable,
 	StationDataClimateVariable: StationDataClimateVariable,
+	SeasonalDecadalClimateVariable: SeasonalDecadalClimateVariable,
 };
+
+export type ClimateVariableClassType = keyof typeof CLIMATE_VARIABLE_MAP;
+
+const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = CLIMATE_VARIABLE_MAP;
 
 /**
  * Provides the ClimateVariable context to the component tree.

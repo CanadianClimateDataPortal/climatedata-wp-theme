@@ -1,5 +1,8 @@
 import React from 'react';
 import { MapDisplayType, MultilingualField, WMSParams } from '@/types/types';
+import {
+	type ClimateVariableClassType,
+} from '@/context/climate-variable-provider';
 
 export interface variableClassMap {
 	[key: string]: string;
@@ -206,7 +209,7 @@ export interface ClimateVariableConfigInterface {
 	title?: string | MultilingualField;
 
 	/** Default class defining the type or category of the climate variable */
-	class: string;
+	class: ClimateVariableClassType;
 
 	/** Alternative classes to use depending on the dataset type */
 	classes?: variableClassMap;

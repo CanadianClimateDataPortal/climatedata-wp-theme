@@ -1632,7 +1632,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	},
 	/** S2D Total Precipitation */
 	{
-		id: 's2d_precipitation',
+		id: 's2d_precip_accum',
 		class: 'SeasonalDecadalClimateVariable',
 	},
 ];

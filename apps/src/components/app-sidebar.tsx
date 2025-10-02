@@ -134,7 +134,7 @@ export function AppSidebar() {
 				<SidebarGroup className="mt-auto gap-0">
 					{currentVarId.startsWith('s2d_') ? (
 						<div className="flex flex-row justify-start gap-2 p-2 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
-							<span>{__('Release date')}:&nbsp;</span>
+							<span>{__('Release date:')}&nbsp;</span>
 							<time
 								className="font-medium"
 								dateTime={'2025-09-30'}

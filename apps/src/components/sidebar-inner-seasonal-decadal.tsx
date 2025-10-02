@@ -21,9 +21,6 @@ import {
 export default function SidebarInnerSeasonalDecadal() {
 	const { climateVariable } = useClimateVariable();
 
-	const varId = climateVariable?.getId();
-	console.log('SidebarInnerSeasonalDecadal', { varId, climateVariable });
-
 	const placeholder = __('Select an option');
 
 	const TooltipToCreate = () => <span>{__('TODO')}</span>;

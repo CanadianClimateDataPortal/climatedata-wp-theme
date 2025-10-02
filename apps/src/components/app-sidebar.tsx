@@ -76,8 +76,7 @@ export function AppSidebar() {
 	const about_url = INTERNAL_URLS[`about-data-${currentLocale}`] || '';
 	const support_url = INTERNAL_URLS[`support-${currentLocale}`] || '';
 
-	const currentVarId = climateVariable?.getId() || '';
-
+	const isSeasonalDecadal = climateVariable?.getClass() === 'SeasonalDecadalClimateVariable'
 
 	return (
 		<Sidebar>
@@ -99,7 +98,7 @@ export function AppSidebar() {
 									<VariablesMenuItem />
 									<SidebarSeparator />
 
-									{currentVarId.startsWith('s2d_') ? (
+									{isSeasonalDecadal ? (
 										<SidebarInnerSeasonalDecadal />
 									) : (
 										<SidebarInnerProjection />
@@ -132,7 +131,7 @@ export function AppSidebar() {
 				</SidebarGroup>
 
 				<SidebarGroup className="mt-auto gap-0">
-					{currentVarId.startsWith('s2d_') ? (
+					{isSeasonalDecadal ? (
 						<div className="flex flex-row justify-start gap-2 p-2 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
 							<span>{__('Release date:')}&nbsp;</span>
 							<time

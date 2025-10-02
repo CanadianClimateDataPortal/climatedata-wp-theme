@@ -14,15 +14,13 @@ import {
 	Checkbox,
 } from '@/components/ui/checkbox';
 
-import { 
-	S2D_FORECAST_DISPLAY,
-	S2D_FORECAST_TYPE,
-	S2D_FREQ,
+import {
+	createFieldOptionsValueLabel,
 	seasonalDecadalActions,
-	S2DParamForecastDisplay,
-	S2DParamForecastType,
-	S2DParamFreq,
-} from '@/store';
+	type S2DParamForecastDisplay,
+	type S2DParamForecastType,
+	type S2DParamFreq,
+} from '@/store/seasonal-decadal-slice';
 
 const {
 	setForecastDisplay,
@@ -36,14 +34,15 @@ export default function SidebarInnerSeasonalDecadal() {
 
 	const TooltipToCreate = () => <span>{__('TODO')}</span>;
 
+	const fieldOptions = createFieldOptionsValueLabel()
+
 	const fieldForecastTypes = {
 		key: 'forecast_types',
 		label: __(
 			'Forecast Types'
 		) /* ^^^^^ But memories of other projects tells me that this might not be good thing to do here to __() like that */,
-		options: [ ...S2D_FORECAST_TYPE ].map(([value, label]) => ({ value, label })),
+		options: fieldOptions.forecastType,
 		onChange: (input: S2DParamForecastType): void => {
-			console.log('fieldForecastTypes.onChange', input)
 			setForecastType(input)
 		},
 	};
@@ -51,7 +50,7 @@ export default function SidebarInnerSeasonalDecadal() {
 	const fieldForecastDisplay = {
 		key: 'forecast_display',
 		label: __('Forecast Display'),
-		options: [ ...S2D_FORECAST_DISPLAY ].map(([value, label]) => ({ value, label })),
+		options: fieldOptions.forecastDisplay,
 		onChange: (input: S2DParamForecastDisplay): void => {
 			setForecastDisplay(input)
 		},
@@ -60,9 +59,8 @@ export default function SidebarInnerSeasonalDecadal() {
 	const fieldFrequencies = {
 		key: 'frequencies',
 		label: __('Frequencies'),
-		options: [ ...S2D_FREQ ].map(([value, label]) => ({ value, label })),
+		options: fieldOptions.freq,
 		onChange: (input: S2DParamFreq): void => {
-			console.log('fieldFrequencies.onChange', input)
 			setFreq(input)
 		},
 	};

@@ -22,9 +22,7 @@ export default function SidebarInnerSeasonalDecadal() {
 
 	const fieldForecastTypes = {
 		key: 'forecast_types',
-		label: __(
-			'Forecast Types'
-		) /* ^^^^^ But memories of other projects tells me that this might not be good thing to do here to __() like that */,
+		label: __('Forecast Types'),
 		options: [
 			{ value: 'foo', label: __('Expected Conditions') },
 			{ value: 'bar', label: __('Unusual Conditions') },

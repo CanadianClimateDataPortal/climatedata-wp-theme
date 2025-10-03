@@ -14,12 +14,14 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DatasetsMenuItem, DatasetsPanel } from '@/components/sidebar-menu-items/datasets';
 import { VariablesMenuItem, VariablesPanel } from '@/components/sidebar-menu-items/variables';
-import TooltipWidget from '@/components/ui/tooltip-widget';
 import { DataValuesControl } from '@/components/sidebar-menu-items/data-values-control';
 import { MapColorsDropdown } from '@/components/sidebar-menu-items/map-colors-dropdown';
 
 import SidebarInnerProjection from '@/components/sidebar-inner-projection';
-import SidebarInnerSeasonalDecadal from '@/components/sidebar-inner-seasonal-decadal';
+import {
+	SidebarInnerSeasonalDecadal,
+	SidebarFooterReleaseDate,
+ } from '@/components/sidebar-inner-seasonal-decadal';
 
 import { RecentLocationsLink, RecentLocationsPanel } from '@/components/sidebar-footer-links/recent-locations';
 import LinkWithIcon from '@/components/sidebar-footer-links/link-with-icon';
@@ -131,16 +133,7 @@ export function AppSidebar() {
 
 				<SidebarGroup className="gap-0 mt-auto">
 					{isSeasonalDecadal ? (
-						<div className="flex flex-row justify-start gap-2 p-2 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
-							<span>{__('Release date:')}&nbsp;</span>
-							<time
-								className="font-medium"
-								dateTime={'2025-09-30'}
-							>
-								{'2025-09-30'}
-							</time>
-							<TooltipWidget tooltip={__('TODO')} />
-						</div>
+						<SidebarFooterReleaseDate />
 					) : null}
 					<RecentLocationsLink />
 					<LinkWithIcon

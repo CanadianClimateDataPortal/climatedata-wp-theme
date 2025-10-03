@@ -15,3 +15,4 @@ class SeasonalDecadalClimateVariable extends ClimateVariableBase {
 }
 
 export default SeasonalDecadalClimateVariable;
+

@@ -14,12 +14,7 @@ import {
 	Checkbox,
 } from '@/components/ui/checkbox';
 
-import {
-	useClimateVariable,
-} from '@/hooks/use-climate-variable';
-
 export default function SidebarInnerSeasonalDecadal() {
-	const { climateVariable } = useClimateVariable();
 
 	const placeholder = __('Select an option');
 
@@ -117,3 +112,4 @@ export default function SidebarInnerSeasonalDecadal() {
 		</>
 	);
 }
+

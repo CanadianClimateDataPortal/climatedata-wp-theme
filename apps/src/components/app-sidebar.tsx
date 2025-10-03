@@ -30,7 +30,6 @@ import { INTERNAL_URLS } from '@/lib/constants';
 import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 
-
 /**
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
  */
@@ -130,7 +129,7 @@ export function AppSidebar() {
 					</Tabs>
 				</SidebarGroup>
 
-				<SidebarGroup className="mt-auto gap-0">
+				<SidebarGroup className="gap-0 mt-auto">
 					{isSeasonalDecadal ? (
 						<div className="flex flex-row justify-start gap-2 p-2 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
 							<span>{__('Release date:')}&nbsp;</span>
@@ -177,3 +176,4 @@ export function AppSidebar() {
 		</Sidebar>
 	);
 }
+

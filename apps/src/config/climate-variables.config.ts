@@ -1636,3 +1636,4 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: 'SeasonalDecadalClimateVariable',
 	},
 ];
+

@@ -182,6 +182,14 @@ export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
 	},
 }
 
+/**
+ * For S2D variables, the number of available periods for each frequency type.
+ */
+export const S2D_NB_PERIODS = {
+	[FrequencyType.MONTHLY]: 3,
+	[FrequencyType.SEASONAL]: 10,
+}
+
 export const AHCCD_SQUARE_ICON = (
 	<svg width="20" height="20" viewBox="0 0 20 20">
 		<rect x="4" y="4" width="12" height="12" fill="#3b82f6" stroke="#222" strokeWidth="2" />

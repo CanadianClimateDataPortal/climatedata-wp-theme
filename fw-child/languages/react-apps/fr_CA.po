@@ -304,7 +304,7 @@ msgid "Search..."
 msgstr "Rechercher..."
 
 msgid "Loading..."
-msgstr "Chargement en cours..."
+msgstr "Chargement..."
 
 msgid "Loading variables..."
 msgstr "Chargement des variables..."
@@ -356,6 +356,42 @@ msgstr "Certains jeux de données maillées ont été moyennés sur différentes
 
 msgid "Interactive Regions"
 msgstr "Régions interactives"
+
+msgid "Jan"
+msgstr "Jan"
+
+msgid "Feb"
+msgstr "Fév"
+
+msgid "Mar"
+msgstr "Mars"
+
+msgid "Apr"
+msgstr "Avr"
+
+msgid "May"
+msgstr "Mai"
+
+msgid "Jun"
+msgstr "Juin"
+
+msgid "Jul"
+msgstr "Juil"
+
+msgid "Aug"
+msgstr "Aoû"
+
+msgid "Sept"
+msgstr "Sept"
+
+msgid "Oct"
+msgstr "Oct"
+
+msgid "Nov"
+msgstr "Nov"
+
+msgid "Dec"
+msgstr "Déc"
 
 msgid "January"
 msgstr "Janvier"

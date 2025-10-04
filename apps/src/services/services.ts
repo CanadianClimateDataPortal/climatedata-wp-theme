@@ -563,3 +563,23 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }, f
 		throw error;
 	}
 };
+
+/**
+ * Fetches the release date of a S2D variable.
+ *
+ * @param variable - The S2D variable ID.
+ * @param frequency - The frequency for which we want the release date.
+ * @param fetchOptions - Any other options to pass to fetch() requests (ex: `signal`)
+ */
+// @ts-expect-error We ignore unused variables errors while waiting for the API endpoint to be implemented.
+export const fetchS2DReleaseDate = async ({ variable, frequency }: { variable: string, frequency: string }, fetchOptions?: FetchOptions): Promise<string> => {
+	// TEMPORARILY mocking the API, while waiting for the API endpoint to be implemented.
+	const fetchMock = new Promise<string>((resolve) => {
+		setTimeout(() => {
+			const value = `2025-03-01`;
+			resolve(value);
+		}, 3000);
+	});
+
+	return await fetchMock;
+}

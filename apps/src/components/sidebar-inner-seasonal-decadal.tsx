@@ -2,27 +2,31 @@ import { __ } from '@/context/locale-provider';
 
 import Dropdown from '@/components/ui/dropdown';
 import TooltipWidget from '@/components/ui/tooltip-widget';
-import { SidebarMenuItem } from '@/components/ui/sidebar';
-
+import { Checkbox } from '@/components/ui/checkbox';
+import { SidebarMenuItem, SidebarSeparator } from '@/components/ui/sidebar';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 import {
-	TimePeriodsControlSingle,
-} from '@/components/sidebar-menu-items/time-periods-control-single';
-import {
-	SidebarSeparator,
-} from '@/components/ui/sidebar';
-import {
-	Checkbox,
-} from '@/components/ui/checkbox';
-
-import {
-	useClimateVariable,
-} from '@/hooks/use-climate-variable';
+	ForecastDisplay,
+	ForecastType,
+	FrequencyType,
+} from '@/types/climate-variable-interface';
+import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
 
 export default function SidebarInnerSeasonalDecadal() {
-	const { climateVariable } = useClimateVariable();
+	const {
+		climateVariable,
+		setForecastType,
+		setForecastDisplay,
+		setIsLowSkillMasked,
+		setFrequency,
+	} = useClimateVariable();
 
-	const varId = climateVariable?.getId();
-	console.log('SidebarInnerSeasonalDecadal', { varId, climateVariable });
+	const isLowSkillMasked = climateVariable?.isLowSkillMasked() ?? false;
+	const forecastType =
+		climateVariable?.getForecastType() ?? ForecastType.EXPECTED;
+	const forecastDisplay =
+		climateVariable?.getForecastDisplay() ?? ForecastDisplay.FORECAST;
+	const frequency = climateVariable?.getFrequency() ?? FrequencyType.MONTHLY;
 
 	const placeholder = __('Select an option');
 
@@ -34,60 +38,63 @@ export default function SidebarInnerSeasonalDecadal() {
 			'Forecast Types'
 		) /* ^^^^^ But memories of other projects tells me that this might not be good thing to do here to __() like that */,
 		options: [
-			{ value: 'foo', label: __('Expected Conditions') },
-			{ value: 'bar', label: __('Unusual Conditions') },
+			{ value: ForecastType.EXPECTED, label: __('Expected Conditions') },
+			{ value: ForecastType.UNUSUAL, label: __('Unusual Conditions') },
 		],
+		value: forecastType,
 	};
 
 	const fieldForecastDisplay = {
 		key: 'forecast_display',
 		label: __('Forecast Display'),
 		options: [
-			{ value: 'forecast', label: __('Forecast') },
-			{ value: 'climatology', label: __('Climatology') },
+			{ value: ForecastDisplay.FORECAST, label: __('Forecast') },
+			{ value: ForecastDisplay.CLIMATOLOGY, label: __('Climatology') },
 		],
+		value: forecastDisplay,
 	};
 
 	const fieldFrequencies = {
 		key: 'frequencies',
 		label: __('Frequencies'),
 		options: [
-			{ value: 'monthly', label: __('Monthly') },
-			{ value: 'seasonal', label: __('Seasonal (3 months)') },
-			{ value: 'decadal', label: __('Decadal (5 years)') },
+			{ value: FrequencyType.MONTHLY, label: __('Monthly') },
+			{ value: FrequencyType.SEASONAL, label: __('Seasonal (3 months)') },
 		],
+		value: frequency,
 	};
 
 	return (
 		<>
 			<SidebarMenuItem>
-				<Dropdown
+				<Dropdown<ForecastType>
 					key={fieldForecastTypes.key}
 					placeholder={placeholder}
 					options={fieldForecastTypes.options}
 					label={fieldForecastTypes.label}
-					value={fieldForecastTypes.options[0].value}
+					value={fieldForecastTypes.value}
 					tooltip={<TooltipToCreate />}
-					onChange={() => void 0}
+					onChange={setForecastType}
 				/>
 			</SidebarMenuItem>
 
 			<SidebarMenuItem>
 				<div className="flex flex-col gap-4">
-					<Dropdown
+					<Dropdown<ForecastDisplay>
 						key={fieldForecastDisplay.key}
 						placeholder={placeholder}
 						options={fieldForecastDisplay.options}
 						label={fieldForecastDisplay.label}
-						value={fieldForecastDisplay.options[0].value}
+						value={fieldForecastDisplay.value}
 						tooltip={<TooltipToCreate />}
-						onChange={() => void 0}
+						onChange={setForecastDisplay}
 					/>
 					<div className="flex items-center space-x-2">
 						<Checkbox
 							id={fieldForecastDisplay.key + '_compare'}
 							className="text-brand-red"
-							onCheckedChange={() => void 0}
+							checked={isLowSkillMasked}
+							onCheckedChange={setIsLowSkillMasked}
 						/>
 						<label
 							htmlFor={fieldForecastDisplay.key + '_compare'}
@@ -103,19 +110,19 @@ export default function SidebarInnerSeasonalDecadal() {
 			<SidebarSeparator />
 
 			<SidebarMenuItem>
-				<Dropdown
+				<Dropdown<string>
 					key={fieldFrequencies.key}
 					placeholder={placeholder}
 					options={fieldFrequencies.options}
 					label={fieldFrequencies.label}
-					value={fieldFrequencies.options[0].value}
+					value={fieldFrequencies.value}
 					tooltip={<TooltipToCreate />}
-					onChange={() => void 0}
+					onChange={setFrequency}
 				/>
 			</SidebarMenuItem>
 
 			<SidebarMenuItem className="mt-4">
-				<TimePeriodsControlSingle />
+				<TimePeriodsControlS2D />
 			</SidebarMenuItem>
 		</>
 	);

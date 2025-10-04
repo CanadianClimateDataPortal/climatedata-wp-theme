@@ -219,3 +219,22 @@ export function formatValue(value: number, unit: string | undefined, decimals: n
 
 	return sprintf(valuePattern, formatter.format(value));
 }
+
+/**
+ * Return the localized, short month name for a given month.
+ *
+ * The month name is three or four letters, without a dot (ex: "Jan").
+ *
+ * This function is an alternative to `date.toLocaleString(<locale>, { month: 'short' })`,
+ * which, for French, tends to generate 4 letters names with a dot (ex: "janv."). This is
+ * not always desired.
+ *
+ * @param monthIndex - The index of the month to get the short name for.
+ */
+export function getShortMonthName(monthIndex: number): string {
+	const monthNames = [
+		__('Jan'), __('Feb'), __('Mar'), __('Apr'), __('May'), __('Jun'),
+		__('Jul'), __('Aug'), __('Sept'), __('Oct'), __('Nov'), __('Dec')
+	];
+	return monthNames[monthIndex];
+}

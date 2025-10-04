@@ -29,7 +29,52 @@ import { PostData } from '@/types/types';
 import { INTERNAL_URLS } from '@/lib/constants';
 import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { useS2D } from '@/hooks/use-s2d';
+import SeasonalDecadalClimateVariable from '@/lib/seasonal-decadal-climate-variable';
 
+type S2DReleaseDateProps = {
+	locale: string,
+	releaseDate: Date | null
+}
+
+/**
+ * Component displaying a release date in the sidebar.
+ *
+ * Shows a loading message if the release date is not yet available.
+ *
+ * @param locale - Locale to use for formatting the date.
+ * @param releaseDate - Release date to display.
+ */
+function ReleaseDate({ locale, releaseDate }: S2DReleaseDateProps): React.ReactElement {
+	let releaseDateElement = (
+		<span className="font-medium italic text-gray-500">{__('Loading...')}</span>
+	);
+
+	if (releaseDate) {
+		const formattedDate = releaseDate.toLocaleDateString(locale, {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric',
+		});
+
+		releaseDateElement = (
+			<time
+				className="font-medium"
+				dateTime={`${releaseDate.getFullYear()}-${releaseDate.getMonth() + 1}-${releaseDate.getDate()}`}
+			>
+				{formattedDate}
+			</time>
+		);
+	}
+
+	return (
+		<div className="flex flex-row justify-start gap-2 p-2 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
+			<span>{__('Release date')}:&nbsp;</span>
+			{releaseDateElement}
+			<TooltipWidget tooltip={__('TODO')} />
+		</div>
+	)
+}
 
 /**
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
@@ -45,6 +90,9 @@ export function AppSidebar() {
 	const dispatch = useAppDispatch();
 	const localeContext = useContext(LocaleContext);
 	const currentLocale = localeContext?.locale || 'en';
+
+	const isS2DVariable = climateVariable && climateVariable instanceof SeasonalDecadalClimateVariable;
+	const { releaseDate: s2dReleaseDate } = useS2D();
 
 	// Update the selected variable when the climate variable changes
 	useEffect(() => {
@@ -77,7 +125,6 @@ export function AppSidebar() {
 	const support_url = INTERNAL_URLS[`support-${currentLocale}`] || '';
 
 	const currentVarId = climateVariable?.getId() || '';
-
 
 	return (
 		<Sidebar>
@@ -132,18 +179,7 @@ export function AppSidebar() {
 				</SidebarGroup>
 
 				<SidebarGroup className="mt-auto gap-0">
-					{currentVarId.startsWith('s2d_') ? (
-						<div className="flex flex-row justify-start gap-2 p-2 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
-							<span>{__('Release date')}:&nbsp;</span>
-							<time
-								className="font-medium"
-								dateTime={'2025-09-30'}
-							>
-								{'2025-09-30'}
-							</time>
-							<TooltipWidget tooltip={__('TODO')} />
-						</div>
-					) : null}
+					{isS2DVariable && <ReleaseDate locale={currentLocale} releaseDate={s2dReleaseDate} />}
 					<RecentLocationsLink />
 					<LinkWithIcon
 						icon={BadgeInfo}

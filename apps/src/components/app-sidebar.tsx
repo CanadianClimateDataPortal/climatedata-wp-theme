@@ -29,6 +29,7 @@ import LayerOpacities from '@/components/ui/layer-opacities';
 
 import { PostData } from '@/types/types';
 import { INTERNAL_URLS } from '@/lib/constants';
+import { SeasonalDecadalClimateVariable } from '@/lib/seasonal-decadal-climate-variable';
 import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 
@@ -77,7 +78,7 @@ export function AppSidebar() {
 	const about_url = INTERNAL_URLS[`about-data-${currentLocale}`] || '';
 	const support_url = INTERNAL_URLS[`support-${currentLocale}`] || '';
 
-	const isSeasonalDecadal = climateVariable?.getClass() === 'SeasonalDecadalClimateVariable'
+	const isSeasonalDecadal = climateVariable instanceof SeasonalDecadalClimateVariable;
 
 	return (
 		<Sidebar>

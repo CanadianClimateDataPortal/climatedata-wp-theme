@@ -84,7 +84,7 @@ const fieldFrequencies = {
 	],
 };
 
-export const SidebarInnerSeasonalDecadal = () => {
+export const SidebarInnerS2D = () => {
 	return (
 		<>
 			<SidebarMenuItem>
@@ -152,7 +152,7 @@ export const SidebarInnerSeasonalDecadal = () => {
 	);
 };
 
-SidebarInnerSeasonalDecadal.displayName = 'SidebarInnerSeasonalDecadal'
+SidebarInnerS2D.displayName = 'SidebarInnerS2D'
 
 export const SidebarFooterReleaseDate = ({
 	date = '2025-10-06',

@@ -19,9 +19,9 @@ import { MapColorsDropdown } from '@/components/sidebar-menu-items/map-colors-dr
 
 import SidebarInnerProjection from '@/components/sidebar-inner-projection';
 import {
-	SidebarInnerSeasonalDecadal,
+	SidebarInnerS2D,
 	SidebarFooterReleaseDate,
- } from '@/components/sidebar-inner-seasonal-decadal';
+ } from '@/components/sidebar-inner-s2d';
 
 import { RecentLocationsLink, RecentLocationsPanel } from '@/components/sidebar-footer-links/recent-locations';
 import LinkWithIcon from '@/components/sidebar-footer-links/link-with-icon';
@@ -29,7 +29,7 @@ import LayerOpacities from '@/components/ui/layer-opacities';
 
 import { PostData } from '@/types/types';
 import { INTERNAL_URLS } from '@/lib/constants';
-import { SeasonalDecadalClimateVariable } from '@/lib/seasonal-decadal-climate-variable';
+import { S2DClimateVariable } from '@/lib/s2d-climate-variable';
 import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 
@@ -78,7 +78,7 @@ export function AppSidebar() {
 	const about_url = INTERNAL_URLS[`about-data-${currentLocale}`] || '';
 	const support_url = INTERNAL_URLS[`support-${currentLocale}`] || '';
 
-	const isSeasonalDecadal = climateVariable instanceof SeasonalDecadalClimateVariable;
+	const isS2D = climateVariable instanceof S2DClimateVariable;
 
 	return (
 		<Sidebar>
@@ -100,8 +100,8 @@ export function AppSidebar() {
 									<VariablesMenuItem />
 									<SidebarSeparator />
 
-									{isSeasonalDecadal ? (
-										<SidebarInnerSeasonalDecadal />
+									{isS2D ? (
+										<SidebarInnerS2D />
 									) : (
 										<SidebarInnerProjection />
 									)}
@@ -133,7 +133,7 @@ export function AppSidebar() {
 				</SidebarGroup>
 
 				<SidebarGroup className="gap-0 mt-auto">
-					{isSeasonalDecadal ? (
+					{isS2D ? (
 						<SidebarFooterReleaseDate />
 					) : null}
 					<RecentLocationsLink />

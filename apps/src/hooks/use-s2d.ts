@@ -9,7 +9,7 @@ import {
 	setReleaseDateIsLoading,
 } from '@/features/s2d/s2d-slice';
 import { fetchS2DReleaseDate } from '@/services/services';
-import { parseReleaseDate } from '@/lib/s2d';
+import { parseUTCDate } from '@/lib/utils';
 
 /**
  * Hook related to S2D variables.
@@ -127,7 +127,7 @@ export const useS2D = () => {
 	 */
 	const releaseDate = useMemo<Date | null>(() => {
 		return releaseDateKey && cachedReleaseDate
-			? parseReleaseDate(cachedReleaseDate)
+			? parseUTCDate(cachedReleaseDate)
 			: null;
 	}, [releaseDateKey, cachedReleaseDate]);
 

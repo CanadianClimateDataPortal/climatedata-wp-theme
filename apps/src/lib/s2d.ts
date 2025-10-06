@@ -1,5 +1,6 @@
 import { S2D_NB_PERIODS } from '@/lib/constants';
 import { FrequencyType } from '@/types/climate-variable-interface';
+import { formatUTCDate, parseUTCDate } from '@/lib/utils';
 
 export type PeriodRange = [Date, Date];
 
@@ -10,7 +11,7 @@ export type PeriodRange = [Date, Date];
  * date of each period depends on the release date.
  *
  * The period start is always the first day of the month, and the period end is
- * always the last day of the month.
+ * always the last day of the month, both in UTC time.
  *
  * @see - S2D_NB_PERIODS in '@/lib/constants'
  * @param releaseDate - The release date of the data.
@@ -26,6 +27,7 @@ export function getPeriods(
 	const periodInterval = 1;
 	const periods: [Date, Date][] = [];
 	const lastPeriod = new Date(
+		// Set to the first day of the month
 		Date.UTC(releaseDate.getUTCFullYear(), releaseDate.getUTCMonth(), 1)
 	);
 
@@ -44,11 +46,24 @@ export function getPeriods(
 	return periods;
 }
 
-export function getPeriodIndexForDateRange(
+/**
+ * Find the index of the period range that matches a date range.
+ *
+ * A date range is two strings of date, in UTC time, of the form 'YYYY-MM-DD'.
+ *
+ * In the date range, only the first date is used to search for a period
+ * starting at the same date.
+ *
+ * @param dateRange - The date range to search for.
+ * @param availablePeriods - The period ranges to search in.
+ * @returns - The index of the period range that matches the date range, or
+ *   null if not found.
+ */
+export function findPeriodIndexForDateRange(
 	dateRange: string[],
 	availablePeriods: PeriodRange[]
 ): number | null {
-	const rangeStart = parseReleaseDate(dateRange[0]);
+	const rangeStart = parseUTCDate(dateRange[0]);
 
 	if (rangeStart === null) {
 		return null;
@@ -61,23 +76,18 @@ export function getPeriodIndexForDateRange(
 	return foundIndex === -1 ? null : foundIndex;
 }
 
-// TODO: cette fonction devrait sans doute être ailleurs, car utilisée pour parser le release date et le date range
-//  aussi, devrait peut-être pouvoir parser des dates partielles ?
-export function parseReleaseDate(dateString: string): Date | null {
-	const [yearPart, monthPart, dayPart] = dateString.split('-');
-	const year = parseInt(yearPart);
-	const month = parseInt(monthPart);
-	const day = parseInt(dayPart);
+/**
+ * Transform a period range to a date range.
+ *
+ * A date range is two strings of date, in UTC time, of the form 'YYYY-MM-DD'.
+ *
+ * @param periodRange - The period range to transform.
+ * @returns - The date range as an array of two dates in string.
+ */
+export function formatPeriodRange(periodRange: PeriodRange): [string, string] {
+	const dateFormat = 'yyyy-MM-dd';
+	const rangeStart = formatUTCDate(periodRange[0], dateFormat);
+	const rangeEnd = formatUTCDate(periodRange[1], dateFormat);
 
-	if (isNaN(year) || isNaN(month) || isNaN(day)) {
-		return null;
-	}
-
-	const date = new Date(Date.UTC(year, month - 1, day));
-
-	if (isNaN(date.valueOf())) {
-		return null;
-	}
-
-	return date;
+	return [rangeStart, rangeEnd];
 }

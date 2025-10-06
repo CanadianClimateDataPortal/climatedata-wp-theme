@@ -31,6 +31,7 @@ import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { useS2D } from '@/hooks/use-s2d';
 import SeasonalDecadalClimateVariable from '@/lib/seasonal-decadal-climate-variable';
+import { formatUTCDate } from '@/lib/utils';
 
 type S2DReleaseDateProps = {
 	locale: string,
@@ -55,12 +56,13 @@ function ReleaseDate({ locale, releaseDate }: S2DReleaseDateProps): React.ReactE
 			year: 'numeric',
 			month: 'short',
 			day: 'numeric',
+			timeZone: 'UTC',
 		});
 
 		releaseDateElement = (
 			<time
 				className="font-medium"
-				dateTime={`${releaseDate.getFullYear()}-${releaseDate.getMonth() + 1}-${releaseDate.getDate()}`}
+				dateTime={formatUTCDate(releaseDate, 'yyyy-MM-dd')}
 			>
 				{formattedDate}
 			</time>

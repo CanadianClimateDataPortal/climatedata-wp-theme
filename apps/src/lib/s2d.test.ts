@@ -1,8 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import {
-	getPeriodIndexForDateRange,
+	findPeriodIndexForDateRange,
 	getPeriods,
-	parseReleaseDate,
 	PeriodRange,
 } from '@/lib/s2d';
 import { FrequencyType } from '@/types/climate-variable-interface';
@@ -58,7 +57,7 @@ describe('getPeriods', () => {
 	});
 });
 
-describe('getPeriodIndexForDateRange', () => {
+describe('findPeriodIndexForDateRange', () => {
 	test('returns the correct index if there is a match', () => {
 		const dateRange = ['2025-12-01', '2025-12-31'];
 		const periods: PeriodRange[] = [
@@ -66,7 +65,7 @@ describe('getPeriodIndexForDateRange', () => {
 			[new Date(Date.UTC(2025, 11, 1)), new Date(Date.UTC(2025, 11, 31))],
 			[new Date(Date.UTC(2026, 0, 1)), new Date(Date.UTC(2026, 1, 31))],
 		];
-		const actualIndex = getPeriodIndexForDateRange(dateRange, periods);
+		const actualIndex = findPeriodIndexForDateRange(dateRange, periods);
 		expect(actualIndex).toBe(1);
 	});
 
@@ -76,38 +75,14 @@ describe('getPeriodIndexForDateRange', () => {
 			[new Date(Date.UTC(2025, 10, 1)), new Date(Date.UTC(2025, 10, 30))],
 			[new Date(Date.UTC(2025, 11, 1)), new Date(Date.UTC(2025, 11, 31))],
 		];
-		const actualIndex = getPeriodIndexForDateRange(dateRange, periods);
+		const actualIndex = findPeriodIndexForDateRange(dateRange, periods);
 		expect(actualIndex).toBeNull();
 	});
 
 	test('returns null for incorrect date range', () => {
 		const dateRange = ['invalid', '2025-10-31'];
 		const periods: PeriodRange[] = [];
-		const actualIndex = getPeriodIndexForDateRange(dateRange, periods);
+		const actualIndex = findPeriodIndexForDateRange(dateRange, periods);
 		expect(actualIndex).toBeNull();
 	});
-});
-
-describe('parseReleaseDate', () => {
-	test.each(['invalid', '2020-12'])(
-		'returns null for incorrect format (%s)',
-		(dateString: string) => {
-			const actual = parseReleaseDate(dateString);
-			expect(actual).toBeNull();
-		}
-	);
-
-	test.each([
-		['2025-01-01', [2025, 0, 1]],
-		['2025-12-31', [2025, 11, 31]],
-	])(
-		'returns the correct date for correct format (%s)',
-		(dateString: string, expectedParts: number[]) => {
-			const expected = new Date(
-				Date.UTC(expectedParts[0], expectedParts[1], expectedParts[2])
-			);
-			const actual = parseReleaseDate(dateString) as Date;
-			expect(actual).toBeSameDate(expected);
-		}
-	);
 });

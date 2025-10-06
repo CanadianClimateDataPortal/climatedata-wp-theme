@@ -8,7 +8,7 @@ import { ControlTitle } from '@/components/ui/control-title';
 import { cn } from '@/lib/utils';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useS2D } from '@/hooks/use-s2d';
-import { getPeriodIndexForDateRange, getPeriods, PeriodRange } from '@/lib/s2d';
+import { formatPeriodRange, findPeriodIndexForDateRange, getPeriods, PeriodRange } from '@/lib/s2d';
 import { getShortMonthName } from '@/lib/format';
 
 type SliderLabels = {
@@ -55,22 +55,6 @@ function generateSliderLabels(periods: PeriodRange[] | null): SliderLabels {
 }
 
 /**
- * Call `setDateRange` with the values corresponding to the specified period.
- *
- * @param setDateRange - The `setDateRange` function of `useClimateVariable()`
- * @param period -The period to which we want to set the date range.
- */
-function updateDateRange(
-	setDateRange: (dates: string[]) => void,
-	period: PeriodRange
-) {
-	const rangeStart = `${period[0].getUTCFullYear()}-${period[0].getUTCMonth() + 1}-${period[0].getUTCDate()}`;
-	const rangeEnd = `${period[1].getUTCFullYear()}-${period[1].getUTCMonth() + 1}-${period[1].getUTCDate()}`;
-
-	setDateRange([rangeStart, rangeEnd]);
-}
-
-/**
  * Time period selector for S2D variables.
  *
  * @constructor
@@ -89,9 +73,9 @@ const TimePeriodsControlS2D: React.FC = () => {
 	let selectedPeriod = 0;
 
 	if (dateRange && periods) {
-		matchingDatePeriodIndex = getPeriodIndexForDateRange(
+		matchingDatePeriodIndex = findPeriodIndexForDateRange(
 			dateRange,
-			periods
+			periods,
 		);
 		selectedPeriod = matchingDatePeriodIndex ?? 0;
 	}
@@ -114,7 +98,7 @@ const TimePeriodsControlS2D: React.FC = () => {
 
 		const period = periods[selectedPeriod];
 
-		updateDateRange(setDateRange, period);
+		setDateRange(formatPeriodRange(period));
 	}, [matchingDatePeriodIndex, selectedPeriod, periods, setDateRange]);
 
 	/**
@@ -133,7 +117,7 @@ const TimePeriodsControlS2D: React.FC = () => {
 
 		const period = periods[periodIndex];
 
-		updateDateRange(setDateRange, period);
+		setDateRange(formatPeriodRange(period));
 	};
 
 	return (

@@ -578,7 +578,7 @@ export const fetchS2DReleaseDate = async ({ variable, frequency }: { variable: s
 		setTimeout(() => {
 			const value = `2025-03-01`;
 			resolve(value);
-		}, 3000);
+		}, 1000);
 	});
 
 	return await fetchMock;

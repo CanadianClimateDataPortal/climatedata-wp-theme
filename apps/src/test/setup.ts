@@ -24,7 +24,13 @@ interface ExpectationResult {
 }
 
 expect.extend({
-	// TODO: comment
+	/**
+	 * Matcher checking if a Date instance is for the same date (year, month,
+	 * day of the month) as an expected Date, without considering time.
+	 *
+	 * @param received - The Date to validate.
+	 * @param expected - The expected Date.
+	 */
 	toBeSameDate(received: Date, expected: Date): ExpectationResult {
 		const isDate = received instanceof Date;
 

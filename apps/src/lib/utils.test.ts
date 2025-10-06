@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { findCeilingIndex, generateRange, parseLatLon } from './utils';
+import { findCeilingIndex, formatUTCDate, generateRange, parseLatLon, parseUTCDate } from './utils';
 
 describe('findCeilingIndex', () => {
 	test('returns exact index for exact value', () => {
@@ -209,4 +209,37 @@ describe('parseLatLon', () => {
 			expect(result).toBeNull();
 		}
 	);
+});
+
+describe('parseUTCDate', () => {
+	test('parses a date as UTC', () => {
+		const dateString = '2024-01-01';
+		const actual = parseUTCDate(dateString) as Date;
+		expect(actual.getUTCFullYear()).toBe(2024);
+		expect(actual.getUTCMonth()).toBe(0);
+		expect(actual.getUTCDate()).toBe(1);
+	});
+
+	test('parses a date-time as UTC', () => {
+		const dateString = '2024-10-03 11:32:14';
+		const actual = parseUTCDate(dateString) as Date;
+		expect(actual.getUTCHours()).toBe(11);
+		expect(actual.getUTCMinutes()).toBe(32);
+		expect(actual.getUTCSeconds()).toBe(14);
+	});
+
+	test('returns null for invalid date', () => {
+		const actual = parseUTCDate('invalid');
+		expect(actual).toBeNull();
+	});
+});
+
+describe('formatUTCDate', () => {
+	test('formats a date as UTC', () => {
+		const date = new Date(Date.UTC(2024, 8, 13, 17, 8, 4));
+		const format = 'yyyy-MM-dd HH:mm:ss';
+		const actual = formatUTCDate(date, format);
+		const expected = '2024-09-13 17:08:04';
+		expect(actual).toEqual(expected);
+	});
 });

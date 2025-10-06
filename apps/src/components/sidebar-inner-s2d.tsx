@@ -2,7 +2,10 @@ import {
 	type ReactNode,
 	useMemo,
 } from 'react';
+
 import { __ } from '@/context/locale-provider';
+
+import { useLocale } from '@/hooks/use-locale';
 
 import Dropdown from '@/components/ui/dropdown';
 import TooltipWidget from '@/components/ui/tooltip-widget';
@@ -159,10 +162,15 @@ export const SidebarFooterReleaseDate = ({
 	tooltip,
 }: ReleaseDateProps) => {
 
+	const { getDateFormatter } = useLocale();
+
 	const formattedDate = useMemo(() => {
-		// TODO: Discuss where to get locale, and formatting.
-		return date;
-	}, [date]);
+		const formatted = getDateFormatter.format(date, 'PPP');
+		return formatted;
+	}, [
+		date,
+		getDateFormatter,
+	]);
 
 	return (
 		<div className="flex flex-row justify-start gap-2 p-2 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">

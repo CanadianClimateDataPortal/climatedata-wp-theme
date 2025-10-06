@@ -181,3 +181,4 @@ export const SidebarFooterReleaseDate = ({
 };
 
 SidebarFooterReleaseDate.displayName = 'SidebarFooterReleaseDate';
+

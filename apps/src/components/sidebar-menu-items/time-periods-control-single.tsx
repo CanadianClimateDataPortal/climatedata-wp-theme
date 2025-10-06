@@ -151,3 +151,4 @@ const TimePeriodsControlSingle: React.FC = ({
 TimePeriodsControlSingle.displayName = 'TimePeriodsControlSingle';
 
 export { TimePeriodsControlSingle };
+

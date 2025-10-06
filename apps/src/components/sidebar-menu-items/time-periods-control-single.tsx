@@ -12,15 +12,26 @@ import { cn } from '@/lib/utils';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { setTimePeriodEnd } from '@/features/map/map-slice';
 
+export interface TimePeriodsControlSingleProps {
+	tooltip?: React.ReactNode;
+}
+
 /**
  * Time period selector for single year (not year range).
  * @constructor
  */
-const TimePeriodsControlSingle: React.FC = () => {
+const TimePeriodsControlSingle: React.FC = ({
+	tooltip,
+}: TimePeriodsControlSingleProps) => {
 	const { __ } = useI18n();
 	const dispatch = useAppDispatch();
 	const { climateVariable, setDateRange } = useClimateVariable();
 	const timePeriodEnd = useAppSelector(state => state.map.timePeriodEnd);
+
+	let controlTooltip = __('Move the slider to select your time period of interest.');
+	if (tooltip) {
+		controlTooltip = tooltip
+	}
 
 	const { min, max, interval } = climateVariable?.getDateRangeConfig() ?? {
 		min: 1950,
@@ -74,7 +85,7 @@ const TimePeriodsControlSingle: React.FC = () => {
 			<div className="time-periods-control">
 				<ControlTitle
 					title={__('Time Periods')}
-					tooltip={__('Move the slider to select your time period of interest.')}
+					tooltip={controlTooltip}
 				/>
 				<Slider.Root
 					className={cn(
@@ -140,3 +151,4 @@ const TimePeriodsControlSingle: React.FC = () => {
 TimePeriodsControlSingle.displayName = 'TimePeriodsControlSingle';
 
 export { TimePeriodsControlSingle };
+

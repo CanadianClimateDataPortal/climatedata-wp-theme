@@ -1,6 +1,6 @@
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useEffect, useMemo, useRef } from 'react';
-import SeasonalDecadalClimateVariable from '@/lib/seasonal-decadal-climate-variable';
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
 	selectReleaseDateCache,
@@ -25,7 +25,7 @@ export const useS2D = () => {
 
 	const isS2DVariable =
 		climateVariable &&
-		climateVariable instanceof SeasonalDecadalClimateVariable;
+		climateVariable instanceof S2DClimateVariable;
 
 	const selectedFrequency = climateVariable?.getFrequency();
 	const climateVariableID = climateVariable?.getId();

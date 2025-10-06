@@ -1149,3 +1149,87 @@ msgstr "Zone climatique %s"
 
 msgid "around"
 msgstr "environ"
+
+msgid "Forecast Types"
+msgstr "Types de prévisions"
+
+# Tooltip: Forecast Types
+msgid "S2D forecasts are shown as probabilities for how conditions will compare to historical climate conditions between 1991 and 2020. "
+  "“Expected conditions” show whether conditions are expected to be above, near or below normal. "
+  "“Unusual conditions” show whether conditions are expected to be unusually high or low. "
+  "Select a forecast type from the options in the dropdown menu."
+msgstr "Les prévisions S2D sont présentées sous forme de probabilités comparant les conditions prévues aux conditions climatiques historiques "
+  "entre 1991 et 2020. Les « Conditions attendues » indiquent si on s’attend à ce que les conditions soient au-dessus de la normale, "
+  "près de la normale ou sous la normale. Les « Conditions inhabituelles » indiquent si on s’attend à ce que les conditions soient "
+  "inhabituellement élevées ou faibles. Sélectionnez un type de prévision parmi les options du menu déroulant."
+
+msgid "Expected Conditions"
+msgstr "Conditions attendues"
+
+msgid "Unusual Conditions"
+msgstr "Conditions inhabituelles"
+
+msgid "Forecast Display"
+msgstr "Affichage des prévisions"
+
+# Tooltip: Forecast Display
+msgid "S2D forecasts provide information on how future conditions may compare to historical conditions between 1991 and 2020. "
+  "Use the dropdown menu to view the forecast or the historical climatology for 1991 to 2020."
+msgstr "Les prévisions S2D fournissent des informations sur la façon dont les conditions futures peuvent se comparer aux conditions "
+  "historiques entre 1991 et 2020. "
+  "Utilisez le menu déroulant pour afficher les prévisions ou la climatologie historique de 1991 à 2020."
+
+msgid "Forecast"
+msgstr "Prévisions"
+
+msgid "Climatology"
+msgstr "Climatologie"
+
+msgid "Mask Low Skill"
+msgstr "Masquer les prévisions de faible habileté"
+
+# Tooltip: Mask Low Skill
+msgid "Forecasts at locations with no or low skill should be used with caution, or the climatology should be consulted instead. "
+  "Click the box to apply cross-hatching over locations with no skill or low skill."
+msgstr "Les prévisions pour les endroits où l’habileté est nulle ou faible doivent être utilisées avec prudence, "
+  "ou il est préférable de consulter la climatologie. Cliquez sur la case pour appliquer des hachures sur les endroits où "
+  "l’habileté est nulle ou faible."
+
+msgid "Frequencies"
+msgstr "Fréquences"
+
+# Tooltip: Frequencies
+msgid "Forecasts are available for different frequencies, from a month to 5 years. "
+  "The available time periods will change based on the frequency selected. "
+  "Select a temporal frequency from the options in the dropdown menu. "
+  "Note: Only the first three months are available individually, as skill tends to be low for later months."
+msgstr "Les prévisions sont disponibles pour différentes fréquences, allant d’un mois à 5 ans. "
+  "Les périodes disponibles varient en fonction de la fréquence sélectionnée. "
+  "Sélectionnez une fréquence temporelle parmi les options du menu déroulant. "
+  "Remarque : seuls les trois premiers mois sont disponibles individuellement, car l’habileté tend à être faible pour les mois suivants."
+
+# Tooltip: S2D TimePeriodsControlSingle
+msgid "The available time periods will change if a different frequency is selected. "
+  "Move the slider to select the forecast for your time period of interest."
+msgstr "Les périodes disponibles changeront si une fréquence différente est sélectionnée. "
+  "Déplacez le curseur pour sélectionner la prévision correspondant à la période qui vous intéresse."
+
+msgid "Seasonal (3 months)"
+msgstr "Saisonnière (3 mois)"
+
+msgid "Decadal (5 years)"
+msgstr "Décennale (5 ans)"
+
+msgid "Release date:"
+msgstr "Date de sortie"
+
+# Tooltip: Release date
+msgid "The forecast was released on this date. "
+  "Monthly and seasonal forecasts are updated each month and decadal forecasts "
+  "are updated annually. "
+  "Skill tends to be higher for time periods closer to the release date."
+msgstr "La prévision a été publiée à cette date. "
+  "Les prévisions mensuelles et saisonnières sont mises à jour chaque mois, "
+  "et les prévisions décennales chaque année. "
+  "L’exactitude a tendance à être plus élevée pour les périodes plus proches de la date de sortie."
+

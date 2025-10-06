@@ -11,6 +11,10 @@ import { useS2D } from '@/hooks/use-s2d';
 import { formatPeriodRange, findPeriodIndexForDateRange, getPeriods, PeriodRange } from '@/lib/s2d';
 import { getShortMonthName } from '@/lib/format';
 
+export interface TimePeriodsControlS2DProps {
+	tooltip?: React.ReactNode;
+}
+
 type SliderLabels = {
 	minimumLabel: string;
 	maximumLabel: string;
@@ -59,7 +63,9 @@ function generateSliderLabels(periods: PeriodRange[] | null): SliderLabels {
  *
  * @constructor
  */
-const TimePeriodsControlS2D: React.FC = () => {
+const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
+	tooltip,
+ }) => {
 	const { climateVariable, setDateRange } = useClimateVariable();
 	const { releaseDate } = useS2D();
 
@@ -83,6 +89,11 @@ const TimePeriodsControlS2D: React.FC = () => {
 	const { minimumLabel, maximumLabel, tickLabels } =
 		generateSliderLabels(periods);
 	const tickLabel = periods ? tickLabels[selectedPeriod] : '...';
+
+	let controlTooltip: React.ReactNode = __('Move the slider to select your time period of interest.');
+	if (tooltip) {
+		controlTooltip = tooltip
+	}
 
 	/**
 	 * Ensure the dateRange is synchronized with the selected period.
@@ -125,9 +136,7 @@ const TimePeriodsControlS2D: React.FC = () => {
 			<div className="time-periods-control">
 				<ControlTitle
 					title={__('Time Periods')}
-					tooltip={__(
-						'Move the slider to select your time period of interest.'
-					)}
+					tooltip={controlTooltip}
 				/>
 				<Slider.Root
 					className={cn(

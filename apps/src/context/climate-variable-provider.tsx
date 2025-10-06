@@ -28,7 +28,7 @@ import SeaLevelClimateVariable from '@/lib/sea-level-climate-variable';
 import StationClimateVariable from '@/lib/station-climate-variable';
 import StationDataClimateVariable from "@/lib/station-data-climate-variable";
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
-import SeasonalDecadalClimateVariable from '@/lib/seasonal-decadal-climate-variable';
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
@@ -82,7 +82,7 @@ const CLIMATE_VARIABLE_MAP = {
 	SeaLevelClimateVariable: SeaLevelClimateVariable,
 	StationClimateVariable: StationClimateVariable,
 	StationDataClimateVariable: StationDataClimateVariable,
-	SeasonalDecadalClimateVariable: SeasonalDecadalClimateVariable,
+	S2DClimateVariable: S2DClimateVariable,
 };
 
 export type ClimateVariableClassType = keyof typeof CLIMATE_VARIABLE_MAP;
@@ -533,3 +533,4 @@ export const ClimateVariableProvider: React.FC<{
 		</ClimateVariableContext.Provider>
 	);
 };
+

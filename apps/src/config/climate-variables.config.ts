@@ -1627,12 +1627,13 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	},
 	/** S2D Mean Temperature */
 	{
-		id: 's2d_mean_temp',
-		class: 'SeasonalDecadalClimateVariable',
+		id: 's2d_air_temp',
+		class: 'S2DClimateVariable',
 	},
 	/** S2D Total Precipitation */
 	{
-		id: 's2d_precipitation',
-		class: 'SeasonalDecadalClimateVariable',
+		id: 's2d_precip_accum',
+		class: 'S2DClimateVariable',
 	},
 ];
+

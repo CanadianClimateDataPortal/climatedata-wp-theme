@@ -2,13 +2,15 @@ import {
 	type ClimateVariableConfigInterface,
 	FrequencyType,
 } from '@/types/climate-variable-interface';
-import ClimateVariableBase from './climate-variable-base';
+import ClimateVariableBase from '@/lib/climate-variable-base';
 
 /**
  * Seasonal To Decadal
  */
-class SeasonalDecadalClimateVariable extends ClimateVariableBase {
-	constructor(config: ClimateVariableConfigInterface) {
+export class S2DClimateVariable extends ClimateVariableBase {
+	constructor(
+		config: ClimateVariableConfigInterface,
+	) {
 		super(config);
 	}
 
@@ -17,4 +19,4 @@ class SeasonalDecadalClimateVariable extends ClimateVariableBase {
 	}
 }
 
-export default SeasonalDecadalClimateVariable;
+export default S2DClimateVariable;

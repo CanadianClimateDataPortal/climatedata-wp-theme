@@ -14,12 +14,14 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DatasetsMenuItem, DatasetsPanel } from '@/components/sidebar-menu-items/datasets';
 import { VariablesMenuItem, VariablesPanel } from '@/components/sidebar-menu-items/variables';
-import TooltipWidget from '@/components/ui/tooltip-widget';
 import { DataValuesControl } from '@/components/sidebar-menu-items/data-values-control';
 import { MapColorsDropdown } from '@/components/sidebar-menu-items/map-colors-dropdown';
 
 import SidebarInnerProjection from '@/components/sidebar-inner-projection';
-import SidebarInnerSeasonalDecadal from '@/components/sidebar-inner-seasonal-decadal';
+import {
+	SidebarInnerS2D,
+	SidebarFooterReleaseDate,
+ } from '@/components/sidebar-inner-s2d';
 
 import { RecentLocationsLink, RecentLocationsPanel } from '@/components/sidebar-footer-links/recent-locations';
 import LinkWithIcon from '@/components/sidebar-footer-links/link-with-icon';
@@ -27,56 +29,10 @@ import LayerOpacities from '@/components/ui/layer-opacities';
 
 import { PostData } from '@/types/types';
 import { INTERNAL_URLS } from '@/lib/constants';
+import { S2DClimateVariable } from '@/lib/s2d-climate-variable';
 import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { useS2D } from '@/hooks/use-s2d';
-import SeasonalDecadalClimateVariable from '@/lib/seasonal-decadal-climate-variable';
-import { formatUTCDate } from '@/lib/utils';
-
-type S2DReleaseDateProps = {
-	locale: string,
-	releaseDate: Date | null
-}
-
-/**
- * Component displaying a release date in the sidebar.
- *
- * Shows a loading message if the release date is not yet available.
- *
- * @param locale - Locale to use for formatting the date.
- * @param releaseDate - Release date to display.
- */
-function ReleaseDate({ locale, releaseDate }: S2DReleaseDateProps): React.ReactElement {
-	let releaseDateElement = (
-		<span className="font-medium italic text-gray-500">{__('Loading...')}</span>
-	);
-
-	if (releaseDate) {
-		const formattedDate = releaseDate.toLocaleDateString(locale, {
-			year: 'numeric',
-			month: 'short',
-			day: 'numeric',
-			timeZone: 'UTC',
-		});
-
-		releaseDateElement = (
-			<time
-				className="font-medium"
-				dateTime={formatUTCDate(releaseDate, 'yyyy-MM-dd')}
-			>
-				{formattedDate}
-			</time>
-		);
-	}
-
-	return (
-		<div className="flex flex-row justify-start gap-2 p-2 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
-			<span>{__('Release date')}:&nbsp;</span>
-			{releaseDateElement}
-			<TooltipWidget tooltip={__('TODO')} />
-		</div>
-	)
-}
 
 /**
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
@@ -93,7 +49,6 @@ export function AppSidebar() {
 	const localeContext = useContext(LocaleContext);
 	const currentLocale = localeContext?.locale || 'en';
 
-	const isS2DVariable = climateVariable && climateVariable instanceof SeasonalDecadalClimateVariable;
 	const { releaseDate: s2dReleaseDate } = useS2D();
 
 	// Update the selected variable when the climate variable changes
@@ -126,7 +81,7 @@ export function AppSidebar() {
 	const about_url = INTERNAL_URLS[`about-data-${currentLocale}`] || '';
 	const support_url = INTERNAL_URLS[`support-${currentLocale}`] || '';
 
-	const currentVarId = climateVariable?.getId() || '';
+	const isS2D = climateVariable instanceof S2DClimateVariable;
 
 	return (
 		<Sidebar>
@@ -148,8 +103,8 @@ export function AppSidebar() {
 									<VariablesMenuItem />
 									<SidebarSeparator />
 
-									{currentVarId.startsWith('s2d_') ? (
-										<SidebarInnerSeasonalDecadal />
+									{isS2D ? (
+										<SidebarInnerS2D />
 									) : (
 										<SidebarInnerProjection />
 									)}
@@ -180,8 +135,10 @@ export function AppSidebar() {
 					</Tabs>
 				</SidebarGroup>
 
-				<SidebarGroup className="mt-auto gap-0">
-					{isS2DVariable && <ReleaseDate locale={currentLocale} releaseDate={s2dReleaseDate} />}
+				<SidebarGroup className="gap-0 mt-auto">
+					{isS2D ? (
+						<SidebarFooterReleaseDate date={s2dReleaseDate} locale={currentLocale} />
+					) : null}
 					<RecentLocationsLink />
 					<LinkWithIcon
 						icon={BadgeInfo}

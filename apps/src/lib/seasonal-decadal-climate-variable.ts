@@ -1,7 +1,7 @@
 import {
 	type ClimateVariableConfigInterface,
 } from '@/types/climate-variable-interface';
-import ClimateVariableBase from './climate-variable-base';
+import ClimateVariableBase from '@/lib/climate-variable-base';
 
 /**
  * Seasonal To Decadal

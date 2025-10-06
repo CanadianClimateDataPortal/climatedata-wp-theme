@@ -182,7 +182,7 @@ export const SidebarFooterReleaseDate = ({
 }: ReleaseDateProps) => {
 
 	let releaseDateElement = (
-		<span className="font-medium italic text-gray-500">{__('Loading...')}</span>
+		<span className="font-medium text-gray-400">{__('Loading...')}</span>
 	);
 
 	if (date) {
@@ -195,7 +195,6 @@ export const SidebarFooterReleaseDate = ({
 
 		releaseDateElement = (
 			<time
-				className="font-medium"
 				dateTime={formatUTCDate(date, 'yyyy-MM-dd')}
 			>
 				{formattedDate}
@@ -204,9 +203,11 @@ export const SidebarFooterReleaseDate = ({
 	}
 
 	return (
-		<div className="flex flex-row justify-start gap-2 p-2 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
-			<span>{__('Release date:')}&nbsp;</span>
-			{releaseDateElement}
+		<div className="flex flex-row flex-nowrap gap-1 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
+			<span>
+				{__('Release date:')}&nbsp;
+				{releaseDateElement}
+			</span>
 			<TooltipWidget
 				tooltip={tooltip ?? tooltipReleaseDate}
 			/>

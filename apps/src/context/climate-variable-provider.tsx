@@ -59,24 +59,26 @@ export type ClimateVariableContextType = {
 	resetSelectedRegion: () => void;
 };
 
+type ClassMapType = Record<
+	string,
+	new (arg: ClimateVariableConfigInterface) => ClimateVariableInterface
+>;
+
 /**
  * Maps climate variable class names to their corresponding class implementations.
  */
-const CLASS_MAP = [
-	['AllowanceClimateVariable', AllowanceClimateVariable],
-	['ClimateVariableBase', ClimateVariableBase],
-	['RasterPrecalculatedClimateVariable', RasterPrecalculatedClimateVariable],
-	['RasterPrecalculatedWithDailyFormatsClimateVariable', RasterPrecalculatedWithDailyFormatsClimateVariable],
-	['RasterAnalyzeClimateVariable', RasterAnalyzeClimateVariable],
-	['SeaLevelClimateVariable', SeaLevelClimateVariable],
-	['StationClimateVariable', StationClimateVariable],
-	['StationDataClimateVariable', StationDataClimateVariable],
-	['S2DClimateVariable', S2DClimateVariable],
-] as const;
-
-export type ClimateVariableKeys = (typeof CLASS_MAP)[number][0];
-
-const CLIMATE_VARIABLE_CLASS_MAP = new Map(CLASS_MAP);
+const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
+	AllowanceClimateVariable: AllowanceClimateVariable,
+	ClimateVariableBase: ClimateVariableBase,
+	RasterPrecalculatedClimateVariable: RasterPrecalculatedClimateVariable,
+	RasterPrecalculatedWithDailyFormatsClimateVariable:
+		RasterPrecalculatedWithDailyFormatsClimateVariable,
+	RasterAnalyzeClimateVariable: RasterAnalyzeClimateVariable,
+	SeaLevelClimateVariable: SeaLevelClimateVariable,
+	StationClimateVariable: StationClimateVariable,
+	StationDataClimateVariable: StationDataClimateVariable,
+	S2DClimateVariable: S2DClimateVariable,
+};
 
 /**
  * Provides the ClimateVariable context to the component tree.
@@ -100,13 +102,14 @@ export const ClimateVariableProvider: React.FC<{
 	const climateVariable = useMemo((): ClimateVariableInterface | null => {
 		if (!climateVariableData) return null;
 
-		const ctor = CLIMATE_VARIABLE_CLASS_MAP.get(climateVariableData.class);
-		if (!ctor) {
+		const climateVariableClass =
+			CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class];
+		if (!climateVariableClass) {
 			throw new Error(
 				`Invalid climate variable class: ${climateVariableData.class}`
 			);
 		}
-		return new ctor(climateVariableData);
+		return new climateVariableClass(climateVariableData);
 	}, [climateVariableData]);
 
 	/**

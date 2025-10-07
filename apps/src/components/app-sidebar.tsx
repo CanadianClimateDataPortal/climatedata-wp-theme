@@ -29,7 +29,7 @@ import LayerOpacities from '@/components/ui/layer-opacities';
 
 import { PostData } from '@/types/types';
 import { INTERNAL_URLS } from '@/lib/constants';
-import { S2DClimateVariable } from '@/lib/s2d-climate-variable';
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 

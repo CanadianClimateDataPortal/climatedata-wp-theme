@@ -6,7 +6,7 @@ import ClimateVariableBase from '@/lib/climate-variable-base';
 /**
  * Seasonal To Decadal
  */
-export class S2DClimateVariable extends ClimateVariableBase {
+class S2DClimateVariable extends ClimateVariableBase {
 	constructor(
 		config: ClimateVariableConfigInterface,
 	) {

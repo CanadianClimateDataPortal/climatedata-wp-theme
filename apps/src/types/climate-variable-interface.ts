@@ -75,6 +75,16 @@ export enum FrequencyType {
 	DAILY = "daily",
 }
 
+export enum ForecastType {
+	EXPECTED = "expected",
+	UNUSUAL = "unusual",
+}
+
+export enum ForecastDisplay {
+	FORECAST = "forecast",
+	CLIMATOLOGY = "climatology",
+}
+
 export type FrequencyConfig = {
 	[K in FrequencyType]?: FrequencyDisplayModeOption;
 }
@@ -382,6 +392,21 @@ export interface ClimateVariableConfigInterface {
 	 * value is an array of the frequencies available (valid values are "ys", "ms" and "qsdec").
 	 */
 	preCalculatedCanDCSConfig?: PreCalculatedCanDCSConfig;
+
+	/**
+	 * For S2D variables, the selected forecast type.
+	 */
+	forecastType?: ForecastType;
+
+	/**
+	 * For S2D variables, the selected forecast display.
+	 */
+	forecastDisplay?: ForecastDisplay;
+
+	/**
+	 * For S2D variables, if the "low skill" mask is shown.
+	 */
+	isLowSkillMasked?: boolean;
 }
 
 /**
@@ -534,4 +559,10 @@ export interface ClimateVariableInterface {
 	getStationTypeFilter(): string[];
 
 	updateMapWMSParams(params: WMSParams, isComparisonMap: boolean): WMSParams;
+
+	getForecastType(): ForecastType | null;
+
+	getForecastDisplay(): ForecastDisplay | null;
+
+	isLowSkillMasked(): boolean | null;
 }

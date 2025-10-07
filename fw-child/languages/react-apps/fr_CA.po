@@ -1185,7 +1185,7 @@ msgid "Decadal (5 years)"
 msgstr "Décennale (5 ans)"
 
 msgid "Release date:"
-msgstr "Date de sortie"
+msgstr "Date de sortie :"
 
 # Tooltip: Release date
 msgid "The forecast was released on this date. "

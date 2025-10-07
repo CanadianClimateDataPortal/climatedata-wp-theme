@@ -1636,4 +1636,3 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: 'S2DClimateVariable',
 	},
 ];
-

@@ -15,4 +15,3 @@ export class S2DClimateVariable extends ClimateVariableBase {
 }
 
 export default S2DClimateVariable;
-

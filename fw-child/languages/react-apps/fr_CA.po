@@ -1196,4 +1196,3 @@ msgstr "La prévision a été publiée à cette date. "
   "Les prévisions mensuelles et saisonnières sont mises à jour chaque mois, "
   "et les prévisions décennales chaque année. "
   "L’exactitude a tendance à être plus élevée pour les périodes plus proches de la date de sortie."
-

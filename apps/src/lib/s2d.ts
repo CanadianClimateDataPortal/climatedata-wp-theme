@@ -5,15 +5,27 @@ import { formatUTCDate, parseUTCDate } from '@/lib/utils';
 export type PeriodRange = [Date, Date];
 
 /**
- * For a data release date, get all the period dates for a specific frequency.
+ * Return the time periods for a release date and specific frequency.
  *
- * The number of periods and their length depend on the frequency. The start
- * date of each period depends on the release date.
+ * The number, length and start of time periods depend on the frequency and the
+ * release date. See `S2D_NB_PERIODS` in '@/lib/constants'
  *
- * The period start is always the first day of the month, and the period end is
- * always the last day of the month, both in UTC time.
+ * For example, for a frequency of 'monthly', we have 3 time periods of one
+ * month. They are for the first three months starting from the release date's
+ * month.
  *
- * @see - S2D_NB_PERIODS in '@/lib/constants'
+ * ```
+ * const releaseDate = new Date('2025-10-15');
+ * const periods = getPeriods(releaseDate, FrequencyType.MONTHLY);
+ * // Returned periods are (as array of Date instances): [
+ * // [2025-10-01, 2025-10-31]
+ * // [2025-11-01, 2025-11-30]
+ * // [2025-12-01, 2025-12-31]
+ * ```
+ *
+ * A period start is always the first day of the month, and a period end is
+ * always the last day of the month. All dates are in UTC time.
+ *
  * @param releaseDate - The release date of the data.
  * @param frequency - The frequency for which to get the periods.
  * @returns - An array of [start, end] dates for each period.
@@ -47,12 +59,13 @@ export function getPeriods(
 }
 
 /**
- * Find the index of the period range that matches a date range.
+ * Find the index of the period range that matches a string date range.
  *
- * A date range is two strings of date, in UTC time, of the form 'YYYY-MM-DD'.
+ * A date range is an array of two strings representing a date, in UTC time.
+ * Each string must be of the form 'YYYY-MM-DD'. The date range is generally
+ * created from the `dateRange` URL parameter.
  *
- * In the date range, only the first date is used to search for a period
- * starting at the same date.
+ * To find the matching period, only the first date of the date range is used.
  *
  * @param dateRange - The date range to search for.
  * @param availablePeriods - The period ranges to search in.
@@ -77,9 +90,10 @@ export function findPeriodIndexForDateRange(
 }
 
 /**
- * Transform a period range to a date range.
+ * Transform a period range (Date instances) to a date range (strings).
  *
- * A date range is two strings of date, in UTC time, of the form 'YYYY-MM-DD'.
+ * A date range is two strings representing dates in UTC time. The strings are
+ * of the form 'YYYY-MM-DD'.
  *
  * @param periodRange - The period range to transform.
  * @returns - The date range as an array of two dates in string.

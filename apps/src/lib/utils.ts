@@ -427,23 +427,25 @@ export function parseLatLon(text: string): ParsedLatLon | null {
  *   cannot be parsed as a date.
  */
 export function parseUTCDate(dateString: string): Date | null {
-	let dateToParse = dateString;
-
-	if (!/Z|([+-]\d{2}(:\d{2}?))$/.test(dateString)) {
-		dateToParse = dateString + 'Z';
-	}
-
-	const parsedDate = new Date(dateToParse);
+	const parsedDate = new Date(dateString);
 
 	if (Number.isNaN(parsedDate.valueOf())) {
 		return null;
 	}
 
-	return parsedDate;
+	return new Date(Date.UTC(
+		parsedDate.getUTCFullYear(),
+		parsedDate.getUTCMonth(),
+		parsedDate.getUTCDate(),
+		parsedDate.getUTCHours(),
+		parsedDate.getUTCMinutes(),
+		parsedDate.getUTCSeconds(),
+		parsedDate.getUTCMilliseconds(),
+	));
 }
 
 /**
- * Format to UTC a date.
+ * Format a date, but using UTC time.
  *
  * The format to use is the one of "date-fns":
  * https://date-fns.org/v3.6.0/docs/format
@@ -452,10 +454,10 @@ export function parseUTCDate(dateString: string): Date | null {
  * ```
  * const date = new Date(Date.UTC(2024, 8, 5, 14, 22, 10));
  * const formattedUTC = formatUTCDate(date, 'yyyy-MM-dd HH:mm:ss');
- * // formattedUTC will be "2024-09-05 14:22:10"
+ * // formattedUTC will be "2024-09-05 14:22:10" (i.e. UTC time)
  * ```
  *
- * @param date - The date to format. This date in UTC time will be formatted.
+ * @param date - The date to format.
  * @param dateFormat - The format to use for the date. Use the "date-fns"
  *   format.
  */
@@ -467,6 +469,7 @@ export function formatUTCDate(date: Date, dateFormat: string): string {
 		date.getUTCHours(),
 		date.getUTCMinutes(),
 		date.getUTCSeconds(),
+		date.getUTCMilliseconds(),
 	);
 
 	return format(localDate, dateFormat);

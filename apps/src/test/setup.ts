@@ -7,7 +7,7 @@ import L from 'leaflet';
 import 'vitest'
 
 interface CustomMatchers<R = unknown> {
-	toBeSameDate: (expected: Date) => R
+	toBeSameDate: (expected: Date) => R;
 }
 
 declare module 'vitest' {
@@ -17,10 +17,10 @@ declare module 'vitest' {
 global.L = L;
 
 interface ExpectationResult {
-	pass: boolean
-	message: () => string
-	actual?: unknown
-	expected?: unknown
+	pass: boolean;
+	message: () => string;
+	actual?: unknown;
+	expected?: unknown;
 }
 
 expect.extend({
@@ -40,7 +40,7 @@ expect.extend({
 				message: () => `Expected ${received} to be a Date`,
 				actual: received,
 				expected: expected,
-			}
+			};
 		}
 
 		const receivedDate = received.toDateString();
@@ -51,6 +51,6 @@ expect.extend({
 			message: () => `Expected ${receivedDate} to be same date as ${expectedDate}`,
 			actual: received,
 			expected: expected,
-		}
+		};
 	}
 });

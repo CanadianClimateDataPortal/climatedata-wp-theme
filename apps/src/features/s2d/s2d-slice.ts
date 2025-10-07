@@ -4,16 +4,20 @@
  * The store contains:
  * - Information about the data release dates.
  *
- * Each release date is associated with a specific variable and frequency
- * combination.
+ * Each release date is associated with a specific variable and frequency.
+ *
+ * Release dates are stored as strings in the format "YYYY-MM-DD". They are to
+ * be interpreted as UTC.
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/app/store';
 
 /**
- * Unique identifier for a release date (a combination of variable and
- * frequency).
+ * Unique identifier for a release date.
+ *
+ * A release date is unique for a combination of variable and frequency, so the
+ * key can be a combination of both to be unique.
  */
 type ReleaseDateKey = string;
 
@@ -32,12 +36,12 @@ const s2dSlice = createSlice({
 	initialState,
 	reducers: {
 		/**
-		 * Save, in the cache, the release date for a specific variable and
-		 * frequency combination.
+		 * Save, in the cache, the date of a specific release date.
 		 *
 		 * Also save in the store that this release date is no longer loading.
 		 *
-		 * The release date is a string in the format "YYYY-MM-DD".
+		 * The release date is a string in the format "YYYY-MM-DD", interpreted
+		 * as UTC.
 		 */
 		setReleaseDate(
 			state,

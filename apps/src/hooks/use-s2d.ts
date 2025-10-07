@@ -12,9 +12,9 @@ import { fetchS2DReleaseDate } from '@/services/services';
 import { parseUTCDate } from '@/lib/utils';
 
 /**
- * Hook related to S2D variables.
+ * Hook containing S2D-related state and functions.
  *
- * Calling this hook will automatically trigger a fetch of the release date for
+ * Calling this hook automatically triggers a fetch of the release date for
  * the current S2D variable and frequency. If the current variable is not an
  * S2D variable, nothing happens. It can thus be included even if a non-S2D
  * variable is selected.
@@ -44,9 +44,11 @@ export const useS2D = () => {
 	const lastKeyRef = useRef<string | null>(null);
 
 	/**
-	 * Fetch the release date for the current S2D variable and frequency.
+	 * Fetch and save in the cache store the release date for the current S2D
+	 * variable and frequency.
 	 *
-	 * Returns immediately if the current variable is not an S2D variable.
+	 * Do nothing if the current variable is not an S2D variable or if the
+	 * cache store already contains the desired release date.
 	 */
 	useEffect(() => {
 		// The releaseDateKey is null if the current variable is not an S2D variable

@@ -6,14 +6,16 @@ import {
 	PopoverTrigger,
 } from '@/components/ui/popover';
 
+export interface TooltipWidgetProps {
+	tooltip: React.ReactNode
+}
+
 /**
  * Circle with an "i" icon that shows a tooltip when hovered or clicked.
  */
 export default function TooltipWidget({
 	tooltip,
-}: {
-	tooltip: string | React.ReactNode;
-}) {
+}: TooltipWidgetProps) {
 	return (
 		<>
 			<Popover>
@@ -27,4 +29,3 @@ export default function TooltipWidget({
 		</>
 	);
 }
-

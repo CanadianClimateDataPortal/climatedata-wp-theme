@@ -17,18 +17,19 @@ export interface TimePeriodsControlSingleProps {
 }
 
 /**
- * Time period selector for single year (not year range).
+ * Time period selector for a single year (not a year range).
  * @constructor
  */
-const TimePeriodsControlSingle: React.FC = ({
+const TimePeriodsControlSingle: React.FC<TimePeriodsControlSingleProps> = ({
 	tooltip,
-}: TimePeriodsControlSingleProps) => {
+}) => {
 	const { __ } = useI18n();
 	const dispatch = useAppDispatch();
 	const { climateVariable, setDateRange } = useClimateVariable();
 	const timePeriodEnd = useAppSelector(state => state.map.timePeriodEnd);
 
-	let controlTooltip = __('Move the slider to select your time period of interest.');
+	let controlTooltip: React.ReactNode =
+		__('Move the slider to select your time period of interest.');
 	if (tooltip) {
 		controlTooltip = tooltip
 	}
@@ -151,4 +152,3 @@ const TimePeriodsControlSingle: React.FC = ({
 TimePeriodsControlSingle.displayName = 'TimePeriodsControlSingle';
 
 export { TimePeriodsControlSingle };
-

@@ -1221,7 +1221,7 @@ msgid "Decadal (5 years)"
 msgstr "Décennale (5 ans)"
 
 msgid "Release date:"
-msgstr "Date de sortie"
+msgstr "Date de sortie :"
 
 # Tooltip: Release date
 msgid "The forecast was released on this date. "
@@ -1232,4 +1232,3 @@ msgstr "La prévision a été publiée à cette date. "
   "Les prévisions mensuelles et saisonnières sont mises à jour chaque mois, "
   "et les prévisions décennales chaque année. "
   "L’exactitude a tendance à être plus élevée pour les périodes plus proches de la date de sortie."
-

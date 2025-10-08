@@ -15,7 +15,7 @@ interface LocationModalContentProps {
 	title: string;
 	latlng: L.LatLng;
 	scenario: string;
-	featureId: number,
+	featureId: number;
 	onDetailsClick: () => void;
 }
 

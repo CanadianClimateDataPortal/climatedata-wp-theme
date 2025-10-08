@@ -1,11 +1,15 @@
-import React from 'react';
-import { __ } from '@/context/locale-provider';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import L from 'leaflet';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
+
+import { __ } from '@/context/locale-provider';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useAppSelector } from '@/app/hooks';
 import { useLocale } from '@/hooks/use-locale';
 import appConfig from '@/config/app.config';
+
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import S2DVariableValues from '@/components/map-layers/s2d-variable-values';
 
 interface LocationModalContentProps {
 	title: string;
@@ -35,6 +39,8 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const { dataset } = useAppSelector((state) => state.map);
 	const variableList = useAppSelector((state) => state.map.variableList);
 
+	const [isS2D, setIsS2D] = useState<boolean>(false);
+
 	// Displayed info
 	const datasetLabel = getLocalized(dataset);
 	const climateVariableTitle = climateVariable?.getTitle() || variableList?.[0]?.title || '';
@@ -50,6 +56,19 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const thresholdLabel = getLabelByValue(threshold);
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
 	const scenarioLabel = appConfig.scenarios.filter((item) => item.value === scenario)[0]?.label;
+
+	useEffect(() => {
+		if (climateVariable) {
+			const testing = climateVariable instanceof S2DClimateVariable;
+			if (testing !== isS2D) {
+				setIsS2D(testing);
+			}
+		}
+	}, [
+		climateVariable,
+		isS2D,
+		setIsS2D,
+	]);
 
 	return (
 		<div>
@@ -68,25 +87,31 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 				}
 			</p>
 
-			{ climateVariable?.getLocationModalContent({
-				latlng,
-				featureId,
-				scenario,
-			}) }
+			{isS2D && (
+				<S2DVariableValues />
+			)}
 
-			<p className="text-right">
-				<a
-					href="#"
-					aria-label={__('Go to details section')}
-					className="font-normal text-sm leading-6"
-					onClick={onDetailsClick}
-				>
-					<span className="text-brand-blue inline-flex items-center gap-2">
-						{__('See details')}
-						<ArrowRight size={16}/>
-					</span>
-				</a>
-			</p>
+			{!isS2D &&
+				climateVariable?.getLocationModalContent({
+					latlng,
+					featureId,
+					scenario,
+				})}
+			{!isS2D && (
+				<p className="text-right">
+					<a
+						href="#"
+						aria-label={__('Go to details section')}
+						className="text-sm font-normal leading-6"
+						onClick={onDetailsClick}
+					>
+						<span className="inline-flex items-center gap-2 text-brand-blue">
+							{__('See details')}
+							<ArrowRight size={16} />
+						</span>
+					</a>
+				</p>
+			)}
 		</div>
 	);
 };

@@ -287,7 +287,7 @@ export interface ClimateVariableConfigInterface {
 	/** Indicates whether delta (difference) values are available */
 	hasDelta?: boolean;
 
-	/** Currently selected data value */
+	/** Currently selected data value (ex: delta, absolute) */
 	dataValue?: string | null;
 
 	/** Custom color scheme used for visualizing the variable */

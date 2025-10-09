@@ -21,7 +21,10 @@ function _show_help {
   echo "    compose <args...>       Execute a docker compose command. All <args...> are passed to docker compose."
   echo ""
   echo "  Developer tools:"
-  echo "    test-apps               Run TypeScript tests in /apps/."
+  echo "    test-apps <file(s)...>    Run TypeScript tests in /apps/. <files(s)...> can optionally be specified, relative to the project's root."
+  echo "    lint-apps <file(s)...>    Run eslint over /apps/. <files(s)...> can optionally be specified, relative to the project's root."
+  echo "    format-apps <file(s)...>  Run prettier (with overwrite) over /apps/. <files(s)...> can optionally be specified, relative to the project's root."
+  echo "    typecheck-apps            Run type checking on all files in /apps/."
   echo ""
   echo "  Portal:"
   echo "    portal-shell            Start a shell on the 'portal' container."
@@ -80,6 +83,25 @@ function _check_for_required_build_assets {
   fi
 }
 
+# Prepends each argument with a prefix path ($1). If no argument specified,
+# return the default path ($2).
+function _prepare_files_args {
+  local prefix_path="$1"
+  shift
+  local default_path="$1"
+  shift
+
+  if [[ $# -eq 0 ]]; then
+    echo "$default_path"
+  else
+    local files=""
+    for arg in "$@"; do
+      files="$files $prefix_path$arg"
+    done
+    echo "${files# }"
+  fi
+}
+
 function start {
   _check_for_required_build_assets
   # The Task Runner image must be built before building the Portal image, so
@@ -103,7 +125,22 @@ function compose {
 }
 
 function test-apps {
-  _docker_compose exec task-runner apps-test.sh /app/
+  files=$(_prepare_files_args "/app/" "/app/apps" "$@")
+  _docker_compose exec task-runner npx vitest run $files
+}
+
+function lint-apps {
+  files=$(_prepare_files_args "/app/" "/app/apps" "$@")
+  _docker_compose exec -w /app/apps/ task-runner npx eslint $files
+}
+
+function format-apps {
+  files=$(_prepare_files_args "/app/" "/app/apps" "$@")
+  _docker_compose exec -w /app/apps/ task-runner npx prettier --write $files
+}
+
+function typecheck-apps {
+  _docker_compose exec -w /app/apps/ task-runner npx tsc --build --noEmit
 }
 
 function download-docker-assets {

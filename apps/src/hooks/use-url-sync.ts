@@ -2,7 +2,9 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useLocale } from '@/hooks/use-locale';
 import {
+	selectLowSkillVisibility,
 	setDataset,
+	setLowSkillVisibility,
 	setMapCoordinates,
 	setOpacity,
 	setTimePeriodEnd,
@@ -14,6 +16,10 @@ import { ClimateVariables } from '@/config/climate-variables.config';
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
+	ForecastDisplay,
+	ForecastDisplays,
+	ForecastType,
+	ForecastTypes,
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
 import { fetchPostsData, fetchTaxonomyData } from '@/services/services';
@@ -21,6 +27,7 @@ import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-s
 import { normalizePostData } from '@/lib/format';
 import { store } from '@/app/store';
 import { CANADA_CENTER, DEFAULT_ZOOM } from '@/lib/constants';
+import { MapItemsOpacity } from '@/types/types';
 
 /**
  * Name of URL parameters.
@@ -39,6 +46,9 @@ const URL_PARAMS = {
 	COLOUR_TYPE: 'clrType',
 	AVERAGING_TYPE: 'avg',
 	DATE_RANGE: 'dateRange',
+	FORECAST_TYPE: 'fcastType',
+	FORECAST_DISPLAY: 'fcastDisp',
+	LOW_SKILL_MASKED: 'hideLowSkill',
 	DATASET: 'dataset',
 	DATA_OPACITY: 'dataOpacity',
 	LABEL_OPACITY: 'labelOpacity',
@@ -67,6 +77,7 @@ export const useUrlSync = () => {
 	const opacity = useAppSelector((state) => state.map.opacity);
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const mapCoordinates = useAppSelector((state) => state.map.mapCoordinates);
+	const lowSkillVisibility = useAppSelector(selectLowSkillVisibility());
 
 	// Climate variable state
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
@@ -91,26 +102,10 @@ export const useUrlSync = () => {
 			params.set(URL_PARAMS.VARIABLE_ID, climateData.id);
 		}
 		
-		// Only add version if it's not the default
-		if (climateData.version) {
-			const defaultVersion = defaultConfig?.version;
-			if (climateData.version !== defaultVersion) {
-				params.set(URL_PARAMS.VERSION, climateData.version);
-			}
-		}
-		
 		// Only add threshold if the variable supports thresholds AND has a value
 		if (climateData.threshold && 
 			(defaultConfig?.thresholds || defaultConfig?.threshold)) {
 			params.set(URL_PARAMS.THRESHOLD, climateData.threshold.toString());
-		}
-		
-		// Only add frequency if it's not the default
-		if (climateData.frequency) {
-			const defaultFrequency = defaultConfig?.frequency;
-			if (climateData.frequency !== defaultFrequency) {
-				params.set(URL_PARAMS.FREQUENCY, climateData.frequency);
-			}
 		}
 		
 		if (climateData.scenario) {
@@ -125,43 +120,6 @@ export const useUrlSync = () => {
 				params.set(URL_PARAMS.COMPARE_TO, climateData.scenarioCompareTo);
 			}
 		}
-		
-		// Add interactive region
-		if (climateData.interactiveRegion) {
-			const defaultRegion = defaultConfig?.interactiveRegion;
-			if (climateData.interactiveRegion !== defaultRegion) {
-				params.set(URL_PARAMS.INTERACTIVE_REGION, climateData.interactiveRegion);
-			}
-		}
-		
-		if (climateData.dataValue) {
-			const defaultDataValue = defaultConfig?.dataValue;
-			if (climateData.dataValue !== defaultDataValue) {
-				params.set(URL_PARAMS.DATA_VALUE, climateData.dataValue);
-			}
-		}
-		
-		// Add color scheme
-		if (climateData.colourScheme) {
-			const defaultColourScheme = defaultConfig?.colourScheme;
-			if (climateData.colourScheme !== defaultColourScheme) {
-				params.set(URL_PARAMS.COLOUR_SCHEME, climateData.colourScheme);
-			}
-		}
-		
-		if (climateData.colourType) {
-			const defaultColourType = defaultConfig?.colourType;
-			if (climateData.colourType !== defaultColourType) {
-				params.set(URL_PARAMS.COLOUR_TYPE, climateData.colourType);
-			}
-		}
-		
-		if (climateData.averagingType) {
-			const defaultAveragingType = defaultConfig?.averagingType;
-			if (climateData.averagingType !== defaultAveragingType) {
-				params.set(URL_PARAMS.AVERAGING_TYPE, climateData.averagingType);
-			}
-		}
 
 		// Add date range
 		if (climateData.dateRange && 
@@ -174,10 +132,32 @@ export const useUrlSync = () => {
 				params.set(URL_PARAMS.DATE_RANGE, currentDateRangeStr);
 			}
 		}
+
+		// List of configurations that are simply saved as is in the params if
+		// their value is different from their default value
+		const simpleConfigurations: [keyof ClimateVariableConfigInterface, string][] = [
+			['forecastType', URL_PARAMS.FORECAST_TYPE],
+			['forecastDisplay', URL_PARAMS.FORECAST_DISPLAY],
+			['interactiveRegion', URL_PARAMS.INTERACTIVE_REGION],
+			['dataValue', URL_PARAMS.DATA_VALUE],
+			['colourScheme', URL_PARAMS.COLOUR_SCHEME],
+			['colourType', URL_PARAMS.COLOUR_TYPE],
+			['averagingType', URL_PARAMS.AVERAGING_TYPE],
+			['version', URL_PARAMS.VERSION],
+			['frequency', URL_PARAMS.FREQUENCY],
+		];
+
+		for (const [configKey, urlParam] of simpleConfigurations) {
+			const defaultValue = defaultConfig?.[configKey];
+			const currentValue = climateData[configKey];
+			if (currentValue != undefined && currentValue !== defaultValue) {
+				params.set(urlParam, currentValue.toString());
+			}
+		}
 	};
 
 	/**
-	 * Save in a URL parameter list settings specific to the Map app.
+	 * Save in a URL parameter list elements of the Map store.
 	 *
 	 * No existing parameters are removed.
 	 *
@@ -208,6 +188,10 @@ export const useUrlSync = () => {
 			params.set(URL_PARAMS.LATITUDE, mapCoordinates.lat.toFixed(5));
 			params.set(URL_PARAMS.LONGITUDE, mapCoordinates.lng.toFixed(5));
 			params.set(URL_PARAMS.ZOOM_LEVEL, mapCoordinates.zoom.toString());
+		}
+
+		if (lowSkillVisibility === false) {
+			params.set(URL_PARAMS.LOW_SKILL_MASKED, '1');
 		}
 	};
 
@@ -243,6 +227,8 @@ export const useUrlSync = () => {
 	/**
 	 * Update the window's URL with the current climate variable and map
 	 * settings.
+	 *
+	 * Update is debounced by a few milliseconds to prevent excessive updates.
 	 */
 	const updateUrlWithDebounce = useCallback(() => {
 		if (typeof window === 'undefined' || !isInitialized) return;
@@ -280,7 +266,8 @@ export const useUrlSync = () => {
 		opacity,
 		dataset,
 		mapCoordinates,
-		isInitialized
+		isInitialized,
+		lowSkillVisibility,
 	]);
 
 	/**
@@ -367,6 +354,22 @@ export const useUrlSync = () => {
 			}
 		}
 
+		if (params.has(URL_PARAMS.FORECAST_TYPE)) {
+			const paramValue = params.get(URL_PARAMS.FORECAST_TYPE) as ForecastType;
+
+			if (Object.values(ForecastTypes).includes(paramValue)) {
+				newConfig.forecastType = paramValue;
+			}
+		}
+
+		if (params.has(URL_PARAMS.FORECAST_DISPLAY)) {
+			const paramValue = params.get(URL_PARAMS.FORECAST_DISPLAY) as ForecastDisplay;
+
+			if (Object.values(ForecastDisplays).includes(paramValue)) {
+				newConfig.forecastDisplay = paramValue;
+			}
+		}
+
 		dispatch(
 			setClimateVariable(
 				newConfig as ClimateVariableConfigInterface
@@ -381,30 +384,20 @@ export const useUrlSync = () => {
 	 *
 	 * @param params - URL parameters to update from.
 	 */
-	const setMapOpacityFromUrlParams = (params: URLSearchParams) => {
-		if (params.has(URL_PARAMS.DATA_OPACITY)) {
-			const dataOpacityStr = params.get(URL_PARAMS.DATA_OPACITY);
+	const updateMapOpacityFromUrlParams = (params: URLSearchParams) => {
+		const opacities: [keyof MapItemsOpacity, string][] = [
+			['mapData', URL_PARAMS.DATA_OPACITY],
+			['labels', URL_PARAMS.LABEL_OPACITY],
+		];
+
+		for (const [storeKey, urlParam] of opacities) {
+			const dataOpacityStr = params.get(urlParam);
 			if (dataOpacityStr) {
 				const opacityNum = parseInt(dataOpacityStr);
 				if (!isNaN(opacityNum)) {
 					dispatch(
 						setOpacity({
-							key: 'mapData',
-							value: opacityNum,
-						})
-					);
-				}
-			}
-		}
-
-		if (params.has(URL_PARAMS.LABEL_OPACITY)) {
-			const labelOpacityStr = params.get(URL_PARAMS.LABEL_OPACITY);
-			if (labelOpacityStr) {
-				const opacityNum = parseInt(labelOpacityStr);
-				if (!isNaN(opacityNum)) {
-					dispatch(
-						setOpacity({
-							key: 'labels',
+							key: storeKey,
 							value: opacityNum,
 						})
 					);
@@ -420,7 +413,7 @@ export const useUrlSync = () => {
 	 *
 	 * @param params - URL parameters to update from.
 	 */
-	const setMapCoordinatesFromUrlParams = (params: URLSearchParams) => {
+	const updateMapCoordinatesFromUrlParams = (params: URLSearchParams) => {
 		const lat = params.get(URL_PARAMS.LATITUDE);
 		const lng = params.get(URL_PARAMS.LONGITUDE);
 		const zoom = params.get(URL_PARAMS.ZOOM_LEVEL);
@@ -447,6 +440,19 @@ export const useUrlSync = () => {
 			}
 		}
 	};
+
+	/**
+	 * Update the Map store entries from a list of URL parameters.
+	 */
+	const updateMapStoreFromUrlParams = (params: URLSearchParams) => {
+		updateMapOpacityFromUrlParams(params);
+		updateMapCoordinatesFromUrlParams(params);
+
+		if (params.has(URL_PARAMS.LOW_SKILL_MASKED)) {
+			const lowSkillMasked = params.get(URL_PARAMS.LOW_SKILL_MASKED) === '1';
+			dispatch(setLowSkillVisibility({ visible: !lowSkillMasked }));
+		}
+	}
 
 	/**
 	 * Load and save the dataset configuration from a list of URL parameters.
@@ -652,11 +658,7 @@ export const useUrlSync = () => {
 					}
 				}
 
-				// Process map opacity
-				setMapOpacityFromUrlParams(params);
-
-				// Process map coordinates and zoom
-				setMapCoordinatesFromUrlParams(params);
+				updateMapStoreFromUrlParams(params);
 
 				lastUrlUpdateRef.current = window.location.href;
 

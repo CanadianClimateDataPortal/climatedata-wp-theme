@@ -75,15 +75,19 @@ export enum FrequencyType {
 	DAILY = "daily",
 }
 
-export enum ForecastType {
-	EXPECTED = "expected",
-	UNUSUAL = "unusual",
-}
+export const ForecastTypes = {
+	EXPECTED: "expected",
+	UNUSUAL: "unusual",
+} as const;
 
-export enum ForecastDisplay {
-	FORECAST = "forecast",
-	CLIMATOLOGY = "climatology",
-}
+export type ForecastType = typeof ForecastTypes[keyof typeof ForecastTypes];
+
+export const ForecastDisplays = {
+	FORECAST: "forecast",
+	CLIMATOLOGY: "climatology",
+} as const;
+
+export type ForecastDisplay = typeof ForecastDisplays[keyof typeof ForecastDisplays];
 
 export type FrequencyConfig = {
 	[K in FrequencyType]?: FrequencyDisplayModeOption;

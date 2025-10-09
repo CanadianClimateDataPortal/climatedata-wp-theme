@@ -12,7 +12,9 @@ import {
 	FieldValues,
 	FileFormatType,
 	ForecastDisplay,
+	ForecastDisplays,
 	ForecastType,
+	ForecastTypes,
 	FrequencyConfig,
 	FrequencyType,
 	GridCoordinates,
@@ -486,11 +488,11 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getForecastType(): ForecastType {
-		return this._config.forecastType ?? ForecastType.EXPECTED;
+		return this._config.forecastType ?? ForecastTypes.EXPECTED;
 	}
 
 	getForecastDisplay(): ForecastDisplay {
-		return this._config.forecastDisplay ?? ForecastDisplay.FORECAST;
+		return this._config.forecastDisplay ?? ForecastDisplays.FORECAST;
 	}
 }
 

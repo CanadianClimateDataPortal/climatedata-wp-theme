@@ -9,7 +9,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 import { formatUTCDate } from '@/lib/utils';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { ForecastDisplay, ForecastType, FrequencyType } from '@/types/climate-variable-interface';
+import {
+	ForecastDisplay,
+	ForecastDisplays,
+	ForecastType,
+	ForecastTypes,
+	FrequencyType,
+} from '@/types/climate-variable-interface';
 import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { selectLowSkillVisibility, setLowSkillVisibility } from '@/features/map/map-slice';
@@ -62,8 +68,8 @@ const fieldForecastTypes = {
 	key: 'forecast_types',
 	label: __('Forecast Types'),
 	options: [
-		{ value: ForecastType.EXPECTED, label: __('Expected Conditions') },
-		{ value: ForecastType.UNUSUAL, label: __('Unusual Conditions') },
+		{ value: ForecastTypes.EXPECTED, label: __('Expected Conditions') },
+		{ value: ForecastTypes.UNUSUAL, label: __('Unusual Conditions') },
 	],
 };
 
@@ -71,8 +77,8 @@ const fieldForecastDisplay = {
 	key: 'forecast_display',
 	label: __('Forecast Display'),
 	options: [
-		{ value: ForecastDisplay.FORECAST, label: __('Forecast') },
-		{ value: ForecastDisplay.CLIMATOLOGY, label: __('Climatology') },
+		{ value: ForecastDisplays.FORECAST, label: __('Forecast') },
+		{ value: ForecastDisplays.CLIMATOLOGY, label: __('Climatology') },
 	],
 };
 
@@ -96,9 +102,9 @@ export const SidebarInnerS2D = () => {
 	const dispatch = useAppDispatch();
 	const isLowSkillMasked = ! useAppSelector(selectLowSkillVisibility());
 	const forecastType =
-		climateVariable?.getForecastType() ?? ForecastType.EXPECTED;
+		climateVariable?.getForecastType() ?? ForecastTypes.EXPECTED;
 	const forecastDisplay =
-		climateVariable?.getForecastDisplay() ?? ForecastDisplay.FORECAST;
+		climateVariable?.getForecastDisplay() ?? ForecastDisplays.FORECAST;
 	const frequency = climateVariable?.getFrequency() ?? FrequencyType.MONTHLY;
 
 	const handleLowSkillHideChange = (checked: boolean) => {

@@ -492,10 +492,6 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	getForecastDisplay(): ForecastDisplay {
 		return this._config.forecastDisplay ?? ForecastDisplay.FORECAST;
 	}
-
-	isLowSkillMasked(): boolean {
-		return this._config.isLowSkillMasked ?? false;
-	}
 }
 
 export default ClimateVariableBase;

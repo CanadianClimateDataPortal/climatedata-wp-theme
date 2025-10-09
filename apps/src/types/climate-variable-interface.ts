@@ -402,11 +402,6 @@ export interface ClimateVariableConfigInterface {
 	 * For S2D variables, the selected forecast display.
 	 */
 	forecastDisplay?: ForecastDisplay;
-
-	/**
-	 * For S2D variables, if the "low skill" mask is shown.
-	 */
-	isLowSkillMasked?: boolean;
 }
 
 /**
@@ -563,6 +558,4 @@ export interface ClimateVariableInterface {
 	getForecastType(): ForecastType | null;
 
 	getForecastDisplay(): ForecastDisplay | null;
-
-	isLowSkillMasked(): boolean | null;
 }

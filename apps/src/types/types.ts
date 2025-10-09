@@ -193,7 +193,8 @@ export interface MapState {
 	variableList: PostData[];
 	variableListLoading: boolean;
 	mapCoordinates: MapCoordinates;
-	messageDisplayStates: {[key: string]: boolean}
+	messageDisplayStates: {[key: string]: boolean};
+	isLowSkillVisible: boolean;
 }
 
 /**

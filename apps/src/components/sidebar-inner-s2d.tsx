@@ -11,6 +11,8 @@ import { formatUTCDate } from '@/lib/utils';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { ForecastDisplay, ForecastType, FrequencyType } from '@/types/climate-variable-interface';
 import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { selectLowSkillVisibility, setLowSkillVisibility } from '@/features/map/map-slice';
 
 export interface ReleaseDateProps {
 	date?: Date | null;
@@ -88,16 +90,20 @@ export const SidebarInnerS2D = () => {
 		climateVariable,
 		setForecastType,
 		setForecastDisplay,
-		setIsLowSkillMasked,
 		setFrequency,
 	} = useClimateVariable();
 
-	const isLowSkillMasked = climateVariable?.isLowSkillMasked() ?? false;
+	const dispatch = useAppDispatch();
+	const isLowSkillMasked = useAppSelector(selectLowSkillVisibility());
 	const forecastType =
 		climateVariable?.getForecastType() ?? ForecastType.EXPECTED;
 	const forecastDisplay =
 		climateVariable?.getForecastDisplay() ?? ForecastDisplay.FORECAST;
 	const frequency = climateVariable?.getFrequency() ?? FrequencyType.MONTHLY;
+
+	const handleLowSkillVisibilityChange = (checked: boolean) => {
+		dispatch(setLowSkillVisibility({ visible: checked }));
+	};
 
 	return (
 		<>
@@ -129,7 +135,7 @@ export const SidebarInnerS2D = () => {
 							id={fieldForecastDisplay.key + '_compare'}
 							className="text-brand-red"
 							checked={isLowSkillMasked}
-							onCheckedChange={setIsLowSkillMasked}
+							onCheckedChange={handleLowSkillVisibilityChange}
 						/>
 						<label
 							htmlFor={fieldForecastDisplay.key + '_compare'}

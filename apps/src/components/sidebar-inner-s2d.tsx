@@ -94,15 +94,16 @@ export const SidebarInnerS2D = () => {
 	} = useClimateVariable();
 
 	const dispatch = useAppDispatch();
-	const isLowSkillMasked = useAppSelector(selectLowSkillVisibility());
+	const isLowSkillMasked = ! useAppSelector(selectLowSkillVisibility());
 	const forecastType =
 		climateVariable?.getForecastType() ?? ForecastType.EXPECTED;
 	const forecastDisplay =
 		climateVariable?.getForecastDisplay() ?? ForecastDisplay.FORECAST;
 	const frequency = climateVariable?.getFrequency() ?? FrequencyType.MONTHLY;
 
-	const handleLowSkillVisibilityChange = (checked: boolean) => {
-		dispatch(setLowSkillVisibility({ visible: checked }));
+	const handleLowSkillHideChange = (checked: boolean) => {
+		const isVisible = !checked; // "checked" means "hide low skill"
+		dispatch(setLowSkillVisibility({ visible: isVisible }));
 	};
 
 	return (
@@ -135,7 +136,7 @@ export const SidebarInnerS2D = () => {
 							id={fieldForecastDisplay.key + '_compare'}
 							className="text-brand-red"
 							checked={isLowSkillMasked}
-							onCheckedChange={handleLowSkillVisibilityChange}
+							onCheckedChange={handleLowSkillHideChange}
 						/>
 						<label
 							htmlFor={fieldForecastDisplay.key + '_compare'}

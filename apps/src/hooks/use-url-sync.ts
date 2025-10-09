@@ -1,15 +1,52 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useLocale } from '@/hooks/use-locale';
-import { setOpacity, setTimePeriodEnd, setDataset, setVariableList, setVariableListLoading, setMapCoordinates } from '@/features/map/map-slice';
+import {
+	setDataset,
+	setMapCoordinates,
+	setOpacity,
+	setTimePeriodEnd,
+	setVariableList,
+	setVariableListLoading,
+} from '@/features/map/map-slice';
 import { setClimateVariable } from '@/store/climate-variable-slice';
 import { ClimateVariables } from '@/config/climate-variables.config';
-import { ClimateVariableConfigInterface, InteractiveRegionOption } from '@/types/climate-variable-interface';
-import { fetchTaxonomyData, fetchPostsData } from '@/services/services';
+import {
+	AveragingType,
+	ClimateVariableConfigInterface,
+	InteractiveRegionOption,
+} from '@/types/climate-variable-interface';
+import { fetchPostsData, fetchTaxonomyData } from '@/services/services';
 import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-sync-slice';
 import { normalizePostData } from '@/lib/format';
 import { store } from '@/app/store';
 import { CANADA_CENTER, DEFAULT_ZOOM } from '@/lib/constants';
+
+/**
+ * Name of URL parameters.
+ */
+const URL_PARAMS = {
+	VARIABLE_ID: 'var',
+	VERSION: 'ver',
+	THRESHOLD: 'th',
+	FREQUENCY: 'freq',
+	SCENARIO: 'scen',
+	DO_COMPARE: 'cmp',
+	COMPARE_TO: 'cmpTo',
+	INTERACTIVE_REGION: 'region',
+	DATA_VALUE: 'dataVal',
+	COLOUR_SCHEME: 'clr',
+	COLOUR_TYPE: 'clrType',
+	AVERAGING_TYPE: 'avg',
+	DATE_RANGE: 'dateRange',
+	DATASET: 'dataset',
+	DATA_OPACITY: 'dataOpacity',
+	LABEL_OPACITY: 'labelOpacity',
+	PERIOD: 'period',
+	LATITUDE: 'lat',
+	LONGITUDE: 'lng',
+	ZOOM_LEVEL: 'zoom',
+} as const;
 
 /**
  * Synchronizes state with URL params from climate variable state
@@ -33,8 +70,17 @@ export const useUrlSync = () => {
 
 	// Climate variable state
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
-	
-	// Helper function to add climate variable parameters to URL
+
+	/**
+	 * Save a climate variable configuration in a URL parameter list.
+	 *
+	 * No existing parameters are removed. If a value is equal to a default
+	 * value, no parameter is added.
+	 *
+	 * @param params - URL parameters to augment.
+	 * @param climateData - Configuration to save into the parameters.
+	 * @param defaultConfig - Default values of the configuration.
+	 */
 	const addClimateVariableParamsToUrl = (
 		params: URLSearchParams,
 		climateData: ClimateVariableConfigInterface,
@@ -42,41 +88,41 @@ export const useUrlSync = () => {
 	) => {
 		// Always include variable ID
 		if (climateData.id) {
-			params.set('var', climateData.id);
+			params.set(URL_PARAMS.VARIABLE_ID, climateData.id);
 		}
 		
 		// Only add version if it's not the default
 		if (climateData.version) {
 			const defaultVersion = defaultConfig?.version;
 			if (climateData.version !== defaultVersion) {
-				params.set('ver', climateData.version);
+				params.set(URL_PARAMS.VERSION, climateData.version);
 			}
 		}
 		
 		// Only add threshold if the variable supports thresholds AND has a value
 		if (climateData.threshold && 
 			(defaultConfig?.thresholds || defaultConfig?.threshold)) {
-			params.set('th', climateData.threshold.toString());
+			params.set(URL_PARAMS.THRESHOLD, climateData.threshold.toString());
 		}
 		
 		// Only add frequency if it's not the default
 		if (climateData.frequency) {
 			const defaultFrequency = defaultConfig?.frequency;
 			if (climateData.frequency !== defaultFrequency) {
-				params.set('freq', climateData.frequency);
+				params.set(URL_PARAMS.FREQUENCY, climateData.frequency);
 			}
 		}
 		
 		if (climateData.scenario) {
-			params.set('scen', climateData.scenario);
+			params.set(URL_PARAMS.SCENARIO, climateData.scenario);
 		}
 		
 		// Only include scenario comparison parameters if enabled
 		if (climateData.scenarioCompare === true) {
-			params.set('cmp', '1');
+			params.set(URL_PARAMS.DO_COMPARE, '1');
 			
 			if (climateData.scenarioCompareTo) {
-				params.set('cmpTo', climateData.scenarioCompareTo);
+				params.set(URL_PARAMS.COMPARE_TO, climateData.scenarioCompareTo);
 			}
 		}
 		
@@ -84,14 +130,14 @@ export const useUrlSync = () => {
 		if (climateData.interactiveRegion) {
 			const defaultRegion = defaultConfig?.interactiveRegion;
 			if (climateData.interactiveRegion !== defaultRegion) {
-				params.set('region', climateData.interactiveRegion);
+				params.set(URL_PARAMS.INTERACTIVE_REGION, climateData.interactiveRegion);
 			}
 		}
 		
 		if (climateData.dataValue) {
 			const defaultDataValue = defaultConfig?.dataValue;
 			if (climateData.dataValue !== defaultDataValue) {
-				params.set('dataVal', climateData.dataValue);
+				params.set(URL_PARAMS.DATA_VALUE, climateData.dataValue);
 			}
 		}
 		
@@ -99,21 +145,21 @@ export const useUrlSync = () => {
 		if (climateData.colourScheme) {
 			const defaultColourScheme = defaultConfig?.colourScheme;
 			if (climateData.colourScheme !== defaultColourScheme) {
-				params.set('clr', climateData.colourScheme);
+				params.set(URL_PARAMS.COLOUR_SCHEME, climateData.colourScheme);
 			}
 		}
 		
 		if (climateData.colourType) {
 			const defaultColourType = defaultConfig?.colourType;
 			if (climateData.colourType !== defaultColourType) {
-				params.set('clrType', climateData.colourType);
+				params.set(URL_PARAMS.COLOUR_TYPE, climateData.colourType);
 			}
 		}
 		
 		if (climateData.averagingType) {
 			const defaultAveragingType = defaultConfig?.averagingType;
 			if (climateData.averagingType !== defaultAveragingType) {
-				params.set('avg', climateData.averagingType);
+				params.set(URL_PARAMS.AVERAGING_TYPE, climateData.averagingType);
 			}
 		}
 
@@ -125,40 +171,52 @@ export const useUrlSync = () => {
 			const defaultDateRangeStr = defaultDateRange?.join(',');
 			
 			if (currentDateRangeStr !== defaultDateRangeStr) {
-				params.set('dateRange', currentDateRangeStr);
+				params.set(URL_PARAMS.DATE_RANGE, currentDateRangeStr);
 			}
 		}
 	};
-	
-	// Helper function to add map-only parameters
+
+	/**
+	 * Save in a URL parameter list settings specific to the Map app.
+	 *
+	 * No existing parameters are removed.
+	 *
+	 * @param params - URL parameters to augment.
+	 */
 	const addMapOnlyParamsToUrl = (
 		params: URLSearchParams
 	) => {
 		// Dataset 
 		if (dataset && dataset.term_id) {
-			params.set('dataset', dataset.term_id.toString());
+			params.set(URL_PARAMS.DATASET, dataset.term_id.toString());
 		}
 		
 		// Opacity
 		if (opacity) {
 			if (opacity.mapData !== undefined) {
 				const urlOpacityValue = Math.round(opacity.mapData * 100);
-				params.set('dataOpacity', urlOpacityValue.toString());
+				params.set(URL_PARAMS.DATA_OPACITY, urlOpacityValue.toString());
 			}
 			
 			if (opacity.labels !== undefined) {
 				const urlOpacityValue = Math.round(opacity.labels * 100);
-				params.set('labelOpacity', urlOpacityValue.toString());
+				params.set(URL_PARAMS.LABEL_OPACITY, urlOpacityValue.toString());
 			}
 		}
 		
 		if (mapCoordinates) {
-			params.set('lat', mapCoordinates.lat.toFixed(5));
-			params.set('lng', mapCoordinates.lng.toFixed(5));
-			params.set('zoom', mapCoordinates.zoom.toString());
+			params.set(URL_PARAMS.LATITUDE, mapCoordinates.lat.toFixed(5));
+			params.set(URL_PARAMS.LONGITUDE, mapCoordinates.lng.toFixed(5));
+			params.set(URL_PARAMS.ZOOM_LEVEL, mapCoordinates.zoom.toString());
 		}
 	};
-	
+
+	/**
+	 * Return if a list of parameters is different from the current URL's
+	 * parameters.
+	 *
+	 * @param params - The parameters to compare against the current URL.
+	 */
 	const haveParamsChanged = (params: URLSearchParams): boolean => {
 		if (typeof window === 'undefined') return false;
 		
@@ -169,7 +227,7 @@ export const useUrlSync = () => {
 		if (currentKeys.length !== newKeys.length) return true;
 		
 		for (const key of newKeys) {
-			if (key === 'lat' || key === 'lng') {
+			if (key === URL_PARAMS.LATITUDE || key === URL_PARAMS.LONGITUDE) {
 				const currentVal = parseFloat(currentParams.get(key) || '0');
 				const newVal = parseFloat(params.get(key) || '0');
 				if (Math.abs(currentVal - newVal) > 0.0001) return true;
@@ -181,7 +239,11 @@ export const useUrlSync = () => {
 		
 		return false;
 	};
-	
+
+	/**
+	 * Update the window's URL with the current climate variable and map
+	 * settings.
+	 */
 	const updateUrlWithDebounce = useCallback(() => {
 		if (typeof window === 'undefined' || !isInitialized) return;
 		if (!climateVariableData) return; // Only update URL if a variable is selected
@@ -221,6 +283,16 @@ export const useUrlSync = () => {
 		isInitialized
 	]);
 
+	/**
+	 * Update and save a climate variable configuration from a list of URL
+	 * parameters.
+	 *
+	 * The Redux store for the climate variable configuration is updated
+	 * directly.
+	 *
+	 * @param params - URL parameters to update from.
+	 * @param matchedVariable - Base configuration of the variable.
+	 */
 	const setClimateVariableFromUrlParams = (
 		params: URLSearchParams,
 		matchedVariable: ClimateVariableConfigInterface
@@ -238,38 +310,38 @@ export const useUrlSync = () => {
 			newConfig.title = matchingPostData.title;
 		}
 
-		if (params.has('ver'))
-			newConfig.version = params.get('ver') || undefined;
-		if (params.has('th')) {
+		if (params.has(URL_PARAMS.VERSION))
+			newConfig.version = params.get(URL_PARAMS.VERSION) || undefined;
+		if (params.has(URL_PARAMS.THRESHOLD)) {
 			if (matchedVariable.thresholds || matchedVariable.threshold) {
-				newConfig.threshold = params.get('th') || undefined;
+				newConfig.threshold = params.get(URL_PARAMS.THRESHOLD) || undefined;
 			}
 		}
-		if (params.has('freq'))
-			newConfig.frequency = params.get('freq') || undefined;
-		if (params.has('scen'))
-			newConfig.scenario = params.get('scen') || undefined;
-		if (params.has('cmp'))
-			newConfig.scenarioCompare = params.get('cmp') === '1';
-		if (params.has('cmpTo') && params.get('cmp') === '1')
-			newConfig.scenarioCompareTo = params.get('cmpTo') || undefined;
+		if (params.has(URL_PARAMS.FREQUENCY))
+			newConfig.frequency = params.get(URL_PARAMS.FREQUENCY) || undefined;
+		if (params.has(URL_PARAMS.SCENARIO))
+			newConfig.scenario = params.get(URL_PARAMS.SCENARIO) || undefined;
+		if (params.has(URL_PARAMS.DO_COMPARE))
+			newConfig.scenarioCompare = params.get(URL_PARAMS.DO_COMPARE) === '1';
+		if (params.has(URL_PARAMS.COMPARE_TO) && params.get(URL_PARAMS.DO_COMPARE) === '1')
+			newConfig.scenarioCompareTo = params.get(URL_PARAMS.COMPARE_TO) || undefined;
 		
-		if (params.has('region'))
-			newConfig.interactiveRegion = params.get('region') as InteractiveRegionOption;
+		if (params.has(URL_PARAMS.INTERACTIVE_REGION))
+			newConfig.interactiveRegion = params.get(URL_PARAMS.INTERACTIVE_REGION) as InteractiveRegionOption;
 		
-		if (params.has('dataVal'))
-			newConfig.dataValue = params.get('dataVal') || undefined;
+		if (params.has(URL_PARAMS.DATA_VALUE))
+			newConfig.dataValue = params.get(URL_PARAMS.DATA_VALUE) || undefined;
 		
-		if (params.has('clr'))
-			newConfig.colourScheme = params.get('clr') || undefined;
+		if (params.has(URL_PARAMS.COLOUR_SCHEME))
+			newConfig.colourScheme = params.get(URL_PARAMS.COLOUR_SCHEME) || undefined;
 		
-		if (params.has('clrType'))
-			newConfig.colourType = params.get('clrType') || undefined;
-		if (params.has('avg'))
-			newConfig.averagingType = params.get('avg') as any;
+		if (params.has(URL_PARAMS.COLOUR_TYPE))
+			newConfig.colourType = params.get(URL_PARAMS.COLOUR_TYPE) || undefined;
+		if (params.has(URL_PARAMS.AVERAGING_TYPE))
+			newConfig.averagingType = params.get(URL_PARAMS.AVERAGING_TYPE) as AveragingType;
 
-		if (params.has('dateRange')) {
-			const dateRangeStr = params.get('dateRange');
+		if (params.has(URL_PARAMS.DATE_RANGE)) {
+			const dateRangeStr = params.get(URL_PARAMS.DATE_RANGE);
 			if (dateRangeStr) {
 				newConfig.dateRange = dateRangeStr.split(',');
 				
@@ -281,8 +353,8 @@ export const useUrlSync = () => {
 					}
 				}
 			}
-		} else if (params.has('period') && matchedVariable.dateRangeConfig) {
-			const period = parseInt(params.get('period') || '');
+		} else if (params.has(URL_PARAMS.PERIOD) && matchedVariable.dateRangeConfig) {
+			const period = parseInt(params.get(URL_PARAMS.PERIOD) || '');
 			const interval = matchedVariable.dateRangeConfig.interval || 30;
 
 			if (!isNaN(period)) {
@@ -302,9 +374,16 @@ export const useUrlSync = () => {
 		);
 	};
 
+	/**
+	 * Update the opacity settings from a list of URL parameters.
+	 *
+	 * The opacity settings in the Redux store are updated directly.
+	 *
+	 * @param params - URL parameters to update from.
+	 */
 	const setMapOpacityFromUrlParams = (params: URLSearchParams) => {
-		if (params.has('dataOpacity')) {
-			const dataOpacityStr = params.get('dataOpacity');
+		if (params.has(URL_PARAMS.DATA_OPACITY)) {
+			const dataOpacityStr = params.get(URL_PARAMS.DATA_OPACITY);
 			if (dataOpacityStr) {
 				const opacityNum = parseInt(dataOpacityStr);
 				if (!isNaN(opacityNum)) {
@@ -318,8 +397,8 @@ export const useUrlSync = () => {
 			}
 		}
 
-		if (params.has('labelOpacity')) {
-			const labelOpacityStr = params.get('labelOpacity');
+		if (params.has(URL_PARAMS.LABEL_OPACITY)) {
+			const labelOpacityStr = params.get(URL_PARAMS.LABEL_OPACITY);
 			if (labelOpacityStr) {
 				const opacityNum = parseInt(labelOpacityStr);
 				if (!isNaN(opacityNum)) {
@@ -333,11 +412,18 @@ export const useUrlSync = () => {
 			}
 		}
 	};
-	
+
+	/**
+	 * Update the map coordinates configurations from a list of URL parameters.
+	 *
+	 * The map's Redux store is updated directly.
+	 *
+	 * @param params - URL parameters to update from.
+	 */
 	const setMapCoordinatesFromUrlParams = (params: URLSearchParams) => {
-		const lat = params.get('lat');
-		const lng = params.get('lng');
-		const zoom = params.get('zoom');
+		const lat = params.get(URL_PARAMS.LATITUDE);
+		const lng = params.get(URL_PARAMS.LONGITUDE);
+		const zoom = params.get(URL_PARAMS.ZOOM_LEVEL);
 		
 		if (lat && lng && zoom) {
 			const latNum = parseFloat(lat);
@@ -362,8 +448,16 @@ export const useUrlSync = () => {
 		}
 	};
 
+	/**
+	 * Load and save the dataset configuration from a list of URL parameters.
+	 *
+	 * The full configuration of the dataset is loaded using the dataset's id
+	 * in the parameters, and the map's Redux store is then updated directly.
+	 *
+	 * @param params - URL parameters from which to retrieve the dataset's id.
+	 */
 	const setDatasetFromUrlParams = async (params: URLSearchParams) => {
-		const datasetParam = params.get('dataset');
+		const datasetParam = params.get(URL_PARAMS.DATASET);
 		
 		try {
 			// Fetch actual dataset objects
@@ -396,7 +490,13 @@ export const useUrlSync = () => {
 		}
 	};
 
-	// Initialize the app with the first variable from the dataset
+	/**
+	 * Fill the Redux stores and the window's URL parameters with default values.
+	 *
+	 * The first dataset and its first variable are used as defaults.
+	 *
+	 * Other attributes are set using various defaults.
+	 */
 	const initializeWithDefaults = async () => {
 		try {
 			// Get the first dataset
@@ -436,20 +536,20 @@ export const useUrlSync = () => {
 						
 						const params = new URLSearchParams();
 						
-						params.set('var', matchingConfig.id);
+						params.set(URL_PARAMS.VARIABLE_ID, matchingConfig.id);
 						
 						if (matchingConfig.version) {
-							params.set('ver', matchingConfig.version);
+							params.set(URL_PARAMS.VERSION, matchingConfig.version);
 						} else if (matchingConfig.versions?.length) {
-							params.set('ver', matchingConfig.versions[0]);
+							params.set(URL_PARAMS.VERSION, matchingConfig.versions[0]);
 						}
 						
 						if (matchingConfig.threshold) {
-							params.set('th', matchingConfig.threshold.toString());
+							params.set(URL_PARAMS.THRESHOLD, matchingConfig.threshold.toString());
 						}
 						
 						if (matchingConfig.scenario) {
-							params.set('scen', matchingConfig.scenario);
+							params.set(URL_PARAMS.SCENARIO, matchingConfig.scenario);
 						} else if (matchingConfig.versions && matchingConfig.versions[0] && matchingConfig.scenarios) {
 							const firstVersion = matchingConfig.versions[0];
 							const scenarios = typeof matchingConfig.scenarios === 'object' ? 
@@ -457,26 +557,26 @@ export const useUrlSync = () => {
 								matchingConfig.scenarios;
 								
 							if (Array.isArray(scenarios) && scenarios.length > 0) {
-								params.set('scen', scenarios[0]);
+								params.set(URL_PARAMS.SCENARIO, scenarios[0]);
 							}
 						}
 						
 						if (matchingConfig.interactiveRegion) {
-							params.set('region', matchingConfig.interactiveRegion);
+							params.set(URL_PARAMS.INTERACTIVE_REGION, matchingConfig.interactiveRegion);
 						}
 						
 						if (matchingConfig.dateRange && matchingConfig.dateRange.length > 0) {
-							params.set('dateRange', matchingConfig.dateRange.join(','));
+							params.set(URL_PARAMS.DATE_RANGE, matchingConfig.dateRange.join(','));
 						}
 
 						const coords = CANADA_CENTER as [number, number] || [62.51231793838694, -98.48144531250001];
 
-						params.set('dataset', firstDataset.term_id.toString());
-						params.set('dataOpacity', '100');
-						params.set('labelOpacity', '100');
-						params.set('lat', coords[0].toFixed(5));
-						params.set('lng', coords[1].toFixed(5));
-						params.set('zoom', DEFAULT_ZOOM.toString());
+						params.set(URL_PARAMS.DATASET, firstDataset.term_id.toString());
+						params.set(URL_PARAMS.DATA_OPACITY, '100');
+						params.set(URL_PARAMS.LABEL_OPACITY, '100');
+						params.set(URL_PARAMS.LATITUDE, coords[0].toFixed(5));
+						params.set(URL_PARAMS.LONGITUDE, coords[1].toFixed(5));
+						params.set(URL_PARAMS.ZOOM_LEVEL, DEFAULT_ZOOM.toString());
 
 						const newUrl = `${window.location.pathname}?${params.toString()}`;
 						lastUrlUpdateRef.current = newUrl;
@@ -499,6 +599,10 @@ export const useUrlSync = () => {
 		}
 	};
 
+	/**
+	 * Initialize the different stores and URL parameters using the window's
+	 * current URL parameters and default values.
+	 */
 	useEffect(() => {
 		if (isInitialized || urlProcessingCompleteRef.current) return;
 		const params = new URLSearchParams(window.location.search);
@@ -506,8 +610,8 @@ export const useUrlSync = () => {
 		dispatch(initializeUrlSync());
 
 		// If no URL parameters or only opacity params, initialize with defaults
-		if (params.toString().length === 0 || 
-			(params.has('dataOpacity') && params.has('labelOpacity') && params.size === 2)) {
+		if (params.toString().length === 0 ||
+			(params.has(URL_PARAMS.DATA_OPACITY) && params.has(URL_PARAMS.LABEL_OPACITY) && params.size === 2)) {
 			initializeWithDefaults();
 			return;
 		}
@@ -520,9 +624,9 @@ export const useUrlSync = () => {
 			try {
 				// First process dataset
 				const selectedDataset = await setDatasetFromUrlParams(params);
-				
+
 				// Then process variable and its parameters
-				const varId = params.get('var');
+				const varId = params.get(URL_PARAMS.VARIABLE_ID);
 				if (varId && selectedDataset) {
 					// Fetch variables for this dataset to ensure we have variable data in state
 					try {
@@ -542,20 +646,20 @@ export const useUrlSync = () => {
 							...matchedVariable,
 							datasetType: selectedDataset.dataset_type
 						};
-						
+
 						// Process all climate variable parameters
 						setClimateVariableFromUrlParams(params, variableWithDataset);
 					}
 				}
-				
+
 				// Process map opacity
 				setMapOpacityFromUrlParams(params);
-				
+
 				// Process map coordinates and zoom
 				setMapCoordinatesFromUrlParams(params);
-				
+
 				lastUrlUpdateRef.current = window.location.href;
-				
+
 				// Mark URL parameters as loaded
 				urlProcessingCompleteRef.current = true;
 				dispatch(setUrlParamsLoaded(true));
@@ -567,13 +671,28 @@ export const useUrlSync = () => {
 		})();
 	}, [dispatch, isInitialized]);
 
+	/**
+	 * Update the URL parameters when some configuration changes.
+	 *
+	 * Map location changes are ignored (they are treated in another
+	 * useEffect()).
+	 *
+	 * URL is updated with:
+	 * - climate variable configuration change
+	 * - Map opacity change
+	 * - Selected dataset change
+	 */
 	useEffect(() => {
 		if (!isInitialized || isUpdatingFromMapRef.current) return;
 		if (climateVariableData) {
 			updateUrlWithDebounce();
 		}
 	}, [climateVariableData, opacity, dataset, updateUrlWithDebounce, isInitialized]);
-	
+
+	/**
+	 * Update the window's URL parameters when the map's coordinates or zoom
+	 * change.
+	 */
 	useEffect(() => {
 		if (!isInitialized || isUpdatingFromMapRef.current) return;
 		
@@ -585,14 +704,14 @@ export const useUrlSync = () => {
 			updateTimeoutRef.current = window.setTimeout(() => {
 				const params = new URLSearchParams(window.location.search);
 				
-				params.set('lat', mapCoordinates.lat.toFixed(5));
-				params.set('lng', mapCoordinates.lng.toFixed(5));
-				params.set('zoom', mapCoordinates.zoom.toString());
+				params.set(URL_PARAMS.LATITUDE, mapCoordinates.lat.toFixed(5));
+				params.set(URL_PARAMS.LONGITUDE, mapCoordinates.lng.toFixed(5));
+				params.set(URL_PARAMS.ZOOM_LEVEL, mapCoordinates.zoom.toString());
 				
 				const currentParams = new URLSearchParams(window.location.search);
-				const currentLat = parseFloat(currentParams.get('lat') || '0');
-				const currentLng = parseFloat(currentParams.get('lng') || '0');
-				const currentZoom = parseInt(currentParams.get('zoom') || '0');
+				const currentLat = parseFloat(currentParams.get(URL_PARAMS.LATITUDE) || '0');
+				const currentLng = parseFloat(currentParams.get(URL_PARAMS.LONGITUDE) || '0');
+				const currentZoom = parseInt(currentParams.get(URL_PARAMS.ZOOM_LEVEL) || '0');
 				
 				if (
 					Math.abs(currentLat - mapCoordinates.lat) > 0.0001 ||

@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
-import L from 'leaflet';
+
+import {
+	 type LocationModalContentParams as BaseLocationModalContentParams,
+} from '@/types/climate-variable-interface';
 
 import { __ } from '@/context/locale-provider';
+
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { useAppSelector } from '@/app/hooks';
 import { useLocale } from '@/hooks/use-locale';
+
+import { useAppSelector } from '@/app/hooks';
+
 import appConfig from '@/config/app.config';
 
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import S2DVariableValues from '@/components/map-layers/s2d-variable-values';
 
-interface LocationModalContentProps {
+interface LocationModalContentProps extends BaseLocationModalContentParams {
 	title: string;
-	latlng: L.LatLng;
 	scenario: string;
-	featureId: number;
 	onDetailsClick: () => void;
 }
 

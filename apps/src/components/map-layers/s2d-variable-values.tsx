@@ -1,82 +1,116 @@
-import React, { useState } from 'react';
-
-import { type LocationModalContentParams } from '@/types/climate-variable-interface';
+import React, { memo } from 'react';
 
 import TooltipWidget from '@/components/ui/tooltip-widget';
+import ValueTemperature from '@/components/value-temperature';
+import ProgressBar, { buildProgressBarProps } from '@/components/progress-bar';
+import { formatValueTemperature } from '@/components/value-temperature';
 
-const PATTERNS_CLASS_NAME = new Map();
-PATTERNS_CLASS_NAME.set('alpha', 'text-xs uppercase text-neutral-grey-medium');
+const PATTERNS_CLASS_NAME = [
+	['alpha', 'text-xs uppercase text-neutral-grey-medium'],
+] as const;
 
-const patternKeys = [...PATTERNS_CLASS_NAME.keys()];
+const classMaps = new Map(PATTERNS_CLASS_NAME) as ReadonlyMap<string, string>;
 
-const getClassNames = (key: string): string => {
-	const attempt = PATTERNS_CLASS_NAME.get(key);
+const cn = (key: string): string => {
+	let v = '';
+	const attempt = classMaps.get(key);
 	if (!attempt) {
-		const message = `Unknown pattern key "${key}", we only have: ${patternKeys}`;
-		throw Error(message);
+		const message = `There's nothing for key: "${key}"`;
+		throw new Error(message);
 	}
-	return attempt;
+	v = attempt;
+	return v;
 };
 
-export default function S2DVariableValues({
-	mode = 'modal',
-}: Partial<LocationModalContentParams>): React.ReactNode {
-	// Question: What's the business with modal and non modal? In which other situations is this used?
-	const [currentMode, setCurrentMode] = useState(mode);
-	// See in:
-	// -  MedianOnlyVariableValues
-	// Something to manipulate in DevTools until we fix workspace to have proper React DevTools
-	Reflect.set(window, 'CURRENT_WORK_ITEM_TEMPORARY_HANDLE', {
-		currentMode,
-		setCurrentMode,
+const ft = (value: number): string =>
+	formatValueTemperature({
+		value: String(value),
+		unit: 'celsius',
+		locale: 'fr-CA',
 	});
 
+export default memo(function S2DVariableValues(): React.ReactNode {
 	return (
 		<>
 			<div className="mt-4 mb-4">
 				<div className="flex mb-3" data-comment="1st Row">
 					<div
-						className="w-1/2 bg-red-300"
+						className="w-1/2"
 						data-comment="Top Left"
 						title="Range description"
 					>
 						<div className="mb-1 text-2xl text-brand-blue">
 							July to Sept.
 						</div>
-						<div className={getClassNames('alpha')}>SEASONAL</div>
+						<div className={cn('alpha')}>
+							SEASONAL
+						</div>
 					</div>
 					<div
-						className="w-1/2 bg-orange-300"
+						className="w-1/2"
 						data-comment="Top Right"
 						title="Skill widget thing"
 					>
-						<div className="flex flex-row gap-2 control-title">
-							<div className={getClassNames('alpha')}>
-								SKILL LEVEL
+						<div className="grid grid-cols-1 place-content-center gap-4 p-8">
+							<div className="flex flex-row items-center justify-center gap-2">
+								<div className={cn('alpha')}>SKILL LEVEL</div>
+								<TooltipWidget tooltip="Skill Level tooltip text" />
 							</div>
-							<TooltipWidget tooltip="Skill Level tooltip text" />
 						</div>
 					</div>
 				</div>
 				<div className="flex mb-3" data-comment="2nd Row">
 					<div
-						className="w-1/2 bg-red-500"
+						className="w-1/2"
 						data-comment="1st Left"
 						title="Historical Median"
 					>
 						<div className="text-2xl text-brand-blue">
-							1.3 deg C
+							<ValueTemperature value="1.3" />
 						</div>
 						<div className="flex flex-row gap-2 control-title">
-							<div className={getClassNames('alpha')}>
+							<div className={cn('alpha')}>
 								HISTORICAL MEDIAN
 							</div>
 							<TooltipWidget tooltip="Historical Median tooltip text" />
 						</div>
 						<div className="text-xs">(1991-2020)</div>
 					</div>
+					<div
+						className="w-1/2 bg-slate-100"
+						data-comment="1st Right"
+						title="TBD"
+					>
+						&nbsp;
+					</div>
+				</div>
+				<div className="flex flex-col mb-3" data-comment="3rd Row">
+					<div className="text-xs uppercase text-neutral-grey-medium mb-3">
+						SEASONAL MEAN TEMPERATURE PROBABILITY:
+					</div>
+					<ProgressBar
+						{...buildProgressBarProps(
+							`Above ${ft(7.5)}`,
+							11,
+							'warm'
+						)}
+					/>
+					<ProgressBar
+						{...buildProgressBarProps(
+							`${ft(-4.9)} to ${ft(7.5)}`,
+							34,
+							'neutral'
+						)}
+					/>
+					<ProgressBar
+						{...buildProgressBarProps(
+							`Below ${ft(-4.9)}`,
+							55,
+							'cool'
+						)}
+					/>
 				</div>
 			</div>
 		</>
 	);
-}
+});

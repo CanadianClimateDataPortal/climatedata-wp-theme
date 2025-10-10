@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import ValueTemperature from '@/components/value-temperature';
-import ProgressBar, { buildProgressBarProps } from '@/components/progress-bar';
+import ProgressBar, { buildProgressBarProps, ProgressBarTwo } from '@/components/progress-bar';
 import { formatValueTemperature } from '@/components/value-temperature';
 
 const PATTERNS_CLASS_NAME = [
@@ -88,14 +88,14 @@ export default memo(function S2DVariableValues(): React.ReactNode {
 					<div className="text-xs uppercase text-neutral-grey-medium mb-3">
 						SEASONAL MEAN TEMPERATURE PROBABILITY:
 					</div>
-					<ProgressBar
+					<ProgressBarTwo
 						{...buildProgressBarProps(
 							`Above ${ft(7.5)}`,
 							11,
 							'warm'
 						)}
 					/>
-					<ProgressBar
+					<ProgressBarTwo
 						{...buildProgressBarProps(
 							`${ft(-4.9)} to ${ft(7.5)}`,
 							34,

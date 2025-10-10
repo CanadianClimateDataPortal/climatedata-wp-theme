@@ -1,4 +1,7 @@
-import React, { memo } from 'react';
+import {
+	memo,
+	type ReactNode,
+} from 'react';
 
 import {
 	formatValueTemperature,
@@ -16,7 +19,7 @@ export default memo(function ValueTemperatureFn({
 	locale = 'fr-CA',
 	unit = 'celsius',
 	value,
-}: ValueTemperatureProps): React.ReactNode {
+}: ValueTemperatureProps): ReactNode {
 	const formatted = formatValueTemperature({
 		locale,
 		unit,

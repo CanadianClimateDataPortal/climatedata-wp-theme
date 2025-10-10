@@ -1,4 +1,7 @@
-import React, { memo } from 'react';
+import {
+	memo,
+	type ReactNode,
+} from 'react';
 
 import {
 	buildProgressBarProps,
@@ -12,14 +15,33 @@ export {
 	type ProgressBarProps,
 };
 
+/**
+ * TODO:
+ *
+ * See how radix-ui does it, and accessibility ("meter pattern")
+ *
+ * https://www.radix-ui.com/primitives/docs/components/progress
+ * https://www.w3.org/WAI/ARIA/apg/patterns/meter/
+ */
 export const ProgressBar = memo(function ProgressBarFn({
 	label,
 	percent,
-	fillColor,
-	textColor,
-}: ProgressBarProps): React.ReactNode {
+	classMap,
+}: ProgressBarProps): ReactNode {
+	const {
+		fillColor,
+		textColor,
+	} = classMap;
+	const screenReaderOnly = `Horizontal bar at ${percent}% filled`;
 	return (
-		<div className="relative w-full h-10 mb-2">
+		<div
+			className="relative w-full h-10 mb-2"
+			role="meter"
+			aria-valuemin="0"
+			aria-valuemax="100"
+			aria-valuenow={percent}
+			title={screenReaderOnly}
+		>
 			<div className="absolute inset-0 bg-gray-100 rounded"></div>
 			<div
 				className={`absolute inset-y-0 left-0 rounded ${fillColor}`}
@@ -35,7 +57,7 @@ export const ProgressBar = memo(function ProgressBarFn({
 	);
 });
 
-export default ProgressBar
+export default ProgressBar;
 
 export const ProgressBarTwo = memo(function ProgressBarTwoFn({
 	label,
@@ -43,10 +65,7 @@ export const ProgressBarTwo = memo(function ProgressBarTwoFn({
 	classMap,
 }: ProgressBarProps): React.ReactNode {
 	const screenReaderOnly = `Horizontal bar at ${percent}% filled`;
-	const {
-		textColor,
-		svgFillColor,
-	} = classMap
+	const { textColor, svgFillColor } = classMap;
 	return (
 		<div title={screenReaderOnly} className={`mb-2`}>
 			<svg width="100%" height="40">

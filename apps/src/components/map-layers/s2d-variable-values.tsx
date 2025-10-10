@@ -1,26 +1,25 @@
-import React, { memo } from 'react';
+import {
+	memo,
+	useState,
+	useEffect,
+	type ReactNode,
+} from 'react';
+
+import { __ } from '@/context/locale-provider';
+
+import { formatValueTemperature } from '@/lib/value-temperature';
+import {
+	classNameMappingForS2DVariableValues,
+	type S2DVariableValuesComponentProps,
+} from '@/lib/s2d-variable-values';
 
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import ValueTemperature from '@/components/value-temperature';
-import ProgressBar, { buildProgressBarProps, ProgressBarTwo } from '@/components/progress-bar';
-import { formatValueTemperature } from '@/components/value-temperature';
-
-const PATTERNS_CLASS_NAME = [
-	['alpha', 'text-xs uppercase text-neutral-grey-medium'],
-] as const;
-
-const classMaps = new Map(PATTERNS_CLASS_NAME) as ReadonlyMap<string, string>;
-
-const cn = (key: string): string => {
-	let v = '';
-	const attempt = classMaps.get(key);
-	if (!attempt) {
-		const message = `There's nothing for key: "${key}"`;
-		throw new Error(message);
-	}
-	v = attempt;
-	return v;
-};
+import {
+	default as ProgressBar,
+	buildProgressBarProps,
+	ProgressBarTwo,
+} from '@/components/progress-bar';
 
 const ft = (value: number): string =>
 	formatValueTemperature({
@@ -29,7 +28,86 @@ const ft = (value: number): string =>
 		locale: 'fr-CA',
 	});
 
-export default memo(function S2DVariableValues(): React.ReactNode {
+const helper = classNameMappingForS2DVariableValues;
+
+const joinRangeWord = __('to');
+
+/**
+ * This will be much easier when #622 is merged
+ */
+const formatDateRangeAsText = (range: [Date, Date]): string => {
+	let out: string = '';
+
+	let parts = [
+		range?.[0]?.getMonth(),
+		range?.[1]?.getMonth(),
+	].map(
+		(i) => String(i) + 'th'
+	);
+
+	parts = ['July', 'Sept']; // TODO using #622
+
+	if (parts.length === 2) {
+		out += parts.join(` ${joinRangeWord} `) + '.';
+	}
+
+	return out;
+};
+
+const formatDateRangeYearsAsText = ([begin, end]: [Date, Date]): string => {
+	let out: string = '';
+
+	const parts = [+begin.getFullYear(), +end.getFullYear()];
+
+	out += parts.join(' - ');
+
+	return out;
+};
+
+const formatTemperatureRangeAsText = (
+	input: S2DVariableValuesComponentProps['temperatureRange']
+) => {
+	let out: string = '';
+
+	const parts = (input ?? []).map((v, idx, arr) => {
+		if (arr.length === 2) {
+			if (idx === 0) {
+				return ft(v).split(' ')[0];
+			} else {
+				return ft(v);
+			}
+		}
+	});
+	if (parts.length === 2) {
+		out = parts.join(` ${joinRangeWord} `);
+	}
+
+	return out;
+};
+
+export default memo(function S2DVariableValues(
+	props: S2DVariableValuesComponentProps
+): ReactNode {
+	const { dateRange, temperatureRange, historicalMedian } = props;
+
+	const [dateRangeAsText, dateRangeAsTextSetter] = useState('...');
+	const [dateRangeYearsText, dateRangeYearsTextSetter] = useState('');
+	const [temperatureRangeAsText, temperatureRangeAsTextSetter] = useState('');
+
+	useEffect(() => {
+		dateRangeAsTextSetter(formatDateRangeAsText(dateRange));
+		dateRangeYearsTextSetter(formatDateRangeYearsAsText(dateRange));
+		temperatureRangeAsTextSetter(formatTemperatureRangeAsText(temperatureRange));
+	}, [
+		dateRange,
+		dateRangeAsTextSetter,
+		dateRangeYearsTextSetter,
+		temperatureRange,
+		temperatureRangeAsTextSetter,
+	]);
+
+	const { emphasisText, smallSubTitleUnderEmphasis } = helper.get();
+
 	return (
 		<>
 			<div className="mt-4 mb-4">
@@ -39,11 +117,11 @@ export default memo(function S2DVariableValues(): React.ReactNode {
 						data-comment="Top Left"
 						title="Range description"
 					>
-						<div className="mb-1 text-2xl text-brand-blue">
-							July to Sept.
+						<div className={`mb-1 ${emphasisText}`}>
+							{dateRangeAsText}
 						</div>
-						<div className={cn('alpha')}>
-							SEASONAL
+						<div className={`${smallSubTitleUnderEmphasis}`}>
+							{__('Seasonal')}
 						</div>
 					</div>
 					<div
@@ -53,7 +131,11 @@ export default memo(function S2DVariableValues(): React.ReactNode {
 					>
 						<div className="grid grid-cols-1 place-content-center gap-4 p-8">
 							<div className="flex flex-row items-center justify-center gap-2">
-								<div className={cn('alpha')}>SKILL LEVEL</div>
+								<div
+									className={`${smallSubTitleUnderEmphasis}`}
+								>
+									{__('Skill Level')}
+								</div>
 								<TooltipWidget tooltip="Skill Level tooltip text" />
 							</div>
 						</div>
@@ -65,27 +147,26 @@ export default memo(function S2DVariableValues(): React.ReactNode {
 						data-comment="1st Left"
 						title="Historical Median"
 					>
-						<div className="text-2xl text-brand-blue">
-							<ValueTemperature value="1.3" />
+						<div className={`${emphasisText}`}>
+							<ValueTemperature value={historicalMedian?.value} />
 						</div>
 						<div className="flex flex-row gap-2 control-title">
-							<div className={cn('alpha')}>
-								HISTORICAL MEDIAN
+							<div className={`${smallSubTitleUnderEmphasis}`}>
+								{__('Historical Median')}
 							</div>
 							<TooltipWidget tooltip="Historical Median tooltip text" />
 						</div>
-						<div className="text-xs">(1991-2020)</div>
+						<div className="text-xs">({dateRangeYearsText})</div>
 					</div>
-					<div
-						className="w-1/2 bg-slate-100"
-						data-comment="1st Right"
-						title="TBD"
-					>
+					<div className="w-1/2" data-comment="1st Right" title="TBD">
+						<div className={`${emphasisText}`}>
+							{temperatureRangeAsText}
+						</div>
 						&nbsp;
 					</div>
 				</div>
-				<div className="flex flex-col mb-3" data-comment="3rd Row">
-					<div className="text-xs uppercase text-neutral-grey-medium mb-3">
+				<div className="flex flex-col mb-3 pt-2" data-comment="3rd Row">
+					<div className={`${smallSubTitleUnderEmphasis} mb-3`}>
 						SEASONAL MEAN TEMPERATURE PROBABILITY:
 					</div>
 					<ProgressBarTwo

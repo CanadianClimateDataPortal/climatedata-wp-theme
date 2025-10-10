@@ -1,4 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import {
+	useState,
+	useEffect,
+	type FC,
+} from 'react';
+
 import { ArrowRight } from 'lucide-react';
 
 import {
@@ -15,7 +20,6 @@ import { useAppSelector } from '@/app/hooks';
 import appConfig from '@/config/app.config';
 
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
-import S2DVariableValues from '@/components/map-layers/s2d-variable-values';
 
 interface LocationModalContentProps extends BaseLocationModalContentParams {
 	title: string;
@@ -31,7 +35,7 @@ interface LocationModalContentProps extends BaseLocationModalContentParams {
  *  - subtitle (current dataset, current climate variable, current version, current scenario)
  *  - button to open charts panel
  */
-export const LocationModalContent: React.FC<LocationModalContentProps> = ({
+export const LocationModalContent: FC<LocationModalContentProps> = ({
 	title,
 	latlng,
 	scenario,
@@ -43,7 +47,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const { dataset } = useAppSelector((state) => state.map);
 	const variableList = useAppSelector((state) => state.map.variableList);
 
-	const [isS2D, setIsS2D] = useState<boolean>(false);
+	const [isS2D, isS2DSetter] = useState<boolean>(false);
 
 	// Displayed info
 	const datasetLabel = getLocalized(dataset);
@@ -65,13 +69,13 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 		if (climateVariable) {
 			const testing = climateVariable instanceof S2DClimateVariable;
 			if (testing !== isS2D) {
-				setIsS2D(testing);
+				isS2DSetter(testing);
 			}
 		}
 	}, [
 		climateVariable,
 		isS2D,
-		setIsS2D,
+		isS2DSetter,
 	]);
 
 	return (
@@ -91,16 +95,12 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 				}
 			</p>
 
-			{isS2D && (
-				<S2DVariableValues />
-			)}
-
-			{!isS2D &&
-				climateVariable?.getLocationModalContent({
+			{climateVariable?.getLocationModalContent({
 					latlng,
 					featureId,
 					scenario,
 				})}
+
 			{!isS2D && (
 				<p className="text-right">
 					<a

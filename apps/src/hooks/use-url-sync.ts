@@ -16,10 +16,6 @@ import { ClimateVariables } from '@/config/climate-variables.config';
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
-	ForecastDisplay,
-	ForecastDisplays,
-	ForecastType,
-	ForecastTypes,
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
 import { fetchPostsData, fetchTaxonomyData } from '@/services/services';
@@ -28,6 +24,7 @@ import { normalizePostData } from '@/lib/format';
 import { store } from '@/app/store';
 import { CANADA_CENTER, DEFAULT_ZOOM } from '@/lib/constants';
 import { MapItemsOpacity } from '@/types/types';
+import { AssertionError, assertIsForecastDisplay, assertIsForecastType } from '@/types/assertions';
 
 /**
  * Name of URL parameters.
@@ -355,18 +352,26 @@ export const useUrlSync = () => {
 		}
 
 		if (params.has(URL_PARAMS.FORECAST_TYPE)) {
-			const paramValue = params.get(URL_PARAMS.FORECAST_TYPE) as ForecastType;
-
-			if (Object.values(ForecastTypes).includes(paramValue)) {
+			try {
+				const paramValue = params.get(URL_PARAMS.FORECAST_TYPE) ?? '';
+				assertIsForecastType(paramValue);
 				newConfig.forecastType = paramValue;
+			} catch (error) {
+				if (!(error instanceof AssertionError)) {
+					throw error;
+				}
 			}
 		}
 
 		if (params.has(URL_PARAMS.FORECAST_DISPLAY)) {
-			const paramValue = params.get(URL_PARAMS.FORECAST_DISPLAY) as ForecastDisplay;
-
-			if (Object.values(ForecastDisplays).includes(paramValue)) {
+			try {
+				const paramValue = params.get(URL_PARAMS.FORECAST_DISPLAY) ?? '';
+				assertIsForecastDisplay(paramValue);
 				newConfig.forecastDisplay = paramValue;
+			} catch (error) {
+				if (!(error instanceof AssertionError)) {
+					throw error;
+				}
 			}
 		}
 

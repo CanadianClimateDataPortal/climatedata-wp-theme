@@ -11,6 +11,10 @@ import {
 	FieldConfig,
 	FieldValues,
 	FileFormatType,
+	ForecastDisplay,
+	ForecastDisplays,
+	ForecastType,
+	ForecastTypes,
 	FrequencyConfig,
 	FrequencyType,
 	GridCoordinates,
@@ -481,6 +485,14 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	updateMapWMSParams(params: WMSParams, isComparisonMap: boolean): WMSParams {
 		return params;
+	}
+
+	getForecastType(): ForecastType {
+		return this._config.forecastType ?? ForecastTypes.EXPECTED;
+	}
+
+	getForecastDisplay(): ForecastDisplay {
+		return this._config.forecastDisplay ?? ForecastDisplays.FORECAST;
 	}
 }
 

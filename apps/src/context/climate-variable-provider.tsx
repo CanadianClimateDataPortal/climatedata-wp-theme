@@ -14,6 +14,8 @@ import {
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface,
 	FileFormatType,
+	ForecastDisplay,
+	ForecastType,
 	GridCoordinates,
 	GridRegion,
 	InteractiveRegionOption,
@@ -57,6 +59,8 @@ export type ClimateVariableContextType = {
 	resetSelectedPoints: () => void;
 	setSelectedRegion: (region: GridRegion) => void;
 	resetSelectedRegion: () => void;
+	setForecastType: (forecastType: ForecastType) => void;
+	setForecastDisplay: (display: ForecastDisplay) => void;
 };
 
 type ClassMapType = Record<
@@ -451,6 +455,28 @@ export const ClimateVariableProvider: React.FC<{
 		[dispatch]
 	);
 
+	const setForecastType = useCallback(
+		(forecastType: ForecastType) => {
+			dispatch(
+				updateClimateVariable({
+					forecastType,
+				})
+			);
+		},
+		[dispatch]
+	);
+
+	const setForecastDisplay = useCallback(
+		(forecastDisplay: ForecastDisplay) => {
+			dispatch(
+				updateClimateVariable({
+					forecastDisplay,
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -480,6 +506,8 @@ export const ClimateVariableProvider: React.FC<{
 		resetSelectedPoints,
 		setSelectedRegion,
 		resetSelectedRegion,
+		setForecastType,
+		setForecastDisplay,
 	};
 
 	return (

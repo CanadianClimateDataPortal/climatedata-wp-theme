@@ -61,7 +61,6 @@ export type ClimateVariableContextType = {
 	resetSelectedRegion: () => void;
 	setForecastType: (forecastType: ForecastType) => void;
 	setForecastDisplay: (display: ForecastDisplay) => void;
-	setIsLowSkillMasked: (masked: boolean) => void;
 };
 
 type ClassMapType = Record<
@@ -478,17 +477,6 @@ export const ClimateVariableProvider: React.FC<{
 		[dispatch]
 	);
 
-	const setIsLowSkillMasked = useCallback(
-		(masked: boolean) => {
-			dispatch(
-				updateClimateVariable({
-					isLowSkillMasked: masked,
-				})
-			);
-		},
-		[dispatch]
-	);
-
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -520,7 +508,6 @@ export const ClimateVariableProvider: React.FC<{
 		resetSelectedRegion,
 		setForecastType,
 		setForecastDisplay,
-		setIsLowSkillMasked,
 	};
 
 	return (

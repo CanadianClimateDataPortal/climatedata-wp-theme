@@ -42,17 +42,17 @@ export interface ThresholdInterface {
 export type InteractiveMode = 'region' | 'station';
 
 export enum InteractiveRegionOption {
-	GRIDDED_DATA = "gridded_data",
-	CENSUS = "census",
-	HEALTH = "health",
-	WATERSHED = "watershed",
+	GRIDDED_DATA = 'gridded_data',
+	CENSUS = 'census',
+	HEALTH = 'health',
+	WATERSHED = 'watershed',
 }
 
 export enum InteractiveRegionDisplay {
-	MAP = "map",
-	DOWNLOAD = "download",
-	ALWAYS = "always",
-	NONE = "none",
+	MAP = 'map',
+	DOWNLOAD = 'download',
+	ALWAYS = 'always',
+	NONE = 'none',
 }
 
 export type InteractiveRegionConfig = {
@@ -60,30 +60,34 @@ export type InteractiveRegionConfig = {
 }
 
 export enum FrequencyDisplayModeOption {
-	MAP = "map",
-	DOWNLOAD = "download",
-	ALWAYS = "always",
-	NONE = "none",
+	MAP = 'map',
+	DOWNLOAD = 'download',
+	ALWAYS = 'always',
+	NONE = 'none',
 }
 
 export enum FrequencyType {
-	ANNUAL = "ann",
-	ANNUAL_JUL_JUN = "annual_jul_jun",
-	MONTHLY = "months",
-	SEASONAL = "seasons",
-	ALL_MONTHS = "allMonths",
-	DAILY = "daily",
+	ANNUAL = 'ann',
+	ANNUAL_JUL_JUN = 'annual_jul_jun',
+	MONTHLY = 'months',
+	SEASONAL = 'seasons',
+	ALL_MONTHS = 'allMonths',
+	DAILY = 'daily',
 }
 
-export enum ForecastType {
-	EXPECTED = "expected",
-	UNUSUAL = "unusual",
-}
+export const ForecastTypes = {
+	EXPECTED: 'expected',
+	UNUSUAL: 'unusual',
+} as const;
 
-export enum ForecastDisplay {
-	FORECAST = "forecast",
-	CLIMATOLOGY = "climatology",
-}
+export type ForecastType = typeof ForecastTypes[keyof typeof ForecastTypes];
+
+export const ForecastDisplays = {
+	FORECAST: 'forecast',
+	CLIMATOLOGY: 'climatology',
+} as const;
+
+export type ForecastDisplay = typeof ForecastDisplays[keyof typeof ForecastDisplays];
 
 export type FrequencyConfig = {
 	[K in FrequencyType]?: FrequencyDisplayModeOption;
@@ -115,29 +119,29 @@ export interface DateRangeConfig {
 	min: string;
 	max: string;
 	interval: number;
-	type?: "year" | "day";
+	type?: 'year' | 'day';
 }
 
 export enum AveragingType {
-	ALL_YEARS = "allYears",
-	THIRTY_YEARS = "30years",
+	ALL_YEARS = 'allYears',
+	THIRTY_YEARS = '30years',
 }
 
 export enum DownloadType {
-	PRECALCULATED = "precalculated",
-	ANALYZED = "analyzed",
+	PRECALCULATED = 'precalculated',
+	ANALYZED = 'analyzed',
 }
 
 export enum FileFormatType {
-	CSV = "csv",
-	JSON = "json",
-	NetCDF = "netcdf",
-	GeoJSON = "geojson",
+	CSV = 'csv',
+	JSON = 'json',
+	NetCDF = 'netcdf',
+	GeoJSON = 'geojson',
 }
 
 export enum ColourType {
-	CONTINUOUS = "ramp",
-	DISCRETE = "intervals",
+	CONTINUOUS = 'ramp',
+	DISCRETE = 'intervals',
 }
 
 export interface CustomColourSchemeColour {
@@ -192,13 +196,13 @@ export interface LocationModalContentParams {
 	latlng: L.LatLng,
 	featureId: number,
 	scenario?: string,
-	mode?: "modal" | "panel"
+	mode?: 'modal' | 'panel'
 }
 
 export enum FrequencyType {
-	YS = "ys",
-	MS = "ms",
-	QSDEC = "qsdec",
+	YS = 'ys',
+	MS = 'ms',
+	QSDEC = 'qsdec',
 }
 
 export type PreCalculatedCanDCSConfig = {
@@ -287,7 +291,7 @@ export interface ClimateVariableConfigInterface {
 	/** Indicates whether delta (difference) values are available */
 	hasDelta?: boolean;
 
-	/** Currently selected data value */
+	/** Currently selected data value (ex: delta, absolute) */
 	dataValue?: string | null;
 
 	/** Custom color scheme used for visualizing the variable */
@@ -402,11 +406,6 @@ export interface ClimateVariableConfigInterface {
 	 * For S2D variables, the selected forecast display.
 	 */
 	forecastDisplay?: ForecastDisplay;
-
-	/**
-	 * For S2D variables, if the "low skill" mask is shown.
-	 */
-	isLowSkillMasked?: boolean;
 }
 
 /**
@@ -563,6 +562,4 @@ export interface ClimateVariableInterface {
 	getForecastType(): ForecastType | null;
 
 	getForecastDisplay(): ForecastDisplay | null;
-
-	isLowSkillMasked(): boolean | null;
 }

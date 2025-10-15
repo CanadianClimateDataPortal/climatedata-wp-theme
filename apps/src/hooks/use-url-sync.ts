@@ -24,7 +24,11 @@ import { normalizePostData } from '@/lib/format';
 import { store } from '@/app/store';
 import { CANADA_CENTER, DEFAULT_ZOOM } from '@/lib/constants';
 import { MapItemsOpacity } from '@/types/types';
-import { AssertionError, assertIsForecastDisplay, assertIsForecastType } from '@/types/assertions';
+import {
+	AssertionError,
+	assertIsForecastDisplay,
+	assertIsForecastType,
+} from '@/types/assertions';
 
 /**
  * Name of URL parameters.

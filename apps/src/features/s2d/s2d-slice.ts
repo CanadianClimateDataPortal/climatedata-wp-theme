@@ -23,8 +23,8 @@ import { RootState } from '@/app/store';
 type ReleaseDateKey = string;
 
 interface S2DStoreState {
-	releaseDateCache: Record<string, string>;
-	releaseDateLoading: Record<string, boolean>;
+	releaseDateCache: Record<ReleaseDateKey, string>;
+	releaseDateLoading: Record<ReleaseDateKey, boolean>;
 }
 
 const initialState: S2DStoreState = {

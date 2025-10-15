@@ -1,21 +1,32 @@
-import {
-	type ReactNode,
-	useMemo,
-} from 'react';
+import { type ReactNode } from 'react';
 import { __ } from '@/context/locale-provider';
 
 import Dropdown from '@/components/ui/dropdown';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 
-import { SidebarMenuItem } from '@/components/ui/sidebar';
-import { SidebarSeparator } from '@/components/ui/sidebar';
+import { SidebarMenuItem, SidebarSeparator } from '@/components/ui/sidebar';
 import { Checkbox } from '@/components/ui/checkbox';
 
-import { TimePeriodsControlSingle } from '@/components/sidebar-menu-items/time-periods-control-single';
+import { formatUTCDate } from '@/lib/utils';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import {
+	ForecastDisplay,
+	ForecastDisplays,
+	ForecastType,
+	ForecastTypes,
+	FrequencyType,
+} from '@/types/climate-variable-interface';
+import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import {
+	selectLowSkillVisibility,
+	setLowSkillVisibility,
+} from '@/features/map/map-slice';
 
 export interface ReleaseDateProps {
-	date?: string;
+	date?: Date | null;
 	tooltip?: ReactNode;
+	locale: string;
 }
 
 const tooltipForecastTypes = __(
@@ -60,8 +71,8 @@ const fieldForecastTypes = {
 	key: 'forecast_types',
 	label: __('Forecast Types'),
 	options: [
-		{ value: 'foo', label: __('Expected Conditions') },
-		{ value: 'bar', label: __('Unusual Conditions') },
+		{ value: ForecastTypes.EXPECTED, label: __('Expected Conditions') },
+		{ value: ForecastTypes.UNUSUAL, label: __('Unusual Conditions') },
 	],
 };
 
@@ -69,8 +80,8 @@ const fieldForecastDisplay = {
 	key: 'forecast_display',
 	label: __('Forecast Display'),
 	options: [
-		{ value: 'forecast', label: __('Forecast') },
-		{ value: 'climatology', label: __('Climatology') },
+		{ value: ForecastDisplays.FORECAST, label: __('Forecast') },
+		{ value: ForecastDisplays.CLIMATOLOGY, label: __('Climatology') },
 	],
 };
 
@@ -78,43 +89,63 @@ const fieldFrequencies = {
 	key: 'frequencies',
 	label: __('Frequencies'),
 	options: [
-		{ value: 'monthly', label: __('Monthly') },
-		{ value: 'seasonal', label: __('Seasonal (3 months)') },
-		{ value: 'decadal', label: __('Decadal (5 years)') },
+		{ value: FrequencyType.MONTHLY, label: __('Monthly') },
+		{ value: FrequencyType.SEASONAL, label: __('Seasonal (3 months)') },
 	],
 };
 
 export const SidebarInnerS2D = () => {
+	const {
+		climateVariable,
+		setForecastType,
+		setForecastDisplay,
+		setFrequency,
+	} = useClimateVariable();
+
+	const dispatch = useAppDispatch();
+	const isLowSkillMasked = ! useAppSelector(selectLowSkillVisibility());
+	const forecastType =
+		climateVariable?.getForecastType() ?? ForecastTypes.EXPECTED;
+	const forecastDisplay =
+		climateVariable?.getForecastDisplay() ?? ForecastDisplays.FORECAST;
+	const frequency = climateVariable?.getFrequency() ?? FrequencyType.MONTHLY;
+
+	const handleLowSkillHideChange = (checked: boolean) => {
+		const isVisible = !checked; // "checked" means "hide low skill"
+		dispatch(setLowSkillVisibility({ visible: isVisible }));
+	};
+
 	return (
 		<>
 			<SidebarMenuItem>
-				<Dropdown
+				<Dropdown<ForecastType>
 					key={fieldForecastTypes.key}
 					placeholder={SelectAnOptionLabel}
 					options={fieldForecastTypes.options}
 					label={fieldForecastTypes.label}
-					value={fieldForecastTypes.options[0].value}
+					value={forecastType}
 					tooltip={tooltipForecastTypes}
-					onChange={() => void 0}
+					onChange={setForecastType}
 				/>
 			</SidebarMenuItem>
 
 			<SidebarMenuItem>
 				<div className="flex flex-col gap-4">
-					<Dropdown
+					<Dropdown<ForecastDisplay>
 						key={fieldForecastDisplay.key}
 						placeholder={SelectAnOptionLabel}
 						options={fieldForecastDisplay.options}
 						label={fieldForecastDisplay.label}
-						value={fieldForecastDisplay.options[0].value}
+						value={forecastDisplay}
 						tooltip={tooltipForecastDisplay}
-						onChange={() => void 0}
+						onChange={setForecastDisplay}
 					/>
 					<div className="flex items-center space-x-2">
 						<Checkbox
 							id={fieldForecastDisplay.key + '_compare'}
 							className="text-brand-red"
-							onCheckedChange={() => void 0}
+							checked={isLowSkillMasked}
+							onCheckedChange={handleLowSkillHideChange}
 						/>
 						<label
 							htmlFor={fieldForecastDisplay.key + '_compare'}
@@ -132,21 +163,19 @@ export const SidebarInnerS2D = () => {
 			<SidebarSeparator />
 
 			<SidebarMenuItem>
-				<Dropdown
+				<Dropdown<string>
 					key={fieldFrequencies.key}
 					placeholder={SelectAnOptionLabel}
 					options={fieldFrequencies.options}
 					label={fieldFrequencies.label}
-					value={fieldFrequencies.options[0].value}
+					value={frequency}
 					tooltip={tooltipFrequencies}
-					onChange={() => void 0}
+					onChange={setFrequency}
 				/>
 			</SidebarMenuItem>
 
 			<SidebarMenuItem className="mt-4">
-				<TimePeriodsControlSingle
-					tooltip={tooltipTimePeriods}
-				 />
+				<TimePeriodsControlS2D tooltip={tooltipTimePeriods} />
 			</SidebarMenuItem>
 		</>
 	);
@@ -154,25 +183,47 @@ export const SidebarInnerS2D = () => {
 
 SidebarInnerS2D.displayName = 'SidebarInnerS2D'
 
+/**
+ * Component displaying the release date for the sidebar.
+ *
+ * Shows a loading message if the release date is not yet available.
+ *
+ * @param locale - Locale to use for formatting the date.
+ * @param releaseDate - Release date to display.
+ */
 export const SidebarFooterReleaseDate = ({
-	date = '2025-10-06',
+	date,
 	tooltip,
+	locale = 'en',
 }: ReleaseDateProps) => {
 
-	const formattedDate = useMemo(() => {
-		// TODO: Discuss where to get locale, and formatting.
-		return date;
-	}, [date]);
+	let releaseDateElement = (
+		<span className="font-medium text-gray-400">{__('Loading...')}</span>
+	);
 
-	return (
-		<div className="flex flex-row justify-start gap-2 p-2 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
-			<span>{__('Release date:')}&nbsp;</span>
+	if (date) {
+		const formattedDate = date.toLocaleDateString(locale, {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric',
+			timeZone: 'UTC',
+		});
+
+		releaseDateElement = (
 			<time
-				className="font-medium"
-				dateTime={date}
+				dateTime={formatUTCDate(date, 'yyyy-MM-dd')}
 			>
 				{formattedDate}
 			</time>
+		);
+	}
+
+	return (
+		<div className="flex flex-row flex-nowrap gap-1 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
+			<span>
+				{__('Release date:')}&nbsp;
+				{releaseDateElement}
+			</span>
 			<TooltipWidget
 				tooltip={tooltip ?? tooltipReleaseDate}
 			/>

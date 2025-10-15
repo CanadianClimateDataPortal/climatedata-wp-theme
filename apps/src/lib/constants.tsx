@@ -2,7 +2,10 @@ import type { LatLngBounds, LatLngExpression } from 'leaflet';
 import L from 'leaflet';
 import { ColourScheme, ColourSchemeType, DatasetKey } from '@/types/types';
 import { MAP_CONFIG } from '@/config/map.config';
-import { FrequencyType } from '@/types/climate-variable-interface';
+import {
+	FrequencyType,
+	S2DFrequencyType,
+} from '@/types/climate-variable-interface';
 
 import mapPinIcon from '@/assets/map-pin.svg';
 
@@ -185,7 +188,7 @@ export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
 /**
  * For S2D variables, the number of available periods for each frequency type.
  */
-export const S2D_NB_PERIODS = {
+export const S2D_NB_PERIODS: { [key in S2DFrequencyType]: number } = {
 	[FrequencyType.MONTHLY]: 3,
 	[FrequencyType.SEASONAL]: 10,
 };

@@ -75,6 +75,13 @@ export enum FrequencyType {
 	DAILY = 'daily',
 }
 
+/**
+ * Type for the supported frequency types for S2D variables.
+ *
+ * A subset of `FrequencyType`.
+ */
+export type S2DFrequencyType = FrequencyType.MONTHLY | FrequencyType.SEASONAL;
+
 export const ForecastTypes = {
 	EXPECTED: 'expected',
 	UNUSUAL: 'unusual',

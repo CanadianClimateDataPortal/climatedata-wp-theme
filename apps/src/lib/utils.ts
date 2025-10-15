@@ -426,7 +426,7 @@ export function parseLatLon(text: string): ParsedLatLon | null {
  * @returns A Date object representing the parsed date, or null if the string
  *   cannot be parsed as a date.
  */
-export function parseUTCDate(dateString: string): Date | null {
+export function utc(dateString: string): Date | null {
 	const parsedDate = new Date(dateString);
 
 	if (Number.isNaN(parsedDate.valueOf())) {

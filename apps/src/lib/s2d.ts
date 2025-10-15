@@ -1,42 +1,47 @@
 import { S2D_NB_PERIODS } from '@/lib/constants';
-import { FrequencyType } from '@/types/climate-variable-interface';
-import { formatUTCDate, parseUTCDate } from '@/lib/utils';
+import {
+	FrequencyType,
+	S2DFrequencyType,
+} from '@/types/climate-variable-interface';
+import { formatUTCDate, utc } from '@/lib/utils';
 
 export type PeriodRange = [Date, Date];
 
 /**
  * Return the time periods for a release date and specific frequency.
  *
- * The number, length and start of time periods depend on the frequency and the
- * release date. See `S2D_NB_PERIODS` in '@/lib/constants'
+ * The number and length of time periods depend on the frequency:
+ * - Seasonal frequency: 10 x 3-month periods, at 1-month interval
+ * - Monthly frequency: 3 x 1-month periods, at 1-month interval
  *
- * For example, for a frequency of 'monthly', we have 3 time periods of one
- * month. They are for the first three months starting from the release date's
- * month.
+ * The first period starts on the same month as the release date. A period start
+ * is always the first day of the month, and a period end is always the last
+ * day of the month.
  *
- * ```
+ * All dates are in UTC time.
+ *
+ * @example
+ * ```typescript
  * const releaseDate = new Date('2025-10-15');
  * const periods = getPeriods(releaseDate, FrequencyType.MONTHLY);
  * // Returned periods are (as array of Date instances): [
- * // [2025-10-01, 2025-10-31]
- * // [2025-11-01, 2025-11-30]
- * // [2025-12-01, 2025-12-31]
+ * //   [2025-10-01, 2025-10-31]
+ * //   [2025-11-01, 2025-11-30]
+ * //   [2025-12-01, 2025-12-31]
+ * // ]
  * ```
- *
- * A period start is always the first day of the month, and a period end is
- * always the last day of the month. All dates are in UTC time.
  *
  * @param releaseDate - The release date of the data.
  * @param frequency - The frequency for which to get the periods.
- * @returns - An array of [start, end] dates for each period.
+ * @returns An array of [start, end] date instances for each period.
  */
 export function getPeriods(
 	releaseDate: Date,
-	frequency: string
+	frequency: S2DFrequencyType,
 ): PeriodRange[] {
-	const nbPeriods = S2D_NB_PERIODS[frequency as keyof typeof S2D_NB_PERIODS];
+	const nbPeriods = S2D_NB_PERIODS[frequency];
 	const periodLength = frequency === FrequencyType.SEASONAL ? 3 : 1;
-	const periodInterval = 1;
+	const periodInterval = 1; // Periods are 1 month apart
 	const periods: [Date, Date][] = [];
 	const lastPeriod = new Date(
 		// Set to the first day of the month
@@ -61,22 +66,23 @@ export function getPeriods(
 /**
  * Find the index of the period range that matches a string date range.
  *
- * A date range is an array of two strings representing a date, in UTC time.
- * Each string must be of the form 'YYYY-MM-DD'. The date range is generally
- * created from the `dateRange` URL parameter.
+ * A date range is an array of exactly two strings representing a date, in UTC
+ * time. Each string must be of the form 'YYYY-MM-DD'. The date range is
+ * generally created from the `dateRange` URL parameter.
  *
  * To find the matching period, only the first date of the date range is used.
  *
- * @param dateRange - The date range to search for.
+ * @param dateRange - The date range to search for. An array of exactly two
+ *   strings.
  * @param availablePeriods - The period ranges to search in.
  * @returns - The index of the period range that matches the date range, or
  *   null if not found.
  */
 export function findPeriodIndexForDateRange(
-	dateRange: string[],
+	dateRange: [string, string],
 	availablePeriods: PeriodRange[]
 ): number | null {
-	const rangeStart = parseUTCDate(dateRange[0]);
+	const rangeStart = utc(dateRange[0]);
 
 	if (rangeStart === null) {
 		return null;

@@ -17,8 +17,7 @@ import TooltipWidget from '@/components/ui/tooltip-widget';
 import ValueTemperature from '@/components/value-temperature';
 import {
 	default as ProgressBar,
-	buildProgressBarProps,
-	ProgressBarTwo,
+	type ProgressBarProps,
 } from '@/components/progress-bar';
 
 const ft = (value: number): string =>
@@ -108,6 +107,24 @@ export default memo(function S2DVariableValues(
 
 	const { emphasisText, smallSubTitleUnderEmphasis } = helper.get();
 
+	const PROGRESS_BARS: ProgressBarProps[] = [
+		{
+			label: `Above ${ft(7.5)}`,
+			percent: 11,
+			colorKey: 'warm',
+		},
+		{
+			label: `${ft(-4.9)} to ${ft(7.5)}`,
+			percent: 34,
+			colorKey: 'neutral',
+		},
+		{
+			label: `Below ${ft(-4.9)}`,
+			percent: 55,
+			colorKey: 'cool',
+		},
+	];
+
 	return (
 		<>
 			<div className="mt-4 mb-4">
@@ -169,27 +186,13 @@ export default memo(function S2DVariableValues(
 					<div className={`${smallSubTitleUnderEmphasis} mb-3`}>
 						SEASONAL MEAN TEMPERATURE PROBABILITY:
 					</div>
-					<ProgressBarTwo
-						{...buildProgressBarProps(
-							`Above ${ft(7.5)}`,
-							11,
-							'warm'
-						)}
-					/>
-					<ProgressBarTwo
-						{...buildProgressBarProps(
-							`${ft(-4.9)} to ${ft(7.5)}`,
-							34,
-							'neutral'
-						)}
-					/>
-					<ProgressBar
-						{...buildProgressBarProps(
-							`Below ${ft(-4.9)}`,
-							55,
-							'cool'
-						)}
-					/>
+					{
+						PROGRESS_BARS.map(({ label, percent, colorKey }) => (
+						<ProgressBar
+							label={label}
+							percent={percent}
+							colorKey={colorKey}
+						/>))}
 				</div>
 			</div>
 		</>

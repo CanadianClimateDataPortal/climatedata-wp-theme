@@ -14,6 +14,7 @@ import mapReducer from '@/features/map/map-slice';
 import downloadReducer from '@/features/download/download-slice';
 import urlSyncReducer from '@/features/url-sync/url-sync-slice';
 import downloadUrlSyncReducer from '@/features/download/download-url-sync-slice';
+import s2dReducer from '@/features/s2d/s2d-slice';
 
 // API Slices and Reducers - Fetch requests that are going to populate the store
 import { wpApiSlice } from '@/services/wp-node';
@@ -37,6 +38,7 @@ export const store = configureStore({
 		download: downloadReducer,
 		urlSync: urlSyncReducer,
 		downloadUrlSync: downloadUrlSyncReducer,
+		s2d: s2dReducer,
 		[wpApiSlice.reducerPath]: wpApiSlice.reducer,
 	},
 	middleware: (getDefaultMiddleware) =>

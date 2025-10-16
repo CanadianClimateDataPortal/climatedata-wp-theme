@@ -1,9 +1,6 @@
 import {
   type TemperatureUnit,
 } from '@/lib/value-temperature';
-import {
-	createClassNameMappingHelper,
-} from '@/lib/class-name-mapping';
 
 export interface S2DVariableValuesModalSection {
 	value?: number;
@@ -102,16 +99,3 @@ export const createPropsForS2DVariableValues = ({
 
 	return out;
 };
-
-const classMaps = new Map<string, S2DVariablesValuesClassNames>([
-	[
-		'default',
-		{
-			smallSubTitleUnderEmphasis: 'text-xs uppercase text-neutral-grey-medium',
-			emphasisText: 'font-semibold text-brand-blue text-2xl',
-		},
-	],
-]);
-
-export const classNameMappingForS2DVariableValues =
-	createClassNameMappingHelper(classMaps, 'default');

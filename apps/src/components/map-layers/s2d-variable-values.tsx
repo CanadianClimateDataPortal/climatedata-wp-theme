@@ -9,7 +9,6 @@ import { __ } from '@/context/locale-provider';
 
 import { formatValueTemperature } from '@/lib/value-temperature';
 import {
-	classNameMappingForS2DVariableValues,
 	type S2DVariableValuesComponentProps,
 } from '@/lib/s2d-variable-values';
 
@@ -27,7 +26,6 @@ const ft = (value: number): string =>
 		locale: 'fr-CA',
 	});
 
-const helper = classNameMappingForS2DVariableValues;
 
 const joinRangeWord = __('to');
 
@@ -105,8 +103,6 @@ export default memo(function S2DVariableValues(
 		temperatureRangeAsTextSetter,
 	]);
 
-	const { emphasisText, smallSubTitleUnderEmphasis } = helper.get();
-
 	const PROGRESS_BARS: ProgressBarProps[] = [
 		{
 			label: `Above ${ft(7.5)}`,
@@ -134,10 +130,10 @@ export default memo(function S2DVariableValues(
 						data-comment="Top Left"
 						title="Range description"
 					>
-						<div className={`mb-1 ${emphasisText}`}>
+						<div className={`mb-1 font-semibold text-brand-blue text-2xl`}>
 							{dateRangeAsText}
 						</div>
-						<div className={`${smallSubTitleUnderEmphasis}`}>
+						<div className={`text-xs uppercase text-neutral-grey-medium`}>
 							{__('Seasonal')}
 						</div>
 					</div>
@@ -149,7 +145,7 @@ export default memo(function S2DVariableValues(
 						<div className="grid grid-cols-1 place-content-center gap-4 p-8">
 							<div className="flex flex-row items-center justify-center gap-2">
 								<div
-									className={`${smallSubTitleUnderEmphasis}`}
+									className={`text-xs uppercase text-neutral-grey-medium`}
 								>
 									{__('Skill Level')}
 								</div>
@@ -164,11 +160,11 @@ export default memo(function S2DVariableValues(
 						data-comment="1st Left"
 						title="Historical Median"
 					>
-						<div className={`${emphasisText}`}>
+						<div className={`font-semibold text-brand-blue text-2xl`}>
 							<ValueTemperature value={historicalMedian?.value} />
 						</div>
 						<div className="flex flex-row gap-2 control-title">
-							<div className={`${smallSubTitleUnderEmphasis}`}>
+							<div className={`text-xs uppercase text-neutral-grey-medium`}>
 								{__('Historical Median')}
 							</div>
 							<TooltipWidget tooltip="Historical Median tooltip text" />
@@ -176,14 +172,14 @@ export default memo(function S2DVariableValues(
 						<div className="text-xs">({dateRangeYearsText})</div>
 					</div>
 					<div className="w-1/2" data-comment="1st Right" title="TBD">
-						<div className={`${emphasisText}`}>
+						<div className={`font-semibold text-brand-blue text-2xl`}>
 							{temperatureRangeAsText}
 						</div>
 						&nbsp;
 					</div>
 				</div>
 				<div className="flex flex-col mb-3 pt-2" data-comment="3rd Row">
-					<div className={`${smallSubTitleUnderEmphasis} mb-3`}>
+					<div className={`text-xs uppercase text-neutral-grey-medium mb-3`}>
 						SEASONAL MEAN TEMPERATURE PROBABILITY:
 					</div>
 					{

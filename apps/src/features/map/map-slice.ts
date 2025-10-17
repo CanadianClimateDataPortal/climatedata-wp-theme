@@ -191,7 +191,7 @@ export const {
 } = mapSlice.actions;
 
 /**
- * Get the visibility of the low skill layer.
+ * Selector that returns the visibility of the "low skill" layer.
  */
 export const selectLowSkillVisibility =
 	() => (state: RootState) =>

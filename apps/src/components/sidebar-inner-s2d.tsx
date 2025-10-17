@@ -18,7 +18,10 @@ import {
 } from '@/types/climate-variable-interface';
 import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { selectLowSkillVisibility, setLowSkillVisibility } from '@/features/map/map-slice';
+import {
+	selectLowSkillVisibility,
+	setLowSkillVisibility,
+} from '@/features/map/map-slice';
 
 export interface ReleaseDateProps {
 	date?: Date | null;

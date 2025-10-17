@@ -9,7 +9,27 @@ import {
 	setReleaseDateIsLoading,
 } from '@/features/s2d/s2d-slice';
 import { fetchS2DReleaseDate } from '@/services/services';
-import { parseUTCDate } from '@/lib/utils';
+import { utc } from '@/lib/utils';
+import { ClimateVariableInterface } from '@/types/climate-variable-interface';
+
+/**
+ * Generate a unique release date key for a climate variable and its selected
+ * frequency.
+ *
+ * Return null if no frequency is selected.
+ *
+ * @param climateVariable
+ */
+function generateReleaseDateKey(
+	climateVariable: ClimateVariableInterface
+): string | null {
+	const selectedFrequency = climateVariable.getFrequency();
+	const climateVariableID = climateVariable.getId();
+
+	return selectedFrequency
+		? `${climateVariableID}__${selectedFrequency}`
+		: null;
+}
 
 /**
  * Hook containing S2D-related state and functions.
@@ -24,15 +44,13 @@ export const useS2D = () => {
 	const { climateVariable } = useClimateVariable();
 
 	const isS2DVariable =
-		climateVariable &&
-		climateVariable instanceof S2DClimateVariable;
+		climateVariable && climateVariable instanceof S2DClimateVariable;
 
 	const selectedFrequency = climateVariable?.getFrequency();
 	const climateVariableID = climateVariable?.getId();
-	const releaseDateKey =
-		isS2DVariable && selectedFrequency
-			? `${climateVariableID}__${selectedFrequency}`
-			: null;
+	const releaseDateKey = isS2DVariable
+		? generateReleaseDateKey(climateVariable)
+		: null;
 
 	const cachedReleaseDate = useAppSelector(
 		releaseDateKey ? selectReleaseDateCache(releaseDateKey) : () => null
@@ -68,8 +86,8 @@ export const useS2D = () => {
 		const abortController = new AbortController();
 		lastKeyRef.current = releaseDateKey;
 
-		// If `releaseDateKey` is set, it implies that `selectedFrequency` and
-		// `climateVariableID` are strings, and not null
+		// Since `releaseDateKey` is set (checked above), it implies that
+		// `selectedFrequency` and `climateVariableID` are strings, and not null
 		const frequency = selectedFrequency as string;
 		const variable = climateVariableID as string;
 
@@ -129,7 +147,7 @@ export const useS2D = () => {
 	 */
 	const releaseDate = useMemo<Date | null>(() => {
 		return releaseDateKey && cachedReleaseDate
-			? parseUTCDate(cachedReleaseDate)
+			? utc(cachedReleaseDate)
 			: null;
 	}, [releaseDateKey, cachedReleaseDate]);
 

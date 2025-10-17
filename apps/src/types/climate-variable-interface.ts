@@ -42,17 +42,17 @@ export interface ThresholdInterface {
 export type InteractiveMode = 'region' | 'station';
 
 export enum InteractiveRegionOption {
-	GRIDDED_DATA = "gridded_data",
-	CENSUS = "census",
-	HEALTH = "health",
-	WATERSHED = "watershed",
+	GRIDDED_DATA = 'gridded_data',
+	CENSUS = 'census',
+	HEALTH = 'health',
+	WATERSHED = 'watershed',
 }
 
 export enum InteractiveRegionDisplay {
-	MAP = "map",
-	DOWNLOAD = "download",
-	ALWAYS = "always",
-	NONE = "none",
+	MAP = 'map',
+	DOWNLOAD = 'download',
+	ALWAYS = 'always',
+	NONE = 'none',
 }
 
 export type InteractiveRegionConfig = {
@@ -60,31 +60,38 @@ export type InteractiveRegionConfig = {
 }
 
 export enum FrequencyDisplayModeOption {
-	MAP = "map",
-	DOWNLOAD = "download",
-	ALWAYS = "always",
-	NONE = "none",
+	MAP = 'map',
+	DOWNLOAD = 'download',
+	ALWAYS = 'always',
+	NONE = 'none',
 }
 
 export enum FrequencyType {
-	ANNUAL = "ann",
-	ANNUAL_JUL_JUN = "annual_jul_jun",
-	MONTHLY = "months",
-	SEASONAL = "seasons",
-	ALL_MONTHS = "allMonths",
-	DAILY = "daily",
+	ANNUAL = 'ann',
+	ANNUAL_JUL_JUN = 'annual_jul_jun',
+	MONTHLY = 'months',
+	SEASONAL = 'seasons',
+	ALL_MONTHS = 'allMonths',
+	DAILY = 'daily',
 }
 
+/**
+ * Type for the supported frequency types for S2D variables.
+ *
+ * A subset of `FrequencyType`.
+ */
+export type S2DFrequencyType = FrequencyType.MONTHLY | FrequencyType.SEASONAL;
+
 export const ForecastTypes = {
-	EXPECTED: "expected",
-	UNUSUAL: "unusual",
+	EXPECTED: 'expected',
+	UNUSUAL: 'unusual',
 } as const;
 
 export type ForecastType = typeof ForecastTypes[keyof typeof ForecastTypes];
 
 export const ForecastDisplays = {
-	FORECAST: "forecast",
-	CLIMATOLOGY: "climatology",
+	FORECAST: 'forecast',
+	CLIMATOLOGY: 'climatology',
 } as const;
 
 export type ForecastDisplay = typeof ForecastDisplays[keyof typeof ForecastDisplays];
@@ -119,29 +126,29 @@ export interface DateRangeConfig {
 	min: string;
 	max: string;
 	interval: number;
-	type?: "year" | "day";
+	type?: 'year' | 'day';
 }
 
 export enum AveragingType {
-	ALL_YEARS = "allYears",
-	THIRTY_YEARS = "30years",
+	ALL_YEARS = 'allYears',
+	THIRTY_YEARS = '30years',
 }
 
 export enum DownloadType {
-	PRECALCULATED = "precalculated",
-	ANALYZED = "analyzed",
+	PRECALCULATED = 'precalculated',
+	ANALYZED = 'analyzed',
 }
 
 export enum FileFormatType {
-	CSV = "csv",
-	JSON = "json",
-	NetCDF = "netcdf",
-	GeoJSON = "geojson",
+	CSV = 'csv',
+	JSON = 'json',
+	NetCDF = 'netcdf',
+	GeoJSON = 'geojson',
 }
 
 export enum ColourType {
-	CONTINUOUS = "ramp",
-	DISCRETE = "intervals",
+	CONTINUOUS = 'ramp',
+	DISCRETE = 'intervals',
 }
 
 export interface CustomColourSchemeColour {
@@ -196,13 +203,13 @@ export interface LocationModalContentParams {
 	latlng: L.LatLng,
 	featureId: number,
 	scenario?: string,
-	mode?: "modal" | "panel"
+	mode?: 'modal' | 'panel'
 }
 
 export enum FrequencyType {
-	YS = "ys",
-	MS = "ms",
-	QSDEC = "qsdec",
+	YS = 'ys',
+	MS = 'ms',
+	QSDEC = 'qsdec',
 }
 
 export type PreCalculatedCanDCSConfig = {

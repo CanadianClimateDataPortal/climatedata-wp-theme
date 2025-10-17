@@ -17,6 +17,11 @@ class S2DClimateVariable extends ClimateVariableBase {
 	getFrequency(): string | null {
 		return super.getFrequency() ?? FrequencyType.SEASONAL;
 	}
+
+	getColourOptionsStatus(): boolean {
+		// No colour options for S2D variables
+		return false;
+	}
 }
 
 export default S2DClimateVariable;

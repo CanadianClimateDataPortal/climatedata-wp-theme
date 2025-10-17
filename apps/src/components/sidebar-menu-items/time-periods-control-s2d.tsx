@@ -8,8 +8,14 @@ import { ControlTitle } from '@/components/ui/control-title';
 import { cn } from '@/lib/utils';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useS2D } from '@/hooks/use-s2d';
-import { formatPeriodRange, findPeriodIndexForDateRange, getPeriods, PeriodRange } from '@/lib/s2d';
+import {
+	formatPeriodRange,
+	findPeriodIndexForDateRange,
+	getPeriods,
+	PeriodRange,
+} from '@/lib/s2d';
 import { getShortMonthName } from '@/lib/format';
+import { S2DFrequencyType } from '@/types/climate-variable-interface';
 
 export interface TimePeriodsControlS2DProps {
 	tooltip?: React.ReactNode;
@@ -65,14 +71,16 @@ function generateSliderLabels(periods: PeriodRange[] | null): SliderLabels {
  */
 const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 	tooltip,
- }) => {
+}) => {
 	const { climateVariable, setDateRange } = useClimateVariable();
 	const { releaseDate } = useS2D();
 
 	const dateRange = climateVariable?.getDateRange();
 	const frequency = climateVariable?.getFrequency() ?? null;
 	const periods =
-		releaseDate && frequency ? getPeriods(releaseDate, frequency) : null;
+		releaseDate && frequency
+			? getPeriods(releaseDate, frequency as S2DFrequencyType)
+			: null;
 	const isLoadingReleaseDate = releaseDate === null;
 
 	let matchingDatePeriodIndex: number | null = null;
@@ -80,8 +88,8 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 
 	if (dateRange && periods) {
 		matchingDatePeriodIndex = findPeriodIndexForDateRange(
-			dateRange,
-			periods,
+			dateRange as [string, string],
+			periods
 		);
 		selectedPeriod = matchingDatePeriodIndex ?? 0;
 	}
@@ -90,9 +98,11 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		generateSliderLabels(periods);
 	const tickLabel = periods ? tickLabels[selectedPeriod] : '...';
 
-	let controlTooltip: React.ReactNode = __('Move the slider to select your time period of interest.');
+	let controlTooltip: React.ReactNode = __(
+		'Move the slider to select your time period of interest.'
+	);
 	if (tooltip) {
-		controlTooltip = tooltip
+		controlTooltip = tooltip;
 	}
 
 	/**

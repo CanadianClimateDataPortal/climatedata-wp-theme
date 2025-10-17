@@ -16,8 +16,9 @@ import { RootState } from '@/app/store';
 /**
  * Unique identifier for a release date.
  *
- * A release date is unique for a combination of variable and frequency, so the
- * key can be a combination of both to be unique.
+ * Simply an alias of `string` to make the code a little bit clearer to read.
+ *
+ * A release date key must be unique to a variable and frequency combination.
  */
 type ReleaseDateKey = string;
 
@@ -68,7 +69,9 @@ const s2dSlice = createSlice({
 export const { setReleaseDate, setReleaseDateIsLoading } = s2dSlice.actions;
 
 /**
- * Retrieve the cached release date for a specific variable and frequency.
+ * Return a selector that retrieves a cached release date.
+ *
+ * The key is unique to a variable and frequency.
  *
  * Null is retrieved if no release date is found.
  */
@@ -77,7 +80,9 @@ export const selectReleaseDateCache =
 		state.s2d.releaseDateCache[key] || null;
 
 /**
- * Retrieve the loading status for a specific release date.
+ * Return a selector that retrieves the loading status for a release date.
+ *
+ * The key is unique to a variable and frequency.
  */
 export const selectReleaseDateLoading =
 	(key: ReleaseDateKey) => (state: RootState) =>

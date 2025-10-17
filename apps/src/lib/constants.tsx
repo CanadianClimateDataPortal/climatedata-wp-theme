@@ -2,7 +2,10 @@ import type { LatLngBounds, LatLngExpression } from 'leaflet';
 import L from 'leaflet';
 import { ColourScheme, ColourSchemeType, DatasetKey } from '@/types/types';
 import { MAP_CONFIG } from '@/config/map.config';
-import { FrequencyType } from '@/types/climate-variable-interface';
+import {
+	FrequencyType,
+	S2DFrequencyType,
+} from '@/types/climate-variable-interface';
 
 import mapPinIcon from '@/assets/map-pin.svg';
 
@@ -181,6 +184,14 @@ export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
 		colours: ["#081D58", "#1F2F88", "#234DA0", "#1F72B1", "#2498C0", "#41B6C3", "#73C8BC", "#AADEB6", "#D6EFB2", "#F0F9B9", "#FEFED1", "#FFF0A9", "#FEE187", "#FEC965", "#FDAA48", "#FD8D3C", "#FC5A2D", "#ED2F21", "#D30F1F", "#B00026", "#800026"],
 	},
 }
+
+/**
+ * For S2D variables, the number of available periods for each frequency type.
+ */
+export const S2D_NB_PERIODS: { [key in S2DFrequencyType]: number } = {
+	[FrequencyType.MONTHLY]: 3,
+	[FrequencyType.SEASONAL]: 10,
+};
 
 export const AHCCD_SQUARE_ICON = (
 	<svg width="20" height="20" viewBox="0 0 20 20">

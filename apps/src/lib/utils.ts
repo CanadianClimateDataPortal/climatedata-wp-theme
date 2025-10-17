@@ -9,6 +9,7 @@ import {
 } from '@/types/climate-variable-interface';
 import { __ } from '@/context/locale-provider';
 import { ParsedLatLon } from '@/types/types';
+import { format } from 'date-fns';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -413,4 +414,63 @@ export function parseLatLon(text: string): ParsedLatLon | null {
 		lon: lonNumber,
 		isPartial: Number.isNaN(lonNumber),
 	}
+}
+
+/**
+ * Parse a string representing a date and time in UTC time.
+ *
+ * For example, the string "2024-01-01" would be parsed as a date where
+ * `date.toUTCString()` would return "Wed, 01 Jan 2024 00:00:00 GMT".
+ *
+ * @param dateString - The string to parse as a UTC date.
+ * @returns A Date object representing the parsed date, or null if the string
+ *   cannot be parsed as a date.
+ */
+export function utc(dateString: string): Date | null {
+	const parsedDate = new Date(dateString);
+
+	if (Number.isNaN(parsedDate.valueOf())) {
+		return null;
+	}
+
+	return new Date(Date.UTC(
+		parsedDate.getUTCFullYear(),
+		parsedDate.getUTCMonth(),
+		parsedDate.getUTCDate(),
+		parsedDate.getUTCHours(),
+		parsedDate.getUTCMinutes(),
+		parsedDate.getUTCSeconds(),
+		parsedDate.getUTCMilliseconds(),
+	));
+}
+
+/**
+ * Format a date, but using UTC time.
+ *
+ * The format to use is the one of "date-fns":
+ * https://date-fns.org/v3.6.0/docs/format
+ *
+ * Example:
+ * ```
+ * const date = new Date(Date.UTC(2024, 8, 5, 14, 22, 10));
+ * const formattedUTC = formatUTCDate(date, 'yyyy-MM-dd HH:mm:ss');
+ * // formattedUTC will be "2024-09-05 14:22:10" (i.e. UTC time)
+ * ```
+ *
+ * @param date - The date to format.
+ * @param dateFormat - The format to use for the date. Use the "date-fns"
+ *   format.
+ */
+export function formatUTCDate(date: Date, dateFormat: string): string {
+	const localDate = new Date(
+		date.getUTCFullYear(),
+		date.getUTCMonth(),
+		date.getUTCDate(),
+		date.getUTCHours(),
+		date.getUTCMinutes(),
+		date.getUTCSeconds(),
+		date.getUTCMilliseconds(),
+	);
+
+	return format(localDate, dateFormat);
 }

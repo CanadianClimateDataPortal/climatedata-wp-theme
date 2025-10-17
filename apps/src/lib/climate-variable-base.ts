@@ -28,8 +28,6 @@ import {
 	ScenariosConfig,
 	ThresholdInterface,
 } from '@/types/climate-variable-interface';
-import RasterMap from '@/components/raster-map';
-import RasterDownloadMap from '@/components/download/raster-download-map';
 import { getDefaultFrequency, getFrequencyType } from '@/lib/utils';
 import { MapDisplayType, WMSParams } from '@/types/types';
 
@@ -312,14 +310,6 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getDecimalPlace(): number {
 		return this._config.decimalPlace ?? 0;
-	}
-
-	renderMap(): React.ReactElement {
-		return <RasterMap />
-	}
-
-	renderDownloadMap(): React.ReactElement {
-		return <RasterDownloadMap />;
 	}
 
 	getDownloadType(): DownloadType | null {

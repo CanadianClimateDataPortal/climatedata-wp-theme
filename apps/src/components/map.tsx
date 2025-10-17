@@ -1,8 +1,10 @@
 import React, { useCallback, useRef } from 'react';
 import 'leaflet.sync';
+import L from 'leaflet';
+import 'leaflet.vectorgrid';
 
 // components
-import MarineMapContainer from '@/components/marine-map-container';
+import MapContainer from '@/components/map-container';
 import WarningRSLCCMIP6 from '@/components/warning-rslc-cmip6';
 
 // other
@@ -12,14 +14,11 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useMapInteractions } from '@/hooks/use-map-interactions';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setMessageDisplay } from '@/features/map/map-slice';
-import L from 'leaflet';
 
 /**
- * Renders a Leaflet map specifically for marine variables.
- * This maintains the same API as RasterMap but uses the custom marine map container
- * with the modified layer ordering (raster under basemap).
+ * Renders a Leaflet map, including custom panes and tile layers.
  */
-export default function MarineMap(): React.ReactElement {
+export default function Map(): React.ReactElement {
 	const { setMap, setComparisonMap } = useMap();
 	const { climateVariable } = useClimateVariable();
 	const dispatch = useAppDispatch();
@@ -103,7 +102,7 @@ export default function MarineMap(): React.ReactElement {
 				displayed={warningRSLCCMIP6Displayed}
 				onHide={handleHideWarning}
 			/>
-			<MarineMapContainer
+			<MapContainer
 				onMapReady={handleMapReady}
 				onUnmount={handleUnmount}
 				isComparisonMap={false}
@@ -115,7 +114,7 @@ export default function MarineMap(): React.ReactElement {
 				layerRef={primaryLayerRef}
 			/>
 			{showComparisonMap && (
-				<MarineMapContainer
+				<MapContainer
 					onMapReady={handleComparisonMapReady}
 					onUnmount={unsyncMaps}
 					isComparisonMap={true}

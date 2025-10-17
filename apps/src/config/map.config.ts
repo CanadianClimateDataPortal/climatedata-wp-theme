@@ -27,22 +27,13 @@ export const MAP_CONFIG = {
 
 	// Pane configuration for standard variables
 	standardPanes: {
-		basemap: 200,
-		raster: 300,
-		grid: 350,
-		labels: 360,
-		stations: 370,
-		custom_shapefile: 700
-	},
-
-	// Pane configuration for marine data visualization
-	combinedMarinePanes: {
-		standardBasemap: 100,  // Standard map base layer
-		raster: 200,           // Ocean data layer
-		grid: 300,             // Interactive regions
-		marineBasemap: 400,    // Marine landmass (transparent ocean)
-		labels: 500,           // Map labels
-		custom_shapefile: 600
+		basemap: 100,
+		raster: 200,
+		grid: 300,
+		landmassMask: 400,
+		labels: 500,
+		stations: 600,
+		custom_shapefile: 700,
 	},
 
 	// Landmass filter for marine data (transforms green to white)

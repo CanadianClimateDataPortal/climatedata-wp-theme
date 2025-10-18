@@ -27,7 +27,6 @@ const ft = (value: number): string =>
 		locale: 'fr-CA',
 	});
 
-
 const joinRangeWord = __('to');
 
 /**
@@ -171,104 +170,94 @@ export default memo(function S2DVariableValues(
 	);
 
 	return (
-		<>
-			<div className={`mt-4 mb-4`}>
-				<div
-					className={`flex mb-3`}
-					data-comment="1st Row"
-				>
-					<div
-						className={`w-1/2`}
-						data-comment="1st Row, Left"
-						id="row-0-left"
-					>
-						<div
-							className={`mb-2 font-semibold text-brand-blue text-2xl`}
-							data-value-text
-						>
-							{dateRangeAsText}
-						</div>
-						<div className={`text-xs uppercase text-neutral-grey-medium font-semibold tracking-wider`}>
-							{__('Seasonal')}
-						</div>
-					</div>
-					<div
-						className={`w-1/2`}
-						data-comment="1st Row, Right"
-						id="row-0-right"
-					>
-						<div
-							className={`mb-2 mt-2`}
-						>
-							<SkillLevelStars skillLevel={skillLevel} />
-						</div>
-						<div className={`flex flex-row gap-2`}>
-							<div className={`text-xs uppercase text-neutral-grey-medium font-semibold tracking-wider`}>
-								{__('Skill Level')}
-							</div>
-							<TooltipWidget tooltip={tooltipSkillLevel} />
-						</div>
-						<div className={`text-xs uppercase text-neutral-grey-medium`}>({HARDCODED_SKILL_LEVEL_PARENS + (skill.crpss ? skill.crpss : '')})</div>
-					</div>
+		<div className="mt-4 mb-4">
+			<dl className="grid grid-cols-2 mb-3 gap-x-4">
+				{/* Seasonal */}
+				<div className="flex flex-col-reverse mb-3">
+					<dt className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
+						{__('Seasonal')}
+					</dt>
+					<dd className="mb-2 text-2xl font-semibold text-brand-blue">
+						{dateRangeAsText}
+					</dd>
 				</div>
 
+				{/* Skill Level */}
 				<div
-					className={`flex mb-3`}
-					data-comment="2nd Row"
+					className="flex flex-col-reverse mb-3"
+					role="group"
+					aria-labelledby="skill-level-label"
 				>
-					<div
-						className={`w-1/2`}
-						data-comment="2nd Row, Left"
-						id="row-1-left"
-					>
-						<div
-							className={`font-semibold text-brand-blue text-2xl`}
-							data-value-text
-						>
-							<ValueTemperature value={historicalMedian?.value} />
+					<dt id="skill-level-label">
+						<div className="flex flex-row gap-2">
+							<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
+								{__('Skill Level')}
+							</span>
+							<TooltipWidget tooltip={tooltipSkillLevel} />
 						</div>
-						<div className={`flex flex-row gap-2`}>
-							<div
-								className={`text-xs uppercase text-neutral-grey-medium font-semibold tracking-wider`}
-								id="historical-median"
-							>
+						<div>({HARDCODED_SKILL_LEVEL_PARENS + (skill.crpss ? skill.crpss : '')})</div>
+					</dt>
+					<dd className="mb-1 text-xs uppercase text-neutral-grey-medium">
+						<SkillLevelStars skillLevel={skill.value ?? 0} />
+					</dd>
+				</div>
+
+				{/* Historical Median */}
+				<div
+					className="flex flex-col-reverse"
+					role="group"
+					aria-labelledby="historical-median-label"
+				>
+					<dt id="historical-median-label">
+						<div className="flex flex-row gap-2 mb-1">
+							<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 								{__('Historical Median')}
-							</div>
+							</span>
 							<TooltipWidget tooltip={tooltipHistoricalMedian} />
 						</div>
-						<div className={`text-xs`}>({dateRangeYearsText})</div>
-					</div>
-					<div
-						className={`w-1/2`}
-						id="row-1-right"
-						data-comment="2nd Row, Right"
-					>
-						<div
-							className={`font-semibold text-brand-blue text-2xl`}
-						>
-							{temperatureRangeAsText}
+						<div className="text-xs">
+							({dateRangeYearsText})
 						</div>
-						<div className={`flex flex-row gap-2`}>
-							<div
-								className={`text-xs uppercase text-neutral-grey-medium font-semibold tracking-wider`}
-							>
+					</dt>
+					<dd className="mb-2 text-2xl font-semibold text-brand-blue">
+						<ValueTemperature value={historicalMedian?.value} />
+					</dd>
+				</div>
+
+				{/* Near-Normal Range */}
+				<div
+					className="flex flex-col-reverse"
+					role="group"
+					aria-labelledby="temperature-range-label"
+				>
+					<dt id="temperature-range-label">
+						<div className="flex flex-row gap-2 mb-1">
+							<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 								{__('Near-Normal Range')}
-							</div>
+							</span>
 							<TooltipWidget tooltip={tooltipTemperatureRange} />
 						</div>
-						<div className={`text-xs`}>({dateRangeYearsText})</div>
-					</div>
+						<div className="text-xs">
+							({dateRangeYearsText})
+						</div>
+					</dt>
+					<dd className="mb-2 text-2xl font-semibold text-brand-blue">
+						{temperatureRangeAsText}
+					</dd>
 				</div>
-				<div
-					className={`flex flex-col pt-2 mb-3`}
-					data-comment="3rd Row"
+			</dl>
+
+			<section aria-labelledby="probability-heading">
+				<h3
+					id="probability-heading"
+					className="mb-3 text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium"
 				>
-					<div className={`text-xs uppercase text-neutral-grey-medium mb-3`}>
-						{__('Seasonal mean temperature probability:') }
-					</div>
-					{PROGRESS_BARS.map((props) => <ProgressBar { ...props } />)}
-				</div>
-			</div>
-		</>
+					{__('Seasonal mean temperature probability:')}
+				</h3>
+				{PROGRESS_BARS.map((props, idx) => (
+					<ProgressBar key={idx} {...props} />
+				))}
+			</section>
+		</div>
 	);
 });

@@ -5,15 +5,8 @@ import {
 
 import {
 	formatValueTemperature,
-	type TemperatureUnit,
 	type ValueTemperatureProps,
 } from '@/lib/value-temperature';
-
-export {
-	formatValueTemperature,
-	type TemperatureUnit,
-	type ValueTemperatureProps,
-};
 
 export default memo(function ValueTemperatureFn({
 	locale = 'fr-CA',
@@ -25,8 +18,15 @@ export default memo(function ValueTemperatureFn({
 		unit,
 		value,
 	});
+	// Since we won't translate this now, let's add [lang=en] attribute.
+	const englishOnlyTitle = `${value} degrees ${unit}`;
 	return (
-		<data value={value} data-unit={unit}>{
+		<data
+			lang="en"
+			value={value}
+			data-unit={unit}
+			title={englishOnlyTitle}
+		>{
 			formatted
 		}</data>
 	);

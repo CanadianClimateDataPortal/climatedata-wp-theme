@@ -1,99 +1,87 @@
-import {
-  type TemperatureUnit,
-} from '@/lib/value-temperature';
+type DateRange = [Date, Date];
 
 export interface S2DVariableValuesModalSection {
 	value?: number;
-	label?: string;
-	labelTooltip?: string;
-	/**
-	 * Bits of information we write in between parenthesis
-	 */
-	parens?: string[];
 }
 
-type DateRange = [Date, Date];
+export interface S2DVariableValuesModalSkillSection
+	extends S2DVariableValuesModalSection {
+	crpss: number;
+}
 
 /**
  * Component Props for S2DVariableValues
  */
 export interface S2DVariableValuesComponentProps {
 	dateRange: DateRange;
-	temperatureRange: null | [number, number];
-	skill: S2DVariableValuesModalSection;
+	dateRangeYears: [number, number];
+	skill: S2DVariableValuesModalSkillSection;
 	historicalMedian: S2DVariableValuesModalSection;
-	temperatureUnit: TemperatureUnit;
+	nearNormalTemperatureRange?: [number, number];
 }
 
 export interface CreateS2DVariableValuesFactory {
 	dateRange: DateRange;
 	skill: number;
+	crpss: number;
 	historicalMedian: number;
-	temperatureUnit?: TemperatureUnit;
-	temperatureRange?: S2DVariableValuesComponentProps['temperatureRange'];
+	nearNormalTemperatureRange?: S2DVariableValuesComponentProps['nearNormalTemperatureRange'];
 }
 
 /**
- * CSS class name mappings for S2DVariableValues
+ * @deprecated Let's figure out how to resolve this value
  */
-export interface S2DVariablesValuesClassNames extends Record<string, string>{
-	/**
-	 * The gray text right under the information point that's in big letters.
-	 */
-	smallSubTitleUnderEmphasis: string;
-
-	/**
-	 * The information point in emphasis letters.
-	 */
-	emphasisText: string;
-}
+export const S2D_HARDCODED_SKILL_CRPSS = 0.18;
 
 /**
- * Data model outside of a class for testability.
- * Some quick example to start from.
+ * @deprecated Let's figure out how to resolve this value
  */
-
-export const S2D_FALLBACK_TEMPERATURE_UNIT: TemperatureUnit = 'celsius';
-
 export const S2D_HARDCODED_SKILL_VALUE = 2;
 
+/**
+ * @deprecated Let's figure out how to resolve this value
+ */
 export const S2D_HARDCODED_HISTORICAL_MEDIAN_VALUE = 1.3;
 
-export const S2D_HARDCODED_TEMPERATURE_RANGE_VALUE = [ 17.1, 18.7 ] as S2DVariableValuesComponentProps['temperatureRange'];
+/**
+ * @deprecated Let's figure out how to resolve this value
+ */
+export const S2D_HARDCODED_TEMPERATURE_RANGE_VALUE = [
+	17.1, 18.7,
+] as NonNullable<S2DVariableValuesComponentProps['nearNormalTemperatureRange']>;
 
-const toUTC = (input: unknown): Date => {
-	const date = new Date(`${input}T00:00:00Z`);
-	if (Number.isNaN(date.getDate())) {
-		throw new Error(String(date));
-	}
-	return date;
-};
-
-const HARDCODED_DATE_RANGE: DateRange = [
-	toUTC('1991-07-01'),
-	toUTC('2020-09-30'),
+/**
+ * @deprecated Let's figure out how to resolve this value
+ */
+export const S2D_HARDCODED_1991_2020_DATE_RANGE: DateRange = [
+	new Date(`1991-07-01T00:00:00Z`),
+	new Date(`2020-09-30T00:00:00Z`),
 ];
 
-// Testability. Plilze!
+/**
+ * @remark Let's figure out the HARDCODED values here and remove this comment.
+ */
 export const createPropsForS2DVariableValues = ({
-	dateRange = HARDCODED_DATE_RANGE,
-	skill = void 0,
-	historicalMedian = void 0,
-	temperatureRange = null,
-	temperatureUnit = S2D_FALLBACK_TEMPERATURE_UNIT,
+	dateRange = S2D_HARDCODED_1991_2020_DATE_RANGE,
+	skill = S2D_HARDCODED_SKILL_VALUE,
+	crpss = S2D_HARDCODED_SKILL_CRPSS,
+	historicalMedian = S2D_HARDCODED_HISTORICAL_MEDIAN_VALUE,
+	nearNormalTemperatureRange = S2D_HARDCODED_TEMPERATURE_RANGE_VALUE,
 }: Partial<CreateS2DVariableValuesFactory>): S2DVariableValuesComponentProps => {
-	const yearTuples = dateRange.map((i) => String(i.getFullYear()));
+	const dateRangeYears = dateRange.map((i) => i.getFullYear()) as [
+		number,
+		number,
+	];
 	const out: S2DVariableValuesComponentProps = {
 		dateRange,
-		temperatureUnit,
-		temperatureRange,
+		dateRangeYears,
+		nearNormalTemperatureRange,
 		skill: {
 			value: skill,
-			parens: [],
+			crpss,
 		},
 		historicalMedian: {
 			value: historicalMedian,
-			parens: yearTuples,
 		},
 	};
 

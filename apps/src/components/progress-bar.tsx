@@ -3,49 +3,7 @@ import {
 	type ReactNode,
 } from 'react';
 
-interface ClassNameMap extends Record<string, string> {
-	/**
-	 * SVG fill color for the progress bar
-	 * Example: 'fill-orange-400'
-	 */
-	labelBgColor: string;
-
-	/**
-	 * Text color for the percentage label
-	 * Should contrast well with fillColor for readability
-	 */
-	labelTextColor: string;
-}
-
-const MAP_DATA: [string, ClassNameMap][] = [
-	[
-		'warm',
-		{
-			labelBgColor: 'fill-orange',
-			labelTextColor: 'text-orange-600',
-		},
-	],
-	[
-		'neutral',
-		{
-			labelBgColor: 'fill-blue-400',
-			labelTextColor: 'text-blue-600',
-		},
-	],
-	[
-		'cool',
-		{
-			labelBgColor: 'fill-cyan-300',
-			labelTextColor: 'text-cyan-600',
-		},
-	],
-] as const;
-
-export type ProgressBarColorKeys = (typeof MAP_DATA)[number][0];
-
-const FALLBACK_COLOR_KEY: ProgressBarColorKeys = 'warm';
-
-const CLASS_NAME_MAP = new Map<ProgressBarColorKeys, ClassNameMap>(MAP_DATA);
+export type HexColor = `#${string}`;
 
 export interface ProgressBarProps {
 	/**
@@ -58,9 +16,9 @@ export interface ProgressBarProps {
 	 */
 	percent: number;
 	/**
-	 * What to use for className
+	 * Color code to use for the bar
 	 */
-	colorKey: ProgressBarColorKeys;
+	fillHexCode: HexColor;
 }
 
 /**
@@ -71,14 +29,8 @@ export interface ProgressBarProps {
 const ProgressBar = memo(function ProgressBarFn({
 	label,
 	percent,
-	colorKey,
+	fillHexCode,
 }: ProgressBarProps): ReactNode {
-	let classMap = CLASS_NAME_MAP.get(colorKey);
-	if (!classMap) {
-		classMap = CLASS_NAME_MAP.get(FALLBACK_COLOR_KEY) as ClassNameMap;
-	}
-
-	const { labelBgColor, labelTextColor } = classMap;
 
 	const screenReaderOnly = `Horizontal bar at ${percent}% filled`;
 
@@ -98,7 +50,7 @@ const ProgressBar = memo(function ProgressBarFn({
 			aria-valuemin={0}
 			aria-valuemax={100}
 			aria-valuenow={percent}
-			data-current-color-key={colorKey}
+			style={{ '--fill-color': fillHexCode } as React.CSSProperties}
 		>
 			{/* Layer 1: Background */}
 			<div className="absolute inset-0 bg-gray-100 rounded" />
@@ -115,7 +67,8 @@ const ProgressBar = memo(function ProgressBarFn({
 					y="0"
 					width={`${percent}%`}
 					height="100%"
-					className={labelBgColor}
+					fill="var(--fill-color)"
+					style={{ fill: 'var(--fill-color)' }}
 					rx="4"
 				/>
 			</svg>
@@ -123,7 +76,7 @@ const ProgressBar = memo(function ProgressBarFn({
 			{/* Layer 3: Text with float layout */}
 			<div className="absolute inset-0 flex items-center text-sm overflow-hidden">
 				<div
-					className="text-gray-700 font-medium pl-3"
+					className="text-black font-medium pl-3"
 					style={{
 						width: `${percent}%`,
 						minWidth: 'fit-content',
@@ -131,7 +84,7 @@ const ProgressBar = memo(function ProgressBarFn({
 				>
 					{label}
 				</div>
-				<div className={`${labelTextColor} font-medium pl-2`}>
+				<div className={`text-blue-600 font-medium pl-2`}>
 					{percent}%
 				</div>
 			</div>

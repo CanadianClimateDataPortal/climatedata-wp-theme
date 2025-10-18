@@ -3,19 +3,16 @@ import {
 	useEffect,
 	type FC,
 } from 'react';
-
+import { __ } from '@/context/locale-provider';
 import { ArrowRight } from 'lucide-react';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { useAppSelector } from '@/app/hooks';
 
 import {
 	 type LocationModalContentParams as BaseLocationModalContentParams,
 } from '@/types/climate-variable-interface';
 
-import { __ } from '@/context/locale-provider';
-
-import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useLocale } from '@/hooks/use-locale';
-
-import { useAppSelector } from '@/app/hooks';
 
 import appConfig from '@/config/app.config';
 
@@ -95,11 +92,11 @@ export const LocationModalContent: FC<LocationModalContentProps> = ({
 				}
 			</p>
 
-			{climateVariable?.getLocationModalContent({
-					latlng,
-					featureId,
-					scenario,
-				})}
+			{ climateVariable?.getLocationModalContent({
+				latlng,
+				featureId,
+				scenario,
+			}) }
 
 			{!isS2D && (
 				<p className="text-right">

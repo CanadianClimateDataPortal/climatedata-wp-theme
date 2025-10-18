@@ -1,6 +1,11 @@
-const UNITS = ['celsius', 'fahrenheit'] as const;
+const TEMPERATURE_UNITS = [
+	/*                    */
+	'celsius',
+	'fahrenheit',
+] as const;
 
-export type TemperatureUnit = (typeof UNITS)[number];
+export type NumberFormatStyleUnitTemperature =
+	(typeof TEMPERATURE_UNITS)[number];
 
 export interface ValueTemperatureProps {
 	/**
@@ -8,8 +13,8 @@ export interface ValueTemperatureProps {
 	 *
 	 * @default 'celcius'
 	 */
-	unit?: TemperatureUnit;
-	value: string;
+	unit?: NumberFormatStyleUnitTemperature;
+	value: number;
 	/**
 	 * Which locale to format the value
 	 *
@@ -23,7 +28,7 @@ export const formatValueTemperature = ({
 	unit = 'celsius',
 	value,
 }: ValueTemperatureProps): string => {
-	if (!UNITS.includes(unit)) {
+	if (!TEMPERATURE_UNITS.includes(unit)) {
 		const message = `Invalid unit "${unit}`;
 		throw new Error(message);
 	}
@@ -33,10 +38,11 @@ export const formatValueTemperature = ({
 		/**
 		 * @see {@link https://v8.dev/features/intl-numberformat#units}
 		 */
-		const formatter = new Intl.NumberFormat(locale, {
+		const numberFormatOptions: Intl.NumberFormatOptions = {
 			style: 'unit',
 			unit,
-		});
+		};
+		const formatter = new Intl.NumberFormat(locale, numberFormatOptions);
 		const attempt = formatter.format(value);
 		formatted = attempt;
 	} catch {

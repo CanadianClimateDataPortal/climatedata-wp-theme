@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import * as Slider from '@radix-ui/react-slider';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 
 // components
@@ -17,7 +17,6 @@ import { setTimePeriodEnd } from '@/features/map/map-slice';
  * @constructor
  */
 const TimePeriodsControlSingle: React.FC = () => {
-	const { __ } = useI18n();
 	const dispatch = useAppDispatch();
 	const { climateVariable, setDateRange } = useClimateVariable();
 	const timePeriodEnd = useAppSelector(state => state.map.timePeriodEnd);

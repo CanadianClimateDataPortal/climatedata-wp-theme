@@ -39,7 +39,10 @@ export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({
 	);
 };
 
-export { LocaleContext };
+export {
+	LocaleContext,
+	type Locale,
+};
 
 // Function to translate text using WordPress i18n
 export const __ = (text: string): string => {

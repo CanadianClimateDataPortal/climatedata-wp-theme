@@ -3,6 +3,7 @@
  */
 import { useContext } from 'react';
 import { LocaleContext } from '@/context/locale-provider';
+import { dateFormatter } from '@/lib/date-formatter'
 
 export const useLocale = () => {
 	const context = useContext(LocaleContext);
@@ -40,5 +41,10 @@ export const useLocale = () => {
 		return obj?.[locale] || obj?.en || '';
 	};
 
-	return { locale, setLocale, getLocalized };
+	return {
+		locale,
+		setLocale,
+		getLocalized,
+		getDateFormatter: dateFormatter(locale),
+	};
 };

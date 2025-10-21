@@ -8,13 +8,13 @@ import { ControlTitle } from '@/components/ui/control-title';
 import { cn } from '@/lib/utils';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useS2D } from '@/hooks/use-s2d';
+import { useLocale } from '@/hooks/use-locale';
 import {
 	formatPeriodRange,
 	findPeriodIndexForDateRange,
 	getPeriods,
-	PeriodRange,
+	type PeriodRange,
 } from '@/lib/s2d';
-import { getShortMonthName } from '@/lib/format';
 import { S2DFrequencyType } from '@/types/climate-variable-interface';
 
 export interface TimePeriodsControlS2DProps {
@@ -31,8 +31,12 @@ type SliderLabels = {
  * Generate the labels to be used on the slider, based on the provided periods.
  *
  * @param periods - The periods to show on the slider.
+ * @param locale - Locale to use for formatting.
  */
-function generateSliderLabels(periods: PeriodRange[] | null): SliderLabels {
+const generateSliderLabels = (
+	periods: PeriodRange[] | null,
+	locale: string
+): SliderLabels => {
 	if (!periods) {
 		return {
 			minimumLabel: '',
@@ -41,20 +45,19 @@ function generateSliderLabels(periods: PeriodRange[] | null): SliderLabels {
 		};
 	}
 
-	const firstAndLastPeriods = [periods[0][0], periods[periods.length - 1][1]];
-	const [minimumLabel, maximumLabel] = firstAndLastPeriods.map(
-		(period) =>
-			`${getShortMonthName(period.getUTCMonth())} ${period.getUTCFullYear()}`
-	);
+	const firstPeriod = periods[0][0];
+	const lastPeriod = periods[periods.length - 1][1];
+
+	const minimumLabel = formatShortMonthYear(firstPeriod, locale);
+	const maximumLabel = formatShortMonthYear(lastPeriod, locale);
 
 	const tickLabels = periods.map((period) => {
-		const labelParts = [];
-		labelParts.push(getShortMonthName(period[0].getUTCMonth()));
-
-		if (period[0].getUTCMonth() != period[1].getUTCMonth()) {
-			labelParts.push(getShortMonthName(period[1].getUTCMonth()));
+		const startMonth = formatShortMonth(period[0], locale);
+		if (period[0].getUTCMonth() === period[1].getUTCMonth()) {
+			return startMonth;
 		}
-		return labelParts.join('-');
+		const endMonth = formatShortMonth(period[1], locale);
+		return `${startMonth}-${endMonth}`;
 	});
 
 	return {
@@ -62,7 +65,31 @@ function generateSliderLabels(periods: PeriodRange[] | null): SliderLabels {
 		maximumLabel,
 		tickLabels,
 	};
-}
+};
+
+/**
+ * Return the short month and year of a date, localized.
+ */
+const formatShortMonthYear = (date: Date, locale: string): string => {
+	return new Intl.DateTimeFormat(locale, {
+		month: 'short',
+		year: 'numeric',
+		timeZone: 'UTC',
+	}).format(date);
+};
+
+/**
+ * Return the short month name of a date, localized.
+ */
+const formatShortMonth = (date: Date, locale: string): string => {
+	const formatted = Intl.DateTimeFormat(locale, {
+		month: 'short',
+		timeZone: 'UTC',
+	}).format(date);
+
+	// In French, dots are added to short names, we remove them
+	return formatted.replace('.', '');
+};
 
 /**
  * Time period selector for S2D variables.
@@ -74,6 +101,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 }) => {
 	const { climateVariable, setDateRange } = useClimateVariable();
 	const { releaseDate } = useS2D();
+	const { locale } = useLocale();
 
 	const dateRange = climateVariable?.getDateRange();
 	const frequency = climateVariable?.getFrequency() ?? null;
@@ -94,8 +122,11 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		selectedPeriod = matchingDatePeriodIndex ?? 0;
 	}
 
-	const { minimumLabel, maximumLabel, tickLabels } =
-		generateSliderLabels(periods);
+	const {
+		minimumLabel,
+		maximumLabel,
+		tickLabels,
+	} = generateSliderLabels(periods, locale);
 	const tickLabel = periods ? tickLabels[selectedPeriod] : '...';
 
 	let controlTooltip: React.ReactNode = __(
@@ -120,7 +151,12 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		const period = periods[selectedPeriod];
 
 		setDateRange(formatPeriodRange(period));
-	}, [matchingDatePeriodIndex, selectedPeriod, periods, setDateRange]);
+	}, [
+		matchingDatePeriodIndex,
+		selectedPeriod,
+		periods,
+		setDateRange,
+	]);
 
 	/**
 	 * Update the date range to the selected value.

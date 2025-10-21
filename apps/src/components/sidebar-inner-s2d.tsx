@@ -22,11 +22,11 @@ import {
 	selectLowSkillVisibility,
 	setLowSkillVisibility,
 } from '@/features/map/map-slice';
+import { useS2D } from '@/hooks/use-s2d';
+import { useLocale } from '@/hooks/use-locale';
 
 export interface ReleaseDateProps {
-	date?: Date | null;
 	tooltip?: ReactNode;
-	locale: string;
 }
 
 const tooltipForecastTypes = __(
@@ -175,7 +175,9 @@ export const SidebarInnerS2D = () => {
 			</SidebarMenuItem>
 
 			<SidebarMenuItem className="mt-4">
-				<TimePeriodsControlS2D tooltip={tooltipTimePeriods} />
+				<TimePeriodsControlS2D
+					tooltip={tooltipTimePeriods}
+				/>
 			</SidebarMenuItem>
 		</>
 	);
@@ -188,21 +190,20 @@ SidebarInnerS2D.displayName = 'SidebarInnerS2D'
  *
  * Shows a loading message if the release date is not yet available.
  *
- * @param locale - Locale to use for formatting the date.
- * @param releaseDate - Release date to display.
+ * @param tooltip - Optional tooltip override.
  */
 export const SidebarFooterReleaseDate = ({
-	date,
 	tooltip,
-	locale = 'en',
 }: ReleaseDateProps) => {
+	const { releaseDate } = useS2D();
+	const { locale } = useLocale();
 
 	let releaseDateElement = (
 		<span className="font-medium text-gray-400">{__('Loading...')}</span>
 	);
 
-	if (date) {
-		const formattedDate = date.toLocaleDateString(locale, {
+	if (releaseDate) {
+		const formattedDate = releaseDate.toLocaleDateString(locale, {
 			year: 'numeric',
 			month: 'short',
 			day: 'numeric',
@@ -211,7 +212,7 @@ export const SidebarFooterReleaseDate = ({
 
 		releaseDateElement = (
 			<time
-				dateTime={formatUTCDate(date, 'yyyy-MM-dd')}
+				dateTime={formatUTCDate(releaseDate, 'yyyy-MM-dd')}
 			>
 				{formattedDate}
 			</time>

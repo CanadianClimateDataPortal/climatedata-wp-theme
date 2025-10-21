@@ -32,7 +32,6 @@ import { INTERNAL_URLS } from '@/lib/constants';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { useS2D } from '@/hooks/use-s2d';
 
 /**
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
@@ -48,8 +47,6 @@ export function AppSidebar() {
 	const dispatch = useAppDispatch();
 	const localeContext = useContext(LocaleContext);
 	const currentLocale = localeContext?.locale || 'en';
-
-	const { releaseDate: s2dReleaseDate } = useS2D();
 
 	// Update the selected variable when the climate variable changes
 	useEffect(() => {
@@ -137,7 +134,7 @@ export function AppSidebar() {
 
 				<SidebarGroup className="gap-0 mt-auto">
 					{isS2D ? (
-						<SidebarFooterReleaseDate date={s2dReleaseDate} locale={currentLocale} />
+						<SidebarFooterReleaseDate />
 					) : null}
 					<RecentLocationsLink />
 					<LinkWithIcon

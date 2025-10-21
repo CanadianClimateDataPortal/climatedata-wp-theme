@@ -1,20 +1,17 @@
-import {
-	memo,
-	type ReactNode,
-} from 'react';
+import React from 'react';
 
 const STAR_COLOR = `#6900b5`;
 
-const STAR_SIZE = 20;
+const SVG_STAR_SIZE = 20;
 
 export interface SkillLevelStarsProps {
-	skillLevel: number;
+	skillLevel?: number;
 }
 
-const StarFilled = (): ReactNode => (
+const StarFilled = (): React.ReactNode => (
 	<svg
-		width={STAR_SIZE}
-		height={STAR_SIZE}
+		width={SVG_STAR_SIZE}
+		height={SVG_STAR_SIZE}
 		viewBox="0 0 24 24"
 		fill="currentColor"
 	>
@@ -22,10 +19,10 @@ const StarFilled = (): ReactNode => (
 	</svg>
 );
 
-const StarEmpty = (): ReactNode => (
+const StarEmpty = (): React.ReactNode => (
 	<svg
-		width={STAR_SIZE}
-		height={STAR_SIZE}
+		width={SVG_STAR_SIZE}
+		height={SVG_STAR_SIZE}
 		viewBox="0 0 24 24"
 		fill="none"
 		stroke="currentColor"
@@ -35,17 +32,20 @@ const StarEmpty = (): ReactNode => (
 	</svg>
 );
 
-export const SkillLevelStars = memo(function SkillLevelStarsFn({
+const SkillLevelStars: React.FC<SkillLevelStarsProps> = ({
 	skillLevel,
-}: SkillLevelStarsProps): ReactNode {
-	const level = parseInt(skillLevel, 10);
+}): React.ReactNode => {
 	const MAX_STARS = 3;
+	let level = !skillLevel ? 0 : skillLevel;
+	if (level > MAX_STARS) {
+		level = MAX_STARS;
+	}
 
 	return (
 		<div
 			role="meter"
 			aria-valuemin={0}
-			aria-valuemax={3}
+			aria-valuemax={MAX_STARS}
 			aria-valuenow={level}
 			className="flex gap-1"
 			data-skill-level={level}
@@ -61,6 +61,8 @@ export const SkillLevelStars = memo(function SkillLevelStarsFn({
 			))}
 		</div>
 	);
-});
+};
+
+SkillLevelStars.displayName = 'SkillLevelStars';
 
 export default SkillLevelStars;

@@ -1196,3 +1196,53 @@ msgstr "La prévision a été publiée à cette date. "
   "Les prévisions mensuelles et saisonnières sont mises à jour chaque mois, "
   "et les prévisions décennales chaque année. "
   "L’exactitude a tendance à être plus élevée pour les périodes plus proches de la date de sortie."
+
+# @TODO: Find translation
+msgid  "Above %s"
+msgstr "Au dessus de %s"
+
+# @TODO: Find translation
+msgid  "%s to %s"
+msgstr "%s à %s"
+
+# @TODO: Find translation
+msgid  "Below %s"
+msgstr "Sous %s"
+
+# @TODO: Find translation -- when generating textual description of a progress bar.
+msgid   "Horizontal bar at %s% filled"
+msgstr  "Horizontal bar at %s% filled"
+
+msgid   "Skill Level"
+msgstr  "Niveau d’habileté"
+
+msgid   "The skill level at this location is"
+msgstr  "Le niveau d'habileté à cet endroit est"
+
+msgid   "No skill"
+msgstr  "Aucune habileté"
+
+msgid   "Low"
+msgstr  "Faible"
+
+msgid   "Medium"
+msgstr  "Moyenne"
+
+msgid   "High"
+msgstr  "Élevée"
+
+msgid   "Near-Normal Range"
+msgstr  "Étendue près de la normale"
+
+msgid   "The near-normal range is defined using the historical climatology for the month, season, or decadal time period of interest between 1991 and 2020. The historical data is divided into three equal parts and the ‘near-normal’ range is defined using the middle third, providing a range of typical past conditions."
+msgstr  "L'étendue près de la normale est définie à l'aide de la climatologie historique pour le mois, la saison ou la période décennale d'intérêt entre 1991 et 2020. Les données historiques sont divisées en trois parties égales et l'étendue « près de la normale » est définie à partir du tiers central, ce qui donne une étendue correspondant aux conditions typiques observées dans le passé."
+
+msgid   "Seasonal mean temperature probability:"
+msgstr  "Seasonal mean temperature probability:"
+
+msgid   "Historical Median"
+msgstr  "Médiane historique"
+
+msgid   "The median of the historical climatology for the month, season, or decadal time period of interest between 1991 and 2020. The median splits the historical data into two equal parts (50th percentile). It is a measure of typical past conditions."
+msgstr  "Médiane de la climatologie historique pour le mois, la saison ou la période décennale d'intérêt entre 1991 et 2020. La médiane divise les données historiques en deux parties égales (50e centile). Il s'agit d'une mesure des conditions passées typiques."
+

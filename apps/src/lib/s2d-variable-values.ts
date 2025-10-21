@@ -31,29 +31,29 @@ export interface CreateS2DVariableValuesFactory {
 /**
  * @deprecated Let's figure out how to resolve this value
  */
-export const S2D_HARDCODED_SKILL_CRPSS = 0.18;
+export const S2D_HARDCODED_SKILL_CRPSS = 0.18; // #Temporary
 
 /**
  * @deprecated Let's figure out how to resolve this value
  */
-export const S2D_HARDCODED_SKILL_VALUE = 2;
+export const S2D_HARDCODED_SKILL_VALUE = 2; // #Temporary
 
 /**
  * @deprecated Let's figure out how to resolve this value
  */
-export const S2D_HARDCODED_HISTORICAL_MEDIAN_VALUE = 1.3;
+export const S2D_HARDCODED_HISTORICAL_MEDIAN_VALUE = 1.3; // #Temporary
 
 /**
  * @deprecated Let's figure out how to resolve this value
  */
-export const S2D_HARDCODED_TEMPERATURE_RANGE_VALUE = [
+export const S2D_HARDCODED_TEMPERATURE_RANGE_VALUE = [ // #Temporary
 	17.1, 18.7,
 ] as NonNullable<S2DVariableValuesComponentProps['nearNormalTemperatureRange']>;
 
 /**
  * @deprecated Let's figure out how to resolve this value
  */
-export const S2D_HARDCODED_1991_2020_DATE_RANGE: DateRange = [
+export const S2D_HARDCODED_1991_2020_DATE_RANGE: DateRange = [ // #Temporary
 	new Date(`1991-07-01T00:00:00Z`),
 	new Date(`2020-09-30T00:00:00Z`),
 ];

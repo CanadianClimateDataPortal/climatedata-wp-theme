@@ -1,173 +1,167 @@
-import {
-	memo,
+import React, {
+	//
 	useState,
 	useEffect,
-	type ReactNode,
 } from 'react';
 
 import { __ } from '@/context/locale-provider';
+import { useLocale } from '@/hooks/use-locale';
 
-import { formatValueTemperature } from '@/lib/value-temperature';
-import {
-	type S2DVariableValuesComponentProps,
-} from '@/lib/s2d-variable-values';
+import { formatValue } from '@/lib/format';
+import { type S2DVariableValuesComponentProps } from '@/lib/s2d-variable-values';
 
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import SkillLevelStars from '@/components/ui/skill-level';
-import ValueTemperature from '@/components/value-temperature';
-import {
-	default as ProgressBar,
+import ProgressBar, {
+	//
 	type ProgressBarProps,
-} from '@/components/progress-bar';
+} from '@/components/ui/progress-bar';
 
-const ft = (value: number): string =>
-	formatValueTemperature({
-		value,
-		unit: 'celsius',
-		locale: 'fr-CA',
-	});
+const tooltipTextPrefixSkillLevel = __('The skill level at this location is');
 
-const joinRangeWord = __('to');
+const tooltipHistoricalMedian = __(
+	'The median of the historical climatology for the month, season, ' +
+		'or decadal time period of interest between 1991 and 2020. ' +
+		'The median splits the historical data into two equal parts (50th percentile). ' +
+		'It is a measure of typical past conditions.'
+);
 
-/**
- * This will be much easier when #622 is merged or using @/lib/format
- */
-const formatDateRangeAsText = (range: [Date, Date]): string => {
-	let out: string = '';
+const tooltipTemperatureRange = __(
+	'The near-normal range is defined using the historical climatology for the month, ' +
+		'season, or decadal time period of interest between 1991 and 2020. ' +
+		'The historical data is divided into three equal parts and the ‘near-normal’ ' +
+		'range is defined using the middle third, providing a range of typical past conditions.'
+);
 
-	let parts = [
-		range?.[0]?.getMonth(),
-		range?.[1]?.getMonth(),
-	].map(
-		(i) => String(i) + 'th'
-	);
+const LABEL_ABOVE = __('Above %s');
 
-	parts = ['July', 'Sept']; // TODO using #622 or using @/lib/format
+const LABEL_RANGE = __('%s to %s');
 
-	if (parts.length === 2) {
-		out += parts.join(` ${joinRangeWord} `) + '.';
-	}
+const LABEL_BELOW = __('Below %s');
 
-	return out;
-};
-
-const formatDateRangeYearsAsText = ([begin, end]: [Date, Date]): string => {
-	let out: string = '';
-
-	const parts = [+begin.getFullYear(), +end.getFullYear()];
-
-	out += parts.join(' - ');
-
-	return out;
-};
-
-const formatTemperatureRangeAsText = (
-	input: S2DVariableValuesComponentProps['nearNormalTemperatureRange']
-) => {
-	let out: string = '';
-
-	const parts = (input ?? []).map((v, idx, arr) => {
-		if (arr.length === 2) {
-			if (idx === 0) {
-				return ft(v).split(' ')[0];
-			} else {
-				return ft(v);
-			}
-		}
-	});
-	if (parts.length === 2) {
-		out = parts.join(` ${joinRangeWord} `);
-	}
-
-	return out;
-};
-
-const PROGRESS_BARS: ProgressBarProps[] = [
-	{
-		label: `Above ${ft(7.5)}`,
-		percent: 11,
-		fillHexCode: '#8abbd1',
-	},
-	{
-		label: `${ft(-4.9)} to ${ft(7.5)}`,
-		percent: 34,
-		fillHexCode: '#5871a3',
-	},
-	{
-		label: `Below ${ft(-4.9)}`,
-		percent: 3,
-		fillHexCode: '#cf9ad6',
-	},
-	{
-		label: `Lorem Ipsum`,
-		percent: 77,
-		fillHexCode: '#8fe3ba',
-	},
-	{
-		label: `Dolor Sit Amet`,
-		percent: 95,
-		fillHexCode: '#b2c2c0',
-	},
+const SKILL_LEVEL_LABELS = [
+	//
+	__('No skill'),
+	__('Low'),
+	__('Medium'),
+	__('High'),
 ];
 
 /**
- * CRPS, such as other words that are not obvious should instead be annotated as an abbreviation
- *
- * @example
- * ```html
- * <abbr title="Charlie Romeo Papa Silva Silva">CRPSS</abbr>
- * ```
- *
- * @TODO: When figuring out what text to use in this list, make sure CRPSS is nested with appropriate semantic HTML.
+ * All the tooltip texts in order of 0-3 from 'no skill' to 'high'.
  */
-const HARDCODED_SKILL_LEVEL_PARENS = 'MEDIUM - CRPSS: ';
+const SKILL_LEVEL_TOOLTIP = [
+	//
+	__(
+		'No Skill (CRPSS value is 0.00 or below): The accuracy of past forecasts was no better than random chance, so the forecast should not be used. The historical climatology is a better guide than the forecast and can be used instead.'
+	),
+	__(
+		'Low (CRPSS value is between 0.00 and 0.05): Past forecasts provided only a small improvement over random chance. Use these forecasts with caution and consider consulting both the forecasts and the historical climatology.'
+	),
+	__(
+		'Medium (CRPSS value is between 0.05 and 0.25): The accuracy of past forecasts was satisfactory. The forecast is a better guide than the historical climatology.'
+	),
+	__(
+		'High (CRPSS value is above 0.25): Past forecasts were mostly accurate. The forecast is considered trustworthy.'
+	),
+];
 
-const tooltipTextPrefixSkillLevel = __(`The skill level at this location is`); // TODO: Find proper text as it's been inadvertenly modified.
+const formatTemperatureLabel = (
+	template: string,
+	values: number | number[],
+	locale: Intl.LocalesArgument
+): string => {
+	const valuesArray = Array.isArray(values) ? values : [values];
+	let result = template;
+	for (const value of valuesArray) {
+		const formatted = formatValue(value, 'degC', 1, locale as string);
+		result = result.replace('%s', formatted);
+	}
+	if (valuesArray.length > 1) {
+		result = result.replace(/ °C/, ''); // #Temporary hack to remove first
+	}
+	return result;
+};
 
-const tooltipTextPrefixHistoricalMedian = __(
-	`
-	The median of the historical climatology for the month, season,
-	or decadal time period of interest between 1991 and 2020.
-	The median splits the historical data into two equal parts (50th percentile).
-	It is a measure of typical past conditions.
-`.trim()
-);
-
-export default memo(function S2DVariableValues(
-	props: S2DVariableValuesComponentProps
-): ReactNode {
-	const {
-		dateRange,
-		nearNormalTemperatureRange,
-		historicalMedian,
-		skill,
-	} = props;
-
-	const [dateRangeAsText, dateRangeAsTextSetter] = useState('...');
-	const [dateRangeYearsText, dateRangeYearsTextSetter] = useState('');
+const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
+	dateRange,
+	dateRangeYears,
+	historicalMedian,
+	nearNormalTemperatureRange,
+	skill,
+}) => {
+	const { locale } = useLocale();
 	const [temperatureRangeAsText, temperatureRangeAsTextSetter] = useState('');
 
+	const DateRangeLine = <>July to Sept.</>; // #Temporary
+	const S2D_HARDCODED_CURRENT_SKILL_LEVEL = 2; // #Temporary
+	const SkillLevelLabel = SKILL_LEVEL_LABELS[S2D_HARDCODED_CURRENT_SKILL_LEVEL]; // #Temporary
+
+	const SkillLevelTooltipSuffix = SKILL_LEVEL_TOOLTIP[S2D_HARDCODED_CURRENT_SKILL_LEVEL];
+	const tooltipSkillLevel = tooltipTextPrefixSkillLevel + ' ' + SkillLevelTooltipSuffix;
+
+	const PROGRESS_BARS: ProgressBarProps[] = [ // #Temporary
+		{
+			label: formatTemperatureLabel(LABEL_ABOVE, 7.5, locale),
+			percent: 11,
+			fillHexCode: '#8abbd1',
+		},
+		{
+			label: formatTemperatureLabel(LABEL_RANGE, [-4.9, 7.5], locale),
+			percent: 34,
+			fillHexCode: '#5871a3',
+		},
+		{
+			label: formatTemperatureLabel(LABEL_BELOW, -4.9, locale),
+			percent: 3,
+			fillHexCode: '#cf9ad6',
+		},
+	];
+
+	const formatTemperature = (value: number): string =>
+		formatValue(value, 'degC', 1, locale as string);
+
+	const SkillLevelLine = (
+		<>
+			{SkillLevelLabel}
+			{' - '}
+			{
+				<abbr
+					lang="en"
+					title="Continuous Ranked Probability Skill Score"
+				>
+					CRPSS
+				</abbr>
+			}
+			{': '}
+			{skill?.crpss ?? ''}
+		</>
+	);
+
+	const HistoricalMeanLine = <>{historicalMedian?.value &&
+							formatTemperature(historicalMedian?.value)}</>
+
+	const DateRangeYearsLine = Array.isArray(dateRangeYears)
+		? '(' + dateRangeYears.join(' - ') + ')'
+		: '';
+
 	useEffect(() => {
-		dateRangeAsTextSetter(formatDateRangeAsText(dateRange));
-		dateRangeYearsTextSetter(formatDateRangeYearsAsText(dateRange));
-		temperatureRangeAsTextSetter(formatTemperatureRangeAsText(nearNormalTemperatureRange));
+		temperatureRangeAsTextSetter(
+			nearNormalTemperatureRange &&
+				Array.isArray(nearNormalTemperatureRange)
+				? formatTemperatureLabel(
+						LABEL_RANGE,
+						nearNormalTemperatureRange,
+						locale
+					)
+				: ''
+		);
 	}, [
+		//
 		dateRange,
+		locale,
 		nearNormalTemperatureRange,
 	]);
-
-	const tooltipSkillLevel = tooltipTextPrefixSkillLevel + '...'; // @TODO: Calculate the proper text from here.
-
-	const tooltipHistoricalMedian = tooltipTextPrefixHistoricalMedian; // @TODO: Calculate the proper text from here.
-
-	const tooltipTemperatureRange = __(
-		`
-		The near-normal range is defined using the historical climatology for the month,
-		season, or decadal time period of interest between 1991 and 2020.
-		The historical data is divided into three equal parts and the ‘near-normal’
-		range is defined using the middle third, providing a range of typical past conditions.
-	`.trim()
-	);
 
 	return (
 		<div className="mt-4 mb-4">
@@ -178,7 +172,7 @@ export default memo(function S2DVariableValues(
 						{__('Seasonal')}
 					</dt>
 					<dd className="mb-2 text-2xl font-semibold text-brand-blue">
-						{dateRangeAsText}
+						{DateRangeLine}
 					</dd>
 				</div>
 
@@ -195,10 +189,10 @@ export default memo(function S2DVariableValues(
 							</span>
 							<TooltipWidget tooltip={tooltipSkillLevel} />
 						</div>
-						<div>({HARDCODED_SKILL_LEVEL_PARENS + (skill.crpss ? skill.crpss : '')})</div>
+						<div>({SkillLevelLine})</div>
 					</dt>
 					<dd className="mb-1 text-xs uppercase text-neutral-grey-medium">
-						<SkillLevelStars skillLevel={skill.value ?? 0} />
+						<SkillLevelStars skillLevel={skill.value} />
 					</dd>
 				</div>
 
@@ -215,12 +209,10 @@ export default memo(function S2DVariableValues(
 							</span>
 							<TooltipWidget tooltip={tooltipHistoricalMedian} />
 						</div>
-						<div className="text-xs">
-							({dateRangeYearsText})
-						</div>
+						<div className="text-xs">{DateRangeYearsLine}</div>
 					</dt>
 					<dd className="mb-2 text-2xl font-semibold text-brand-blue">
-						<ValueTemperature value={historicalMedian?.value} />
+						{HistoricalMeanLine}
 					</dd>
 				</div>
 
@@ -237,9 +229,7 @@ export default memo(function S2DVariableValues(
 							</span>
 							<TooltipWidget tooltip={tooltipTemperatureRange} />
 						</div>
-						<div className="text-xs">
-							({dateRangeYearsText})
-						</div>
+						<div className="text-xs">{DateRangeYearsLine}</div>
 					</dt>
 					<dd className="mb-2 text-2xl font-semibold text-brand-blue">
 						{temperatureRangeAsText}
@@ -260,4 +250,8 @@ export default memo(function S2DVariableValues(
 			</section>
 		</div>
 	);
-});
+};
+
+S2DVariableValues.displayName = 'S2DVariableValues';
+
+export default S2DVariableValues;

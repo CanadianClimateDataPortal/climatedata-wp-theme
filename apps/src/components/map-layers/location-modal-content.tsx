@@ -1,8 +1,4 @@
-import {
-	useState,
-	useEffect,
-	type FC,
-} from 'react';
+import React from 'react';
 import { __ } from '@/context/locale-provider';
 import { ArrowRight } from 'lucide-react';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
@@ -32,7 +28,7 @@ interface LocationModalContentProps extends BaseLocationModalContentParams {
  *  - subtitle (current dataset, current climate variable, current version, current scenario)
  *  - button to open charts panel
  */
-export const LocationModalContent: FC<LocationModalContentProps> = ({
+export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	title,
 	latlng,
 	scenario,
@@ -44,7 +40,7 @@ export const LocationModalContent: FC<LocationModalContentProps> = ({
 	const { dataset } = useAppSelector((state) => state.map);
 	const variableList = useAppSelector((state) => state.map.variableList);
 
-	const [isS2D, isS2DSetter] = useState<boolean>(false);
+	const isS2D = climateVariable && climateVariable instanceof S2DClimateVariable;
 
 	// Displayed info
 	const datasetLabel = getLocalized(dataset);
@@ -62,25 +58,12 @@ export const LocationModalContent: FC<LocationModalContentProps> = ({
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
 	const scenarioLabel = appConfig.scenarios.filter((item) => item.value === scenario)[0]?.label;
 
-	useEffect(() => {
-		if (climateVariable) {
-			const testing = climateVariable instanceof S2DClimateVariable;
-			if (testing !== isS2D) {
-				isS2DSetter(testing);
-			}
-		}
-	}, [
-		climateVariable,
-		isS2D,
-		isS2DSetter,
-	]);
-
 	return (
 		<div>
-			<h2 className="text-2xl text-cdc-black font-semibold leading-7 mb-1">
+			<h2 className="mb-1 text-2xl font-semibold leading-7 text-cdc-black">
 				{title}
 			</h2>
-			<p className="text-sm text-neutral-grey-medium leading-5 m-0">
+			<p className="m-0 text-sm leading-5 text-neutral-grey-medium">
 				{
 					[
 						__(datasetLabel),

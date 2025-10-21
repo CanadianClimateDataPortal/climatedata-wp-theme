@@ -1,7 +1,5 @@
-import {
-	memo,
-	type ReactNode,
-} from 'react';
+import React from 'react';
+import { __ } from '@/context/locale-provider';
 
 export type HexColor = `#${string}`;
 
@@ -12,7 +10,7 @@ export interface ProgressBarProps {
 	label: string;
 	/**
 	 * The width as a percent the bar with background color
-	 * (using fillColor) will take up.
+	 * (using fillColor) will take up. A number between 0 and 100.
 	 */
 	percent: number;
 	/**
@@ -26,13 +24,12 @@ export interface ProgressBarProps {
  * The label being shown is centered vertically and on top of the filled bar.
  * On the right of the filled bar, we see the percent value aligned with the label text.
  */
-const ProgressBar = memo(function ProgressBarFn({
+const ProgressBar: React.FC<ProgressBarProps> = ({
 	label,
 	percent,
 	fillHexCode,
-}: ProgressBarProps): ReactNode {
-
-	const screenReaderOnly = `Horizontal bar at ${percent}% filled`;
+}) => {
+	const screenReaderOnly = __('Horizontal bar at %s% filled').replace('%s', String(percent));
 
 	/**
 	 * aria-value and role=meter:
@@ -90,6 +87,8 @@ const ProgressBar = memo(function ProgressBarFn({
 			</div>
 		</div>
 	);
-});
+};
+
+ProgressBar.displayName = 'ProgressBar';
 
 export default ProgressBar;

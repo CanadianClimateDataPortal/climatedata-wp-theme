@@ -304,7 +304,7 @@ msgid "Search..."
 msgstr "Rechercher..."
 
 msgid "Loading..."
-msgstr "Chargement en cours..."
+msgstr "Chargement..."
 
 msgid "Loading variables..."
 msgstr "Chargement des variables..."

@@ -38,6 +38,7 @@ import {
 	MAP_OPACITY_MIN,
 } from '@/lib/constants';
 import { MapItemsOpacity } from '@/types/types';
+import { RootState } from '@/app/store';
 
 const defaultTimePeriodEnd = Math.min(
 	SLIDER_DEFAULT_YEAR_VALUE + SLIDER_YEAR_WINDOW_SIZE,
@@ -73,6 +74,7 @@ const initialState: MapState = {
 	 * the value is a boolean indicating if the message should be displayed.
 	 */
 	messageDisplayStates: {},
+	isLowSkillVisible: true,
 };
 
 // Create the slice
@@ -159,6 +161,9 @@ const mapSlice = createSlice({
 		setMessageDisplay(state, action: PayloadAction<{ message: string; displayed: boolean }>) {
 			state.messageDisplayStates[action.payload.message] = action.payload.displayed;
 		},
+		setLowSkillVisibility(state, action: PayloadAction<{ visible: boolean }>) {
+			state.isLowSkillVisible = action.payload.visible;
+		},
 	},
 });
 
@@ -182,7 +187,15 @@ export const {
 	setOpacity,
 	setMapCoordinates,
 	setMessageDisplay,
+	setLowSkillVisibility,
 } = mapSlice.actions;
+
+/**
+ * Selector that returns the visibility of the "low skill" layer.
+ */
+export const selectLowSkillVisibility =
+	() => (state: RootState) =>
+		state.map.isLowSkillVisible;
 
 // Export reducer
 export default mapSlice.reducer;

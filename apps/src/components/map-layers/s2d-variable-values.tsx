@@ -12,6 +12,7 @@ import ProgressBar, {
 	//
 	type ProgressBarProps,
 } from '@/components/ui/progress-bar';
+import { SidebarFooterReleaseDate } from '@/components/sidebar-inner-s2d';
 
 const tooltipHistoricalMedian = __(
 	'The median of the historical climatology for the month, season, ' +
@@ -254,6 +255,10 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 				{PROGRESS_BARS.map((props, idx) => (
 					<ProgressBar key={idx} {...props} />
 				))}
+			</section>
+
+			<section className="mt-9">
+				<SidebarFooterReleaseDate />
 			</section>
 		</div>
 	);

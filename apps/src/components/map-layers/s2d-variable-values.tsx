@@ -172,10 +172,10 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 		: '';
 
 	return (
-		<div className="mt-4 mb-4">
-			<dl className="grid grid-cols-2 mb-3 gap-x-4">
+		<div className="my-4">
+			<dl className="relative grid grid-cols-2 mb-3 gap-x-4">
 				{/* Seasonal */}
-				<div className="flex flex-col-reverse mb-3">
+				<div className="flex flex-col-reverse mb-1">
 					<dt className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 						{__('Seasonal')}
 					</dt>
@@ -186,11 +186,11 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 
 				{/* Skill Level */}
 				<div
-					className="flex flex-col-reverse mb-3"
+					className="flex flex-col-reverse mb-1"
 					role="group"
 					aria-labelledby="skill-level-label"
 				>
-					<dt id="skill-level-label">
+					<dt id="skill-level-label" className="mt-0">
 						<div className="flex flex-row gap-2">
 							<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 								{__('Skill Level')}
@@ -245,7 +245,7 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 				</div>
 			</dl>
 
-			<section aria-labelledby="probability-heading">
+			<section aria-labelledby="probability-heading" className="mt-9">
 				<h3
 					id="probability-heading"
 					className="mb-3 text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium"

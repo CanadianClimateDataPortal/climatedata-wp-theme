@@ -336,7 +336,7 @@ export const useUrlSync = () => {
 				const dateRange = dateRangeStr.split(',');
 				if (dateRange.length > 1) {
 					const endYear = parseInt(dateRange[1]);
-					if (!isNaN(endYear)) {
+					if (!Number.isNaN(endYear)) {
 						dispatch(setTimePeriodEnd([endYear]));
 					}
 				}
@@ -362,7 +362,11 @@ export const useUrlSync = () => {
 				newConfig.forecastType = paramValue;
 			} catch (error) {
 				if (!(error instanceof AssertionError)) {
-					throw error;
+					const originalError = error as Error;
+					throw new Error(
+						originalError.message,
+						{ cause: originalError },
+					);
 				}
 			}
 		}
@@ -374,7 +378,11 @@ export const useUrlSync = () => {
 				newConfig.forecastDisplay = paramValue;
 			} catch (error) {
 				if (!(error instanceof AssertionError)) {
-					throw error;
+					const originalError = error as Error;
+					throw new Error(
+						originalError.message,
+						{ cause: originalError },
+					);
 				}
 			}
 		}

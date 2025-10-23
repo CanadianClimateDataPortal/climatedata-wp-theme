@@ -1,8 +1,4 @@
-import React, {
-	//
-	useState,
-	useEffect,
-} from 'react';
+import React from 'react';
 
 import { __ } from '@/context/locale-provider';
 import { useLocale } from '@/hooks/use-locale';
@@ -16,8 +12,6 @@ import ProgressBar, {
 	//
 	type ProgressBarProps,
 } from '@/components/ui/progress-bar';
-
-const tooltipTextPrefixSkillLevel = __('The skill level at this location is');
 
 const tooltipHistoricalMedian = __(
 	'The median of the historical climatology for the month, season, ' +
@@ -83,24 +77,40 @@ const formatTemperatureLabel = (
 	return result;
 };
 
-const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
-	dateRange,
+export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 	dateRangeYears,
 	historicalMedian,
 	nearNormalTemperatureRange,
 	skill,
 }) => {
 	const { locale } = useLocale();
-	const [temperatureRangeAsText, temperatureRangeAsTextSetter] = useState('');
 
 	const DateRangeLine = <>July to Sept.</>; // #Temporary
 	const S2D_HARDCODED_CURRENT_SKILL_LEVEL = 2; // #Temporary
-	const SkillLevelLabel = SKILL_LEVEL_LABELS[S2D_HARDCODED_CURRENT_SKILL_LEVEL]; // #Temporary
 
 	const SkillLevelTooltipSuffix = SKILL_LEVEL_TOOLTIP[S2D_HARDCODED_CURRENT_SKILL_LEVEL];
-	const tooltipSkillLevel = tooltipTextPrefixSkillLevel + ' ' + SkillLevelTooltipSuffix;
 
-	const PROGRESS_BARS: ProgressBarProps[] = [ // #Temporary
+	/**
+	 * We might even be able to use the following code instead of another copy.
+	 * Unless the {@link SkillLevelTooltipSuffix} gets translation text without the
+	 * convention of prefixing the text "High (...) ..." where we would have the text we need.
+	 *
+	 * @example
+	 * ```typescript
+	 * const SkillLevelLabel = SkillLevelTooltipSuffix.split(' (')[0];
+	 * ```
+	 *
+	 * @see {@link SKILL_LEVEL_TOOLTIP}
+	 */
+	const SkillLevelLabel = SKILL_LEVEL_LABELS[S2D_HARDCODED_CURRENT_SKILL_LEVEL]; // #Temporary
+
+	const tooltipSkillLevel = __('The skill level at this location is') + ' ' + SkillLevelTooltipSuffix;
+
+	const formatTemperature = (value: number): string =>
+		formatValue(value, 'degC', 1, locale as string);
+
+	const PROGRESS_BARS: ProgressBarProps[] = [
+		// #Temporary
 		{
 			label: formatTemperatureLabel(LABEL_ABOVE, 7.5, locale),
 			percent: 11,
@@ -117,9 +127,6 @@ const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 			fillHexCode: '#cf9ad6',
 		},
 	];
-
-	const formatTemperature = (value: number): string =>
-		formatValue(value, 'degC', 1, locale as string);
 
 	const SkillLevelLine = (
 		<>
@@ -138,30 +145,30 @@ const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 		</>
 	);
 
-	const HistoricalMeanLine = <>{historicalMedian?.value &&
-							formatTemperature(historicalMedian?.value)}</>
+	const NearNormalTemperatureRangeLine = (
+		<>
+			{nearNormalTemperatureRange && (
+				<data value={nearNormalTemperatureRange.join(',')}>
+					{formatTemperatureLabel(
+						LABEL_RANGE,
+						nearNormalTemperatureRange,
+						locale
+					)}
+				</data>
+			)}
+		</>
+	);
+
+	const HistoricalMeanLine = (
+		<>
+			{historicalMedian?.value &&
+				formatTemperature(historicalMedian?.value)}
+		</>
+	);
 
 	const DateRangeYearsLine = Array.isArray(dateRangeYears)
 		? '(' + dateRangeYears.join(' - ') + ')'
 		: '';
-
-	useEffect(() => {
-		temperatureRangeAsTextSetter(
-			nearNormalTemperatureRange &&
-				Array.isArray(nearNormalTemperatureRange)
-				? formatTemperatureLabel(
-						LABEL_RANGE,
-						nearNormalTemperatureRange,
-						locale
-					)
-				: ''
-		);
-	}, [
-		//
-		dateRange,
-		locale,
-		nearNormalTemperatureRange,
-	]);
 
 	return (
 		<div className="mt-4 mb-4">
@@ -232,7 +239,7 @@ const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 						<div className="text-xs">{DateRangeYearsLine}</div>
 					</dt>
 					<dd className="mb-2 text-2xl font-semibold text-brand-blue">
-						{temperatureRangeAsText}
+						{NearNormalTemperatureRangeLine}
 					</dd>
 				</div>
 			</dl>

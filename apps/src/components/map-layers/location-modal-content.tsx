@@ -99,3 +99,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 		</div>
 	);
 };
+
+LocationModalContent.displayName = 'LocationModalContent';
+
+export default LocationModalContent;

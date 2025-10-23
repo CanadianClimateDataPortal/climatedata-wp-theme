@@ -5,7 +5,7 @@ export interface S2DVariableValuesModalSection {
 }
 
 export interface S2DVariableValuesModalSkillSection
-	extends S2DVariableValuesModalSection {
+	extends Required<S2DVariableValuesModalSection> {
 	crpss: number;
 }
 
@@ -36,7 +36,7 @@ export const S2D_HARDCODED_SKILL_CRPSS = 0.18; // #Temporary
 /**
  * @deprecated Let's figure out how to resolve this value
  */
-export const S2D_HARDCODED_SKILL_VALUE = 2; // #Temporary
+export const S2D_HARDCODED_SKILL_VALUE = Math.floor(Math.random() * 4); // #Temporary
 
 /**
  * @deprecated Let's figure out how to resolve this value

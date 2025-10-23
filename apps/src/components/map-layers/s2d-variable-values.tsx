@@ -86,9 +86,9 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 	const { locale } = useLocale();
 
 	const DateRangeLine = <>July to Sept.</>; // #Temporary
-	const S2D_HARDCODED_CURRENT_SKILL_LEVEL = 2; // #Temporary
 
-	const SkillLevelTooltipSuffix = SKILL_LEVEL_TOOLTIP[S2D_HARDCODED_CURRENT_SKILL_LEVEL];
+	const skillLevel = skill.value as number
+	const SkillLevelTooltipSuffix = SKILL_LEVEL_TOOLTIP[skillLevel];
 
 	/**
 	 * We might even be able to use the following code instead of another copy.
@@ -102,7 +102,7 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 	 *
 	 * @see {@link SKILL_LEVEL_TOOLTIP}
 	 */
-	const SkillLevelLabel = SKILL_LEVEL_LABELS[S2D_HARDCODED_CURRENT_SKILL_LEVEL]; // #Temporary
+	const SkillLevelLabel = SKILL_LEVEL_LABELS[skillLevel]; // #Temporary
 
 	const tooltipSkillLevel = __('The skill level at this location is') + ' ' + SkillLevelTooltipSuffix;
 
@@ -199,7 +199,7 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 						<div>({SkillLevelLine})</div>
 					</dt>
 					<dd className="mb-1 text-xs uppercase text-neutral-grey-medium">
-						<SkillLevelStars skillLevel={skill.value} />
+						<SkillLevelStars skillLevel={skillLevel} />
 					</dd>
 				</div>
 

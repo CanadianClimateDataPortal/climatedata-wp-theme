@@ -1,17 +1,22 @@
 import React from 'react';
 import { __ } from '@/context/locale-provider';
 import { ArrowRight } from 'lucide-react';
-import L from 'leaflet';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useAppSelector } from '@/app/hooks';
+
+import {
+	 type LocationModalContentParams as BaseLocationModalContentParams,
+} from '@/types/climate-variable-interface';
+
 import { useLocale } from '@/hooks/use-locale';
+
 import appConfig from '@/config/app.config';
 
-interface LocationModalContentProps {
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
+
+interface LocationModalContentProps extends BaseLocationModalContentParams {
 	title: string;
-	latlng: L.LatLng;
 	scenario: string;
-	featureId: number,
 	onDetailsClick: () => void;
 }
 
@@ -35,6 +40,8 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const { dataset } = useAppSelector((state) => state.map);
 	const variableList = useAppSelector((state) => state.map.variableList);
 
+	const isS2D = climateVariable && climateVariable instanceof S2DClimateVariable;
+
 	// Displayed info
 	const datasetLabel = getLocalized(dataset);
 	const climateVariableTitle = climateVariable?.getTitle() || variableList?.[0]?.title || '';
@@ -53,10 +60,10 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 
 	return (
 		<div>
-			<h2 className="text-2xl text-cdc-black font-semibold leading-7 mb-1">
+			<h2 className="mb-1 text-2xl font-semibold leading-7 text-cdc-black">
 				{title}
 			</h2>
-			<p className="text-sm text-neutral-grey-medium leading-5 m-0">
+			<p className="m-0 text-sm leading-5 text-neutral-grey-medium">
 				{
 					[
 						__(datasetLabel),
@@ -74,19 +81,25 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 				scenario,
 			}) }
 
-			<p className="text-right">
-				<a
-					href="#"
-					aria-label={__('Go to details section')}
-					className="font-normal text-sm leading-6"
-					onClick={onDetailsClick}
-				>
-					<span className="text-brand-blue inline-flex items-center gap-2">
-						{__('See details')}
-						<ArrowRight size={16}/>
-					</span>
-				</a>
-			</p>
+			{!isS2D && (
+				<p className="text-right">
+					<a
+						href="#"
+						aria-label={__('Go to details section')}
+						className="text-sm font-normal leading-6"
+						onClick={onDetailsClick}
+					>
+						<span className="inline-flex items-center gap-2 text-brand-blue">
+							{__('See details')}
+							<ArrowRight size={16} />
+						</span>
+					</a>
+				</p>
+			)}
 		</div>
 	);
 };
+
+LocationModalContent.displayName = 'LocationModalContent';
+
+export default LocationModalContent;

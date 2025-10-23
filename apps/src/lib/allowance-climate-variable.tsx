@@ -1,3 +1,5 @@
+import React from 'react';
+
 import MarineClimateVariable from "@/lib/marine-climate-variable";
 import MedianOnlyVariableValues from "@/components/map-layers/median-only-variable-values";
 import { LocationModalContentParams } from "@/types/climate-variable-interface";

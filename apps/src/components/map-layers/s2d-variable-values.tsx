@@ -7,12 +7,12 @@ import { formatValue } from '@/lib/format';
 import { type S2DVariableValuesComponentProps } from '@/lib/s2d-variable-values';
 
 import TooltipWidget from '@/components/ui/tooltip-widget';
-import SkillLevelStars from '@/components/ui/skill-level';
+import StarRating from '@/components/ui/star-rating';
 import ProgressBar, {
-	//
 	type ProgressBarProps,
 } from '@/components/ui/progress-bar';
 import { SidebarFooterReleaseDate } from '@/components/sidebar-inner-s2d';
+import { sprintf } from '@wordpress/i18n';
 
 const tooltipHistoricalMedian = __(
 	'The median of the historical climatology for the month, season, ' +
@@ -26,6 +26,14 @@ const tooltipTemperatureRange = __(
 		'season, or decadal time period of interest between 1991 and 2020. ' +
 		'The historical data is divided into three equal parts and the ‘near-normal’ ' +
 		'range is defined using the middle third, providing a range of typical past conditions.'
+);
+
+const tooltipSkillLevelSuffix = __(
+	'The past performance or “skill” of the prediction system is measured ' +
+	'using the continuous ranked probability skill score (CRPSS). CRPSS ' +
+	'measures the accuracy of forecasts produced for the same lead time as ' +
+	'the selected forecast and for the same month, season, or decadal time ' +
+	'period over 1991 to 2020.'
 );
 
 const LABEL_ABOVE = __('Above %s');
@@ -48,35 +56,29 @@ const SKILL_LEVEL_LABELS = [
 const SKILL_LEVEL_TOOLTIP = [
 	//
 	__(
-		'No Skill (CRPSS value is 0.00 or below): The accuracy of past forecasts was no better than random chance, so the forecast should not be used. The historical climatology is a better guide than the forecast and can be used instead.'
+		'The skill level at this location is No Skill (CRPSS value is 0.00 ' +
+		'or below): The accuracy of past forecasts was no better than random ' +
+		'chance, so the forecast should not be used. The historical ' +
+		'climatology is a better guide than the forecast and can be used ' +
+		'instead.'
 	),
 	__(
-		'Low (CRPSS value is between 0.00 and 0.05): Past forecasts provided only a small improvement over random chance. Use these forecasts with caution and consider consulting both the forecasts and the historical climatology.'
+		'The skill level at this location is Low (CRPSS value is between ' +
+		'0.00 and 0.05): Past forecasts provided only a small improvement ' +
+		'over random chance. Use these forecasts with caution and consider ' +
+		'consulting both the forecasts and the historical climatology.'
 	),
 	__(
-		'Medium (CRPSS value is between 0.05 and 0.25): The accuracy of past forecasts was satisfactory. The forecast is a better guide than the historical climatology.'
+		'The skill level at this location is Medium (CRPSS value is between ' +
+		'0.05 and 0.25): The accuracy of past forecasts was satisfactory. ' +
+		'The forecast is a better guide than the historical climatology.'
 	),
 	__(
-		'High (CRPSS value is above 0.25): Past forecasts were mostly accurate. The forecast is considered trustworthy.'
+		'The skill level at this location is High (CRPSS value is above ' +
+		'0.25): Past forecasts were mostly accurate. The forecast is ' +
+		'considered trustworthy.'
 	),
 ];
-
-const formatTemperatureLabel = (
-	template: string,
-	values: number | number[],
-	locale: Intl.LocalesArgument
-): string => {
-	const valuesArray = Array.isArray(values) ? values : [values];
-	let result = template;
-	for (const value of valuesArray) {
-		const formatted = formatValue(value, 'degC', 1, locale as string);
-		result = result.replace('%s', formatted);
-	}
-	if (valuesArray.length > 1) {
-		result = result.replace(/ °C/, ''); // #Temporary hack to remove first
-	}
-	return result;
-};
 
 export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 	dateRangeYears,
@@ -89,7 +91,6 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 	const DateRangeLine = <>July to Sept.</>; // #Temporary
 
 	const skillLevel = skill.value as number
-	const SkillLevelTooltipSuffix = SKILL_LEVEL_TOOLTIP[skillLevel];
 
 	/**
 	 * We might even be able to use the following code instead of another copy.
@@ -105,7 +106,12 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 	 */
 	const SkillLevelLabel = SKILL_LEVEL_LABELS[skillLevel]; // #Temporary
 
-	const tooltipSkillLevel = __('The skill level at this location is') + ' ' + SkillLevelTooltipSuffix;
+	const tooltipSkillLevel = (
+		<>
+			<p className="mb-2">{SKILL_LEVEL_TOOLTIP[skillLevel]}</p>
+			<p>{tooltipSkillLevelSuffix}</p>
+		</>
+	);
 
 	const formatTemperature = (value: number): string =>
 		formatValue(value, 'degC', 1, locale as string);
@@ -113,17 +119,21 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 	const PROGRESS_BARS: ProgressBarProps[] = [
 		// #Temporary
 		{
-			label: formatTemperatureLabel(LABEL_ABOVE, 7.5, locale),
+			label: sprintf(LABEL_ABOVE, formatTemperature(7.5)),
 			percent: 11,
 			fillHexCode: '#8abbd1',
 		},
 		{
-			label: formatTemperatureLabel(LABEL_RANGE, [-4.9, 7.5], locale),
+			label: sprintf(
+				LABEL_RANGE,
+				formatTemperature(-4.9),
+				formatTemperature(7.5),
+			),
 			percent: 34,
 			fillHexCode: '#5871a3',
 		},
 		{
-			label: formatTemperatureLabel(LABEL_BELOW, -4.9, locale),
+			label: sprintf(LABEL_BELOW, formatTemperature(-4.9)),
 			percent: 3,
 			fillHexCode: '#cf9ad6',
 		},
@@ -133,16 +143,14 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 		<>
 			{SkillLevelLabel}
 			{' - '}
-			{
-				<abbr
-					lang="en"
-					title="Continuous Ranked Probability Skill Score"
-				>
-					CRPSS
-				</abbr>
-			}
+			<abbr
+				lang="en"
+				title="Continuous Ranked Probability Skill Score"
+			>
+				CRPSS
+			</abbr>
 			{': '}
-			{skill?.crpss ?? ''}
+			{formatValue(skill.crpss, '', 2, locale)}
 		</>
 	);
 
@@ -150,10 +158,10 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 		<>
 			{nearNormalTemperatureRange && (
 				<data value={nearNormalTemperatureRange.join(',')}>
-					{formatTemperatureLabel(
+					{sprintf(
 						LABEL_RANGE,
-						nearNormalTemperatureRange,
-						locale
+						formatTemperature(nearNormalTemperatureRange[0]),
+						formatTemperature(nearNormalTemperatureRange[1]),
 					)}
 				</data>
 			)}
@@ -162,8 +170,7 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 
 	const HistoricalMeanLine = (
 		<>
-			{historicalMedian?.value &&
-				formatTemperature(historicalMedian?.value)}
+			{formatTemperature(historicalMedian.value)}
 		</>
 	);
 
@@ -172,14 +179,14 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 		: '';
 
 	return (
-		<div className="my-4">
-			<dl className="relative grid grid-cols-2 mb-3 gap-x-4">
+		<div className="mt-4">
+			<dl className="relative grid grid-cols-2 mb-3 gap-x-4 gap-y-3 items-start">
 				{/* Seasonal */}
 				<div className="flex flex-col-reverse mb-1">
 					<dt className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 						{__('Seasonal')}
 					</dt>
-					<dd className="mb-2 text-2xl font-semibold text-brand-blue">
+					<dd className="mb-1 text-2xl font-semibold text-brand-blue">
 						{DateRangeLine}
 					</dd>
 				</div>
@@ -197,10 +204,12 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 							</span>
 							<TooltipWidget tooltip={tooltipSkillLevel} />
 						</div>
-						<div>({SkillLevelLine})</div>
+						<div className="text-xs text-neutral-grey-medium">
+							({SkillLevelLine})
+						</div>
 					</dt>
-					<dd className="mb-1 text-xs uppercase text-neutral-grey-medium">
-						<SkillLevelStars skillLevel={skillLevel} />
+					<dd className="mb-2 mt-1 text-xs uppercase text-neutral-grey-medium">
+						<StarRating value={2} maxStars={3} />
 					</dd>
 				</div>
 
@@ -217,9 +226,11 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 							</span>
 							<TooltipWidget tooltip={tooltipHistoricalMedian} />
 						</div>
-						<div className="text-xs">{DateRangeYearsLine}</div>
+						<div className="text-xs text-neutral-grey-medium">
+							{DateRangeYearsLine}
+						</div>
 					</dt>
-					<dd className="mb-2 text-2xl font-semibold text-brand-blue">
+					<dd className="mb-1 text-2xl font-semibold text-brand-blue">
 						{HistoricalMeanLine}
 					</dd>
 				</div>
@@ -237,9 +248,11 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 							</span>
 							<TooltipWidget tooltip={tooltipTemperatureRange} />
 						</div>
-						<div className="text-xs">{DateRangeYearsLine}</div>
+						<div className="text-xs text-neutral-grey-medium">
+							{DateRangeYearsLine}
+						</div>
 					</dt>
-					<dd className="mb-2 text-2xl font-semibold text-brand-blue">
+					<dd className="mb-1 text-2xl font-semibold text-brand-blue">
 						{NearNormalTemperatureRangeLine}
 					</dd>
 				</div>
@@ -252,9 +265,14 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 				>
 					{__('Seasonal mean temperature probability:')}
 				</h3>
-				{PROGRESS_BARS.map((props, idx) => (
-					<ProgressBar key={idx} {...props} />
-				))}
+				<div className="border-x border-cold-grey-2 relative">
+					<div className="absolute h-full top-0 border-l border-cold-grey-2 left-1/4"></div>
+					<div className="absolute h-full top-0 border-l border-cold-grey-2 left-1/2"></div>
+					<div className="absolute h-full top-0 border-l border-cold-grey-2 left-3/4"></div>
+					{PROGRESS_BARS.map((props, idx) => (
+						<ProgressBar key={idx} {...props} />
+					))}
+				</div>
 			</section>
 
 			<section className="mt-9">

@@ -3,7 +3,7 @@ import {
 	type ClimateVariableConfigInterface,
 	type LocationModalContentParams,
 } from '@/types/climate-variable-interface';
-import S2DClimateVariableValues from '@/components/map-layers/s2d-variable-values';
+import S2DVariableValues from '@/components/map-layers/s2d-variable-values';
 import ClimateVariableBase from '@/lib/climate-variable-base';
 import {
 	createPropsForS2DVariableValues,
@@ -34,7 +34,7 @@ class S2DClimateVariable extends ClimateVariableBase {
 		// TODO: Figure out where we will resolve the values. Probably from this class, and not outside.
 		const props = createPropsForS2DVariableValues({});
 		return super.renderWithComponent(
-			S2DClimateVariableValues,
+			S2DVariableValues,
 			props,
 		);
 	}

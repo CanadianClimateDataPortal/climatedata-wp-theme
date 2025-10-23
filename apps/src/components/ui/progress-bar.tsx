@@ -1,5 +1,6 @@
 import React from 'react';
 import { __ } from '@/context/locale-provider';
+import { sprintf } from '@wordpress/i18n';
 
 export type HexColor = `#${string}`;
 
@@ -29,7 +30,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 	percent,
 	fillHexCode,
 }) => {
-	const screenReaderOnly = __('Horizontal bar at %s% filled').replace('%s', String(percent));
+	const screenReaderOnly = sprintf(__('Horizontal bar at %s%% filled'), percent);
 
 	/**
 	 * aria-value and role=meter:
@@ -50,7 +51,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 			style={{ '--fill-color': fillHexCode } as React.CSSProperties}
 		>
 			{/* Layer 1: Background */}
-			<div className="absolute inset-0 bg-gray-100 rounded" />
+			<div className="absolute" />
 
 			{/* Layer 2: SVG filled bar */}
 			<svg

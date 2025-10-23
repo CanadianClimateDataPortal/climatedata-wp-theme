@@ -1,7 +1,7 @@
 type DateRange = [Date, Date];
 
 export interface S2DVariableValuesModalSection {
-	value?: number;
+	value: number;
 }
 
 export interface S2DVariableValuesModalSkillSection

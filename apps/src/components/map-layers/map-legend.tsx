@@ -1,9 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+	lazy,
+	Suspense,
+	useEffect,
+	useRef,
+	useState,
+} from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 
 import MapLegendControl from '@/components/map-legend-control';
+import MapLegendControlS2D from '@/components/map-legend-control-s2d';
+
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useColorMap } from '@/hooks/use-color-map';
 import { ColourType } from '@/types/climate-variable-interface';
@@ -12,13 +20,16 @@ import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 
+const LazyMapLegendInnerS2D = lazy(() => import('@/components/map-layers/map-legend-inner-s2d'));
+
+
 const MapLegend: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 
 	const map = useMap();
 	const { locale } = useLocale();
 	const { climateVariable } = useClimateVariable();
-	let { colorMap } = useColorMap();
+	const { colorMap } = useColorMap();
 	const {
 		opacity: { mapData }
 	} = useAppSelector((state) => state.map);
@@ -99,17 +110,17 @@ const MapLegend: React.FC = () => {
 		}
 
 		if (isConditionForClim1197) {
-			/**
-			 * Ugly hack to display legend.
-			 * Let's see if we change the colorMap hook or not.
-			 */
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-			colorMap = {
-				colours: ['#317CB7', '#4D94C3', '#67001F'],
-				quantities: [-50, -38, -25],
-				type: 'sequential',
-				isDivergent: false,
-			} as NonNullable<typeof colorMap>;
+			rootRef.current.render(
+				<MapLegendControlS2D
+					isOpen={isOpen}
+					toggleOpen={() => setIsOpen((prev) => !prev)}
+				>
+					<Suspense fallback={'...'}>
+						<LazyMapLegendInnerS2D />
+					</Suspense>
+				</MapLegendControlS2D>
+			);
+			return;
 		}
 
 		if (!colorMap) {

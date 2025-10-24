@@ -38,6 +38,8 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 	const legendValues = [...data.quantities].reverse();
 	const legendColors = [...data.colours].reverse();
 
+	console.log('isBlocksGradient', { isBlocksGradient });
+
 	if (legendConfig?.addTopPadding) {
 		// A label won't be generated for an NaN value.
 		legendValues.unshift(NaN);

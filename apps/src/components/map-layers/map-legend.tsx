@@ -18,7 +18,7 @@ const MapLegend: React.FC = () => {
 	const map = useMap();
 	const { locale } = useLocale();
 	const { climateVariable } = useClimateVariable();
-	const { colorMap } = useColorMap();
+	let { colorMap } = useColorMap();
 	const {
 		opacity: { mapData }
 	} = useAppSelector((state) => state.map);
@@ -99,10 +99,17 @@ const MapLegend: React.FC = () => {
 		}
 
 		if (isConditionForClim1197) {
-			rootRef.current.render(
-				<>S2D Map Legend</>
-			);
-			return;
+			/**
+			 * Ugly hack to display legend.
+			 * Let's see if we change the colorMap hook or not.
+			 */
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			colorMap = {
+				colours: ['#317CB7', '#4D94C3', '#67001F'],
+				quantities: [-50, -38, -25],
+				type: 'sequential',
+				isDivergent: false,
+			} as NonNullable<typeof colorMap>;
 		}
 
 		if (!colorMap) {

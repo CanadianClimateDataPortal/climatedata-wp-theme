@@ -6,6 +6,8 @@ import { useMap } from 'react-leaflet';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 
 import MapLegendControl from '@/components/map-legend-control';
+import MapLegendControlS2D from '@/components/map-legend-control-s2d';
+
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useColorMap } from '@/hooks/use-color-map';
 import { ColourType } from '@/types/climate-variable-interface';
@@ -97,13 +99,25 @@ const MapLegend: React.FC = () => {
 	useEffect(() => {
 		if (isConditionForClim1197) {
 			/* Temporary hack for now. Attaboy!! */
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 			colorMap = {
-				// Ugly
 				colours: ['#317CB7', '#4D94C3', '#67001F'],
 				quantities: [-50, -38, -25],
+				// @ts-ignore
 				type: 'sequential',
-				isDivergent: false,
+				isDivergent: true,
 			};
+			// Either we give the right mix-match values up of here
+			// ... or we make another component?
+			// @ts-ignore
+			rootRef?.current.render(
+				<MapLegendControlS2D
+					data={colorMap}
+					isOpen={isOpen}
+					toggleOpen={() => setIsOpen((prev) => !prev)}
+				/>
+			);
+			return;
 		}
 
 		if (!rootRef.current) {

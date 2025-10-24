@@ -80,6 +80,7 @@
     "eslint-plugin-react-refresh": "^0.4.12",
     "globals": "^15.9.0",
     "jsdom": "^26.1.0",
+		"@ladle/react": "^5.1.0",
     "patch-package": "^8.0.0",
     "postcss": "^8.4.47",
     "postinstall-postinstall": "^2.1.0",

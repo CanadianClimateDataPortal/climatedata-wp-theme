@@ -3,6 +3,8 @@ import { createRoot, Root } from 'react-dom/client';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
+
 import MapLegendControl from '@/components/map-legend-control';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useColorMap } from '@/hooks/use-color-map';
@@ -17,7 +19,7 @@ const MapLegend: React.FC = () => {
 	const map = useMap();
 	const { locale } = useLocale();
 	const { climateVariable } = useClimateVariable();
-	const { colorMap } = useColorMap();
+	let { colorMap } = useColorMap();
 	const {
 		opacity: { mapData }
 	} = useAppSelector((state) => state.map);
@@ -34,10 +36,20 @@ const MapLegend: React.FC = () => {
 	// For the default colour palette, isCategorical defaults to the default legend's type
 	if ((colourScheme === null || colourScheme === 'default') && legendData && legendData.Legend) {
 		const type = legendData.Legend[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap?.type;
-		isCategorical = (type === ColourType.DISCRETE);
+		isCategorical = type === ColourType.DISCRETE;
 	}
 
-	const rootRef = useRef<Root | null>	(null);
+	const rootRef = useRef<Root | null> (null);
+
+	/**
+	 * This is temporary until we do this the way the rest of the code expects.
+	 */
+	const isConditionForClim1197 = (() => {
+		const fd = climateVariable?.getForecastDisplay();
+		const isForecastDisplay = fd === 'forecast';
+		const isS2D = climateVariable instanceof S2DClimateVariable;
+		return isForecastDisplay === true && isS2D === true;
+	})(/* Temporary hack for now */);
 
 	/**
 	 * This hook creates the legend control once the map is ready. It only
@@ -74,7 +86,6 @@ const MapLegend: React.FC = () => {
 				legend.remove();
 				rootRef.current = null;
 			}
-
 		};
 	}, [map]);
 
@@ -82,7 +93,19 @@ const MapLegend: React.FC = () => {
 	 * This hook renders the legend content inside the legend control container
 	 * (created in the previous hook).
 	 */
+
 	useEffect(() => {
+		if (isConditionForClim1197) {
+			/* Temporary hack for now. Attaboy!! */
+			colorMap = {
+				// Ugly
+				colours: ['#317CB7', '#4D94C3', '#67001F'],
+				quantities: [-50, -38, -25],
+				type: 'sequential',
+				isDivergent: false,
+			};
+		}
+
 		if (!rootRef.current) {
 			return;
 		}
@@ -108,7 +131,17 @@ const MapLegend: React.FC = () => {
 				locale={locale}
 			/>
 		);
-	}, [colorMap, mapData, isOpen, isCategorical, legendConfig, isDelta, unit, locale]);
+	}, [
+		colorMap,
+		mapData,
+		isOpen,
+		isCategorical,
+		legendConfig,
+		isDelta,
+		unit,
+		locale,
+		isConditionForClim1197,
+	]);
 
 	return null;
 };

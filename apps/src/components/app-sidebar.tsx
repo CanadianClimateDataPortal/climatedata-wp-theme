@@ -18,10 +18,8 @@ import { DataValuesControl } from '@/components/sidebar-menu-items/data-values-c
 import { MapColorsDropdown } from '@/components/sidebar-menu-items/map-colors-dropdown';
 
 import SidebarInnerProjection from '@/components/sidebar-inner-projection';
-import {
-	SidebarInnerS2D,
-	SidebarFooterReleaseDate,
- } from '@/components/sidebar-inner-s2d';
+import SidebarInnerS2D from '@/components/sidebar-inner-s2d';
+import S2DReleaseDate from '@/components/s2d-release-date';
 
 import { RecentLocationsLink, RecentLocationsPanel } from '@/components/sidebar-footer-links/recent-locations';
 import LinkWithIcon from '@/components/sidebar-footer-links/link-with-icon';
@@ -134,7 +132,7 @@ export function AppSidebar() {
 
 				<SidebarGroup className="gap-0 mt-auto">
 					{isS2D ? (
-						<SidebarFooterReleaseDate />
+						<S2DReleaseDate />
 					) : null}
 					<RecentLocationsLink />
 					<LinkWithIcon

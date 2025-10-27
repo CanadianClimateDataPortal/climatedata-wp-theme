@@ -11,7 +11,7 @@ import StarRating from '@/components/ui/star-rating';
 import ProgressBar, {
 	type ProgressBarProps,
 } from '@/components/ui/progress-bar';
-import { SidebarFooterReleaseDate } from '@/components/sidebar-inner-s2d';
+import S2DReleaseDate from '@/components/s2d-release-date';
 import { sprintf } from '@wordpress/i18n';
 
 const tooltipHistoricalMedian = __(
@@ -276,7 +276,7 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 			</section>
 
 			<section className="mt-9">
-				<SidebarFooterReleaseDate />
+				<S2DReleaseDate />
 			</section>
 		</div>
 	);

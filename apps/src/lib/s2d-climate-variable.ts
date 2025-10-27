@@ -4,7 +4,7 @@ import {
 	type LocationModalContentParams,
 } from '@/types/climate-variable-interface';
 import S2DVariableValues from '@/components/map-layers/s2d-variable-values';
-import ClimateVariableBase from '@/lib/climate-variable-base';
+import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
 import {
 	createPropsForS2DVariableValues,
 } from '@/lib/s2d-variable-values';
@@ -13,7 +13,7 @@ import { createElement } from 'react';
 /**
  * Seasonal To Decadal
  */
-class S2DClimateVariable extends ClimateVariableBase {
+class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 	constructor(
 		config: ClimateVariableConfigInterface,
 	) {

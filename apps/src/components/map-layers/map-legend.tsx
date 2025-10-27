@@ -10,6 +10,7 @@ import { ColourType } from '@/types/climate-variable-interface';
 import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
 
 const MapLegend: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -38,6 +39,16 @@ const MapLegend: React.FC = () => {
 	}
 
 	const rootRef = useRef<Root | null>	(null);
+
+	/**
+	 * This is temporary until we do this the way the rest of the code expects.
+	 */
+	const isConditionForClim1197 = (() => {
+		const fd = climateVariable?.getForecastDisplay();
+		const isForecastDisplay = fd === 'forecast';
+		const isS2D = climateVariable instanceof S2DClimateVariable;
+		return isForecastDisplay === true && isS2D === true;
+	})(/* @TODO Make this condition written the usual way */);
 
 	/**
 	 * This hook creates the legend control once the map is ready. It only
@@ -87,6 +98,13 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
+		if (isConditionForClim1197) {
+			rootRef.current.render(
+				<>S2D Map Legend</>
+			);
+			return;
+		}
+
 		if (!colorMap) {
 			rootRef.current.render(<></>);
 			return;
@@ -108,7 +126,17 @@ const MapLegend: React.FC = () => {
 				locale={locale}
 			/>
 		);
-	}, [colorMap, mapData, isOpen, isCategorical, legendConfig, isDelta, unit, locale]);
+	}, [
+		colorMap,
+		mapData,
+		isOpen,
+		isCategorical,
+		legendConfig,
+		isDelta,
+		unit,
+		locale,
+		isConditionForClim1197,
+	]);
 
 	return null;
 };

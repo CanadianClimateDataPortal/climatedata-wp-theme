@@ -67,22 +67,26 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 					height="100%"
 					fill="var(--fill-color)"
 					style={{ fill: 'var(--fill-color)' }}
-					rx="4"
+					rx="6"
 				/>
 			</svg>
 
 			{/* Layer 3: Text with float layout */}
 			<div className="absolute inset-0 flex items-center text-sm overflow-hidden">
 				<div
-					className="text-black font-medium pl-3"
+					className="text-black font-medium pl-3 min-w-fit"
 					style={{
 						width: `${percent}%`,
-						minWidth: 'fit-content',
 					}}
 				>
 					{label}
 				</div>
-				<div className={`text-blue-600 font-medium pl-2`}>
+				<div
+					className="text-blue-600 font-medium pl-2"
+					style={{
+						textShadow: 'rgba(255, 255, 255, 1) 0px 0px 3px',
+					}}
+				>
 					{percent}%
 				</div>
 			</div>

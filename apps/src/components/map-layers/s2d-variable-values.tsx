@@ -120,7 +120,7 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 		// #Temporary
 		{
 			label: sprintf(LABEL_ABOVE, formatTemperature(7.5)),
-			percent: 11,
+			percent: 55,
 			fillHexCode: '#8abbd1',
 		},
 		{
@@ -129,7 +129,7 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 				formatTemperature(-4.9),
 				formatTemperature(7.5),
 			),
-			percent: 34,
+			percent: 92,
 			fillHexCode: '#5871a3',
 		},
 		{
@@ -160,7 +160,7 @@ export const S2DVariableValues: React.FC<S2DVariableValuesComponentProps> = ({
 				<data value={nearNormalTemperatureRange.join(',')}>
 					{sprintf(
 						LABEL_RANGE,
-						formatTemperature(nearNormalTemperatureRange[0]),
+						formatValue(nearNormalTemperatureRange[0], '', 1, locale),
 						formatTemperature(nearNormalTemperatureRange[1]),
 					)}
 				</data>

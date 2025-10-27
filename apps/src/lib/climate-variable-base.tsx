@@ -1,4 +1,4 @@
-import React, { createElement } from 'react';
+import React from 'react';
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
@@ -424,18 +424,6 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	getLocationModalContent(_params: LocationModalContentParams): React.ReactNode | null {
 		return null;
-	}
-
-	renderWithComponent<P extends object>(
-		element: React.NamedExoticComponent<P> | React.FunctionComponent<P> | React.ComponentClass<P> | string,
-		props?: React.Attributes & P,
-	): React.ReactNode {
-			// https://react.dev/reference/react/createElement
-			const tree = createElement(
-				element,
-				props,
-			);
-			return tree;
 	}
 
 	getLayerValue(scenario: string | null | undefined, section?: string): string {

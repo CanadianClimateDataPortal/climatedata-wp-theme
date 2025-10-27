@@ -8,6 +8,7 @@ import ClimateVariableBase from '@/lib/climate-variable-base';
 import {
 	createPropsForS2DVariableValues,
 } from '@/lib/s2d-variable-values';
+import { createElement } from 'react';
 
 /**
  * Seasonal To Decadal
@@ -33,7 +34,7 @@ class S2DClimateVariable extends ClimateVariableBase {
 	): React.ReactNode | null {
 		// TODO: Figure out where we will resolve the values. Probably from this class, and not outside.
 		const props = createPropsForS2DVariableValues({});
-		return super.renderWithComponent(
+		return createElement(
 			S2DVariableValues,
 			props,
 		);

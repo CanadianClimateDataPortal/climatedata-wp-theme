@@ -67,6 +67,8 @@ export const MapLegendInnerS2D: React.FC<MapLegendInnerS2DProps> = () => {
 
 	const labelWidth = 50; // px
 
+	const headingFontSize = '.6rem';
+
 	return (
 		<div className="relative">
 			{/* Header */}
@@ -105,6 +107,7 @@ export const MapLegendInnerS2D: React.FC<MapLegendInnerS2DProps> = () => {
 								<th
 									key={idx}
 									id={`${prefix}-b${startBoundary}-b${endBoundary}`}
+									style={{fontSize: headingFontSize}}
 									scope="col"
 									className="text-xs font-normal p-0"
 								>
@@ -134,6 +137,7 @@ export const MapLegendInnerS2D: React.FC<MapLegendInnerS2DProps> = () => {
 							<tr key={rowId}>
 								<th
 									id={`${prefix}-${rowId}`}
+									style={{fontSize: headingFontSize}}
 									scope="row"
 									className="text-right pr-2 text-sm font-normal align-middle"
 								>

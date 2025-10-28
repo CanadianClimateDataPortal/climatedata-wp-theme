@@ -281,7 +281,8 @@ export const MapLegendInnerS2D: React.FC = () => {
 	// Table heading on the left
 	const labelWidth = 50; // px
 	// Font size to for table headings on the top and left.
-	const headingFontSize = '.6rem';
+	const headingFontSize = '.8rem';
+	const marginTopNegativeToAlign = '-15px';
 
 	return (
 		<div className="relative">
@@ -329,16 +330,63 @@ export const MapLegendInnerS2D: React.FC = () => {
 									id={`${prefix}-b${startBoundary}-b${endBoundary}`}
 									style={{ fontSize: headingFontSize }}
 									scope="col"
-									className="p-0 text-xs font-normal"
+									className="relative p-0 pt-4 text-xs font-normal"
 								>
 									{isFirst ? (
-										<div className="flex justify-between">
-											<span>{startBoundary}</span>
-											<span>{endBoundary}</span>
+										<div className="flex justify-between font-[font-variant-numeric:tabular-nums]">
+											{/* Fist item has 2 marks, 1/2, left boundary, on the left edge */}
+											<div
+												className="relative -ml-px"
+												style={{ marginTop: marginTopNegativeToAlign }}
+											>
+												<span className="absolute left-0 -translate-x-1/2">
+													{startBoundary}
+												</span>
+												<div
+													className="absolute w-px bg-black"
+													style={{
+														top: '1em',
+														height: '6px',
+														left: 0,
+													}}
+												></div>
+											</div>
+
+											{/* First item has 2 marks, 2/2, right boundary, on the right edge */}
+											<div
+												className="relative -mr-px"
+												style={{ marginTop: marginTopNegativeToAlign }}
+											>
+												<span className="absolute right-0 translate-x-1/2">
+													{endBoundary}
+												</span>
+												<div
+													className="absolute w-px bg-black"
+													style={{
+														top: '1em',
+														height: '6px',
+														right: 0,
+													}}
+												></div>
+											</div>
 										</div>
 									) : (
-										<div className="text-right">
-											{endBoundary}
+										<div
+											className="relative -mr-px font-[font-variant-numeric:tabular-nums]"
+											style={{ marginTop: marginTopNegativeToAlign }}
+										>
+											{/* Every other items. Boundary at right edge */}
+											<span className="absolute right-0 translate-x-1/2">
+												{endBoundary}
+											</span>
+											<div
+												className="absolute w-px bg-black"
+												style={{
+													top: '1em',
+													height: '6px',
+													right: 0,
+												}}
+											></div>
 										</div>
 									)}
 								</th>

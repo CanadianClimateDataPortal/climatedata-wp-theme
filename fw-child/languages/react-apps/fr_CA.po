@@ -1196,3 +1196,43 @@ msgstr "La prévision a été publiée à cette date. "
   "Les prévisions mensuelles et saisonnières sont mises à jour chaque mois, "
   "et les prévisions décennales chaque année. "
   "L’exactitude a tendance à être plus élevée pour les périodes plus proches de la date de sortie."
+
+msgid "Probability"
+msgstr "Probabilité"
+
+msgid "Above"
+msgstr "au-dessus"
+
+msgid "Near"
+msgstr "près"
+
+msgid "Below"
+msgstr "en-dessous"
+
+msgid "total precipitation"
+msgstr "précipitations totales"
+
+msgid "unusually high or low"
+msgstr "inhabituellement élevées ou faibles"
+
+msgid "Probability that the %s will be %s relative to the %d to %d historical climatology."
+msgstr "Probabilité que la %s soit %s par rapport à la climatologie historique de %d à %d."
+
+msgid "Unusually high"
+msgstr "Inhabituellement élevée"
+
+msgid "Above the %s percentile"
+msgstr "au-dessus du %s centile"
+
+msgid "top fifth of historical data"
+msgstr "cinquième supérieur des données historiques"
+
+msgid "Unusually low"
+msgstr "Inhabituellement faible"
+
+msgid "Below the %s percentile"
+msgstr "en-dessous du 20e centile"
+
+msgid "bottom fifth of historical data"
+msgstr "cinquième inférieur des données historiques"
+

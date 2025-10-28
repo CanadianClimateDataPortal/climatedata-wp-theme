@@ -342,9 +342,10 @@ export const MapLegendInnerS2D: React.FC = () => {
 													{startBoundary}
 												</span>
 												<div
-													className="absolute w-px -translate-x-1/2 bg-black left-1/2"
+													className="absolute w-px bg-black"
 													style={{
-														top: `calc(100% + ${numberToTickGap}px)`,
+														top: `calc(1em + ${numberToTickGap}px)`,
+														left: 0,
 														height: `${tickHeight}px`,
 													}}
 												></div>
@@ -356,9 +357,10 @@ export const MapLegendInnerS2D: React.FC = () => {
 													{endBoundary}
 												</span>
 												<div
-													className="absolute w-px -translate-x-1/2 bg-black left-1/2"
+													className="absolute w-px bg-black"
 													style={{
-														top: `calc(100% + ${numberToTickGap}px)`,
+														top: `calc(1em + ${numberToTickGap}px)`,
+														right: 0,
 														height: `${tickHeight}px`,
 													}}
 												></div>
@@ -371,9 +373,10 @@ export const MapLegendInnerS2D: React.FC = () => {
 												{endBoundary}
 											</span>
 											<div
-												className="absolute right-0 w-px bg-black"
+												className="absolute w-px bg-black"
 												style={{
-													top: `calc(100% + ${numberToTickGap}px)`,
+													top: `calc(1em + ${numberToTickGap}px)`,
+													right: 0,
 													height: `${tickHeight}px`,
 												}}
 											></div>

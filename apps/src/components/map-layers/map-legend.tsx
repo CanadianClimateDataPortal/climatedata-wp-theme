@@ -130,8 +130,6 @@ const MapLegend: React.FC = () => {
 
 		const colourType = colorMap.type;
 
-		window.colorMap = colorMap;
-
 		rootRef.current.render(
 			<MapLegendControl
 				data={colorMap}

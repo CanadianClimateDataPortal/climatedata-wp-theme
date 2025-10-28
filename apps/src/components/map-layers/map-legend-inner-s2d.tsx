@@ -283,6 +283,8 @@ export const MapLegendInnerS2D: React.FC = () => {
 	// Font size to for table headings on the top and left.
 	const headingFontSize = '.8rem';
 	const marginTopNegativeToAlign = '-15px';
+	const tickHeight = 6; // px
+	const numberToTickGap = 2; // px
 
 	return (
 		<div className="relative">
@@ -330,61 +332,49 @@ export const MapLegendInnerS2D: React.FC = () => {
 									id={`${prefix}-b${startBoundary}-b${endBoundary}`}
 									style={{ fontSize: headingFontSize }}
 									scope="col"
-									className="relative p-0 pt-4 text-xs font-normal"
+									className="relative p-0 pb-1 text-xs font-normal"
 								>
 									{isFirst ? (
 										<div className="flex justify-between font-[font-variant-numeric:tabular-nums]">
 											{/* Fist item has 2 marks, 1/2, left boundary, on the left edge */}
-											<div
-												className="relative -ml-px"
-												style={{ marginTop: marginTopNegativeToAlign }}
-											>
-												<span className="absolute left-0 -translate-x-1/2">
+											<div className="relative">
+												<span className="block pb-0.5">
 													{startBoundary}
 												</span>
 												<div
-													className="absolute w-px bg-black"
+													className="absolute w-px -translate-x-1/2 bg-black left-1/2"
 													style={{
-														top: '1em',
-														height: '6px',
-														left: 0,
+														top: `calc(100% + ${numberToTickGap}px)`,
+														height: `${tickHeight}px`,
 													}}
 												></div>
 											</div>
 
 											{/* First item has 2 marks, 2/2, right boundary, on the right edge */}
-											<div
-												className="relative -mr-px"
-												style={{ marginTop: marginTopNegativeToAlign }}
-											>
-												<span className="absolute right-0 translate-x-1/2">
+											<div className="relative">
+												<span className="block pb-0.5">
 													{endBoundary}
 												</span>
 												<div
-													className="absolute w-px bg-black"
+													className="absolute w-px -translate-x-1/2 bg-black left-1/2"
 													style={{
-														top: '1em',
-														height: '6px',
-														right: 0,
+														top: `calc(100% + ${numberToTickGap}px)`,
+														height: `${tickHeight}px`,
 													}}
 												></div>
 											</div>
 										</div>
 									) : (
-										<div
-											className="relative -mr-px font-[font-variant-numeric:tabular-nums]"
-											style={{ marginTop: marginTopNegativeToAlign }}
-										>
+										<div className="relative text-right font-[font-variant-numeric:tabular-nums]">
 											{/* Every other items. Boundary at right edge */}
-											<span className="absolute right-0 translate-x-1/2">
+											<span className="inline-block pb-0.5">
 												{endBoundary}
 											</span>
 											<div
-												className="absolute w-px bg-black"
+												className="absolute right-0 w-px bg-black"
 												style={{
-													top: '1em',
-													height: '6px',
-													right: 0,
+													top: `calc(100% + ${numberToTickGap}px)`,
+													height: `${tickHeight}px`,
 												}}
 											></div>
 										</div>

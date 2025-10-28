@@ -10,7 +10,7 @@ import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 
 import MapLegendControl from '@/components/map-legend-control';
-import MapLegendControlS2D from '@/components/map-legend-control-s2d';
+import MapLegendOpenControl from '@/components/map-layers/map-legend-open-control';
 
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useColorMap } from '@/hooks/use-color-map';
@@ -111,14 +111,14 @@ const MapLegend: React.FC = () => {
 
 		if (isConditionForClim1197) {
 			rootRef.current.render(
-				<MapLegendControlS2D
+				<MapLegendOpenControl
 					isOpen={isOpen}
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 				>
 					<Suspense fallback={'...'}>
 						<LazyMapLegendInnerS2D />
 					</Suspense>
-				</MapLegendControlS2D>
+				</MapLegendOpenControl>
 			);
 			return;
 		}

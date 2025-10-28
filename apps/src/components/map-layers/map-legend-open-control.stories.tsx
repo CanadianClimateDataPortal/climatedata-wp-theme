@@ -1,9 +1,11 @@
 import { lazy, Suspense, useState } from 'react';
 
-import { type Story, type StoryDefault } from '@ladle/react';
+import {
+	type Story,
+	type StoryDefault,
+} from '@ladle/react';
 
 import MapLegendOpenControl from '@/components/map-layers/map-legend-open-control';
-
 
 export default {
 	title: 'Map Legend Open Control!',

@@ -1,3 +1,4 @@
+import React from 'react';
 import ClimateVariableBase from '@/lib/climate-variable-base';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import {
@@ -14,9 +15,11 @@ import {
 	LocationModalContentParams,
 	ScenariosConfig,
 } from '@/types/climate-variable-interface';
+import { getFrequencyType } from '@/lib/utils.ts';
 import RasterPrecalcultatedClimateVariableValues
 	from '../components/map-layers/raster-precalculated-climate-variable-values';
-import { getFrequencyType } from '@/lib/utils.ts';
+import RasterMap from '@/components/raster-map';
+import RasterDownloadMap from '@/components/download/raster-download-map';
 
 interface DownloadPayloadProps {
 	dataset_name: string | null;
@@ -345,6 +348,14 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 			}
 		}
 		return null;
+	}
+
+	renderMap(): React.ReactElement {
+		return <RasterMap />;
+	}
+
+	renderDownloadMap(): React.ReactElement {
+		return <RasterDownloadMap />;
 	}
 
 	getLocationModalContent({

@@ -1,4 +1,3 @@
-import { type ReactNode } from 'react';
 import { __ } from '@/context/locale-provider';
 
 import Dropdown from '@/components/ui/dropdown';
@@ -7,7 +6,6 @@ import TooltipWidget from '@/components/ui/tooltip-widget';
 import { SidebarMenuItem, SidebarSeparator } from '@/components/ui/sidebar';
 import { Checkbox } from '@/components/ui/checkbox';
 
-import { formatUTCDate } from '@/lib/utils';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import {
 	ForecastDisplay,
@@ -22,12 +20,6 @@ import {
 	selectLowSkillVisibility,
 	setLowSkillVisibility,
 } from '@/features/map/map-slice';
-import { useS2D } from '@/hooks/use-s2d';
-import { useLocale } from '@/hooks/use-locale';
-
-export interface ReleaseDateProps {
-	tooltip?: ReactNode;
-}
 
 const tooltipForecastTypes = __(
 	'S2D forecasts are shown as probabilities for how conditions will compare to historical climate conditions between 1991 and 2020. ' +
@@ -56,13 +48,6 @@ const tooltipFrequencies = __(
 const tooltipTimePeriods = __(
 	'The available time periods will change if a different frequency is selected. ' +
 		'Move the slider to select the forecast for your time period of interest.'
-);
-
-const tooltipReleaseDate = __(
-	'The forecast was released on this date. ' +
-		'Monthly and seasonal forecasts are updated each month and decadal forecasts ' +
-		'are updated annually. ' +
-		'Skill tends to be higher for time periods closer to the release date.'
 );
 
 const SelectAnOptionLabel = __('Select an option');
@@ -94,7 +79,7 @@ const fieldFrequencies = {
 	],
 };
 
-export const SidebarInnerS2D = () => {
+const SidebarInnerS2D = () => {
 	const {
 		climateVariable,
 		setForecastType,
@@ -183,53 +168,6 @@ export const SidebarInnerS2D = () => {
 	);
 };
 
-SidebarInnerS2D.displayName = 'SidebarInnerS2D'
+SidebarInnerS2D.displayName = 'SidebarInnerS2D';
 
-/**
- * Component displaying the release date for the sidebar.
- *
- * Shows a loading message if the release date is not yet available.
- *
- * @param tooltip - Optional tooltip override.
- */
-export const SidebarFooterReleaseDate = ({
-	tooltip,
-}: ReleaseDateProps) => {
-	const { releaseDate } = useS2D();
-	const { locale } = useLocale();
-
-	let releaseDateElement = (
-		<span className="font-medium text-gray-400">{__('Loading...')}</span>
-	);
-
-	if (releaseDate) {
-		const formattedDate = releaseDate.toLocaleDateString(locale, {
-			year: 'numeric',
-			month: 'short',
-			day: 'numeric',
-			timeZone: 'UTC',
-		});
-
-		releaseDateElement = (
-			<time
-				dateTime={formatUTCDate(releaseDate, 'yyyy-MM-dd')}
-			>
-				{formattedDate}
-			</time>
-		);
-	}
-
-	return (
-		<div className="flex flex-row flex-nowrap gap-1 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
-			<span>
-				{__('Release date:')}&nbsp;
-				{releaseDateElement}
-			</span>
-			<TooltipWidget
-				tooltip={tooltip ?? tooltipReleaseDate}
-			/>
-		</div>
-	);
-};
-
-SidebarFooterReleaseDate.displayName = 'SidebarFooterReleaseDate';
+export default SidebarInnerS2D;

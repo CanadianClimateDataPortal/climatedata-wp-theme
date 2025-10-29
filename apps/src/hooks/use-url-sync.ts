@@ -102,13 +102,13 @@ export const useUrlSync = () => {
 		if (climateData.id) {
 			params.set(URL_PARAMS.VARIABLE_ID, climateData.id);
 		}
-		
+
 		// Only add threshold if the variable supports thresholds AND has a value
 		if (climateData.threshold && 
 			(defaultConfig?.thresholds || defaultConfig?.threshold)) {
 			params.set(URL_PARAMS.THRESHOLD, climateData.threshold.toString());
 		}
-		
+
 		if (climateData.scenario) {
 			params.set(URL_PARAMS.SCENARIO, climateData.scenario);
 		}
@@ -336,7 +336,7 @@ export const useUrlSync = () => {
 				const dateRange = dateRangeStr.split(',');
 				if (dateRange.length > 1) {
 					const endYear = parseInt(dateRange[1]);
-					if (!isNaN(endYear)) {
+					if (!Number.isNaN(endYear)) {
 						dispatch(setTimePeriodEnd([endYear]));
 					}
 				}
@@ -362,7 +362,11 @@ export const useUrlSync = () => {
 				newConfig.forecastType = paramValue;
 			} catch (error) {
 				if (!(error instanceof AssertionError)) {
-					throw error;
+					const originalError = error as Error;
+					throw new Error(
+						originalError.message,
+						{ cause: originalError },
+					);
 				}
 			}
 		}
@@ -374,7 +378,11 @@ export const useUrlSync = () => {
 				newConfig.forecastDisplay = paramValue;
 			} catch (error) {
 				if (!(error instanceof AssertionError)) {
-					throw error;
+					const originalError = error as Error;
+					throw new Error(
+						originalError.message,
+						{ cause: originalError },
+					);
 				}
 			}
 		}

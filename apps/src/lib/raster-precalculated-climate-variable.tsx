@@ -1,3 +1,4 @@
+import React from 'react';
 import ClimateVariableBase from '@/lib/climate-variable-base';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import {
@@ -14,9 +15,9 @@ import {
 	LocationModalContentParams,
 	ScenariosConfig,
 } from '@/types/climate-variable-interface';
+import { getFrequencyType } from '@/lib/utils.ts';
 import RasterPrecalcultatedClimateVariableValues
 	from '../components/map-layers/raster-precalculated-climate-variable-values';
-import { getFrequencyType } from '@/lib/utils.ts';
 
 interface DownloadPayloadProps {
 	dataset_name: string | null;

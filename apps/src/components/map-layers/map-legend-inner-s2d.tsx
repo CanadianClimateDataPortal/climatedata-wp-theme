@@ -199,6 +199,8 @@ const ProbabilityStatement: React.FC<ProbabilityStatementProps> = ({
 	locale,
 }) => {
 	const [startYear, endYear] = dateRangeYears ?? ['1991', '2020'];
+	const statementRows = S2D_HARDCODED_STMT_ROWS;
+	const afterStatementRows = S2D_HARDCODED_STMT_ROWS_LAST_LINE;
 
 	const firstLine = sprintf(
 		__(
@@ -212,34 +214,34 @@ const ProbabilityStatement: React.FC<ProbabilityStatementProps> = ({
 
 	const renderRow = (v: ProbabilityStatementTooltipRow, idx: number) => {
 		const { value, label, text, parens } = v;
-		const parentheses =
-			typeof parens === 'string' && parens ? ` (${__(parens)})` : void 0;
-		/**
-		 * Code-Review Question: Instead of a string, we could use `<sup>th</sup>` instead.
-		 */
 		const formattedValue = value + getOrdinalSuffix(value, locale);
 		return (
-			<>
-				<dt key={idx + '-dt'}>{__(label)}</dt>
-				<dd key={idx + '-dd'}>
-					{sprintf(__(text), formattedValue)} {parentheses}
+			<div key={idx} className="space-y-0.5">
+				<dt className="font-semibold text-gray-900">{__(label)}</dt>
+				<dd className="text-gray-700">
+					{sprintf(__(text), formattedValue)}
+					{parens && (
+						<span className="ml-1 text-gray-600">
+							({__(parens)})
+						</span>
+					)}
 				</dd>
-			</>
+			</div>
 		);
 	};
 
 	return (
-		<>
+		<div className="space-y-3 text-sm leading-relaxed">
 			<p>{firstLine}</p>
-			{S2D_HARDCODED_STMT_ROWS.length > 0 ? (
-				<dl>
-					{S2D_HARDCODED_STMT_ROWS.map((v, idx) => renderRow(v, idx))}
+			{statementRows.length > 0 ? (
+				<dl className="pl-3 space-y-2 border-l-2 border-gray-300">
+					{statementRows.map((v, idx) => renderRow(v, idx))}
 				</dl>
 			) : (
 				void 0
 			)}
-			<p>{__(S2D_HARDCODED_STMT_ROWS_LAST_LINE)}</p>
-		</>
+			{afterStatementRows && <p>{__(afterStatementRows)}</p>}
+		</div>
 	);
 };
 
@@ -329,7 +331,11 @@ export const MapLegendInnerS2D: React.FC = () => {
 							const endBoundary = data.scale[idx + 1];
 							const isFirst = idx === 0;
 
-							const ariaLabel = sprintf(__('Between %s and %s'), startBoundary, endBoundary);
+							const ariaLabel = sprintf(
+								__('Between %s and %s'),
+								startBoundary,
+								endBoundary
+							);
 
 							return (
 								<th

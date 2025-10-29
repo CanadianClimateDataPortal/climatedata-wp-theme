@@ -1236,3 +1236,6 @@ msgstr "en-dessous du 20e centile"
 msgid "bottom fifth of historical data"
 msgstr "cinquième inférieur des données historiques"
 
+msgid "Between %s and %s"
+msgstr "Entre %s et %s"
+

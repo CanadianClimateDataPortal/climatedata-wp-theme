@@ -329,10 +329,13 @@ export const MapLegendInnerS2D: React.FC = () => {
 							const endBoundary = data.scale[idx + 1];
 							const isFirst = idx === 0;
 
+							const ariaLabel = sprintf(__('Between %s and %s'), startBoundary, endBoundary);
+
 							return (
 								<th
 									key={idx}
 									id={`${prefix}-b${startBoundary}-b${endBoundary}`}
+									aria-label={ariaLabel}
 									style={{ fontSize: headingFontSize }}
 									scope="col"
 									className="relative p-0 pb-1 text-xs font-normal"

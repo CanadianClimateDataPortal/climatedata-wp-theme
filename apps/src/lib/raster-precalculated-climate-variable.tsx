@@ -15,7 +15,6 @@ import {
 	LocationModalContentParams,
 	ScenariosConfig,
 } from '@/types/climate-variable-interface';
-import { getFrequencyType } from '@/lib/utils.ts';
 import RasterPrecalcultatedClimateVariableValues
 	from '../components/map-layers/raster-precalculated-climate-variable-values';
 import { getFrequencyType } from '@/lib/utils.ts';

@@ -8,6 +8,22 @@ import {
 import { WMSParams } from '@/types/types';
 import L from 'leaflet';
 
+/**
+ * Filter out the "version" and "TIME" attributes from a WMSParams object.
+ *
+ * Those specific attributes are removed since they are the ones that change.
+ */
+const filterVersionAndTime = (params: WMSParams): object => {
+	const {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		version: _ignored1,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		TIME: _ignored2,
+		...filteredParams
+	} = params;
+	return filteredParams;
+}
+
 describe('getLayerValue', () => {
 	let climateVariable: S2DClimateVariable;
 
@@ -137,11 +153,9 @@ describe('updateMapWMSParams', () => {
 	});
 
 	test("doesn't change the other parameters", () => {
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { version: _ignored1, ...originalParams } = baseParams;
+		const originalParams = filterVersionAndTime(baseParams);
 		const params = climateVariable.updateMapWMSParams(baseParams, false);
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { version: _ignored2, ...newParams } = params;
+		const newParams = filterVersionAndTime(params);
 		expect(newParams).toEqual(originalParams);
 	});
 

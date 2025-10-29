@@ -46,6 +46,10 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 		return 'canadagrid';
 	}
 
+	hasDelta(): boolean | undefined {
+		return false;
+	}
+
 	/**
 	 * Generate and return the GeoServer layer name for the data map.
 	 *

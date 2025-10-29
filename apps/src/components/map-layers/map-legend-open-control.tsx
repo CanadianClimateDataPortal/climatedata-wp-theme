@@ -15,7 +15,7 @@ export const MapLegendOpenControl: React.FC<MapLegendOpenControlProps> = ({
 }) => {
 	// This should match what we have in MapLegendControl
 	return (
-		<div className="space-y-[5px] w-[230px]">
+		<div className="space-y-[5px] w-[350px]">
 			<button
 				id="legend-toggle"
 				className="legend-toggle flex items-center space-x-2 bg-white border border-cold-grey-3 rounded-md py-1 px-2.5"
@@ -31,7 +31,10 @@ export const MapLegendOpenControl: React.FC<MapLegendOpenControlProps> = ({
 				)}
 			</button>
 			{isOpen && children && (
-				<div className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto relative">
+				<div
+					className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto relative overflow-hidden"
+					style={{ paddingRight: 10 }}
+				>
 					{children}
 				</div>
 			)}

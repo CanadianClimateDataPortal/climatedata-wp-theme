@@ -282,9 +282,12 @@ export const MapLegendInnerS2D: React.FC = () => {
 	const labelWidth = 50; // px
 	// Font size to for table headings on the top and left.
 	const headingFontSize = '.8rem';
-	const marginTopNegativeToAlign = '-15px';
+	// The little notch between each levels
 	const tickHeight = 6; // px
+	// Gap between the tick notch and the level's number
 	const numberToTickGap = 2; // px
+	// Distance to skew off to mimick aligning. But this is assuming numbers will only be no longer than 3 digits.
+	const offsetToAlignInMiddleOfTwoDigitsNumber = 0.5; // em
 
 	return (
 		<div className="relative">
@@ -338,7 +341,12 @@ export const MapLegendInnerS2D: React.FC = () => {
 										<div className="flex justify-between font-[font-variant-numeric:tabular-nums]">
 											{/* Fist item has 2 marks, 1/2, left boundary, on the left edge */}
 											<div className="relative">
-												<span className="block pb-0.5">
+												<span
+													className="block pb-0.5"
+													style={{
+														marginLeft: `-${offsetToAlignInMiddleOfTwoDigitsNumber}em`,
+													}}
+												>
 													{startBoundary}
 												</span>
 												<div
@@ -353,7 +361,12 @@ export const MapLegendInnerS2D: React.FC = () => {
 
 											{/* First item has 2 marks, 2/2, right boundary, on the right edge */}
 											<div className="relative">
-												<span className="block pb-0.5">
+												<span
+													className="block pb-0.5"
+													style={{
+														marginRight: `-${offsetToAlignInMiddleOfTwoDigitsNumber}em`,
+													}}
+												>
 													{endBoundary}
 												</span>
 												<div
@@ -369,7 +382,12 @@ export const MapLegendInnerS2D: React.FC = () => {
 									) : (
 										<div className="relative text-right font-[font-variant-numeric:tabular-nums]">
 											{/* Every other items. Boundary at right edge */}
-											<span className="inline-block pb-0.5">
+											<span
+												className="inline-block pb-0.5"
+												style={{
+													marginRight: `-${offsetToAlignInMiddleOfTwoDigitsNumber}em`,
+												}}
+											>
 												{endBoundary}
 											</span>
 											<div

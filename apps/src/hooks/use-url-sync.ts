@@ -102,13 +102,13 @@ export const useUrlSync = () => {
 		if (climateData.id) {
 			params.set(URL_PARAMS.VARIABLE_ID, climateData.id);
 		}
-		
+
 		// Only add threshold if the variable supports thresholds AND has a value
 		if (climateData.threshold && 
 			(defaultConfig?.thresholds || defaultConfig?.threshold)) {
 			params.set(URL_PARAMS.THRESHOLD, climateData.threshold.toString());
 		}
-		
+
 		if (climateData.scenario) {
 			params.set(URL_PARAMS.SCENARIO, climateData.scenario);
 		}

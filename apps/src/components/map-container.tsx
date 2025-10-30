@@ -1,6 +1,17 @@
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet';
-import { MAP_CONFIG } from '@/config/map.config';
+import React, {
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
+import {
+	MapContainer as LMapContainer,
+	TileLayer,
+	WMSTileLayer,
+} from 'react-leaflet';
+import { LAYER_KEYS, MAP_CONFIG, WMS_PARAMS } from '@/config/map.config';
 import 'leaflet.vectorgrid';
 import L from 'leaflet';
 
@@ -23,15 +34,38 @@ import { generateChartData } from '@/services/services';
 import { cn, getDefaultFrequency, remToPx } from '@/lib/utils';
 import SectionContext from '@/context/section-provider';
 import appConfig from '@/config/app.config';
-import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM, SIDEBAR_WIDTH } from '@/lib/constants';
+import {
+	CANADA_BOUNDS,
+	DEFAULT_MAX_ZOOM,
+	DEFAULT_MIN_ZOOM,
+	GEOSERVER_BASE_URL,
+	SIDEBAR_WIDTH,
+} from '@/lib/constants';
 import { LocationModalContent } from '@/components/map-layers/location-modal-content';
 import { SelectedLocationInfo, Station } from '@/types/types';
 import { InteractiveRegionOption } from '@/types/climate-variable-interface';
+import MarineClimateVariable from '@/lib/marine-climate-variable';
+
+interface MapContainerProps {
+	onMapReady: (map: L.Map) => void;
+	onUnmount?: () => void;
+	isComparisonMap?: boolean;
+	onOver: (
+		e: { latlng: L.LatLng; layer: { properties: unknown } },
+		getFeatureColor: (featureId: number) => string
+	) => void;
+	onOut: () => void;
+	onClick: (e: { latlng: L.LatLng; layer: { properties: unknown } }) => void;
+	selectedLocation: SelectedLocationInfo | null;
+	clearSelectedLocation: () => void;
+	// @ts-expect-error: L.VectorGrid is a valid type
+	layerRef?: React.MutableRefObject<L.VectorGrid | null>;
+}
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
-export default function RasterMapContainer({
+export default function MapContainer({
 	onMapReady,
 	onUnmount,
 	isComparisonMap = false,
@@ -41,17 +75,7 @@ export default function RasterMapContainer({
 	selectedLocation,
 	clearSelectedLocation,
 	layerRef,
-}: {
-	onMapReady: (map: L.Map) => void;
-	onUnmount?: () => void;
-	isComparisonMap?: boolean;
-	onOver: (e: { latlng: L.LatLng; layer: { properties: any } }, getFeatureColor: (featureId: number) => string) => void;
-	onOut: () => void;
-	onClick: (e: { latlng: L.LatLng; layer: { properties: any } }) => void;
-	selectedLocation: SelectedLocationInfo | null;
-	clearSelectedLocation: () => void;
-	layerRef?: React.MutableRefObject<any>;
-}): React.ReactElement {
+}: MapContainerProps): React.ReactElement {
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
 	const [selectedStation, setSelectedStation] = useState<Station | null>(null);
 
@@ -68,6 +92,8 @@ export default function RasterMapContainer({
 	const scenario = isComparisonMap ?
 		(climateVariable?.getScenarioCompareTo() ?? '') :
 		(climateVariable?.getScenario() ?? '');
+
+	const showLandmassMask = climateVariable && climateVariable instanceof MarineClimateVariable;
 
 	const scenarioLabel = appConfig.scenarios.find(item => item.value === scenario)?.label ?? scenario;
 
@@ -173,7 +199,7 @@ export default function RasterMapContainer({
 	}, [onMapReady, onUnmount]);
 
 	return (
-		<MapContainer
+		<LMapContainer
 			ref={mapRef}
 			attributionControl={false}
 			center={[mapCoordinates.lat, mapCoordinates.lng]}
@@ -194,7 +220,7 @@ export default function RasterMapContainer({
 			)}
 
 			{/* Use the unified CustomPanesLayer with 'standard' mode */}
-			<CustomPanesLayer mode="standard" />
+			<CustomPanesLayer />
 
 			{/* Use the unified VariableLayer */}
 			<VariableLayer isComparisonMap={isComparisonMap} />
@@ -237,6 +263,21 @@ export default function RasterMapContainer({
 				maxZoom={DEFAULT_MAX_ZOOM}
 			/>
 
+			{/* Landmass layer for marine data, with transparent oceans */}
+			{showLandmassMask && (
+				<WMSTileLayer
+					url={`${GEOSERVER_BASE_URL}/geoserver/wms`}
+					layers={LAYER_KEYS.landmass}
+					params={WMS_PARAMS.landmass}
+					format="image/png"
+					transparent={true}
+					version="1.1.1"
+					pane="landmassMask"
+					opacity={1.0}
+					bounds={CANADA_BOUNDS}
+				/>
+			)}
+
 			{/* Labels TileLayer */}
 			<TileLayer
 				url={MAP_CONFIG.labelsTileUrl}
@@ -245,13 +286,15 @@ export default function RasterMapContainer({
 			/>
 
 			{/* show current scenario label */}
-			<div className={cn(
-				'absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20',
-				'text-sm text-zinc-900 font-normal leading-5',
-				'bg-neutral-grey-light border border-cold-grey-4 shadow-md rounded-xl px-3.5 py-1.5',
-			)}>
-				{scenarioLabel}
-			</div>
-		</MapContainer>
+			{ scenarioLabel && (
+				<div className={cn(
+					'absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20',
+					'text-sm text-zinc-900 font-normal leading-5',
+					'bg-neutral-grey-light border border-cold-grey-4 shadow-md rounded-xl px-3.5 py-1.5',
+				)}>
+					{scenarioLabel}
+				</div>
+			)}
+		</LMapContainer>
 	);
 }

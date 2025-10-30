@@ -312,14 +312,6 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.decimalPlace ?? 0;
 	}
 
-	renderMap(): React.ReactNode {
-		return null
-	}
-
-	renderDownloadMap(): React.ReactNode {
-		return null;
-	}
-
 	getDownloadType(): DownloadType | null {
 		return this._config.downloadType ?? null;
 	}

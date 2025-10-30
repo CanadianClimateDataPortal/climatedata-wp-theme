@@ -48,6 +48,22 @@ import MarineClimateVariable from '@/lib/marine-climate-variable';
 import LowSkillLayer from '@/components/map-layers/low-skill-layer';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 
+interface MapContainerProps {
+	onMapReady: (map: L.Map) => void;
+	onUnmount?: () => void;
+	isComparisonMap?: boolean;
+	onOver: (
+		e: { latlng: L.LatLng; layer: { properties: unknown } },
+		getFeatureColor: (featureId: number) => string
+	) => void;
+	onOut: () => void;
+	onClick: (e: { latlng: L.LatLng; layer: { properties: unknown } }) => void;
+	selectedLocation: SelectedLocationInfo | null;
+	clearSelectedLocation: () => void;
+	// @ts-expect-error: L.VectorGrid is a valid type
+	layerRef?: React.MutableRefObject<L.VectorGrid | null>;
+}
+
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
@@ -61,17 +77,7 @@ export default function MapContainer({
 	selectedLocation,
 	clearSelectedLocation,
 	layerRef,
-}: {
-	onMapReady: (map: L.Map) => void;
-	onUnmount?: () => void;
-	isComparisonMap?: boolean;
-	onOver: (e: { latlng: L.LatLng; layer: { properties: any } }, getFeatureColor: (featureId: number) => string) => void;
-	onOut: () => void;
-	onClick: (e: { latlng: L.LatLng; layer: { properties: any } }) => void;
-	selectedLocation: SelectedLocationInfo | null;
-	clearSelectedLocation: () => void;
-	layerRef?: React.MutableRefObject<any>;
-}): React.ReactElement {
+}: MapContainerProps): React.ReactElement {
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
 	const [selectedStation, setSelectedStation] = useState<Station | null>(null);
 

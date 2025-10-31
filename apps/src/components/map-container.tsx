@@ -43,10 +43,11 @@ import {
 } from '@/lib/constants';
 import { LocationModalContent } from '@/components/map-layers/location-modal-content';
 import { SelectedLocationInfo, Station } from '@/types/types';
-import { InteractiveRegionOption } from '@/types/climate-variable-interface';
-import MarineClimateVariable from '@/lib/marine-climate-variable';
+import {
+	InteractiveRegionOption,
+	VariableTypes,
+} from '@/types/climate-variable-interface';
 import LowSkillLayer from '@/components/map-layers/low-skill-layer';
-import S2DClimateVariable from '@/lib/s2d-climate-variable';
 
 interface MapContainerProps {
 	onMapReady: (map: L.Map) => void;
@@ -95,8 +96,8 @@ export default function MapContainer({
 		(climateVariable?.getScenarioCompareTo() ?? '') :
 		(climateVariable?.getScenario() ?? '');
 
-	const showLandmassMask = climateVariable && climateVariable instanceof MarineClimateVariable;
-	const showLowSkillLayer = climateVariable && climateVariable instanceof S2DClimateVariable;
+	const showLandmassMask = climateVariable?.isOfType(VariableTypes.Marine) ?? false;
+	const showLowSkillLayer = climateVariable?.isOfType(VariableTypes.S2D) ?? false;
 
 	const scenarioLabel = appConfig.scenarios.find(item => item.value === scenario)?.label ?? scenario;
 

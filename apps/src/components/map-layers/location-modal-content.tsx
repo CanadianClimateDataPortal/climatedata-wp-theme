@@ -5,14 +5,13 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useAppSelector } from '@/app/hooks';
 
 import {
-	 type LocationModalContentParams as BaseLocationModalContentParams,
+	type LocationModalContentParams as BaseLocationModalContentParams,
+	VariableTypes,
 } from '@/types/climate-variable-interface';
 
 import { useLocale } from '@/hooks/use-locale';
 
 import appConfig from '@/config/app.config';
-
-import S2DClimateVariable from '@/lib/s2d-climate-variable';
 
 interface LocationModalContentProps extends BaseLocationModalContentParams {
 	title: string;
@@ -40,7 +39,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const { dataset } = useAppSelector((state) => state.map);
 	const variableList = useAppSelector((state) => state.map.variableList);
 
-	const isS2D = climateVariable && climateVariable instanceof S2DClimateVariable;
+	const isS2D = climateVariable?.isOfType(VariableTypes.S2D) ?? false;
 
 	// Displayed info
 	const datasetLabel = getLocalized(dataset);

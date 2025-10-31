@@ -8,6 +8,8 @@ import {
 	InteractiveRegionConfig,
 	InteractiveRegionDisplay,
 	InteractiveRegionOption,
+	VariableType,
+	VariableTypes,
 } from '@/types/climate-variable-interface';
 import S2DVariableValues from '@/components/map-layers/s2d-variable-values';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
@@ -25,6 +27,13 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 		config: ClimateVariableConfigInterface,
 	) {
 		super(config);
+	}
+
+	getTypes(): VariableType[] {
+		return [
+			VariableTypes.S2D,
+			...super.getTypes(),
+		];
 	}
 
 	getFrequency(): string | null {

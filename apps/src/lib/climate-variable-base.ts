@@ -27,6 +27,7 @@ import {
 	LocationModalContentParams,
 	ScenariosConfig,
 	ThresholdInterface,
+	VariableType,
 } from '@/types/climate-variable-interface';
 import { getDefaultFrequency, getFrequencyType } from '@/lib/utils';
 import { MapDisplayType, WMSParams } from '@/types/types';
@@ -49,6 +50,14 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getId(): string {
 		return this._config.id;
+	}
+
+	getTypes(): VariableType[] {
+		return [];
+	}
+
+	isOfType(type: VariableType): boolean {
+		return this.getTypes().includes(type);
 	}
 
 	getPostId(): number | undefined {

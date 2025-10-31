@@ -1,6 +1,13 @@
 import React from 'react';
 import { MapDisplayType, MultilingualField, WMSParams } from '@/types/types';
 
+export const VariableTypes = {
+	S2D: 's2d',
+	Marine: 'marine',
+} as const;
+
+export type VariableType = typeof VariableTypes[keyof typeof VariableTypes];
+
 export interface variableClassMap {
 	[key: string]: string;
 }
@@ -422,6 +429,21 @@ export interface ClimateVariableInterface {
 	getId(): string;
 
 	getClass(): string;
+
+	/**
+	 * Return all the "types" of the current variable.
+	 *
+	 * A "type" can be used to represent a category of variable.
+	 *
+	 * It can be used in lieu of an `instanceof`, which can create issues with
+	 * circular dependencies.
+	 */
+	getTypes(): VariableType[];
+
+	/**
+	 * Return true if the variable is of the specified type.
+	 */
+	isOfType(type: VariableType): boolean;
 
 	/** Returns the post ID for the variable, if available. */
 	getPostId(): number | undefined;

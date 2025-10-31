@@ -1,6 +1,5 @@
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useEffect, useMemo, useRef } from 'react';
-import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
 	selectReleaseDateCache,
@@ -10,7 +9,10 @@ import {
 } from '@/features/s2d/s2d-slice';
 import { fetchS2DReleaseDate } from '@/services/services';
 import { utc } from '@/lib/utils';
-import { ClimateVariableInterface } from '@/types/climate-variable-interface';
+import {
+	ClimateVariableInterface,
+	VariableTypes,
+} from '@/types/climate-variable-interface';
 
 /**
  * Generate a unique release date key for a climate variable and its selected
@@ -43,12 +45,11 @@ export const useS2D = () => {
 	const dispatch = useAppDispatch();
 	const { climateVariable } = useClimateVariable();
 
-	const isS2DVariable =
-		climateVariable && climateVariable instanceof S2DClimateVariable;
+	const isS2DVariable = climateVariable?.isOfType(VariableTypes.S2D) ?? false;
 
 	const selectedFrequency = climateVariable?.getFrequency();
 	const climateVariableID = climateVariable?.getId();
-	const releaseDateKey = isS2DVariable
+	const releaseDateKey = climateVariable && isS2DVariable
 		? generateReleaseDateKey(climateVariable)
 		: null;
 

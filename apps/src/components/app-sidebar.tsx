@@ -27,9 +27,9 @@ import LayerOpacities from '@/components/ui/layer-opacities';
 
 import { PostData } from '@/types/types';
 import { INTERNAL_URLS } from '@/lib/constants';
-import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { VariableTypes } from '@/types/climate-variable-interface';
 
 /**
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
@@ -76,7 +76,7 @@ export function AppSidebar() {
 	const about_url = INTERNAL_URLS[`about-data-${currentLocale}`] || '';
 	const support_url = INTERNAL_URLS[`support-${currentLocale}`] || '';
 
-	const isS2D = climateVariable instanceof S2DClimateVariable;
+	const isS2D = climateVariable?.isOfType(VariableTypes.S2D) ?? false;
 
 	return (
 		<Sidebar>

@@ -343,7 +343,7 @@ export const MapLegendInnerS2D = () => {
 								>
 									{isFirst ? (
 										<div className="flex justify-between font-[font-variant-numeric:tabular-nums]">
-											{/* Fist item has 2 marks, 1/2, left boundary, on the left edge */}
+											{/* First item has 2 marks, 1/2, left boundary, on the left edge */}
 											<div className="relative">
 												<span
 													className="block pb-0.5"

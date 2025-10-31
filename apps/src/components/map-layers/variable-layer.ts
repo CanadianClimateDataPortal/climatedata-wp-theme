@@ -67,20 +67,16 @@ export default function VariableLayer(
 	}, [climateVariable, scenario, section]);
 
 	const {
-		startYear,
 		hasCustomColorScheme,
 		colourMapType,
-		datasetVersion,
 		layerStyles,
 		interactiveRegion,
 	} = useMemo(() => {
 		const colourScheme = climateVariable?.getColourScheme();
 
 		return {
-			startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
 			hasCustomColorScheme: colourScheme && colourScheme in DEFAULT_COLOUR_SCHEMES,
 			colourMapType: climateVariable?.getColourType() ?? ColourType.CONTINUOUS,
-			datasetVersion: climateVariable?.getVersion(),
 			layerStyles: climateVariable?.getLayerStyles(),
 			interactiveRegion: climateVariable?.getInteractiveRegion(),
 		};
@@ -139,13 +135,12 @@ export default function VariableLayer(
 			format: OWS_FORMAT,
 			transparent: true,
 			tiled: true,
-			version: datasetVersion === 'cmip6' ? '1.3.0' : '1.1.1',
+			version: '1.1.1',
 			layers: layerValue,
 			styles: layerStyles,
 			opacity: 1,
 			pane: pane,
 			bounds: CANADA_BOUNDS,
-			TIME: parseInt(startYear) + '-01-00T00:00:00Z',
 		};
 
 		if (sld) {
@@ -169,14 +164,12 @@ export default function VariableLayer(
 	}, [
 		hasCustomColorScheme,
 		colorMap,
-		datasetVersion,
 		generateSLD,
 		interactiveRegion,
 		layerStyles,
 		layerValue,
 		map,
 		pane,
-		startYear,
 		climateVariable,
 		isComparisonMap,
 		// Even though `mapData` (data opacity) is used in this useEffect, we don't want

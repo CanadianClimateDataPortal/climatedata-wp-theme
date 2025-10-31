@@ -803,7 +803,7 @@ export interface WMSParams {
 	tiled: boolean;
 	version: string;
 	layers: string;
-	styles: string | undefined;
+	styles?: string;
 	TIME?: string;
 	opacity: number;
 	pane: string;

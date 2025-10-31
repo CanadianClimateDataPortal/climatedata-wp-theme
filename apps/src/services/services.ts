@@ -576,7 +576,8 @@ export const fetchS2DReleaseDate = async ({ variable, frequency }: { variable: s
 	// TEMPORARILY mocking the API, while waiting for the API endpoint to be implemented.
 	const fetchMock = new Promise<string>((resolve) => {
 		setTimeout(() => {
-			resolve('2025-03-01');
+			// The backend currently only contains data for July 2025.
+			resolve('2025-07-01');
 		}, 1000);
 	});
 

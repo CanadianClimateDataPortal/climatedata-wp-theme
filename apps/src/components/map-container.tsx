@@ -45,6 +45,8 @@ import { LocationModalContent } from '@/components/map-layers/location-modal-con
 import { SelectedLocationInfo, Station } from '@/types/types';
 import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 import MarineClimateVariable from '@/lib/marine-climate-variable';
+import LowSkillLayer from '@/components/map-layers/low-skill-layer';
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
 
 interface MapContainerProps {
 	onMapReady: (map: L.Map) => void;
@@ -94,6 +96,7 @@ export default function MapContainer({
 		(climateVariable?.getScenario() ?? '');
 
 	const showLandmassMask = climateVariable && climateVariable instanceof MarineClimateVariable;
+	const showLowSkillLayer = climateVariable && climateVariable instanceof S2DClimateVariable;
 
 	const scenarioLabel = appConfig.scenarios.find(item => item.value === scenario)?.label ?? scenario;
 
@@ -263,6 +266,11 @@ export default function MapContainer({
 				maxZoom={DEFAULT_MAX_ZOOM}
 			/>
 
+			{/* Low skill layer for S2D variables */}
+			{showLowSkillLayer && (
+				<LowSkillLayer pane="aboveRaster"/>
+			)}
+
 			{/* Landmass layer for marine data, with transparent oceans */}
 			{showLandmassMask && (
 				<WMSTileLayer
@@ -272,7 +280,7 @@ export default function MapContainer({
 					format="image/png"
 					transparent={true}
 					version="1.1.1"
-					pane="landmassMask"
+					pane="aboveGrid"
 					opacity={1.0}
 					bounds={CANADA_BOUNDS}
 				/>

@@ -15,9 +15,10 @@ import {
 	LocationModalContentParams,
 	ScenariosConfig,
 } from '@/types/climate-variable-interface';
-import { getFrequencyType } from '@/lib/utils.ts';
 import RasterPrecalcultatedClimateVariableValues
 	from '../components/map-layers/raster-precalculated-climate-variable-values';
+import { getFrequencyType } from '@/lib/utils.ts';
+import { WMSParams } from '@/types/types';
 
 interface DownloadPayloadProps {
 	dataset_name: string | null;
@@ -357,6 +358,25 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		return (
 			<RasterPrecalcultatedClimateVariableValues latlng={latlng} featureId={featureId} mode={mode} scenario={scenario ?? ''} />
 		);
+	}
+
+	/**
+	 * Set the version based on the selected scenario and set the time to the
+	 * selected year.
+	 */
+	updateMapWMSParams(params: WMSParams, isComparisonMap: boolean): WMSParams {
+		const datasetVersion = this.getVersion();
+		const startYear = parseInt(this.getDateRange()?.[0] ?? '2040');
+		const updatedParams = {
+			...super.updateMapWMSParams(params, isComparisonMap),
+			version: datasetVersion === 'cmip6' ? '1.3.0' : '1.1.1',
+		};
+
+		if (!Number.isNaN(startYear)) {
+			updatedParams.TIME = `${startYear}-01-00T00:00:00Z`;
+		}
+
+		return updatedParams;
 	}
 }
 

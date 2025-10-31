@@ -41,7 +41,9 @@ class SeaLevelClimateVariable extends MarineClimateVariable {
 	 * same colour map as the left map. Also, the "enhanced" scenario has no time attribute.
 	 */
 	updateMapWMSParams(params: WMSParams, isComparisonMap: boolean): WMSParams {
-		const updatedParams = { ...params };
+		const updatedParams = {
+			...super.updateMapWMSParams(params, isComparisonMap)
+		};
 		const version = this.getVersion();
 		const scenario = isComparisonMap ?
 			(this.getScenarioCompareTo() ?? '') :

@@ -25,17 +25,6 @@ export const MAP_CONFIG = {
 	// Labels tiles
 	labelsTileUrl: "//{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png",
 
-	// Pane configuration for standard variables
-	standardPanes: {
-		basemap: 100,
-		raster: 200,
-		grid: 300,
-		landmassMask: 400,
-		labels: 500,
-		stations: 600,
-		custom_shapefile: 700,
-	},
-
 	// Landmass filter for marine data (transforms green to white)
 	landmassFilter: 'saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(298deg) brightness(100%) contrast(98%)',
 

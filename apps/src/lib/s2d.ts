@@ -1,5 +1,6 @@
 import { S2D_NB_PERIODS } from '@/lib/constants';
 import {
+	ClimateVariableInterface,
 	FrequencyType,
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
@@ -110,4 +111,84 @@ export function formatPeriodRange(periodRange: PeriodRange): [string, string] {
 	const rangeEnd = formatUTCDate(periodRange[1], dateFormat);
 
 	return [rangeStart, rangeEnd];
+}
+
+/**
+ * Create and return the GeoServer layer name for the Skill layer.
+ *
+ * The name is `CDC:s2d-skill-<VAR>-<F>-<REF-PERIOD>`
+ *
+ * Where:
+ * - <VAR>: the variable ID (without the "s2d_" prefix)
+ * - <F>: the frequency (e.g. "seasonal" or "monthly")
+ * - <REF-PERIOD>: The period relative to which we want to know the skill (e.g.
+ *     "01" to get the skill layer calculated for a reference period of January)
+ *
+ * @param climateVariable
+ * @param releaseDate
+ */
+export function buildSkillLayerName(
+	climateVariable: ClimateVariableInterface,
+	releaseDate: Date
+): string | null {
+
+	const frequencyNameMap: Record<string, string> = {
+		[FrequencyType.SEASONAL]: 'seasonal',
+		[FrequencyType.MONTHLY]: 'monthly',
+	}
+
+	let variableId = climateVariable.getId();
+	const variableFrequency = climateVariable.getFrequency() ?? '';
+	const frequency = frequencyNameMap[variableFrequency];
+	const referencePeriod = String(releaseDate.getUTCMonth() + 1).padStart(2, '0');
+
+	if (!frequency) {
+		return null;
+	}
+
+	// Trim the "s2d_" prefix from the variable ID if it exists.
+	if (variableId.startsWith('s2d_')) {
+		variableId = variableId.slice(4);
+	}
+
+	return `CDC:s2d-skill-${variableId}-${frequency}-${referencePeriod}`;
+}
+
+/**
+ * Create and return the TIME attribute for the Skill GeoServer layer.
+ *
+ * The TIME is determined by the start of the variable's selected date range.
+ *
+ * But it's always *relative* to the year 1991 (the skill is year-agnostic, so
+ * it's based on the base year of 1991). This "relativity" is determined
+ * by the release date: if the date is in the same year as the release date,
+ * then 1991 will be used, if the date is the year after, then 1992 will be
+ * used, etc.
+ *
+ * @param climateVariable - The variable containing the selected date range.
+ * @param releaseDate - The release date to calculate the relative year.
+ */
+export function buildSkillLayerTime(
+	climateVariable: ClimateVariableInterface,
+	releaseDate: Date,
+): string | null {
+	const dateRange = climateVariable.getDateRange();
+
+	if (!dateRange) {
+		return null;
+	}
+
+	const periodStart = utc(dateRange[0]);
+
+	if (!periodStart) {
+		return null;
+	}
+
+	const yearDiff = periodStart.getUTCFullYear() - releaseDate.getUTCFullYear();
+	const layerDate = new Date(Date.UTC(
+		1991 + yearDiff,
+		periodStart.getUTCMonth(),
+		1,
+	));
+	return formatUTCDate(layerDate, 'yyyy-MM-dd\'T00:00:00Z\'');
 }

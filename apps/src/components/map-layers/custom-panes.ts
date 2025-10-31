@@ -1,6 +1,40 @@
 import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
-import { MAP_CONFIG } from '@/config/map.config';
+
+interface CustomPanesDefinition {
+	[key: string]: {
+		style?: {
+			[key: string]: unknown;
+		};
+	};
+}
+
+const customPanes: CustomPanesDefinition = {
+	basemap: {
+		style: { zIndex: '100', pointerEvents: 'none' },
+	},
+	raster: {
+		style: { zIndex: '200', pointerEvents: 'none' },
+	},
+	aboveRaster: {
+		style: { zIndex: '300', pointerEvents: 'none' },
+	},
+	grid: {
+		style: { zIndex: '400', pointerEvents: 'all' },
+	},
+	aboveGrid: {
+		style: { zIndex: '500', pointerEvents: 'none' },
+	},
+	labels: {
+		style: { zIndex: '600', pointerEvents: 'none' },
+	},
+	stations: {
+		style: { zIndex: '700', pointerEvents: 'all' },
+	},
+	custom_shapefile: {
+		style: { zIndex: '800', pointerEvents: 'all' },
+	},
+};
 
 /**
  * Component that creates the custom Leaflet map panes for the layers of our map.
@@ -15,52 +49,18 @@ export default function CustomPanesLayer(): null {
 			mapPane.classList.add('z-20');
 		}
 
-		// Clear any existing custom panes to prevent duplicates
-		const existingPanes = [
-			'basemap',
-			'raster',
-			'grid',
-			'landmassMask',
-			'labels',
-			'stations',
-			'custom_shapefile',
-		];
+		Object.entries(customPanes).forEach(([paneName, configuration]) => {
+			if (!map.getPane(paneName)) {
+				const { style } = configuration;
+				const pane = map.createPane(paneName);
 
-		existingPanes.forEach(pane => {
-			if (map.getPane(pane)) {
-				map.getPane(pane)!.remove();
+				if (style) {
+					Object.entries(style).forEach(([key, value]) => {
+						pane.style.setProperty(key, value as string);
+					});
+				}
 			}
 		});
-
-		map.createPane('basemap');
-		map.getPane('basemap')!.style.zIndex = String(MAP_CONFIG.standardPanes.basemap);
-		map.getPane('basemap')!.style.pointerEvents = 'none';
-
-		map.createPane('raster');
-		map.getPane('raster')!.style.zIndex = String(MAP_CONFIG.standardPanes.raster);
-		map.getPane('raster')!.style.pointerEvents = 'none';
-
-		map.createPane('grid');
-		map.getPane('grid')!.style.zIndex = String(MAP_CONFIG.standardPanes.grid);
-		map.getPane('grid')!.style.pointerEvents = 'all';
-
-		// Marine data landmass layer (with transparent oceans)
-		map.createPane('landmassMask');
-		map.getPane('landmassMask')!.style.zIndex = String(MAP_CONFIG.standardPanes.landmassMask);
-		map.getPane('landmassMask')!.style.pointerEvents = 'none';
-
-		map.createPane('labels');
-		map.getPane('labels')!.style.zIndex = String(MAP_CONFIG.standardPanes.labels);
-		map.getPane('labels')!.style.pointerEvents = 'none';
-
-		map.createPane('stations');
-		map.getPane('stations')!.style.zIndex = String(MAP_CONFIG.standardPanes.stations);
-		map.getPane('stations')!.style.pointerEvents = 'all';
-
-		map.createPane('custom_shapefile');
-		map.getPane('custom_shapefile')!.style.zIndex = String(MAP_CONFIG.standardPanes.custom_shapefile);
-		map.getPane('custom_shapefile')!.style.pointerEvents = 'all';
-
 	}, [map]);
 
 	return null;

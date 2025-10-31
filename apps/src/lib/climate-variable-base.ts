@@ -250,10 +250,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getDefaultDateRange(): string[] | null {
-		return this._config.defaultDateRange ?? [
-			"2040",
-			"2070",
-		];
+		return this._config.defaultDateRange ?? null;
 	}
 
 	isTimePeriodARange(): boolean {

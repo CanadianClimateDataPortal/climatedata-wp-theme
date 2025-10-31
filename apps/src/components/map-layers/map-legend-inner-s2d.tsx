@@ -288,8 +288,8 @@ export const MapLegendInnerS2D = () => {
 	return (
 		<div className="relative">
 			{/* Header */}
-			<header className="flex mb-2" id={prefix + '-legend-header'}>
-				<span className="mr-1 font-semibold whitespace-nowrap text-md">
+			<header className="flex justify-center mb-4" id={prefix + '-legend-header'}>
+				<span className="mr-1 font-sans text-sm font-medium leading-none whitespace-nowrap text-cdc-black">
 					{__('Probability') + ' (%)'}
 				</span>
 				<TooltipWidget
@@ -310,7 +310,8 @@ export const MapLegendInnerS2D = () => {
 						let style = {};
 						if (idx >= 1 && idx <= _arr.length - 1) {
 							style = {
-								borderLeft: '1px solid white',
+								// If we wanted a thin separator to align with the mark
+								// borderLeft: '1px solid white',
 							};
 						}
 						return <col key={idx} style={style} />;
@@ -410,13 +411,28 @@ export const MapLegendInnerS2D = () => {
 				</thead>
 
 				<tbody>
-					{data.rows.map((row) => {
+					{data.rows.map((row, idx) => {
 						const rowId = row.label
 							.toLowerCase()
 							.replace(/\s+/g, '-');
+						const isFirst = idx === 0;
+
+						const style: React.CSSProperties = {
+							height: 40,
+						};
+						if (!isFirst) {
+							/**
+							 * Fidelity with design issue:
+							 *
+							 * The design describes some white space between each items.
+							 * Since we also need to align all gradient between themselves, and because this is tabular data,
+							 * there is no other way to have each bar with some spacing than a border.
+							 */
+							style.borderTop = '10px solid white';
+						}
 
 						return (
-							<tr key={rowId}>
+							<tr key={rowId} style={style}>
 								<th
 									id={`${prefix}-${rowId}`}
 									style={{ fontSize: headingFontSize }}
@@ -425,16 +441,42 @@ export const MapLegendInnerS2D = () => {
 								>
 									{__(row.label)}
 								</th>
-								{row.colors.map((color, idx) => {
+								{row.colors.map((color, idx, arr) => {
 									const startBoundary = data.scale[idx];
 									const endBoundary = data.scale[idx + 1];
+									const isFirst = idx === 0;
+									const isLast = idx === arr.length - 1;
 
+									const borderRadius = 3;
+									const style: React.CSSProperties = {
+										backgroundColor: color,
+									};
+									/**
+									 * Fidelity with design issue:
+									 *
+									 * We can't have each gradient line have border radius on top and bottom because this is a table and
+									 * there is no other way to have each bar with some spacing than a border which then affects how border radius
+									 * is calculated.
+									 *
+									 * So, the following properties are effectively useless:
+									 * - borderTopRightRadius
+									 * - borderTopLeftRadius
+									 */
+
+									if (isFirst) {
+										style.borderTopLeftRadius = borderRadius;
+										style.borderBottomLeftRadius = borderRadius;
+									}
+									if (isLast) {
+										style.borderTopRightRadius = borderRadius;
+										style.borderBottomRightRadius = borderRadius;
+									}
 									return (
 										<td
 											key={idx}
 											headers={`${prefix}-${rowId} ${prefix}-b${startBoundary}-b${endBoundary}`}
-											style={{ backgroundColor: color }}
-											className="h-6 p-0 border-0"
+											style={style}
+											className="p-0 border-0"
 										/>
 									);
 								})}

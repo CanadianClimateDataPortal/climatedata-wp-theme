@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { nanoid } from 'nanoid';
 import { sprintf } from '@wordpress/i18n';
 
@@ -63,13 +63,6 @@ interface ProbabilityStatementProps {
 	 * @example 'total precipitation', 'mean temperature'
 	 */
 	variableName: string;
-
-	/**
-	 * Historical reference period (climatology baseline) as [startYear, endYear]
-	 *
-	 * @default [1991, 2020]
-	 */
-	dateRangeYears?: [number, number];
 
 	/**
 	 * Qualitative description of the forecasted outcome
@@ -182,7 +175,7 @@ const S2D_HARDCODED_STMT_ROWS: ProbabilityStatementTooltipRow[] = [
 	},
 ];
 const S2D_HARDCODED_STMT_ROWS_LAST_LINE = __(
-	'If the probability is below 30%, no single outcome is significantly more likely' +
+	'If the probability is below 30%, no single outcome is significantly more likely ' +
 		'than the others, and the climatology should be used instead.'
 );
 // END: HARDCODED DATA
@@ -192,27 +185,27 @@ const S2D_HARDCODED_STMT_ROWS_LAST_LINE = __(
  * Example: "Probability that the total precipitation will be unusually high
  * or low relative to the 1991 to 2020 historical climatology."
  */
-const ProbabilityStatement: React.FC<ProbabilityStatementProps> = ({
-	dateRangeYears,
-	variableName,
-	outcome,
-	locale,
-}) => {
-	const [startYear, endYear] = dateRangeYears ?? ['1991', '2020'];
+const ProbabilityStatement = (props: ProbabilityStatementProps) => {
+	const {
+		variableName,
+		outcome,
+		locale,
+	} = props;
 	const statementRows = S2D_HARDCODED_STMT_ROWS;
 	const afterStatementRows = S2D_HARDCODED_STMT_ROWS_LAST_LINE;
 
 	const firstLine = sprintf(
 		__(
-			'Probability that the %s will be %s relative to the %d to %d historical climatology.'
+			'Probability that the %s will be %s relative to the 1991 to 2020 historical climatology.'
 		),
 		__(variableName),
 		__(outcome),
-		startYear,
-		endYear
 	);
 
-	const renderRow = (v: ProbabilityStatementTooltipRow, idx: number) => {
+	const renderRow = (
+		v: ProbabilityStatementTooltipRow,
+		idx: number,
+	): JSX.Element => {
 		const { value, label, text, parens } = v;
 		const formattedValue = value + getOrdinalSuffix(value, locale);
 		return (
@@ -245,7 +238,7 @@ const ProbabilityStatement: React.FC<ProbabilityStatementProps> = ({
 	);
 };
 
-export const MapLegendInnerS2D: React.FC = () => {
+export const MapLegendInnerS2D = () => {
 	const data = S2D_HARDCODED_LEGEND_DATA;
 
 	/**
@@ -254,8 +247,6 @@ export const MapLegendInnerS2D: React.FC = () => {
 	const { lang = 'fr' } = window.document.documentElement as {
 		lang: Intl.LocalesArgument;
 	};
-
-	const prefix = useMemo(() => nanoid(8), []);
 
 	const probabilityStatement: ProbabilityStatementProps = {
 		variableName: S2D_HARDCODED_LEGEND_VAR_NAME,
@@ -290,6 +281,9 @@ export const MapLegendInnerS2D: React.FC = () => {
 	const numberToTickGap = 2; // px
 	// Distance to skew off to mimick aligning. But this is assuming numbers will only be no longer than 3 digits.
 	const offsetToAlignInMiddleOfTwoDigitsNumber = 0.5; // em
+
+	// To make sure no collisions with IDs
+	const prefix = useMemo(() => nanoid(4), []);
 
 	return (
 		<div className="relative">

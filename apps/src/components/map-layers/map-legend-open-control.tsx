@@ -8,11 +8,12 @@ export interface MapLegendOpenControlProps {
 	toggleOpen: () => void;
 }
 
-export const MapLegendOpenControl: React.FC<MapLegendOpenControlProps> = ({
-	children,
-	isOpen,
-	toggleOpen,
-}) => {
+export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
+	const {
+		children,
+		isOpen,
+		toggleOpen,
+	} = props;
 	// This should match what we have in MapLegendControl
 	return (
 		<div className="space-y-[5px] w-[350px]">
@@ -21,18 +22,18 @@ export const MapLegendOpenControl: React.FC<MapLegendOpenControlProps> = ({
 				className="legend-toggle flex items-center space-x-2 bg-white border border-cold-grey-3 rounded-md py-1 px-2.5"
 				onClick={toggleOpen}
 			>
-				<span className="font-sans text-black text-sm font-normal leading-5">
+				<span className="font-sans text-sm font-normal leading-5 text-black">
 					{__('Legend')}
 				</span>
 				{isOpen ? (
-					<ChevronUp className="text-brand-blue w-4 h-4" />
+					<ChevronUp className="w-4 h-4 text-brand-blue" />
 				) : (
-					<ChevronDown className="text-brand-blue w-4 h-4" />
+					<ChevronDown className="w-4 h-4 text-brand-blue" />
 				)}
 			</button>
 			{isOpen && children && (
 				<div
-					className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto relative overflow-hidden"
+					className="relative flex flex-col items-end gap-1 px-1 py-2 overflow-hidden overflow-y-auto bg-white border rounded-md border-cold-grey-3"
 					style={{ paddingRight: 10 }}
 				>
 					{children}

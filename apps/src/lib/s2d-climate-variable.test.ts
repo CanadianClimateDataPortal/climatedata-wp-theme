@@ -13,16 +13,16 @@ import L from 'leaflet';
  *
  * Those specific attributes are removed since they are the ones that change.
  */
-const filterVersionAndTime = (params: WMSParams): object => {
+const filterVersionAndTime = (
+	params: WMSParams
+): Omit<WMSParams, 'version' | 'TIME'> => {
 	const {
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		version: _ignored1,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		TIME: _ignored2,
+		version: _omit1, // eslint-disable-line @typescript-eslint/no-unused-vars
+		TIME: _omit2, // eslint-disable-line @typescript-eslint/no-unused-vars
 		...filteredParams
 	} = params;
 	return filteredParams;
-}
+};
 
 describe('getLayerValue', () => {
 	let climateVariable: S2DClimateVariable;

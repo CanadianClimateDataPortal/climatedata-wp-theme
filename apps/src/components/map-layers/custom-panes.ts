@@ -3,10 +3,10 @@ import { useMap } from 'react-leaflet';
 
 interface CustomPanesDefinition {
 	[key: string]: {
-		style: {
+		style?: {
 			[key: string]: unknown;
-		}
-	}
+		};
+	};
 }
 
 const customPanes: CustomPanesDefinition = {
@@ -50,13 +50,17 @@ export default function CustomPanesLayer(): null {
 		}
 
 		Object.entries(customPanes).forEach(([paneName, configuration]) => {
-			const { style } = configuration;
 			if (!map.getPane(paneName)) {
+				const { style } = configuration;
 				const pane = map.createPane(paneName);
-				Object.assign(pane.style, style);
+
+				if (style) {
+					Object.entries(style).forEach(([key, value]) => {
+						pane.style.setProperty(key, value as string);
+					});
+				}
 			}
 		});
-
 	}, [map]);
 
 	return null;

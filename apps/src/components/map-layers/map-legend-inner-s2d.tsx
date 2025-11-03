@@ -273,8 +273,6 @@ export const MapLegendInnerS2D = () => {
 
 	// Table heading on the left
 	const labelWidth = 78; // px
-	// Padding around the table
-	const paddingEquallyLeftRight = 12; // px
 	// Font size to for table headings on the top and left.
 	const headingFontSize = '.8rem';
 	// The little notch between each levels
@@ -304,7 +302,7 @@ export const MapLegendInnerS2D = () => {
 				style={{
 					borderCollapse: 'separate',
 					borderSpacing: '0 10px', // vertical spacing between rows
-					padding: `0 ${paddingEquallyLeftRight}px`,
+					paddingRight: 12, // We need more space between right side than left where we already add lots of space for longer text
 				}}
 				aria-labelledby={prefix + '-legend-header'}
 			>

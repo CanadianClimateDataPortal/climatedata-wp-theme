@@ -1,9 +1,4 @@
-import {
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from 'react';
+import { useMemo } from 'react';
 import { nanoid } from 'nanoid';
 import { sprintf } from '@wordpress/i18n';
 
@@ -204,12 +199,12 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 			'Probability that the %s will be %s relative to the 1991 to 2020 historical climatology.'
 		),
 		__(variableName),
-		__(outcome)
+		__(outcome),
 	);
 
 	const renderRow = (
 		v: ProbabilityStatementTooltipRow,
-		idx: number
+		idx: number,
 	): JSX.Element => {
 		const { value, label, text, parens } = v;
 		const formattedValue = value + getOrdinalSuffix(value, locale);
@@ -276,6 +271,8 @@ export const MapLegendInnerS2D = () => {
 		}
 	}
 
+	// Table heading on the left
+	const labelWidth = 50; // px
 	// Font size to for table headings on the top and left.
 	const headingFontSize = '.8rem';
 	// The little notch between each levels
@@ -285,57 +282,13 @@ export const MapLegendInnerS2D = () => {
 	// Distance to skew off to mimick aligning. But this is assuming numbers will only be no longer than 3 digits.
 	const offsetToAlignInMiddleOfTwoDigitsNumber = 0.5; // em
 
-	// #MeasuringLeftSideLabel: Dynamic left-side label width measurement
-	// Shared styles for both measurement div and actual table cells
-	const labelCellClassName =
-		'pr-2 text-sm font-normal text-right whitespace-nowrap';
-	const labelCellStyle: React.CSSProperties = {
-		fontSize: headingFontSize,
-		lineHeight: '.9em',
-	};
-	const [labelWidth, setLabelWidth] = useState(50);
-	const measureRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		if (measureRef.current) {
-			const maxWidth = Array.from(measureRef.current.children).reduce(
-				(max, el) => Math.max(max, el.getBoundingClientRect().width),
-				0
-			);
-			setLabelWidth(Math.ceil(maxWidth) + 8);
-		}
-	}, [
-		data.rows,
-		lang,
-	]);
-
 	// To make sure no collisions with IDs
 	const prefix = useMemo(() => nanoid(4), []);
 
 	return (
 		<div className="relative">
-			{/* #MeasuringLeftSideLabel: Hidden measurement container */}
-			<div
-				ref={measureRef}
-				className="absolute invisible pointer-events-none"
-				aria-hidden="true"
-			>
-				{data.rows.map((row, idx) => (
-					<span
-						key={idx}
-						className={`block ${labelCellClassName}`}
-						style={labelCellStyle}
-					>
-						{__(row.label)}
-					</span>
-				))}
-			</div>
-
 			{/* Header */}
-			<header
-				className="flex justify-center mb-4"
-				id={prefix + '-legend-header'}
-			>
+			<header className="flex justify-center mb-4" id={prefix + '-legend-header'}>
 				<span className="mr-1 font-sans text-sm font-medium leading-none whitespace-nowrap text-cdc-black">
 					{__('Probability') + ' (%)'}
 				</span>
@@ -465,7 +418,7 @@ export const MapLegendInnerS2D = () => {
 						const isFirst = idx === 0;
 
 						const style: React.CSSProperties = {
-							height: 50,
+							height: 40,
 						};
 						if (!isFirst) {
 							/**
@@ -482,14 +435,11 @@ export const MapLegendInnerS2D = () => {
 							<tr key={rowId} style={style}>
 								<th
 									id={`${prefix}-${rowId}`}
-									style={labelCellStyle}
+									style={{ fontSize: headingFontSize }}
 									scope="row"
-									className={labelCellClassName}
+									className="pr-2 text-sm font-normal text-right align-middle"
 								>
-									<span>
-										{/* #MeasuringLeftSideLabel: Allowing us to measure how long this text is */}
-										{__(row.label)}
-									</span>
+									{__(row.label)}
 								</th>
 								{row.colors.map((color, idx, arr) => {
 									const startBoundary = data.scale[idx];

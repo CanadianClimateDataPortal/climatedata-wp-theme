@@ -54,10 +54,6 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 						'items-end gap-1 px-2 py-4' /* alignment */,
 						'bg-white border rounded-md border-cold-grey-3' /* visual */,
 					)}
-					style={{
-						paddingRight: 20,
-						paddingLeft: 20,
-					}}
 				>
 					{children}
 				</div>

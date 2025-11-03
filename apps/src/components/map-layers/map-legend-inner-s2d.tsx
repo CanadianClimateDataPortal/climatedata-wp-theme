@@ -272,7 +272,9 @@ export const MapLegendInnerS2D = () => {
 	}
 
 	// Table heading on the left
-	const labelWidth = 50; // px
+	const labelWidth = 78; // px
+	// Padding around the table
+	const paddingEquallyLeftRight = 12; // px
 	// Font size to for table headings on the top and left.
 	const headingFontSize = '.8rem';
 	// The little notch between each levels
@@ -286,7 +288,7 @@ export const MapLegendInnerS2D = () => {
 	const prefix = useMemo(() => nanoid(4), []);
 
 	return (
-		<div className="relative">
+		<div className="w-full">
 			{/* Header */}
 			<header className="flex justify-center mb-4" id={prefix + '-legend-header'}>
 				<span className="mr-1 font-sans text-sm font-medium leading-none whitespace-nowrap text-cdc-black">
@@ -298,7 +300,12 @@ export const MapLegendInnerS2D = () => {
 			</header>
 
 			<table
-				className="w-full border-collapse table-fixed"
+				className="w-full table-fixed"
+				style={{
+					borderCollapse: 'separate',
+					borderSpacing: '0 10px', // vertical spacing between rows
+					padding: `0 ${paddingEquallyLeftRight}px`,
+				}}
 				aria-labelledby={prefix + '-legend-header'}
 			>
 				<colgroup>
@@ -306,15 +313,8 @@ export const MapLegendInnerS2D = () => {
 						style={{ width: `${labelWidth}px` }}
 						className="whitespace-nowrap"
 					/>
-					{data.rows[0].colors.map((_, idx, _arr) => {
-						let style = {};
-						if (idx >= 1 && idx <= _arr.length - 1) {
-							style = {
-								// If we wanted a thin separator to align with the mark
-								// borderLeft: '1px solid white',
-							};
-						}
-						return <col key={idx} style={style} />;
+					{data.rows[0].colors.map((_, idx) => {
+						return (<col key={idx} />); // Should redistribute equally
 					})}
 				</colgroup>
 

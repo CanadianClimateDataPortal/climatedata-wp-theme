@@ -110,3 +110,22 @@
 #       WP_DB_HOST: my-custom-db
 #       WP_WP_DEBUG: "false"
 #
+
+###
+# Scenario:
+#   Run Ladle development server to view React component stories in isolation.
+#   Ladle is a lightweight alternative to Storybook that works with the existing
+#   *.stories.tsx files in the apps/ directory. This is for local development only
+#   and allows developers to work on components without running the full application.
+#
+# Solution:
+#   Expose port 61000 from the task-runner container. Ladle will be installed at
+#   runtime when running `./dev.sh ladle-apps` and doesn't affect the production
+#   build. The server will be accessible at http://localhost:61000
+#
+# services:
+#   task-runner:
+#     ports:
+#       - "5173:5173"  # Vite (already exposed in compose.yaml)
+#       - "61000:61000"  # Ladle development server
+#

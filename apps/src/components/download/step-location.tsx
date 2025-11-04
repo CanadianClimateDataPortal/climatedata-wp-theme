@@ -11,6 +11,7 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { StepComponentRef } from '@/types/download-form-interface';
 import { useAppDispatch } from '@/app/hooks';
 import { setSelectionMode } from '@/features/download/download-slice';
+import RasterDownloadMap from '@/components/download/raster-download-map';
 
 /**
  * Location step, allows the user to make a selection on the map and choose what type of region to select
@@ -42,7 +43,7 @@ const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
 					'Using the tool below, you can select or draw a selection to include in your download file.'
 				)}
 			</StepContainerDescription>
-			{climateVariable?.renderDownloadMap()}
+			<RasterDownloadMap />
 		</StepContainer>
 	);
 });

@@ -3,6 +3,7 @@ import { MapInfoData } from "@/types/types";
 import { fetchWPData } from "@/services/services";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import MapHeader from "@/components/map-header";
+import Map from '@/components/map';
 
 const MapWrapper = () => {
 	const { climateVariable } = useClimateVariable();
@@ -17,7 +18,7 @@ const MapWrapper = () => {
 	return (
 		<div className="relative flex-1">
 			<MapHeader data={mapInfo}/>
-			{climateVariable?.renderMap()}
+			<Map />
 		</div>
 	);
 }

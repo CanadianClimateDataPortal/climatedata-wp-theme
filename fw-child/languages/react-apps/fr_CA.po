@@ -1197,6 +1197,92 @@ msgstr "La prévision a été publiée à cette date. "
   "et les prévisions décennales chaque année. "
   "L’exactitude a tendance à être plus élevée pour les périodes plus proches de la date de sortie."
 
+msgid  "Above %s"
+msgstr "Au dessus de %s"
+
+msgid  "%s to %s"
+msgstr "%s à %s"
+
+msgid  "Below %s"
+msgstr "En dessous de %s"
+
+msgid  "Horizontal bar at %s%% filled"
+msgstr "Barre horizontale remplie à %s%%"
+
+msgid  "Skill Level"
+msgstr "Niveau d’habileté"
+
+msgid  "The skill level at this location is"
+msgstr "Le niveau d'habileté à cet endroit est"
+
+msgid  "No skill"
+msgstr "Aucune habileté"
+
+msgid  "Low"
+msgstr "Faible"
+
+msgid  "Medium"
+msgstr "Moyenne"
+
+msgid  "High"
+msgstr "Élevée"
+
+msgid  "Near-Normal Range"
+msgstr "Étendue près de la normale"
+
+msgid  "The near-normal range is defined using the historical climatology for the month, season, or decadal time "
+       "period of interest between 1991 and 2020. The historical data is divided into three equal parts and the "
+       "‘near-normal’ range is defined using the middle third, providing a range of typical past conditions."
+msgstr "L'étendue près de la normale est définie à l'aide de la climatologie historique pour le mois, la saison ou la "
+       "période décennale d'intérêt entre 1991 et 2020. Les données historiques sont divisées en trois parties égales et "
+       "l'étendue « près de la normale » est définie à partir du tiers central, ce qui donne une étendue correspondant aux "
+       "conditions typiques observées dans le passé."
+
+msgid  "Seasonal mean temperature probability:"
+msgstr "Seasonal mean temperature probability:"
+
+msgid  "Historical Median"
+msgstr "Médiane historique"
+
+msgid  "The median of the historical climatology for the month, season, or decadal time period of interest between "
+       "1991 and 2020. The median splits the historical data into two equal parts (50th percentile). It is a measure of "
+       "typical past conditions."
+msgstr "Médiane de la climatologie historique pour le mois, la saison ou la période décennale d'intérêt entre 1991 et "
+       "2020. La médiane divise les données historiques en deux parties égales (50e centile). Il s'agit d'une mesure des "
+       "conditions passées typiques."
+
+msgid  "The skill level at this location is No Skill (CRPSS value is 0.00 or below): The accuracy of past forecasts "
+       "was no better than random chance, so the forecast should not be used. The historical climatology is a better guide "
+       "than the forecast and can be used instead."
+msgstr "Le niveau d'habileté à cet endroit est Aucune habileté (valeur CRPSS est de 0,00 ou moins) : l'exactitude des "
+       "prévisions passées n'était pas meilleure que le hasard; il ne faut donc pas les utiliser. La climatologie "
+       "historique est un meilleur indicateur que les prévisions et peut être utilisée à la place."
+
+msgid  "The skill level at this location is Low (CRPSS value is between 0.00 and 0.05): Past forecasts provided only a "
+       "small improvement over random chance. Use these forecasts with caution and consider consulting both the forecasts "
+       "and the historical climatology."
+msgstr "Le niveau d'habileté à cet endroit est Faible (valeur CRPSS comprise entre 0,00 et 0,05) : les prévisions "
+       "passées n'ont apporté qu'une légère amélioration par rapport au hasard. Utilisez ces prévisions avec prudence et "
+       "pensez à consulter à la fois les prévisions et la climatologie historique."
+
+msgid  "The skill level at this location is Medium (CRPSS value is between 0.05 and 0.25): The accuracy of past "
+       "forecasts was satisfactory. The forecast is a better guide than the historical climatology."
+msgstr "Le niveau d'habileté à cet endroit est Moyenne (valeur CRPSS comprise entre 0,05 et 0,25) : l'exactitude des "
+       "prévisions passées est satisfaisante. Elles constituent une meilleure indication que la climatologie historique."
+
+msgid  "The skill level at this location is High (CRPSS value is above 0.25): Past forecasts were mostly accurate. The "
+       "forecast is considered trustworthy."
+msgstr "Le niveau d'habileté à cet endroit est Élevée (valeur CRPSS supérieure à 0,25) : l'exactitude des prévisions "
+       "passées est satisfaisante. Les prévisions sont considérées comme fiables."
+
+msgid  "The past performance or “skill” of the prediction system is measured using the continuous ranked probability "
+       "skill score (CRPSS). CRPSS measures the accuracy of forecasts produced for the same lead time as the selected "
+       "forecast and for the same month, season, or decadal time period over 1991 to 2020."
+msgstr "Les performances passées ou « habileté » du système de prévision sont mesurées à l'aide du score d’habileté de "
+       "l’indice continu de probabilité ordonnée (CRPSS). Le CRPSS mesure l'exactitude des prévisions produites pour le "
+       "même délai de prévision que la prévision sélectionnée et pour le même mois, la même saison ou la même période "
+       "décennale entre 1991 et 2020."
+
 msgid "Probability"
 msgstr "Probabilité"
 

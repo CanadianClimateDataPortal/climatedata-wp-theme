@@ -530,10 +530,6 @@ export interface ClimateVariableInterface {
 
 	getDecimalPlace(): number;
 
-	renderMap(): React.ReactElement;
-
-	renderDownloadMap(): React.ReactElement;
-
 	getDownloadType(): DownloadType | null;
 
 	hasMultipleDownloadUrls(): boolean;

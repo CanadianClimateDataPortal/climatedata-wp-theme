@@ -1213,10 +1213,13 @@ msgid "total precipitation"
 msgstr "précipitations totales"
 
 msgid "unusually high or low"
-msgstr "inhabituellement élevées ou faibles"
+msgstr "inhabituellement élevée ou faible"
 
-msgid "Probability that the %s will be %s relative to the 1991 to 2020 historical climatology."
-msgstr "Probabilité que la %s soit %s par rapport à la climatologie historique de 1991 à 2020."
+msgid "above, near, or below normal"
+msgstr "au-dessus, près ou sous la normale"
+
+msgid "%s: probability that this variable will be %s relative to the 1991 to 2020 historical climatology."
+msgstr "%s : probabilité que cette variable soit %s par rapport à la climatologie historique de 1991 à 2020."
 
 msgid "Unusually high"
 msgstr "Inhabituellement élevée"
@@ -1231,7 +1234,7 @@ msgid "Unusually low"
 msgstr "Inhabituellement faible"
 
 msgid "Below the %s percentile"
-msgstr "En-dessous du 20e centile"
+msgstr "En-dessous du %s centile"
 
 msgid "bottom fifth of historical data"
 msgstr "cinquième inférieur des données historiques"
@@ -1244,4 +1247,3 @@ msgid "If the probability is below 30%, no single outcome is significantly more 
 msgstr "Si la probabilité est inférieure à 30 %, aucun résultat n’est "
   "significativement plus probable que les autres, et la climatologie "
   "doit être utilisée à la place."
-

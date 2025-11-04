@@ -14,7 +14,10 @@ import MapLegendOpenControl from '@/components/map-layers/map-legend-open-contro
 
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useColorMap } from '@/hooks/use-color-map';
-import { ColourType } from '@/types/climate-variable-interface';
+import {
+	ColourType,
+	ForecastDisplays,
+} from '@/types/climate-variable-interface';
 import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
@@ -42,6 +45,11 @@ const MapLegend: React.FC = () => {
 		climateVariable?.getLegendConfig(isDelta ? MapDisplayType.DELTA : MapDisplayType.ABSOLUTE) ??
 		undefined;
 	let isCategorical = climateVariable?.getColourType() !== ColourType.CONTINUOUS;
+	const isS2D = climateVariable instanceof S2DClimateVariable;
+	const forecastDisplay = climateVariable?.getForecastDisplay();
+
+	// Whether to show the regular legend or the S2D forecast legend
+	const showForecastLegend = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
 
 	// For the default colour palette, isCategorical defaults to the default legend's type
 	if ((colourScheme === null || colourScheme === 'default') && legendData && legendData.Legend) {
@@ -50,16 +58,6 @@ const MapLegend: React.FC = () => {
 	}
 
 	const rootRef = useRef<Root | null>	(null);
-
-	/**
-	 * This is temporary until we do this the way the rest of the code expects.
-	 */
-	const isConditionForClim1197 = (() => {
-		const fd = climateVariable?.getForecastDisplay();
-		const isForecastDisplay = fd === 'forecast';
-		const isS2D = climateVariable instanceof S2DClimateVariable;
-		return isForecastDisplay === true && isS2D === true;
-	})(/* @TODO Make this condition written the usual way */);
 
 	/**
 	 * This hook creates the legend control once the map is ready. It only
@@ -109,7 +107,7 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
-		if (isConditionForClim1197) {
+		if (showForecastLegend) {
 			rootRef.current.render(
 				<MapLegendOpenControl
 					isOpen={isOpen}
@@ -153,7 +151,7 @@ const MapLegend: React.FC = () => {
 		isDelta,
 		unit,
 		locale,
-		isConditionForClim1197,
+		showForecastLegend,
 	]);
 
 	return null;

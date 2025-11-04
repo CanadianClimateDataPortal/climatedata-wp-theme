@@ -196,7 +196,7 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 
 	const firstLine = sprintf(
 		__(
-			'Probability that the %s will be %s relative to the 1991 to 2020 historical climatology.'
+			'%s: probability that this variable will be %s relative to the 1991 to 2020 historical climatology.'
 		),
 		__(variableName),
 		__(outcome),
@@ -274,7 +274,6 @@ export const MapLegendInnerS2D = () => {
 	// Table heading on the left
 	const labelWidth = 78; // px
 	// Padding around the table
-	const paddingEquallyLeftRight = 12; // px
 	// Font size to for table headings on the top and left.
 	const headingFontSize = '.8rem';
 	// The little notch between each levels
@@ -288,10 +287,10 @@ export const MapLegendInnerS2D = () => {
 	const prefix = useMemo(() => nanoid(4), []);
 
 	return (
-		<div className="w-full">
+		<div className="w-full font-sans px-2 pt-3">
 			{/* Header */}
-			<header className="flex justify-center mb-4" id={prefix + '-legend-header'}>
-				<span className="mr-1 font-sans text-sm font-medium leading-none whitespace-nowrap text-cdc-black">
+			<header className="flex justify-center mb-1" id={prefix + '-legend-header'}>
+				<span className="mr-1 text-sm font-medium leading-none whitespace-nowrap text-cdc-black">
 					{__('Probability') + ' (%)'}
 				</span>
 				<TooltipWidget
@@ -300,12 +299,7 @@ export const MapLegendInnerS2D = () => {
 			</header>
 
 			<table
-				className="w-full table-fixed"
-				style={{
-					borderCollapse: 'separate',
-					borderSpacing: '0 10px', // vertical spacing between rows
-					padding: `0 ${paddingEquallyLeftRight}px`,
-				}}
+				className="w-full table-fixed px-3 border-separate border-spacing-y-2"
 				aria-labelledby={prefix + '-legend-header'}
 			>
 				<colgroup>
@@ -319,7 +313,7 @@ export const MapLegendInnerS2D = () => {
 				</colgroup>
 
 				<thead>
-					<tr>
+					<tr className="translate-y-2">
 						<th id={`${prefix}-cat`} scope="col"></th>
 						{data.rows[0].colors.map((_, idx) => {
 							const startBoundary = data.scale[idx];
@@ -337,9 +331,8 @@ export const MapLegendInnerS2D = () => {
 									key={idx}
 									id={`${prefix}-b${startBoundary}-b${endBoundary}`}
 									aria-label={ariaLabel}
-									style={{ fontSize: headingFontSize }}
 									scope="col"
-									className="relative p-0 pb-1 text-xs font-normal"
+									className="relative p-0 pb-1 text-sm font-normal"
 								>
 									{isFirst ? (
 										<div className="flex justify-between font-[font-variant-numeric:tabular-nums]">
@@ -354,10 +347,9 @@ export const MapLegendInnerS2D = () => {
 													{startBoundary}
 												</span>
 												<div
-													className="absolute w-px bg-black"
+													className="absolute w-px bg-black left-0"
 													style={{
 														top: `calc(1em + ${numberToTickGap}px)`,
-														left: 0,
 														height: `${tickHeight}px`,
 													}}
 												></div>
@@ -374,10 +366,9 @@ export const MapLegendInnerS2D = () => {
 													{endBoundary}
 												</span>
 												<div
-													className="absolute w-px bg-black"
+													className="absolute w-px bg-black right-0"
 													style={{
 														top: `calc(1em + ${numberToTickGap}px)`,
-														right: 0,
 														height: `${tickHeight}px`,
 													}}
 												></div>
@@ -395,10 +386,9 @@ export const MapLegendInnerS2D = () => {
 												{endBoundary}
 											</span>
 											<div
-												className="absolute w-px bg-black"
+												className="absolute w-px bg-black right-0"
 												style={{
 													top: `calc(1em + ${numberToTickGap}px)`,
-													right: 0,
 													height: `${tickHeight}px`,
 												}}
 											></div>

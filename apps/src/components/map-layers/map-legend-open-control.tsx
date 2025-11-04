@@ -17,9 +17,9 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 		toggleOpen,
 	} = props;
 
-	const maxLegendWidth = 500; // px
+	const maxLegendWidth = 430; // px
 	const rootElementStyle: React.CSSProperties = {
-		width: `${maxLegendWidth}px`,
+		maxWidth: `${maxLegendWidth}px`,
 	};
 
 	// This should match what we have in MapLegendControl
@@ -51,7 +51,7 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 				<div
 					className={cn(
 						'relative flex flex-col overflow-hidden overflow-y-auto' /* positioning and overflow */,
-						'items-end gap-1 px-2 py-4' /* alignment */,
+						'items-end gap-1' /* alignment */,
 						'bg-white border rounded-md border-cold-grey-3' /* visual */,
 					)}
 				>

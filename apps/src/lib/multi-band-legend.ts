@@ -3,7 +3,7 @@ import { type ColourQuantitiesMap } from '@/types/types';
 /**
  * Single row in a probability visualization showing one forecast category
  */
-export interface MultiBandLegendGroup /*ProbabilityVisualizationRow*/ {
+export interface MultiBandLegendGroup {
 	/**
 	 * Category label for this probability band
 	 *
@@ -29,7 +29,7 @@ export interface MultiBandLegendGroup /*ProbabilityVisualizationRow*/ {
  *
  * Contains scale boundaries and color-coded probability bands for multiple categories
  */
-export type MultiBandLegend /*ProbabilityVisualization*/ = {
+export type MultiBandLegend = {
 	/**
 	 * Boundary values defining probability ranges
 	 *

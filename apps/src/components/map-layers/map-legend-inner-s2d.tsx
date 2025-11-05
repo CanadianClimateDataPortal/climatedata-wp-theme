@@ -187,7 +187,6 @@ export const MapLegendInnerS2D = (
 			data = transformed;
 			Reflect.set(data.rows?.[0], 'label', 'Unusually high');
 			Reflect.set(data.rows?.[1], 'label', 'Unusually low');
-			// Unfinished
 		}
 	}
 

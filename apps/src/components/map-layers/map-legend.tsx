@@ -26,6 +26,7 @@ import type { MapLegendInnerS2D } from '@/components/map-layers/map-legend-inner
 
 const LazyMapLegendInnerS2D = lazy<MapLegendInnerS2D>(() => import('@/components/map-layers/map-legend-inner-s2d'));
 
+
 const MapLegend: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 

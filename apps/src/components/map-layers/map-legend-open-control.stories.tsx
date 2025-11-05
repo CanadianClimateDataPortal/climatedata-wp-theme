@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react';
+import { Suspense, useState } from 'react';
 
 import {
 	type Story,
@@ -6,6 +6,13 @@ import {
 } from '@ladle/react';
 
 import MapLegendOpenControl from '@/components/map-layers/map-legend-open-control';
+import { createDelayedComponent } from '@/lib/ladle/delayed-component';
+
+const SomethingInside = () => (
+	<>
+		<img src="https://placecats.com/500/400" />
+	</>
+)
 
 export default {
 	title: 'Map Legend Open Control!',
@@ -44,24 +51,29 @@ export const StoryBravo: Story = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const toggleOpen = () => setIsOpen((prev) => !prev);
 
-	const LazyMapLegendInnerS2D = lazy(() => {
-		return Promise.all([
-			import('@/components/map-layers/map-legend-inner-s2d'),
-			new Promise((resolve) => setTimeout(resolve, 800)),
-		]).then(([moduleExports]) => moduleExports);
-	});
+	const DelayedComponent = createDelayedComponent(
+		SomethingInside,
+		1000,
+	)
+
+	const maxLegendWidth = MapLegendOpenControl.maxLegendWidth ?? 900;
 
 	return (
-		<>
+		<div
+			style={{
+				width: maxLegendWidth,
+			}}
+			className="p-5 bg-neutral-grey-light"
+		>
 			<MapLegendOpenControl
 				isOpen={isOpen}
 				toggleOpen={toggleOpen}
 			>
 				<Suspense fallback="...">
-					<LazyMapLegendInnerS2D />
+					<DelayedComponent />
 				</Suspense>
 			</MapLegendOpenControl>
-		</>
+		</div>
 	);
 };
 

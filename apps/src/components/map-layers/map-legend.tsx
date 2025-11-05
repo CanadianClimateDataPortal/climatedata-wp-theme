@@ -22,9 +22,8 @@ import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
-
-const LazyMapLegendInnerS2D = lazy(() => import('@/components/map-layers/map-legend-inner-s2d'));
-
+import type { MapLegendInnerS2D } from '@/components/map-layers/map-legend-inner-s2d';
+const LazyMapLegendInnerS2D = lazy<MapLegendInnerS2D>(() => import('@/components/map-layers/map-legend-inner-s2d'));
 
 const MapLegend: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -107,6 +106,11 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
+		if (!colorMap) {
+			rootRef.current.render(<></>);
+			return;
+		}
+
 		if (showForecastLegend) {
 			rootRef.current.render(
 				<MapLegendOpenControl
@@ -114,15 +118,10 @@ const MapLegend: React.FC = () => {
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 				>
 					<Suspense fallback={'...'}>
-						<LazyMapLegendInnerS2D />
+						<LazyMapLegendInnerS2D data={colorMap} />
 					</Suspense>
 				</MapLegendOpenControl>
 			);
-			return;
-		}
-
-		if (!colorMap) {
-			rootRef.current.render(<></>);
 			return;
 		}
 

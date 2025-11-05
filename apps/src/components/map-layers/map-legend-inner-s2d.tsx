@@ -5,53 +5,13 @@ import { sprintf } from '@wordpress/i18n';
 import { __ } from '@/context/locale-provider';
 import { getOrdinalSuffix } from '@/lib/format';
 import TooltipWidget from '@/components/ui/tooltip-widget';
+import { ColourMap } from '@/types/types';
 
-/**
- * Single row in a probability visualization showing one forecast category
- */
-export interface ProbabilityVisualizationRow {
-	/**
-	 * Category label for this probability band
-	 *
-	 * @example 'Above', 'Near', 'Below'
-	 */
-	label: string;
-
-	/**
-	 * Hexadecimal color codes for each segment, length must equal `scale.length - 1`
-	 *
-	 * Each color represents one interval between adjacent scale values
-	 *
-	 * @example
-	 * ```
-	 * { colors: ['#FDD0BB', '#FBAD94', '#F88B6E'] }
-	 * ```
-	 */
-	colors: string[];
-}
-
-/**
- * Complete probability visualization data
- *
- * Contains scale boundaries and color-coded probability bands for multiple categories
- */
-export type ProbabilityVisualization = {
-	/**
-	 * Boundary values defining probability ranges
-	 *
-	 * @example [40, 50, 60, 70, 80, 90, 100]
-	 * @see {@link ProbabilityVisualizationRow.colors} - Must have length equal to `scale.length - 1`
-	 */
-	scale: number[];
-
-	/**
-	 * Probability categories with their respective color gradients
-	 *
-	 * @remarks
-	 * Constraint: Each row's `colors` array length must equal `scale.length - 1`
-	 */
-	rows: ProbabilityVisualizationRow[];
-};
+import {
+	transformColorMapToMultiBandLegend,
+	type MultiBandLegend,
+} from '@/lib/multi-band-legend';
+import { color } from 'highcharts';
 
 /**
  * Props for component contextual information to rendering a probability forecast statement
@@ -116,7 +76,7 @@ interface ProbabilityStatementTooltipRow {
 }
 
 // BEGIN: HARDCODED DATA
-const S2D_HARDCODED_LEGEND_DATA: ProbabilityVisualization = {
+const S2D_HARDCODED_LEGEND_DATA: MultiBandLegend = {
 	scale: [40, 50, 60, 70, 80, 90, 100],
 	rows: [
 		{
@@ -238,8 +198,28 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 	);
 };
 
-export const MapLegendInnerS2D = () => {
-	const data = S2D_HARDCODED_LEGEND_DATA;
+export interface MapLegendInnerS2DProps {
+	data: ColourMap;
+}
+
+export type MapLegendInnerS2D = typeof MapLegendInnerS2D;
+
+export const MapLegendInnerS2D = (props: MapLegendInnerS2DProps): JSX.Element => {
+	let data = S2D_HARDCODED_LEGEND_DATA;
+
+	const {
+		data: colorMap,
+	} = props;
+
+	const transformed = transformColorMapToMultiBandLegend(colorMap);
+	// TODO: Some gymnastics to invert order of data2.rows
+	if (transformed.rows.length === 3) {
+		// We know it's for Forecast
+		data = transformed; // Gymnastics
+	} else if (transformed.rows.length === 2) {
+		// We know it's climatology
+		data = transformed; // Gymnastics
+	}
 
 	/**
 	 * Code-Review note: For some reason, we can't use useLocale because the present component says it can't find it. @TODO

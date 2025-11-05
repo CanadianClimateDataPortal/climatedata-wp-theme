@@ -14,6 +14,8 @@ import {
 	type StoryWithLocale,
 } from '@/lib/ladle';
 
+import { EXAMPLE_COLOR_MAP_3_BANDS } from '@/hooks/use-color-map.examples';
+
 import MapLegendInnerS2D from '@/components/map-layers/map-legend-inner-s2d';
 
 const styleForFirstChildOfLegendWrapperLeafletControl: React.CSSProperties = {
@@ -50,7 +52,7 @@ interface MapLegendInnerStory extends StoryWithLocale {
 
 export const StoryAlpha: Story<MapLegendInnerStory> = ({
 	locale = 'en',
-	data = FIXTURE_DATA,
+	data = EXAMPLE_COLOR_MAP_3_BANDS,
 }) => {
 	return (
 		<LadleMockLocaleProvider
@@ -67,48 +69,3 @@ StoryAlpha.storyName = 'Using a table';
 StoryAlpha.argTypes = {
 	...createLadleMockLocaleStoryArgTypes(),
 };
-
-/**
- * Sample data we'd receive from `useColorMap`
- */
-const FIXTURE_DATA = {
-	colours: [
-		'#FFFFFF',
-		/* Will get into "Line 1" */
-		'#FDD0BB',
-		'#FBAD94',
-		'#F88B6E',
-		'#F26A49',
-		'#E54E29',
-		'#C73518',
-
-
-		'#FFFFFF',
-		/* Will get into "Line 2" */
-		'#E5E5E5',
-		'#D0D0D0',
-		'#BABABA',
-		'#A5A5A5',
-		'#8F8F8F',
-		'#7A7A7A',
-
-
-		'#FFFFFF',
-		/* Will get into "Line 3" */
-		'#D4E8F5',
-		'#B5D9EE',
-		'#96CAE7',
-		'#77BBE0',
-		'#58ACD9',
-		'#3A9DD2',
-
-	],
-	quantities: [
-		// Line 1
-		1040, 1050, 1060, 1070, 1080, 1090, 1100,
-		// Line 2
-		2040, 2050, 2060, 2070, 2080, 2090, 2100,
-		// Line 3
-		3040, 3050, 3060, 3070, 3080, 3090, 3100,
-	],
-} as ColourMap;

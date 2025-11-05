@@ -2,7 +2,6 @@ import { type ColourMap } from '@/types/types';
 
 /**
  * Single row in a probability visualization showing one forecast category
- *
  */
 export interface MultiBandLegendGroup /*ProbabilityVisualizationRow*/ {
 	/**
@@ -64,7 +63,74 @@ const extractGroupingIndex = (quantity: number): number => {
 };
 
 /**
- * Extracts percentage value from quantity
+ * Base error class for multi-band legend operations
+ */
+export class MultiBandLegendError extends Error {
+	constructor(
+		//
+		message: string,
+		options?: ErrorOptions
+	) {
+		super(message, options);
+		this.name = this.constructor.name;
+	}
+}
+
+/**
+ * Thrown when quantity format is invalid
+ */
+export class InvalidQuantityFormatError extends MultiBandLegendError {
+	quantity: number;
+	reason: string;
+
+	constructor(
+		//
+		quantity: number,
+		reason: string,
+		options?: ErrorOptions
+	) {
+		super(`Invalid quantity format: ${quantity}. ${reason}`, options);
+		this.quantity = quantity;
+		this.reason = reason;
+	}
+}
+
+/**
+ * Thrown when scales don't match across groups
+ */
+export class ScaleMismatchError extends MultiBandLegendError {
+	groupIndex: number;
+	expectedScale: number[];
+	actualScale: number[];
+
+	constructor(
+		groupIndex: number,
+		expectedScale: number[],
+		actualScale: number[],
+		options?: ErrorOptions
+	) {
+		super(
+			`
+				Scale mismatch in group ${groupIndex}.
+				We're expecting [${expectedScale.join(', ')}]
+				and we got [${actualScale.join(', ')}]
+			`
+				.replace(/(\n|\s){2,}/g, ' ')
+				.trim(),
+			options
+		);
+
+		this.groupIndex = groupIndex;
+		this.expectedScale = expectedScale;
+		this.actualScale = actualScale;
+	}
+}
+
+/**
+ * Extracts percentage value from quantity with validation
+ *
+ * @throws {InvalidQuantityFormatError} When quantity format is invalid
+ *
  *
  * @example
  * ```typescript
@@ -74,7 +140,24 @@ const extractGroupingIndex = (quantity: number): number => {
  * ```
  */
 const extractPercentage = (quantity: number): number => {
-	const percentageStr = String(quantity).substring(1, 4);
+	const str = String(quantity);
+
+	if (str.length !== 4) {
+		throw new InvalidQuantityFormatError(
+			quantity,
+			`Quantity must be 4 digits (format: GXYY). Got ${str.length} digits`
+		);
+	}
+
+	const secondDigit = str[1];
+	if (secondDigit !== '0' && secondDigit !== '1') {
+		throw new InvalidQuantityFormatError(
+			quantity,
+			`Second digit must be 0 or 1 (represents 0-100%). Got '${secondDigit}'`
+		);
+	}
+
+	const percentageStr = str.substring(1, 4);
 	return Number(percentageStr);
 };
 
@@ -126,15 +209,84 @@ const findGroupRanges = (quantities: number[]): GroupRange[] => {
 export type TransformColorMapInput = Pick<ColourMap, 'colours' | 'quantities'>;
 
 /**
+ * Validates that all groups have identical scales
+ */
+const validateScaleConsistency = (
+	quantities: number[],
+	ranges: GroupRange[]
+): void => {
+	if (ranges.length === 0) {
+		return;
+	}
+
+	// Extract scale from first group as reference
+	const firstRange = ranges[0];
+	const expectedScale = quantities
+		.slice(firstRange.startIndex, firstRange.endIndex + 1)
+		.map(extractPercentage);
+
+	// Validate all other groups match
+	for (let i = 1; i < ranges.length; i++) {
+		const range = ranges[i];
+		const actualScale = quantities
+			.slice(range.startIndex, range.endIndex + 1)
+			.map(extractPercentage);
+
+		// Check length first
+		if (actualScale.length !== expectedScale.length) {
+			throw new ScaleMismatchError(
+				range.groupIndex,
+				expectedScale,
+				actualScale
+			);
+		}
+
+		// Check values match
+		const scalesMatch = actualScale.every(
+			(val, idx) => val === expectedScale[idx]
+		);
+
+		if (!scalesMatch) {
+			throw new ScaleMismatchError(
+				range.groupIndex,
+				expectedScale,
+				actualScale
+			);
+		}
+	}
+};
+
+/**
+ * Validates no duplicate quantities exist
+ */
+const validateNoDuplicates = (quantities: number[]): void => {
+	const seen = new Set<number>();
+
+	for (const quantity of quantities) {
+		if (seen.has(quantity)) {
+			throw new MultiBandLegendError(
+				`Duplicate quantity found: ${quantity}. Each quantity must be unique`
+			);
+		}
+		seen.add(quantity);
+	}
+};
+
+/**
  * Transforms colorMap data into MultiBandLegend format
  *
  * @param colorMap - Input color map from backend
  * @param labels - Optional labels for each group (if fewer than groups, generates defaults)
  */
-export const transformColorMapToMultiBandLegend = (
-	{ quantities = [], colours = [] }: TransformColorMapInput,
-): MultiBandLegend => {
+export const transformColorMapToMultiBandLegend = ({
+	quantities = [],
+	colours = [],
+}: TransformColorMapInput): MultiBandLegend => {
 	const ranges = findGroupRanges(quantities);
+
+	// Validate scale consistency across groups
+	validateNoDuplicates(quantities);
+	validateScaleConsistency(quantities, ranges);
 
 	// Extract scale from first group (they're all the same)
 	const firstRange = ranges[0];

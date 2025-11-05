@@ -123,7 +123,7 @@ const findGroupRanges = (quantities: number[]): GroupRange[] => {
 	return ranges;
 };
 
-type ColorMapInput = Pick<ColourMap, 'colours' | 'quantities'>;
+export type TransformColorMapInput = Pick<ColourMap, 'colours' | 'quantities'>;
 
 /**
  * Transforms colorMap data into MultiBandLegend format
@@ -132,7 +132,7 @@ type ColorMapInput = Pick<ColourMap, 'colours' | 'quantities'>;
  * @param labels - Optional labels for each group (if fewer than groups, generates defaults)
  */
 export const transformColorMapToMultiBandLegend = (
-	{ quantities = [], colours = [] }: ColorMapInput,
+	{ quantities = [], colours = [] }: TransformColorMapInput,
 	labels?: string[]
 ): MultiBandLegend => {
 	const ranges = findGroupRanges(quantities);

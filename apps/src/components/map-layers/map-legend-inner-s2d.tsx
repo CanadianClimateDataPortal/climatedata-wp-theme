@@ -11,7 +11,6 @@ import {
 	transformColorMapToMultiBandLegend,
 	type MultiBandLegend,
 } from '@/lib/multi-band-legend';
-import { color } from 'highcharts';
 
 /**
  * Props for component contextual information to rendering a probability forecast statement
@@ -75,71 +74,6 @@ interface ProbabilityStatementTooltipRow {
 	parens: string;
 }
 
-// BEGIN: HARDCODED DATA
-const S2D_HARDCODED_LEGEND_DATA: MultiBandLegend = {
-	scale: [40, 50, 60, 70, 80, 90, 100],
-	rows: [
-		{
-			label: 'Above',
-			colors: [
-				'#FDD0BB',
-				'#FBAD94',
-				'#F88B6E',
-				'#F26A49',
-				'#E54E29',
-				'#C73518',
-			], // (coral gradient)
-		},
-		{
-			label: 'Near',
-			colors: [
-				'#E5E5E5',
-				'#D0D0D0',
-				'#BABABA',
-				'#A5A5A5',
-				'#8F8F8F',
-				'#7A7A7A',
-			], //  (gray gradient)
-		},
-		{
-			label: 'Below',
-			colors: [
-				'#D4E8F5',
-				'#B5D9EE',
-				'#96CAE7',
-				'#77BBE0',
-				'#58ACD9',
-				'#3A9DD2',
-			], // (blue gradient)
-		},
-	],
-};
-const S2D_HARDCODED_LEGEND_VAR_NAME = 'total precipitation';
-const S2D_HARDCODED_LEGEND_OUTCOME = 'unusually high or low';
-const S2D_HARDCODED_STMT_ROW_1_VALUE = 80;
-const S2D_HARDCODED_STMT_ROW_2_VALUE = 20;
-const S2D_HARDCODED_STMT_ROWS: ProbabilityStatementTooltipRow[] = [
-	{
-		// Unusually high: Above the 80th percentile (top fifth of historical data)
-		value: S2D_HARDCODED_STMT_ROW_1_VALUE,
-		label: 'Unusually high',
-		text: 'Above the %s percentile',
-		parens: 'top fifth of historical data',
-	},
-	{
-		// Unusually low: Below the 20th percentile (bottom fifth of historical data)
-		value: S2D_HARDCODED_STMT_ROW_2_VALUE,
-		label: 'Unusually low',
-		text: 'Below the %s percentile',
-		parens: 'bottom fifth of historical data',
-	},
-];
-const S2D_HARDCODED_STMT_ROWS_LAST_LINE = __(
-	'If the probability is below 30%, no single outcome is significantly more likely ' +
-		'than the others, and the climatology should be used instead.'
-);
-// END: HARDCODED DATA
-
 /**
  * Renders the introductory probability statement for forecast tooltips.
  * Example: "Probability that the total precipitation will be unusually high
@@ -151,8 +85,28 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 		outcome,
 		locale,
 	} = props;
-	const statementRows = S2D_HARDCODED_STMT_ROWS;
-	const afterStatementRows = S2D_HARDCODED_STMT_ROWS_LAST_LINE;
+	// No need to pass translation (`__('...')`) in the items as its done at the end.
+	const statementRows: ProbabilityStatementTooltipRow[] = [
+		{
+			// Unusually high: Above the 80th percentile (top fifth of historical data)
+			value: 80,
+			label: 'Unusually high',
+			text: 'Above the %s percentile',
+			parens: 'top fifth of historical data',
+		},
+		{
+			// Unusually low: Below the 20th percentile (bottom fifth of historical data)
+			value: 20,
+			label: 'Unusually low',
+			text: 'Below the %s percentile',
+			parens: 'bottom fifth of historical data',
+		},
+	];
+
+	const afterStatementRows = __(
+		'If the probability is below 30%, no single outcome is significantly more likely ' +
+			'than the others, and the climatology should be used instead.'
+	);
 
 	const firstLine = sprintf(
 		__(
@@ -204,21 +158,37 @@ export interface MapLegendInnerS2DProps {
 
 export type MapLegendInnerS2D = typeof MapLegendInnerS2D;
 
-export const MapLegendInnerS2D = (props: MapLegendInnerS2DProps): JSX.Element => {
-	let data = S2D_HARDCODED_LEGEND_DATA;
+export const MapLegendInnerS2D = (
+	props: MapLegendInnerS2DProps
+): JSX.Element => {
+
+	let data: MultiBandLegend = {
+		rows: [
+			{ label: '', colors: [] },
+		],
+		scale: [],
+	};
 
 	const {
 		data: colorMap,
 	} = props;
 
 	const transformed = transformColorMapToMultiBandLegend(colorMap);
-	// TODO: Some gymnastics to invert order of data2.rows
-	if (transformed.rows.length === 3) {
-		// We know it's for Forecast
-		data = transformed; // Gymnastics
-	} else if (transformed.rows.length === 2) {
-		// We know it's climatology
-		data = transformed; // Gymnastics
+	if (transformed && transformed?.rows) {
+		if (transformed.rows.length === 3) {
+			// We know it's for Forecast
+			data = transformed;
+			// There's probably a better way to do this
+			Reflect.set(data.rows?.[0], 'label', 'Above');
+			Reflect.set(data.rows?.[1], 'label', 'Near');
+			Reflect.set(data.rows?.[2], 'label', 'Below');
+		} else if (transformed.rows.length === 2) {
+			// We know it's climatology
+			data = transformed;
+			Reflect.set(data.rows?.[0], 'label', 'Unusually high');
+			Reflect.set(data.rows?.[1], 'label', 'Unusually low');
+			// Unfinished
+		}
 	}
 
 	/**
@@ -229,27 +199,29 @@ export const MapLegendInnerS2D = (props: MapLegendInnerS2DProps): JSX.Element =>
 	};
 
 	const probabilityStatement: ProbabilityStatementProps = {
-		variableName: S2D_HARDCODED_LEGEND_VAR_NAME,
-		outcome: S2D_HARDCODED_LEGEND_OUTCOME,
+		variableName: 'total precipitation',
+		outcome: 'unusually high or low',
 		locale: lang,
 	};
 
 	let errorMessage: string | undefined
-	const scaleLength = data.scale.length;
-	const rowsLengthMustBe = scaleLength - 1;
-	for (const [idx, row] of (data?.rows ?? []).entries()) {
-		const { colors } = row;
-		const curLen = colors.length;
-		if (curLen !== rowsLengthMustBe) {
-			const message = `
-				Inconsistency error at row index ${idx}:
-				We're expecting to have exactly ${rowsLengthMustBe}
-				and we got an array of ${curLen} color codes
-			`
-				.replace(/(\n|\s){2,}/g, ' ')
-				.trim();
-			console.error(message);
-			errorMessage = message;
+	const scaleLength = (data?.scale ?? []).length;
+	if (scaleLength > 0) {
+		const rowsLengthMustBe = scaleLength - 1;
+		for (const [idx, row] of (data?.rows ?? []).entries()) {
+			const { colors = [] } = row ?? {};
+			const curLen = colors.length;
+			if (curLen > 0 && curLen !== rowsLengthMustBe) {
+				const message = `
+					Inconsistency error at row index ${idx}:
+					We're expecting to have exactly ${rowsLengthMustBe}
+					and we got an array of ${curLen} color codes
+				`
+					.replace(/(\n|\s){2,}/g, ' ')
+					.trim();
+				console.error(message);
+				errorMessage = message;
+			}
 		}
 	}
 
@@ -269,13 +241,16 @@ export const MapLegendInnerS2D = (props: MapLegendInnerS2DProps): JSX.Element =>
 	const prefix = useMemo(() => nanoid(4), []);
 
 	if (errorMessage) {
-		return (<div title={errorMessage}>&hellip;</div>)
+		return (<div title={errorMessage}>&hellip;</div>);
 	}
 
 	return (
 		<div className="w-full font-sans px-2 pt-3">
 			{/* Header */}
-			<header className="flex justify-center mb-1" id={prefix + '-legend-header'}>
+			<header
+				className="flex justify-center mb-1"
+				id={prefix + '-legend-header'}
+			>
 				<span className="mr-1 text-sm font-medium leading-none whitespace-nowrap text-cdc-black">
 					{__('Probability') + ' (%)'}
 				</span>
@@ -387,11 +362,19 @@ export const MapLegendInnerS2D = (props: MapLegendInnerS2DProps): JSX.Element =>
 				</thead>
 
 				<tbody>
-					{data.rows.map((row, idx) => {
-						const rowId = row.label
+					{data.rows.map(({ label = '', colors = [] }, idx) => {
+						const rowId = label
 							.toLowerCase()
 							.replace(/\s+/g, '-');
 						const isFirst = idx === 0;
+
+						if (colors.length < 1) {
+							return (
+								<tr>
+									<th>&nbsp;</th>
+								</tr>
+							)
+						}
 
 						const style: React.CSSProperties = {
 							height: 40,
@@ -415,9 +398,9 @@ export const MapLegendInnerS2D = (props: MapLegendInnerS2DProps): JSX.Element =>
 									scope="row"
 									className="pr-2 text-sm font-normal text-right align-middle"
 								>
-									{__(row.label)}
+									{__(label)}
 								</th>
-								{row.colors.map((color, idx, arr) => {
+								{colors.map((color, idx, arr) => {
 									const startBoundary = data.scale[idx];
 									const endBoundary = data.scale[idx + 1];
 									const isFirst = idx === 0;

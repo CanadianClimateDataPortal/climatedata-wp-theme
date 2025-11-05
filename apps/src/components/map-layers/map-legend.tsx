@@ -23,6 +23,7 @@ import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import type { MapLegendInnerS2D } from '@/components/map-layers/map-legend-inner-s2d';
+
 const LazyMapLegendInnerS2D = lazy<MapLegendInnerS2D>(() => import('@/components/map-layers/map-legend-inner-s2d'));
 
 const MapLegend: React.FC = () => {

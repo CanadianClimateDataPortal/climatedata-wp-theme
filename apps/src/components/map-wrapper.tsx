@@ -18,7 +18,14 @@ const MapWrapper = () => {
 	return (
 		<div className="relative flex-1">
 			<MapHeader data={mapInfo}/>
-			<Map />
+			{/*
+			Render the map only if the climate variable has loaded, else the
+			map events can interfere with the app's state.
+			*/}
+			{climateVariable ?
+				<Map /> :
+				null
+			}
 		</div>
 	);
 }

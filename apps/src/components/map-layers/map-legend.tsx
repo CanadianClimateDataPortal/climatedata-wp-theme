@@ -1,15 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+	lazy,
+	Suspense,
+	useEffect,
+	useRef,
+	useState,
+} from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 
 import MapLegendControl from '@/components/map-legend-control';
+import MapLegendOpenControl from '@/components/map-layers/map-legend-open-control';
+
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useColorMap } from '@/hooks/use-color-map';
-import { ColourType } from '@/types/climate-variable-interface';
+import {
+	ColourType,
+	ForecastDisplays,
+} from '@/types/climate-variable-interface';
 import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
+
+const LazyMapLegendInnerS2D = lazy(() => import('@/components/map-layers/map-legend-inner-s2d'));
+
 
 const MapLegend: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -30,6 +45,11 @@ const MapLegend: React.FC = () => {
 		climateVariable?.getLegendConfig(isDelta ? MapDisplayType.DELTA : MapDisplayType.ABSOLUTE) ??
 		undefined;
 	let isCategorical = climateVariable?.getColourType() !== ColourType.CONTINUOUS;
+	const isS2D = climateVariable instanceof S2DClimateVariable;
+	const forecastDisplay = climateVariable?.getForecastDisplay();
+
+	// Whether to show the regular legend or the S2D forecast legend
+	const showForecastLegend = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
 
 	// For the default colour palette, isCategorical defaults to the default legend's type
 	if ((colourScheme === null || colourScheme === 'default') && legendData && legendData.Legend) {
@@ -87,6 +107,20 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
+		if (showForecastLegend) {
+			rootRef.current.render(
+				<MapLegendOpenControl
+					isOpen={isOpen}
+					toggleOpen={() => setIsOpen((prev) => !prev)}
+				>
+					<Suspense fallback={'...'}>
+						<LazyMapLegendInnerS2D />
+					</Suspense>
+				</MapLegendOpenControl>
+			);
+			return;
+		}
+
 		if (!colorMap) {
 			rootRef.current.render(<></>);
 			return;
@@ -108,7 +142,17 @@ const MapLegend: React.FC = () => {
 				locale={locale}
 			/>
 		);
-	}, [colorMap, mapData, isOpen, isCategorical, legendConfig, isDelta, unit, locale]);
+	}, [
+		colorMap,
+		mapData,
+		isOpen,
+		isCategorical,
+		legendConfig,
+		isDelta,
+		unit,
+		locale,
+		showForecastLegend,
+	]);
 
 	return null;
 };

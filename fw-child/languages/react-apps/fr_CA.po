@@ -1282,3 +1282,54 @@ msgstr "Les performances passées ou « habileté » du système de prévision s
        "l’indice continu de probabilité ordonnée (CRPSS). Le CRPSS mesure l'exactitude des prévisions produites pour le "
        "même délai de prévision que la prévision sélectionnée et pour le même mois, la même saison ou la même période "
        "décennale entre 1991 et 2020."
+
+msgid "Probability"
+msgstr "Probabilité"
+
+msgid "Above"
+msgstr "Au-dessus"
+
+msgid "Near"
+msgstr "Près"
+
+msgid "Below"
+msgstr "En-dessous"
+
+msgid "total precipitation"
+msgstr "précipitations totales"
+
+msgid "unusually high or low"
+msgstr "inhabituellement élevée ou faible"
+
+msgid "above, near, or below normal"
+msgstr "au-dessus, près ou sous la normale"
+
+msgid "%s: probability that this variable will be %s relative to the 1991 to 2020 historical climatology."
+msgstr "%s : probabilité que cette variable soit %s par rapport à la climatologie historique de 1991 à 2020."
+
+msgid "Unusually high"
+msgstr "Inhabituellement élevée"
+
+msgid "Above the %s percentile"
+msgstr "Au-dessus du %s centile"
+
+msgid "top fifth of historical data"
+msgstr "cinquième supérieur des données historiques"
+
+msgid "Unusually low"
+msgstr "Inhabituellement faible"
+
+msgid "Below the %s percentile"
+msgstr "En-dessous du %s centile"
+
+msgid "bottom fifth of historical data"
+msgstr "cinquième inférieur des données historiques"
+
+msgid "Between %s and %s"
+msgstr "Entre %s et %s"
+
+msgid "If the probability is below 30%, no single outcome is significantly more likely "
+  "than the others, and the climatology should be used instead."
+msgstr "Si la probabilité est inférieure à 30 %, aucun résultat n’est "
+  "significativement plus probable que les autres, et la climatologie "
+  "doit être utilisée à la place."

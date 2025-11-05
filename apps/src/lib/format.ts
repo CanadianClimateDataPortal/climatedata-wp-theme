@@ -219,3 +219,57 @@ export function formatValue(value: number, unit: string | undefined, decimals: n
 
 	return sprintf(valuePattern, formatter.format(value));
 }
+
+/**
+ * Gets the ordinal suffix for a number based on locale.
+ *
+ * An ordinal number indicates position or rank (1st, 2nd, 3rd) as opposed to
+ * a cardinal number (1, 2, 3). This function returns only the suffix portion.
+ *
+ * @param nbr - The cardinal number to get the ordinal suffix for
+ * @param locale - The locale to use for determining the suffix. Supports:
+ *   - 'en' or 'en-*': Returns 'st', 'nd', 'rd', or 'th' using proper English rules
+ *     (handles special cases like 11th, 12th, 13th correctly)
+ *   - 'fr' or 'fr-*': Returns 'er' for 1, 'e' for all other numbers
+ *   - Other locales: Falls back to Intl.PluralRules ordinal selection
+ *
+ * @returns The ordinal suffix string (e.g., 'st', 'nd', 'rd', 'th', 'er', 'e')
+ *
+ * @example
+ * ```typescript
+ * getOrdinalSuffix(1, 'en');    // 'st'
+ * getOrdinalSuffix(2, 'en');    // 'nd'
+ * getOrdinalSuffix(3, 'en');    // 'rd'
+ * getOrdinalSuffix(11, 'en');   // 'th' (not 'st')
+ * getOrdinalSuffix(21, 'en');   // 'st'
+ * getOrdinalSuffix(1, 'fr');    // 'er'
+ * getOrdinalSuffix(2, 'fr');    // 'e'
+ * getOrdinalSuffix(66, 'en');   // 'th'
+ * ```
+ *
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/PluralRules Intl.PluralRules}
+ * @see {@link https://www.unicode.org/cldr/charts/43/supplemental/language_plural_rules.html#en CLDR Plural Rules for English}
+ * @see {@link https://www.unicode.org/cldr/charts/43/supplemental/language_plural_rules.html#fr CLDR Plural Rules for French}
+ */
+export const getOrdinalSuffix = (
+	nbr: number,
+	locale: Intl.LocalesArgument,
+): string => {
+	if (typeof locale === 'string' && String(locale).startsWith('fr')) {
+		// French: 1er, 2e, 3e, etc.
+		return nbr === 1 ? 'er' : 'e';
+	}
+
+	// English: use Intl.PluralRules for proper ordinal logic
+	const pr = new Intl.PluralRules(locale, { type: 'ordinal' });
+	const suffixes: Record<Intl.LDMLPluralRule, string> = {
+		one: 'st', // 1st, 21st, 31st...
+		two: 'nd', // 2nd, 22nd, 32nd...
+		few: 'rd', // 3rd, 23rd, 33rd...
+		other: 'th', // 4th, 5th, 6th, 11th, 12th, 13th...
+		zero: 'th', // 0th law
+		many: 'th',
+	};
+
+	return suffixes[pr.select(nbr)];
+};

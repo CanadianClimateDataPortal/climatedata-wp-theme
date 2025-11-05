@@ -133,7 +133,6 @@ export type TransformColorMapInput = Pick<ColourMap, 'colours' | 'quantities'>;
  */
 export const transformColorMapToMultiBandLegend = (
 	{ quantities = [], colours = [] }: TransformColorMapInput,
-	labels?: string[]
 ): MultiBandLegend => {
 	const ranges = findGroupRanges(quantities);
 
@@ -144,12 +143,12 @@ export const transformColorMapToMultiBandLegend = (
 		.map(extractPercentage);
 
 	// Build rows for each group
-	const rows: MultiBandLegendGroup[] = ranges.map((range, index) => {
+	const rows: MultiBandLegendGroup[] = ranges.map((range) => {
 		// Skip first color in each group (placeholder)
 		const colors = colours.slice(range.startIndex + 1, range.endIndex + 1);
 
 		return {
-			label: labels?.[index] || `Line ${range.groupIndex}`,
+			label: `Line ${range.groupIndex}`,
 			colors,
 		};
 	});

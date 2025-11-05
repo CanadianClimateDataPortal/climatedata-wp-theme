@@ -5,14 +5,15 @@ import {
 	type StoryDefault,
 } from '@ladle/react';
 
-import MapLegendOpenControl from '@/components/map-layers/map-legend-open-control';
 import { createDelayedComponent } from '@/lib/ladle/delayed-component';
+
+import MapLegendOpenControl from '@/components/map-layers/map-legend-open-control';
 
 const SomethingInside = () => (
 	<>
 		<img src="https://placecats.com/500/400" />
 	</>
-)
+);
 
 export default {
 	title: 'Map Legend Open Control!',
@@ -51,10 +52,7 @@ export const StoryBravo: Story = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const toggleOpen = () => setIsOpen((prev) => !prev);
 
-	const DelayedComponent = createDelayedComponent(
-		SomethingInside,
-		1000,
-	)
+	const DelayedComponent = createDelayedComponent(SomethingInside, 1000);
 
 	const maxLegendWidth = MapLegendOpenControl.maxLegendWidth ?? 900;
 

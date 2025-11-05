@@ -13,7 +13,7 @@ import MapLegendInnerS2D from '@/components/map-layers/map-legend-inner-s2d';
 
 const styleForFirstChildOfLegendWrapperLeafletControl: React.CSSProperties = {
 	width: 500,
-}
+};
 
 export default {
 	title: 'Seasonal Decadal Legend',
@@ -33,10 +33,10 @@ export default {
 
 // Mocked translation specific for this component
 const translatedFrench = {
-	'Probability': 'Probabilité',
-	'Above': 'Au-dessus',
-	'Near': 'Près de',
-	'Below': 'En dessous',
+	Probability: 'Probabilité',
+	Above: 'Au-dessus',
+	Near: 'Près de',
+	Below: 'En dessous',
 };
 
 export const StoryAlpha: Story<StoryWithLocale> = ({ locale = 'en' }) => {

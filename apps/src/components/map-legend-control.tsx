@@ -11,7 +11,7 @@ const GRADIENT_WIDTH = 22;
 const TICK_WIDTH = 10;
 const MIN_LABEL_SPACING = 30; // Minimum spacing between labels
 
-type MapLegendControlProps = {
+export type MapLegendControlProps = {
 	data: ColourMap;
 	opacity: number;
 	isOpen: boolean;
@@ -24,9 +24,25 @@ type MapLegendControlProps = {
 	locale?: string;
 }
 
-const MapLegendControl: React.FC<MapLegendControlProps> = (
-	{ data, opacity, isOpen, toggleOpen, isCategorical, isDelta, unit, legendConfig, colourType, locale = 'en' }
-) => {
+export type MapLegendControl = typeof MapLegendControl;
+
+export const MapLegendControl = (
+	props: MapLegendControlProps
+): JSX.Element => {
+	const {
+		data,
+		opacity,
+		isOpen,
+		toggleOpen,
+		isCategorical,
+		isDelta,
+		unit,
+		legendConfig,
+		colourType,
+		locale = 'en',
+	} = props;
+	console.log('MapLegendControl');
+
 	const [svgWidth, setSvgWidth] = useState(0);
 	const [availableHeight, setAvailableHeight] = useState<number | undefined>(undefined);
 	const [svgElement, setSvgElement] = useState<SVGSVGElement | null>(null);
@@ -246,5 +262,7 @@ const MapLegendControl: React.FC<MapLegendControlProps> = (
 		</div>
 	);
 };
+
+MapLegendControl.displayName = 'MapLegendControl';
 
 export default React.memo(MapLegendControl);

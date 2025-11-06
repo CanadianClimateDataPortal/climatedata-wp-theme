@@ -9,7 +9,6 @@ import { createRoot, Root } from 'react-dom/client';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 
-import MapLegendControl from '@/components/map-legend-control';
 import MapLegendOpenControl from '@/components/map-layers/map-legend-open-control';
 
 import { useClimateVariable } from '@/hooks/use-climate-variable';
@@ -22,9 +21,12 @@ import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
+
 import type { MapLegendInnerS2D } from '@/components/map-layers/map-legend-inner-s2d';
+import type { MapLegendControl } from '@/components/map-legend-control';
 
 const LazyMapLegendInnerS2D = lazy<MapLegendInnerS2D>(() => import('@/components/map-layers/map-legend-inner-s2d'));
+const LazyMapLegendControl = lazy<React.MemoExoticComponent<MapLegendControl>>(() => import('@/components/map-legend-control'));
 
 
 const MapLegend: React.FC = () => {
@@ -136,7 +138,7 @@ const MapLegend: React.FC = () => {
 		const colourType = colorMap.type;
 
 		rootRef.current.render(
-			<MapLegendControl
+			<LazyMapLegendControl
 				data={colorMap}
 				opacity={mapData}
 				isOpen={isOpen}

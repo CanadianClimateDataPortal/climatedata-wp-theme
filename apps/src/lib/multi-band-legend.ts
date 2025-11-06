@@ -1,4 +1,4 @@
-import { type ColourMap } from '@/types/types';
+import { type ColourQuantitiesMap } from '@/types/types';
 
 /**
  * Single row in a probability visualization showing one forecast category
@@ -206,8 +206,6 @@ const findGroupRanges = (quantities: number[]): GroupRange[] => {
 	return ranges;
 };
 
-export type TransformColorMapInput = Pick<ColourMap, 'colours' | 'quantities'>;
-
 /**
  * Validates that all groups have identical scales
  */
@@ -281,7 +279,7 @@ const validateNoDuplicates = (quantities: number[]): void => {
 export const transformColorMapToMultiBandLegend = ({
 	quantities = [],
 	colours = [],
-}: TransformColorMapInput): MultiBandLegend => {
+}: ColourQuantitiesMap): MultiBandLegend => {
 	const ranges = findGroupRanges(quantities);
 
 	// Validate scale consistency across groups

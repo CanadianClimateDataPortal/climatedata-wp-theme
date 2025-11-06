@@ -4,10 +4,11 @@ import {
 	transformColorMapToMultiBandLegend,
 	InvalidQuantityFormatError,
 	ScaleMismatchError,
-	type TransformColorMapInput,
 } from '@/lib/multi-band-legend';
 
 import { EXAMPLE_COLOR_MAP_3_BANDS } from '@/hooks/use-color-map.examples';
+
+type TransformColorMapInputParam = Parameters<typeof transformColorMapToMultiBandLegend>[0];
 
 /**
  * Factory to create test fixtures for multi-band legend
@@ -18,7 +19,7 @@ import { EXAMPLE_COLOR_MAP_3_BANDS } from '@/hooks/use-color-map.examples';
 const createFixture = (
 	groups: number = 3,
 	percentages: number[] = [40, 50, 60, 70, 80, 90, 100]
-): TransformColorMapInput => {
+): TransformColorMapInputParam => {
 	const colours: string[] = [];
 	const quantities: number[] = [];
 
@@ -222,7 +223,7 @@ describe('multi-band-legend', () => {
 				});
 
 				it('throws ScaleMismatchError when scales differ', () => {
-					const input: TransformColorMapInput = {
+					const input: TransformColorMapInputParam = {
 						/* prettier-ignore-start */
 						colours: [
 							// Line 1

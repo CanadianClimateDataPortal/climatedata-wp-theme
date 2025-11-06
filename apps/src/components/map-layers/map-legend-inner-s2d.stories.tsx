@@ -4,7 +4,7 @@ import {
 } from '@ladle/react';
 
 import {
-	type ColourMap,
+	type ColourQuantitiesMap,
 	type Locale,
 } from '@/types/types';
 
@@ -47,7 +47,7 @@ const translatedFrench = {
 };
 
 interface MapLegendInnerStory extends StoryWithLocale {
-	data: ColourMap;
+	data: ColourQuantitiesMap;
 }
 
 export const StoryAlpha: Story<MapLegendInnerStory> = ({

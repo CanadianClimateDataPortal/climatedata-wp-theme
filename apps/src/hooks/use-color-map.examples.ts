@@ -1,7 +1,7 @@
-import type { ColourMap } from '@/types/types';
+import type { ColourQuantitiesMap } from '@/types/types';
 
 /**
- * Example ColourMap as returned by useColorMap hook when it's a multi-band legend (e.g. in S2D forecasts).
+ * Example ColourQuantitiesMap as returned by useColorMap hook when it's a multi-band legend (e.g. in S2D forecasts).
  *
  * CONSUMED BY: {@link transformColorMapToMultiBandLegend} → {@link MapLegendInnerS2D}
  * NOT COMPATIBLE WITH: {@link MapLegendControl}
@@ -35,7 +35,7 @@ import type { ColourMap } from '@/types/types';
  * @see transformColorMapToMultiBandLegend (`@/lib/multi-band-legend`) - Transforms GXYY format
  * @see MapLegendInnerS2D (`@/components/map-layers/map-legend-inner-s2d`) - Horizontal multi-band legend renderer
  */
-export const EXAMPLE_COLOR_MAP_3_BANDS: ColourMap = {
+export const EXAMPLE_COLOR_MAP_3_BANDS: ColourQuantitiesMap = {
 	colours: [
 		'#FFFFFF',
 		/* Will get into "Line 1" */
@@ -77,16 +77,15 @@ export const EXAMPLE_COLOR_MAP_3_BANDS: ColourMap = {
 		// Left mark                 Right mark
 
 		// Line 2 - The Gray gradient (labelled: "Near" in S2D Forecasts)
-		//      40%   50%   60%   70%   80%   90%  100%
+		// 40%  50%   60%   70%   80%   90%  100%
 		2040, 2050, 2060, 2070, 2080, 2090, 2100,
 
 		// Line 3 - The Blue gradient (labelled: "Above" in S2D Forecasts)
-		//      40%   50%   60%   70%   80%   90%  100%
+		// 40%  50%   60%   70%   80%   90%  100%
 		3040, 3050, 3060, 3070, 3080, 3090, 3100,
 	],
 	/* prettier-ignore-end */
-	// ...
-} as ColourMap;
+};
 
 /**
  * Example ColourMap for single-gradient discrete legend.
@@ -106,7 +105,7 @@ export const EXAMPLE_COLOR_MAP_3_BANDS: ColourMap = {
  *
  * @see useColorMap (`@/hooks/use-color-map`) - Hook that can return this format OR multi-band format
  */
-export const EXAMPLE_COLOR_MAP_DISCRETE_SINGLE: ColourMap = {
+export const EXAMPLE_COLOR_MAP_DISCRETE_SINGLE: ColourQuantitiesMap = {
 	colours: [
 		//  -150
 		'#053061',
@@ -136,5 +135,4 @@ export const EXAMPLE_COLOR_MAP_DISCRETE_SINGLE: ColourMap = {
 		 150,
 		 22500,
 	],
-	// ...
-} as ColourMap;
+};

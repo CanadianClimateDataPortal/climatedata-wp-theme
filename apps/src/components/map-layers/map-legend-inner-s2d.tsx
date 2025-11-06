@@ -5,7 +5,7 @@ import { sprintf } from '@wordpress/i18n';
 import { __ } from '@/context/locale-provider';
 import { getOrdinalSuffix } from '@/lib/format';
 import TooltipWidget from '@/components/ui/tooltip-widget';
-import { ColourMap } from '@/types/types';
+import { type ColourQuantitiesMap } from '@/types/types';
 
 import {
 	transformColorMapToMultiBandLegend,
@@ -153,7 +153,7 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 };
 
 export interface MapLegendInnerS2DProps {
-	data: ColourMap;
+	data: ColourQuantitiesMap;
 }
 
 export type MapLegendInnerS2D = typeof MapLegendInnerS2D;

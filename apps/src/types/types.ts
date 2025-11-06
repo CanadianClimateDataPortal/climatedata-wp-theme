@@ -601,6 +601,28 @@ export interface ColourMap {
 	isDivergent: boolean;
 }
 
+/**
+ * Essential colour-to-quantity mapping extracted from ColourMap.
+ *
+ * Contains only the fields actually used for legend transformations and rendering,
+ * excluding legacy/unused metadata fields (`type`, `isDivergent`).
+ *
+ * @property colours - Hex color codes in order
+ * @property quantities - Numeric values corresponding to each color
+ *
+ * @see {ColourMap} - Full type with metadata fields
+ * @see {transformColorMapToMultiBandLegend} - Primary consumer of this type
+ *
+ * @example
+ * ```typescript
+ * const input: ColourQuantitiesMap = {
+ *   colours: ['#FFFFFF', '#FF0000', '#00FF00'],
+ *   quantities: [1040, 1050, 1060],
+ * }
+ * ```
+ */
+export type ColourQuantitiesMap = Pick<ColourMap, 'colours' | 'quantities'>;
+
 // A translatable string object with English and French variants
 export interface LocalizedString {
 	en: string;

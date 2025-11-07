@@ -1,10 +1,20 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react';
+import { nanoid } from 'nanoid';
+
 import { __ } from '@/context/locale-provider';
 
 import { ColourType, LegendConfig } from '@/types/climate-variable-interface';
 import { ColourMap } from '@/types/types';
 import { getUnitName } from '@/lib/utils';
 import { doyFormatter, formatValue } from '@/lib/format';
+import { TooltipContent } from '@radix-ui/react-tooltip';
+
+import TooltipWidget from '@/components/ui/tooltip-widget';
 
 const GRADIENT_WIDTH = 22;
 const TICK_WIDTH = 10;
@@ -19,6 +29,8 @@ export type MapLegendControlProps = {
 	legendConfig?: LegendConfig;
 	colourType?: string;
 	locale?: string;
+	title?: string;
+	tooltipContents?: React.ReactNode;
 }
 
 export type MapLegendControl = typeof MapLegendControl;
@@ -35,6 +47,8 @@ export const MapLegendControl = (
 		legendConfig,
 		colourType,
 		locale = 'en',
+		title,
+		tooltipContents,
 	} = props;
 
 	const [svgWidth, setSvgWidth] = useState(0);
@@ -77,6 +91,7 @@ export const MapLegendControl = (
 	const legendHeight = availableHeight !== undefined ? availableHeight : totalLabels * MIN_LABEL_SPACING;
 
 	// Position gradient box, label and line horizontally
+
 	const gradientX = svgWidth - GRADIENT_WIDTH;
 	const labelX = gradientX - TICK_WIDTH - 5;
 	const lineStartX = gradientX - TICK_WIDTH;
@@ -127,12 +142,33 @@ export const MapLegendControl = (
 		}
 	}, [svgElement]);
 
+	// To make sure no collisions with IDs
+	const prefix = useMemo(() => nanoid(4), []);
+
+	const titleBlock = typeof title === 'string' && (
+		<header
+			className="flex justify-center mb-1 text-center"
+			id={prefix + '-legend-header'}
+		>
+			<span className="text-sm font-medium leading-none text-cdc-black">
+				{__(title)}!
+			</span>
+			{tooltipContents ? (<TooltipWidget tooltip={tooltipContents} />) : (void 0)}
+		</header>
+	)
+
 	return (
 		<div className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto">
+			{titleBlock}
 			<div className="font-sans text-zinc-900 font-semibold text-lg leading-5 text-right">
 				{unitName}
 			</div>
-			<svg ref={svgRef} height={legendHeight} className="w-full">
+			<svg
+				ref={svgRef}
+				height={legendHeight}
+				className="w-full"
+				aria-labelledby={titleBlock ? prefix + '-legend-header' : void 0}
+			>
 				{isBlocksGradient ? (
 					<g fillOpacity={opacity}>
 						{legendColors.map((color, index) => {

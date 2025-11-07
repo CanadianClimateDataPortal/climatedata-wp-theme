@@ -153,6 +153,8 @@ const MapLegend: React.FC = () => {
 						unit={unit}
 						legendConfig={legendConfig}
 						locale={locale}
+						title="Titre A Configurer"
+						tooltipContents={'Texte de tooltip a configurer'}
 					/>
 					</Suspense>
 			</MapLegendOpenControl>

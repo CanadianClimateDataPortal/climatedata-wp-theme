@@ -7,10 +7,9 @@ import { cn } from '@/lib/utils';
 export interface MapLegendOpenControlProps {
 	children?: React.ReactNode;
 	isOpen: boolean;
-	title?: string;
+	width?: number;
 	toggleOpen: () => void;
 }
-
 
 const MAX_LEGEND_WIDTH = 430; // px
 
@@ -18,7 +17,7 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 	const {
 		children,
 		isOpen,
-		title,
+		width,
 		toggleOpen,
 	} = props;
 
@@ -26,12 +25,9 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 		maxWidth: `${MAX_LEGEND_WIDTH}px`,
 	};
 
-	// Setup for next PR
-	const titleBlock = typeof title === 'string' && (
-		<>
-			<h1>{title}</h1>
-		</>
-	)
+	if (typeof width === 'number') {
+		Reflect.set(rootElementStyle, 'width', `${width}px`);
+	}
 
 	// This should match what we have in MapLegendControl
 	return (
@@ -66,7 +62,6 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 						'bg-white border rounded-md border-cold-grey-3' /* visual */,
 					)}
 				>
-					{titleBlock}
 					{children}
 				</div>
 			)}

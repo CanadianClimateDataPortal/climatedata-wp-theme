@@ -138,18 +138,24 @@ const MapLegend: React.FC = () => {
 		const colourType = colorMap.type;
 
 		rootRef.current.render(
-			<LazyMapLegendControl
-				data={colorMap}
-				opacity={mapData}
+			<MapLegendOpenControl
 				isOpen={isOpen}
 				toggleOpen={() => setIsOpen((prev) => !prev)}
-				isCategorical={isCategorical}
-				isDelta={isDelta}
-				colourType={colourType}
-				unit={unit}
-				legendConfig={legendConfig}
-				locale={locale}
-			/>
+				width={100}
+			>
+				<Suspense fallback={'...'}>
+					<LazyMapLegendControl
+						data={colorMap}
+						opacity={mapData}
+						isCategorical={isCategorical}
+						isDelta={isDelta}
+						colourType={colourType}
+						unit={unit}
+						legendConfig={legendConfig}
+						locale={locale}
+					/>
+					</Suspense>
+			</MapLegendOpenControl>
 		);
 	}, [
 		colorMap,

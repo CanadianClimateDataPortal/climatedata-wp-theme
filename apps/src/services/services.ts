@@ -19,7 +19,11 @@ import {
 	WP_API_LOCATION_BY_COORDS_PATH,
 	WP_API_VARIABLE_PATH,
 } from '@/lib/constants';
-import { InteractiveRegionOption } from '@/types/climate-variable-interface';
+import {
+	FrequencyType,
+	InteractiveRegionOption,
+} from '@/types/climate-variable-interface';
+import { LocationS2DData } from '@/lib/s2d';
 
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, any>();
@@ -565,19 +569,65 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }, f
 };
 
 /**
- * Fetches the release date of a S2D variable.
+ * Fetch the release date of a S2D variable.
  *
  * @param variable - The S2D variable ID.
  * @param frequency - The frequency for which we want the release date.
  * @param fetchOptions - Any other options to pass to fetch() requests (ex: `signal`)
  */
 // @ts-expect-error - We ignore unused variables errors while waiting for the API endpoint to be implemented.
-export const fetchS2DReleaseDate = async ({ variable, frequency }: { variable: string, frequency: string }, fetchOptions?: FetchOptions): Promise<string> => {
+export const fetchS2DReleaseDate = async (variable: string, frequency: string, fetchOptions?: FetchOptions): Promise<string> => {
 	// TEMPORARILY mocking the API, while waiting for the API endpoint to be implemented.
 	const fetchMock = new Promise<string>((resolve) => {
 		setTimeout(() => {
 			// The backend currently only contains data for July 2025.
 			resolve('2025-07-01');
+		}, 1000);
+	});
+
+	return await fetchMock;
+}
+
+/**
+ * Fetch the location data for a S2D variable.
+ *
+ * @param latlng - Location coordinates.
+ * @param variable - ID of the S2D variable.
+ * @param frequency - Frequency for which we want the data.
+ * @param period - Period for which we want the data.
+ * @param fetchOptions - Any other options to pass to fetch() requests (ex: `signal`)
+ */
+export const fetchS2DLocationData = async (
+	latlng: L.LatLng,
+	variable: string,
+	frequency: FrequencyType,
+	period: Date,
+	fetchOptions?: FetchOptions
+): Promise<LocationS2DData> => {
+	// TEMPORARILY mocking the API, while waiting for the API endpoint to be
+	// implemented.
+	const fetchMock = new Promise<LocationS2DData>((resolve) => {
+		setTimeout(() => {
+			const values = Array.from({ length: 5 }, () => Math.random() * 20 - 10);
+			const probabilities = Array.from({ length: 5 }, () => Math.random() * 100);
+
+			// Mocked values must be sorted to make sense
+			values.sort((a, b) => a - b);
+
+			resolve({
+				cutoff_unusually_low_p20: values[0],
+				cutoff_below_normal_p33: values[1],
+				historical_median_p50: values[2],
+				cutoff_above_normal_p66: values[3],
+				cutoff_unusually_high_p80: values[4],
+				prob_unusually_low: probabilities[0],
+				prob_below_normal: probabilities[1],
+				prob_near_normal: probabilities[2],
+				prob_above_normal: probabilities[3],
+				prob_unusually_high: probabilities[4],
+				skill_level: Math.round(Math.random() * 3),
+				skill_CRPSS: Math.random() * 1.5 - 0.5, // Can be negative
+			});
 		}, 1000);
 	});
 

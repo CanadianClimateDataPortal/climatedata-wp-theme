@@ -1206,6 +1206,12 @@ msgstr "%s à %s"
 msgid  "Below %s"
 msgstr "En dessous de %s"
 
+msgid  "Lower than %s"
+msgstr "Plus bas que %s"
+
+msgid  "Higher than %s"
+msgstr "Plus élevé que %s"
+
 msgid  "Horizontal bar at %s%% filled"
 msgstr "Barre horizontale remplie à %s%%"
 
@@ -1238,8 +1244,11 @@ msgstr "L'étendue près de la normale est définie à l'aide de la climatologie
        "l'étendue « près de la normale » est définie à partir du tiers central, ce qui donne une étendue correspondant aux "
        "conditions typiques observées dans le passé."
 
-msgid  "Seasonal mean temperature probability:"
-msgstr "Seasonal mean temperature probability:"
+msgid  "Seasonal %s probability:"
+msgstr "Probabilité saisonnière pour \"%s\":"
+
+msgid  "Monthly %s probability:"
+msgstr "Probabilité mensuelle pour \"%s\":"
 
 msgid  "Historical Median"
 msgstr "Médiane historique"
@@ -1293,7 +1302,19 @@ msgid "Near"
 msgstr "Près"
 
 msgid "Below"
-msgstr "En-dessous"
+msgstr "En dessous"
+
+msgid "Above normal cutoff"
+msgstr "Seuil au-dessus de la normale"
+
+msgid "Below normal cutoff"
+msgstr "Seuil en dessous de la normale"
+
+msgid "Unusually high cutoff"
+msgstr "Seuil inhabituellement élevée"
+
+msgid "Unusually low cutoff"
+msgstr "Seuil inhabituellement faible"
 
 msgid "total precipitation"
 msgstr "précipitations totales"
@@ -1320,7 +1341,7 @@ msgid "Unusually low"
 msgstr "Inhabituellement faible"
 
 msgid "Below the %s percentile"
-msgstr "En-dessous du %s centile"
+msgstr "En dessous du %s centile"
 
 msgid "bottom fifth of historical data"
 msgstr "cinquième inférieur des données historiques"
@@ -1328,8 +1349,20 @@ msgstr "cinquième inférieur des données historiques"
 msgid "Between %s and %s"
 msgstr "Entre %s et %s"
 
+msgid "Climatology (1991 to 2020)"
+msgstr "Climatologie (1991 à 2020)"
+
 msgid "If the probability is below 30%, no single outcome is significantly more likely "
   "than the others, and the climatology should be used instead."
 msgstr "Si la probabilité est inférieure à 30 %, aucun résultat n’est "
   "significativement plus probable que les autres, et la climatologie "
   "doit être utilisée à la place."
+
+msgid  "The historical climatology contains data corresponding to the month, season, or decadal time period of "
+       "interest for the 30 years between 1991 and 2020. The historical median and near-normal range provide context "
+       "for typical past conditions at this location. The cutoff values provide the exact values that define the "
+       "forecast outcomes for this location."
+msgstr "La climatologie historique contient des données correspondant au mois, à la saison ou à la période décennale "
+       "d'intérêt pour les 30 années comprises entre 1991 et 2020. La médiane historique et l'étendue près de la "
+       "normale fournissent un contexte pour les conditions passées typiques à cet endroit. Les valeurs seuils "
+       "fournissent les valeurs exactes qui définissent les résultats de prévision pour cet endroit."

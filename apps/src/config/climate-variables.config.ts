@@ -1629,10 +1629,16 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
 		id: 's2d_air_temp',
 		class: 'S2DClimateVariable',
+		unit: 'degC',
 	},
 	/** S2D Total Precipitation */
 	{
 		id: 's2d_precip_accum',
 		class: 'S2DClimateVariable',
+		legendConfigs: {
+			[MapDisplayType.ABSOLUTE]: {
+				addTopPadding: true,
+			}
+		},
 	},
 ];

@@ -29,7 +29,7 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 		Reflect.set(rootElementStyle, 'width', `${width}px`);
 	}
 
-	// This should match what we have in MapLegendControl
+	// This should match what we have in MapLegendCommon
 	return (
 		<div
 			className="relative space-y-[5px]"

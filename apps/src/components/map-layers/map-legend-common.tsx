@@ -12,7 +12,6 @@ import { ColourType, LegendConfig } from '@/types/climate-variable-interface';
 import { ColourMap } from '@/types/types';
 import { getUnitName } from '@/lib/utils';
 import { doyFormatter, formatValue } from '@/lib/format';
-import { TooltipContent } from '@radix-ui/react-tooltip';
 
 import TooltipWidget from '@/components/ui/tooltip-widget';
 
@@ -20,7 +19,7 @@ const GRADIENT_WIDTH = 22;
 const TICK_WIDTH = 10;
 const MIN_LABEL_SPACING = 30; // Minimum spacing between labels
 
-export type MapLegendControlProps = {
+export type MapLegendCommonProps = {
 	data: ColourMap;
 	opacity: number;
 	isCategorical?: boolean;
@@ -33,10 +32,10 @@ export type MapLegendControlProps = {
 	tooltipContents?: React.ReactNode;
 }
 
-export type MapLegendControl = typeof MapLegendControl;
+export type MapLegendCommon = typeof MapLegendCommon;
 
-export const MapLegendControl = (
-	props: MapLegendControlProps
+export const MapLegendCommon = (
+	props: MapLegendCommonProps
 ): JSX.Element => {
 	const {
 		data,
@@ -274,6 +273,6 @@ export const MapLegendControl = (
 	);
 };
 
-MapLegendControl.displayName = 'MapLegendControl';
+MapLegendCommon.displayName = 'MapLegendCommon';
 
-export default React.memo(MapLegendControl);
+export default React.memo(MapLegendCommon);

@@ -26,7 +26,7 @@ import type { MapLegendForecastS2D } from '@/components/map-layers/map-legend-fo
 import type { MapLegendCommon } from '@/components/map-layers/map-legend-common';
 
 const LazyMapLegendForecastS2D = lazy<MapLegendForecastS2D>(() => import('@/components/map-layers/map-legend-forecast-s2d'));
-const LazyMapLegendControl = lazy<React.MemoExoticComponent<MapLegendCommon>>(() => import('@/components/map-layers/map-legend-common'));
+const LazyMapLegendCommon = lazy<React.MemoExoticComponent<MapLegendCommon>>(() => import('@/components/map-layers/map-legend-common'));
 
 
 const MapLegend: React.FC = () => {
@@ -144,7 +144,7 @@ const MapLegend: React.FC = () => {
 				width={100}
 			>
 				<Suspense fallback={'...'}>
-					<LazyMapLegendControl
+					<LazyMapLegendCommon
 						data={colorMap}
 						opacity={mapData}
 						isCategorical={isCategorical}

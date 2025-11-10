@@ -1,6 +1,7 @@
 import React from 'react';
 import { __ } from '@/context/locale-provider';
 import { sprintf } from '@wordpress/i18n';
+import { getContrastingTextColor } from '@/lib/color-contrast';
 
 export type HexColor = `#${string}`;
 
@@ -31,6 +32,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 	fillHexCode,
 }) => {
 	const screenReaderOnly = sprintf(__('Horizontal bar at %s%% filled'), percent);
+
+	const textHexCode = getContrastingTextColor(fillHexCode);
 
 	/**
 	 * aria-value and role=meter:
@@ -77,6 +80,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 					className="text-black font-medium pl-3 min-w-fit"
 					style={{
 						width: `${percent}%`,
+						color: textHexCode,
 					}}
 				>
 					{label}

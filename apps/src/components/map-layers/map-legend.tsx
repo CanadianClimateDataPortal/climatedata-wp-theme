@@ -55,8 +55,8 @@ const MapLegend: React.FC = () => {
 	const variableName = climateVariable?.getTitle();
 
 	// Whether to show the regular legend or the S2D forecast legend
-	const showS2DForecastLegend = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
-	const showS2DClimatolotyLegend = isS2D && forecastDisplay == ForecastDisplays.CLIMATOLOGY;
+	const showForecastLegendOfS2D = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
+	const showClimatologyLegendOfS2D = isS2D && forecastDisplay == ForecastDisplays.CLIMATOLOGY;
 
 	// For the default colour palette, isCategorical defaults to the default legend's type
 	if ((colourScheme === null || colourScheme === 'default') && legendData && legendData.Legend) {
@@ -119,7 +119,7 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
-		if (showS2DForecastLegend) {
+		if (showForecastLegendOfS2D) {
 			rootRef.current.render(
 				<MapLegendOpenControl
 					isOpen={isOpen}
@@ -141,7 +141,7 @@ const MapLegend: React.FC = () => {
 
 		let title: MapLegendCommonProps['title'] = void 0
 		let tooltipContents: MapLegendCommonProps['tooltipContents'] = void 0
-		if (showS2DClimatolotyLegend) {
+		if (showClimatologyLegendOfS2D) {
 			// Thus far, only in the situation of S2D Climatology we've needed a legend.
 			title = __('Historical median');
 			// tooltipContents = 'Hardcoded Tooltip Text Content';
@@ -180,8 +180,8 @@ const MapLegend: React.FC = () => {
 		unit,
 		locale,
 		forecastType,
-		showS2DForecastLegend,
-		showS2DClimatolotyLegend,
+		showForecastLegendOfS2D,
+		showClimatologyLegendOfS2D,
 	]);
 
 	return null;

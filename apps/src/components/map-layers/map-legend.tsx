@@ -137,6 +137,8 @@ const MapLegend: React.FC = () => {
 
 		const colourType = colorMap.type;
 
+		console.log('MapLegendCommon', { opacity: mapData, isDelta, unit })
+
 		rootRef.current.render(
 			<MapLegendOpenControl
 				isOpen={isOpen}

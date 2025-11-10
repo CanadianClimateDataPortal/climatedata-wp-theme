@@ -24,7 +24,7 @@ const styleForFirstChildOfLegendWrapperLeafletControl: React.CSSProperties = {
 };
 
 export default {
-	title: 'Seasonal Decadal Legend',
+	title: 'map-layers/map-legend-forecast-s2d',
 	decorators: [
 		(Component) => (
 			<div
@@ -65,7 +65,7 @@ export const StoryAlpha: Story<MapLegendInnerStory> = ({
 	);
 };
 
-StoryAlpha.storyName = 'Using a table';
+StoryAlpha.storyName = 'Default';
 
 StoryAlpha.args = {
 	data: EXAMPLE_COLOR_MAP_S2D_MULTIBAND,

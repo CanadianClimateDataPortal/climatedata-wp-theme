@@ -9,7 +9,7 @@ import { nanoid } from 'nanoid';
 import { __ } from '@/context/locale-provider';
 
 import { ColourType, LegendConfig } from '@/types/climate-variable-interface';
-import { ColourMap } from '@/types/types';
+import { type ColourQuantitiesMap } from '@/types/types';
 import { getUnitName } from '@/lib/utils';
 import { doyFormatter, formatValue } from '@/lib/format';
 
@@ -20,7 +20,7 @@ const TICK_WIDTH = 10;
 const MIN_LABEL_SPACING = 30; // Minimum spacing between labels
 
 export type MapLegendCommonProps = {
-	data: ColourMap;
+	data: ColourQuantitiesMap;
 	opacity: number;
 	isCategorical?: boolean;
 	isDelta: boolean;

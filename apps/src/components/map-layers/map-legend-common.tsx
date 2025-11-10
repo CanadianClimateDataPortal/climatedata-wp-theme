@@ -42,7 +42,7 @@ const MaybeTitleBlock = (
 					className="flex justify-center mb-1 text-center"
 					id={idPrefix + '-legend-header'}
 				>
-					<span className="text-sm font-medium leading-none text-cdc-black mr-1">
+					<span className="mr-1 text-sm font-medium leading-none text-cdc-black">
 						{title}
 					</span>
 					{tooltipContents ? (
@@ -192,12 +192,12 @@ export const MapLegendCommon = (
 	);
 
 	return (
-		<div className="w-full font-sans px-2 pt-3 relative">
+		<div className="relative w-full px-2 pt-3 font-sans">
 			{titleBlock}
-			<div className="font-sans text-zinc-900 font-semibold text-lg leading-5 text-right">
+			<div className="px-1 font-sans text-lg font-semibold leading-5 text-right text-zinc-900">
 				{unitName}
 			</div>
-			<div className="flex flex-col items-end gap-1 py-2 px-1 overflow-y-auto">
+			<div className="flex flex-col items-end gap-1 px-1 py-2 overflow-y-auto">
 				<svg
 					ref={svgRef}
 					height={legendHeight}

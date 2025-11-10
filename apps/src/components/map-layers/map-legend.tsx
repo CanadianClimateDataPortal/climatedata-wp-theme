@@ -11,6 +11,7 @@ import { useMap } from 'react-leaflet';
 
 import MapLegendOpenControl from '@/components/map-layers/map-legend-open-control';
 
+import { __ } from '@/context/locale-provider';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useColorMap } from '@/hooks/use-color-map';
 import {
@@ -23,7 +24,7 @@ import { useAppSelector } from '@/app/hooks';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 
 import type { MapLegendForecastS2D } from '@/components/map-layers/map-legend-forecast-s2d';
-import type { MapLegendCommon } from '@/components/map-layers/map-legend-common';
+import type { MapLegendCommon, MapLegendCommonProps } from '@/components/map-layers/map-legend-common';
 
 const LazyMapLegendForecastS2D = lazy<MapLegendForecastS2D>(() => import('@/components/map-layers/map-legend-forecast-s2d'));
 const LazyMapLegendCommon = lazy<React.MemoExoticComponent<MapLegendCommon>>(() => import('@/components/map-layers/map-legend-common'));
@@ -55,6 +56,7 @@ const MapLegend: React.FC = () => {
 
 	// Whether to show the regular legend or the S2D forecast legend
 	const showS2DForecastLegend = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
+	const showS2DClimatolotyLegend = isS2D && forecastDisplay == ForecastDisplays.CLIMATOLOGY;
 
 	// For the default colour palette, isCategorical defaults to the default legend's type
 	if ((colourScheme === null || colourScheme === 'default') && legendData && legendData.Legend) {
@@ -137,7 +139,14 @@ const MapLegend: React.FC = () => {
 
 		const colourType = colorMap.type;
 
-		console.log('MapLegendCommon', { opacity: mapData, isDelta, unit })
+		let title: MapLegendCommonProps['title'] = void 0
+		let tooltipContents: MapLegendCommonProps['tooltipContents'] = void 0
+		if (showS2DClimatolotyLegend) {
+			// Thus far, only in the situation of S2D Climatology we've needed a legend.
+			title = __('Historical median');
+			// tooltipContents = 'Hardcoded Tooltip Text Content';
+			tooltipContents = void 0; // Because we do not know yet the text
+		}
 
 		rootRef.current.render(
 			<MapLegendOpenControl
@@ -155,8 +164,8 @@ const MapLegend: React.FC = () => {
 						unit={unit}
 						legendConfig={legendConfig}
 						locale={locale}
-						title="Titre A Configurer"
-						tooltipContents={'Texte de tooltip a configurer'}
+						title={title}
+						tooltipContents={tooltipContents}
 					/>
 					</Suspense>
 			</MapLegendOpenControl>
@@ -172,6 +181,7 @@ const MapLegend: React.FC = () => {
 		locale,
 		forecastType,
 		showS2DForecastLegend,
+		showS2DClimatolotyLegend,
 	]);
 
 	return null;

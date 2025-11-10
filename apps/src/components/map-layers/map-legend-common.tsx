@@ -19,6 +19,45 @@ const GRADIENT_WIDTH = 22;
 const TICK_WIDTH = 10;
 const MIN_LABEL_SPACING = 30; // Minimum spacing between labels
 
+
+type MaybeTitleBlockProps = {
+	idPrefix: string;
+	title?: string;
+	tooltipContents?: React.ReactNode;
+};
+
+const MaybeTitleBlock = (
+	props: MaybeTitleBlockProps
+): React.ReactNode | undefined => {
+	const {
+		idPrefix,
+		title,
+		tooltipContents,
+	} = props;
+	let output: React.ReactNode | undefined = void 0;
+	if (typeof title === 'string') {
+		output = (
+			<>
+				<header
+					className="flex justify-center mb-1 text-center"
+					id={idPrefix + '-legend-header'}
+				>
+					<span className="text-sm font-medium leading-none text-cdc-black">
+						{title}
+					</span>
+					{tooltipContents ? (
+						<TooltipWidget tooltip={tooltipContents} />
+					) : (
+						void 0
+					)}
+				</header>
+			</>
+		);
+	}
+
+	return output;
+};
+
 export type MapLegendCommonProps = {
 	data: ColourQuantitiesMap;
 	opacity: number;
@@ -144,17 +183,13 @@ export const MapLegendCommon = (
 	// To make sure no collisions with IDs
 	const prefix = useMemo(() => nanoid(4), []);
 
-	const titleBlock = typeof title === 'string' && (
-		<header
-			className="flex justify-center mb-1 text-center"
-			id={prefix + '-legend-header'}
-		>
-			<span className="text-sm font-medium leading-none text-cdc-black">
-				{__(title)}!
-			</span>
-			{tooltipContents ? (<TooltipWidget tooltip={tooltipContents} />) : (void 0)}
-		</header>
-	)
+	const titleBlock = (
+		<MaybeTitleBlock
+			idPrefix={prefix}
+			title={title}
+			tooltipContents={tooltipContents}
+		/>
+	);
 
 	return (
 		<div className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto">

@@ -19,7 +19,7 @@ import { EXAMPLE_COLOR_MAP_DISCRETE_SINGLE } from '@/hooks/use-color-map.example
 import MapLegendCommon, { type MapLegendCommonProps } from '@/components/map-layers/map-legend-common';
 
 const styleForFirstChildOfLegendWrapperLeafletControl: React.CSSProperties = {
-	width: 500,
+	width: 200,
 };
 
 // Mocked translation specific for this component
@@ -45,14 +45,20 @@ export default {
 
 interface MapLegendControlStory extends StoryWithLocale {
 	data: ColourQuantitiesMap;
-	opacity: MapLegendCommonProps['opacity'];
 	isDelta: MapLegendCommonProps['isDelta'];
+	opacity: MapLegendCommonProps['opacity'];
+	title: MapLegendCommonProps['title'];
+	tooltipContents: MapLegendCommonProps['tooltipContents'];
 	unit: MapLegendCommonProps['unit'];
 }
 
 export const StoryAlpha: Story<MapLegendControlStory> = ({
-	locale = 'en',
 	data = EXAMPLE_COLOR_MAP_DISCRETE_SINGLE,
+	isDelta,
+	locale = 'en',
+	opacity,
+	title,
+	tooltipContents,
 	unit = 'degC',
 }) => {
 	return (
@@ -62,11 +68,11 @@ export const StoryAlpha: Story<MapLegendControlStory> = ({
 		>
 			<MapLegendCommon
 				data={data}
-				opacity={1}
-				isDelta={true}
-				title="Hardcoded Title"
+				isDelta={isDelta}
+				opacity={opacity}
+				title={title}
+				tooltipContents={tooltipContents}
 				unit={unit}
-				tooltipContents="Hardcoded Tooltip Content"
 			/>
 		</LadleMockLocaleProvider>
 	);
@@ -77,10 +83,12 @@ StoryAlpha.storyName = 'Default';
 
 
 StoryAlpha.args = {
+	isDelta: true,
 	locale: 'en',
 	opacity: 1,
-	isDelta: true,
-	unit: 'mm'
+	title: 'Hardcoded Title',
+	tooltipContents: 'Hardcoded Tooltip Text Contents',
+	unit: 'mm',
 };
 
 StoryAlpha.argTypes = {

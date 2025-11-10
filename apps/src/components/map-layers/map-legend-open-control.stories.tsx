@@ -44,7 +44,7 @@ export const StoryAlpha: Story = () => {
 		</>
 	);
 };
-StoryAlpha.storyName = 'With nothing inside';
+StoryAlpha.storyName = 'Default';
 
 /**
  * With Some Lazy component

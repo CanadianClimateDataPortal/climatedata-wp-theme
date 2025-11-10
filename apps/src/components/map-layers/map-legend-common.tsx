@@ -42,7 +42,7 @@ const MaybeTitleBlock = (
 					className="flex justify-center mb-1 text-center"
 					id={idPrefix + '-legend-header'}
 				>
-					<span className="text-sm font-medium leading-none text-cdc-black">
+					<span className="text-sm font-medium leading-none text-cdc-black mr-1">
 						{title}
 					</span>
 					{tooltipContents ? (
@@ -192,118 +192,120 @@ export const MapLegendCommon = (
 	);
 
 	return (
-		<div className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto">
+		<div className="w-full font-sans px-2 pt-3 relative">
 			{titleBlock}
 			<div className="font-sans text-zinc-900 font-semibold text-lg leading-5 text-right">
 				{unitName}
 			</div>
-			<svg
-				ref={svgRef}
-				height={legendHeight}
-				className="w-full"
-				aria-labelledby={titleBlock ? prefix + '-legend-header' : void 0}
-			>
-				{isBlocksGradient ? (
-					<g fillOpacity={opacity}>
-						{legendColors.map((color, index) => {
-							return (
-								<rect
-									key={index}
-									width={GRADIENT_WIDTH}
-									height={itemHeight}
-									fill={color}
-									x={gradientX}
-									y={index * itemHeight}
-								/>
-							);
-						})}
-					</g>
-				) : (
-					<>
-						<defs>
-							<linearGradient
-								id="temperatureGradient"
-								gradientTransform="rotate(90)"
-							>
-								{legendColors.map((color, index) => {
-									const offset = (index  / totalLabels) * 100;
-
-									return (
-										<stop
-											key={index}
-											offset={`${offset}%`}
-											stopColor={color}
-										/>
-									)
-								})}
-							</linearGradient>
-						</defs>
-
-						<rect
-							width={GRADIENT_WIDTH}
-							height={legendHeight}
-							fill="url(#temperatureGradient)"
-							x={gradientX}
-							fillOpacity={opacity}
-						/>
-					</>
-				)}
-
-				{legendValues.map((value, index) => {
-
-					if (Number.isNaN(value)) {
-						return;
-					}
-
-					let label = '';
-
-					if (legendConfig?.labels && legendConfig?.labels[index]) {
-						// The values' list was reversed, so we have to take the reverse of the custom labels
-						const customLabel = legendConfig.labels[legendValues.length - 1 - index];
-						if (customLabel != undefined) {
-							label = __(customLabel);
-						}
-					} else if (unit === 'DoY' && !isDelta) {
-						label = doyFormatter(value, locale, 'short');
-					} else {
-						const decimals = legendConfig?.decimals ?? 0;
-						label = formatValue(value, undefined, decimals, locale, isDelta);
-					}
-
-					if (label === previousLabel) {
-						return;
-					}
-					previousLabel = label;
-
-					let labelY = index * itemHeight;
-
-					if (legendConfig?.centerLabels) {
-						labelY += itemHeight / 2;
-					}
-
-					return (
-						<g key={index}>
-							<text
-								x={labelX}
-								y={labelY}
-								className="legend-temp-text"
-								dominantBaseline="middle"
-								textAnchor="end"
-							>
-								{label}
-							</text>
-							<line
-								x1={lineStartX}
-								y1={labelY}
-								x2={lineEndX}
-								y2={labelY}
-								stroke="black"
-								strokeWidth="1"
-							/>
+			<div className="flex flex-col items-end gap-1 py-2 px-1 overflow-y-auto">
+				<svg
+					ref={svgRef}
+					height={legendHeight}
+					className="w-full"
+					aria-labelledby={titleBlock ? prefix + '-legend-header' : void 0}
+				>
+					{isBlocksGradient ? (
+						<g fillOpacity={opacity}>
+							{legendColors.map((color, index) => {
+								return (
+									<rect
+										key={index}
+										width={GRADIENT_WIDTH}
+										height={itemHeight}
+										fill={color}
+										x={gradientX}
+										y={index * itemHeight}
+									/>
+								);
+							})}
 						</g>
-					);
-				})}
-			</svg>
+					) : (
+						<>
+							<defs>
+								<linearGradient
+									id="temperatureGradient"
+									gradientTransform="rotate(90)"
+								>
+									{legendColors.map((color, index) => {
+										const offset = (index  / totalLabels) * 100;
+
+										return (
+											<stop
+												key={index}
+												offset={`${offset}%`}
+												stopColor={color}
+											/>
+										)
+									})}
+								</linearGradient>
+							</defs>
+
+							<rect
+								width={GRADIENT_WIDTH}
+								height={legendHeight}
+								fill="url(#temperatureGradient)"
+								x={gradientX}
+								fillOpacity={opacity}
+							/>
+						</>
+					)}
+
+					{legendValues.map((value, index) => {
+
+						if (Number.isNaN(value)) {
+							return;
+						}
+
+						let label = '';
+
+						if (legendConfig?.labels && legendConfig?.labels[index]) {
+							// The values' list was reversed, so we have to take the reverse of the custom labels
+							const customLabel = legendConfig.labels[legendValues.length - 1 - index];
+							if (customLabel != undefined) {
+								label = __(customLabel);
+							}
+						} else if (unit === 'DoY' && !isDelta) {
+							label = doyFormatter(value, locale, 'short');
+						} else {
+							const decimals = legendConfig?.decimals ?? 0;
+							label = formatValue(value, undefined, decimals, locale, isDelta);
+						}
+
+						if (label === previousLabel) {
+							return;
+						}
+						previousLabel = label;
+
+						let labelY = index * itemHeight;
+
+						if (legendConfig?.centerLabels) {
+							labelY += itemHeight / 2;
+						}
+
+						return (
+							<g key={index}>
+								<text
+									x={labelX}
+									y={labelY}
+									className="legend-temp-text"
+									dominantBaseline="middle"
+									textAnchor="end"
+								>
+									{label}
+								</text>
+								<line
+									x1={lineStartX}
+									y1={labelY}
+									x2={lineEndX}
+									y2={labelY}
+									stroke="black"
+									strokeWidth="1"
+								/>
+							</g>
+						);
+					})}
+				</svg>
+			</div>
 		</div>
 	);
 };

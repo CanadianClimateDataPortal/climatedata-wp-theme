@@ -17,7 +17,7 @@ import {
 
 import { EXAMPLE_COLOR_MAP_S2D_MULTIBAND } from '@/hooks/use-color-map.examples';
 
-import MapLegendInnerS2D from '@/components/map-layers/map-legend-inner-s2d';
+import MapLegendS2DForecast from '@/components/map-layers/map-legend-forecast-s2d';
 
 const styleForFirstChildOfLegendWrapperLeafletControl: React.CSSProperties = {
 	width: 500,
@@ -60,7 +60,7 @@ export const StoryAlpha: Story<MapLegendInnerStory> = ({
 			locale={locale}
 			translatedFrench={translatedFrench}
 		>
-			<MapLegendInnerS2D data={data} />
+			<MapLegendS2DForecast data={data} />
 		</LadleMockLocaleProvider>
 	);
 };

@@ -22,11 +22,11 @@ import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 
-import type { MapLegendInnerS2D } from '@/components/map-layers/map-legend-inner-s2d';
-import type { MapLegendControl } from '@/components/map-legend-control';
+import type { MapLegendForecastS2D } from '@/components/map-layers/map-legend-forecast-s2d';
+import type { MapLegendCommon } from '@/components/map-layers/map-legend-common';
 
-const LazyMapLegendInnerS2D = lazy<MapLegendInnerS2D>(() => import('@/components/map-layers/map-legend-inner-s2d'));
-const LazyMapLegendControl = lazy<React.MemoExoticComponent<MapLegendControl>>(() => import('@/components/map-legend-control'));
+const LazyMapLegendForecastS2D = lazy<MapLegendForecastS2D>(() => import('@/components/map-layers/map-legend-forecast-s2d'));
+const LazyMapLegendControl = lazy<React.MemoExoticComponent<MapLegendCommon>>(() => import('@/components/map-layers/map-legend-common'));
 
 
 const MapLegend: React.FC = () => {
@@ -54,7 +54,7 @@ const MapLegend: React.FC = () => {
 	const variableName = climateVariable?.getTitle();
 
 	// Whether to show the regular legend or the S2D forecast legend
-	const showForecastLegend = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
+	const showS2DForecastLegend = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
 
 	// For the default colour palette, isCategorical defaults to the default legend's type
 	if ((colourScheme === null || colourScheme === 'default') && legendData && legendData.Legend) {
@@ -117,14 +117,14 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
-		if (showForecastLegend) {
+		if (showS2DForecastLegend) {
 			rootRef.current.render(
 				<MapLegendOpenControl
 					isOpen={isOpen}
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 				>
 					<Suspense fallback={'...'}>
-						<LazyMapLegendInnerS2D
+						<LazyMapLegendForecastS2D
 							data={colorMap}
 							variableName={variableName}
 							forecastType={forecastType}
@@ -168,8 +168,8 @@ const MapLegend: React.FC = () => {
 		isDelta,
 		unit,
 		locale,
-		showForecastLegend,
 		forecastType,
+		showS2DForecastLegend,
 	]);
 
 	return null;

@@ -1,6 +1,7 @@
 import React from 'react';
 import { __ } from '@/context/locale-provider';
 import { sprintf } from '@wordpress/i18n';
+import { getContrastingTextColor } from '@/lib/color-contrast';
 
 export type HexColor = `#${string}`;
 
@@ -31,6 +32,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 	fillHexCode,
 }) => {
 	const screenReaderOnly = sprintf(__('Horizontal bar at %s%% filled'), percent);
+
+	let textHexCode = getContrastingTextColor(fillHexCode);
+	if (textHexCode.startsWith('#FFF') && percent < 51) {
+		// if the filled area is less than 51%, we won't be able to read the text white on white
+		textHexCode = '#000000';
+	}
 
 	/**
 	 * aria-value and role=meter:
@@ -77,6 +84,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 					className="text-black font-medium pl-3 min-w-fit"
 					style={{
 						width: `${percent}%`,
+						color: textHexCode,
 					}}
 				>
 					{label}

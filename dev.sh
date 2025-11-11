@@ -142,12 +142,8 @@ function dev-apps {
 
     echo "Starting Ladle development server..."
     _docker_compose exec -w /app/apps/ task-runner bash -c '
-      if ! command -v ladle &> /dev/null; then
-        echo "Installing Ladle (one-time per container)..."
-        npm install --no-save @ladle/react || exit 1
-      fi
       echo "Starting Ladle on http://localhost:61000"
-      exec npx ladle dev --host 0.0.0.0 --port 61000 --stories "src/**/*.stories.tsx"
+      exec node_modules/.bin/ladle dev --host 0.0.0.0 --port 61000 --stories "src/**/*.stories.tsx"
     '
   )
 }

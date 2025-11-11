@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
 	type Story,
 	type StoryDefault,
@@ -5,7 +7,6 @@ import {
 
 import {
 	type ColourQuantitiesMap,
-	type Locale,
 } from '@/types/types';
 
 import {
@@ -51,12 +52,12 @@ interface MapLegendInnerStory extends StoryWithLocale {
 }
 
 export const StoryAlpha: Story<MapLegendInnerStory> = ({
-	locale = 'en',
-	data = EXAMPLE_COLOR_MAP_3_BANDS,
+	locale,
+	data,
 }) => {
 	return (
 		<LadleMockLocaleProvider
-			locale={locale as Locale}
+			locale={locale}
 			translatedFrench={translatedFrench}
 		>
 			<MapLegendInnerS2D data={data} />
@@ -65,6 +66,11 @@ export const StoryAlpha: Story<MapLegendInnerStory> = ({
 };
 
 StoryAlpha.storyName = 'Using a table';
+
+StoryAlpha.args = {
+	data: EXAMPLE_COLOR_MAP_3_BANDS,
+	locale: 'en',
+};
 
 StoryAlpha.argTypes = {
 	...createLadleMockLocaleStoryArgTypes(),

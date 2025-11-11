@@ -132,7 +132,7 @@ function test-apps {
 
 function dev-apps {
   (
-    set -e  # Exit on error
+    set -e
 
     cleanup() {
       echo -e "\n\nCleaning up Ladle..."

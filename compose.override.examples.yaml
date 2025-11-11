@@ -126,6 +126,5 @@
 # services:
 #   task-runner:
 #     ports:
-#       - "5173:5173"  # Vite (already exposed in compose.yaml)
 #       - "61000:61000"  # Ladle development server
 #

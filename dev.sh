@@ -21,7 +21,7 @@ function _show_help {
   echo "    compose <args...>       Execute a docker compose command. All <args...> are passed to docker compose."
   echo ""
   echo "  Developer tools:"
-  echo "    dev-apps                  Run and Watch /apps/**/*.stories.tsx to develop on React components in isolation."
+  echo "    ladle-apps                Run and Watch /apps/**/*.stories.tsx to develop on React components in isolation."
   echo "    test-apps <file(s)...>    Run TypeScript tests in /apps/. <files(s)...> can optionally be specified, relative to the project's root."
   echo "    lint-apps <file(s)...>    Run eslint over /apps/. <files(s)...> can optionally be specified, relative to the project's root."
   echo "    format-apps <file(s)...>  Run prettier (with overwrite) over /apps/. <files(s)...> can optionally be specified, relative to the project's root."

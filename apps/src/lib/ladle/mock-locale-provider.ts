@@ -84,7 +84,7 @@ export const LadleMockLocaleProvider = ({
 		setLocale: setCurrentLocale,
 	};
 
-	// Not using JSX notation so we do not need to make this module mignle JSX and logic.
+	// Not using JSX notation so we do not need to make this module mingle JSX and logic.
 	return createElement(
 		I18nProvider,
 		{

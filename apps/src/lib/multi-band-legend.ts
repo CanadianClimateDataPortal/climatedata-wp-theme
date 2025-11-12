@@ -60,21 +60,6 @@ export type MultiBandLegend = {
 };
 
 /**
- * Extracts grouping index from first digit of quantity
- *
- * @example
- * ```typescript
- * extractGroupingIndex(1040) // 1
- * extractGroupingIndex(2050) // 2
- * extractGroupingIndex(3100) // 3
- * ```
- */
-const extractGroupingIndex = (quantity: number): number => {
-	const firstChar = String(quantity)[0];
-	return Number(firstChar);
-};
-
-/**
  * Base error class for multi-band legend operations
  */
 export class MultiBandLegendError extends Error {
@@ -141,8 +126,8 @@ export class ScaleMismatchError extends MultiBandLegendError {
 /**
  * Extracts percentage value from quantity with validation
  *
- * @throws {InvalidQuantityFormatError} When quantity format is invalid
- *
+ * @param quantity - Must be a 4-digit number (validated by validateQuantityFormat)
+ * @throws {InvalidQuantityFormatError} When second digit is not 0 or 1
  *
  * @example
  * ```typescript
@@ -153,15 +138,8 @@ export class ScaleMismatchError extends MultiBandLegendError {
  */
 const extractPercentage = (quantity: number): number => {
 	const str = String(quantity);
-
-	if (str.length !== 4) {
-		throw new InvalidQuantityFormatError(
-			quantity,
-			`Quantity must be 4 digits (format: GXYY). Got ${str.length} digits`
-		);
-	}
-
 	const secondDigit = str[1];
+
 	if (secondDigit !== '0' && secondDigit !== '1') {
 		throw new InvalidQuantityFormatError(
 			quantity,
@@ -169,8 +147,24 @@ const extractPercentage = (quantity: number): number => {
 		);
 	}
 
-	const percentageStr = str.substring(1, 4);
-	return Number(percentageStr);
+	return Number(str.substring(1));  // Last 3 digits (XYY)
+};
+
+/**
+ * Extracts grouping index from first digit of quantity
+ *
+ * @param quantity - Must be a 4-digit number (validated by validateQuantityFormat)
+ *
+ * @example
+ * ```typescript
+ * extractGroupingIndex(1040) // 1
+ * extractGroupingIndex(2050) // 2
+ * extractGroupingIndex(3100) // 3
+ * ```
+ */
+const extractGroupingIndex = (quantity: number): number => {
+	const str = String(quantity);
+	return Number(str[0]);
 };
 
 type GroupRange = {
@@ -283,19 +277,39 @@ const validateNoDuplicates = (quantities: number[]): void => {
 };
 
 /**
+ * Validates quantities are 4-digit numbers (1000-9999)
+ *
+ * Must be called before extractGroupingIndex or extractPercentage
+ */
+const validateQuantityFormat = (quantities: number[]): void => {
+	for (const quantity of quantities) {
+		if (quantity < 1000 || quantity > 9999) {
+			throw new InvalidQuantityFormatError(
+				quantity,
+				`Quantity must be a 4-digit number (1000-9999)`
+			);
+		}
+	}
+};
+
+/**
  * Transforms colorMap data into MultiBandLegend format
  *
  * @param colorMap - Input color map from backend
- * @param labels - Optional labels for each group (if fewer than groups, generates defaults)
  */
-export const transformColorMapToMultiBandLegend = ({
-	quantities = [],
-	colours = [],
-}: ColourQuantitiesMap): MultiBandLegend => {
-	const ranges = findGroupRanges(quantities);
-
+export const transformColorMapToMultiBandLegend = (
+	colorMap: ColourQuantitiesMap,
+): MultiBandLegend => {
+	const {
+		quantities = [],
+		colours = [],
+	} = colorMap;
+	// Validate quantity format FIRST (before any string operations)
+	validateQuantityFormat(quantities);
 	// Validate scale consistency across groups
 	validateNoDuplicates(quantities);
+
+	const ranges = findGroupRanges(quantities);
 	validateScaleConsistency(quantities, ranges);
 
 	// Extract scale from first group (they're all the same)

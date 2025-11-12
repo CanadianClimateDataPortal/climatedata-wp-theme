@@ -1,6 +1,8 @@
 import React from 'react';
 import { __ } from '@/context/locale-provider';
 import { sprintf } from '@wordpress/i18n';
+import { cn } from '@/lib/utils';
+import { bestContrastingColor } from '@/lib/colors';
 
 export type HexColor = `#${string}`;
 
@@ -23,6 +25,7 @@ export interface ProgressBarProps {
 /**
  * Progress Bar to illustrate a percent value.
  * The label being shown is centered vertically and on top of the filled bar.
+ * The label's color is light or dark based on the luminosity of the fill color.
  * On the right of the filled bar, we see the percent value aligned with the label text.
  */
 const ProgressBar: React.FC<ProgressBarProps> = ({
@@ -31,6 +34,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 	fillHexCode,
 }) => {
 	const screenReaderOnly = sprintf(__('Horizontal bar at %s%% filled'), percent);
+	const labelColor = bestContrastingColor(fillHexCode, 'text-black', 'text-white');
 
 	/**
 	 * aria-value and role=meter:
@@ -74,7 +78,10 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 			{/* Layer 3: Text with float layout */}
 			<div className="absolute inset-0 flex items-center text-sm overflow-hidden">
 				<div
-					className="text-black font-medium pl-3 min-w-fit"
+					className={cn(
+						labelColor,
+						'font-medium pl-3 min-w-fit',
+					)}
 					style={{
 						width: `${percent}%`,
 					}}

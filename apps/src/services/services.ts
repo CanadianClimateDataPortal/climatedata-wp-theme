@@ -598,10 +598,15 @@ export const fetchS2DReleaseDate = async (variable: string, frequency: string, f
  * @param fetchOptions - Any other options to pass to fetch() requests (ex: `signal`)
  */
 export const fetchS2DLocationData = async (
+	// @ts-expect-error - We ignore unused variables errors while waiting for the API endpoint to be implemented.
 	latlng: L.LatLng,
+	// @ts-expect-error - idem.
 	variable: string,
+	// @ts-expect-error - idem.
 	frequency: FrequencyType,
+	// @ts-expect-error - idem.
 	period: Date,
+	// @ts-expect-error - idem.
 	fetchOptions?: FetchOptions
 ): Promise<LocationS2DData> => {
 	// TEMPORARILY mocking the API, while waiting for the API endpoint to be

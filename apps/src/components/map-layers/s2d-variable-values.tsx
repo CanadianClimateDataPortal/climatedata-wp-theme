@@ -336,6 +336,8 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 
 S2DVariableValues.displayName = 'S2DVariableValues';
 
+export default S2DVariableValues;
+
 /**
  * Component to display a loading spinner, where a text is expected.
  */
@@ -881,5 +883,3 @@ const PopupContent = ({
 };
 
 PopupContent.displayName = 'Content';
-
-export default S2DVariableValues;

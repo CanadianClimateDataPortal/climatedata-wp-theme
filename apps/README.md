@@ -47,9 +47,9 @@ The project's structure is organized to maintain modularity and readability:
 - **`src/App.tsx`**: Root component.
 - **`src/Global.css`**: Global styles.
 - **`src/main-*.tsx`**: Entry point for the application.
-- **`./ladle/`**: React components workspace (using "*Ladle*") [configuration](https://ladle.dev/docs/config/) files.
-- **`src/**/*.stories.tsx`**: Workspace to visualize different component states (a *[story](https://ladle.dev/docs/stories/)*).
-- **`src/lib/ladle/`**: Ladle Specific Libraries and addons to be imported and used within *stories*.
+- **`.ladle/`**: Ladle [configuration](https://ladle.dev/docs/config/) directory for component development workspace.
+- **`src/**/*.stories.tsx`**: Component stories showing different states and variations (see [Ladle stories documentation](https://ladle.dev/docs/stories/)).
+- **`src/lib/ladle/`**: Development-only [utilities for Ladle stories](./src/lib/ladle/README.md). Imported as `@/lib/ladle` but excluded from production builds.
 
 ### Redux Toolkit
 - **`src/features/**`**: This folder will contain all the slices of the Redux Store. Each feature will have its own folder with the following structure:

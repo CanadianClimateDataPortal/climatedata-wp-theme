@@ -121,7 +121,7 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 	const renderRow = (
 		v: ProbabilityStatementTooltipRow,
 		idx: number,
-	): JSX.Element => {
+	) => {
 		const { label, text } = v;
 		return (
 			<div key={idx} className="space-y-0.5">
@@ -157,7 +157,7 @@ export type MapLegendInnerS2D = typeof MapLegendInnerS2D;
 
 export const MapLegendInnerS2D = (
 	props: MapLegendInnerS2DProps
-): JSX.Element => {
+) => {
 
 	let data: MultiBandLegend = {
 		rows: [

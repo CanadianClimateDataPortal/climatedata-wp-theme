@@ -119,6 +119,20 @@ Run the tests with:
 ./dev.sh test-apps
 ```
 
+#### Ladle
+
+To ease with React component development, the [Ladle](https://ladle.js.org/)
+framework is available. It's not required to use it, but it can be useful.
+
+You start the Ladle development server with:
+
+```shell
+./dev.sh ladle-apps
+```
+
+More technical documentation is available in [the README of the ladle/
+directory](../apps/src/lib/ladle/README.md).
+
 ### Database access
 
 The database container has the port `3306` opened, so you can connect to it

@@ -254,6 +254,7 @@ export const MapLegendInnerS2D = () => {
 		locale: lang,
 	};
 
+	let errorMessage: string | undefined
 	const scaleLength = data.scale.length;
 	const rowsLengthMustBe = scaleLength - 1;
 	for (const [idx, row] of (data?.rows ?? []).entries()) {
@@ -267,7 +268,8 @@ export const MapLegendInnerS2D = () => {
 			`
 				.replace(/(\n|\s){2,}/g, ' ')
 				.trim();
-			throw new Error(message);
+			console.error(message);
+			errorMessage = message;
 		}
 	}
 
@@ -285,6 +287,10 @@ export const MapLegendInnerS2D = () => {
 
 	// To make sure no collisions with IDs
 	const prefix = useMemo(() => nanoid(4), []);
+
+	if (errorMessage) {
+		return (<div title={errorMessage}>&hellip;</div>)
+	}
 
 	return (
 		<div className="w-full font-sans px-2 pt-3">

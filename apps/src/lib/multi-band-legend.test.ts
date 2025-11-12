@@ -6,7 +6,7 @@ import {
 	ScaleMismatchError,
 } from '@/lib/multi-band-legend';
 
-import { EXAMPLE_COLOR_MAP_3_BANDS } from '@/hooks/use-color-map.examples';
+import { EXAMPLE_COLOR_MAP_S2D_MULTIBAND } from '@/hooks/use-color-map.examples';
 
 type TransformColorMapInputParam = Parameters<typeof transformColorMapToMultiBandLegend>[0];
 
@@ -55,9 +55,9 @@ const createFixture = (
 describe('multi-band-legend', () => {
 	describe('transformColorMapToMultiBandLegend', () => {
 		describe('happy path', () => {
-			it('transforms real production data (EXAMPLE_COLOR_MAP_3_BANDS)', () => {
+			it('transforms real production data (EXAMPLE_COLOR_MAP_S2D_MULTIBAND)', () => {
 				const result = transformColorMapToMultiBandLegend(
-					EXAMPLE_COLOR_MAP_3_BANDS
+					EXAMPLE_COLOR_MAP_S2D_MULTIBAND
 				);
 
 				expect(result.scale).toEqual([40, 50, 60, 70, 80, 90, 100]);

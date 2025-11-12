@@ -1,6 +1,18 @@
 import { type ColourQuantitiesMap } from '@/types/types';
 
 /**
+ * @file Multi-Band Legend Transformation (S2D Forecasts Only)
+ *
+ * This module handles transformation of S2D (Sub-seasonal to Decadal) forecast data
+ * into a format suitable for rendering horizontal multi-band probability legends.
+ *
+ * ⚠️ SPECIALIZED MODULE - Only accepts GXYY-encoded multi-band format
+ * ⚠️ NOT for standard single-gradient legends (use regular legend components instead)
+ *
+ * @see EXAMPLE_COLOR_MAP_S2D_MULTIBAND (`@/hooks/use-color-map.examples`) - Example input format
+ */
+
+/**
  * Single row in a probability visualization showing one forecast category
  */
 export interface MultiBandLegendGroup {

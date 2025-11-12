@@ -15,7 +15,7 @@ import {
 	type StoryWithLocale,
 } from '@/lib/ladle';
 
-import { EXAMPLE_COLOR_MAP_3_BANDS } from '@/hooks/use-color-map.examples';
+import { EXAMPLE_COLOR_MAP_S2D_MULTIBAND } from '@/hooks/use-color-map.examples';
 
 import MapLegendInnerS2D from '@/components/map-layers/map-legend-inner-s2d';
 
@@ -68,7 +68,7 @@ export const StoryAlpha: Story<MapLegendInnerStory> = ({
 StoryAlpha.storyName = 'Using a table';
 
 StoryAlpha.args = {
-	data: EXAMPLE_COLOR_MAP_3_BANDS,
+	data: EXAMPLE_COLOR_MAP_S2D_MULTIBAND,
 	locale: 'en',
 };
 

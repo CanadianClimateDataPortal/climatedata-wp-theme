@@ -121,7 +121,10 @@ const MapLegend: React.FC = () => {
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 				>
 					<Suspense fallback={'...'}>
-						<LazyMapLegendInnerS2D data={colorMap} forecastType={forecastType} />
+						<LazyMapLegendInnerS2D
+							data={colorMap}
+							forecastType={forecastType}
+						/>
 					</Suspense>
 				</MapLegendOpenControl>
 			);

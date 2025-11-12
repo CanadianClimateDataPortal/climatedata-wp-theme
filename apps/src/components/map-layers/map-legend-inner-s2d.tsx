@@ -6,6 +6,10 @@ import { __ } from '@/context/locale-provider';
 import { getOrdinalSuffix } from '@/lib/format';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import { type ColourQuantitiesMap } from '@/types/types';
+import {
+	ForecastTypes,
+	type ForecastType,
+} from '@/types/climate-variable-interface';
 
 import {
 	transformColorMapToMultiBandLegend,
@@ -17,23 +21,23 @@ import {
  */
 interface ProbabilityStatementProps {
 	/**
-	 * Climate variable being forecasted
+	 * Climate variable being shown
 	 *
 	 * @example 'total precipitation', 'mean temperature'
 	 */
 	variableName: string;
 
 	/**
-	 * Qualitative description of the forecasted outcome
+	 * Qualitative description
 	 *
 	 * @example 'unusually high or low', 'above normal'
 	 */
 	outcome: string;
 
 	/**
-	 * Locale for number formatting and translations
+	 * The type of forecast being described
 	 */
-	locale: Intl.LocalesArgument;
+	forecastType?: ForecastType | null;
 }
 
 /**
@@ -46,32 +50,18 @@ interface ProbabilityStatementProps {
  */
 interface ProbabilityStatementTooltipRow {
 	/**
-	 * Percentile threshold value (0-100)
+	 * Description Term item title
 	 *
-	 * @example 80 for "80th percentile"
-	 */
-	value: number;
-
-	/**
-	 * User-facing category label
-	 *
-	 * @example 'Unusually high', 'Above normal'
+	 * @example 'Unusually high'
 	 */
 	label: string;
 
 	/**
-	 * Template string with `%s` placeholder for percentile value
+	 * Description Term Details -- one or many lines under that label
 	 *
-	 * @example 'Above the %s percentile' becomes "Above the 80th percentile"
+	 * @example 'Above the 66th percentile ...'
 	 */
 	text: string;
-
-	/**
-	 * Explanatory clarification in parentheses
-	 *
-	 * @example 'top fifth of historical data', 'middle three-fifths'
-	 */
-	parens: string;
 }
 
 /**
@@ -83,32 +73,12 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 	const {
 		variableName,
 		outcome,
-		locale,
+		forecastType,
 	} = props;
-	// No need to pass translation (`__('...')`) in the items as its done at the end.
-	const statementRows: ProbabilityStatementTooltipRow[] = [
-		{
-			// Unusually high: Above the 80th percentile (top fifth of historical data)
-			value: 80,
-			label: 'Unusually high',
-			text: 'Above the %s percentile',
-			parens: 'top fifth of historical data',
-		},
-		{
-			// Unusually low: Below the 20th percentile (bottom fifth of historical data)
-			value: 20,
-			label: 'Unusually low',
-			text: 'Below the %s percentile',
-			parens: 'bottom fifth of historical data',
-		},
-	];
+	const statementRows: ProbabilityStatementTooltipRow[] = [];
+	let afterStatementParagraph: string | undefined = void 0;
 
-	const afterStatementRows = __(
-		'If the probability is below 30%, no single outcome is significantly more likely ' +
-			'than the others, and the climatology should be used instead.'
-	);
-
-	const firstLine = sprintf(
+	const beforeStatement = sprintf(
 		__(
 			'%s: probability that this variable will be %s relative to the 1991 to 2020 historical climatology.'
 		),
@@ -116,22 +86,48 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 		__(outcome),
 	);
 
+	if (forecastType === ForecastTypes.EXPECTED) {
+		statementRows.push({
+			label: __('Above normal'),
+			text: __('Above the 66th percentile (upper third of historical data)'),
+		});
+		statementRows.push({
+			label: __('Near normal'),
+			text: __('Between the 33rd and 66th percentiles (middle third of historical data)'),
+		});
+		statementRows.push({
+			label: __('Below normal'),
+			text: __('Below the 33rd percentile (lower third of historical data)'),
+		});
+		afterStatementParagraph = __(
+			'If the probability is below 40%, no single outcome is significantly more likely ' +
+				'than the others, and the climatology should be used instead.'
+		);
+	} else if (forecastType === ForecastTypes.UNUSUAL) {
+		statementRows.push({
+			label: __('Unusually high'),
+			text: __('Above the 80th percentile (top fifth of historical data)'),
+		});
+		statementRows.push({
+			label: __('Unusually low'),
+			text: __('Below the 20th percentile (bottom fifth of historical data)'),
+		});
+		afterStatementParagraph = __(
+			'If the probability is below 30%, no single outcome is significantly more likely ' +
+				'than the others, and the climatology should be used instead.'
+		);
+	}
+
 	const renderRow = (
 		v: ProbabilityStatementTooltipRow,
 		idx: number,
 	): JSX.Element => {
-		const { value, label, text, parens } = v;
-		const formattedValue = value + getOrdinalSuffix(value, locale);
+		const { label, text } = v;
 		return (
 			<div key={idx} className="space-y-0.5">
-				<dt className="font-semibold text-gray-900">{__(label)}</dt>
+				<dt className="font-semibold text-gray-900">{label}</dt>
 				<dd className="text-gray-700">
-					{sprintf(__(text), formattedValue)}
-					{parens && (
-						<span className="ml-1 text-gray-600">
-							({__(parens)})
-						</span>
-					)}
+					{text}
 				</dd>
 			</div>
 		);
@@ -139,7 +135,7 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 
 	return (
 		<div className="space-y-3 text-sm leading-relaxed">
-			<p>{firstLine}</p>
+			<p>{beforeStatement}</p>
 			{statementRows.length > 0 ? (
 				<dl className="pl-3 space-y-2 border-l-2 border-gray-300">
 					{statementRows.map((v, idx) => renderRow(v, idx))}
@@ -147,13 +143,14 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 			) : (
 				void 0
 			)}
-			{afterStatementRows && <p>{__(afterStatementRows)}</p>}
+			{afterStatementParagraph && <p>{afterStatementParagraph}</p>}
 		</div>
 	);
 };
 
 export interface MapLegendInnerS2DProps {
 	data: ColourQuantitiesMap;
+	forecastType?: ForecastType | null;
 }
 
 export type MapLegendInnerS2D = typeof MapLegendInnerS2D;
@@ -171,6 +168,7 @@ export const MapLegendInnerS2D = (
 
 	const {
 		data: colorMap,
+		forecastType,
 	} = props;
 
 	const transformed = transformColorMapToMultiBandLegend(colorMap);
@@ -190,17 +188,10 @@ export const MapLegendInnerS2D = (
 		}
 	}
 
-	/**
-	 * Code-Review note: For some reason, we can't use useLocale because the present component says it can't find it. @TODO
-	 */
-	const { lang = 'fr' } = window.document.documentElement as {
-		lang: Intl.LocalesArgument;
-	};
-
 	const probabilityStatement: ProbabilityStatementProps = {
 		variableName: 'total precipitation',
 		outcome: 'unusually high or low',
-		locale: lang,
+		forecastType,
 	};
 
 	let errorMessage: string | undefined

@@ -48,6 +48,7 @@ const MapLegend: React.FC = () => {
 	let isCategorical = climateVariable?.getColourType() !== ColourType.CONTINUOUS;
 	const isS2D = climateVariable instanceof S2DClimateVariable;
 	const forecastDisplay = climateVariable?.getForecastDisplay();
+	const forecastType = climateVariable?.getForecastType();
 
 	// Whether to show the regular legend or the S2D forecast legend
 	const showForecastLegend = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
@@ -120,7 +121,7 @@ const MapLegend: React.FC = () => {
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 				>
 					<Suspense fallback={'...'}>
-						<LazyMapLegendInnerS2D data={colorMap} />
+						<LazyMapLegendInnerS2D data={colorMap} forecastType={forecastType} />
 					</Suspense>
 				</MapLegendOpenControl>
 			);
@@ -153,6 +154,7 @@ const MapLegend: React.FC = () => {
 		unit,
 		locale,
 		showForecastLegend,
+		forecastType,
 	]);
 
 	return null;

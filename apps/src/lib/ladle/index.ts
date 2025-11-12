@@ -1,2 +1,2 @@
-export * from './delayed-component';
+export * from './lazy';
 export * from './mock-locale-provider';

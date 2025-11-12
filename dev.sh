@@ -130,7 +130,7 @@ function test-apps {
   _docker_compose exec task-runner npx vitest run $files
 }
 
-function dev-apps {
+function ladle-apps {
   (
     set -e
 
@@ -143,7 +143,7 @@ function dev-apps {
     echo "Starting Ladle development server..."
     _docker_compose exec -w /app/apps/ task-runner bash -c '
       echo "Starting Ladle on http://localhost:61000"
-      exec node_modules/.bin/ladle dev --host 0.0.0.0 --port 61000 --stories "src/**/*.stories.tsx"
+      exec ladle dev --host 0.0.0.0 --port 61000 --stories "src/**/*.stories.tsx"
     '
   )
 }

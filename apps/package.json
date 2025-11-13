@@ -10,6 +10,7 @@
     "build:unminified": "tsc -b && UNMINIFIED=true vite build",
     "clean": "tsc -b --clean",
     "lint": "eslint .",
+		"ladle": "ladle dev --host 0.0.0.0 --port 61000 --stories 'src/**/*.stories.tsx'",
     "preview": "vite preview",
     "format": "prettier --write ./src",
     "watch": "vite build --watch",

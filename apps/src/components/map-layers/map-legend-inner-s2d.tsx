@@ -76,9 +76,12 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 			term: __('Below normal'),
 			details: __('Below the 33rd percentile (lower third of historical data)'),
 		});
-		afterStatementParagraph = __(
-			'If the probability is below 40%, no single outcome is significantly more likely ' +
+		afterStatementParagraph = sprintf(
+			__(
+			'If the probability is below %s, no single outcome is significantly more likely ' +
 				'than the others, and the climatology should be used instead.'
+			),
+			'40%',
 		);
 	} else if (forecastType === ForecastTypes.UNUSUAL) {
 		statementRows.push({
@@ -89,9 +92,12 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 			term: __('Unusually low'),
 			details: __('Below the 20th percentile (bottom fifth of historical data)'),
 		});
-		afterStatementParagraph = __(
-			'If the probability is below 30%, no single outcome is significantly more likely ' +
+		afterStatementParagraph = sprintf(
+			__(
+			'If the probability is below %s, no single outcome is significantly more likely ' +
 				'than the others, and the climatology should be used instead.'
+			),
+			'30%',
 		);
 	}
 

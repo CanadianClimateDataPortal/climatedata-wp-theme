@@ -235,7 +235,7 @@ export const MapLegendCommon = (
 												offset={`${offset}%`}
 												stopColor={color}
 											/>
-										)
+										);
 									})}
 								</linearGradient>
 							</defs>

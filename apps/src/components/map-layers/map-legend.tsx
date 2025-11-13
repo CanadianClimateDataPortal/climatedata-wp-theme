@@ -139,8 +139,8 @@ const MapLegend: React.FC = () => {
 
 		const colourType = colorMap.type;
 
-		let title: MapLegendCommonProps['title'] = void 0
-		let tooltipContents: MapLegendCommonProps['tooltipContents'] = void 0
+		let title: MapLegendCommonProps['title'] = void 0;
+		let tooltipContents: MapLegendCommonProps['tooltipContents'] = void 0;
 		if (showClimatologyLegendOfS2D) {
 			// Thus far, only in the situation of S2D Climatology we've needed a title and tooltip.
 			title = __('Historical median');

@@ -119,11 +119,46 @@ Run the tests with:
 ./dev.sh test-apps
 ```
 
+#### Ladle
+
+To ease with React component development, the [Ladle](https://ladle.js.org/)
+framework is available. It's not required to use it, but it can be useful.
+
+You start the Ladle development server with:
+
+```shell
+./dev.sh ladle-apps
+```
+
+More technical documentation is available in [the README of the ladle/
+directory](../apps/src/lib/ladle/README.md).
+
 ### Database access
 
 The database container has the port `3306` opened, so you can connect to it
 using your IDE or any other database management tool (using `localhost` as the
 server host).
+
+### Adding packages to apps/package.json
+
+To make sure that the Docker images will correctly build, use the _Task Runner_
+service to install or update any NPM packages (do not use a local `npm`). Do
+not edit directly the `apps/package*.json` files.
+
+First, make sure the _Task Runner_ container is running (e.g. by running
+`./dev.sh start`).
+
+Connect to the _Task Runner_ container and run `npm` from there:
+
+```shell
+./dev.sh task-runner-shell
+
+# Then, from the Task Runner shell:
+npm install <EXAMPLE-PACKAGE> --save-dev
+```
+
+This will update the `apps/package*.json` files. You can stop the services,
+rebuild the _Task Runner_ and _Portal_ Docker images and commit the changes.
 
 ## Committing changes
 

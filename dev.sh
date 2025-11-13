@@ -21,6 +21,7 @@ function _show_help {
   echo "    compose <args...>       Execute a docker compose command. All <args...> are passed to docker compose."
   echo ""
   echo "  Developer tools:"
+  echo "    ladle-apps                Run and Watch /apps/**/*.stories.tsx to develop on React components in isolation."
   echo "    test-apps <file(s)...>    Run TypeScript tests in /apps/. <files(s)...> can optionally be specified, relative to the project's root."
   echo "    lint-apps <file(s)...>    Run eslint over /apps/. <files(s)...> can optionally be specified, relative to the project's root."
   echo "    format-apps <file(s)...>  Run prettier (with overwrite) over /apps/. <files(s)...> can optionally be specified, relative to the project's root."
@@ -127,6 +128,24 @@ function compose {
 function test-apps {
   files=$(_prepare_files_args "/app/" "/app/apps" "$@")
   _docker_compose exec task-runner npx vitest run $files
+}
+
+function ladle-apps {
+  (
+    set -e
+
+    cleanup() {
+      echo -e "\n\nCleaning up Ladle..."
+      _docker_compose exec task-runner pkill -f "ladle dev" 2>/dev/null || true
+    }
+    trap cleanup EXIT
+
+    echo "Starting Ladle development server..."
+    _docker_compose exec -w /app/apps/ task-runner bash -c '
+      echo "Starting Ladle on http://localhost:61000"
+      npx ladle dev --host 0.0.0.0 --port 61000 --stories "src/**/*.stories.tsx"
+    '
+  )
 }
 
 function lint-apps {

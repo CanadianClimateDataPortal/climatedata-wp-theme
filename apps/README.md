@@ -20,6 +20,8 @@ The project uses several essential libraries and frameworks:
 - [Highcharts](https://www.highcharts.com/): Library for data visualization and interactive charts.
 - [wordpress/react-i18n](https://github.com/WordPress/gutenberg/blob/d9b726b8451746703cc1b9680487e3726ab4a03f/packages/react-i18n/README.md): Internationalization library for React applications.
 - [ReactMotion](https://motion.dev/): Animation library for React.
+- [Ladle](https://ladle.dev/): Develop and test your React component's "*stories*" (i.e. possible states) in isolation
+
 
 ## Getting Started
 
@@ -45,6 +47,9 @@ The project's structure is organized to maintain modularity and readability:
 - **`src/App.tsx`**: Root component.
 - **`src/Global.css`**: Global styles.
 - **`src/main-*.tsx`**: Entry point for the application.
+- **`.ladle/`**: Ladle [configuration](https://ladle.dev/docs/config/) directory for component development workspace.
+- **`src/**/*.stories.tsx`**: Component stories showing different states and variations (see [Ladle stories documentation](https://ladle.dev/docs/stories/)).
+- **`src/lib/ladle/`**: Development-only [utilities for Ladle stories](./src/lib/ladle/README.md). Imported as `@/lib/ladle` but excluded from production builds.
 
 ### Redux Toolkit
 - **`src/features/**`**: This folder will contain all the slices of the Redux Store. Each feature will have its own folder with the following structure:

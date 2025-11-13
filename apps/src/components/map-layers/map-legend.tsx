@@ -22,8 +22,9 @@ import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import type { MapLegendInnerS2D } from '@/components/map-layers/map-legend-inner-s2d';
 
-const LazyMapLegendInnerS2D = lazy(() => import('@/components/map-layers/map-legend-inner-s2d'));
+const LazyMapLegendInnerS2D = lazy<MapLegendInnerS2D>(() => import('@/components/map-layers/map-legend-inner-s2d'));
 
 
 const MapLegend: React.FC = () => {
@@ -47,6 +48,8 @@ const MapLegend: React.FC = () => {
 	let isCategorical = climateVariable?.getColourType() !== ColourType.CONTINUOUS;
 	const isS2D = climateVariable instanceof S2DClimateVariable;
 	const forecastDisplay = climateVariable?.getForecastDisplay();
+	const forecastType = climateVariable?.getForecastType();
+	const variableName = climateVariable?.getTitle();
 
 	// Whether to show the regular legend or the S2D forecast legend
 	const showForecastLegend = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
@@ -107,6 +110,11 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
+		if (!colorMap) {
+			rootRef.current.render(<></>);
+			return;
+		}
+
 		if (showForecastLegend) {
 			rootRef.current.render(
 				<MapLegendOpenControl
@@ -114,15 +122,14 @@ const MapLegend: React.FC = () => {
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 				>
 					<Suspense fallback={'...'}>
-						<LazyMapLegendInnerS2D />
+						<LazyMapLegendInnerS2D
+							data={colorMap}
+							variableName={variableName}
+							forecastType={forecastType}
+						/>
 					</Suspense>
 				</MapLegendOpenControl>
 			);
-			return;
-		}
-
-		if (!colorMap) {
-			rootRef.current.render(<></>);
 			return;
 		}
 
@@ -152,6 +159,7 @@ const MapLegend: React.FC = () => {
 		unit,
 		locale,
 		showForecastLegend,
+		forecastType,
 	]);
 
 	return null;

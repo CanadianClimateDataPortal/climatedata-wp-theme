@@ -1316,9 +1316,6 @@ msgstr "Seuil inhabituellement élevée"
 msgid "Unusually low cutoff"
 msgstr "Seuil inhabituellement faible"
 
-msgid "total precipitation"
-msgstr "précipitations totales"
-
 msgid "unusually high or low"
 msgstr "inhabituellement élevée ou faible"
 
@@ -1331,20 +1328,20 @@ msgstr "%s : probabilité que cette variable soit %s par rapport à la climatolo
 msgid "Unusually high"
 msgstr "Inhabituellement élevée"
 
-msgid "Above the %s percentile"
-msgstr "Au-dessus du %s centile"
+msgid "Above the 66th percentile (upper third of historical data)"
+msgstr "Au-dessus du 66e centile (tiers supérieur des données historiques)"
 
-msgid "top fifth of historical data"
-msgstr "cinquième supérieur des données historiques"
+msgid "Above the 80th percentile (top fifth of historical data)"
+msgstr "Au-dessus du 80e centile (cinquième supérieur des données historiques)"
 
 msgid "Unusually low"
 msgstr "Inhabituellement faible"
 
-msgid "Below the %s percentile"
-msgstr "En dessous du %s centile"
+msgid "Below the 20th percentile (bottom fifth of historical data)"
+msgstr "En dessous du 20e centile (cinquième inférieur des données historiques)"
 
-msgid "bottom fifth of historical data"
-msgstr "cinquième inférieur des données historiques"
+msgid "Below the 33rd percentile (lower third of historical data)"
+msgstr "Inférieur au 33e centile (tiers inférieur des données historiques)"
 
 msgid "Between %s and %s"
 msgstr "Entre %s et %s"
@@ -1352,9 +1349,9 @@ msgstr "Entre %s et %s"
 msgid "Climatology (1991 to 2020)"
 msgstr "Climatologie (1991 à 2020)"
 
-msgid "If the probability is below 30%, no single outcome is significantly more likely "
+msgid "If the probability is below %s, no single outcome is significantly more likely "
   "than the others, and the climatology should be used instead."
-msgstr "Si la probabilité est inférieure à 30 %, aucun résultat n’est "
+msgstr "Si la probabilité est inférieure à %s, aucun résultat n’est "
   "significativement plus probable que les autres, et la climatologie "
   "doit être utilisée à la place."
 
@@ -1366,3 +1363,15 @@ msgstr "La climatologie historique contient des données correspondant au mois, 
        "d'intérêt pour les 30 années comprises entre 1991 et 2020. La médiane historique et l'étendue près de la "
        "normale fournissent un contexte pour les conditions passées typiques à cet endroit. Les valeurs seuils "
        "fournissent les valeurs exactes qui définissent les résultats de prévision pour cet endroit."
+
+msgid "Above normal"
+msgstr "Au-dessus de la normale"
+
+msgid "Near normal"
+msgstr "Près de la normale"
+
+msgid "Below normal"
+msgstr "Sous la normale"
+
+msgid "Between the 33rd and 66th percentiles (middle third of historical data)"
+msgstr "Entre le 33e et le 66e centile (tiers central des données historiques)"

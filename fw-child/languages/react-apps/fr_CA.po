@@ -1313,35 +1313,20 @@ msgstr "Inhabituellement élevée"
 msgid "Above the %s percentile"
 msgstr "Au-dessus du %s centile"
 
-msgid "upper third of historical data"
-msgstr "tiers supérieur des données historiques"
-
 msgid "Above the 66th percentile (upper third of historical data)"
 msgstr "Au-dessus du 66e centile (tiers supérieur des données historiques)"
 
 msgid "Above the 80th percentile (top fifth of historical data)"
 msgstr "Au-dessus du 80e centile (cinquième supérieur des données historiques)"
 
-msgid "top fifth of historical data"
-msgstr "cinquième supérieur des données historiques"
-
 msgid "Unusually low"
 msgstr "Inhabituellement faible"
 
-msgid "Below the %s percentile"
-msgstr "En-dessous du %s centile"
-
 msgid "Below the 20th percentile (bottom fifth of historical data)"
-msgstr "En-dessous du 20e centile (cinquième inférieur des données historiques) "
-
-msgid "bottom fifth of historical data"
-msgstr "cinquième inférieur des données historiques"
+msgstr "En-dessous du 20e centile (cinquième inférieur des données historiques)"
 
 msgid "Below the 33rd percentile (lower third of historical data)"
 msgstr "Inférieur au 33e centile (tiers inférieur des données historiques)"
-
-msgid "lower third of historical data"
-msgstr "tiers inférieur des données historiques"
 
 msgid "Between %s and %s"
 msgstr "Entre %s et %s"
@@ -1363,10 +1348,3 @@ msgstr "Sous la normale"
 
 msgid "Between the 33rd and 66th percentiles (middle third of historical data)"
 msgstr "Entre le 33e et le 66e centile (tiers central des données historiques)"
-
-msgid "Between the %s and %s percentiles"
-msgstr "Entre le %s et le %s centile"
-
-msgid "middle third of historical data"
-msgstr "tiers central des données historiques"
-

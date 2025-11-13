@@ -3,36 +3,34 @@ import { useMap } from 'react-leaflet';
 
 interface CustomPanesDefinition {
 	[key: string]: {
-		style?: {
-			[key: string]: unknown;
-		};
+		classList?: string[];
 	};
 }
 
 const customPanes: CustomPanesDefinition = {
 	basemap: {
-		style: { zIndex: '100', pointerEvents: 'none' },
+		classList: ['z-[100]', 'pointer-events-none'],
 	},
 	raster: {
-		style: { zIndex: '200', pointerEvents: 'none' },
+		classList: ['z-[200]', 'pointer-events-none'],
 	},
 	aboveRaster: {
-		style: { zIndex: '300', pointerEvents: 'none' },
+		classList: ['z-[300]', 'pointer-events-none'],
 	},
 	grid: {
-		style: { zIndex: '400', pointerEvents: 'all' },
+		classList: ['z-[400]'],
 	},
 	aboveGrid: {
-		style: { zIndex: '500', pointerEvents: 'none' },
+		classList: ['z-[500]', 'pointer-events-none'],
 	},
 	labels: {
-		style: { zIndex: '600', pointerEvents: 'none' },
+		classList: ['z-[600]', 'pointer-events-none'],
 	},
 	stations: {
-		style: { zIndex: '700', pointerEvents: 'all' },
+		classList: ['z-[700]'],
 	},
 	custom_shapefile: {
-		style: { zIndex: '800', pointerEvents: 'all' },
+		classList: ['z-[800]'],
 	},
 };
 
@@ -51,13 +49,11 @@ export default function CustomPanesLayer(): null {
 
 		Object.entries(customPanes).forEach(([paneName, configuration]) => {
 			if (!map.getPane(paneName)) {
-				const { style } = configuration;
+				const { classList } = configuration;
 				const pane = map.createPane(paneName);
 
-				if (style) {
-					Object.entries(style).forEach(([key, value]) => {
-						pane.style.setProperty(key, value as string);
-					});
+				if (classList) {
+					pane.classList.add(...classList);
 				}
 			}
 		});

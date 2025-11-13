@@ -34,7 +34,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 	fillHexCode,
 }) => {
 	const screenReaderOnly = sprintf(__('Horizontal bar at %s%% filled'), percent);
-	const labelColor = bestContrastingColor(fillHexCode, 'text-black', 'text-white');
+	const textLightColor = 'text-white';
+	const textDarkColor = 'text-black';
+	const labelColor = percent < 50
+		// Dark text color is used in case the percentage bar is not long enough
+		? textDarkColor
+		: bestContrastingColor(fillHexCode, textDarkColor, textLightColor);
 
 	/**
 	 * aria-value and role=meter:

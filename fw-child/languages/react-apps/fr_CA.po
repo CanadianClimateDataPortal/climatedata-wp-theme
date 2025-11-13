@@ -1313,6 +1313,15 @@ msgstr "Inhabituellement élevée"
 msgid "Above the %s percentile"
 msgstr "Au-dessus du %s centile"
 
+msgid "upper third of historical data"
+msgstr "tiers supérieur des données historiques"
+
+msgid "Above the 66th percentile (upper third of historical data)"
+msgstr "Au-dessus du 66e centile (tiers supérieur des données historiques)"
+
+msgid "Above the 80th percentile (top fifth of historical data)"
+msgstr "Au-dessus du 80e centile (cinquième supérieur des données historiques)"
+
 msgid "top fifth of historical data"
 msgstr "cinquième supérieur des données historiques"
 
@@ -1322,14 +1331,42 @@ msgstr "Inhabituellement faible"
 msgid "Below the %s percentile"
 msgstr "En-dessous du %s centile"
 
+msgid "Below the 20th percentile (bottom fifth of historical data)"
+msgstr "En-dessous du 20e centile (cinquième inférieur des données historiques) "
+
 msgid "bottom fifth of historical data"
 msgstr "cinquième inférieur des données historiques"
+
+msgid "Below the 33rd percentile (lower third of historical data)"
+msgstr "Inférieur au 33e centile (tiers inférieur des données historiques)"
+
+msgid "lower third of historical data"
+msgstr "tiers inférieur des données historiques"
 
 msgid "Between %s and %s"
 msgstr "Entre %s et %s"
 
-msgid "If the probability is below 30%, no single outcome is significantly more likely "
+msgid "If the probability is below %s, no single outcome is significantly more likely "
   "than the others, and the climatology should be used instead."
-msgstr "Si la probabilité est inférieure à 30 %, aucun résultat n’est "
+msgstr "Si la probabilité est inférieure à %s, aucun résultat n’est "
   "significativement plus probable que les autres, et la climatologie "
   "doit être utilisée à la place."
+
+msgid "Above normal"
+msgstr "Au-dessus de la normale"
+
+msgid "Near normal"
+msgstr "Près de la normale"
+
+msgid "Below normal"
+msgstr "Sous la normale"
+
+msgid "Between the 33rd and 66th percentiles (middle third of historical data)"
+msgstr "Entre le 33e et le 66e centile (tiers central des données historiques)"
+
+msgid "Between the %s and %s percentiles"
+msgstr "Entre le %s et le %s centile"
+
+msgid "middle third of historical data"
+msgstr "tiers central des données historiques"
+

@@ -3,16 +3,13 @@ import { __ } from '@/context/locale-provider';
 import { ArrowRight } from 'lucide-react';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useAppSelector } from '@/app/hooks';
-
 import {
-	 type LocationModalContentParams as BaseLocationModalContentParams,
+	type LocationModalContentParams as BaseLocationModalContentParams,
 } from '@/types/climate-variable-interface';
-
 import { useLocale } from '@/hooks/use-locale';
-
 import appConfig from '@/config/app.config';
-
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import { getForecastTypeName } from '@/lib/s2d';
 
 interface LocationModalContentProps extends BaseLocationModalContentParams {
 	title: string;
@@ -58,21 +55,29 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
 	const scenarioLabel = appConfig.scenarios.filter((item) => item.value === scenario)[0]?.label;
 
+	const subTitleParts: string[] = [
+		__(datasetLabel),
+		__(climateVariableTitle),
+	];
+
+	if (isS2D) {
+		const forecastType = climateVariable?.getForecastType() ?? '';
+		subTitleParts.push(getForecastTypeName(forecastType));
+	} else {
+		subTitleParts.push(
+			__(thresholdLabel),
+			__(versionLabel),
+			__(scenarioLabel),
+		);
+	}
+
 	return (
 		<div>
 			<h2 className="mb-1 text-2xl font-semibold leading-7 text-cdc-black">
 				{title}
 			</h2>
 			<p className="m-0 text-sm leading-5 text-neutral-grey-medium">
-				{
-					[
-						__(datasetLabel),
-						__(climateVariableTitle),
-						__(thresholdLabel),
-						__(versionLabel),
-						__(scenarioLabel)
-					].filter(Boolean).join(' - ')
-				}
+				{subTitleParts.filter(Boolean).join(' - ')}
 			</p>
 
 			{ climateVariable?.getLocationModalContent({

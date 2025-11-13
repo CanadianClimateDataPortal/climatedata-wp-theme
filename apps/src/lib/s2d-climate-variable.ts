@@ -11,9 +11,6 @@ import {
 } from '@/types/climate-variable-interface';
 import S2DVariableValues from '@/components/map-layers/s2d-variable-values';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
-import {
-	createPropsForS2DVariableValues,
-} from '@/lib/s2d-variable-values';
 import { WMSParams } from '@/types/types';
 import { formatUTCDate, utc } from '@/lib/utils';
 
@@ -120,13 +117,14 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 	}
 
 	getLocationModalContent(
-		_params: LocationModalContentParams // eslint-disable-line @typescript-eslint/no-unused-vars
+		params: LocationModalContentParams,
 	): React.ReactNode | null {
-		// TODO: Figure out where we will resolve the values. Probably from this class, and not outside.
-		const props = createPropsForS2DVariableValues({});
+		const { latlng } = params;
 		return createElement(
 			S2DVariableValues,
-			props,
+			{
+				latlng,
+			},
 		);
 	}
 }

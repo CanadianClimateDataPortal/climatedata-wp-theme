@@ -21,6 +21,8 @@ import {
 	setLowSkillVisibility,
 } from '@/features/map/map-slice';
 
+import { getForecastTypeName } from '@/lib/s2d';
+
 const tooltipForecastTypes = __(
 	'S2D forecasts are shown as probabilities for how conditions will compare to historical climate conditions between 1991 and 2020. ' +
 		'“Expected conditions” show whether conditions are expected to be above, near or below normal. ' +
@@ -55,10 +57,10 @@ const SelectAnOptionLabel = __('Select an option');
 const fieldForecastTypes = {
 	key: 'forecast_types',
 	label: __('Forecast Types'),
-	options: [
-		{ value: ForecastTypes.EXPECTED, label: __('Expected Conditions') },
-		{ value: ForecastTypes.UNUSUAL, label: __('Unusual Conditions') },
-	],
+	options: [ForecastTypes.EXPECTED, ForecastTypes.UNUSUAL].map((type) => ({
+		value: type,
+		label: getForecastTypeName(type),
+	})),
 };
 
 const fieldForecastDisplay = {

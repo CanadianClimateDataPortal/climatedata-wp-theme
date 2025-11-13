@@ -6,25 +6,30 @@ import {
 } from '@ladle/react';
 
 import {
-	type ColourQuantitiesMap,
-} from '@/types/types';
-
-import {
 	LadleMockLocaleProvider,
 	createLadleMockLocaleStoryArgTypes,
 	type StoryWithLocale,
 } from '@/lib/ladle';
 
+import {
+	type ColourQuantitiesMap,
+} from '@/types/types';
+
+import {
+	ForecastTypes,
+	type ForecastType,
+} from '@/types/climate-variable-interface';
+
 import { EXAMPLE_COLOR_MAP_S2D_MULTIBAND } from '@/hooks/use-color-map.examples';
 
-import MapLegendInnerS2D from '@/components/map-layers/map-legend-inner-s2d';
+import MapLegendForecastS2D from '@/components/map-layers/map-legend-forecast-s2d';
 
 const styleForFirstChildOfLegendWrapperLeafletControl: React.CSSProperties = {
 	width: 500,
 };
 
 export default {
-	title: 'Seasonal Decadal Legend',
+	title: 'map-layers/map-legend-forecast-s2d',
 	decorators: [
 		(Component) => (
 			<div
@@ -48,30 +53,49 @@ const translatedFrench = {
 };
 
 interface MapLegendInnerStory extends StoryWithLocale {
+	translatedFrench: Record<string, string>;
 	data: ColourQuantitiesMap;
+	forecastType?: ForecastType;
+	variableName?: string | null;
 }
 
 export const StoryAlpha: Story<MapLegendInnerStory> = ({
-	locale,
 	data,
+	forecastType,
+	locale,
+	translatedFrench,
+	variableName = null,
 }) => {
 	return (
 		<LadleMockLocaleProvider
 			locale={locale}
 			translatedFrench={translatedFrench}
 		>
-			<MapLegendInnerS2D data={data} />
+			<MapLegendForecastS2D
+				data={data}
+				forecastType={forecastType}
+				variableName={variableName}
+			/>
 		</LadleMockLocaleProvider>
 	);
 };
 
-StoryAlpha.storyName = 'Using a table';
+StoryAlpha.storyName = 'Default';
 
 StoryAlpha.args = {
 	data: EXAMPLE_COLOR_MAP_S2D_MULTIBAND,
+	forecastType: ForecastTypes.EXPECTED,
 	locale: 'en',
+	translatedFrench,
+	variableName: 'Air Temperature',
 };
 
 StoryAlpha.argTypes = {
 	...createLadleMockLocaleStoryArgTypes(),
+	forecastType: {
+		options: Object.values(ForecastTypes),
+		control: {
+			type: 'select',
+		},
+	},
 };

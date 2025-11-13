@@ -9,9 +9,9 @@ import { createRoot, Root } from 'react-dom/client';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 
-import MapLegendControl from '@/components/map-legend-control';
 import MapLegendOpenControl from '@/components/map-layers/map-legend-open-control';
 
+import { __ } from '@/context/locale-provider';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useColorMap } from '@/hooks/use-color-map';
 import {
@@ -22,9 +22,12 @@ import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
-import type { MapLegendInnerS2D } from '@/components/map-layers/map-legend-inner-s2d';
 
-const LazyMapLegendInnerS2D = lazy<MapLegendInnerS2D>(() => import('@/components/map-layers/map-legend-inner-s2d'));
+import type { MapLegendForecastS2D } from '@/components/map-layers/map-legend-forecast-s2d';
+import type { MapLegendCommon, MapLegendCommonProps } from '@/components/map-layers/map-legend-common';
+
+const LazyMapLegendForecastS2D = lazy<MapLegendForecastS2D>(() => import('@/components/map-layers/map-legend-forecast-s2d'));
+const LazyMapLegendCommon = lazy<React.MemoExoticComponent<MapLegendCommon>>(() => import('@/components/map-layers/map-legend-common'));
 
 
 const MapLegend: React.FC = () => {
@@ -52,7 +55,8 @@ const MapLegend: React.FC = () => {
 	const variableName = climateVariable?.getTitle();
 
 	// Whether to show the regular legend or the S2D forecast legend
-	const showForecastLegend = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
+	const showForecastLegendOfS2D = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
+	const showClimatologyLegendOfS2D = isS2D && forecastDisplay == ForecastDisplays.CLIMATOLOGY;
 
 	// For the default colour palette, isCategorical defaults to the default legend's type
 	if ((colourScheme === null || colourScheme === 'default') && legendData && legendData.Legend) {
@@ -115,14 +119,14 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
-		if (showForecastLegend) {
+		if (showForecastLegendOfS2D) {
 			rootRef.current.render(
 				<MapLegendOpenControl
 					isOpen={isOpen}
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 				>
 					<Suspense fallback={'...'}>
-						<LazyMapLegendInnerS2D
+						<LazyMapLegendForecastS2D
 							data={colorMap}
 							variableName={variableName}
 							forecastType={forecastType}
@@ -135,19 +139,35 @@ const MapLegend: React.FC = () => {
 
 		const colourType = colorMap.type;
 
+		let title: MapLegendCommonProps['title'] = void 0;
+		let tooltipContents: MapLegendCommonProps['tooltipContents'] = void 0;
+		if (showClimatologyLegendOfS2D) {
+			// Thus far, only in the situation of S2D Climatology we've needed a title and tooltip.
+			title = __('Historical median');
+			tooltipContents = __('Historical median from the 1991 to 2020 historical climatology.');
+		}
+
 		rootRef.current.render(
-			<MapLegendControl
-				data={colorMap}
-				opacity={mapData}
+			<MapLegendOpenControl
 				isOpen={isOpen}
 				toggleOpen={() => setIsOpen((prev) => !prev)}
-				isCategorical={isCategorical}
-				isDelta={isDelta}
-				colourType={colourType}
-				unit={unit}
-				legendConfig={legendConfig}
-				locale={locale}
-			/>
+				width={100}
+			>
+				<Suspense fallback={'...'}>
+					<LazyMapLegendCommon
+						data={colorMap}
+						opacity={mapData}
+						isCategorical={isCategorical}
+						isDelta={isDelta}
+						colourType={colourType}
+						unit={unit}
+						legendConfig={legendConfig}
+						locale={locale}
+						title={title}
+						tooltipContents={tooltipContents}
+					/>
+					</Suspense>
+			</MapLegendOpenControl>
 		);
 	}, [
 		colorMap,
@@ -158,8 +178,9 @@ const MapLegend: React.FC = () => {
 		isDelta,
 		unit,
 		locale,
-		showForecastLegend,
 		forecastType,
+		showForecastLegendOfS2D,
+		showClimatologyLegendOfS2D,
 	]);
 
 	return null;

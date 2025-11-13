@@ -16,7 +16,7 @@ import type { ColourQuantitiesMap } from '@/types/types';
 // ============================================================================
 
 /**
- * Example ColourMap for single-gradient discrete legend (STANDARD FORMAT - MOST COMMON).
+ * Example ColourMap for single-gradient legend (STANDARD FORMAT - MOST COMMON).
  *
  * This is the PRIMARY format used throughout the application for most climate data visualizations.
  * It represents a single continuous or discrete color scale WITHOUT groupings.

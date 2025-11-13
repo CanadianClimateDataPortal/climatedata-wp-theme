@@ -604,8 +604,8 @@ export interface ColourMap {
 /**
  * Essential colour-to-quantity mapping extracted from ColourMap.
  *
- * Contains only the fields actually used for legend transformations and rendering,
- * excluding legacy/unused metadata fields (`type`, `isDivergent`).
+ * Contains the subset of ColourMap fields which are generally enough for legend
+ * transformations and rendering.
  *
  * @property colours - Hex color codes in order
  * @property quantities - Numeric values corresponding to each color

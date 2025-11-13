@@ -144,20 +144,18 @@ export const MapLegendInnerS2D = (
 	} = props;
 
 	const transformed = transformColorMapToMultiBandLegend(colorMap);
-	if (transformed && transformed?.rows) {
-		if (transformed.rows.length === 3) {
-			// We know it's for Forecast
-			data = transformed;
-			// There's probably a better way to do this
-			Reflect.set(data.rows?.[0], 'label', 'Above');
-			Reflect.set(data.rows?.[1], 'label', 'Near');
-			Reflect.set(data.rows?.[2], 'label', 'Below');
-		} else if (transformed.rows.length === 2) {
-			// We know it's climatology
-			data = transformed;
-			Reflect.set(data.rows?.[0], 'label', 'Unusually high');
-			Reflect.set(data.rows?.[1], 'label', 'Unusually low');
-		}
+	if (transformed.rows.length === 3) {
+		// We know it's for Forecast
+		data = transformed;
+		// There's probably a better way to do this
+		Reflect.set(data.rows?.[0], 'label', 'Above');
+		Reflect.set(data.rows?.[1], 'label', 'Near');
+		Reflect.set(data.rows?.[2], 'label', 'Below');
+	} else if (transformed.rows.length === 2) {
+		// We know it's climatology
+		data = transformed;
+		Reflect.set(data.rows?.[0], 'label', 'Unusually high');
+		Reflect.set(data.rows?.[1], 'label', 'Unusually low');
 	}
 
 	const probabilityStatement: ProbabilityStatementProps = {
@@ -167,27 +165,6 @@ export const MapLegendInnerS2D = (
 			: 'above, near, or below normal',
 		forecastType,
 	};
-
-	let errorMessage: string | undefined
-	const scaleLength = (data?.scale ?? []).length;
-	if (scaleLength > 0) {
-		const rowsLengthMustBe = scaleLength - 1;
-		for (const [idx, row] of (data?.rows ?? []).entries()) {
-			const { colors = [] } = row ?? {};
-			const curLen = colors.length;
-			if (curLen > 0 && curLen !== rowsLengthMustBe) {
-				const message = `
-					Inconsistency error at row index ${idx}:
-					We're expecting to have exactly ${rowsLengthMustBe}
-					and we got an array of ${curLen} color codes
-				`
-					.replace(/(\n|\s){2,}/g, ' ')
-					.trim();
-				console.error(message);
-				errorMessage = message;
-			}
-		}
-	}
 
 	// Table heading on the left
 	const labelWidth = 78; // px
@@ -203,10 +180,6 @@ export const MapLegendInnerS2D = (
 
 	// To make sure no collisions with IDs
 	const prefix = useMemo(() => nanoid(4), []);
-
-	if (errorMessage) {
-		return (<div title={errorMessage}>&hellip;</div>);
-	}
 
 	return (
 		<div className="w-full px-2 pt-3 font-sans">

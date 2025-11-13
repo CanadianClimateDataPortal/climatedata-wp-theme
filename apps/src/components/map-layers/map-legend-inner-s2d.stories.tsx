@@ -1,13 +1,21 @@
+import React from 'react';
+
 import {
 	type Story,
 	type StoryDefault,
 } from '@ladle/react';
 
 import {
+	type ColourQuantitiesMap,
+} from '@/types/types';
+
+import {
 	LadleMockLocaleProvider,
 	createLadleMockLocaleStoryArgTypes,
 	type StoryWithLocale,
 } from '@/lib/ladle';
+
+import { EXAMPLE_COLOR_MAP_S2D_MULTIBAND } from '@/hooks/use-color-map.examples';
 
 import MapLegendInnerS2D from '@/components/map-layers/map-legend-inner-s2d';
 
@@ -39,18 +47,30 @@ const translatedFrench = {
 	Below: 'En dessous',
 };
 
-export const StoryAlpha: Story<StoryWithLocale> = ({ locale = 'en' }) => {
+interface MapLegendInnerStory extends StoryWithLocale {
+	data: ColourQuantitiesMap;
+}
+
+export const StoryAlpha: Story<MapLegendInnerStory> = ({
+	locale,
+	data,
+}) => {
 	return (
 		<LadleMockLocaleProvider
 			locale={locale}
 			translatedFrench={translatedFrench}
 		>
-			<MapLegendInnerS2D />
+			<MapLegendInnerS2D data={data} />
 		</LadleMockLocaleProvider>
 	);
 };
 
 StoryAlpha.storyName = 'Using a table';
+
+StoryAlpha.args = {
+	data: EXAMPLE_COLOR_MAP_S2D_MULTIBAND,
+	locale: 'en',
+};
 
 StoryAlpha.argTypes = {
 	...createLadleMockLocaleStoryArgTypes(),

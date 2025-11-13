@@ -3,182 +3,42 @@ import { nanoid } from 'nanoid';
 import { sprintf } from '@wordpress/i18n';
 
 import { __ } from '@/context/locale-provider';
-import { getOrdinalSuffix } from '@/lib/format';
 import TooltipWidget from '@/components/ui/tooltip-widget';
+import { type DefinitionItem, DefinitionList } from '@/components/ui/definition-list';
+import { type ColourQuantitiesMap } from '@/types/types';
+import {
+	ForecastTypes,
+	type ForecastType,
+} from '@/types/climate-variable-interface';
 
-/**
- * Single row in a probability visualization showing one forecast category
- */
-export interface ProbabilityVisualizationRow {
-	/**
-	 * Category label for this probability band
-	 *
-	 * @example 'Above', 'Near', 'Below'
-	 */
-	label: string;
-
-	/**
-	 * Hexadecimal color codes for each segment, length must equal `scale.length - 1`
-	 *
-	 * Each color represents one interval between adjacent scale values
-	 *
-	 * @example
-	 * ```
-	 * { colors: ['#FDD0BB', '#FBAD94', '#F88B6E'] }
-	 * ```
-	 */
-	colors: string[];
-}
-
-/**
- * Complete probability visualization data
- *
- * Contains scale boundaries and color-coded probability bands for multiple categories
- */
-export type ProbabilityVisualization = {
-	/**
-	 * Boundary values defining probability ranges
-	 *
-	 * @example [40, 50, 60, 70, 80, 90, 100]
-	 * @see {@link ProbabilityVisualizationRow.colors} - Must have length equal to `scale.length - 1`
-	 */
-	scale: number[];
-
-	/**
-	 * Probability categories with their respective color gradients
-	 *
-	 * @remarks
-	 * Constraint: Each row's `colors` array length must equal `scale.length - 1`
-	 */
-	rows: ProbabilityVisualizationRow[];
-};
+import {
+	transformColorMapToMultiBandLegend,
+	type MultiBandLegend,
+} from '@/lib/multi-band-legend';
 
 /**
  * Props for component contextual information to rendering a probability forecast statement
  */
 interface ProbabilityStatementProps {
 	/**
-	 * Climate variable being forecasted
+	 * Climate variable being shown
 	 *
 	 * @example 'total precipitation', 'mean temperature'
 	 */
 	variableName: string;
 
 	/**
-	 * Qualitative description of the forecasted outcome
+	 * Qualitative description
 	 *
 	 * @example 'unusually high or low', 'above normal'
 	 */
 	outcome: string;
 
 	/**
-	 * Locale for number formatting and translations
+	 * The type of forecast being described
 	 */
-	locale: Intl.LocalesArgument;
+	forecastType?: ForecastType | null;
 }
-
-/**
- * Single row in the probability statement tooltip explaining percentile thresholds
- *
- * Describes what each probability category means in terms of historical distribution
- *
- * @example
- * Renders as: "Unusually high: Above the 80th percentile (top fifth of historical data)"
- */
-interface ProbabilityStatementTooltipRow {
-	/**
-	 * Percentile threshold value (0-100)
-	 *
-	 * @example 80 for "80th percentile"
-	 */
-	value: number;
-
-	/**
-	 * User-facing category label
-	 *
-	 * @example 'Unusually high', 'Above normal'
-	 */
-	label: string;
-
-	/**
-	 * Template string with `%s` placeholder for percentile value
-	 *
-	 * @example 'Above the %s percentile' becomes "Above the 80th percentile"
-	 */
-	text: string;
-
-	/**
-	 * Explanatory clarification in parentheses
-	 *
-	 * @example 'top fifth of historical data', 'middle three-fifths'
-	 */
-	parens: string;
-}
-
-// BEGIN: HARDCODED DATA
-const S2D_HARDCODED_LEGEND_DATA: ProbabilityVisualization = {
-	scale: [40, 50, 60, 70, 80, 90, 100],
-	rows: [
-		{
-			label: 'Above',
-			colors: [
-				'#FDD0BB',
-				'#FBAD94',
-				'#F88B6E',
-				'#F26A49',
-				'#E54E29',
-				'#C73518',
-			], // (coral gradient)
-		},
-		{
-			label: 'Near',
-			colors: [
-				'#E5E5E5',
-				'#D0D0D0',
-				'#BABABA',
-				'#A5A5A5',
-				'#8F8F8F',
-				'#7A7A7A',
-			], //  (gray gradient)
-		},
-		{
-			label: 'Below',
-			colors: [
-				'#D4E8F5',
-				'#B5D9EE',
-				'#96CAE7',
-				'#77BBE0',
-				'#58ACD9',
-				'#3A9DD2',
-			], // (blue gradient)
-		},
-	],
-};
-const S2D_HARDCODED_LEGEND_VAR_NAME = 'total precipitation';
-const S2D_HARDCODED_LEGEND_OUTCOME = 'unusually high or low';
-const S2D_HARDCODED_STMT_ROW_1_VALUE = 80;
-const S2D_HARDCODED_STMT_ROW_2_VALUE = 20;
-const S2D_HARDCODED_STMT_ROWS: ProbabilityStatementTooltipRow[] = [
-	{
-		// Unusually high: Above the 80th percentile (top fifth of historical data)
-		value: S2D_HARDCODED_STMT_ROW_1_VALUE,
-		label: 'Unusually high',
-		text: 'Above the %s percentile',
-		parens: 'top fifth of historical data',
-	},
-	{
-		// Unusually low: Below the 20th percentile (bottom fifth of historical data)
-		value: S2D_HARDCODED_STMT_ROW_2_VALUE,
-		label: 'Unusually low',
-		text: 'Below the %s percentile',
-		parens: 'bottom fifth of historical data',
-	},
-];
-const S2D_HARDCODED_STMT_ROWS_LAST_LINE = __(
-	'If the probability is below 30%, no single outcome is significantly more likely ' +
-		'than the others, and the climatology should be used instead.'
-);
-// END: HARDCODED DATA
 
 /**
  * Renders the introductory probability statement for forecast tooltips.
@@ -189,12 +49,10 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 	const {
 		variableName,
 		outcome,
-		locale,
+		forecastType,
 	} = props;
-	const statementRows = S2D_HARDCODED_STMT_ROWS;
-	const afterStatementRows = S2D_HARDCODED_STMT_ROWS_LAST_LINE;
 
-	const firstLine = sprintf(
+	const beforeStatement = sprintf(
 		__(
 			'%s: probability that this variable will be %s relative to the 1991 to 2020 historical climatology.'
 		),
@@ -202,76 +60,111 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 		__(outcome),
 	);
 
-	const renderRow = (
-		v: ProbabilityStatementTooltipRow,
-		idx: number,
-	): JSX.Element => {
-		const { value, label, text, parens } = v;
-		const formattedValue = value + getOrdinalSuffix(value, locale);
-		return (
-			<div key={idx} className="space-y-0.5">
-				<dt className="font-semibold text-gray-900">{__(label)}</dt>
-				<dd className="text-gray-700">
-					{sprintf(__(text), formattedValue)}
-					{parens && (
-						<span className="ml-1 text-gray-600">
-							({__(parens)})
-						</span>
-					)}
-				</dd>
-			</div>
+	const statementRows: DefinitionItem[] = [];
+	let afterStatementParagraph: string | undefined;
+
+	if (forecastType === ForecastTypes.EXPECTED) {
+		statementRows.push({
+			term: __('Above normal'),
+			details: __('Above the 66th percentile (upper third of historical data)'),
+		});
+		statementRows.push({
+			term: __('Near normal'),
+			details: __('Between the 33rd and 66th percentiles (middle third of historical data)'),
+		});
+		statementRows.push({
+			term: __('Below normal'),
+			details: __('Below the 33rd percentile (lower third of historical data)'),
+		});
+		afterStatementParagraph = sprintf(
+			__(
+			'If the probability is below %s, no single outcome is significantly more likely ' +
+				'than the others, and the climatology should be used instead.'
+			),
+			'40%',
 		);
-	};
+	} else if (forecastType === ForecastTypes.UNUSUAL) {
+		statementRows.push({
+			term: __('Unusually high'),
+			details: __('Above the 80th percentile (top fifth of historical data)'),
+		});
+		statementRows.push({
+			term: __('Unusually low'),
+			details: __('Below the 20th percentile (bottom fifth of historical data)'),
+		});
+		afterStatementParagraph = sprintf(
+			__(
+			'If the probability is below %s, no single outcome is significantly more likely ' +
+				'than the others, and the climatology should be used instead.'
+			),
+			'30%',
+		);
+	}
 
 	return (
 		<div className="space-y-3 text-sm leading-relaxed">
-			<p>{firstLine}</p>
-			{statementRows.length > 0 ? (
-				<dl className="pl-3 space-y-2 border-l-2 border-gray-300">
-					{statementRows.map((v, idx) => renderRow(v, idx))}
-				</dl>
-			) : (
-				void 0
+			<p>{beforeStatement}</p>
+
+			{statementRows.length > 0 && (
+				<DefinitionList
+					items={statementRows}
+					className="pl-3 space-y-2"
+				/>
 			)}
-			{afterStatementRows && <p>{__(afterStatementRows)}</p>}
+
+			{afterStatementParagraph && <p>{afterStatementParagraph}</p>}
 		</div>
 	);
 };
 
-export const MapLegendInnerS2D = () => {
-	const data = S2D_HARDCODED_LEGEND_DATA;
 
-	/**
-	 * Code-Review note: For some reason, we can't use useLocale because the present component says it can't find it. @TODO
-	 */
-	const { lang = 'fr' } = window.document.documentElement as {
-		lang: Intl.LocalesArgument;
+export interface MapLegendInnerS2DProps {
+	data: ColourQuantitiesMap;
+	forecastType?: ForecastType | null;
+	variableName?: string | null;
+}
+
+export type MapLegendInnerS2D = typeof MapLegendInnerS2D;
+
+export const MapLegendInnerS2D = (
+	props: MapLegendInnerS2DProps
+) => {
+
+	let data: MultiBandLegend = {
+		rows: [
+			{ label: '', colors: [] },
+		],
+		scale: [],
 	};
+
+	const {
+		data: colorMap,
+		variableName,
+		forecastType,
+	} = props;
+
+	const transformed = transformColorMapToMultiBandLegend(colorMap);
+	if (transformed.rows.length === 3) {
+		// We know it's for Forecast
+		data = transformed;
+		// There's probably a better way to do this
+		Reflect.set(data.rows?.[0], 'label', 'Above');
+		Reflect.set(data.rows?.[1], 'label', 'Near');
+		Reflect.set(data.rows?.[2], 'label', 'Below');
+	} else if (transformed.rows.length === 2) {
+		// We know it's climatology
+		data = transformed;
+		Reflect.set(data.rows?.[0], 'label', 'Unusually high');
+		Reflect.set(data.rows?.[1], 'label', 'Unusually low');
+	}
 
 	const probabilityStatement: ProbabilityStatementProps = {
-		variableName: S2D_HARDCODED_LEGEND_VAR_NAME,
-		outcome: S2D_HARDCODED_LEGEND_OUTCOME,
-		locale: lang,
+		variableName: variableName ?? '',
+		outcome: forecastType === ForecastTypes.UNUSUAL
+			? 'unusually high or low'
+			: 'above, near, or below normal',
+		forecastType,
 	};
-
-	let errorMessage: string | undefined
-	const scaleLength = data.scale.length;
-	const rowsLengthMustBe = scaleLength - 1;
-	for (const [idx, row] of (data?.rows ?? []).entries()) {
-		const { colors } = row;
-		const curLen = colors.length;
-		if (curLen !== rowsLengthMustBe) {
-			const message = `
-				Inconsistency error at row index ${idx}:
-				We're expecting to have exactly ${rowsLengthMustBe}
-				and we got an array of ${curLen} color codes
-			`
-				.replace(/(\n|\s){2,}/g, ' ')
-				.trim();
-			console.error(message);
-			errorMessage = message;
-		}
-	}
 
 	// Table heading on the left
 	const labelWidth = 78; // px
@@ -288,14 +181,13 @@ export const MapLegendInnerS2D = () => {
 	// To make sure no collisions with IDs
 	const prefix = useMemo(() => nanoid(4), []);
 
-	if (errorMessage) {
-		return (<div title={errorMessage}>&hellip;</div>)
-	}
-
 	return (
-		<div className="w-full font-sans px-2 pt-3">
+		<div className="w-full px-2 pt-3 font-sans">
 			{/* Header */}
-			<header className="flex justify-center mb-1" id={prefix + '-legend-header'}>
+			<header
+				className="flex justify-center mb-1"
+				id={prefix + '-legend-header'}
+			>
 				<span className="mr-1 text-sm font-medium leading-none whitespace-nowrap text-cdc-black">
 					{__('Probability') + ' (%)'}
 				</span>
@@ -407,11 +299,20 @@ export const MapLegendInnerS2D = () => {
 				</thead>
 
 				<tbody>
-					{data.rows.map((row, idx) => {
-						const rowId = row.label
+					{data.rows.map((props, idx) => {
+						const { label = '', colors = [] } = props;
+						const rowId = label
 							.toLowerCase()
 							.replace(/\s+/g, '-');
 						const isFirst = idx === 0;
+
+						if (colors.length < 1) {
+							return (
+								<tr>
+									<th>&nbsp;</th>
+								</tr>
+							)
+						}
 
 						const style: React.CSSProperties = {
 							height: 40,
@@ -435,9 +336,9 @@ export const MapLegendInnerS2D = () => {
 									scope="row"
 									className="pr-2 text-sm font-normal text-right align-middle"
 								>
-									{__(row.label)}
+									{__(label)}
 								</th>
-								{row.colors.map((color, idx, arr) => {
+								{colors.map((color, idx, arr) => {
 									const startBoundary = data.scale[idx];
 									const endBoundary = data.scale[idx + 1];
 									const isFirst = idx === 0;

@@ -143,7 +143,7 @@ function ladle-apps {
     echo "Starting Ladle development server..."
     _docker_compose exec -w /app/apps/ task-runner bash -c '
       echo "Starting Ladle on http://localhost:61000"
-      npm exec ladle dev --host 0.0.0.0 --port 61000 --stories "src/**/*.stories.tsx"
+      npx ladle dev --host 0.0.0.0 --port 61000 --stories "src/**/*.stories.tsx"
     '
   )
 }

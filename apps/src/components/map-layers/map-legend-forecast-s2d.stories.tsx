@@ -6,14 +6,19 @@ import {
 } from '@ladle/react';
 
 import {
-	type ColourQuantitiesMap,
-} from '@/types/types';
-
-import {
 	LadleMockLocaleProvider,
 	createLadleMockLocaleStoryArgTypes,
 	type StoryWithLocale,
 } from '@/lib/ladle';
+
+import {
+	type ColourQuantitiesMap,
+} from '@/types/types';
+
+import {
+	ForecastTypes,
+	type ForecastType,
+} from '@/types/climate-variable-interface';
 
 import { EXAMPLE_COLOR_MAP_S2D_MULTIBAND } from '@/hooks/use-color-map.examples';
 
@@ -48,19 +53,29 @@ const translatedFrench = {
 };
 
 interface MapLegendInnerStory extends StoryWithLocale {
+	translatedFrench: Record<string, string>;
 	data: ColourQuantitiesMap;
+	forecastType?: ForecastType;
+	variableName?: string | null;
 }
 
 export const StoryAlpha: Story<MapLegendInnerStory> = ({
-	locale,
 	data,
+	forecastType,
+	locale,
+	translatedFrench,
+	variableName = null,
 }) => {
 	return (
 		<LadleMockLocaleProvider
 			locale={locale}
 			translatedFrench={translatedFrench}
 		>
-			<MapLegendForecastS2D data={data} />
+			<MapLegendForecastS2D
+				data={data}
+				forecastType={forecastType}
+				variableName={variableName}
+			/>
 		</LadleMockLocaleProvider>
 	);
 };
@@ -69,9 +84,18 @@ StoryAlpha.storyName = 'Default';
 
 StoryAlpha.args = {
 	data: EXAMPLE_COLOR_MAP_S2D_MULTIBAND,
+	forecastType: ForecastTypes.EXPECTED,
 	locale: 'en',
+	translatedFrench,
+	variableName: 'Air Temperature',
 };
 
 StoryAlpha.argTypes = {
 	...createLadleMockLocaleStoryArgTypes(),
+	forecastType: {
+		options: Object.values(ForecastTypes),
+		control: {
+			type: 'select',
+		},
+	},
 };

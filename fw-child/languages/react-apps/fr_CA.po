@@ -1348,3 +1348,9 @@ msgstr "Sous la normale"
 
 msgid "Between the 33rd and 66th percentiles (middle third of historical data)"
 msgstr "Entre le 33e et le 66e centile (tiers central des données historiques)"
+
+msgid "Historical median from the 1991 to 2020 historical climatology."
+msgstr "Médiane historique provenant de la climatologie historique de 1991 à 2020."
+
+msgid "Historical median"
+msgstr "Médiane historique"

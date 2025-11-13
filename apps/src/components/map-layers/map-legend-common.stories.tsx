@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
 	type Story,
 	type StoryDefault,
@@ -79,8 +81,6 @@ export const StoryAlpha: Story<MapLegendControlStory> = ({
 };
 
 StoryAlpha.storyName = 'Default';
-
-
 
 StoryAlpha.args = {
 	isDelta: true,

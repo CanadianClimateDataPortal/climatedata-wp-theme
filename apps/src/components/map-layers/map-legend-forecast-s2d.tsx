@@ -127,7 +127,7 @@ export type MapLegendForecastS2D = typeof MapLegendForecastS2D;
 
 export const MapLegendForecastS2D = (
 	props: MapLegendForecastS2DProps
-): JSX.Element => {
+) => {
 
 	let data: MultiBandLegend = {
 		rows: [

@@ -142,10 +142,9 @@ const MapLegend: React.FC = () => {
 		let title: MapLegendCommonProps['title'] = void 0
 		let tooltipContents: MapLegendCommonProps['tooltipContents'] = void 0
 		if (showClimatologyLegendOfS2D) {
-			// Thus far, only in the situation of S2D Climatology we've needed a legend.
+			// Thus far, only in the situation of S2D Climatology we've needed a title and tooltip.
 			title = __('Historical median');
-			// tooltipContents = 'Hardcoded Tooltip Text Content';
-			tooltipContents = void 0; // Because we do not know yet the text
+			tooltipContents = __('Historical median from the 1991 to 2020 historical climatology.');
 		}
 
 		rootRef.current.render(

@@ -75,7 +75,7 @@ export type MapLegendCommon = typeof MapLegendCommon;
 
 export const MapLegendCommon = (
 	props: MapLegendCommonProps
-): JSX.Element => {
+) => {
 	const {
 		data,
 		opacity,

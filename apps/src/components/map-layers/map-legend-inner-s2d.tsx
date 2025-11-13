@@ -121,6 +121,7 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 export interface MapLegendInnerS2DProps {
 	data: ColourQuantitiesMap;
 	forecastType?: ForecastType | null;
+	variableName?: string | null;
 }
 
 export type MapLegendInnerS2D = typeof MapLegendInnerS2D;
@@ -138,6 +139,7 @@ export const MapLegendInnerS2D = (
 
 	const {
 		data: colorMap,
+		variableName,
 		forecastType,
 	} = props;
 
@@ -159,8 +161,10 @@ export const MapLegendInnerS2D = (
 	}
 
 	const probabilityStatement: ProbabilityStatementProps = {
-		variableName: 'total precipitation',
-		outcome: 'unusually high or low',
+		variableName: variableName ?? '',
+		outcome: forecastType === ForecastTypes.UNUSUAL
+			? 'unusually high or low'
+			: 'above, near, or below normal',
 		forecastType,
 	};
 

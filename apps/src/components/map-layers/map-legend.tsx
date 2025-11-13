@@ -49,6 +49,7 @@ const MapLegend: React.FC = () => {
 	const isS2D = climateVariable instanceof S2DClimateVariable;
 	const forecastDisplay = climateVariable?.getForecastDisplay();
 	const forecastType = climateVariable?.getForecastType();
+	const variableName = climateVariable?.getTitle();
 
 	// Whether to show the regular legend or the S2D forecast legend
 	const showForecastLegend = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
@@ -123,6 +124,7 @@ const MapLegend: React.FC = () => {
 					<Suspense fallback={'...'}>
 						<LazyMapLegendInnerS2D
 							data={colorMap}
+							variableName={variableName}
 							forecastType={forecastType}
 						/>
 					</Suspense>

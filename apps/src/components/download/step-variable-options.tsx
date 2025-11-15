@@ -6,7 +6,9 @@ import {
 } from '@/components/download/step-container';
 import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-download-fields";
 import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
+import { ForecastTypeFields } from '@/components/download/ui/s2d-fields';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useDatasetHelperS2D } from '@/hooks/use-dataset-helper-s2d';
 import { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
 import { dateFormatCheck } from '@/lib/utils';
 
@@ -16,11 +18,14 @@ import { dateFormatCheck } from '@/lib/utils';
 const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { climateVariable } = useClimateVariable();
 
+	const { isS2D } = useDatasetHelperS2D();
+
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
 			if (!climateVariable) {
 				return false;
 			}
+
 
 			const version = climateVariable.getVersion() ?? true;
 			const fields = climateVariable.getAnalysisFields() ?? [];
@@ -76,12 +81,18 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 	const analysisFields = !!climateVariable?.getAnalysisFields()?.length;
 	const version = !!climateVariable?.getVersions()?.length;
 
-	return (
-		<StepContainer title={__('Set your variable options')}>
-			<StepContainerDescription>
-				{__('Set options to adjust your variable to your needs.')}
-			</StepContainerDescription>
-			<div className="gap-4">
+	let Inner: React.ReactElement = <></>;
+	if (isS2D) {
+		Inner = (
+			<>
+				<div className="mb-8">
+					<ForecastTypeFields />
+				</div>
+			</>
+		);
+	} else {
+		Inner = (
+			<>
 				{version && (
 					<div className="mb-8">
 						<VersionDownloadFields />
@@ -93,6 +104,17 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 					<AnalyzedDownloadFields />
 				</div>
 				)}
+			</>
+		);
+	}
+
+	return (
+		<StepContainer title={__('Set your variable options')}>
+			<StepContainerDescription>
+				{__('Set options to adjust your variable to your needs.')}
+			</StepContainerDescription>
+			<div className="gap-4">
+				{Inner}
 			</div>
 		</StepContainer>
 	);

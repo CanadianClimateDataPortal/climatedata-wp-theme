@@ -6,7 +6,9 @@ import {
 } from '@/components/download/step-container';
 import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-download-fields";
 import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
+import { ForecastDisplayFieldDropdown } from '@/components/fields/forecast';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import useS2D from '@/hooks/use-s2d';
 import { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
 import { dateFormatCheck } from '@/lib/utils';
 
@@ -15,6 +17,8 @@ import { dateFormatCheck } from '@/lib/utils';
  */
 const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { climateVariable } = useClimateVariable();
+
+	const { isS2DVariable: isS2D } = useS2D();
 
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
@@ -68,9 +72,18 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				payload.analysisFieldValues = {};
 			}
 
+			if (isS2D) {
+				if (climateVariable.getForecastDisplay()?.length) {
+					payload.forecastDisplay = ForecastDisplayFieldDropdown.DEFAULT_VALUE;
+				}
+			}
+
 			return payload;
 		}
-	}), [climateVariable]);
+	}), [
+		climateVariable,
+		isS2D,
+	]);
 
 	// Determine if there are any analysis fields to display.
 	const analysisFields = !!climateVariable?.getAnalysisFields()?.length;
@@ -82,16 +95,25 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				{__('Set options to adjust your variable to your needs.')}
 			</StepContainerDescription>
 			<div className="gap-4">
-				{version && (
-					<div className="mb-8">
-						<VersionDownloadFields />
-					</div>
-				)}
-
-				{analysisFields && (
-					<div className="mb-8">
-					<AnalyzedDownloadFields />
-				</div>
+				{isS2D ? (
+					<>
+						<div className="mb-8">
+							<ForecastDisplayFieldDropdown />
+						</div>
+					</>
+				) : (
+					<>
+						{version && (
+							<div className="mb-8">
+								<VersionDownloadFields />
+							</div>
+						)}
+						{analysisFields && (
+							<div className="mb-8">
+							<AnalyzedDownloadFields />
+						</div>
+						)}
+					</>
 				)}
 			</div>
 		</StepContainer>

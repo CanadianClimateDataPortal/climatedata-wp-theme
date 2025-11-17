@@ -12,6 +12,18 @@ import { fetchS2DReleaseDate } from '@/services/services';
 import { utc } from '@/lib/utils';
 import { ClimateVariableInterface } from '@/types/climate-variable-interface';
 
+
+export type UseS2DHook = {
+	/**
+	 * Check whether the instance of {@see ClimateVariableInterface} is an {@see S2DClimateVariable}.
+	 */
+	isS2DVariable: boolean | null;
+	/**
+	 * The current S2D dataset release date.
+	 */
+	releaseDate: Date | null;
+};
+
 /**
  * Generate a unique release date key for a climate variable and its selected
  * frequency.
@@ -39,7 +51,7 @@ function generateReleaseDateKey(
  * S2D variable, nothing happens. It can thus be included even if a non-S2D
  * variable is selected.
  */
-export const useS2D = () => {
+export const useS2D = (): UseS2DHook => {
 	const dispatch = useAppDispatch();
 	const { climateVariable } = useClimateVariable();
 
@@ -152,5 +164,10 @@ export const useS2D = () => {
 			: null;
 	}, [releaseDateKey, cachedReleaseDate]);
 
-	return { releaseDate };
+	return {
+		releaseDate,
+		isS2DVariable,
+	};
 };
+
+export default useS2D;

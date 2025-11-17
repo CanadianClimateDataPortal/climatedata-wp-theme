@@ -21,7 +21,7 @@ import {
 import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
-import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import { useS2D } from '@/hooks/use-s2d';
 
 import type { MapLegendForecastS2D } from '@/components/map-layers/map-legend-forecast-s2d';
 import type { MapLegendCommon, MapLegendCommonProps } from '@/components/map-layers/map-legend-common';
@@ -49,7 +49,7 @@ const MapLegend: React.FC = () => {
 		climateVariable?.getLegendConfig(isDelta ? MapDisplayType.DELTA : MapDisplayType.ABSOLUTE) ??
 		undefined;
 	let isCategorical = climateVariable?.getColourType() !== ColourType.CONTINUOUS;
-	const isS2D = climateVariable instanceof S2DClimateVariable;
+	const { isS2DVariable: isS2D } = useS2D();
 	const forecastDisplay = climateVariable?.getForecastDisplay();
 	const forecastType = climateVariable?.getForecastType();
 	const variableName = climateVariable?.getTitle();

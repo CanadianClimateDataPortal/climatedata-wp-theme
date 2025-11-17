@@ -1640,7 +1640,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
 		id: 's2d_precip_accum',
 		class: 'S2DClimateVariable',
-		unit: 'mm',
+		unit: 'mm/day',
 		legendConfigs: {
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,

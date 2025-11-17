@@ -1,12 +1,51 @@
 import { S2D_NB_PERIODS } from '@/lib/constants';
 import {
 	ClimateVariableInterface,
+	ForecastType,
+	ForecastTypes,
 	FrequencyType,
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 import { formatUTCDate, utc } from '@/lib/utils';
+import { __ } from '@/context/locale-provider';
 
 export type PeriodRange = [Date, Date];
+
+export interface LocationS2DData {
+	cutoff_unusually_low_p20: number;
+	cutoff_below_normal_p33: number;
+	historical_median_p50: number;
+	cutoff_above_normal_p66: number;
+	cutoff_unusually_high_p80: number;
+	prob_unusually_low: number;
+	prob_below_normal: number;
+	prob_near_normal: number;
+	prob_above_normal: number;
+	prob_unusually_high: number;
+	skill_level: number;
+	skill_CRPSS: number;
+}
+
+/**
+ * For a period start return the end date of the period based on the frequency.
+ *
+ * For "monthly" frequency, the period end is the end of the same month.
+ * For "seasonal", the period end is the end of the 3rd following month.
+ *
+ * @param periodStart - The date representing the start of the period
+ * @param frequency - The frequency for which we want the period end
+ * @returns - The date for the end of the period
+ */
+export function getPeriodEnd(
+	periodStart: Date,
+	frequency: FrequencyType
+): Date {
+	const periodLength = frequency === FrequencyType.SEASONAL ? 3 : 1;
+	const periodEnd = new Date(periodStart);
+	periodEnd.setUTCMonth(periodStart.getUTCMonth() + periodLength);
+	periodEnd.setUTCDate(0);
+	return periodEnd;
+}
 
 /**
  * Return the time periods for a release date and specific frequency.
@@ -41,7 +80,6 @@ export function getPeriods(
 	frequency: S2DFrequencyType,
 ): PeriodRange[] {
 	const nbPeriods = S2D_NB_PERIODS[frequency];
-	const periodLength = frequency === FrequencyType.SEASONAL ? 3 : 1;
 	const periodInterval = 1; // Periods are 1 month apart
 	const periods: [Date, Date][] = [];
 	const lastPeriod = new Date(
@@ -51,10 +89,7 @@ export function getPeriods(
 
 	for (let i = 0; i < nbPeriods; i++) {
 		const periodStart = new Date(lastPeriod);
-
-		const periodEnd = new Date(lastPeriod);
-		periodEnd.setUTCMonth(lastPeriod.getUTCMonth() + periodLength);
-		periodEnd.setUTCDate(0);
+		const periodEnd = getPeriodEnd(periodStart, frequency);
 
 		periods.push([periodStart, periodEnd]);
 
@@ -191,4 +226,18 @@ export function buildSkillLayerTime(
 		1,
 	));
 	return formatUTCDate(layerDate, 'yyyy-MM-dd\'T00:00:00Z\'');
+}
+
+/**
+ * Return the translated display name for a S2D forecast type.
+ *
+ * @param forecastType - The forecast type to translate.
+ */
+export function getForecastTypeName(forecastType: ForecastType): string {
+	const nameMap = {
+		[ForecastTypes.EXPECTED]: __('Expected Conditions'),
+		[ForecastTypes.UNUSUAL]: __('Unusual Conditions'),
+	};
+
+	return nameMap[forecastType] ?? (forecastType as string);
 }

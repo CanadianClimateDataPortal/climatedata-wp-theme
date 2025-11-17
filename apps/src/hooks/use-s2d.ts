@@ -98,7 +98,8 @@ export const useS2D = () => {
 		(async () => {
 			try {
 				const releaseDate = await fetchS2DReleaseDate(
-					{ variable, frequency },
+					variable,
+					frequency,
 					{ signal: abortController.signal }
 				);
 				if (!abortController.signal.aborted) {

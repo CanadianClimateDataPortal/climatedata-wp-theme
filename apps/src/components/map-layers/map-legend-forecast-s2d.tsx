@@ -117,17 +117,16 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 	);
 };
 
-
-export interface MapLegendInnerS2DProps {
+export interface MapLegendForecastS2DProps {
 	data: ColourQuantitiesMap;
 	forecastType?: ForecastType | null;
 	variableName?: string | null;
 }
 
-export type MapLegendInnerS2D = typeof MapLegendInnerS2D;
+export type MapLegendForecastS2D = typeof MapLegendForecastS2D;
 
-export const MapLegendInnerS2D = (
-	props: MapLegendInnerS2DProps
+export const MapLegendForecastS2D = (
+	props: MapLegendForecastS2DProps
 ) => {
 
 	let data: MultiBandLegend = {
@@ -386,6 +385,6 @@ export const MapLegendInnerS2D = (
 	);
 };
 
-MapLegendInnerS2D.displayName = 'MapLegendInnerS2D';
+MapLegendForecastS2D.displayName = 'MapLegendForecastS2D';
 
-export default MapLegendInnerS2D;
+export default MapLegendForecastS2D;

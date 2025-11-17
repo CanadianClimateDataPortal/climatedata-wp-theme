@@ -81,7 +81,7 @@ export const EXAMPLE_COLOR_MAP_DISCRETE_SINGLE: ColourQuantitiesMap = {
  *
  * SPECIFIC TO: MapLegendInnerS2D component (`@/components/map-layers/map-legend-inner-s2d`)
  * CONSUMED BY: {@link transformColorMapToMultiBandLegend} → {@link MapLegendInnerS2D}
- * NOT COMPATIBLE WITH: {@link MapLegendControl} or standard single-gradient legends
+ * NOT COMPATIBLE WITH: {@link MapLegendCommon}
  *
  * This represents the transformed response from GeoServer's GetLegendGraphic endpoint
  * for S2D forecasts that require displaying multiple probability bands simultaneously

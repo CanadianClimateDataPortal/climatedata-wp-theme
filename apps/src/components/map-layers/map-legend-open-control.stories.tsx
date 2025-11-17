@@ -17,7 +17,7 @@ const MapLegendExample = () => (
 
 
 export default {
-	title: 'Map Legend Open Control!',
+	title: 'map-layers/map-legend-open-control',
 	// https://ladle.dev/docs/decorators
 	decorators: [
 		(Component) => (
@@ -44,7 +44,7 @@ export const StoryAlpha: Story = () => {
 		</>
 	);
 };
-StoryAlpha.storyName = 'With nothing inside';
+StoryAlpha.storyName = 'Default';
 
 /**
  * With Some Lazy component

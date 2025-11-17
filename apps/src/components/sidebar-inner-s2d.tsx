@@ -12,16 +12,9 @@ import { FrequencyFieldDropdown } from '@/components/fields/frequency';
 
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import {
-	ForecastDisplays,
-	ForecastTypes,
 	FrequencyType,
 } from '@/types/climate-variable-interface';
 import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import {
-	selectLowSkillVisibility,
-	setLowSkillVisibility,
-} from '@/features/map/map-slice';
 
 import { getForecastTypeName } from '@/lib/s2d';
 
@@ -55,33 +48,11 @@ const tooltipTimePeriods = __(
 );
 
 const SidebarInnerS2D = () => {
-	const {
-		climateVariable,
-		setForecastType,
-		setForecastDisplay,
-		setFrequency,
-	} = useClimateVariable();
-
-	const dispatch = useAppDispatch();
-	const isLowSkillMasked = ! useAppSelector(selectLowSkillVisibility());
-	const forecastType =
-		climateVariable?.getForecastType() ?? ForecastTypes.EXPECTED;
-	const forecastDisplay =
-		climateVariable?.getForecastDisplay() ?? ForecastDisplays.FORECAST;
-	const frequency = (climateVariable?.getFrequency() ?? FrequencyType.MONTHLY) as FrequencyType | string;
-
-	const handleLowSkillHideChange = (checked: boolean) => {
-		const isVisible = !checked; // "checked" means "hide low skill"
-		dispatch(setLowSkillVisibility({ visible: isVisible }));
-	};
-
 	return (
 		<>
 			<SidebarMenuItem>
 				<ForecastTypeFieldDropdown
 					tooltip={tooltipForecastTypes}
-					value={forecastType}
-					onChange={setForecastType}
 				/>
 			</SidebarMenuItem>
 
@@ -89,13 +60,9 @@ const SidebarInnerS2D = () => {
 				<div className="flex flex-col gap-4">
 					<ForecastDisplayFieldDropdown
 						tooltip={tooltipForecastDisplay}
-						value={forecastDisplay}
-						onChange={setForecastDisplay}
 					/>
 					<ForecastDisplaySkillFieldCheckbox
 						tooltip={tooltipForecastDisplayLowSkill}
-						value={isLowSkillMasked}
-						onCheckedChange={handleLowSkillHideChange}
 					/>
 				</div>
 			</SidebarMenuItem>
@@ -105,8 +72,6 @@ const SidebarInnerS2D = () => {
 			<SidebarMenuItem>
 				<FrequencyFieldDropdown
 					tooltip={tooltipFrequencies}
-					value={frequency}
-					onChange={setFrequency}
 				/>
 			</SidebarMenuItem>
 

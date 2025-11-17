@@ -1,12 +1,11 @@
 import React from 'react';
 
 import { __ } from '@/context/locale-provider';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 import Dropdown from '@/components/ui/dropdown';
 
-import {
-	FrequencyType,
-} from '@/types/climate-variable-interface';
+import { FrequencyType } from '@/types/climate-variable-interface';
 
 const FrequencyField = {
 	key: 'frequencies',
@@ -19,20 +18,31 @@ const FrequencyField = {
 
 export interface FrequencyFieldDropdownProps {
 	tooltip?: React.ReactNode;
-	value: FrequencyType | string;
-	onChange: (value: FrequencyType | string) => void;
 }
 
 export const FrequencyFieldDropdown = (
-	props: FrequencyFieldDropdownProps
+	props: FrequencyFieldDropdownProps,
 ) => {
+	const {
+		climateVariable,
+		setFrequency,
+	} = useClimateVariable();
+
+	const value = climateVariable?.getFrequency() ?? FrequencyType.MONTHLY;
+
+	const fieldProps = {
+		label: FrequencyField.label,
+		onChange: setFrequency,
+		value,
+		...props,
+	};
+
 	return (
 		<Dropdown<FrequencyType | string>
 			key={FrequencyField.key}
 			placeholder={__('Select an option')}
 			options={FrequencyField.options}
-			label={FrequencyField.label}
-			{...props}
+			{...fieldProps}
 		/>
 	);
 };

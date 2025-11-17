@@ -1,6 +1,13 @@
 import React from 'react';
 
 import { __ } from '@/context/locale-provider';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import {
+	selectLowSkillVisibility,
+	setLowSkillVisibility,
+} from '@/features/map/map-slice';
 
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import Dropdown from '@/components/ui/dropdown';
@@ -33,20 +40,32 @@ const ForecastDisplayField = {
 
 export interface ForecastTypeFieldDropdownProps {
 	tooltip?: React.ReactNode;
-	value: ForecastType;
-	onChange: (value: ForecastType) => void;
 }
 
 export const ForecastTypeFieldDropdown = (
 	props: ForecastTypeFieldDropdownProps
 ) => {
+	const {
+		climateVariable,
+		setForecastType,
+	} = useClimateVariable();
+
+	const value =
+		climateVariable?.getForecastType() ?? ForecastTypes.EXPECTED;
+
+	const fieldProps = {
+		label: ForecastTypeField.label,
+		onChange: setForecastType,
+		options: ForecastTypeField.options,
+		value,
+		...props,
+	};
+
 	return (
 		<Dropdown<ForecastType>
 			key={ForecastTypeField.key}
 			placeholder={__('Select an option')}
-			options={ForecastTypeField.options}
-			label={ForecastTypeField.label}
-			{...props}
+			{...fieldProps}
 		/>
 	);
 };
@@ -56,20 +75,32 @@ ForecastTypeFieldDropdown.DEFAULT_VALUE = ForecastTypes.EXPECTED;
 
 export interface ForecastDisplayFieldDropdownProps {
 	tooltip?: React.ReactNode;
-	value: ForecastDisplay;
-	onChange: (value: ForecastDisplay) => void;
 }
 
 export const ForecastDisplayFieldDropdown = (
 	props: ForecastDisplayFieldDropdownProps
 ) => {
+	const {
+		climateVariable,
+		setForecastDisplay,
+	} = useClimateVariable();
+
+	const value =
+		climateVariable?.getForecastDisplay() ?? ForecastDisplays.FORECAST;
+
+	const fieldProps = {
+		label: ForecastDisplayField.label,
+		onChange: setForecastDisplay,
+		options: ForecastDisplayField.options,
+		value,
+		...props,
+	};
+
 	return (
 		<Dropdown<ForecastDisplay>
 			key={ForecastDisplayField.key}
 			placeholder={__('Select an option')}
-			options={ForecastDisplayField.options}
-			label={ForecastDisplayField.label}
-			{...props}
+			{...fieldProps}
 		/>
 	);
 };
@@ -79,20 +110,35 @@ ForecastDisplayFieldDropdown.DEFAULT_VALUE = ForecastDisplays.FORECAST;
 
 export interface ForecastDisplaySkillFieldCheckboxProps {
 	tooltip?: React.ReactNode;
-	value: boolean;
-	onCheckedChange: (value: boolean) => void;
 }
 
 export const ForecastDisplaySkillFieldCheckbox = (
 	props: ForecastDisplaySkillFieldCheckboxProps
 ) => {
+	const dispatch = useAppDispatch();
+
+	const checked = !useAppSelector(selectLowSkillVisibility());
+	const onCheckedChange = (checked: boolean) => {
+		const isVisible = !checked; // "checked" means "hide low skill"
+		dispatch(setLowSkillVisibility({ visible: isVisible }));
+	};
+
+	const {
+		tooltip,
+		...propsRest
+	} = props;
+	const fieldProps = {
+		checked,
+		onCheckedChange,
+		...propsRest,
+	 };
+
 	return (
 		<div className="flex items-center space-x-2">
 			<Checkbox
 				id={ForecastDisplayField.key + '_compare'}
 				className="text-brand-red"
-				checked={props.value}
-				onCheckedChange={props.onCheckedChange}
+				{...fieldProps}
 			/>
 			<label
 				htmlFor={ForecastDisplayField.key + '_compare'}
@@ -100,10 +146,9 @@ export const ForecastDisplaySkillFieldCheckbox = (
 			>
 				{__('Mask Low Skill')}
 			</label>
-			<TooltipWidget tooltip={props.tooltip} />
+			<TooltipWidget tooltip={tooltip} />
 		</div>
 	);
 };
 
-ForecastDisplaySkillFieldCheckbox.displayName =
-	'ForecastDisplaySkillFieldCheckbox';
+ForecastDisplaySkillFieldCheckbox.displayName = 'ForecastDisplaySkillFieldCheckbox';

@@ -15,7 +15,10 @@ import {
 	getPeriods,
 	type PeriodRange,
 } from '@/lib/s2d';
-import { S2DFrequencyType } from '@/types/climate-variable-interface';
+import {
+	ForecastDisplays,
+	S2DFrequencyType,
+} from '@/types/climate-variable-interface';
 
 export interface TimePeriodsControlS2DProps {
 	tooltip?: React.ReactNode;
@@ -32,10 +35,12 @@ type SliderLabels = {
  *
  * @param periods - The periods to show on the slider.
  * @param locale - Locale to use for formatting.
+ * @param showYears - If false, the year is not shown in the min/max labels.
  */
 const generateSliderLabels = (
 	periods: PeriodRange[] | null,
-	locale: string
+	locale: string,
+	showYears: boolean = true,
 ): SliderLabels => {
 	if (!periods) {
 		return {
@@ -48,15 +53,19 @@ const generateSliderLabels = (
 	const firstPeriod = periods[0][0];
 	const lastPeriod = periods[periods.length - 1][1];
 
-	const minimumLabel = formatShortMonthYear(firstPeriod, locale);
-	const maximumLabel = formatShortMonthYear(lastPeriod, locale);
+	const formatMinMaxLabel = showYears
+		? formatShortMonthYear
+		: formatShortMonth;
+
+	const minimumLabel = formatMinMaxLabel(firstPeriod, locale);
+	const maximumLabel = formatMinMaxLabel(lastPeriod, locale);
 
 	const tickLabels = periods.map((period) => {
-		const startMonth = formatShortMonth(period[0], locale);
+		const startMonth = formatShortMonth(period[0], locale, true);
 		if (period[0].getUTCMonth() === period[1].getUTCMonth()) {
 			return startMonth;
 		}
-		const endMonth = formatShortMonth(period[1], locale);
+		const endMonth = formatShortMonth(period[1], locale, true);
 		return `${startMonth}-${endMonth}`;
 	});
 
@@ -80,15 +89,20 @@ const formatShortMonthYear = (date: Date, locale: string): string => {
 
 /**
  * Return the short month name of a date, localized.
+ *
+ * @param date - The date to format.
+ * @param locale - The locale to use for formatting.
+ * @param removeDots - If true, the dots are removed from the formatted month name.
  */
-const formatShortMonth = (date: Date, locale: string): string => {
+const formatShortMonth = (date: Date, locale: string, removeDots: boolean = false): string => {
 	const formatted = Intl.DateTimeFormat(locale, {
 		month: 'short',
 		timeZone: 'UTC',
 	}).format(date);
 
-	// In French, dots are added to short names, we remove them
-	return formatted.replace('.', '');
+	return removeDots
+		? formatted.replace('.', '')
+		: formatted;
 };
 
 /**
@@ -105,6 +119,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 
 	const dateRange = climateVariable?.getDateRange();
 	const frequency = climateVariable?.getFrequency() ?? null;
+	const forecastDisplay = climateVariable?.getForecastDisplay();
 	const periods =
 		releaseDate && frequency
 			? getPeriods(releaseDate, frequency as S2DFrequencyType)
@@ -126,7 +141,11 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		minimumLabel,
 		maximumLabel,
 		tickLabels,
-	} = generateSliderLabels(periods, locale);
+	} = generateSliderLabels(
+		periods,
+		locale,
+		forecastDisplay !== ForecastDisplays.CLIMATOLOGY,
+	);
 	const tickLabel = periods ? tickLabels[selectedPeriod] : '...';
 
 	let controlTooltip: React.ReactNode = __(

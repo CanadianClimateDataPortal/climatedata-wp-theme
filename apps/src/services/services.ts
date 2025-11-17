@@ -596,6 +596,12 @@ export const fetchS2DReleaseDate = async (variable: string, frequency: string, f
  * @param frequency - Frequency for which we want the data.
  * @param period - Period for which we want the data.
  * @param fetchOptions - Any other options to pass to fetch() requests (ex: `signal`)
+ *
+ * @TODO This is currently a mock implementation with randomized data.
+ *       The real API endpoint will be implemented in a future PR.
+ *       When implementing the real API:
+ *       - Use fetch() with the provided signal for cancellation support
+ *       - Add proper error handling for network failures and API errors
  */
 export const fetchS2DLocationData = async (
 	// @ts-expect-error - We ignore unused variables errors while waiting for the API endpoint to be implemented.
@@ -609,8 +615,8 @@ export const fetchS2DLocationData = async (
 	// @ts-expect-error - idem.
 	fetchOptions?: FetchOptions
 ): Promise<LocationS2DData> => {
-	// TEMPORARILY mocking the API, while waiting for the API endpoint to be
-	// implemented.
+	// TEMPORARILY mocking the API with randomized data. This mock always resolves
+	// successfully and ignores the abort signal. Real implementation will use fetch().
 	const fetchMock = new Promise<LocationS2DData>((resolve) => {
 		setTimeout(() => {
 			const values = Array.from({ length: 5 }, () => Math.random() * 20 - 10);

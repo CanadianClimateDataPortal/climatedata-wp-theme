@@ -1,7 +1,8 @@
 import React from 'react';
-import { __ } from '@/context/locale-provider';
 
-import 'leaflet/dist/leaflet.css';
+import { sprintf } from '@wordpress/i18n';
+
+import { __, _n } from '@/context/locale-provider';
 
 import {
 	StepContainer,
@@ -12,6 +13,8 @@ import { StepComponentRef } from '@/types/download-form-interface';
 import { useAppDispatch } from '@/app/hooks';
 import { setSelectionMode } from '@/features/download/download-slice';
 import RasterDownloadMap from '@/components/download/raster-download-map';
+
+import 'leaflet/dist/leaflet.css';
 
 /**
  * Step 4
@@ -52,3 +55,24 @@ const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
 StepLocation.displayName = 'StepLocation';
 
 export default StepLocation;
+
+
+/**
+ * Extracts and formats summary data for the Variable Options step.
+ */
+export const StepSummaryLocation = (): React.ReactNode | null => {
+	const { climateVariable } = useClimateVariable();
+
+	if (!climateVariable) return null;
+
+	const isRegion = Boolean(climateVariable?.getSelectedRegion());
+
+	const selectedCount = isRegion
+		? climateVariable?.getSelectedRegion()?.cellCount ?? 0
+		: climateVariable?.getSelectedPointsCount() ?? 0;
+
+	return (
+		(isRegion ? '~ ' : '') +
+		sprintf(_n('%d selected', `%d selected`, selectedCount), selectedCount)
+	);
+}

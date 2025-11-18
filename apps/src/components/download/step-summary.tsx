@@ -1,63 +1,43 @@
 import React, { useMemo } from 'react';
-import { __, _n } from '@/context/locale-provider';
+import { __ } from '@/context/locale-provider';
 import { PencilLine } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useLocale } from '@/hooks/use-locale';
 import { useDownload } from '@/hooks/use-download';
-import { cn } from '@/lib/utils';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
-import appConfig from '@/config/app.config';
-import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
-import { sprintf } from "@wordpress/i18n";
+// All <Step>Summary components
+import { StepSummaryVariableOptions } from '@/components/download/step-variable-options';
+import { StepSummaryLocation } from '@/components/download/step-location';
+import { StepSummaryAdditionalDetails } from '@/components/download/step-additional-details';
+import { StepSummarySendRequest } from '@/components/download/step-send-request';
 
 // Type-only imports for JSDoc @see references - these enable IDE navigation to step components
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { default as StepDataset } from './step-dataset';
+import type { default as StepDataset } from '@/components/download/step-dataset';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { default as StepVariable } from './step-variable';
+import type { default as StepVariable } from '@/components/download/step-variable';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { default as StepVariableOptions } from './step-variable-options';
+import type { default as StepVariableOptions } from '@/components/download/step-variable-options';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { default as StepLocation } from './step-location';
+import type { default as StepLocation } from '@/components/download/step-location';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { default as StepAdditionalDetails } from './step-additional-details';
+import type { default as StepAdditionalDetails } from '@/components/download/step-additional-details';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { default as StepSendRequest } from './step-send-request';
+import type { default as StepSendRequest } from '@/components/download/step-send-request';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { default as StepResult } from './step-result';
+import type { default as StepResult } from '@/components/download/step-result';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { STEPS } from './config';
+import type { STEPS } from '@/components/download/config';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { DownloadProvider } from '@/context/download-provider';
 
-const VariableOptionsSummary: React.FC = () => {
-	const { climateVariable } = useClimateVariable();
-
-	if (!climateVariable) return null;
-
-	const version = climateVariable.getVersion?.(); // fallback if getVersion exists
-	const analysisFields = climateVariable.getAnalysisFields?.() ?? [];
-	const analysisFieldValues = climateVariable.getAnalysisFieldValues?.() ?? {};
-
-	return (
-			<ul className="download-summary-bullet list-disc list-inside">
-				{climateVariable.getVersions().length > 0 && (<li key={version}><span className='text-dark-purple text-sm'>Version:</span> <span className="uppercase">{version || 'N/A'}</span></li>)}
-				{analysisFields.map(({ key, label }) => {
-					const value = analysisFieldValues[key] ?? '-';
-
-					return (
-						<li className="summary-item" key={key}>
-							<span className='text-gray-600 text-sm'>{__(label)}</span>: <span className="uppercase">{value}</span>
-						</li>
-					);
-				})}
-			</ul>
-	);
-};
+import type { StepSummaryData } from '@/types/download-form-interface';
 
 /**
  * Summary on the side and visible throughout the download steps.
@@ -84,7 +64,7 @@ const VariableOptionsSummary: React.FC = () => {
  * @see {@link StepSendRequest} - Step 6: File parameters (conditional)
  * @see {@link StepResult} - Step 7: Result display
  */
-const StepSummary: React.FC = () => {
+const StepSummary = () => {
 	const { locale } = useLocale();
 	const { currentStep, goToStep, dataset, steps } = useDownload();
 
@@ -93,7 +73,7 @@ const StepSummary: React.FC = () => {
 	const summaryData = useMemo(() => {
 		const stepNames = steps.map((step) => step.displayName)
 
-		const summaryData = [];
+		const summaryData: StepSummaryData[] = [];
 
 		/**
 		 * Dataset summary section
@@ -114,7 +94,7 @@ const StepSummary: React.FC = () => {
 			summaryData.push({
 				title: __('Variable'),
 				content: [__(climateVariable?.getTitle() ?? '')],
-			})
+			});
 		}
 
 		/**
@@ -124,8 +104,8 @@ const StepSummary: React.FC = () => {
 		if (stepNames.includes("StepVariableOptions")) {
 			summaryData.push({
 				title: __('Variable options'),
-				content: <VariableOptionsSummary />,
-			})
+				content: <StepSummaryVariableOptions />,
+			});
 		}
 
 		/**
@@ -135,19 +115,8 @@ const StepSummary: React.FC = () => {
 		if (stepNames.includes("StepLocation")) {
 			summaryData.push({
 				title: __('Location or area'),
-				content: (() => {
-					const isRegion = Boolean(climateVariable?.getSelectedRegion());
-
-					const selectedCount = isRegion
-						? climateVariable?.getSelectedRegion()?.cellCount ?? 0
-						: climateVariable?.getSelectedPointsCount() ?? 0;
-
-					return (
-						(isRegion ? '~ ' : '') +
-						sprintf(_n('%d selected', `%d selected`, selectedCount), selectedCount)
-					);
-				})(),
-			})
+				content: <StepSummaryLocation />,
+			});
 		}
 
 		/**
@@ -157,52 +126,8 @@ const StepSummary: React.FC = () => {
 		if (stepNames.includes("StepAdditionalDetails")) {
 			summaryData.push({
 				title: __('Additional details'),
-				content: (() => {
-					const variableId = climateVariable?.getId();
-					const isDownloadTypeAnalyzed = climateVariable?.getDownloadType() === DownloadType.ANALYZED;
-					const [startYear, endYear] = climateVariable?.getDateRange() ?? [];
-					const missingData = climateVariable?.getMissingData();
-					const frequency = climateVariable?.getFrequency() ?? '';
-					const percentiles = climateVariable?.getPercentiles() ?? [];
-					const scenarios = climateVariable?.getAnalyzeScenarios() ?? [];
-
-					const data = [];
-
-					if (isDownloadTypeAnalyzed || variableId === "station_data") {
-						if (climateVariable?.getDatasetType() === "ahccd") {
-							if (missingData) {
-								data.push(missingData === 'wmo' ? __('WMO Parameters') :missingData + '%');
-							}
-						} else {
-							if (startYear && endYear) {
-								data.push(`${startYear} - ${endYear}`);
-							}
-						}
-					}
-
-					if (frequency && frequency !== '') {
-						data.push(__(appConfig.frequencies.find(({ value }) => value === frequency)?.label ?? frequency));
-					}
-
-					if (scenarios && scenarios.length > 0) {
-						const scenarioParts: string[] = [];
-						scenarios.forEach((scenario) => {
-							scenarioParts.push(appConfig.scenarios.find(({ value }) => value === scenario)?.label ?? scenario);
-						});
-						data.push(scenarioParts.join(', '));
-					}
-
-					if (percentiles && percentiles.length > 0) {
-						data.push(
-							percentiles.length === climateVariable?.getPercentileOptions().length
-								? __('All percentiles')
-								: sprintf(_n('%d percentile', '%d percentiles', percentiles.length), percentiles.length)
-						);
-					}
-
-					return data.join(', ');
-				})(),
-			})
+				content: <StepSummaryAdditionalDetails />,
+			});
 		}
 
 		/**
@@ -212,24 +137,19 @@ const StepSummary: React.FC = () => {
 		if (stepNames.includes("StepSendRequest")) {
 			summaryData.push({
 				title: __('File parameters'),
-				content: (() => {
-					const fileFormat = climateVariable?.getFileFormat();
-					if(!fileFormat) return '';
-
-					const fileFormatLabels = {
-						[FileFormatType.CSV]: 'CSV',
-						[FileFormatType.JSON]: 'JSON',
-						[FileFormatType.NetCDF]: 'NetCDF',
-						[FileFormatType.GeoJSON]: 'GeoJSON',
-					};
-
-					return fileFormatLabels[fileFormat] ?? fileFormat;
-				})(),
-			})
+				content: <StepSummarySendRequest />,
+			});
 		}
 
-		return summaryData
-	}, [steps, __, dataset?.title, locale, climateVariable, _n]);
+		return summaryData;
+
+	},
+	[
+		steps,
+		dataset?.title,
+		locale,
+		climateVariable,
+	]);
 
 	return (
 		<Card

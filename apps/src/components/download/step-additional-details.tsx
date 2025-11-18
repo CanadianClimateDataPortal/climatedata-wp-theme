@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { __ } from '@/context/locale-provider';
+import { __, _n } from '@/context/locale-provider';
 
 import { CheckboxFactory } from '@/components/ui/checkbox';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
@@ -383,5 +383,63 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 });
 
 StepAdditionalDetails.displayName = 'StepAdditionalDetails';
+
+/**
+ * Extracts and formats summary data for the Additional Details step.
+ *
+ * Exported as a named export so it can be imported and used by StepSummary.
+ * This keeps the logic for extracting summary data co-located with the step itself.
+ *
+ * @returns Summary string or empty string
+ */
+export const StepSummaryAdditionalDetails = (): string => {
+	const { climateVariable } = useClimateVariable();
+
+	if (!climateVariable) return '';
+
+	const variableId = climateVariable.getId();
+	const isDownloadTypeAnalyzed = climateVariable.getDownloadType() === DownloadType.ANALYZED;
+	const [startYear, endYear] = climateVariable.getDateRange() ?? [];
+	const missingData = climateVariable.getMissingData();
+	const frequency = climateVariable.getFrequency() ?? '';
+	const percentiles = climateVariable.getPercentiles() ?? [];
+	const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
+
+	const data = [];
+
+	if (isDownloadTypeAnalyzed || variableId === "station_data") {
+		if (climateVariable.getDatasetType() === "ahccd") {
+			if (missingData) {
+				data.push(missingData === 'wmo' ? __('WMO Parameters') : missingData + '%');
+			}
+		} else {
+			if (startYear && endYear) {
+				data.push(`${startYear} - ${endYear}`);
+			}
+		}
+	}
+
+	if (frequency && frequency !== '') {
+		data.push(__(appConfig.frequencies.find(({ value }) => value === frequency)?.label ?? frequency));
+	}
+
+	if (scenarios && scenarios.length > 0) {
+		const scenarioParts: string[] = [];
+		scenarios.forEach((scenario) => {
+			scenarioParts.push(appConfig.scenarios.find(({ value }) => value === scenario)?.label ?? scenario);
+		});
+		data.push(scenarioParts.join(', '));
+	}
+
+	if (percentiles && percentiles.length > 0) {
+		data.push(
+			percentiles.length === climateVariable.getPercentileOptions().length
+				? __('All percentiles')
+				: sprintf(_n('%d percentile', '%d percentiles', percentiles.length), percentiles.length)
+		);
+	}
+
+	return data.join(', ');
+};
 
 export default StepAdditionalDetails;

@@ -18,7 +18,7 @@ import { dateFormatCheck } from '@/lib/utils';
 const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { climateVariable } = useClimateVariable();
 
-	const { isS2DVariable: isS2D } = useS2D();
+	const { isS2DVariable } = useS2D();
 
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
@@ -72,7 +72,7 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				payload.analysisFieldValues = {};
 			}
 
-			if (isS2D) {
+			if (isS2DVariable) {
 				if (climateVariable.getForecastDisplay()?.length) {
 					payload.forecastDisplay = ForecastDisplayFieldDropdown.DEFAULT_VALUE;
 				}
@@ -82,7 +82,7 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 		}
 	}), [
 		climateVariable,
-		isS2D,
+		isS2DVariable,
 	]);
 
 	// Determine if there are any analysis fields to display.
@@ -95,7 +95,7 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				{__('Set options to adjust your variable to your needs.')}
 			</StepContainerDescription>
 			<div className="gap-4">
-				{isS2D ? (
+				{isS2DVariable ? (
 					<>
 						<div className="mb-8">
 							<ForecastDisplayFieldDropdown />

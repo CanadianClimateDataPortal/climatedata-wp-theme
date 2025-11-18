@@ -76,7 +76,7 @@ export function AppSidebar() {
 	const about_url = INTERNAL_URLS[`about-data-${currentLocale}`] || '';
 	const support_url = INTERNAL_URLS[`support-${currentLocale}`] || '';
 
-	const { isS2DVariable: isS2D } = useS2D();
+	const { isS2DVariable } = useS2D();
 
 	return (
 		<Sidebar>
@@ -98,7 +98,7 @@ export function AppSidebar() {
 									<VariablesMenuItem />
 									<SidebarSeparator />
 
-									{isS2D ? (
+									{isS2DVariable ? (
 										<SidebarInnerS2D />
 									) : (
 										<SidebarInnerProjection />
@@ -131,7 +131,7 @@ export function AppSidebar() {
 				</SidebarGroup>
 
 				<SidebarGroup className="gap-0 mt-auto">
-					{isS2D ? (
+					{isS2DVariable ? (
 						<S2DReleaseDate />
 					) : null}
 					<RecentLocationsLink />

@@ -37,7 +37,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const { dataset } = useAppSelector((state) => state.map);
 	const variableList = useAppSelector((state) => state.map.variableList);
 
-	const { isS2DVariable: isS2D } = useS2D();
+	const { isS2DVariable } = useS2D();
 
 	// Displayed info
 	const datasetLabel = getLocalized(dataset);
@@ -60,7 +60,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 		__(climateVariableTitle),
 	];
 
-	if (isS2D) {
+	if (isS2DVariable) {
 		const forecastType = climateVariable?.getForecastType();
 		if (forecastType) {
 			subTitleParts.push(getForecastTypeName(forecastType));
@@ -88,7 +88,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 				scenario,
 			}) }
 
-			{!isS2D && (
+			{!isS2DVariable && (
 				<p className="text-right">
 					<a
 						href="#"

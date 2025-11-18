@@ -49,14 +49,14 @@ const MapLegend: React.FC = () => {
 		climateVariable?.getLegendConfig(isDelta ? MapDisplayType.DELTA : MapDisplayType.ABSOLUTE) ??
 		undefined;
 	let isCategorical = climateVariable?.getColourType() !== ColourType.CONTINUOUS;
-	const { isS2DVariable: isS2D } = useS2D();
+	const { isS2DVariable } = useS2D();
 	const forecastDisplay = climateVariable?.getForecastDisplay();
 	const forecastType = climateVariable?.getForecastType();
 	const variableName = climateVariable?.getTitle();
 
 	// Whether to show the regular legend or the S2D forecast legend
-	const showForecastLegendOfS2D = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
-	const showClimatologyLegendOfS2D = isS2D && forecastDisplay == ForecastDisplays.CLIMATOLOGY;
+	const showForecastLegendOfS2D = isS2DVariable && forecastDisplay === ForecastDisplays.FORECAST;
+	const showClimatologyLegendOfS2D = isS2DVariable && forecastDisplay == ForecastDisplays.CLIMATOLOGY;
 
 	// For the default colour palette, isCategorical defaults to the default legend's type
 	if ((colourScheme === null || colourScheme === 'default') && legendData && legendData.Legend) {

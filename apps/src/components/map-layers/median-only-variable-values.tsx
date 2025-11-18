@@ -56,10 +56,10 @@ const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 			// Fetching median
 
 			// Params
-			const medianParams = new URLSearchParams({
+			const medianParams = {
 				period: String(decadeValue),
 				dataset_name: version,
-			}).toString();
+			};
 
 			const medianData = await fetchDeltaValues({
 				endpoint: endpoint,

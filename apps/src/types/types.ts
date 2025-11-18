@@ -545,7 +545,7 @@ export interface DeltaValuesOptions {
 	endpoint: string;
 	varName: string | null;
 	frequency: string | null;
-	params: string;
+	params: Record<string, string>;
 }
 
 export interface PercentileData {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MapInfoData } from "@/types/types";
-import { fetchWPData } from "@/services/services";
+import { fetchMapInfoData } from "@/services/services";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import MapHeader from "@/components/map-header";
 import Map from '@/components/map';
@@ -12,7 +12,11 @@ const MapWrapper = () => {
 	useEffect(() => {
 		const postId = climateVariable?.getPostId();
 		if (typeof postId !== 'number') return;
-		fetchWPData(postId).then((data) => setMapInfo(data.mapInfo));
+		fetchMapInfoData(postId).then((mapInfo) => {
+			if (mapInfo) {
+				setMapInfo(mapInfo);
+			}
+		});
 	}, [climateVariable]);
 
 	return (

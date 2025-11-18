@@ -6,7 +6,7 @@ import {
 } from '@/components/download/step-container';
 import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-download-fields";
 import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
-import { ForecastDisplayFieldDropdown } from '@/components/fields/forecast';
+import { S2DForecastDisplayFieldDropdown } from '@/components/fields/forecast';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import useS2D from '@/hooks/use-s2d';
 import { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
@@ -74,7 +74,7 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 
 			if (isS2DVariable) {
 				if (climateVariable.getForecastDisplay()?.length) {
-					payload.forecastDisplay = ForecastDisplayFieldDropdown.DEFAULT_VALUE;
+					payload.forecastDisplay = S2DForecastDisplayFieldDropdown.DEFAULT_VALUE;
 				}
 			}
 
@@ -98,7 +98,7 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				{isS2DVariable ? (
 					<>
 						<div className="mb-8">
-							<ForecastDisplayFieldDropdown />
+							<S2DForecastDisplayFieldDropdown />
 						</div>
 					</>
 				) : (

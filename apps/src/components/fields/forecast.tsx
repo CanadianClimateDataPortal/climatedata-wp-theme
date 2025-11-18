@@ -38,12 +38,12 @@ const ForecastDisplayField = {
 	],
 };
 
-export interface ForecastTypeFieldDropdownProps {
+export interface S2DForecastTypeFieldDropdownProps {
 	tooltip?: React.ReactNode;
 }
 
-export const ForecastTypeFieldDropdown = (
-	props: ForecastTypeFieldDropdownProps
+export const S2DForecastTypeFieldDropdown = (
+	props: S2DForecastTypeFieldDropdownProps
 ) => {
 	const {
 		climateVariable,
@@ -70,15 +70,15 @@ export const ForecastTypeFieldDropdown = (
 	);
 };
 
-ForecastTypeFieldDropdown.displayName = 'ForecastTypeFieldDropdown';
-ForecastTypeFieldDropdown.DEFAULT_VALUE = ForecastTypes.EXPECTED;
+S2DForecastTypeFieldDropdown.displayName = 'S2DForecastTypeFieldDropdown';
+S2DForecastTypeFieldDropdown.DEFAULT_VALUE = ForecastTypes.EXPECTED;
 
-export interface ForecastDisplayFieldDropdownProps {
+export interface S2DForecastDisplayFieldDropdownProps {
 	tooltip?: React.ReactNode;
 }
 
-export const ForecastDisplayFieldDropdown = (
-	props: ForecastDisplayFieldDropdownProps
+export const S2DForecastDisplayFieldDropdown = (
+	props: S2DForecastDisplayFieldDropdownProps
 ) => {
 	const {
 		climateVariable,
@@ -105,15 +105,15 @@ export const ForecastDisplayFieldDropdown = (
 	);
 };
 
-ForecastDisplayFieldDropdown.displayName = 'ForecastDisplayFieldDropdown';
-ForecastDisplayFieldDropdown.DEFAULT_VALUE = ForecastDisplays.FORECAST;
+S2DForecastDisplayFieldDropdown.displayName = 'S2DForecastDisplayFieldDropdown';
+S2DForecastDisplayFieldDropdown.DEFAULT_VALUE = ForecastDisplays.FORECAST;
 
-export interface ForecastDisplaySkillFieldCheckboxProps {
+export interface S2DForecastDisplaySkillFieldCheckboxProps {
 	tooltip?: React.ReactNode;
 }
 
-export const ForecastDisplaySkillFieldCheckbox = (
-	props: ForecastDisplaySkillFieldCheckboxProps
+export const S2DForecastDisplaySkillFieldCheckbox = (
+	props: S2DForecastDisplaySkillFieldCheckboxProps
 ) => {
 	const dispatch = useAppDispatch();
 
@@ -151,4 +151,4 @@ export const ForecastDisplaySkillFieldCheckbox = (
 	);
 };
 
-ForecastDisplaySkillFieldCheckbox.displayName = 'ForecastDisplaySkillFieldCheckbox';
+S2DForecastDisplaySkillFieldCheckbox.displayName = 'S2DForecastDisplaySkillFieldCheckbox';

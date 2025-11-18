@@ -1,19 +1,15 @@
 import { __ } from '@/context/locale-provider';
 
-import Dropdown from '@/components/ui/dropdown';
 import { SidebarMenuItem, SidebarSeparator } from '@/components/ui/sidebar';
 
 import {
-	ForecastDisplayFieldDropdown,
-	ForecastDisplaySkillFieldCheckbox,
-	ForecastTypeFieldDropdown,
+	S2DForecastDisplayFieldDropdown,
+	S2DForecastDisplaySkillFieldCheckbox,
+	S2DForecastTypeFieldDropdown,
 } from '@/components/fields/forecast';
-import { FrequencyFieldDropdown } from '@/components/fields/frequency';
 
-import { useClimateVariable } from '@/hooks/use-climate-variable';
-import {
-	FrequencyType,
-} from '@/types/climate-variable-interface';
+import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
+
 import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
 
 import { getForecastTypeName } from '@/lib/s2d';
@@ -51,17 +47,17 @@ const SidebarInnerS2D = () => {
 	return (
 		<>
 			<SidebarMenuItem>
-				<ForecastTypeFieldDropdown
+				<S2DForecastTypeFieldDropdown
 					tooltip={tooltipForecastTypes}
 				/>
 			</SidebarMenuItem>
 
 			<SidebarMenuItem>
 				<div className="flex flex-col gap-4">
-					<ForecastDisplayFieldDropdown
+					<S2DForecastDisplayFieldDropdown
 						tooltip={tooltipForecastDisplay}
 					/>
-					<ForecastDisplaySkillFieldCheckbox
+					<S2DForecastDisplaySkillFieldCheckbox
 						tooltip={tooltipForecastDisplayLowSkill}
 					/>
 				</div>
@@ -70,7 +66,7 @@ const SidebarInnerS2D = () => {
 			<SidebarSeparator />
 
 			<SidebarMenuItem>
-				<FrequencyFieldDropdown
+				<S2DFrequencyFieldDropdown
 					tooltip={tooltipFrequencies}
 				/>
 			</SidebarMenuItem>

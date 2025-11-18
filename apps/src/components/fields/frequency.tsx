@@ -16,12 +16,12 @@ const FrequencyField = {
 	],
 };
 
-export interface FrequencyFieldDropdownProps {
+export interface S2DFrequencyFieldDropdownProps {
 	tooltip?: React.ReactNode;
 }
 
-export const FrequencyFieldDropdown = (
-	props: FrequencyFieldDropdownProps,
+export const S2DFrequencyFieldDropdown = (
+	props: S2DFrequencyFieldDropdownProps,
 ) => {
 	const {
 		climateVariable,
@@ -47,4 +47,4 @@ export const FrequencyFieldDropdown = (
 	);
 };
 
-FrequencyFieldDropdown.displayName = 'FrequencyFieldDropdown';
+S2DFrequencyFieldDropdown.displayName = 'S2DFrequencyFieldDropdown';

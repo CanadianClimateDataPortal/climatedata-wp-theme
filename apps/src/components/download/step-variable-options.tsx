@@ -7,6 +7,7 @@ import {
 import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-download-fields";
 import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
 import { S2DForecastTypeFieldDropdown } from '@/components/fields/forecast';
+import { DefinitionList, type DefinitionItem } from '@/components/ui/definition-list';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useS2D } from '@/hooks/use-s2d';
 import { dateFormatCheck } from '@/lib/utils';
@@ -151,15 +152,20 @@ export const StepSummaryVariableOptions = (): React.ReactNode | null => {
 		const forecastType = climateVariable.getForecastType() ?? '';
 		const formattedValue = forecastType.substring(0, 1).toUpperCase() + forecastType.substring(1).toLowerCase();
 
+		const items: DefinitionItem[] = [
+			{
+				term: __('Forecast Type'),
+				details: __(formattedValue),
+			}
+		];
 		return (
-			<ul className="download-summary-bullet list-disc list-inside">
-				{forecastType !== '' && (
-					<li key={forecastType}>
-						<span className='text-dark-purple text-sm'>{ __('Forecast Type')}:</span>{' '}
-						<span className="uppercase">{ __(formattedValue)}</span>
-					</li>
-				)}
-			</ul>
+			<DefinitionList
+				items={items}
+				className="download-summary-bullet list-disc list-inside text-sm"
+				dtClassName="text-dark-purple"
+				ddClassName="text-brand-blue uppercase"
+				variant="ul"
+			/>
 		);
 	}
 

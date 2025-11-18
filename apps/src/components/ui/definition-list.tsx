@@ -38,18 +38,21 @@ export interface DefinitionItem {
 }
 
 /**
- * Reusable definition list renderer for dl/dt/dd pattern
+ * Reusable definition list renderer for dl/dt/dd pattern or ul/li pattern
  *
  * Handles the flexible details type (undefined | string | string[])
  * and provides consistent styling for definition lists.
  *
- * Accepts optional className props to customize styling for dl, dt, and dd elements.
+ * Accepts optional className props to customize styling for elements.
+ *
+ * @param variant - 'dl' for semantic definition list (dl/dt/dd), 'ul' for unordered list (ul/li)
  */
 interface DefinitionListProps {
 	items: DefinitionItem[];
 	className?: string;
 	dtClassName?: string;
 	ddClassName?: string;
+	variant?: 'ul' | 'dl';
 }
 
 export const DefinitionList = ({
@@ -57,13 +60,50 @@ export const DefinitionList = ({
 	className,
 	dtClassName,
 	ddClassName,
+	variant = 'dl',
 }: DefinitionListProps) => {
-	const normalizeDetails = (details?: string | string[]): string[] => {
+	const normalizeDetails = (
+		details?: string | string[],
+	): string[] => {
 		if (!details) {
 			return [];
 		}
 		return Array.isArray(details) ? details : [details];
 	};
+
+	if (variant === 'ul') {
+		return (
+			<ul className={cn('list-disc list-inside', className)}>
+				{items.map(({ term, details = [] }, idx) => {
+					const detailsArray = normalizeDetails(details);
+
+					// Throw error if ul variant used with multiple details
+					if (detailsArray.length > 1) {
+						throw new Error(
+							`DefinitionList with variant="ul" does not support multiple details. ` +
+							`Item "${term}" has ${detailsArray.length} details. Use variant="dl" instead.`
+						);
+					}
+
+					return (
+						<li key={idx} className="space-y-0.5">
+							<span className={cn('font-semibold text-gray-800', dtClassName)}>
+								{term}
+							</span>
+							{detailsArray.length > 0 && (
+								<>
+									{': '}
+									<span className={cn('text-gray-700', ddClassName)}>
+										{detailsArray[0]}
+									</span>
+								</>
+							)}
+						</li>
+					);
+				})}
+			</ul>
+		);
+	}
 
 	return (
 		<dl className={cn('border-l-2 border-gray-300', className)}>

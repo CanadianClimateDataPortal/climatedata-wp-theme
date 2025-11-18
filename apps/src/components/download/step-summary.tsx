@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { __ } from '@/context/locale-provider';
 import { PencilLine } from 'lucide-react';
 

@@ -6,8 +6,11 @@ import {
 } from '@/components/download/step-container';
 import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-download-fields";
 import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
+import { S2DForecastTypeFieldDropdown } from '@/components/fields/forecast';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useS2D } from '@/hooks/use-s2d';
 import { dateFormatCheck } from '@/lib/utils';
+
 import type { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
 
 /**
@@ -17,6 +20,8 @@ import type { StepComponentRef, StepResetPayload } from '@/types/download-form-i
  */
 const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { climateVariable } = useClimateVariable();
+
+	const { isS2DVariable } = useS2D();
 
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
@@ -70,9 +75,18 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				payload.analysisFieldValues = {};
 			}
 
+			if (isS2DVariable) {
+				if (climateVariable.getForecastType()?.length) {
+					payload.forecastType = S2DForecastTypeFieldDropdown.DEFAULT_VALUE;
+				}
+			}
+
 			return payload;
 		}
-	}), [climateVariable]);
+	}), [
+		climateVariable,
+		isS2DVariable,
+	]);
 
 	// Determine if there are any analysis fields to display.
 	const analysisFields = !!climateVariable?.getAnalysisFields()?.length;
@@ -84,16 +98,23 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				{__('Set options to adjust your variable to your needs.')}
 			</StepContainerDescription>
 			<div className="gap-4">
-				{version && (
+				{isS2DVariable ? (
 					<div className="mb-8">
-						<VersionDownloadFields />
+						<S2DForecastTypeFieldDropdown />
 					</div>
-				)}
-
-				{analysisFields && (
-					<div className="mb-8">
-					<AnalyzedDownloadFields />
-				</div>
+				) : (
+					<>
+						{version && (
+							<div className="mb-8">
+								<VersionDownloadFields />
+							</div>
+						)}
+						{analysisFields && (
+							<div className="mb-8">
+							<AnalyzedDownloadFields />
+						</div>
+						)}
+					</>
 				)}
 			</div>
 		</StepContainer>
@@ -107,8 +128,26 @@ StepVariableOptions.displayName = 'StepVariableOptions';
  */
 export const StepSummaryVariableOptions = (): React.ReactNode | null => {
 	const { climateVariable } = useClimateVariable();
+	const { isS2DVariable } = useS2D();
 
 	if (!climateVariable) return null;
+
+	// S2D Variables have different summary format
+	if (isS2DVariable) {
+		const forecastType = climateVariable.getForecastType() ?? '';
+		const formattedValue = forecastType.substring(0, 1).toUpperCase() + forecastType.substring(1).toLowerCase();
+
+		return (
+			<ul className="download-summary-bullet list-disc list-inside">
+				{forecastType !== '' && (
+					<li key={forecastType}>
+						<span className='text-dark-purple text-sm'>{ __('Forecast Type')}:</span>{' '}
+						<span className="uppercase">{ __(formattedValue)}</span>
+					</li>
+				)}
+			</ul>
+		);
+	}
 
 	// Regular variables
 	const version = climateVariable.getVersion?.();

@@ -11,6 +11,8 @@ import { StepComponentRef, StepResetPayload } from '@/types/download-form-interf
 import { dateFormatCheck } from '@/lib/utils';
 
 /**
+ * Step 3.
+ *
  * Variable options step
  */
 const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {

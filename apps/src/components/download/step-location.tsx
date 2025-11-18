@@ -14,6 +14,8 @@ import { setSelectionMode } from '@/features/download/download-slice';
 import RasterDownloadMap from '@/components/download/raster-download-map';
 
 /**
+ * Step 4
+ *
  * Location step, allows the user to make a selection on the map and choose what type of region to select
  */
 const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {

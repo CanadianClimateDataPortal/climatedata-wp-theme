@@ -79,6 +79,8 @@ function MissingDataTooltip(): React.ReactElement {
 }
 
 /**
+ * Step 5.
+ *
  * Additional details step will allow the user to customize the download request
  */
 const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {

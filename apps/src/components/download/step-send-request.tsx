@@ -73,6 +73,8 @@ const Captcha: React.FC<{
 Captcha.displayName = 'Captcha';
 
 /**
+ * Step 6.
+ *
  * Send download request step
  */
 const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
@@ -148,7 +150,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	 */
 	const shouldShowCaptcha = () => {
 		if (!climateVariable) return false;
-		
+
 		if (climateVariable.getId() === 'daily_ahccd_temperature_and_precipitation') {
 			return false;
 		}

@@ -14,6 +14,26 @@ import appConfig from '@/config/app.config';
 import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
 import { sprintf } from "@wordpress/i18n";
 
+// Type-only imports for JSDoc @see references - these enable IDE navigation to step components
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { default as StepDataset } from './step-dataset';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { default as StepVariable } from './step-variable';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { default as StepVariableOptions } from './step-variable-options';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { default as StepLocation } from './step-location';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { default as StepAdditionalDetails } from './step-additional-details';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { default as StepSendRequest } from './step-send-request';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { default as StepResult } from './step-result';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { STEPS } from './config';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { DownloadProvider } from '@/context/download-provider';
+
 const VariableOptionsSummary: React.FC = () => {
 	const { climateVariable } = useClimateVariable();
 
@@ -38,6 +58,32 @@ const VariableOptionsSummary: React.FC = () => {
 			</ul>
 	);
 };
+
+/**
+ * Summary on the side and visible throughout the download steps.
+ *
+ * This component displays a summary of user selections made in each step of the download form.
+ * It filters and displays information based on which steps are currently active in the form flow.
+ *
+ * **How steps are referenced:**
+ * - Steps are defined in {@link STEPS} array (see `@/components/download/config.ts`)
+ * - Each step component has a `displayName` property (e.g., "StepDataset", "StepVariable")
+ * - This component checks `stepNames.includes("StepDataset")` to determine if a step is active
+ * - The active steps can vary based on the selected climate variable type (see {@link DownloadProvider})
+ *
+ * **Distinction between step components:**
+ * - `step-dataset.tsx`, `step-variable.tsx`, etc. are the actual form step components
+ * - `step-summary.tsx` (this file) is NOT a step - it's a sidebar that summarizes selections
+ * - `steps.tsx` is the wrapper that renders the current active step component
+ *
+ * @see {@link StepDataset} - Step 1: Dataset selection
+ * @see {@link StepVariable} - Step 2: Variable selection
+ * @see {@link StepVariableOptions} - Step 3: Variable options (conditional)
+ * @see {@link StepLocation} - Step 4: Location/area selection
+ * @see {@link StepAdditionalDetails} - Step 5: Additional details (conditional)
+ * @see {@link StepSendRequest} - Step 6: File parameters (conditional)
+ * @see {@link StepResult} - Step 7: Result display
+ */
 const StepSummary: React.FC = () => {
 	const { locale } = useLocale();
 	const { currentStep, goToStep, dataset, steps } = useDownload();
@@ -49,6 +95,10 @@ const StepSummary: React.FC = () => {
 
 		const summaryData = [];
 
+		/**
+		 * Dataset summary section
+		 * @see {@link StepDataset} - The actual step component for dataset selection
+		 */
 		if (stepNames.includes("StepDataset")) {
 			summaryData.push({
 				title: __('Dataset'),
@@ -56,6 +106,10 @@ const StepSummary: React.FC = () => {
 			});
 		}
 
+		/**
+		 * Variable summary section
+		 * @see {@link StepVariable} - The actual step component for variable selection
+		 */
 		if (stepNames.includes("StepVariable")) {
 			summaryData.push({
 				title: __('Variable'),
@@ -63,6 +117,10 @@ const StepSummary: React.FC = () => {
 			})
 		}
 
+		/**
+		 * Variable options summary section
+		 * @see {@link StepVariableOptions} - The actual step component for variable options
+		 */
 		if (stepNames.includes("StepVariableOptions")) {
 			summaryData.push({
 				title: __('Variable options'),
@@ -70,6 +128,10 @@ const StepSummary: React.FC = () => {
 			})
 		}
 
+		/**
+		 * Location summary section
+		 * @see {@link StepLocation} - The actual step component for location/area selection
+		 */
 		if (stepNames.includes("StepLocation")) {
 			summaryData.push({
 				title: __('Location or area'),
@@ -88,6 +150,10 @@ const StepSummary: React.FC = () => {
 			})
 		}
 
+		/**
+		 * Additional details summary section
+		 * @see {@link StepAdditionalDetails} - The actual step component for additional details
+		 */
 		if (stepNames.includes("StepAdditionalDetails")) {
 			summaryData.push({
 				title: __('Additional details'),
@@ -139,6 +205,10 @@ const StepSummary: React.FC = () => {
 			})
 		}
 
+		/**
+		 * File parameters summary section
+		 * @see {@link StepSendRequest} - The actual step component for file parameters and request sending
+		 */
 		if (stepNames.includes("StepSendRequest")) {
 			summaryData.push({
 				title: __('File parameters'),

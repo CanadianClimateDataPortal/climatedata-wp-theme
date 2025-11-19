@@ -61,8 +61,10 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	];
 
 	if (isS2D) {
-		const forecastType = climateVariable?.getForecastType() ?? '';
-		subTitleParts.push(getForecastTypeName(forecastType));
+		const forecastType = climateVariable?.getForecastType();
+		if (forecastType) {
+			subTitleParts.push(getForecastTypeName(forecastType));
+		}
 	} else {
 		subTitleParts.push(
 			__(thresholdLabel),

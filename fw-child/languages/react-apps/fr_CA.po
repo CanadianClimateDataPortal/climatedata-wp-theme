@@ -1311,7 +1311,7 @@ msgid "Below normal cutoff"
 msgstr "Seuil en dessous de la normale"
 
 msgid "Unusually high cutoff"
-msgstr "Seuil inhabituellement élevée"
+msgstr "Seuil inhabituellement élevé"
 
 msgid "Unusually low cutoff"
 msgstr "Seuil inhabituellement faible"

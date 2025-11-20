@@ -40,6 +40,9 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 		// Dark text color is used in case the percentage bar is not long enough
 		? textDarkColor
 		: bestContrastingColor(fillHexCode, textDarkColor, textLightColor);
+	// If the percentage >= this threshold, we will show the percentage
+	// value *inside* the bar and in white.
+	const innerPercentageThreshold = 94;
 
 	/**
 	 * aria-value and role=meter:
@@ -81,7 +84,14 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 			</svg>
 
 			{/* Layer 3: Text with float layout */}
-			<div className="absolute inset-0 flex items-center text-sm overflow-hidden">
+			<div
+				className="absolute inset-0 flex items-center text-sm overflow-hidden"
+				style={{
+					maxWidth: percent >= innerPercentageThreshold
+						? `calc(${percent}% - 2%)`
+						: 'none',
+				}}
+			>
 				<div
 					className={cn(
 						labelColor,
@@ -94,10 +104,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 					{label}
 				</div>
 				<div
-					className="text-blue-600 font-medium pl-2"
-					style={{
-						textShadow: 'rgba(255, 255, 255, 1) 0px 0px 3px',
-					}}
+					className={cn(
+						percent >= innerPercentageThreshold
+							? labelColor :
+							'text-blue-600',
+						'font-medium pl-2'
+					)}
 				>
 					{percent}%
 				</div>

@@ -7,7 +7,7 @@ import { useLocale } from '@/hooks/use-locale';
 import { useS2D } from '@/hooks/use-s2d';
 import { useColorMap } from '@/hooks/use-color-map';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { fetchS2DLocationData } from '@/services/services';
+import { FetchError, fetchS2DLocationData } from '@/services/services';
 
 import { formatValue } from '@/lib/format';
 import { cn, findCeilingIndex, utc } from '@/lib/utils';
@@ -282,20 +282,33 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 		const abortController = new AbortController();
 
 		const fetchData = async () => {
-			const loadedLocationData = await fetchS2DLocationData(
-				latlng,
-				variableId,
-				frequency,
-				period,
-				{ signal: abortController.signal }
-			);
+			try {
+				const loadedLocationData = await fetchS2DLocationData(
+					latlng,
+					variableId,
+					frequency,
+					period,
+					{ signal: abortController.signal }
+				);
 
-			if (abortController.signal.aborted) {
-				return;
+				lastLoadingRef.current = null;
+
+				if (!loadedLocationData || abortController.signal.aborted) {
+					return;
+				}
+
+				setLocationData(loadedLocationData);
+			} catch (error) {
+				if (error instanceof FetchError) {
+					// In case of a fetch error, we show it in the console, but
+					// we don't propagate it to avoid blocking the rest of the
+					// app.
+					console.error(error);
+				} else {
+					const originalError = error as Error;
+					throw new Error(originalError.message, { cause: error });
+				}
 			}
-
-			lastLoadingRef.current = null;
-			setLocationData(loadedLocationData);
 		};
 
 		lastLoadingRef.current = loadingKey;

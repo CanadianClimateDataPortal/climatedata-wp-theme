@@ -8,7 +8,7 @@ import {
 	setReleaseDate,
 	setReleaseDateIsLoading,
 } from '@/features/s2d/s2d-slice';
-import { fetchS2DReleaseDate } from '@/services/services';
+import { FetchError, fetchS2DReleaseDate } from '@/services/services';
 import { utc } from '@/lib/utils';
 import { ClimateVariableInterface } from '@/types/climate-variable-interface';
 
@@ -102,13 +102,24 @@ export const useS2D = () => {
 					frequency,
 					{ signal: abortController.signal }
 				);
-				if (!abortController.signal.aborted) {
+
+				if (releaseDate && !abortController.signal.aborted) {
 					dispatch(
 						setReleaseDate({
 							key: releaseDateKey,
 							value: releaseDate,
 						})
 					);
+				}
+			} catch (error) {
+				if (error instanceof FetchError) {
+					// In case of a fetch error, we show it in the console, but
+					// we don't propagate it to avoid blocking the rest of the
+					// app.
+					console.error(error);
+				} else {
+					const originalError = error as Error;
+					throw new Error(originalError.message, { cause: error });
 				}
 			} finally {
 				dispatch(

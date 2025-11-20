@@ -22,8 +22,13 @@ import {
 import {
 	FrequencyType,
 	InteractiveRegionOption,
+	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
-import { LocationS2DData } from '@/lib/s2d';
+import {
+	getApiFrequencyName,
+	getApiVariableId,
+	LocationS2DData,
+} from '@/lib/s2d';
 
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, unknown>();
@@ -33,7 +38,15 @@ const isAborted = (fetchOptions?: FetchOptions): boolean => {
 }
 
 /**
+ * Error returned by fetch functions of this module in case of a request error.
+ */
+export class FetchError extends Error {}
+
+/**
  * Send a GET JSON request and return the parsed JSON response.
+ *
+ * If the request is aborted (e.g. through a `signal` in `fetchOptions`), the
+ * function will return `null` immediately. No error will be thrown.
  *
  * @param url - The URL to fetch. GET parameters can be specified in the
  *              `params` parameter.
@@ -41,7 +54,7 @@ const isAborted = (fetchOptions?: FetchOptions): boolean => {
  * @param fetchOptions - Additional options to pass to the fetch request.
  * @returns A promise that resolves to the parsed JSON response. If the request
  *     is aborted, the promise resolves to `null`.
- * @throws Error - If the response is not successful.
+ * @throws FetchError - If the request failed.
  */
 export const fetchJSON = async <T = any>(
 	url: string,
@@ -49,33 +62,44 @@ export const fetchJSON = async <T = any>(
 	fetchOptions?: FetchOptions,
 ): Promise<T | null> => {
 	let fetchUrl = url;
+	let response: Response;
 
 	if (params) {
 		fetchUrl += `?${new URLSearchParams(params).toString()}`;
 	}
 
-	const response = await fetch(
-		fetchUrl,
-		{
-			method: 'GET',
-			headers: {
-				Accept: 'application/json',
-			},
-			...fetchOptions,
-		}
-	);
-
-	if (!response.ok) {
-		throw new Error(
-			`HTTP error ${response.status}: ${response.statusText}`
+	try {
+		response = await fetch(
+			fetchUrl,
+			{
+				method: 'GET',
+				headers: {
+					Accept: 'application/json',
+				},
+				...fetchOptions,
+			}
 		);
-	}
 
-	if (isAborted(fetchOptions)) {
-		return null;
-	}
+		if (!response.ok) {
+			throw new Error(
+				`HTTP error ${response.status}: ${response.statusText}`
+			);
+		}
 
-	return await response.json();
+		return await response.json();
+	} catch (error) {
+		const originalError = error as Error;
+		// In case of fetch abort, we return null immediately, we don't throw
+		// an error.
+		if (originalError.name === 'AbortError') {
+			return null;
+		} else {
+			throw new FetchError(
+				`Error fetching and parsing ${url}`,
+				{ cause: originalError },
+			);
+		}
+	}
 }
 
 /**
@@ -86,7 +110,6 @@ export const fetchJSON = async <T = any>(
  * @param fetchOptions - Additional options to pass to the fetch request.
  * @returns A promise that resolves to the parsed JSON response. If the request
  *     is aborted, the promise resolves to `null`.
- * @throws Error - If the response is not successful.
  */
 export const queryWordPressAPI = async <T = any>(
 	endpoint: string,
@@ -114,7 +137,6 @@ export const queryWordPressAPI = async <T = any>(
  * @param fetchOptions - Additional options to pass to the fetch request.
  * @returns A promise that resolves to the parsed JSON response. If the request
  *     is aborted, the promise resolves to `null`.
- * @throws Error - If the response is not successful.
  */
 export const queryDataAPI = async <T = any>(
 	endpoint: string,
@@ -643,73 +665,52 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }, f
  * @param variable - The S2D variable ID.
  * @param frequency - The frequency for which we want the release date.
  * @param fetchOptions - Any other options to pass to fetch() requests (ex: `signal`)
+ * @returns The release date as a string, or null if the request is aborted.
  */
-// @ts-expect-error - We ignore unused variables errors while waiting for the API endpoint to be implemented.
-export const fetchS2DReleaseDate = async (variable: string, frequency: string, fetchOptions?: FetchOptions): Promise<string> => {
-	// TEMPORARILY mocking the API, while waiting for the API endpoint to be implemented.
-	const fetchMock = new Promise<string>((resolve) => {
-		setTimeout(() => {
-			// The backend currently only contains data for July 2025.
-			resolve('2025-07-01');
-		}, 1000);
-	});
+export const fetchS2DReleaseDate = async (
+	variable: string,
+	frequency: S2DFrequencyType | string,
+	fetchOptions?: FetchOptions,
+): Promise<string | null> => {
+	const argVariableName = getApiVariableId(variable);
+	const argFrequencyName = getApiFrequencyName(frequency);
 
-	return await fetchMock;
+	const data = await queryDataAPI(
+		`/get-s2d-release-date/${argVariableName}/${argFrequencyName}`,
+		undefined,
+		fetchOptions,
+	);
+
+	return data;
 }
 
 /**
  * Fetch the location data for a S2D variable.
  *
  * @param latlng - Location coordinates.
- * @param variable - ID of the S2D variable.
+ * @param variableId - ID of the S2D variable.
  * @param frequency - Frequency for which we want the data.
  * @param period - Period for which we want the data.
  * @param fetchOptions - Any other options to pass to fetch() requests (ex: `signal`)
- *
- * @TODO This is currently a mock implementation with randomized data.
- *       The real API endpoint will be implemented in a future PR.
- *       When implementing the real API:
- *       - Use fetch() with the provided signal for cancellation support
- *       - Add proper error handling for network failures and API errors
+ * @returns The location data, or null if the request is aborted.
  */
 export const fetchS2DLocationData = async (
-	// @ts-expect-error - We ignore unused variables errors while waiting for the API endpoint to be implemented.
 	latlng: L.LatLng,
-	// @ts-expect-error - idem.
-	variable: string,
-	// @ts-expect-error - idem.
+	variableId: string,
 	frequency: FrequencyType,
-	// @ts-expect-error - idem.
 	period: Date,
-	// @ts-expect-error - idem.
 	fetchOptions?: FetchOptions
-): Promise<LocationS2DData> => {
-	// TEMPORARILY mocking the API with randomized data. This mock always resolves
-	// successfully and ignores the abort signal. Real implementation will use fetch().
-	const fetchMock = new Promise<LocationS2DData>((resolve) => {
-		setTimeout(() => {
-			const values = Array.from({ length: 5 }, () => Math.random() * 20 - 10);
-			const probabilities = Array.from({ length: 5 }, () => Math.random() * 100);
+): Promise<LocationS2DData | null> => {
+	const argVariableName = getApiVariableId(variableId);
+	const argFrequencyName = getApiFrequencyName(frequency);
+	const argLat = latlng.lat.toFixed(6);
+	const argLon = latlng.lng.toFixed(6);
 
-			// Mocked values must be sorted to make sense
-			values.sort((a, b) => a - b);
-
-			resolve({
-				cutoff_unusually_low_p20: values[0],
-				cutoff_below_normal_p33: values[1],
-				historical_median_p50: values[2],
-				cutoff_above_normal_p66: values[3],
-				cutoff_unusually_high_p80: values[4],
-				prob_unusually_low: probabilities[0],
-				prob_below_normal: probabilities[1],
-				prob_near_normal: probabilities[2],
-				prob_above_normal: probabilities[3],
-				prob_unusually_high: probabilities[4],
-				skill_level: Math.round(Math.random() * 3),
-				skill_CRPSS: Math.random() * 1.5 - 0.5, // Can be negative
-			});
-		}, 1000);
-	});
-
-	return await fetchMock;
+	return await queryDataAPI(
+		`/get-s2d-gridded-values/${argLat}/${argLon}/${argVariableName}/${argFrequencyName}`,
+		{
+			period: `${period.getUTCFullYear()}-${String(period.getUTCMonth() + 1).padStart(2, '0')}`,
+		},
+		fetchOptions,
+	);
 }

@@ -12,6 +12,7 @@ import { useS2D } from '@/hooks/use-s2d';
 import { dateFormatCheck } from '@/lib/utils';
 
 import type { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
+import type { ForecastType } from "@/types/climate-variable-interface";
 
 /**
  * Step 3.
@@ -19,7 +20,7 @@ import type { StepComponentRef, StepResetPayload } from '@/types/download-form-i
  * Variable options step
  */
 const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
-	const { climateVariable } = useClimateVariable();
+	const { climateVariable, setForecastType } = useClimateVariable();
 
 	const { isS2DVariable } = useS2D();
 
@@ -52,6 +53,16 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 					})
 			];
 
+			if (isS2DVariable) {
+				/**
+				 * In S2DClimateVariable's parent (ClimateVariableBase) getForecastType() method
+				 * always return 'expected' if it isn't set.
+				 */
+				const forecastTypeValue = climateVariable.getForecastType() as ForecastType;
+				const hasForecastType = forecastTypeValue != null;
+				validations.push(hasForecastType);
+			}
+
 			return validations.every(Boolean);
 		},
 		getResetPayload: () => {
@@ -76,16 +87,19 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			if (isS2DVariable) {
-				if (climateVariable.getForecastType()?.length) {
-					payload.forecastType = S2DForecastTypeFieldDropdown.DEFAULT_VALUE;
-				}
+				// I doubt that this should be done this way since we have setForecastType always returning a default value
+				payload.forecastType = S2DForecastTypeFieldDropdown.DEFAULT_VALUE;
 			}
 
 			return payload;
+		},
+		reset: () => {
+			setForecastType(S2DForecastTypeFieldDropdown.DEFAULT_VALUE);
 		}
 	}), [
 		climateVariable,
 		isS2DVariable,
+		setForecastType,
 	]);
 
 	// Determine if there are any analysis fields to display.

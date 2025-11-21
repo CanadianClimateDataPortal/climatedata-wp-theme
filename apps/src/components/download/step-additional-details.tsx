@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { __, _n } from '@/context/locale-provider';
+import { getPeriods } from '@/lib/s2d';
 
 import { CheckboxFactory } from '@/components/ui/checkbox';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
@@ -9,7 +10,7 @@ import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
 import S2DReleaseDate from '@/components/s2d-release-date';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { AveragingType, DownloadType, FrequencyConfig, FrequencyType } from "@/types/climate-variable-interface";
+import { AveragingType, DownloadType, FrequencyType } from "@/types/climate-variable-interface";
 import { StepComponentRef, StepResetPayload } from "@/types/download-form-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
@@ -26,6 +27,11 @@ const modelLabels: Record<string, string> = {
 	'26models': __('Full ensemble'),
 	'humidex_models': __('Full ensemble'),
 }
+
+const LOCALE_DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
+	month: 'long',
+	timeZone: 'UTC',
+};
 
 function MissingDataTooltip(): React.ReactElement {
 	return (
@@ -99,8 +105,20 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		setModel
 	} = useClimateVariable();
 	const section = useContext(SectionContext);
-	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
-	const { isS2DVariable } = useS2D();
+	let frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as Parameters<typeof getPeriods>[1];
+	const { isS2DVariable, releaseDate } = useS2D();
+
+	let periods: ReturnType<typeof getPeriods> = [];
+
+	if (isS2DVariable) {
+		// There's an issue with the typings here
+		frequencyConfig = FrequencyType.SEASONAL as Parameters<typeof getPeriods>[1];
+		//                ^^^^^^^^^^^^^^^^^^^^^^ But this is the type to get getPeriods to behave differently
+		if (releaseDate) {
+			const newPeriods = getPeriods(releaseDate, frequencyConfig);
+			periods = newPeriods; // There's something wrong with the typings. The getPeriods is meant to be used here.
+		}
+	}
 
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
@@ -112,10 +130,17 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			const averagingType = climateVariable.getAveragingType();
 			const averagingOptions = climateVariable.getAveragingOptions() ?? [];
 
-			const validations = [
+			const validations: boolean[] = [];
+
+			if (isS2DVariable) {
+				// TODO: Add S2D specific validation soon here.
+				return validations.every(Boolean);
+			}
+
+			validations.push(
 				// If frequency is not daily and averaging options are available, one must be selected
 				frequency === FrequencyType.DAILY || averagingOptions.length === 0 || Boolean(averagingType),
-			];
+			);
 
 			// For analyzed downloads, add additional validations
 			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
@@ -141,6 +166,11 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 
 			const payload: StepResetPayload = {};
 
+			if (isS2DVariable) {
+				// TODO: Add S2D specific reset payload soon here.
+				return payload;
+			}
+
 			if (climateVariable.getFrequencyConfig()) {
 				payload.frequency = null;
 			}
@@ -161,7 +191,10 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 
 			return payload;
 		}
-	}), [climateVariable]);
+	}), [
+		climateVariable,
+		isS2DVariable,
+	]);
 
 	const averagingOptions = [
 		{
@@ -173,7 +206,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			label: __('30-year averages'),
 		},
 	].filter((option) =>
-		climateVariable?.getAveragingOptions()?.includes(option.value)
+		!isS2DVariable && climateVariable?.getAveragingOptions()?.includes(option.value)
 	);
 
 	// Check if Download Type is Analysed.
@@ -367,6 +400,24 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 					</div>
 					<div className="mb-8">
 						<S2DReleaseDate tooltip={null} className="-uppercase -font-semibold leading-4" />
+					</div>
+					<div className="mb-8">
+						<strong>{__('Periods')}</strong>
+						<ul>
+							{periods.map((period, idx) => {
+								const isoStringFirst = period[0].toISOString();
+								const id = `start-date-${isoStringFirst}`;
+								const start = period[0].toLocaleDateString(locale, LOCALE_DATE_FORMAT_OPTIONS);
+								const end = period[1].toLocaleDateString(locale, LOCALE_DATE_FORMAT_OPTIONS);
+
+								return (
+									<li key={isoStringFirst + '_' + idx} className="mb-2">
+										<input type="checkbox" value={isoStringFirst} id={id} name="period"></input>
+										<label htmlFor={id}>{sprintf(__('%s to %s'), start, end)}</label>
+									</li>
+								);
+							})}
+						</ul>
 					</div>
 				</>
 			) : (

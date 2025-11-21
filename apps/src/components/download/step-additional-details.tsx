@@ -10,7 +10,12 @@ import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
 import S2DReleaseDate from '@/components/s2d-release-date';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { AveragingType, DownloadType, FrequencyType } from "@/types/climate-variable-interface";
+import {
+	AveragingType,
+	DownloadType,
+	FrequencyType,
+	type S2DFrequencyType,
+} from '@/types/climate-variable-interface';
 import { StepComponentRef, StepResetPayload } from "@/types/download-form-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
@@ -20,6 +25,20 @@ import appConfig from "@/config/app.config";
 import { useLocale } from '@/hooks/use-locale';
 import { sprintf } from "@wordpress/i18n";
 import { useS2D } from '@/hooks/use-s2d';
+import { assertIsS2DFrequencyType } from '@/types/assertions';
+import { utc } from '@/lib/utils';
+
+type CheckboxFactoryOption = Extract<
+	Parameters<typeof CheckboxFactory>[0]['options'][number],
+	{ value: unknown }
+>;
+
+// The full month name followed by the year. Ex: "February 2025"
+const DATE_FORMAT_OPTIONS_WHEN_MONTH_YEAR: Intl.DateTimeFormatOptions = {
+	month: 'long',
+	year: 'numeric',
+	timeZone: 'UTC',
+};
 
 const modelLabels: Record<string, string> = {
 	'pcic12': __('PCIC12 (Ensemble)'),
@@ -27,11 +46,6 @@ const modelLabels: Record<string, string> = {
 	'26models': __('Full ensemble'),
 	'humidex_models': __('Full ensemble'),
 }
-
-const LOCALE_DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
-	month: 'long',
-	timeZone: 'UTC',
-};
 
 function MissingDataTooltip(): React.ReactElement {
 	return (
@@ -87,6 +101,77 @@ function MissingDataTooltip(): React.ReactElement {
 	);
 }
 
+const normalizeListSelectedPeriods = (
+	periods: ReturnType<typeof getPeriods>,
+	frequency: S2DFrequencyType,
+	locale: string,
+): CheckboxFactoryOption[] => {
+
+	const ucFirst = (val: string): string => {
+    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+	}
+
+	return periods.map((period) => {
+		const parts = []
+		let lineTemplate = '';
+		if (frequency === FrequencyType.MONTHLY) {
+			/**
+			 * @remarks As the spec indicates:
+			 * For “Monthly”, we have 3 items
+			 * The full month name followed by the year. Ex: “February 2025”
+			 */
+			parts.push(ucFirst(period[0].toLocaleDateString(locale, DATE_FORMAT_OPTIONS_WHEN_MONTH_YEAR)));
+			lineTemplate = '%s';
+		} else if (frequency === FrequencyType.SEASONAL) {
+			/**
+			 * @remarks As the spec indicates:
+			 * For “Seasonal”, we have 10 items
+			 * The full month names with the year.
+			 * If they are in the same year, show the year only for the second month.
+			 * If they are in different year, show the year for both.
+			 * Ex: “February to April 2025”, “December 2025 to February 2026”
+			 */
+			parts.push(ucFirst(period[0].toLocaleDateString(locale, DATE_FORMAT_OPTIONS_WHEN_MONTH_YEAR)));
+			parts.push(ucFirst(period[1].toLocaleDateString(locale, DATE_FORMAT_OPTIONS_WHEN_MONTH_YEAR)));
+			lineTemplate = '%s to %s';
+		}
+		// Code-Review Question: What is the expected format here?
+		// Currently "2025-02-01,2025-04-30", because CheckboxFactory expects a string value
+		let value = period[0].toISOString().split('T')[0]; // e.g. 2025-02-01
+		value += ','
+		value += period[1].toISOString().split('T')[0]; // e.g. 2025-04-30
+		const out = {
+			label: sprintf(__(lineTemplate), ...parts),
+			value,
+		};
+		return out;
+	});
+};
+
+// TEMPORARY
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const formatSelectedPeriodsListAlpha = (
+	selectedPeriods: ReturnType<typeof getPeriods>,
+	frequency: FrequencyType,
+	locale: string,
+) => {
+	const items = normalizeListSelectedPeriods(selectedPeriods, frequency, locale);
+	return (
+		<ul>
+			{items.map(({ label, value }, idx) => {
+				const id = 'period_' + value + '_' + idx;
+				return (
+					<li key={value + '_' + idx} className="mb-2">
+						<input type="checkbox" value={value} id={id} name="period"></input>
+						<label htmlFor={id}>{label}</label>
+					</li>
+				);
+			})}
+		</ul>
+	);
+};
+
+
 /**
  * Step 5.
  *
@@ -102,23 +187,40 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		setAnalyzeScenarios,
 		setPercentiles,
 		setMissingData,
-		setModel
+		setModel,
+		setSelectedPeriods,
+		resetSelectedPeriods,
 	} = useClimateVariable();
 	const section = useContext(SectionContext);
-	let frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as Parameters<typeof getPeriods>[1];
+	const frequencyConfig = climateVariable?.getFrequencyConfig();
+	const frequency = climateVariable?.getFrequency() as FrequencyType;
 	const { isS2DVariable, releaseDate } = useS2D();
 
-	let periods: ReturnType<typeof getPeriods> = [];
-
-	if (isS2DVariable) {
-		// There's an issue with the typings here
-		frequencyConfig = FrequencyType.SEASONAL as Parameters<typeof getPeriods>[1];
-		//                ^^^^^^^^^^^^^^^^^^^^^^ But this is the type to get getPeriods to behave differently
-		if (releaseDate) {
-			const newPeriods = getPeriods(releaseDate, frequencyConfig);
-			periods = newPeriods; // There's something wrong with the typings. The getPeriods is meant to be used here.
+	let selectedPeriods: ReturnType<typeof getPeriods> = [];
+	let selectedPeriodsList: CheckboxFactoryOption[] = [];
+	if (isS2DVariable && frequency && releaseDate) {
+		try {
+			assertIsS2DFrequencyType(frequency);
+			// Will not get here if it failed above.
+			selectedPeriods = getPeriods(releaseDate, frequency);
+			selectedPeriodsList = normalizeListSelectedPeriods(selectedPeriods, frequency, locale);
+		} catch (e) {
+			// We don't want the whole page to break if there's an unexpected error here
+			console.error('Invalid frequency for S2D but not breaking:', e);
 		}
 	}
+
+	/**
+	 * Issue is that CheckboxFactory onChange expects an array of strings,
+	 * but here we have an array of [Date, Date] tuples.
+	 */
+	const onChangeForSelectedPeriodsTemporaryClosure = (values: string[]) => {
+		const selection = values.map(v => {
+			const [startStr, endStr] = v.split(',');
+			return [utc(startStr), utc(endStr)];
+		}) as ReturnType<typeof getPeriods>;
+		setSelectedPeriods(selection);
+	};
 
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
@@ -167,8 +269,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			const payload: StepResetPayload = {};
 
 			if (isS2DVariable) {
-				// TODO: Add S2D specific reset payload soon here.
-				return payload;
+				payload.selectedPeriods = null;
 			}
 
 			if (climateVariable.getFrequencyConfig()) {
@@ -190,10 +291,16 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			return payload;
-		}
+		},
+		reset: () => {
+			if (isS2DVariable) {
+				resetSelectedPeriods();
+			}
+		},
 	}), [
 		climateVariable,
 		isS2DVariable,
+		resetSelectedPeriods,
 	]);
 
 	const averagingOptions = [
@@ -402,26 +509,16 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 						<S2DReleaseDate tooltip={null} className="-uppercase -font-semibold leading-4" />
 					</div>
 					<div className="mb-8">
-						<strong>{__('Periods')}</strong>
-						<ul>
-							{periods.map((period, idx) => {
-								const isoStringFirst = period[0].toISOString();
-								const id = `start-date-${isoStringFirst}`;
-								const start = period[0].toLocaleDateString(locale, LOCALE_DATE_FORMAT_OPTIONS);
-								const end = period[1].toLocaleDateString(locale, LOCALE_DATE_FORMAT_OPTIONS);
-
-								return (
-									<li key={isoStringFirst + '_' + idx} className="mb-2">
-										<input type="checkbox" value={isoStringFirst} id={id} name="period"></input>
-										<label htmlFor={id}>{sprintf(__('%s to %s'), start, end)}</label>
-									</li>
-								);
-							})}
-						</ul>
+						<CheckboxFactory
+							name="selectedPeriods"
+							title={__('Periods')}
+							options={selectedPeriodsList}
+							onChange={onChangeForSelectedPeriodsTemporaryClosure}
+						/>
 					</div>
 				</>
 			) : (
-				<FrequencySelect
+				frequencyConfig && <FrequencySelect
 					title={__('Temporal frequency')}
 					config={frequencyConfig}
 					section={section}

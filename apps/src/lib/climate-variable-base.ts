@@ -30,6 +30,7 @@ import {
 } from '@/types/climate-variable-interface';
 import { getDefaultFrequency, getFrequencyType } from '@/lib/utils';
 import { MapDisplayType, WMSParams } from '@/types/types';
+import { type PeriodRange } from '@/lib/s2d';
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -235,6 +236,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getAnalysisFieldValue(key: keyof FieldValues): string | null {
 		return this._config.analysisFieldValues?.[key] ?? null;
+	}
+
+	getSelectedPeriods(): PeriodRange[] | null {
+		return this._config.selectedPeriods ?? null;
 	}
 
 	getDateRangeConfig(): DateRangeConfig | null {

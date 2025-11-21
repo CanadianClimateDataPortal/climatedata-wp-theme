@@ -1,5 +1,6 @@
 import React from 'react';
 import { MapDisplayType, MultilingualField, WMSParams } from '@/types/types';
+import { type PeriodRange, type getPeriods } from '@/lib/s2d';
 
 export interface variableClassMap {
 	[key: string]: string;
@@ -66,6 +67,14 @@ export enum FrequencyDisplayModeOption {
 	NONE = 'none',
 }
 
+/**
+ * Frequency in terms of temporal resolution.
+ *
+ * @remark
+ * If we search the code for `/FrequencyType\.(ANNUAL|ANNUAL_JUL_JUN|MONTHLY|SEASONAL|ALL_MONTHS|DAILY)/`,
+ * we see close to 200 times used of this enum.
+ * But there's another `FrequencyType` enum defined later in this file.
+ */
 export enum FrequencyType {
 	ANNUAL = 'ann',
 	ANNUAL_JUL_JUN = 'annual_jul_jun',
@@ -76,11 +85,37 @@ export enum FrequencyType {
 }
 
 /**
+ * In order to transition away from enums, we define an object with the same values.
+ *
+ */
+export const FrequencyTypes = {
+	ANNUAL: FrequencyType.ANNUAL,
+	ANNUAL_JUL_JUN: FrequencyType.ANNUAL_JUL_JUN,
+	MONTHLY: FrequencyType.MONTHLY,
+	SEASONAL: FrequencyType.SEASONAL,
+	ALL_MONTHS: FrequencyType.ALL_MONTHS,
+	DAILY: FrequencyType.DAILY,
+} as const;
+
+/**
+ * Derive type from the object (same as enum type {@link FrequencyType}).
+ */
+export type FrequencyTypeFromObject = typeof FrequencyTypes[keyof typeof FrequencyTypes];
+
+/**
+ * S2D frequency types - subset of available frequencies.
+ */
+export const S2DFrequencyTypes = {
+    MONTHLY: FrequencyTypes.MONTHLY,
+    SEASONAL: FrequencyTypes.SEASONAL,
+} as const;
+
+/**
  * Type for the supported frequency types for S2D variables.
  *
  * A subset of `FrequencyType`.
  */
-export type S2DFrequencyType = FrequencyType.MONTHLY | FrequencyType.SEASONAL;
+export type S2DFrequencyType = typeof S2DFrequencyTypes[keyof typeof S2DFrequencyTypes];
 
 export const ForecastTypes = {
 	EXPECTED: 'expected',
@@ -206,6 +241,15 @@ export interface LocationModalContentParams {
 	mode?: 'modal' | 'panel'
 }
 
+/**
+ * Frequency in terms of duration of pre-calculated data.
+ *
+ * @remark
+ * If we search the code for `/FrequencyType\.(YS|MS|QSDEC)/`, we see more than 76 usage
+ * of this enum.
+ * But there's another `FrequencyType` enum defined earlier in this file.
+ * We probably should rename this and all the occurences, or ... do something about it.
+ */
 export enum FrequencyType {
 	YS = 'ys',
 	MS = 'ms',
@@ -318,6 +362,12 @@ export interface ClimateVariableConfigInterface {
 
 	/** Holds submitted values for analysisFields */
 	analysisFieldValues?: FieldValues;
+
+	/**
+	 * In Download for S2D, the periods selected as calculated by {@link getPeriods}
+	 * when we use the
+	 */
+	selectedPeriods?: PeriodRange[] | null;
 
 	/** Configuration defining the date range to be used in the Download section */
 	dateRangeConfig?: DateRangeConfig;

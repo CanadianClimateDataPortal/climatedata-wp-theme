@@ -1,8 +1,12 @@
 import {
-	ForecastDisplay,
 	ForecastDisplays,
-	ForecastType,
 	ForecastTypes,
+	FrequencyTypes,
+	S2DFrequencyTypes,
+	type ForecastDisplay,
+	type ForecastType,
+	type FrequencyType,
+	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
 /**
@@ -10,6 +14,7 @@ import {
  *
  * @param validTypes - Record where values are the valid types.
  * @param name - Name of the type to use in the error message.
+ * @returns Assertion function that throws if value is not valid, otherwise narrows the type.
  */
 function buildCorrectTypeAsserter<T>(
 	validTypes: Record<string, T>,
@@ -28,8 +33,43 @@ function buildCorrectTypeAsserter<T>(
 
 /**
  * Error class representing a failed assertion.
- */
-export class AssertionError extends Error {}
+ *
+ * Supports ES2022 error chaining via the `cause` option for better debugging.
+ * Uses V8's Error.captureStackTrace when available to exclude the constructor
+ * from the stack trace for cleaner debugging.
+ *
+ * @example
+ * throw new AssertionError('Invalid type', { cause: originalError });
+ * ``` */
+export class AssertionError extends Error {
+	constructor(
+		message: string,
+		options?: ErrorOptions,
+	) {
+		super(message, options);
+		this.name = 'AssertionError';
+		// V8-specific: Capture stack trace excluding the constructor itself
+		// This gives cleaner stack traces showing where the assertion failed,
+		// not the AssertionError constructor internals
+		if (Error.captureStackTrace) {
+			Error.captureStackTrace(this, AssertionError);
+		}
+	}
+}
+
+export const assertIsFrequencyType: (
+	value: string
+) => asserts value is FrequencyType = buildCorrectTypeAsserter<FrequencyType>(
+	FrequencyTypes,
+	'FrequencyType'
+);
+
+export const assertIsS2DFrequencyType: (
+	value: string
+) => asserts value is S2DFrequencyType = buildCorrectTypeAsserter<S2DFrequencyType>(
+	S2DFrequencyTypes,
+	'S2DFrequencyType'
+);
 
 /**
  * Assert that a value is a valid ForecastType.
@@ -40,7 +80,7 @@ export const assertIsForecastType: (
 	value: string
 ) => asserts value is ForecastType = buildCorrectTypeAsserter<ForecastType>(
 	ForecastTypes,
-	'forecast type'
+	'ForecastType'
 );
 
 /**
@@ -53,5 +93,5 @@ export const assertIsForecastDisplay: (
 ) => asserts value is ForecastDisplay =
 	buildCorrectTypeAsserter<ForecastDisplay>(
 		ForecastDisplays,
-		'forecast display'
+		'ForecastDisplay'
 	);

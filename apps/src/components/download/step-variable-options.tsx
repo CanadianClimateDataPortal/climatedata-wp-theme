@@ -12,8 +12,8 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useS2D } from '@/hooks/use-s2d';
 import { dateFormatCheck } from '@/lib/utils';
 
+import { ForecastTypes } from '@/types/climate-variable-interface';
 import type { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
-import type { ForecastType } from "@/types/climate-variable-interface";
 
 /**
  * Step 3.
@@ -55,13 +55,11 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 			];
 
 			if (isS2DVariable) {
-				/**
-				 * In S2DClimateVariable's parent (ClimateVariableBase) getForecastType() method
-				 * always return 'expected' if it isn't set.
-				 */
-				const forecastTypeValue = climateVariable.getForecastType() as ForecastType;
-				const hasForecastType = forecastTypeValue != null;
-				validations.push(hasForecastType);
+				// Validate that forecastType is one of the valid ForecastType values
+				const forecastType = climateVariable.getForecastType();
+				const validForecastTypes = Object.values(ForecastTypes);
+				const isValidForecastType = forecastType != null && validForecastTypes.includes(forecastType);
+				validations.push(isValidForecastType);
 			}
 
 			return validations.every(Boolean);
@@ -88,7 +86,7 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			if (isS2DVariable) {
-				// I doubt that this should be done this way since we have setForecastType always returning a default value
+				// Matching ClimateVariableBase['getForecastType'] fallback default.
 				payload.forecastType = S2DForecastTypeFieldDropdown.DEFAULT_VALUE;
 			}
 

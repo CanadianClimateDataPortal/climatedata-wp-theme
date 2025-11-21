@@ -7,10 +7,12 @@ import {
 import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-download-fields";
 import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
 import { dateFormatCheck } from '@/lib/utils';
+import type { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
 
 /**
+ * Step 3.
+ *
  * Variable options step
  */
 const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
@@ -98,5 +100,41 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 	);
 });
 StepVariableOptions.displayName = 'StepVariableOptions';
+
+
+/**
+ * Extracts and formats summary data for the Variable Options step.
+ */
+export const StepSummaryVariableOptions = (): React.ReactNode | null => {
+	const { climateVariable } = useClimateVariable();
+
+	if (!climateVariable) return null;
+
+	// Regular variables
+	const version = climateVariable.getVersion?.();
+	const analysisFields = climateVariable.getAnalysisFields?.() ?? [];
+	const analysisFieldValues = climateVariable.getAnalysisFieldValues?.() ?? {};
+
+	return (
+		<ul className="download-summary-bullet list-disc list-inside">
+			{climateVariable.getVersions().length > 0 && (
+				<li key={version}>
+					<span className='text-dark-purple text-sm'>Version:</span>{' '}
+					<span className="uppercase">{version || 'N/A'}</span>
+				</li>
+			)}
+			{analysisFields.map(({ key, label }: { key: string; label: string }) => {
+				const value = analysisFieldValues[key] ?? '-';
+
+				return (
+					<li className="summary-item" key={key}>
+						<span className='text-gray-600 text-sm'>{__(label)}</span>:{' '}
+						<span className="uppercase">{value}</span>
+					</li>
+				);
+			})}
+		</ul>
+	);
+}
 
 export default StepVariableOptions;

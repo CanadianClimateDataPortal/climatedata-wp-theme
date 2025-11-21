@@ -82,7 +82,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	/** Map of step numbers to their component refs */
 	const stepRefs = useRef(new Map<number, StepComponentRef>());
 
-	/** 
+	/**
 	 * Update steps when the climate variable class or id change.
 	 * - skip step 3 (variable options) if it's a station variable
 	 * - skip step 5 (additional details) if it's a station variable (but not station variable)
@@ -94,7 +94,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 			if (!climateVariable) {
 				return [...STEPS];
 			}
-			
+
 			if (climateVariable?.getClass() === 'StationClimateVariable' || climateVariable?.getClass() === 'StationDataClimateVariable') {
 				// skip step 3 (variable options) if it's a station variable
 				const skipIndexes = [2];

@@ -27,8 +27,8 @@ import LayerOpacities from '@/components/ui/layer-opacities';
 
 import { PostData } from '@/types/types';
 import { INTERNAL_URLS } from '@/lib/constants';
-import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { setDataset } from '@/features/map/map-slice';
+import { useS2D } from '@/hooks/use-s2d';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 
 /**
@@ -76,7 +76,7 @@ export function AppSidebar() {
 	const about_url = INTERNAL_URLS[`about-data-${currentLocale}`] || '';
 	const support_url = INTERNAL_URLS[`support-${currentLocale}`] || '';
 
-	const isS2D = climateVariable instanceof S2DClimateVariable;
+	const { isS2DVariable } = useS2D();
 
 	return (
 		<Sidebar>
@@ -98,7 +98,7 @@ export function AppSidebar() {
 									<VariablesMenuItem />
 									<SidebarSeparator />
 
-									{isS2D ? (
+									{isS2DVariable ? (
 										<SidebarInnerS2D />
 									) : (
 										<SidebarInnerProjection />
@@ -131,7 +131,7 @@ export function AppSidebar() {
 				</SidebarGroup>
 
 				<SidebarGroup className="gap-0 mt-auto">
-					{isS2D ? (
+					{isS2DVariable ? (
 						<S2DReleaseDate />
 					) : null}
 					<RecentLocationsLink />

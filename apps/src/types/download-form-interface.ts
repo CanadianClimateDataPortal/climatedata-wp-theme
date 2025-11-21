@@ -25,3 +25,8 @@ export type FinchRequestInput = {
 	id: string;
 	data: string;
 }
+
+export interface StepSummaryData {
+	title: string;
+	content: React.ReactNode | null;
+}

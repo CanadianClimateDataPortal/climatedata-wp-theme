@@ -5,6 +5,8 @@ import { CheckboxFactory } from '@/components/ui/checkbox';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
 import { StepContainer, StepContainerDescription } from '@/components/download/step-container';
 import { EmissionScenariosTooltip } from '@/components/sidebar-menu-items/emission-scenarios-control';
+import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
+import S2DReleaseDate from '@/components/s2d-release-date';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { AveragingType, DownloadType, FrequencyConfig, FrequencyType } from "@/types/climate-variable-interface";
@@ -16,6 +18,7 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import appConfig from "@/config/app.config";
 import { useLocale } from '@/hooks/use-locale';
 import { sprintf } from "@wordpress/i18n";
+import { useS2D } from '@/hooks/use-s2d';
 
 const modelLabels: Record<string, string> = {
 	'pcic12': __('PCIC12 (Ensemble)'),
@@ -97,6 +100,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 	} = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
+	const { isS2DVariable } = useS2D();
 
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
@@ -356,15 +360,26 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				/>
 			}
 
-			<FrequencySelect
-				title={__('Temporal frequency')}
-				config={frequencyConfig}
-				section={section}
-				value={climateVariable?.getFrequency() ?? undefined}
-				onValueChange={setFrequency}
-				className={"sm:w-64 mb-4"}
-				downloadType={climateVariable?.getDownloadType() ?? undefined}
-			/>
+			{isS2DVariable ? (
+				<>
+					<div className="mb-8">
+						<S2DFrequencyFieldDropdown />
+					</div>
+					<div className="mb-8">
+						<S2DReleaseDate tooltip={null} className="-uppercase -font-semibold leading-4" />
+					</div>
+				</>
+			) : (
+				<FrequencySelect
+					title={__('Temporal frequency')}
+					config={frequencyConfig}
+					section={section}
+					value={climateVariable?.getFrequency() ?? undefined}
+					onValueChange={setFrequency}
+					className={"sm:w-64 mb-4"}
+					downloadType={climateVariable?.getDownloadType() ?? undefined}
+				/>
+			)}
 
 			{!isDownloadTypeAnalyzed
 				&& averagingOptions.length > 0

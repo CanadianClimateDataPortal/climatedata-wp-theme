@@ -1,13 +1,21 @@
 import React, { useContext } from 'react';
 import { __, _n } from '@/context/locale-provider';
+import { getPeriods } from '@/lib/s2d';
 
 import { CheckboxFactory } from '@/components/ui/checkbox';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
 import { StepContainer, StepContainerDescription } from '@/components/download/step-container';
 import { EmissionScenariosTooltip } from '@/components/sidebar-menu-items/emission-scenarios-control';
+import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
+import S2DReleaseDate from '@/components/s2d-release-date';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { AveragingType, DownloadType, FrequencyConfig, FrequencyType } from "@/types/climate-variable-interface";
+import {
+	AveragingType,
+	DownloadType,
+	FrequencyType,
+	type S2DFrequencyType,
+} from '@/types/climate-variable-interface';
 import { StepComponentRef, StepResetPayload } from "@/types/download-form-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
@@ -16,6 +24,21 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import appConfig from "@/config/app.config";
 import { useLocale } from '@/hooks/use-locale';
 import { sprintf } from "@wordpress/i18n";
+import { useS2D } from '@/hooks/use-s2d';
+import { assertIsS2DFrequencyType } from '@/types/assertions';
+import { utc } from '@/lib/utils';
+
+type CheckboxFactoryOption = Extract<
+	Parameters<typeof CheckboxFactory>[0]['options'][number],
+	{ value: unknown }
+>;
+
+// The full month name followed by the year. Ex: "February 2025"
+const DATE_FORMAT_OPTIONS_WHEN_MONTH_YEAR: Intl.DateTimeFormatOptions = {
+	month: 'long',
+	year: 'numeric',
+	timeZone: 'UTC',
+};
 
 const modelLabels: Record<string, string> = {
 	'pcic12': __('PCIC12 (Ensemble)'),
@@ -78,6 +101,77 @@ function MissingDataTooltip(): React.ReactElement {
 	);
 }
 
+const normalizeListSelectedPeriods = (
+	periods: ReturnType<typeof getPeriods>,
+	frequency: S2DFrequencyType,
+	locale: string,
+): CheckboxFactoryOption[] => {
+
+	const ucFirst = (val: string): string => {
+    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+	}
+
+	return periods.map((period) => {
+		const parts = []
+		let lineTemplate = '';
+		if (frequency === FrequencyType.MONTHLY) {
+			/**
+			 * @remarks As the spec indicates:
+			 * For “Monthly”, we have 3 items
+			 * The full month name followed by the year. Ex: “February 2025”
+			 */
+			parts.push(ucFirst(period[0].toLocaleDateString(locale, DATE_FORMAT_OPTIONS_WHEN_MONTH_YEAR)));
+			lineTemplate = '%s';
+		} else if (frequency === FrequencyType.SEASONAL) {
+			/**
+			 * @remarks As the spec indicates:
+			 * For “Seasonal”, we have 10 items
+			 * The full month names with the year.
+			 * If they are in the same year, show the year only for the second month.
+			 * If they are in different year, show the year for both.
+			 * Ex: “February to April 2025”, “December 2025 to February 2026”
+			 */
+			parts.push(ucFirst(period[0].toLocaleDateString(locale, DATE_FORMAT_OPTIONS_WHEN_MONTH_YEAR)));
+			parts.push(ucFirst(period[1].toLocaleDateString(locale, DATE_FORMAT_OPTIONS_WHEN_MONTH_YEAR)));
+			lineTemplate = '%s to %s';
+		}
+		// Code-Review Question: What is the expected format here?
+		// Currently "2025-02-01,2025-04-30", because CheckboxFactory expects a string value
+		let value = period[0].toISOString().split('T')[0]; // e.g. 2025-02-01
+		value += ','
+		value += period[1].toISOString().split('T')[0]; // e.g. 2025-04-30
+		const out = {
+			label: sprintf(__(lineTemplate), ...parts),
+			value,
+		};
+		return out;
+	});
+};
+
+// TEMPORARY
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const formatSelectedPeriodsListAlpha = (
+	selectedPeriods: ReturnType<typeof getPeriods>,
+	frequency: FrequencyType,
+	locale: string,
+) => {
+	const items = normalizeListSelectedPeriods(selectedPeriods, frequency, locale);
+	return (
+		<ul>
+			{items.map(({ label, value }, idx) => {
+				const id = 'period_' + value + '_' + idx;
+				return (
+					<li key={value + '_' + idx} className="mb-2">
+						<input type="checkbox" value={value} id={id} name="period"></input>
+						<label htmlFor={id}>{label}</label>
+					</li>
+				);
+			})}
+		</ul>
+	);
+};
+
+
 /**
  * Step 5.
  *
@@ -93,10 +187,40 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		setAnalyzeScenarios,
 		setPercentiles,
 		setMissingData,
-		setModel
+		setModel,
+		setSelectedPeriods,
+		resetSelectedPeriods,
 	} = useClimateVariable();
 	const section = useContext(SectionContext);
-	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
+	const frequencyConfig = climateVariable?.getFrequencyConfig();
+	const frequency = climateVariable?.getFrequency() as FrequencyType;
+	const { isS2DVariable, releaseDate } = useS2D();
+
+	let selectedPeriods: ReturnType<typeof getPeriods> = [];
+	let selectedPeriodsList: CheckboxFactoryOption[] = [];
+	if (isS2DVariable && frequency && releaseDate) {
+		try {
+			assertIsS2DFrequencyType(frequency);
+			// Will not get here if it failed above.
+			selectedPeriods = getPeriods(releaseDate, frequency);
+			selectedPeriodsList = normalizeListSelectedPeriods(selectedPeriods, frequency, locale);
+		} catch (e) {
+			// We don't want the whole page to break if there's an unexpected error here
+			console.error('Invalid frequency for S2D but not breaking:', e);
+		}
+	}
+
+	/**
+	 * Issue is that CheckboxFactory onChange expects an array of strings,
+	 * but here we have an array of [Date, Date] tuples.
+	 */
+	const onChangeForSelectedPeriodsTemporaryClosure = (values: string[]) => {
+		const selection = values.map(v => {
+			const [startStr, endStr] = v.split(',');
+			return [utc(startStr), utc(endStr)];
+		}) as ReturnType<typeof getPeriods>;
+		setSelectedPeriods(selection);
+	};
 
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
@@ -108,10 +232,17 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			const averagingType = climateVariable.getAveragingType();
 			const averagingOptions = climateVariable.getAveragingOptions() ?? [];
 
-			const validations = [
+			const validations: boolean[] = [];
+
+			if (isS2DVariable) {
+				// TODO: Add S2D specific validation soon here.
+				return validations.every(Boolean);
+			}
+
+			validations.push(
 				// If frequency is not daily and averaging options are available, one must be selected
 				frequency === FrequencyType.DAILY || averagingOptions.length === 0 || Boolean(averagingType),
-			];
+			);
 
 			// For analyzed downloads, add additional validations
 			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
@@ -137,6 +268,10 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 
 			const payload: StepResetPayload = {};
 
+			if (isS2DVariable) {
+				payload.selectedPeriods = null;
+			}
+
 			if (climateVariable.getFrequencyConfig()) {
 				payload.frequency = null;
 			}
@@ -156,8 +291,17 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			return payload;
-		}
-	}), [climateVariable]);
+		},
+		reset: () => {
+			if (isS2DVariable) {
+				resetSelectedPeriods();
+			}
+		},
+	}), [
+		climateVariable,
+		isS2DVariable,
+		resetSelectedPeriods,
+	]);
 
 	const averagingOptions = [
 		{
@@ -169,7 +313,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			label: __('30-year averages'),
 		},
 	].filter((option) =>
-		climateVariable?.getAveragingOptions()?.includes(option.value)
+		!isS2DVariable && climateVariable?.getAveragingOptions()?.includes(option.value)
 	);
 
 	// Check if Download Type is Analysed.
@@ -356,15 +500,34 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				/>
 			}
 
-			<FrequencySelect
-				title={__('Temporal frequency')}
-				config={frequencyConfig}
-				section={section}
-				value={climateVariable?.getFrequency() ?? undefined}
-				onValueChange={setFrequency}
-				className={"sm:w-64 mb-4"}
-				downloadType={climateVariable?.getDownloadType() ?? undefined}
-			/>
+			{isS2DVariable ? (
+				<>
+					<div className="mb-8">
+						<S2DFrequencyFieldDropdown />
+					</div>
+					<div className="mb-8">
+						<S2DReleaseDate tooltip={null} className="-uppercase -font-semibold leading-4" />
+					</div>
+					<div className="mb-8">
+						<CheckboxFactory
+							name="selectedPeriods"
+							title={__('Periods')}
+							options={selectedPeriodsList}
+							onChange={onChangeForSelectedPeriodsTemporaryClosure}
+						/>
+					</div>
+				</>
+			) : (
+				frequencyConfig && <FrequencySelect
+					title={__('Temporal frequency')}
+					config={frequencyConfig}
+					section={section}
+					value={climateVariable?.getFrequency() ?? undefined}
+					onValueChange={setFrequency}
+					className={"sm:w-64 mb-4"}
+					downloadType={climateVariable?.getDownloadType() ?? undefined}
+				/>
+			)}
 
 			{!isDownloadTypeAnalyzed
 				&& averagingOptions.length > 0

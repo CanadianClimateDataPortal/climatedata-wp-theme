@@ -6,8 +6,13 @@ import {
 } from '@/components/download/step-container';
 import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-download-fields";
 import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
+import { S2DForecastTypeFieldDropdown } from '@/components/fields/forecast';
+import { DefinitionList, type DefinitionItem } from '@/components/ui/definition-list';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useS2D } from '@/hooks/use-s2d';
 import { dateFormatCheck } from '@/lib/utils';
+
+import { ForecastTypes } from '@/types/climate-variable-interface';
 import type { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
 
 /**
@@ -16,7 +21,9 @@ import type { StepComponentRef, StepResetPayload } from '@/types/download-form-i
  * Variable options step
  */
 const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
-	const { climateVariable } = useClimateVariable();
+	const { climateVariable, setForecastType } = useClimateVariable();
+
+	const { isS2DVariable } = useS2D();
 
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
@@ -47,6 +54,14 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 					})
 			];
 
+			if (isS2DVariable) {
+				// Validate that forecastType is one of the valid ForecastType values
+				const forecastType = climateVariable.getForecastType();
+				const validForecastTypes = Object.values(ForecastTypes);
+				const isValidForecastType = forecastType != null && validForecastTypes.includes(forecastType);
+				validations.push(isValidForecastType);
+			}
+
 			return validations.every(Boolean);
 		},
 		getResetPayload: () => {
@@ -70,9 +85,21 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				payload.analysisFieldValues = {};
 			}
 
+			if (isS2DVariable) {
+				// Matching ClimateVariableBase['getForecastType'] fallback default.
+				payload.forecastType = S2DForecastTypeFieldDropdown.DEFAULT_VALUE;
+			}
+
 			return payload;
+		},
+		reset: () => {
+			setForecastType(S2DForecastTypeFieldDropdown.DEFAULT_VALUE);
 		}
-	}), [climateVariable]);
+	}), [
+		climateVariable,
+		isS2DVariable,
+		setForecastType,
+	]);
 
 	// Determine if there are any analysis fields to display.
 	const analysisFields = !!climateVariable?.getAnalysisFields()?.length;
@@ -84,16 +111,23 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				{__('Set options to adjust your variable to your needs.')}
 			</StepContainerDescription>
 			<div className="gap-4">
-				{version && (
+				{isS2DVariable ? (
 					<div className="mb-8">
-						<VersionDownloadFields />
+						<S2DForecastTypeFieldDropdown />
 					</div>
-				)}
-
-				{analysisFields && (
-					<div className="mb-8">
-					<AnalyzedDownloadFields />
-				</div>
+				) : (
+					<>
+						{version && (
+							<div className="mb-8">
+								<VersionDownloadFields />
+							</div>
+						)}
+						{analysisFields && (
+							<div className="mb-8">
+							<AnalyzedDownloadFields />
+						</div>
+						)}
+					</>
 				)}
 			</div>
 		</StepContainer>
@@ -107,8 +141,31 @@ StepVariableOptions.displayName = 'StepVariableOptions';
  */
 export const StepSummaryVariableOptions = (): React.ReactNode | null => {
 	const { climateVariable } = useClimateVariable();
+	const { isS2DVariable } = useS2D();
 
 	if (!climateVariable) return null;
+
+	// S2D Variables have different summary format
+	if (isS2DVariable) {
+		const forecastType = climateVariable.getForecastType() ?? '';
+		const formattedValue = forecastType.substring(0, 1).toUpperCase() + forecastType.substring(1).toLowerCase();
+
+		const items: DefinitionItem[] = [
+			{
+				term: __('Forecast Type'),
+				details: __(formattedValue),
+			}
+		];
+		return (
+			<DefinitionList
+				items={items}
+				className="download-summary-bullet list-disc list-inside text-sm"
+				dtClassName="text-dark-purple"
+				ddClassName="text-brand-blue uppercase"
+				variant="ul"
+			/>
+		);
+	}
 
 	// Regular variables
 	const version = climateVariable.getVersion?.();

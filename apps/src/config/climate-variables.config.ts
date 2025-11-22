@@ -618,7 +618,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
+		frequency: FrequencyType.SEASONAL,
 		interactiveRegionConfig: {
 			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
 		},
@@ -1635,6 +1637,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				addTopPadding: true,
 			}
 		},
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
+		},
 	},
 	/** S2D Total Precipitation */
 	{
@@ -1645,6 +1650,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
 			}
+		},
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
 		},
 	},
 ];

@@ -113,19 +113,24 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 
 			// For analyzed downloads, add additional validations
 			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
-				const [startYear, endYear] = climateVariable.getDateRange() ?? [];
-				const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
+				if (climateVariable.getDatasetType() === 'ahccd') {
+					validations.push(
+						climateVariable.getMissingDataOptions().length === 0 || !!climateVariable.getMissingData()
+					);
+				} else {
+					const [startYear, endYear] = climateVariable.getDateRange() ?? [];
+					const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
 
-				validations.push(
-					// A date range is required if the config is available.
-					!!climateVariable.getDownloadDateRangeConfig() || !!(startYear && endYear),
+					validations.push(
+						// A date range is required if the config is available.
+						!!climateVariable.getDownloadDateRangeConfig() || !!(startYear && endYear),
 
-					// Following checks if there are no available options or if one is selected.
-					climateVariable.getScenarios().length === 0 || scenarios.length > 0,
-					// Note: Percentiles validation is removed since empty selection is now valid
-					climateVariable.getModelOptions().length === 0 || !!climateVariable.getModel(),
-					climateVariable.getMissingDataOptions().length === 0 || !!climateVariable.getMissingData()
-				);
+						// Following checks if there are no available options or if one is selected.
+						climateVariable.getScenarios().length === 0 || scenarios.length > 0,
+						// Note: Percentiles validation is removed since empty selection is now valid
+						climateVariable.getModelOptions().length === 0 || !!climateVariable.getModel(),
+					);
+				}
 			}
 
 			return validations.every(Boolean);

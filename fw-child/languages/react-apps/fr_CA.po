@@ -1381,3 +1381,29 @@ msgstr "Médiane historique provenant de la climatologie historique de 1991 à 2
 
 msgid "Historical median"
 msgstr "Médiane historique"
+
+msgid "All periods"
+msgstr "Toutes les périodes"
+
+msgid "%d period"
+msgid_plural "%d periods"
+msgstr[0] "%d période"
+msgstr[1] "%d périodes"
+
+msgid  "S2D forecasts are shown as probabilities for how conditions will compare to historical climate conditions "
+       "between 1991 and 2020. “Expected conditions” show whether conditions are expected to be above, near or below "
+       "normal. “Unusual conditions” show whether conditions are expected to be unusually high or low. Select a forecast "
+       "type from the options in the dropdown menu."
+msgstr "Les prévisions S2D sont présentées sous forme de probabilités comparant les conditions prévues aux conditions "
+       "climatiques historiques entre 1991 et 2020. Les « Conditions attendues » indiquent si on s'attend à ce que les "
+       "conditions soient au-dessus de la normale, près de la normale ou sous la normale. Les « Conditions "
+       "inhabituelles » indiquent si on s'attend à ce que les conditions soient inhabituellement élevées ou faibles. "
+       "Sélectionnez un type de prévision parmi les options du menu déroulant."
+
+msgid  "Forecasts are available for different frequencies, from a month to 5 years. The available time periods will "
+       "change based on the frequency selected. Select a temporal frequency from the options in the dropdown menu. "
+       "Note: Only the first three months are available individually, as skill tends to be low for later months."
+msgstr "Les prévisions sont disponibles pour différentes fréquences, allant d'un mois à 5 ans. Les périodes "
+       "disponibles varient en fonction de la fréquence sélectionnée. Sélectionnez une fréquence temporelle parmi les "
+       "options du menu déroulant. Remarque : seuls les trois premiers mois sont disponibles individuellement, car "
+       "l'habileté tend à être faible pour les mois suivants."

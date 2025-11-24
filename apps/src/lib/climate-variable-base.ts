@@ -28,9 +28,8 @@ import {
 	ScenariosConfig,
 	ThresholdInterface,
 } from '@/types/climate-variable-interface';
-import { getDefaultFrequency, getFrequencyType } from '@/lib/utils';
+import { getDefaultFrequency, getFrequencyType, utc } from '@/lib/utils';
 import { MapDisplayType, WMSParams } from '@/types/types';
-import { type PeriodRange } from '@/lib/s2d';
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -238,8 +237,9 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.analysisFieldValues?.[key] ?? null;
 	}
 
-	getSelectedPeriods(): PeriodRange[] | null {
-		return this._config.selectedPeriods ?? null;
+	getSelectedPeriods(): Date[] {
+		const periodStrings = this._config.selectedPeriods ?? [];
+		return periodStrings.map(periodString => utc(periodString) as Date);
 	}
 
 	getDateRangeConfig(): DateRangeConfig | null {

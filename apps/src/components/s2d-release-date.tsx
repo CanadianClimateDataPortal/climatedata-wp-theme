@@ -33,6 +33,7 @@ const S2DReleaseDate = (props: S2DReleaseDateProps) => {
 	} = props;
 	const { releaseDate } = useS2D();
 	const { locale } = useLocale();
+	const effectiveTooltip = tooltip ?? tooltipReleaseDate;
 
 	let releaseDateElement = (
 		<span className="font-medium text-gray-400">{__('Loading...')}</span>
@@ -59,7 +60,7 @@ const S2DReleaseDate = (props: S2DReleaseDateProps) => {
 				{__('Release date:')}&nbsp;
 				{releaseDateElement}
 			</span>
-			{tooltip !== null && <TooltipWidget tooltip={tooltip ?? tooltipReleaseDate} />}
+			{effectiveTooltip && <TooltipWidget tooltip={effectiveTooltip} />}
 		</div>
 	);
 };

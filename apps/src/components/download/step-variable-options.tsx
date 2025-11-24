@@ -12,8 +12,55 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useS2D } from '@/hooks/use-s2d';
 import { dateFormatCheck } from '@/lib/utils';
 
-import { ForecastTypes } from '@/types/climate-variable-interface';
+import { ClimateVariableInterface, ForecastTypes } from '@/types/climate-variable-interface';
 import type { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
+import { getForecastTypeName } from '@/lib/s2d';
+
+const validateS2DVariable = (
+	climateVariable: ClimateVariableInterface,
+): unknown[] => {
+	// Validate that forecastType is one of the valid ForecastType values
+	const forecastType = climateVariable.getForecastType();
+	const validForecastTypes = Object.values(ForecastTypes);
+	const isValidForecastType = forecastType != null && validForecastTypes.includes(forecastType);
+	return [isValidForecastType];
+};
+
+const validateRegularVariable = (
+	climateVariable: ClimateVariableInterface,
+): unknown[] => {
+	const version = climateVariable.getVersion() ?? true;
+	const fields = climateVariable.getAnalysisFields() ?? [];
+	const values = climateVariable.getAnalysisFieldValues() ?? {};
+
+	return [
+		version,
+		...fields
+			.filter(f => f.required !== false)
+			.map(f => {
+				const value = values?.[f.key];
+				// If it's a date field with a format, check both existence and format validity
+				if (f.type === 'input' && f.attributes?.type === 'date' && f.format) {
+					return (
+						value != null &&
+						value !== '' &&
+						dateFormatCheck(f.format).test(value)
+					);
+				}
+				// Otherwise, just check existence
+				return value != null && value !== '';
+			})
+	];
+}
+
+const tooltipForecastType = __(
+	'S2D forecasts are shown as probabilities for how conditions will ' +
+	'compare to historical climate conditions between 1991 and 2020. ' +
+	'“Expected conditions” show whether conditions are expected to be above, ' +
+	'near or below normal. “Unusual conditions” show whether conditions are ' +
+	'expected to be unusually high or low. Select a forecast type from the ' +
+	'options in the dropdown menu.'
+);
 
 /**
  * Step 3.
@@ -21,8 +68,7 @@ import type { StepComponentRef, StepResetPayload } from '@/types/download-form-i
  * Variable options step
  */
 const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
-	const { climateVariable, setForecastType } = useClimateVariable();
-
+	const { climateVariable } = useClimateVariable();
 	const { isS2DVariable } = useS2D();
 
 	React.useImperativeHandle(ref, () => ({
@@ -30,36 +76,12 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 			if (!climateVariable) {
 				return false;
 			}
-
-			const version = climateVariable.getVersion() ?? true;
-			const fields = climateVariable.getAnalysisFields() ?? [];
-			const values = climateVariable.getAnalysisFieldValues() ?? {};
-
-			const validations = [
-				version,
-				...fields
-					.filter(f => f.required !== false)
-					.map(f => {
-						const value = values?.[f.key];
-						// If it's a date field with a format, check both existence and format validity
-						if (f.type === 'input' && f.attributes?.type === 'date' && f.format) {
-							return (
-								value != null &&
-								value !== '' &&
-								dateFormatCheck(f.format).test(value)
-							);
-						}
-						// Otherwise, just check existence
-						return value != null && value !== '';
-					})
-			];
+			const validations = [];
 
 			if (isS2DVariable) {
-				// Validate that forecastType is one of the valid ForecastType values
-				const forecastType = climateVariable.getForecastType();
-				const validForecastTypes = Object.values(ForecastTypes);
-				const isValidForecastType = forecastType != null && validForecastTypes.includes(forecastType);
-				validations.push(isValidForecastType);
+				validations.push(...validateS2DVariable(climateVariable));
+			} else {
+				validations.push(...validateRegularVariable(climateVariable));
 			}
 
 			return validations.every(Boolean);
@@ -86,19 +108,14 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			if (isS2DVariable) {
-				// Matching ClimateVariableBase['getForecastType'] fallback default.
-				payload.forecastType = S2DForecastTypeFieldDropdown.DEFAULT_VALUE;
+				payload.forecastType = null;
 			}
 
 			return payload;
 		},
-		reset: () => {
-			setForecastType(S2DForecastTypeFieldDropdown.DEFAULT_VALUE);
-		}
 	}), [
 		climateVariable,
 		isS2DVariable,
-		setForecastType,
 	]);
 
 	// Determine if there are any analysis fields to display.
@@ -112,8 +129,10 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 			</StepContainerDescription>
 			<div className="gap-4">
 				{isS2DVariable ? (
-					<div className="mb-8">
-						<S2DForecastTypeFieldDropdown />
+					<div className="mb-8 sm:w-64">
+						<S2DForecastTypeFieldDropdown
+							tooltip={tooltipForecastType}
+						/>
 					</div>
 				) : (
 					<>
@@ -142,55 +161,58 @@ StepVariableOptions.displayName = 'StepVariableOptions';
 export const StepSummaryVariableOptions = (): React.ReactNode | null => {
 	const { climateVariable } = useClimateVariable();
 	const { isS2DVariable } = useS2D();
+	const items: DefinitionItem[] = [];
 
-	if (!climateVariable) return null;
+	if (!climateVariable) {
+		return null;
+	}
 
-	// S2D Variables have different summary format
+	// S2D Variables have a different summary format
 	if (isS2DVariable) {
-		const forecastType = climateVariable.getForecastType() ?? '';
-		const formattedValue = forecastType.substring(0, 1).toUpperCase() + forecastType.substring(1).toLowerCase();
+		const forecastType = climateVariable.getForecastType();
 
-		const items: DefinitionItem[] = [
+		if (!forecastType) {
+			return null;
+		}
+
+		items.push(
 			{
-				term: __('Forecast Type'),
-				details: __(formattedValue),
+				term: __('Forecast Types'),
+				details: getForecastTypeName(forecastType),
 			}
-		];
-		return (
-			<DefinitionList
-				items={items}
-				className="download-summary-bullet list-disc list-inside text-sm"
-				dtClassName="text-dark-purple"
-				ddClassName="text-brand-blue uppercase"
-				variant="ul"
-			/>
+		);
+
+	} else {
+		// Regular variables
+		const version = climateVariable.getVersion?.();
+		const analysisFields = climateVariable.getAnalysisFields?.() ?? [];
+		const analysisFieldValues = climateVariable.getAnalysisFieldValues?.() ?? {};
+
+		if (climateVariable.getVersions().length > 0) {
+			items.push({
+				term: __('Version'),
+				details: version?.toUpperCase() ?? __('N/A'),
+			});
+		}
+
+		items.push(
+			...analysisFields.map(({ key, label }: { key: string; label: string }) => (
+				{
+					term: __(label),
+					details: analysisFieldValues[key]?.toUpperCase() ?? '-',
+				}
+			))
 		);
 	}
 
-	// Regular variables
-	const version = climateVariable.getVersion?.();
-	const analysisFields = climateVariable.getAnalysisFields?.() ?? [];
-	const analysisFieldValues = climateVariable.getAnalysisFieldValues?.() ?? {};
-
 	return (
-		<ul className="download-summary-bullet list-disc list-inside">
-			{climateVariable.getVersions().length > 0 && (
-				<li key={version}>
-					<span className='text-dark-purple text-sm'>Version:</span>{' '}
-					<span className="uppercase">{version || 'N/A'}</span>
-				</li>
-			)}
-			{analysisFields.map(({ key, label }: { key: string; label: string }) => {
-				const value = analysisFieldValues[key] ?? '-';
-
-				return (
-					<li className="summary-item" key={key}>
-						<span className='text-gray-600 text-sm'>{__(label)}</span>:{' '}
-						<span className="uppercase">{value}</span>
-					</li>
-				);
-			})}
-		</ul>
+		<DefinitionList
+			items={items}
+			className="download-summary-bullet list-disc list-inside text-sm"
+			dtClassName="text-dark-purple font-medium"
+			ddClassName="text-brand-blue"
+			variant="ul"
+		/>
 	);
 }
 

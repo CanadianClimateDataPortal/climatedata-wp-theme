@@ -1,6 +1,5 @@
 import React from 'react';
 import { MapDisplayType, MultilingualField, WMSParams } from '@/types/types';
-import { type PeriodRange, type getPeriods } from '@/lib/s2d';
 
 export interface variableClassMap {
 	[key: string]: string;
@@ -364,10 +363,9 @@ export interface ClimateVariableConfigInterface {
 	analysisFieldValues?: FieldValues;
 
 	/**
-	 * In Download for S2D, the periods selected as calculated by {@link getPeriods}
-	 * when we use the
+	 * Selected S2D periods, as an array of dates in a string format of 'YYYY-MM'.
 	 */
-	selectedPeriods?: PeriodRange[] | null;
+	selectedPeriods?: string[] | null;
 
 	/** Configuration defining the date range to be used in the Download section */
 	dateRangeConfig?: DateRangeConfig;
@@ -615,4 +613,12 @@ export interface ClimateVariableInterface {
 	getForecastType(): ForecastType | null;
 
 	getForecastDisplay(): ForecastDisplay | null;
+
+	/**
+	 * List of selected periods, each period represented as a Date of the period's start'.
+	 *
+	 * Each element is the period's *start* date. The length (and thus the end
+	 * date) of a period can be determined from the frequency selected.
+	 */
+	getSelectedPeriods(): Date[];
 }

@@ -618,9 +618,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
-			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
-		frequency: FrequencyType.SEASONAL,
 		interactiveRegionConfig: {
 			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
 		},

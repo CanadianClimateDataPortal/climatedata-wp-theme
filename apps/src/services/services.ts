@@ -675,13 +675,11 @@ export const fetchS2DReleaseDate = async (
 	const argVariableName = getApiVariableId(variable);
 	const argFrequencyName = getApiFrequencyName(frequency);
 
-	const data = await queryDataAPI(
+	return await queryDataAPI(
 		`/get-s2d-release-date/${argVariableName}/${argFrequencyName}`,
 		undefined,
 		fetchOptions,
 	);
-
-	return data;
 }
 
 /**

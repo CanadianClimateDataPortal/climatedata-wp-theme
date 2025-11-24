@@ -17,9 +17,10 @@ export type UseS2DHook = {
 	/**
 	 * Check whether the instance of {@see ClimateVariableInterface} is an {@see S2DClimateVariable}.
 	 */
-	isS2DVariable: boolean | null;
+	isS2DVariable: boolean;
 	/**
-	 * The current S2D dataset release date.
+	 * The release date for the current S2D variable and frequency. Null if the
+	 * current variable is not loaded, or not an S2D variable.
 	 */
 	releaseDate: Date | null;
 };
@@ -56,7 +57,7 @@ export const useS2D = (): UseS2DHook => {
 	const { climateVariable } = useClimateVariable();
 
 	const isS2DVariable =
-		climateVariable && climateVariable instanceof S2DClimateVariable;
+		!!(climateVariable && climateVariable instanceof S2DClimateVariable);
 
 	const selectedFrequency = climateVariable?.getFrequency();
 	const climateVariableID = climateVariable?.getId();

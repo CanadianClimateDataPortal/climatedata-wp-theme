@@ -2,16 +2,7 @@ import React from 'react';
 
 import { __ } from '@/context/locale-provider';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import {
-	selectLowSkillVisibility,
-	setLowSkillVisibility,
-} from '@/features/map/map-slice';
-
-import TooltipWidget from '@/components/ui/tooltip-widget';
 import Dropdown from '@/components/ui/dropdown';
-import { Checkbox } from '@/components/ui/checkbox';
 
 import {
 	ForecastDisplay,
@@ -107,48 +98,3 @@ export const S2DForecastDisplayFieldDropdown = (
 
 S2DForecastDisplayFieldDropdown.displayName = 'S2DForecastDisplayFieldDropdown';
 S2DForecastDisplayFieldDropdown.DEFAULT_VALUE = ForecastDisplays.FORECAST;
-
-export interface S2DForecastDisplaySkillFieldCheckboxProps {
-	tooltip?: React.ReactNode;
-}
-
-export const S2DForecastDisplaySkillFieldCheckbox = (
-	props: S2DForecastDisplaySkillFieldCheckboxProps
-) => {
-	const dispatch = useAppDispatch();
-
-	const checked = !useAppSelector(selectLowSkillVisibility());
-	const onCheckedChange = (checked: boolean) => {
-		const isVisible = !checked; // "checked" means "hide low skill"
-		dispatch(setLowSkillVisibility({ visible: isVisible }));
-	};
-
-	const {
-		tooltip,
-		...propsRest
-	} = props;
-	const fieldProps = {
-		checked,
-		onCheckedChange,
-		...propsRest,
-	 };
-
-	return (
-		<div className="flex items-center space-x-2">
-			<Checkbox
-				id={ForecastDisplayField.key + '_compare'}
-				className="text-brand-red"
-				{...fieldProps}
-			/>
-			<label
-				htmlFor={ForecastDisplayField.key + '_compare'}
-				className="text-sm font-medium leading-none cursor-pointer"
-			>
-				{__('Mask Low Skill')}
-			</label>
-			<TooltipWidget tooltip={tooltip} />
-		</div>
-	);
-};
-
-S2DForecastDisplaySkillFieldCheckbox.displayName = 'S2DForecastDisplaySkillFieldCheckbox';

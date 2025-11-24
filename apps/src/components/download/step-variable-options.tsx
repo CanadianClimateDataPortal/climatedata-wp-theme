@@ -11,6 +11,7 @@ import { DefinitionList, type DefinitionItem } from '@/components/ui/definition-
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useS2D } from '@/hooks/use-s2d';
 import { dateFormatCheck } from '@/lib/utils';
+import type { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
 
 import { ForecastTypes } from '@/types/climate-variable-interface';
 import type { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';

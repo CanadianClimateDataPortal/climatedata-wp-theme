@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { nanoid } from 'nanoid';
 import { sprintf } from '@wordpress/i18n';
+import chroma from 'chroma-js';
 
 import { __ } from '@/context/locale-provider';
 import TooltipWidget from '@/components/ui/tooltip-widget';
@@ -119,6 +120,7 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 
 export interface MapLegendForecastS2DProps {
 	data: ColourQuantitiesMap;
+	opacity: number;
 	forecastType?: ForecastType | null;
 	variableName?: string | null;
 }
@@ -138,6 +140,7 @@ export const MapLegendForecastS2D = (
 
 	const {
 		data: colorMap,
+		opacity,
 		variableName,
 		forecastType,
 	} = props;
@@ -343,7 +346,7 @@ export const MapLegendForecastS2D = (
 
 									const borderRadius = 3;
 									const style: React.CSSProperties = {
-										backgroundColor: color,
+										backgroundColor: chroma(color).alpha(opacity).css(),
 									};
 									/**
 									 * Fidelity with design issue:

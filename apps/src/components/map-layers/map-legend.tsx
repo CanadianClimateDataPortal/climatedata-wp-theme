@@ -128,6 +128,7 @@ const MapLegend: React.FC = () => {
 					<Suspense fallback={'...'}>
 						<LazyMapLegendForecastS2D
 							data={colorMap}
+							opacity={mapData}
 							variableName={variableName}
 							forecastType={forecastType}
 						/>
@@ -181,6 +182,7 @@ const MapLegend: React.FC = () => {
 		forecastType,
 		showForecastLegendOfS2D,
 		showClimatologyLegendOfS2D,
+		variableName,
 	]);
 
 	return null;

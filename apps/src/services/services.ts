@@ -33,6 +33,12 @@ import {
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, unknown>();
 
+/**
+ * Checks if a fetch request was aborted, using its fetchOptions.
+ *
+ * @param fetchOptions - The fetchOptions object passed to the fetch request.
+ *   Can be undefined.
+ */
 const isAborted = (fetchOptions?: FetchOptions): boolean => {
 	return fetchOptions?.signal?.aborted ?? false;
 }
@@ -86,7 +92,7 @@ export const fetchJSON = async <T = any>(
 			);
 		}
 
-		return await response.json();
+		return await response.json() as T;
 	} catch (error) {
 		const originalError = error as Error;
 		// In case of fetch abort, we return null immediately, we don't throw

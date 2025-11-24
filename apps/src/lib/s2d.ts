@@ -249,6 +249,8 @@ export function getForecastTypeName(forecastType: ForecastType): string {
  * @returns The variable id to use for S2D API requests, e.g. `"air_temp"`.
  */
 export function getApiVariableId(variableId: string): string {
+	// For now, the only difference between the app's variable ids and the ones
+	// used in the API is simply a prefix.
 	return variableId.replace(/^s2d_/, '');
 }
 

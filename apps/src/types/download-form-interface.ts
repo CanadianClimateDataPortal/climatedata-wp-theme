@@ -1,3 +1,5 @@
+import React from 'react';
+
 /**
  * Interface for the payload returned when resetting a step's data
  */

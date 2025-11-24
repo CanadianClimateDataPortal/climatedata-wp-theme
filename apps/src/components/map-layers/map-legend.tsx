@@ -42,6 +42,7 @@ const MapLegend: React.FC = () => {
 	} = useAppSelector((state) => state.map);
 
 	const { legendData } = useAppSelector((state) => state.map);
+	const { isS2DVariable } = useS2D();
 	const colourScheme = climateVariable?.getColourScheme();
 	const isDelta = climateVariable?.getDataValue() === 'delta';
 	const unit = climateVariable?.getUnitLegend();
@@ -49,7 +50,6 @@ const MapLegend: React.FC = () => {
 		climateVariable?.getLegendConfig(isDelta ? MapDisplayType.DELTA : MapDisplayType.ABSOLUTE) ??
 		undefined;
 	let isCategorical = climateVariable?.getColourType() !== ColourType.CONTINUOUS;
-	const { isS2DVariable } = useS2D();
 	const forecastDisplay = climateVariable?.getForecastDisplay();
 	const forecastType = climateVariable?.getForecastType();
 	const variableName = climateVariable?.getTitle();

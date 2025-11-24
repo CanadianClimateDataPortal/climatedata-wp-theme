@@ -65,11 +65,11 @@ export const StepSummaryLocation = (): React.ReactNode | null => {
 
 	if (!climateVariable) return null;
 
-	const isRegion = Boolean(climateVariable?.getSelectedRegion());
+	const isRegion = Boolean(climateVariable.getSelectedRegion());
 
 	const selectedCount = isRegion
-		? climateVariable?.getSelectedRegion()?.cellCount ?? 0
-		: climateVariable?.getSelectedPointsCount() ?? 0;
+		? climateVariable.getSelectedRegion()?.cellCount ?? 0
+		: climateVariable.getSelectedPointsCount() ?? 0;
 
 	return (
 		(isRegion ? '~ ' : '') +

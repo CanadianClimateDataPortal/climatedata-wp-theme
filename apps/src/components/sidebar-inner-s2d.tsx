@@ -4,15 +4,11 @@ import { SidebarMenuItem, SidebarSeparator } from '@/components/ui/sidebar';
 
 import {
 	S2DForecastDisplayFieldDropdown,
-	S2DForecastDisplaySkillFieldCheckbox,
 	S2DForecastTypeFieldDropdown,
 } from '@/components/fields/forecast';
-
 import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
-
 import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
-
-import { getForecastTypeName } from '@/lib/s2d';
+import { MaskLowSkillField } from '@/components/fields/skill';
 
 const tooltipForecastTypes = __(
 	'S2D forecasts are shown as probabilities for how conditions will compare to historical climate conditions between 1991 and 2020. ' +
@@ -57,7 +53,7 @@ const SidebarInnerS2D = () => {
 					<S2DForecastDisplayFieldDropdown
 						tooltip={tooltipForecastDisplay}
 					/>
-					<S2DForecastDisplaySkillFieldCheckbox
+					<MaskLowSkillField
 						tooltip={tooltipForecastDisplayLowSkill}
 					/>
 				</div>

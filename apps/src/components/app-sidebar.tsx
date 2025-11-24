@@ -39,6 +39,7 @@ export function AppSidebar() {
 	const {
 		dataset,
 	} = useAppSelector((state) => state.map);
+	const { isS2DVariable } = useS2D();
 	const [selectedVariable, setSelectedVariable] = useState<PostData | null>(
 		null
 	);
@@ -75,8 +76,6 @@ export function AppSidebar() {
 
 	const about_url = INTERNAL_URLS[`about-data-${currentLocale}`] || '';
 	const support_url = INTERNAL_URLS[`support-${currentLocale}`] || '';
-
-	const { isS2DVariable } = useS2D();
 
 	return (
 		<Sidebar>

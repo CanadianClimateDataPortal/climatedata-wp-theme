@@ -36,7 +36,6 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const { getLocalized } = useLocale();
 	const { dataset } = useAppSelector((state) => state.map);
 	const variableList = useAppSelector((state) => state.map.variableList);
-
 	const { isS2DVariable } = useS2D();
 
 	// Displayed info

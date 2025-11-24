@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { nanoid } from 'nanoid';
 import { sprintf } from '@wordpress/i18n';
+import chroma from 'chroma-js';
 
 import { __ } from '@/context/locale-provider';
 import TooltipWidget from '@/components/ui/tooltip-widget';
@@ -119,6 +120,7 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 
 export interface MapLegendForecastS2DProps {
 	data: ColourQuantitiesMap;
+	opacity: number;
 	forecastType?: ForecastType | null;
 	variableName?: string | null;
 }
@@ -138,6 +140,7 @@ export const MapLegendForecastS2D = (
 
 	const {
 		data: colorMap,
+		opacity,
 		variableName,
 		forecastType,
 	} = props;
@@ -166,8 +169,7 @@ export const MapLegendForecastS2D = (
 	};
 
 	// Table heading on the left
-	const labelWidth = 78; // px
-	// Padding around the table
+	const itemWidth = 50; // px
 	// Font size to for table headings on the top and left.
 	const headingFontSize = '.8rem';
 	// The little notch between each levels
@@ -196,16 +198,15 @@ export const MapLegendForecastS2D = (
 			</header>
 
 			<table
-				className="w-full table-fixed px-3 border-separate border-spacing-y-2"
+				className="w-full px-3 border-separate border-spacing-y-2"
 				aria-labelledby={prefix + '-legend-header'}
 			>
 				<colgroup>
 					<col
-						style={{ width: `${labelWidth}px` }}
 						className="whitespace-nowrap"
 					/>
 					{data.rows[0].colors.map((_, idx) => {
-						return (<col key={idx} />); // Should redistribute equally
+						return (<col key={idx} style={{ width: `${itemWidth}px` }} />);
 					})}
 				</colgroup>
 
@@ -345,7 +346,7 @@ export const MapLegendForecastS2D = (
 
 									const borderRadius = 3;
 									const style: React.CSSProperties = {
-										backgroundColor: color,
+										backgroundColor: chroma(color).alpha(opacity).css(),
 									};
 									/**
 									 * Fidelity with design issue:

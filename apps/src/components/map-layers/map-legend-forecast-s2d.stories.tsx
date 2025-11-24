@@ -55,12 +55,14 @@ const translatedFrench = {
 interface MapLegendInnerStory extends StoryWithLocale {
 	translatedFrench: Record<string, string>;
 	data: ColourQuantitiesMap;
+	opacity: number;
 	forecastType?: ForecastType;
 	variableName?: string | null;
 }
 
 export const StoryAlpha: Story<MapLegendInnerStory> = ({
 	data,
+	opacity,
 	forecastType,
 	locale,
 	translatedFrench,
@@ -73,6 +75,7 @@ export const StoryAlpha: Story<MapLegendInnerStory> = ({
 		>
 			<MapLegendForecastS2D
 				data={data}
+				opacity={opacity}
 				forecastType={forecastType}
 				variableName={variableName}
 			/>
@@ -84,6 +87,7 @@ StoryAlpha.storyName = 'Default';
 
 StoryAlpha.args = {
 	data: EXAMPLE_COLOR_MAP_S2D_MULTIBAND,
+	opacity: 1,
 	forecastType: ForecastTypes.EXPECTED,
 	locale: 'en',
 	translatedFrench,

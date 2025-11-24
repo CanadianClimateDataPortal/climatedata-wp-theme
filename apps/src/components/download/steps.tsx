@@ -354,7 +354,7 @@ const Steps: React.FC = () => {
 					const fileName = climateVariable.getId() ?? 'file';
 					const downloadFileName = fileName + (fileFormat === FileFormatType.NetCDF ? '.nc' : '.zip');
 
-// Generate the file to be downloaded
+					// Generate the file to be downloaded
 					climateVariable.getDownloadUrl()
 						.then((url) => {
 							// If a valid URL is returned, create a download file object

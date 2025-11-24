@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { useAppSelector } from '@/app/hooks';
 import { sprintf } from "@wordpress/i18n";
 import { trackIDFDownload, trackPrecalculatedDownload, trackStationDataDownload } from '@/lib/google-analytics';
+import useS2D from '@/hooks/use-s2d';
 
 /**
  * Track a Google Tag Manager event for a downloaded variable.
@@ -56,6 +57,7 @@ function trackDownloadClick(
 const StepResult = React.forwardRef(() => {
 	const { climateVariable } = useClimateVariable();
 	const { requestResult, downloadLinks } = useAppSelector((state) => state.download);
+	const { isS2DVariable } = useS2D();
 
 	const [containerTitle, setContainerTitle] = useState<string | null>(null);
 	const [containerDescription, setContainerDescription] = useState<string | null>(null);
@@ -137,6 +139,19 @@ const StepResult = React.forwardRef(() => {
 									'Government of Canada Historical Climate Data</a> websites.'
 								),
 								'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
+								'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
+							)
+					}}
+					/>
+				)}
+				{isS2DVariable && (
+					<p className="mt-4" dangerouslySetInnerHTML={{ __html:
+							sprintf(
+								__(
+									'For access to global S2D forecast data or to set up automated downloads, please ' +
+									'visit <a href="https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_en/" %s>GeoMet</a> ' +
+									'(Environment and Climate Change Canada site).'
+								),
 								'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
 							)
 					}}

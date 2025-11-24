@@ -127,6 +127,44 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 			},
 		);
 	}
+
+	/**
+	 * TODO: For now, only outputs in the console the payload to send to the API
+	 */
+	async getDownloadUrl(): Promise<string | null> {
+		const selectedRegion = this.getSelectedRegion?.(); // For a drawn region
+		const selectedPoints = this.getSelectedPoints?.(); // For selected points/cells
+
+		const formatPeriod = (date: Date): string => formatUTCDate(date, 'yyyy-MM');
+
+		const payload: Record<string, unknown> = {
+			var: this.getId(), // TODO: use getApiVariableId()
+			format: this.getFileFormat(),
+			forecast_type: this.getForecastType(), // TODO: use getApiForecastType()
+			frequency: this.getFrequency(), // TODO: use getApiFrequency()
+			periods: this.getSelectedPeriods().map(formatPeriod),
+		}
+
+		// Add bbox or points based on the selected region
+		if (selectedRegion && selectedRegion.bounds) {
+			// Region (bbox) selection
+			const bounds = selectedRegion.bounds as [[number, number], [number, number]];
+			payload['bbox'] = [
+				bounds[0][0], // minLat
+				bounds[0][1], // minLng
+				bounds[1][0], // maxLat
+				bounds[1][1], // maxLng
+			];
+		} else if (selectedPoints && Object.keys(selectedPoints).length > 0) {
+			payload['points'] = Object.values(selectedPoints).map(({ lat, lng }) => [lat, lng]);
+		}
+
+		console.log(payload);
+
+		// Must return a blob URL, look at the fetchDownloadUrl() method in raster-precalculated-climate-variable.tsx
+		// return await this.fetchDownloadUrl(payload);
+		return 'https://example.com/';
+	}
 }
 
 export default S2DClimateVariable;

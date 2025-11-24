@@ -7,8 +7,8 @@ import {
 	type LocationModalContentParams as BaseLocationModalContentParams,
 } from '@/types/climate-variable-interface';
 import { useLocale } from '@/hooks/use-locale';
+import { useS2D } from '@/hooks/use-s2d';
 import appConfig from '@/config/app.config';
-import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { getForecastTypeName } from '@/lib/s2d';
 
 interface LocationModalContentProps extends BaseLocationModalContentParams {
@@ -36,8 +36,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const { getLocalized } = useLocale();
 	const { dataset } = useAppSelector((state) => state.map);
 	const variableList = useAppSelector((state) => state.map.variableList);
-
-	const isS2D = climateVariable && climateVariable instanceof S2DClimateVariable;
+	const { isS2DVariable } = useS2D();
 
 	// Displayed info
 	const datasetLabel = getLocalized(dataset);
@@ -60,7 +59,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 		__(climateVariableTitle),
 	];
 
-	if (isS2D) {
+	if (isS2DVariable) {
 		const forecastType = climateVariable?.getForecastType();
 		if (forecastType) {
 			subTitleParts.push(getForecastTypeName(forecastType));
@@ -88,7 +87,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 				scenario,
 			}) }
 
-			{!isS2D && (
+			{!isS2DVariable && (
 				<p className="text-right">
 					<a
 						href="#"

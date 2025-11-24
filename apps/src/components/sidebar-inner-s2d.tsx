@@ -1,27 +1,14 @@
 import { __ } from '@/context/locale-provider';
 
-import Dropdown from '@/components/ui/dropdown';
-import TooltipWidget from '@/components/ui/tooltip-widget';
-
 import { SidebarMenuItem, SidebarSeparator } from '@/components/ui/sidebar';
-import { Checkbox } from '@/components/ui/checkbox';
 
-import { useClimateVariable } from '@/hooks/use-climate-variable';
 import {
-	ForecastDisplay,
-	ForecastDisplays,
-	ForecastType,
-	ForecastTypes,
-	FrequencyType,
-} from '@/types/climate-variable-interface';
+	S2DForecastDisplayFieldDropdown,
+	S2DForecastTypeFieldDropdown,
+} from '@/components/fields/forecast';
+import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
 import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import {
-	selectLowSkillVisibility,
-	setLowSkillVisibility,
-} from '@/features/map/map-slice';
-
-import { getForecastTypeName } from '@/lib/s2d';
+import { MaskLowSkillField } from '@/components/fields/skill';
 
 const tooltipForecastTypes = __(
 	'S2D forecasts are shown as probabilities for how conditions will compare to historical climate conditions between 1991 and 2020. ' +
@@ -52,112 +39,31 @@ const tooltipTimePeriods = __(
 		'Move the slider to select the forecast for your time period of interest.'
 );
 
-const SelectAnOptionLabel = __('Select an option');
-
-const fieldForecastTypes = {
-	key: 'forecast_types',
-	label: __('Forecast Types'),
-	options: [ForecastTypes.EXPECTED, ForecastTypes.UNUSUAL].map((type) => ({
-		value: type,
-		label: getForecastTypeName(type),
-	})),
-};
-
-const fieldForecastDisplay = {
-	key: 'forecast_display',
-	label: __('Forecast Display'),
-	options: [
-		{ value: ForecastDisplays.FORECAST, label: __('Forecast') },
-		{ value: ForecastDisplays.CLIMATOLOGY, label: __('Climatology') },
-	],
-};
-
-const fieldFrequencies = {
-	key: 'frequencies',
-	label: __('Frequencies'),
-	options: [
-		{ value: FrequencyType.MONTHLY, label: __('Monthly') },
-		{ value: FrequencyType.SEASONAL, label: __('Seasonal (3 months)') },
-	],
-};
-
 const SidebarInnerS2D = () => {
-	const {
-		climateVariable,
-		setForecastType,
-		setForecastDisplay,
-		setFrequency,
-	} = useClimateVariable();
-
-	const dispatch = useAppDispatch();
-	const isLowSkillMasked = ! useAppSelector(selectLowSkillVisibility());
-	const forecastType =
-		climateVariable?.getForecastType() ?? ForecastTypes.EXPECTED;
-	const forecastDisplay =
-		climateVariable?.getForecastDisplay() ?? ForecastDisplays.FORECAST;
-	const frequency = climateVariable?.getFrequency() ?? FrequencyType.MONTHLY;
-
-	const handleLowSkillHideChange = (checked: boolean) => {
-		const isVisible = !checked; // "checked" means "hide low skill"
-		dispatch(setLowSkillVisibility({ visible: isVisible }));
-	};
-
 	return (
 		<>
 			<SidebarMenuItem>
-				<Dropdown<ForecastType>
-					key={fieldForecastTypes.key}
-					placeholder={SelectAnOptionLabel}
-					options={fieldForecastTypes.options}
-					label={fieldForecastTypes.label}
-					value={forecastType}
+				<S2DForecastTypeFieldDropdown
 					tooltip={tooltipForecastTypes}
-					onChange={setForecastType}
 				/>
 			</SidebarMenuItem>
 
 			<SidebarMenuItem>
 				<div className="flex flex-col gap-4">
-					<Dropdown<ForecastDisplay>
-						key={fieldForecastDisplay.key}
-						placeholder={SelectAnOptionLabel}
-						options={fieldForecastDisplay.options}
-						label={fieldForecastDisplay.label}
-						value={forecastDisplay}
+					<S2DForecastDisplayFieldDropdown
 						tooltip={tooltipForecastDisplay}
-						onChange={setForecastDisplay}
 					/>
-					<div className="flex items-center space-x-2">
-						<Checkbox
-							id={fieldForecastDisplay.key + '_compare'}
-							className="text-brand-red"
-							checked={isLowSkillMasked}
-							onCheckedChange={handleLowSkillHideChange}
-						/>
-						<label
-							htmlFor={fieldForecastDisplay.key + '_compare'}
-							className="text-sm font-medium leading-none cursor-pointer"
-						>
-							{__('Mask Low Skill')}
-						</label>
-						<TooltipWidget
-							tooltip={tooltipForecastDisplayLowSkill}
-						/>
-					</div>
+					<MaskLowSkillField
+						tooltip={tooltipForecastDisplayLowSkill}
+					/>
 				</div>
 			</SidebarMenuItem>
 
 			<SidebarSeparator />
 
 			<SidebarMenuItem>
-				<Dropdown<string>
-					key={fieldFrequencies.key}
-					placeholder={SelectAnOptionLabel}
-					options={fieldFrequencies.options}
-					label={fieldFrequencies.label}
-					value={frequency}
+				<S2DFrequencyFieldDropdown
 					tooltip={tooltipFrequencies}
-					onChange={setFrequency}
 				/>
 			</SidebarMenuItem>
 

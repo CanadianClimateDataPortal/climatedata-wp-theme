@@ -19,6 +19,8 @@ import SectionContext from "@/context/section-provider";
 import useFilteredVariables from '@/hooks/use-filtered-variables';
 
 /**
+ * Step 2.
+ *
  * Variable step
  */
 const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {

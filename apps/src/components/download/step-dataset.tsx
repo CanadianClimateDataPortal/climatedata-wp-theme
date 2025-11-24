@@ -17,6 +17,8 @@ import { TaxonomyData } from '@/types/types';
 import { StepComponentRef } from '@/types/download-form-interface';
 
 /**
+ * Step 1.
+ *
  * Dataset step
  */
 const StepDataset = React.forwardRef<StepComponentRef>((_, ref) => {

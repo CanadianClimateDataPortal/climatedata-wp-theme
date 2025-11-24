@@ -21,7 +21,7 @@ import {
 import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
-import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import { useS2D } from '@/hooks/use-s2d';
 
 import type { MapLegendForecastS2D } from '@/components/map-layers/map-legend-forecast-s2d';
 import type { MapLegendCommon, MapLegendCommonProps } from '@/components/map-layers/map-legend-common';
@@ -42,6 +42,7 @@ const MapLegend: React.FC = () => {
 	} = useAppSelector((state) => state.map);
 
 	const { legendData } = useAppSelector((state) => state.map);
+	const { isS2DVariable } = useS2D();
 	const colourScheme = climateVariable?.getColourScheme();
 	const isDelta = climateVariable?.getDataValue() === 'delta';
 	const unit = climateVariable?.getUnitLegend();
@@ -49,14 +50,13 @@ const MapLegend: React.FC = () => {
 		climateVariable?.getLegendConfig(isDelta ? MapDisplayType.DELTA : MapDisplayType.ABSOLUTE) ??
 		undefined;
 	let isCategorical = climateVariable?.getColourType() !== ColourType.CONTINUOUS;
-	const isS2D = climateVariable instanceof S2DClimateVariable;
 	const forecastDisplay = climateVariable?.getForecastDisplay();
 	const forecastType = climateVariable?.getForecastType();
 	const variableName = climateVariable?.getTitle();
 
 	// Whether to show the regular legend or the S2D forecast legend
-	const showForecastLegendOfS2D = isS2D && forecastDisplay === ForecastDisplays.FORECAST;
-	const showClimatologyLegendOfS2D = isS2D && forecastDisplay == ForecastDisplays.CLIMATOLOGY;
+	const showForecastLegendOfS2D = isS2DVariable && forecastDisplay === ForecastDisplays.FORECAST;
+	const showClimatologyLegendOfS2D = isS2DVariable && forecastDisplay == ForecastDisplays.CLIMATOLOGY;
 
 	// For the default colour palette, isCategorical defaults to the default legend's type
 	if ((colourScheme === null || colourScheme === 'default') && legendData && legendData.Legend) {

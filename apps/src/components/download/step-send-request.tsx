@@ -73,6 +73,8 @@ const Captcha: React.FC<{
 Captcha.displayName = 'Captcha';
 
 /**
+ * Step 6.
+ *
  * Send download request step
  */
 const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
@@ -148,7 +150,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	 */
 	const shouldShowCaptcha = () => {
 		if (!climateVariable) return false;
-		
+
 		if (climateVariable.getId() === 'daily_ahccd_temperature_and_precipitation') {
 			return false;
 		}
@@ -268,5 +270,31 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	);
 });
 StepSendRequest.displayName = 'StepSendRequest';
+
+/**
+ * Extracts and formats summary data for the Send Request step (file parameters).
+ *
+ * Exported as a named export so it can be imported and used by StepSummary.
+ * This keeps the logic for extracting summary data co-located with the step itself.
+ *
+ * @returns File format label or empty string
+ */
+export const StepSummarySendRequest = (): string => {
+	const { climateVariable } = useClimateVariable();
+
+	if (!climateVariable) return '';
+
+	const fileFormat = climateVariable.getFileFormat();
+	if (!fileFormat) return '';
+
+	const fileFormatLabels = {
+		[FileFormatType.CSV]: 'CSV',
+		[FileFormatType.JSON]: 'JSON',
+		[FileFormatType.NetCDF]: 'NetCDF',
+		[FileFormatType.GeoJSON]: 'GeoJSON',
+	};
+
+	return fileFormatLabels[fileFormat] ?? fileFormat;
+};
 
 export default StepSendRequest;

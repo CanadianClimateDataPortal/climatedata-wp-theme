@@ -1,3 +1,5 @@
+import React from 'react';
+
 /**
  * Interface for the payload returned when resetting a step's data
  */
@@ -24,4 +26,9 @@ export interface StepComponentRef {
 export type FinchRequestInput = {
 	id: string;
 	data: string;
+}
+
+export interface StepSummaryData {
+	title: string;
+	content: React.ReactNode | null;
 }

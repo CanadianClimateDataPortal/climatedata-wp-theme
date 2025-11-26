@@ -10,6 +10,7 @@ import {
 	MapInfoData,
 	Sector,
 	TaxonomyData,
+	WMSLegendData,
 } from '@/types/types';
 import L from 'leaflet';
 
@@ -22,107 +23,244 @@ import {
 import {
 	FrequencyType,
 	InteractiveRegionOption,
+	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
-import { LocationS2DData } from '@/lib/s2d';
+import {
+	normalizeForApiFrequencyName,
+	normalizeForApiVariableId,
+	LocationS2DData,
+} from '@/lib/s2d';
+import { AbstractError } from '@/lib/errors';
 
 // Cache for API responses to avoid duplicate requests
-const apiCache = new Map<string, any>();
+const apiCache = new Map<string, unknown>();
+
+/**
+ * Checks if a fetch request was aborted, using its fetchOptions.
+ *
+ * @param fetchOptions - The fetchOptions object passed to the fetch request.
+ *   Can be undefined.
+ */
+const isAborted = (fetchOptions?: FetchOptions): boolean => {
+	return fetchOptions?.signal?.aborted ?? false;
+}
+
+/**
+ * Error returned by fetch functions of this module in case of a request error.
+ */
+export class FetchError extends AbstractError {}
+
+/**
+ * Send a GET JSON request and return the parsed JSON response.
+ *
+ * If the request is aborted (e.g. through a `signal` in `fetchOptions`), the
+ * function will return `null` immediately. No error will be thrown.
+ *
+ * @param url - The URL to fetch. GET parameters can be specified in the
+ *              `params` parameter.
+ * @param params - GET parameters to set in the URL.
+ * @param fetchOptions - Additional options to pass to the fetch request.
+ * @returns A promise that resolves to the parsed JSON response. If the request
+ *     is aborted, the promise resolves to `null`.
+ * @throws FetchError - If the request failed.
+ */
+export const fetchJSON = async <T = any>(
+	url: string,
+	params?: Record<string, string>,
+	fetchOptions?: FetchOptions,
+): Promise<T | null> => {
+	let fetchUrl = url;
+	let response: Response;
+
+	if (params) {
+		fetchUrl += `?${new URLSearchParams(params).toString()}`;
+	}
+
+	try {
+		response = await fetch(
+			fetchUrl,
+			{
+				method: 'GET',
+				headers: {
+					Accept: 'application/json',
+				},
+				...fetchOptions,
+			}
+		);
+
+		if (!response.ok) {
+			throw new Error(
+				`HTTP error ${response.status}: ${response.statusText}`
+			);
+		}
+
+		return await response.json() as T;
+	} catch (error) {
+		const originalError = error as Error;
+		// In case of fetch abort, we return null immediately, we don't throw
+		// an error.
+		if (originalError.name === 'AbortError') {
+			return null;
+		} else {
+			throw new FetchError(
+				`Error fetching and parsing ${url}`,
+				{ cause: originalError },
+			);
+		}
+	}
+}
+
+/**
+ * Send a GET JSON request to the WordPress API and return the parsed JSON response.
+ *
+ * @param endpoint - The endpoint to query, e.g. /wp-json/wp/v2/posts
+ * @param params - GET parameters to set in the URL.
+ * @param fetchOptions - Additional options to pass to the fetch request.
+ * @returns A promise that resolves to the parsed JSON response. If the request
+ *     is aborted, the promise resolves to `null`.
+ */
+export const queryWordPressAPI = async <T = any>(
+	endpoint: string,
+	params?: Record<string, string>,
+	fetchOptions?: FetchOptions,
+): Promise<T | null> => {
+	let fetchEndpoint = endpoint;
+
+	if (!fetchEndpoint.startsWith('/')) {
+		fetchEndpoint = `/${fetchEndpoint}`;
+	}
+
+	return await fetchJSON<T>(
+		`${WP_API_DOMAIN}${fetchEndpoint}`,
+		params,
+		fetchOptions,
+	);
+}
+
+/**
+ * Send a GET JSON request to the "Data"" API and return the parsed JSON response.
+ *
+ * @param endpoint - The endpoint to query, e.g. /generate-charts/
+ * @param params - GET parameters to set in the URL.
+ * @param fetchOptions - Additional options to pass to the fetch request.
+ * @returns A promise that resolves to the parsed JSON response. If the request
+ *     is aborted, the promise resolves to `null`.
+ */
+export const queryDataAPI = async <T = any>(
+	endpoint: string,
+	params?: Record<string, string>,
+	fetchOptions?: FetchOptions,
+): Promise<T | null> => {
+	let fetchEndpoint = endpoint;
+
+	if (!fetchEndpoint.startsWith('/')) {
+		fetchEndpoint = `/${fetchEndpoint}`;
+	}
+
+	return await fetchJSON<T>(
+		`${window.DATA_URL}${fetchEndpoint}`,
+		params,
+		fetchOptions,
+	);
+}
 
 /**
  * Fetches WordPress variable data by post ID from the custom WP REST API endpoint.
  * Processes and normalizes the response into a structured MapInfoData object,
  * including sectors, trainings, featured image, and dataset taxonomy terms.
  */
-export const fetchWPData = async (postId: number, fetchOptions?: FetchOptions) => {
-	try {
-		const cacheKey = `wp_data_${postId}`;
+export const fetchMapInfoData = async (
+	postId: number,
+	fetchOptions?: FetchOptions,
+): Promise<MapInfoData | null> => {
+	const cacheKey = `wp_data_${postId}`;
 
-		// Check cache first
-		if (apiCache.has(cacheKey)) {
-			return apiCache.get(cacheKey);
-		}
-
-		// Make the Fetch request.
-		const response = await fetch(
-			`${WP_API_DOMAIN}${WP_API_VARIABLE_PATH}?post_id=${postId}`,
-			{
-				method: 'GET',
-				headers: {
-					Accept: 'application/json',
-					'Content-Type': 'application/json',
-				},
-				...fetchOptions,
-			}
-		);
-
-		// Handle HTTP errors
-		if (!response.ok) {
-			const errorDetails = await response.json();
-			throw new Error(
-				`HTTP error ${response.status}: ${response.statusText} - ${errorDetails}`
-			);
-		}
-
-		// Parse response JSON
-		const data = await response.json();
-		const content = data?.variable?.meta?.content;
-		const taxonomy = data?.variable?.meta?.taxonomy;
-		// @todo Add fallback for empty dataset.
-		const dataset = taxonomy?.['variable-dataset']?.terms;
-
-		// Map sectors if available and valid.
-		// @todo Add dynamic lear URL and slug.
-		const baseLearnUrl = '/learn/?q=sector:';
-		const sectors = Array.isArray(content?.relevant_sectors)
-			? content.relevant_sectors.map((item: Sector) => {
-					const slug = item.name.en
-						.toLowerCase()
-						.replace(/\s+/g, '-');
-					const link = `${baseLearnUrl}${slug}`;
-					return {
-						...item,
-						link,
-					};
-				})
-			: [];
-
-		// Generate the mapInfo object.
-		const mapInfo: MapInfoData = {
-			title: content?.title || { en: '', fr: '' },
-			tagline: content?.tagline || { en: '', fr: '' },
-			fullDescription: content?.full_description || { en: '', fr: '' },
-			techDescription: content?.tech_description || { en: '', fr: '' },
-			relevantSectors: sectors,
-			relevantTrainings: Array.isArray(content?.relevant_trainings)
-				? content.relevant_trainings
-				: [],
-			featuredImage: content?.featured_image || {
-				thumbnail: '',
-				medium: '',
-				large: '',
-				full: '',
-			},
-			dataset: Array.isArray(dataset) ? dataset : [],
-		};
-
-		const result = { mapInfo };
-
-		// Cache the result
-		apiCache.set(cacheKey, result);
-
-		return result;
-	} catch (error) {
-		console.error('Fetch error:', error);
-		throw error;
+	// Check cache first
+	if (apiCache.has(cacheKey)) {
+		return apiCache.get(cacheKey) as MapInfoData;
 	}
+
+	// Make the Fetch request.
+	const data = await queryWordPressAPI(
+		WP_API_VARIABLE_PATH,
+		{ post_id: String(postId) },
+		fetchOptions,
+	);
+
+	if (isAborted(fetchOptions)) {
+		return null;
+	}
+
+	const content = data?.variable?.meta?.content;
+	const taxonomy = data?.variable?.meta?.taxonomy;
+	// @todo Add fallback for empty dataset.
+	const dataset = taxonomy?.['variable-dataset']?.terms;
+
+	// Map sectors if available and valid.
+	// @todo Add dynamic lear URL and slug.
+	const baseLearnUrl = '/learn/?q=sector:';
+	const sectors = Array.isArray(content?.relevant_sectors)
+		? content.relevant_sectors.map((item: Sector) => {
+				const slug = item.name.en
+					.toLowerCase()
+					.replace(/\s+/g, '-');
+				const link = `${baseLearnUrl}${slug}`;
+				return {
+					...item,
+					link,
+				};
+			})
+		: [];
+
+	// Generate the mapInfo object.
+	const mapInfo: MapInfoData = {
+		title: content?.title || { en: '', fr: '' },
+		tagline: content?.tagline || { en: '', fr: '' },
+		fullDescription: content?.full_description || { en: '', fr: '' },
+		techDescription: content?.tech_description || { en: '', fr: '' },
+		relevantSectors: sectors,
+		relevantTrainings: Array.isArray(content?.relevant_trainings)
+			? content.relevant_trainings
+			: [],
+		featuredImage: content?.featured_image || {
+			thumbnail: '',
+			medium: '',
+			large: '',
+			full: '',
+		},
+		dataset: Array.isArray(dataset) ? dataset : [],
+	};
+
+	const result = mapInfo;
+
+	// Cache the result
+	apiCache.set(cacheKey, result);
+
+	return result;
 };
 
-export const fetchLegendData = async (url: string, fetchOptions?: FetchOptions) => {
-	const res = await fetch(url, { ...fetchOptions });
-	if (!res.ok) {
-		throw new Error('Failed to fetch data');
+export const fetchLegendData = async (
+	layerValue?: string,
+	layerStyles?: string,
+	fetchOptions?: FetchOptions,
+): Promise<WMSLegendData | null> => {
+	const params: Record<string, string> = {
+		service: 'WMS',
+		version: '1.1.0',
+		request: 'GetLegendGraphic',
+		format: 'application/json',
+		layer: layerValue ?? '',
+	};
+
+	if (layerStyles) {
+		params['style'] = layerStyles;
 	}
-	return res.json();
+
+	return await fetchJSON<WMSLegendData>(
+		`${GEOSERVER_BASE_URL}/geoserver/wms`,
+		params,
+		fetchOptions,
+	);
 };
 
 /**
@@ -145,63 +283,48 @@ export const fetchTaxonomyData = async (
 
 		// Check cache first
 		if (apiCache.has(cacheKey)) {
-			return apiCache.get(cacheKey);
+			return apiCache.get(cacheKey) as TaxonomyData[];
 		}
 
 		// Extract the taxonomy info from the variable response
 		// For sector and var-type, we need to get them from the dataset's variables list
 		if (slug === 'sector' || slug === 'var-type') {
 			// Use datasets-list to get the first dataset
-			const datasetsResponse = await fetch(
-				`${WP_API_DOMAIN}/wp-json/cdc/v3/datasets-list?app=${app}`,
-				{
-					method: 'GET',
-					headers: {
-						Accept: 'application/json',
-						'Content-Type': 'application/json',
-					},
-					...fetchOptions,
-				}
+			const datasetsData = await queryWordPressAPI(
+				'/wp-json/cdc/v3/datasets-list',
+				{ app: app },
+				fetchOptions,
 			);
 
-			if (!datasetsResponse.ok) {
-				throw new Error(
-					`Failed to fetch datasets: ${datasetsResponse.statusText}`
-				);
+			if (isAborted(fetchOptions)) {
+				return [];
 			}
 
-			const datasetsData = await datasetsResponse.json();
-			const firstDataset = datasetsData.datasets?.terms?.[0];
+			const firstDataset = datasetsData?.datasets?.terms?.[0];
 
 			if (!firstDataset || !firstDataset.term_id) {
 				throw new Error('No datasets found');
 			}
 
 			// Now get variables for this dataset to extract taxonomies
-			const variablesResponse = await fetch(
-				`${WP_API_DOMAIN}/wp-json/cdc/v3/variables-list?app=${app}&variable_dataset_term_id=${firstDataset.term_id}`,
+			const variablesData = await queryWordPressAPI(
+				'/wp-json/cdc/v3/variables-list',
 				{
-					method: 'GET',
-					headers: {
-						Accept: 'application/json',
-						'Content-Type': 'application/json',
-					},
-					...fetchOptions,
-				}
+					app: app,
+					variable_dataset_term_id: firstDataset.term_id,
+				},
+				fetchOptions
 			);
 
-			if (!variablesResponse.ok) {
-				throw new Error(
-					`Failed to fetch variables: ${variablesResponse.statusText}`
-				);
+			if (isAborted(fetchOptions)) {
+				return [];
 			}
-
-			const variablesData = await variablesResponse.json();
 
 			// Extract unique taxonomy terms from all variables
 			const termMap = new Map<number, TaxonomyData>();
 
 			if (
+				variablesData &&
 				variablesData.variables &&
 				Array.isArray(variablesData.variables)
 			) {
@@ -226,25 +349,17 @@ export const fetchTaxonomyData = async (
 		}
 
 		// For other taxonomies, use the normal pattern
-		const url = `${WP_API_DOMAIN}/wp-json/cdc/v3/${slug}-list?app=${app}`;
 
 		// Fetch data from the API
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-			...fetchOptions,
-		});
+		const data = await queryWordPressAPI(
+			`/wp-json/cdc/v3/${slug}-list`,
+			{ app: app },
+			fetchOptions,
+		);
 
-		if (!response.ok) {
-			throw new Error(
-				`Failed to fetch taxonomy data: ${response.statusText}`
-			);
+		if (isAborted(fetchOptions)) {
+			return [];
 		}
-
-		const data = await response.json();
 
 		// Extract terms from the response as per the API structure
 		let terms: TaxonomyData[] = [];
@@ -302,13 +417,14 @@ export const fetchPostsData = async (
 
 		// Check cache first
 		if (apiCache.has(cacheKey)) {
-			return apiCache.get(cacheKey);
+			return apiCache.get(cacheKey) as ApiPostData[];
 		}
 
 		// Build the query parameters - only include essential parameters
-		const queryParams = new URLSearchParams();
-		queryParams.append('app', section);
-		queryParams.append('variable_dataset_term_id', String(term_id));
+		const queryParams: Record<string, string> = {
+			app: section,
+			variable_dataset_term_id: String(term_id),
+		};
 
 		// Add search parameter if provided (since it can reduce the payload size)
 		if (
@@ -316,28 +432,20 @@ export const fetchPostsData = async (
 			typeof filters.search === 'string' &&
 			filters.search.trim()
 		) {
-			queryParams.append('search', filters.search.trim());
+			queryParams['search'] = filters.search.trim();
 		}
-
-		const url = `${WP_API_DOMAIN}/wp-json/cdc/v3/${postType}-list?${queryParams.toString()}`;
 
 		// Fetch the data
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-			...fetchOptions,
-		});
+		type FetchedPostData = { [key: string]: ApiPostData[] };
+		const data = await queryWordPressAPI<FetchedPostData|null>(
+			`/wp-json/cdc/v3/${postType}-list`,
+			queryParams,
+			fetchOptions,
+		);
 
-		if (!response.ok) {
-			throw new Error(
-				`Failed to fetch posts data: ${response.statusText}`
-			);
+		if (isAborted(fetchOptions)) {
+			return [];
 		}
-
-		const data = await response.json();
 
 		// Return the data if it exists in the expected format
 		let result: ApiPostData[] = [];
@@ -356,11 +464,6 @@ export const fetchPostsData = async (
 	}
 };
 
-// Method to clear cache for a specific key or all keys
-export const clearApiCache = (key?: string): void => {
-	key ? apiCache.delete(key) : apiCache.clear();
-};
-
 /**
  * Fetches location data from the API
  *
@@ -371,29 +474,15 @@ export const fetchLocationByCoords = async (
 	latlng: L.LatLng | { lat: number; lng: number },
 	fetchOptions?: FetchOptions,
 ) => {
-	try {
-		// Make the Fetch request.
-		const response = await fetch(`${WP_API_DOMAIN}${WP_API_LOCATION_BY_COORDS_PATH}?lat=${latlng.lat}&lng=${latlng.lng}&sealevel=false`, {
-			method: 'GET',
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-			},
-			...fetchOptions,
-		});
-
-		// Handle HTTP errors
-		if (!response.ok) {
-			const errorDetails = await response.json();
-			throw new Error(`HTTP error ${response.status}: ${response.statusText} - ${errorDetails}`);
-		}
-
-		// Parse response JSON
-		return await response.json();
-	} catch (error) {
-		console.error('Fetch error:', error);
-		throw error;
-	}
+	return await queryWordPressAPI(
+		WP_API_LOCATION_BY_COORDS_PATH,
+		{
+			lat: String(latlng.lat),
+			lng: String(latlng.lng),
+			sealevel: 'false',
+		},
+		fetchOptions,
+	);
 };
 
 /**
@@ -413,7 +502,7 @@ export const generateChartData = async (options: ChartDataOptions, fetchOptions?
 		unitDecimals
 	} = options;
 // 
-	let fetchUrl = `${window.DATA_URL}`;
+	let fetchUrl = '';
 
 	if(interactiveRegion == InteractiveRegionOption.GRIDDED_DATA) {
 		// For gridded data
@@ -428,14 +517,16 @@ export const generateChartData = async (options: ChartDataOptions, fetchOptions?
 		fetchUrl += `/generate-regional-charts/${interactiveRegion}/${featureId}`;
 	}
 
-	fetchUrl += `/${variable}/${frequency}?decimals=${unitDecimals}&dataset_name=${dataset}`;
-	const response = await fetch(fetchUrl, { ...fetchOptions });
+	fetchUrl += `/${variable}/${frequency}`;
 
-	if (!response.ok) {
-		throw new Error('Failed to fetch data');
-	}
-
-	return await response.json();
+	return await queryDataAPI(
+		fetchUrl,
+		{
+			decimals: String(unitDecimals),
+			dataset_name: dataset,
+		},
+		fetchOptions,
+	);
 };
 
 /**
@@ -446,16 +537,16 @@ export const generateChartData = async (options: ChartDataOptions, fetchOptions?
  * @param fetchOptions Any other options to pass to fetch (ex: `signal`)
  */
 export const fetchMSCClimateNormalsChartData = async (stationId: string, normalId: number, fetchOptions?: FetchOptions) => {
-	const response = await fetch(
-		`https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=${stationId}&NORMAL_ID=${normalId}&sortby=MONTH`,
-		{ ...fetchOptions }
+	return await fetchJSON(
+		'https://api.weather.gc.ca/collections/climate-normals/items',
+		{
+			f: 'json',
+			CLIMATE_IDENTIFIER: stationId,
+			NORMAL_ID: String(normalId),
+			sortby: 'MONTH',
+		},
+		fetchOptions,
 	);
-
-	if (!response.ok) {
-		throw new Error('Failed to fetch data');
-	}
-
-	return await response.json();
 };
 
 /**
@@ -467,18 +558,15 @@ export const fetchMSCClimateNormalsChartData = async (stationId: string, normalI
 export const fetchDeltaValues = async (options: DeltaValuesOptions, fetchOptions?: FetchOptions) => {
 	try {
 		const { endpoint, varName, frequency, params } = options;
-		let url = `${GEOSERVER_BASE_URL}/${endpoint}`;
+		let url = `/${endpoint}`;
 		if(varName !== null) url += `/${varName}`;
 		if(frequency !== null) url += `/${frequency}`;
-		url += `?${params}`;
 
-		const response = await fetch(url, { ...fetchOptions });
-
-		if (!response.ok) {
-			throw new Error(response.statusText);
-		}
-
-		return await response.json();
+		return await queryDataAPI(
+			url,
+			params,
+			fetchOptions,
+		);
 	} catch (err) {
 		console.error('Failed to fetch', err);
 		return null;
@@ -499,21 +587,18 @@ export const fetchChoroValues = async (options: ChoroValuesOptions, fetchOptions
 		options.frequency,
 	].join('/');
 
-	const urlQuery = [
-		`period=${parseInt(options.decade) + 1}`,
-		`dataset_name=${options.dataset}`,
-		`decimals=${options.decimals}`,
-		`delta7100=${options.isDelta7100 ? 'true' : 'false'}`,
-	].join('&');
+	const params = {
+		period: String(parseInt(options.decade) + 1),
+		dataset_name: options.dataset,
+		decimals: String(options.decimals),
+		delta7100: options.isDelta7100 ? 'true' : 'false',
+	};
 
-	const res = await fetch(
-		`${GEOSERVER_BASE_URL}/get-choro-values/${urlPath}/?${urlQuery}`,
-		{ ...fetchOptions },
-	)
-	if (!res.ok) {
-		throw new Error('Failed to fetch data');
-	}
-	return res.json();
+	return await queryDataAPI(
+		`/get-choro-values/${urlPath}/`,
+		params,
+		fetchOptions,
+	);
 };
 
 /**
@@ -522,50 +607,64 @@ export const fetchChoroValues = async (options: ChoroValuesOptions, fetchOptions
  * @returns A list of stations with their names, ids and coords.
  */
 export const fetchStationsList = async ({ threshold }: { threshold?: string }, fetchOptions?: FetchOptions) => {
-	try {
-		let data: any;
+	let data: any;
 
-		const fetchJson = async (url: string) => {
-			const response = await fetch(url, {
-				method: 'GET',
-				headers: {
-					Accept: 'application/json',
-					'Content-Type': 'application/json',
-				},
-				...fetchOptions,
-			});
-			if (!response.ok) {
-				throw new Error(`Failed to fetch stations list: ${response.statusText}`);
-			}
-			return response.json();
-		};
-
-		if (threshold === 'ahccd') {
-			data = await fetchJson(`${window.DATA_URL}/fileserver/ahccd/ahccd.json`);
-		} else if (threshold === 'bdv') {
-			data = await fetchJson(`${window.DATA_URL}/fileserver/bdv/bdv.json`);
-		} else if (threshold === 'station-data') {
-			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE');
-		} else if (threshold === 'idf') {
-			data = await fetchJson(`${window.DATA_URL}/fileserver/idf/idf_curves.json`);
-		} else {
-			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&offset=0&HAS_NORMALS_DATA=Y');
-		}
-
-		return (data.features || []).map((feature: any) => ({
-			id: String(feature.properties?.ID ?? ((threshold === 'station-data') ? feature.properties?.STN_ID : feature?.id)),
-			name: feature.properties?.STATION_NAME ?? feature.properties?.Name ?? feature.properties?.Location,
-			type: feature.properties?.type,
-			coordinates: {
-				lat: feature.geometry.coordinates[1],
-				lng: feature.geometry.coordinates[0],
+	if (threshold === 'ahccd') {
+		data = await queryDataAPI(
+			'/fileserver/ahccd/ahccd.json',
+			undefined,
+			fetchOptions,
+		);
+	} else if (threshold === 'bdv') {
+		data = await queryDataAPI(
+			'/fileserver/bdv/bdv.json',
+			undefined,
+			fetchOptions,
+		);
+	} else if (threshold === 'station-data') {
+		data = await fetchJSON(
+			'https://api.weather.gc.ca/collections/climate-stations/items',
+			{
+				f: 'json',
+				limit: '10000',
+				properties: 'STATION_NAME,STN_ID,LATITUDE,LONGITUDE',
 			},
-			filename: feature.properties?.filename,
-		}));
-	} catch (error) {
-		console.error('Error fetching stations list:', error);
-		throw error;
+			fetchOptions,
+		);
+	} else if (threshold === 'idf') {
+		data = await queryDataAPI(
+			'/fileserver/idf/idf_curves.json',
+			undefined,
+			fetchOptions,
+		);
+	} else {
+		data = await fetchJSON(
+			'https://api.weather.gc.ca/collections/climate-stations/items',
+			{
+				f: 'json',
+				limit: '10000',
+				properties: 'STATION_NAME,STN_ID',
+				offset: '0',
+				HAS_NORMALS_DATA: 'Y',
+			},
+			fetchOptions,
+		);
 	}
+
+	if (isAborted(fetchOptions)) {
+		return [];
+	}
+
+	return (data?.features ?? []).map((feature: any) => ({
+		id: String(feature.properties?.ID ?? ((threshold === 'station-data') ? feature.properties?.STN_ID : feature?.id)),
+		name: feature.properties?.STATION_NAME ?? feature.properties?.Name ?? feature.properties?.Location,
+		type: feature.properties?.type,
+		coordinates: {
+			lat: feature.geometry.coordinates[1],
+			lng: feature.geometry.coordinates[0],
+		},
+		filename: feature.properties?.filename,
+	}));
 };
 
 /**
@@ -574,73 +673,50 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }, f
  * @param variable - The S2D variable ID.
  * @param frequency - The frequency for which we want the release date.
  * @param fetchOptions - Any other options to pass to fetch() requests (ex: `signal`)
+ * @returns The release date as a string, or null if the request is aborted.
  */
-// @ts-expect-error - We ignore unused variables errors while waiting for the API endpoint to be implemented.
-export const fetchS2DReleaseDate = async (variable: string, frequency: string, fetchOptions?: FetchOptions): Promise<string> => {
-	// TEMPORARILY mocking the API, while waiting for the API endpoint to be implemented.
-	const fetchMock = new Promise<string>((resolve) => {
-		setTimeout(() => {
-			// The backend currently only contains data for July 2025.
-			resolve('2025-07-01');
-		}, 1000);
-	});
+export const fetchS2DReleaseDate = async (
+	variable: string,
+	frequency: S2DFrequencyType | string,
+	fetchOptions?: FetchOptions,
+): Promise<string | null> => {
+	const argVariableName = normalizeForApiVariableId(variable);
+	const argFrequencyName = normalizeForApiFrequencyName(frequency);
 
-	return await fetchMock;
+	return await queryDataAPI(
+		`/get-s2d-release-date/${argVariableName}/${argFrequencyName}`,
+		undefined,
+		fetchOptions,
+	);
 }
 
 /**
  * Fetch the location data for a S2D variable.
  *
  * @param latlng - Location coordinates.
- * @param variable - ID of the S2D variable.
+ * @param variableId - ID of the S2D variable.
  * @param frequency - Frequency for which we want the data.
  * @param period - Period for which we want the data.
  * @param fetchOptions - Any other options to pass to fetch() requests (ex: `signal`)
- *
- * @TODO This is currently a mock implementation with randomized data.
- *       The real API endpoint will be implemented in a future PR.
- *       When implementing the real API:
- *       - Use fetch() with the provided signal for cancellation support
- *       - Add proper error handling for network failures and API errors
+ * @returns The location data, or null if the request is aborted.
  */
 export const fetchS2DLocationData = async (
-	// @ts-expect-error - We ignore unused variables errors while waiting for the API endpoint to be implemented.
 	latlng: L.LatLng,
-	// @ts-expect-error - idem.
-	variable: string,
-	// @ts-expect-error - idem.
+	variableId: string,
 	frequency: FrequencyType,
-	// @ts-expect-error - idem.
 	period: Date,
-	// @ts-expect-error - idem.
 	fetchOptions?: FetchOptions
-): Promise<LocationS2DData> => {
-	// TEMPORARILY mocking the API with randomized data. This mock always resolves
-	// successfully and ignores the abort signal. Real implementation will use fetch().
-	const fetchMock = new Promise<LocationS2DData>((resolve) => {
-		setTimeout(() => {
-			const values = Array.from({ length: 5 }, () => Math.random() * 20 - 10);
-			const probabilities = Array.from({ length: 5 }, () => Math.random() * 100);
+): Promise<LocationS2DData | null> => {
+	const argVariableName = normalizeForApiVariableId(variableId);
+	const argFrequencyName = normalizeForApiFrequencyName(frequency);
+	const argLat = latlng.lat.toFixed(6);
+	const argLon = latlng.lng.toFixed(6);
 
-			// Mocked values must be sorted to make sense
-			values.sort((a, b) => a - b);
-
-			resolve({
-				cutoff_unusually_low_p20: values[0],
-				cutoff_below_normal_p33: values[1],
-				historical_median_p50: values[2],
-				cutoff_above_normal_p66: values[3],
-				cutoff_unusually_high_p80: values[4],
-				prob_unusually_low: probabilities[0],
-				prob_below_normal: probabilities[1],
-				prob_near_normal: probabilities[2],
-				prob_above_normal: probabilities[3],
-				prob_unusually_high: probabilities[4],
-				skill_level: Math.round(Math.random() * 3),
-				skill_CRPSS: Math.random() * 1.5 - 0.5, // Can be negative
-			});
-		}, 1000);
-	});
-
-	return await fetchMock;
+	return await queryDataAPI(
+		`/get-s2d-gridded-values/${argLat}/${argLon}/${argVariableName}/${argFrequencyName}`,
+		{
+			period: `${period.getUTCFullYear()}-${String(period.getUTCMonth() + 1).padStart(2, '0')}`,
+		},
+		fetchOptions,
+	);
 }

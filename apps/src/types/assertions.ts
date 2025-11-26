@@ -4,6 +4,7 @@ import {
 	ForecastType,
 	ForecastTypes,
 } from '@/types/climate-variable-interface';
+import { AbstractError } from '@/lib/errors';
 
 /**
  * Return a function that asserts that a value is one of the valid types.
@@ -29,7 +30,7 @@ function buildCorrectTypeAsserter<T>(
 /**
  * Error class representing a failed assertion.
  */
-export class AssertionError extends Error {}
+export class AssertionError extends AbstractError {}
 
 /**
  * Assert that a value is a valid ForecastType.

@@ -100,12 +100,12 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			}
 
 			// Params
-			const medianRangeParams = new URLSearchParams({
+			const medianRangeParams = {
 				period: String(decadeValue),
 				decimals: decimals.toString(),
 				delta7100: climateVariable?.getDataValue() === 'delta' ? 'true' : 'false',
 				dataset_name: climateVariable?.getVersion() ?? '',
-			}).toString();
+			};
 
 			const medianRangeData = await fetchDeltaValues({
 				endpoint: medianRangeEndpoint,

@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { generateColourScale } from '@/lib/colour-scheme';
 import SectionContext from '@/context/section-provider';
-import { DEFAULT_COLOUR_SCHEMES, GEOSERVER_BASE_URL } from '@/lib/constants';
+import { DEFAULT_COLOUR_SCHEMES } from '@/lib/constants';
 import { fetchLegendData } from '@/services/services';
 import { setLegendData } from '@/features/map/map-slice';
 import { ColourMap, ColourSchemeType } from '@/types/types';
@@ -20,16 +20,15 @@ export function useColorMap() {
 
 	useEffect(() => {
 		const abortController = new AbortController();
-		let url = `${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`;
-
-		if (layerStyles) {
-			url += `&style=${layerStyles}`;
-		}
 
 		(async () => {
-			const data = await fetchLegendData(url, {signal: abortController.signal});
+			const data = await fetchLegendData(
+				layerValue,
+				layerStyles,
+				{ signal: abortController.signal },
+			);
 
-			if (!abortController.signal.aborted) {
+			if (data && !abortController.signal.aborted) {
 				// store in redux
 				dispatch(setLegendData(data));
 			}

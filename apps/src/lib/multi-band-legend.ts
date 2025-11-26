@@ -1,4 +1,5 @@
 import { type ColourQuantitiesMap } from '@/types/types';
+import { AbstractError } from '@/lib/errors';
 
 /**
  * @file Multi-Band Legend Transformation (S2D Forecasts Only)
@@ -62,16 +63,7 @@ export type MultiBandLegend = {
 /**
  * Base error class for multi-band legend operations
  */
-export class MultiBandLegendError extends Error {
-	constructor(
-		//
-		message: string,
-		options?: ErrorOptions
-	) {
-		super(message, options);
-		this.name = this.constructor.name;
-	}
-}
+export class MultiBandLegendError extends AbstractError {}
 
 /**
  * Thrown when quantity format is invalid

@@ -248,7 +248,7 @@ export function getForecastTypeName(forecastType: ForecastType): string {
  * @param variableId - The variable id used in the app, e.g. `"s2d_air_temp"`.
  * @returns The variable id to use for S2D API requests, e.g. `"air_temp"`.
  */
-export function getApiVariableId(variableId: string): string {
+export function normalizeForApiVariableId(variableId: string): string {
 	// For now, the only difference between the app's variable ids and the ones
 	// used in the API is simply a prefix.
 	return variableId.replace(/^s2d_/, '');
@@ -260,11 +260,13 @@ export function getApiVariableId(variableId: string): string {
  * @param frequency - The frequency, e.g. `FrequencyType.SEASONAL`.
  * @returns The frequency name to use for S2D API requests, e.g. `"seasonal"`
  */
-export function getApiFrequencyName(frequency: S2DFrequencyType | string): string {
+export function normalizeForApiFrequencyName(
+	frequency: S2DFrequencyType | string
+): string {
 	const frequencyNameMap: Record<string, string> = {
 		[FrequencyType.SEASONAL]: 'seasonal',
 		[FrequencyType.MONTHLY]: 'monthly',
-	}
+	};
 
 	return frequencyNameMap[frequency] ?? frequency;
 }

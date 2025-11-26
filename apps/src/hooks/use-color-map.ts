@@ -28,7 +28,7 @@ export function useColorMap() {
 				{ signal: abortController.signal },
 			);
 
-			if (!abortController.signal.aborted) {
+			if (data && !abortController.signal.aborted) {
 				// store in redux
 				dispatch(setLegendData(data));
 			}

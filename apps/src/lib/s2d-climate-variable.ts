@@ -13,7 +13,7 @@ import S2DVariableValues from '@/components/map-layers/s2d-variable-values';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
 import { WMSParams } from '@/types/types';
 import { formatUTCDate, utc } from '@/lib/utils';
-import { getApiVariableId } from '@/lib/s2d';
+import { normalizeForApiVariableId } from '@/lib/s2d';
 
 /**
  * Seasonal To Decadal
@@ -64,7 +64,7 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 		const forecastType = this.getForecastType();
 		const isForecast = this.getForecastDisplay() === ForecastDisplays.FORECAST;
 		const frequency = this.getFrequency() ?? FrequencyType.SEASONAL;
-		const variable = getApiVariableId(this.getId());
+		const variable = normalizeForApiVariableId(this.getId());
 
 		const frequencyNameMap: Record<string, string> = {
 			[FrequencyType.SEASONAL]: 'seasonal',

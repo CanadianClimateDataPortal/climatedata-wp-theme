@@ -281,7 +281,7 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 
 		const abortController = new AbortController();
 
-		const fetchData = async () => {
+		const loadLocationData = async () => {
 			try {
 				const loadedLocationData = await fetchS2DLocationData(
 					latlng,
@@ -313,7 +313,7 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 
 		lastLoadingRef.current = loadingKey;
 		setLocationData(null);
-		fetchData();
+		loadLocationData();
 
 		return () => {
 			lastLoadingRef.current = null;

@@ -10,6 +10,7 @@ import {
 	MapInfoData,
 	Sector,
 	TaxonomyData,
+	WMSLegendData,
 } from '@/types/types';
 import L from 'leaflet';
 
@@ -25,10 +26,11 @@ import {
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 import {
-	getApiFrequencyName,
-	getApiVariableId,
+	normalizeForApiFrequencyName,
+	normalizeForApiVariableId,
 	LocationS2DData,
 } from '@/lib/s2d';
+import { AbstractError } from '@/lib/errors';
 
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, unknown>();
@@ -46,7 +48,7 @@ const isAborted = (fetchOptions?: FetchOptions): boolean => {
 /**
  * Error returned by fetch functions of this module in case of a request error.
  */
-export class FetchError extends Error {}
+export class FetchError extends AbstractError {}
 
 /**
  * Send a GET JSON request and return the parsed JSON response.
@@ -241,7 +243,7 @@ export const fetchLegendData = async (
 	layerValue?: string,
 	layerStyles?: string,
 	fetchOptions?: FetchOptions,
-) => {
+): Promise<WMSLegendData | null> => {
 	const params: Record<string, string> = {
 		service: 'WMS',
 		version: '1.1.0',
@@ -254,7 +256,7 @@ export const fetchLegendData = async (
 		params['style'] = layerStyles;
 	}
 
-	return await fetchJSON(
+	return await fetchJSON<WMSLegendData>(
 		`${GEOSERVER_BASE_URL}/geoserver/wms`,
 		params,
 		fetchOptions,
@@ -434,8 +436,8 @@ export const fetchPostsData = async (
 		}
 
 		// Fetch the data
-		type ResponseData = { [key: string]: ApiPostData[] };
-		const data = await queryWordPressAPI<ResponseData|null>(
+		type FetchedPostData = { [key: string]: ApiPostData[] };
+		const data = await queryWordPressAPI<FetchedPostData|null>(
 			`/wp-json/cdc/v3/${postType}-list`,
 			queryParams,
 			fetchOptions,
@@ -678,8 +680,8 @@ export const fetchS2DReleaseDate = async (
 	frequency: S2DFrequencyType | string,
 	fetchOptions?: FetchOptions,
 ): Promise<string | null> => {
-	const argVariableName = getApiVariableId(variable);
-	const argFrequencyName = getApiFrequencyName(frequency);
+	const argVariableName = normalizeForApiVariableId(variable);
+	const argFrequencyName = normalizeForApiFrequencyName(frequency);
 
 	return await queryDataAPI(
 		`/get-s2d-release-date/${argVariableName}/${argFrequencyName}`,
@@ -705,8 +707,8 @@ export const fetchS2DLocationData = async (
 	period: Date,
 	fetchOptions?: FetchOptions
 ): Promise<LocationS2DData | null> => {
-	const argVariableName = getApiVariableId(variableId);
-	const argFrequencyName = getApiFrequencyName(frequency);
+	const argVariableName = normalizeForApiVariableId(variableId);
+	const argFrequencyName = normalizeForApiFrequencyName(frequency);
 	const argLat = latlng.lat.toFixed(6);
 	const argLon = latlng.lng.toFixed(6);
 

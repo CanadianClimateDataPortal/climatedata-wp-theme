@@ -67,12 +67,7 @@ export enum FrequencyDisplayModeOption {
 }
 
 /**
- * Frequency in terms of temporal resolution.
- *
- * @remark
- * If we search the code for `/FrequencyType\.(ANNUAL|ANNUAL_JUL_JUN|MONTHLY|SEASONAL|ALL_MONTHS|DAILY)/`,
- * we see close to 200 times used of this enum.
- * But there's another `FrequencyType` enum defined later in this file.
+ * All frequency types.
  */
 export enum FrequencyType {
 	ANNUAL = 'ann',
@@ -81,6 +76,9 @@ export enum FrequencyType {
 	SEASONAL = 'seasons',
 	ALL_MONTHS = 'allMonths',
 	DAILY = 'daily',
+	YS = 'ys',
+	MS = 'ms',
+	QSDEC = 'qsdec',
 }
 
 /**
@@ -94,12 +92,11 @@ export const FrequencyTypes = {
 	SEASONAL: FrequencyType.SEASONAL,
 	ALL_MONTHS: FrequencyType.ALL_MONTHS,
 	DAILY: FrequencyType.DAILY,
+	// Frequency types for API and GeoServer queries.
+	YS: FrequencyType.YS,
+	MS: FrequencyType.MS,
+	QSDEC: FrequencyType.QSDEC,
 } as const;
-
-/**
- * Derive type from the object (same as enum type {@link FrequencyType}).
- */
-export type FrequencyTypeFromObject = typeof FrequencyTypes[keyof typeof FrequencyTypes];
 
 /**
  * S2D frequency types - subset of available frequencies.
@@ -238,21 +235,6 @@ export interface LocationModalContentParams {
 	featureId: number,
 	scenario?: string,
 	mode?: 'modal' | 'panel'
-}
-
-/**
- * Frequency in terms of duration of pre-calculated data.
- *
- * @remark
- * If we search the code for `/FrequencyType\.(YS|MS|QSDEC)/`, we see more than 76 usage
- * of this enum.
- * But there's another `FrequencyType` enum defined earlier in this file.
- * We probably should rename this and all the occurences, or ... do something about it.
- */
-export enum FrequencyType {
-	YS = 'ys',
-	MS = 'ms',
-	QSDEC = 'qsdec',
 }
 
 export type PreCalculatedCanDCSConfig = {

@@ -33,7 +33,7 @@ const S2DReleaseDate = (props: S2DReleaseDateProps) => {
 	} = props;
 	const { releaseDate } = useS2D();
 	const { locale } = useLocale();
-	const effectiveTooltip = tooltip ?? tooltipReleaseDate;
+	const effectiveTooltip = tooltip === undefined ? tooltipReleaseDate : tooltip;
 
 	let releaseDateElement = (
 		<span className="font-medium text-gray-400">{__('Loading...')}</span>

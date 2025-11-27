@@ -100,11 +100,11 @@ const generatePeriodsOptions = (
 			const isSameYear = period[1].getUTCFullYear() === period[0].getUTCFullYear();
 			parts.push((isSameYear ? monthFormatter : monthYearFormatter).format(period[0]));
 			parts.push(monthYearFormatter.format(period[1]));
-			lineTemplate = '%s to %s';
+			lineTemplate = __('%s to %s');
 		}
 
 		return {
-			label: ucFirst(sprintf(__(lineTemplate), ...parts)),
+			label: ucFirst(sprintf(lineTemplate, ...parts)),
 			value: period[0],
 			id: formatUTCDate(period[0], 'yyyy-MM'),
 		};
@@ -227,7 +227,7 @@ const PeriodsSelector = (props: PeriodsSelectorProps) => {
 				</label>
 			</div>
 			{availablePeriodsOptions.map((option) => (
-				<div key={`period-${option.id}`} className="ml-4">
+				<div key={`period-${frequency}-${option.id}`} className="ml-4">
 					<label
 						htmlFor={`checkbox-period-${option.id}`}
 						className="flex items-center space-x-2 cursor-pointer w-fit"

@@ -903,6 +903,12 @@ export enum MapDisplayType {
  * Describe on a map a region.
  *
  * The 4 coordinate points forming a rectangle on a map.
+ *
+ * It's in the following order:
+ * - minLat
+ * - minLng
+ * - maxLat
+ * - maxLng
  */
 export type MapBoundaryBox = [number, number, number, number];
 

@@ -1,6 +1,9 @@
-import { FileFormatType } from "@/types/climate-variable-interface";
+import { FileFormatType } from '@/types/climate-variable-interface';
 
-import type { MapBoundaryBox, MapPointsList } from '@/types/types';
+import type {
+	MapBoundaryBox,
+	MapPointsList,
+} from '@/types/types';
 
 class FetchPostDownloadError extends Error {
 	constructor(message: string, options?: ErrorOptions) {
@@ -20,6 +23,31 @@ export interface PostDownloadToBlobObjectURLPayload {
 	bbox?: MapBoundaryBox;
 	points?: MapPointsList;
 }
+
+/**
+ * Validates that a download payload has exactly one geographic selector: bbox OR points.
+ *
+ * @param payload - The download payload to validate
+ * @throws {Error} If neither bbox nor points is present, or if both are present
+ */
+export const assertHasExactlyOneGeographicSelector = (
+	payload: PostDownloadToBlobObjectURLPayload
+): void => {
+	const hasBbox = 'bbox' in payload && payload.bbox !== undefined;
+	const hasPoints = 'points' in payload && payload.points !== undefined;
+
+	if (!hasBbox && !hasPoints) {
+		throw new Error(
+			'Download requires either a selected region (bbox) or selected grid cells (points)'
+		);
+	}
+
+	if (hasBbox && hasPoints) {
+		throw new Error(
+			'Download cannot have both bbox and points - only one geographic selector allowed'
+		);
+	}
+};
 
 /**
  * Fetches binary file data from a download endpoint and returns a temporary blob URL.
@@ -57,7 +85,9 @@ export const postDownloadToBlobObjectURL = async (
 
 		// Throw an error if the response is not OK (4xx or 5xx)
 		if (!response.ok) {
-			throw new FetchPostDownloadError(`HTTP error! status: ${response.status}`);
+			throw new FetchPostDownloadError(
+				`HTTP error! status: ${response.status}`
+			);
 		}
 
 		/**
@@ -79,8 +109,13 @@ export const postDownloadToBlobObjectURL = async (
 
 		// Validate response contains binary file data, not an error page
 		const contentType = response.headers.get('Content-Type');
-		if (!contentType?.includes('application/zip') && !contentType?.includes('application/octet-stream')) {
-			throw new FetchPostDownloadError(`Unexpected content type: ${contentType}`);
+		if (
+			!contentType?.includes('application/zip') &&
+			!contentType?.includes('application/octet-stream')
+		) {
+			throw new FetchPostDownloadError(
+				`Unexpected content type: ${contentType}`
+			);
 		}
 
 		// Check response isn't empty before reading stream

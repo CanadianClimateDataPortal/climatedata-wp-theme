@@ -1,13 +1,20 @@
 import React, { useContext } from 'react';
 import { __, _n } from '@/context/locale-provider';
+import { getPeriods, PeriodRange } from '@/lib/s2d';
 
-import { CheckboxFactory } from '@/components/ui/checkbox';
+import { Checkbox, CheckboxFactory } from '@/components/ui/checkbox';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
 import { StepContainer, StepContainerDescription } from '@/components/download/step-container';
 import { EmissionScenariosTooltip } from '@/components/sidebar-menu-items/emission-scenarios-control';
+import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
+import S2DReleaseDate from '@/components/s2d-release-date';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { AveragingType, DownloadType, FrequencyConfig, FrequencyType } from "@/types/climate-variable-interface";
+import {
+	AveragingType,
+	DownloadType,
+	FrequencyType,
+} from '@/types/climate-variable-interface';
 import { StepComponentRef, StepResetPayload } from "@/types/download-form-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
@@ -16,6 +23,26 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import appConfig from "@/config/app.config";
 import { useLocale } from '@/hooks/use-locale';
 import { sprintf } from "@wordpress/i18n";
+import { useS2D } from '@/hooks/use-s2d';
+import { assertIsS2DFrequencyType } from '@/types/assertions';
+import { formatUTCDate } from '@/lib/utils';
+import { Spinner } from '@/components/ui/spinner';
+import { ControlTitle } from '@/components/ui/control-title';
+import { CheckedState } from '@radix-ui/react-checkbox';
+
+type PeriodOption = {
+	label: string;
+	value: Date;
+	id: string;
+}
+
+type PeriodsSelectorProps = {
+	availablePeriods: PeriodRange[],
+	selectedPeriods: Date[],
+	frequency: FrequencyType,
+	locale: string,
+	onChange?: (values: Date[]) => void,
+};
 
 const modelLabels: Record<string, string> = {
 	'pcic12': __('PCIC12 (Ensemble)'),
@@ -23,6 +50,66 @@ const modelLabels: Record<string, string> = {
 	'26models': __('Full ensemble'),
 	'humidex_models': __('Full ensemble'),
 }
+
+const tooltipS2DFrequency = __(
+	'Forecasts are available for different frequencies, from a month to 5 ' +
+	'years. The available time periods will change based on the frequency ' +
+	'selected. Select a temporal frequency from the options in the dropdown ' +
+	'menu. Note: Only the first three months are available individually, as ' +
+	'skill tends to be low for later months.'
+);
+
+const generatePeriodsOptions = (
+	periods: PeriodRange[],
+	frequency: FrequencyType,
+	locale: string,
+): PeriodOption[] => {
+	const monthFormatter = Intl.DateTimeFormat(locale, {
+		month: 'long',
+		timeZone: 'UTC',
+	});
+
+	const monthYearFormatter = Intl.DateTimeFormat(locale, {
+		month: 'long',
+		year: 'numeric',
+		timeZone: 'UTC',
+	});
+
+	const ucFirst = (val: string): string => {
+		return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+	}
+
+	return periods.map((period) => {
+		const parts = []
+		let lineTemplate = '';
+		if (frequency === FrequencyType.MONTHLY) {
+			/**
+			 * For “Monthly”, we show the full month name followed by the year.
+			 * Ex: “February 2025”
+			 */
+			parts.push(monthYearFormatter.format(period[0]));
+			lineTemplate = '%s';
+		} else if (frequency === FrequencyType.SEASONAL) {
+			/**
+			 * @remarks As the spec indicates:
+			 * For “Seasonal”, we show the full month name of the start and end
+			 * months. We show the year only for the end month, unless the start
+			 * year is not in the same year.
+			 * Ex: “February to April 2025”, “December 2025 to February 2026”
+			 */
+			const isSameYear = period[1].getUTCFullYear() === period[0].getUTCFullYear();
+			parts.push((isSameYear ? monthFormatter : monthYearFormatter).format(period[0]));
+			parts.push(monthYearFormatter.format(period[1]));
+			lineTemplate = __('%s to %s');
+		}
+
+		return {
+			label: ucFirst(sprintf(lineTemplate, ...parts)),
+			value: period[0],
+			id: formatUTCDate(period[0], 'yyyy-MM'),
+		};
+	});
+};
 
 function MissingDataTooltip(): React.ReactElement {
 	return (
@@ -78,6 +165,90 @@ function MissingDataTooltip(): React.ReactElement {
 	);
 }
 
+const PeriodsSelector = (props: PeriodsSelectorProps) => {
+	const {
+		availablePeriods,
+		selectedPeriods,
+		frequency,
+		locale,
+		onChange,
+	} = props;
+
+	// Internally, the dates are transformed to timestamps to allow strict
+	// equality checks between two "dates".
+	const normalizeDate = (date: Date): number => date.getTime();
+	const selectedNormalized = selectedPeriods.map(normalizeDate);
+	const isSelected = (date: Date): boolean => selectedNormalized.includes(normalizeDate(date));
+
+	const availablePeriodsOptions = generatePeriodsOptions(availablePeriods, frequency, locale);
+	const allValues = availablePeriodsOptions.map(option => option.value);
+	const isAllSelected = allValues.every(value => isSelected(value));
+
+	const handleAllPeriodsCheckboxChange = (checked: boolean) => {
+		if (checked) {
+			onChange?.(allValues);
+		} else {
+			onChange?.([]);
+		}
+	}
+
+	const handleCheckboxChange = (checked: CheckedState, value: Date) => {
+		const currentIndex = selectedNormalized.indexOf(normalizeDate(value));
+
+		// Add the element
+		if (checked && currentIndex === -1) {
+			onChange?.([...selectedPeriods, value]);
+			return;
+		}
+
+		// Remove the element
+		if (!checked && currentIndex !== -1) {
+			const newSelected = [...selectedPeriods];
+			newSelected.splice(currentIndex, 1);
+			onChange?.(newSelected);
+		}
+	}
+
+	return (
+		<div className="flex gap-y-2 flex-col">
+			<div>
+				<label
+					htmlFor="periods-select-all"
+					className="flex items-center space-x-2 cursor-pointer w-fit"
+				>
+					<Checkbox
+						id="periods-select-all"
+						checked={isAllSelected}
+						onCheckedChange={handleAllPeriodsCheckboxChange}
+					/>
+					<span className="text-zinc-900 text-sm leading-5">
+						{__('All periods')}
+					</span>
+				</label>
+			</div>
+			{availablePeriodsOptions.map((option) => (
+				<div key={`period-${frequency}-${option.id}`} className="ml-4">
+					<label
+						htmlFor={`checkbox-period-${option.id}`}
+						className="flex items-center space-x-2 cursor-pointer w-fit"
+					>
+						<Checkbox
+							id={`checkbox-period-${option.id}`}
+							checked={isSelected(option.value)}
+							onCheckedChange={(checked) =>
+								handleCheckboxChange(checked, option.value)
+							}
+						/>
+						<span className="text-zinc-900 text-sm leading-5">
+							{option.label}
+						</span>
+					</label>
+				</div>
+			))}
+		</div>
+	);
+}
+
 /**
  * Step 5.
  *
@@ -93,10 +264,26 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		setAnalyzeScenarios,
 		setPercentiles,
 		setMissingData,
-		setModel
+		setModel,
+		setSelectedPeriods,
 	} = useClimateVariable();
 	const section = useContext(SectionContext);
-	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
+	const frequencyConfig = climateVariable?.getFrequencyConfig();
+	const frequency = climateVariable?.getFrequency() as FrequencyType;
+	const selectedPeriods = climateVariable?.getSelectedPeriods();
+	const { isS2DVariable, releaseDate } = useS2D();
+
+	let availablePeriods: ReturnType<typeof getPeriods> = [];
+	if (isS2DVariable && frequency && releaseDate) {
+		try {
+			assertIsS2DFrequencyType(frequency);
+			// Will not get here if it failed above.
+			availablePeriods = getPeriods(releaseDate, frequency);
+		} catch (e) {
+			// We don't want the whole page to break if there's an unexpected error here
+			console.error('Invalid frequency for S2D but not breaking:', e);
+		}
+	}
 
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
@@ -104,34 +291,41 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				return false;
 			}
 
-			const frequency = climateVariable.getFrequency();
-			const averagingType = climateVariable.getAveragingType();
-			const averagingOptions = climateVariable.getAveragingOptions() ?? [];
+			const validations = [];
 
-			const validations = [
-				// If frequency is not daily and averaging options are available, one must be selected
-				frequency === FrequencyType.DAILY || averagingOptions.length === 0 || Boolean(averagingType),
-			];
+			if (isS2DVariable) {
+				const selectedPeriods = climateVariable.getSelectedPeriods();
+				validations.push(selectedPeriods.length > 0);
+			} else {
+				const frequency = climateVariable.getFrequency();
+				const averagingType = climateVariable.getAveragingType();
+				const averagingOptions = climateVariable.getAveragingOptions() ?? [];
 
-			// For analyzed downloads, add additional validations
-			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
-				if (climateVariable.getDatasetType() === 'ahccd') {
-					validations.push(
-						climateVariable.getMissingDataOptions().length === 0 || !!climateVariable.getMissingData()
-					);
-				} else {
-					const [startYear, endYear] = climateVariable.getDateRange() ?? [];
-					const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
+				validations.push(
+					// If frequency is not daily and averaging options are available, one must be selected
+					frequency === FrequencyType.DAILY || averagingOptions.length === 0 || Boolean(averagingType),
+				);
 
-					validations.push(
-						// A date range is required if the config is available.
-						!!climateVariable.getDownloadDateRangeConfig() || !!(startYear && endYear),
+				// For analyzed downloads, add additional validations
+				if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
+					if (climateVariable.getDatasetType() === 'ahccd') {
+						validations.push(
+							climateVariable.getMissingDataOptions().length === 0 || !!climateVariable.getMissingData()
+						);
+					} else {
+						const [startYear, endYear] = climateVariable.getDateRange() ?? [];
+						const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
 
-						// Following checks if there are no available options or if one is selected.
-						climateVariable.getScenarios().length === 0 || scenarios.length > 0,
-						// Note: Percentiles validation is removed since empty selection is now valid
-						climateVariable.getModelOptions().length === 0 || !!climateVariable.getModel(),
-					);
+						validations.push(
+							// A date range is required if the config is available.
+							!!climateVariable.getDownloadDateRangeConfig() || !!(startYear && endYear),
+
+							// Following checks if there are no available options or if one is selected.
+							climateVariable.getScenarios().length === 0 || scenarios.length > 0,
+							// Note: Percentiles validation is removed since empty selection is now valid
+							climateVariable.getModelOptions().length === 0 || !!climateVariable.getModel(),
+						);
+					}
 				}
 			}
 
@@ -141,6 +335,10 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			if (!climateVariable) return {};
 
 			const payload: StepResetPayload = {};
+
+			if (isS2DVariable) {
+				payload.selectedPeriods = [];
+			}
 
 			if (climateVariable.getFrequencyConfig()) {
 				payload.frequency = null;
@@ -161,8 +359,11 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			return payload;
-		}
-	}), [climateVariable]);
+		},
+	}), [
+		climateVariable,
+		isS2DVariable,
+	]);
 
 	const averagingOptions = [
 		{
@@ -174,7 +375,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			label: __('30-year averages'),
 		},
 	].filter((option) =>
-		climateVariable?.getAveragingOptions()?.includes(option.value)
+		!isS2DVariable && climateVariable?.getAveragingOptions()?.includes(option.value)
 	);
 
 	// Check if Download Type is Analysed.
@@ -361,15 +562,44 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				/>
 			}
 
-			<FrequencySelect
-				title={__('Temporal frequency')}
-				config={frequencyConfig}
-				section={section}
-				value={climateVariable?.getFrequency() ?? undefined}
-				onValueChange={setFrequency}
-				className={"sm:w-64 mb-4"}
-				downloadType={climateVariable?.getDownloadType() ?? undefined}
-			/>
+			{isS2DVariable ? (
+				<>
+					<div className="mb-2 sm:w-64">
+						<S2DFrequencyFieldDropdown
+							// Reset list of selected periods when changing frequency
+							afterOnChange={() => setSelectedPeriods([])}
+							tooltip={tooltipS2DFrequency}
+						/>
+					</div>
+					<div className="mb-8">
+						<S2DReleaseDate />
+					</div>
+					<div className="mb-8">
+						<ControlTitle title={__('Periods')} />
+						{availablePeriods.length > 0 ? (
+							<PeriodsSelector
+								availablePeriods={availablePeriods}
+								selectedPeriods={selectedPeriods ?? []}
+								frequency={frequency}
+								locale={locale}
+								onChange={setSelectedPeriods}
+							/>
+						) : (
+							<Spinner />
+						)}
+					</div>
+				</>
+			) : (
+				frequencyConfig && <FrequencySelect
+					title={__('Temporal frequency')}
+					config={frequencyConfig}
+					section={section}
+					value={climateVariable?.getFrequency() ?? undefined}
+					onValueChange={setFrequency}
+					className={"sm:w-64 mb-4"}
+					downloadType={climateVariable?.getDownloadType() ?? undefined}
+				/>
+			)}
 
 			{!isDownloadTypeAnalyzed
 				&& averagingOptions.length > 0
@@ -409,6 +639,7 @@ export const StepSummaryAdditionalDetails = (): string => {
 	const frequency = climateVariable.getFrequency() ?? '';
 	const percentiles = climateVariable.getPercentiles() ?? [];
 	const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
+	const selectedPeriods = climateVariable.getSelectedPeriods();
 
 	const data = [];
 
@@ -426,6 +657,13 @@ export const StepSummaryAdditionalDetails = (): string => {
 
 	if (frequency && frequency !== '') {
 		data.push(__(appConfig.frequencies.find(({ value }) => value === frequency)?.label ?? frequency));
+	}
+
+	if (selectedPeriods.length > 0) {
+		data.push(sprintf(
+			_n('%d period', '%d periods', selectedPeriods.length),
+			selectedPeriods.length)
+		);
 	}
 
 	if (scenarios && scenarios.length > 0) {

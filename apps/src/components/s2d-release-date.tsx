@@ -1,12 +1,16 @@
 import type { ReactNode } from 'react';
+
+import { formatUTCDate, cn } from '@/lib/utils';
+
 import { useS2D } from '@/hooks/use-s2d';
 import { useLocale } from '@/hooks/use-locale';
 import { __ } from '@/context/locale-provider';
-import { formatUTCDate } from '@/lib/utils';
+
 import TooltipWidget from '@/components/ui/tooltip-widget';
 
 interface S2DReleaseDateProps {
-	tooltip?: ReactNode;
+	tooltip?: ReactNode | null;
+	className?: string;
 }
 
 const tooltipReleaseDate = __(
@@ -22,9 +26,14 @@ const tooltipReleaseDate = __(
  *
  * @param tooltip - Optional tooltip override.
  */
-const S2DReleaseDate = ({ tooltip }: S2DReleaseDateProps) => {
+const S2DReleaseDate = (props: S2DReleaseDateProps) => {
+	const {
+		tooltip,
+		className,
+	} = props;
 	const { releaseDate } = useS2D();
 	const { locale } = useLocale();
+	const effectiveTooltip = tooltip === undefined ? tooltipReleaseDate : tooltip;
 
 	let releaseDateElement = (
 		<span className="font-medium text-gray-400">{__('Loading...')}</span>
@@ -46,12 +55,12 @@ const S2DReleaseDate = ({ tooltip }: S2DReleaseDateProps) => {
 	}
 
 	return (
-		<div className="flex flex-row flex-nowrap gap-1 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple">
+		<div className={cn('flex flex-row flex-nowrap gap-1 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple', className)}>
 			<span>
 				{__('Release date:')}&nbsp;
 				{releaseDateElement}
 			</span>
-			<TooltipWidget tooltip={tooltip ?? tooltipReleaseDate} />
+			{effectiveTooltip && <TooltipWidget tooltip={effectiveTooltip} />}
 		</div>
 	);
 };

@@ -28,7 +28,7 @@ import {
 	ScenariosConfig,
 	ThresholdInterface,
 } from '@/types/climate-variable-interface';
-import { getDefaultFrequency, getFrequencyType } from '@/lib/utils';
+import { getDefaultFrequency, getFrequencyType, utc } from '@/lib/utils';
 import { MapDisplayType, WMSParams } from '@/types/types';
 
 /**
@@ -235,6 +235,11 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getAnalysisFieldValue(key: keyof FieldValues): string | null {
 		return this._config.analysisFieldValues?.[key] ?? null;
+	}
+
+	getSelectedPeriods(): Date[] {
+		const periodStrings = this._config.selectedPeriods ?? [];
+		return periodStrings.map(periodString => utc(periodString) as Date);
 	}
 
 	getDateRangeConfig(): DateRangeConfig | null {

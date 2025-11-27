@@ -1,8 +1,12 @@
 import {
-	ForecastDisplay,
 	ForecastDisplays,
-	ForecastType,
 	ForecastTypes,
+	FrequencyTypes,
+	S2DFrequencyTypes,
+	type ForecastDisplay,
+	type ForecastType,
+	type FrequencyType,
+	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 import { AbstractError } from '@/lib/errors';
 
@@ -11,6 +15,7 @@ import { AbstractError } from '@/lib/errors';
  *
  * @param validTypes - Record where values are the valid types.
  * @param name - Name of the type to use in the error message.
+ * @returns Assertion function that throws if value is not valid, otherwise narrows the type.
  */
 function buildCorrectTypeAsserter<T>(
 	validTypes: Record<string, T>,
@@ -29,8 +34,27 @@ function buildCorrectTypeAsserter<T>(
 
 /**
  * Error class representing a failed assertion.
+ *
+ * @example
+ * ```typescript
+ * throw new AssertionError('Invalid type', { cause: originalError });
+ * ```
  */
 export class AssertionError extends AbstractError {}
+
+export const assertIsFrequencyType: (
+	value: string
+) => asserts value is FrequencyType = buildCorrectTypeAsserter<FrequencyType>(
+	FrequencyTypes,
+	'FrequencyType'
+);
+
+export const assertIsS2DFrequencyType: (
+	value: string
+) => asserts value is S2DFrequencyType = buildCorrectTypeAsserter<S2DFrequencyType>(
+	S2DFrequencyTypes,
+	'S2DFrequencyType'
+);
 
 /**
  * Assert that a value is a valid ForecastType.
@@ -41,7 +65,7 @@ export const assertIsForecastType: (
 	value: string
 ) => asserts value is ForecastType = buildCorrectTypeAsserter<ForecastType>(
 	ForecastTypes,
-	'forecast type'
+	'ForecastType'
 );
 
 /**
@@ -54,5 +78,5 @@ export const assertIsForecastDisplay: (
 ) => asserts value is ForecastDisplay =
 	buildCorrectTypeAsserter<ForecastDisplay>(
 		ForecastDisplays,
-		'forecast display'
+		'ForecastDisplay'
 	);

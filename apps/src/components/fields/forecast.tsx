@@ -10,13 +10,14 @@ import {
 	ForecastType,
 	ForecastTypes,
 } from '@/types/climate-variable-interface';
+import { getForecastTypeName } from '@/lib/s2d';
 
 const ForecastTypeField = {
 	key: 'forecast_types',
 	label: __('Forecast Types'),
 	options: [
-		{ value: ForecastTypes.EXPECTED, label: __('Expected Conditions') },
-		{ value: ForecastTypes.UNUSUAL, label: __('Unusual Conditions') },
+		{ value: ForecastTypes.EXPECTED, label: getForecastTypeName(ForecastTypes.EXPECTED) },
+		{ value: ForecastTypes.UNUSUAL, label: getForecastTypeName(ForecastTypes.UNUSUAL) },
 	],
 };
 

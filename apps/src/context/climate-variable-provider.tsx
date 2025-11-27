@@ -29,6 +29,7 @@ import StationClimateVariable from '@/lib/station-climate-variable';
 import StationDataClimateVariable from "@/lib/station-data-climate-variable";
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import { formatUTCDate } from '@/lib/utils';
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
@@ -46,6 +47,7 @@ export type ClimateVariableContextType = {
 	setFrequency: (frequency: string) => void;
 	setAnalysisFieldValue: (key: string, value: string | null) => void;
 	setAveragingType: (type: AveragingType) => void;
+	setSelectedPeriods: (periods: Date[]) => void;
 	setDateRange: (dates: string[]) => void;
 	setPercentiles: (percentiles: string[]) => void;
 	setMissingData: (missingData: string) => void;
@@ -305,6 +307,23 @@ export const ClimateVariableProvider: React.FC<{
 		[dispatch]
 	);
 
+	const setSelectedPeriods = useCallback(
+		(selectedPeriods: Date[]) => {
+			const periodStrings = selectedPeriods.map(
+				period => formatUTCDate(period, 'yyyy-MM')
+			);
+
+			periodStrings.sort();
+
+			dispatch(
+				updateClimateVariable({
+					selectedPeriods: periodStrings,
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const setDateRange = useCallback(
 		(dates: string[]) => {
 			dispatch(
@@ -504,6 +523,7 @@ export const ClimateVariableProvider: React.FC<{
 		addSelectedPoints,
 		removeSelectedPoint,
 		resetSelectedPoints,
+		setSelectedPeriods,
 		setSelectedRegion,
 		resetSelectedRegion,
 		setForecastType,

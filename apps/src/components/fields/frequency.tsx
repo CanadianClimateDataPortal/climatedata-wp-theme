@@ -18,6 +18,7 @@ const FrequencyField = {
 
 export interface S2DFrequencyFieldDropdownProps {
 	tooltip?: React.ReactNode;
+	afterOnChange?: (value: FrequencyType | string) => void;
 }
 
 export const S2DFrequencyFieldDropdown = (
@@ -27,14 +28,18 @@ export const S2DFrequencyFieldDropdown = (
 		climateVariable,
 		setFrequency,
 	} = useClimateVariable();
+	const { afterOnChange, ...restProps } = props;
 
 	const value = climateVariable?.getFrequency() ?? FrequencyType.MONTHLY;
 
 	const fieldProps = {
 		label: FrequencyField.label,
-		onChange: setFrequency,
+		onChange: (value: FrequencyType | string) => {
+			setFrequency(value);
+			afterOnChange?.(value);
+		},
 		value,
-		...props,
+		...restProps,
 	};
 
 	return (

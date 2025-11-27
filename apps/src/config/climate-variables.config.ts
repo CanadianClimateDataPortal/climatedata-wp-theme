@@ -1635,6 +1635,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				addTopPadding: true,
 			}
 		},
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
+		},
 	},
 	/** S2D Total Precipitation */
 	{
@@ -1645,6 +1648,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[MapDisplayType.ABSOLUTE]: {
 				addTopPadding: true,
 			}
+		},
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
 		},
 	},
 ];

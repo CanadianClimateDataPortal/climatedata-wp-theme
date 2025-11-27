@@ -66,6 +66,9 @@ export enum FrequencyDisplayModeOption {
 	NONE = 'none',
 }
 
+/**
+ * All frequency types.
+ */
 export enum FrequencyType {
 	ANNUAL = 'ann',
 	ANNUAL_JUL_JUN = 'annual_jul_jun',
@@ -73,14 +76,42 @@ export enum FrequencyType {
 	SEASONAL = 'seasons',
 	ALL_MONTHS = 'allMonths',
 	DAILY = 'daily',
+	YS = 'ys',
+	MS = 'ms',
+	QSDEC = 'qsdec',
 }
+
+/**
+ * In order to transition away from enums, we define an object with the same values.
+ *
+ */
+export const FrequencyTypes = {
+	ANNUAL: FrequencyType.ANNUAL,
+	ANNUAL_JUL_JUN: FrequencyType.ANNUAL_JUL_JUN,
+	MONTHLY: FrequencyType.MONTHLY,
+	SEASONAL: FrequencyType.SEASONAL,
+	ALL_MONTHS: FrequencyType.ALL_MONTHS,
+	DAILY: FrequencyType.DAILY,
+	// Frequency types for API and GeoServer queries.
+	YS: FrequencyType.YS,
+	MS: FrequencyType.MS,
+	QSDEC: FrequencyType.QSDEC,
+} as const;
+
+/**
+ * S2D frequency types - subset of available frequencies.
+ */
+export const S2DFrequencyTypes = {
+    MONTHLY: FrequencyTypes.MONTHLY,
+    SEASONAL: FrequencyTypes.SEASONAL,
+} as const;
 
 /**
  * Type for the supported frequency types for S2D variables.
  *
  * A subset of `FrequencyType`.
  */
-export type S2DFrequencyType = FrequencyType.MONTHLY | FrequencyType.SEASONAL;
+export type S2DFrequencyType = typeof S2DFrequencyTypes[keyof typeof S2DFrequencyTypes];
 
 export const ForecastTypes = {
 	EXPECTED: 'expected',
@@ -206,12 +237,6 @@ export interface LocationModalContentParams {
 	mode?: 'modal' | 'panel'
 }
 
-export enum FrequencyType {
-	YS = 'ys',
-	MS = 'ms',
-	QSDEC = 'qsdec',
-}
-
 export type PreCalculatedCanDCSConfig = {
 	[key: string]: FrequencyType[],
 }
@@ -318,6 +343,11 @@ export interface ClimateVariableConfigInterface {
 
 	/** Holds submitted values for analysisFields */
 	analysisFieldValues?: FieldValues;
+
+	/**
+	 * Selected S2D periods, as an array of dates in a string format of 'YYYY-MM'.
+	 */
+	selectedPeriods?: string[] | null;
 
 	/** Configuration defining the date range to be used in the Download section */
 	dateRangeConfig?: DateRangeConfig;
@@ -565,4 +595,12 @@ export interface ClimateVariableInterface {
 	getForecastType(): ForecastType | null;
 
 	getForecastDisplay(): ForecastDisplay | null;
+
+	/**
+	 * List of selected periods, each period represented as a Date of the period's start'.
+	 *
+	 * Each element is the period's *start* date. The length (and thus the end
+	 * date) of a period can be determined from the frequency selected.
+	 */
+	getSelectedPeriods(): Date[];
 }

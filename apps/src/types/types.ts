@@ -899,6 +899,20 @@ export enum MapDisplayType {
 	DELTA = 'delta',
 }
 
+/**
+ * Describe on a map a region.
+ *
+ * The 4 coordinate points forming a rectangle on a map.
+ */
+export type MapBoundaryBox = [number, number, number, number];
+
+/**
+ * Describe on a map a region as a set of points.
+ *
+ * Each point is represented as a tuple of [longitude, latitude].
+ */
+export type MapPointsList = [number, number][];
+
 export type HighChartSeries = {
 	visible: boolean;
 	type: string;

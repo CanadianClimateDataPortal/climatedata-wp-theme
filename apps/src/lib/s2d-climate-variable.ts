@@ -13,6 +13,7 @@ import S2DVariableValues from '@/components/map-layers/s2d-variable-values';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
 import { WMSParams } from '@/types/types';
 import { formatUTCDate, utc } from '@/lib/utils';
+import { normalizeForApiVariableId } from '@/lib/s2d';
 
 /**
  * Seasonal To Decadal
@@ -55,7 +56,7 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 	 * - Climatology: `CDC:s2d-climatology-<VAR>-<F>`
 	 *
 	 * Where:
-	 * - <VAR>: the variable ID (without the "s2d_" prefix)
+	 * - <VAR>: the API variable's ID
 	 * - <F>: the frequency (e.g. "seasonal" or "monthly")
 	 * - <FT>: the forecast type (e.g. "expected" or "unusual")
 	 */
@@ -63,7 +64,7 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 		const forecastType = this.getForecastType();
 		const isForecast = this.getForecastDisplay() === ForecastDisplays.FORECAST;
 		const frequency = this.getFrequency() ?? FrequencyType.SEASONAL;
-		let variable = this.getId();
+		const variable = normalizeForApiVariableId(this.getId());
 
 		const frequencyNameMap: Record<string, string> = {
 			[FrequencyType.SEASONAL]: 'seasonal',
@@ -73,10 +74,6 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 		const forecastTypeMap: Record<string, string> = {
 			[ForecastTypes.EXPECTED]: 'expected',
 			[ForecastTypes.UNUSUAL]: 'unusual',
-		}
-
-		if (variable.startsWith('s2d_')) {
-			variable = variable.substring(4);
 		}
 
 		const frequencyName = frequencyNameMap[frequency];

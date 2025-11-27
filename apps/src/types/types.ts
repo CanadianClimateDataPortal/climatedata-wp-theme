@@ -221,20 +221,70 @@ export interface DownloadState {
 }
 
 /**
- * Represents an individual entry in a WMS legend colormap.
+ * Individual entry in a {@link WMSLegendData} colormap from GeoServer's
+ * GetLegendGraphic.
+ *
+ * **Format variants:**
+ * - **Standard**: Regular numeric quantities (e.g., "-150", "6", "83.3")
+ * - **S2D Multi-band**: GXYY-encoded quantities (e.g., "1040", "2050", "3100")
+ *
+ * @see {@link WMSLegendData} - Parent structure
+ * @see {@link transformColorMapToMultiBandLegend} in `@/lib/multi-band-legend` - Transforms S2D format
+ *
+ * @example Standard format
+ * ```typescript
+ * const entry: WMSLegendEntry = {
+ *   label: "6days",
+ *   quantity: "6",
+ *   color: "#FFFFE7",
+ *   opacity: "1.0"
+ * };
+ * ```
+ *
+ * @example S2D Multi-band format
+ * ```typescript
+ * const entry: WMSLegendEntry = {
+ *   label: "L1-0",
+ *   quantity: "1040",  // GXYY: Group 1, 40%
+ *   color: "#FFFFFF",
+ *   opacity: "0.0"
+ * };
+ * ```
  */
 export interface WMSLegendEntry {
+	/**
+	 * Entry identifier
+	 */
 	label: string;
+	/**
+	 * Hex color code
+	 * @example `#FFFFFF`
+	 */
 	color: string;
+	/**
+	 * Opacity value, as string, in range [0.0, 1.0]
+	 * @example `"0.0"`
+	 */
 	opacity: string;
-	quantity: number;
+	/**
+	 * Numeric value as string
+	 */
+	quantity: string;
 }
 
 /**
- * Represents the structure of WMS legend data.
+ * WMS legend data structure from GeoServer GetLegendGraphic endpoint.
+ *
+ * Supports both standard legends and S2D multi-band variants (GXYY-encoded).
+ * Variant detection happens downstream via {@link transformColorMapToMultiBandLegend}.
+ *
+ * @see EXAMPLE_COLOR_MAP_DISCRETE_SINGLE in `@/hooks/use-color-map.examples` - Standard format
+ * @see EXAMPLE_COLOR_MAP_S2D_MULTIBAND in `@/hooks/use-color-map.examples` - S2D multi-band format
  */
 export interface WMSLegendData {
 	Legend?: {
+		layerName?: string;
+		title?: string;
 		rules?: {
 			symbolizers?: {
 				Raster?: {
@@ -242,6 +292,7 @@ export interface WMSLegendData {
 						entries: WMSLegendEntry[];
 						type?: string;
 					};
+					opacity?: string;
 				};
 			}[];
 		}[];
@@ -545,7 +596,7 @@ export interface DeltaValuesOptions {
 	endpoint: string;
 	varName: string | null;
 	frequency: string | null;
-	params: string;
+	params: Record<string, string>;
 }
 
 export interface PercentileData {

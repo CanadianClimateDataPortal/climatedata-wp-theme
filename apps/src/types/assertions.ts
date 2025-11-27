@@ -8,6 +8,7 @@ import {
 	type FrequencyType,
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
+import { AbstractError } from '@/lib/errors';
 
 /**
  * Return a function that asserts that a value is one of the valid types.
@@ -34,28 +35,12 @@ function buildCorrectTypeAsserter<T>(
 /**
  * Error class representing a failed assertion.
  *
- * Supports ES2022 error chaining via the `cause` option for better debugging.
- * Uses V8's Error.captureStackTrace when available to exclude the constructor
- * from the stack trace for cleaner debugging.
- *
  * @example
+ * ```typescript
  * throw new AssertionError('Invalid type', { cause: originalError });
- * ``` */
-export class AssertionError extends Error {
-	constructor(
-		message: string,
-		options?: ErrorOptions,
-	) {
-		super(message, options);
-		this.name = 'AssertionError';
-		// V8-specific: Capture stack trace excluding the constructor itself
-		// This gives cleaner stack traces showing where the assertion failed,
-		// not the AssertionError constructor internals
-		if (Error.captureStackTrace) {
-			Error.captureStackTrace(this, AssertionError);
-		}
-	}
-}
+ * ```
+ */
+export class AssertionError extends AbstractError {}
 
 export const assertIsFrequencyType: (
 	value: string

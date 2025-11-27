@@ -13,7 +13,28 @@ import S2DVariableValues from '@/components/map-layers/s2d-variable-values';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
 import { WMSParams } from '@/types/types';
 import { formatUTCDate, utc } from '@/lib/utils';
-import { normalizeForApiVariableId } from '@/lib/s2d';
+import {
+	postDownloadToBlobObjectURL,
+	type PostDownloadToBlobObjectURLPayload,
+} from '@/services/download';
+import {
+	normalizeForApiFrequencyName,
+	normalizeForApiVariableId,
+} from '@/lib/s2d';
+
+interface PostDownloadS2DDescriptor extends PostDownloadToBlobObjectURLPayload {
+	/**
+	 * @remark
+	 * While the local code base has the variable ID prefixed with 's2d_',
+	 * the API expects the variable ID without this prefix.
+	 *
+	 * @example 'air_temp' or 'precip_accum'
+	 */
+	var: string;
+	forecast_type: string;
+	frequency: string | null;
+	periods: string[];
+}
 
 /**
  * Seasonal To Decadal
@@ -127,6 +148,8 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 
 	/**
 	 * TODO: For now, only outputs in the console the payload to send to the API
+	 *
+	 * {@link https://ccdpwiki.atlassian.net/wiki/spaces/CCDP/pages/2752544799/API+endpoints+downloaded+file#Endpoint}
 	 */
 	async getDownloadUrl(): Promise<string | null> {
 		const selectedRegion = this.getSelectedRegion?.(); // For a drawn region
@@ -134,11 +157,11 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 
 		const formatPeriod = (date: Date): string => formatUTCDate(date, 'yyyy-MM');
 
-		const payload: Record<string, unknown> = {
-			var: this.getId(), // TODO: use getApiVariableId()
+		const payload: PostDownloadS2DDescriptor = {
+			var: normalizeForApiVariableId(this.getId() ?? ''),
 			format: this.getFileFormat(),
-			forecast_type: this.getForecastType(), // TODO: use getApiForecastType()
-			frequency: this.getFrequency(), // TODO: use getApiFrequency()
+			forecast_type: this.getForecastType(), // TODO: use getApiForecastType() ???
+			frequency: normalizeForApiFrequencyName(this.getFrequency() ?? ''),
 			periods: this.getSelectedPeriods().map(formatPeriod),
 		}
 
@@ -158,9 +181,9 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 
 		console.log(payload);
 
-		// Must return a blob URL, look at the fetchDownloadUrl() method in raster-precalculated-climate-variable.tsx
-		// return await this.fetchDownloadUrl(payload);
-		return 'https://example.com/';
+		const url = `${window.DATA_URL}/download-s2d`;
+		const blobPayload = await postDownloadToBlobObjectURL(url, payload);
+		return blobPayload;
 	}
 }
 

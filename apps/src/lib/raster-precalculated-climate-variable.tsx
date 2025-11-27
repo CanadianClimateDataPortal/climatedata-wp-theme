@@ -19,17 +19,16 @@ import RasterPrecalcultatedClimateVariableValues
 	from '../components/map-layers/raster-precalculated-climate-variable-values';
 import { getFrequencyType } from '@/lib/utils.ts';
 import { WMSParams } from '@/types/types';
-import {
-	type PostDownloadToBlobObjectURLPayload,
-	postDownloadToBlobObjectURL,
-} from '@/services/download';
 
-interface DownloadPayloadProps extends PostDownloadToBlobObjectURLPayload {
+interface DownloadPayloadProps {
 	dataset_name: string | null;
 	dataset_type: string;
+	format: FileFormatType | null;
 	month: string | null;
 	var: string | null;
 	zipped: boolean;
+	bbox?: [number, number, number, number];
+	points?: [number, number][];
 }
 
 /**
@@ -167,11 +166,42 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 	}
 
 	/**
-	 * @see {@link postDownloadToBlobObjectURL}
+	 * Sends a POST request to the download endpoint with the provided payload,
+	 * receives a Blob in response (usually a ZIP file), and returns a temporary
+	 * object URL that can be used to trigger a file download in the browser.
+	 *
+	 * @param payload - The data specifying what file(s) to download (variable, region, format, etc.)
+	 * @returns A temporary blob URL as a string, or null if the request fails
+	 * @throws Any network or HTTP error that occurs during the fetch
 	 */
 	async fetchDownloadUrl(payload: DownloadPayloadProps): Promise<string | null> {
 		const url = `${window.DATA_URL}/download`;
-		return await postDownloadToBlobObjectURL(url, payload);
+
+		try {
+			// Send the POST request with the payload as JSON
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(payload)
+			});
+
+			// Throw an error if the response is not OK (4xx or 5xx)
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+
+			// Convert the response to a Blob (usually a ZIP file)
+			const blob = await response.blob();
+
+			// Return a temporary object URL to be used for downloading
+			return window.URL.createObjectURL(blob);
+		} catch (error) {
+			// Log and rethrow any errors during the request
+			console.error('Download error:', error);
+			throw error;
+		}
 	}
 
 	// TODO: it seems this method is only used for gridded_data + drawn region

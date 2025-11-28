@@ -48,7 +48,12 @@ const isAborted = (fetchOptions?: FetchOptions): boolean => {
 /**
  * Error returned by fetch functions of this module in case of a request error.
  */
-export class FetchError extends AbstractError {}
+export class FetchError extends AbstractError {
+ constructor(message: string, options?: ErrorOptions) {
+   super(message, options);
+   this.name = 'FetchError';
+ }
+}
 
 /**
  * Send a GET JSON request and return the parsed JSON response.

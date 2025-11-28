@@ -1,14 +1,25 @@
 import { FileFormatType } from '@/types/climate-variable-interface';
+import { AbstractError } from '@/lib/errors';
 
 import type {
 	MapBoundaryBox,
 	MapPointsList,
 } from '@/types/types';
 
-class FetchPostDownloadError extends Error {
+class FetchPostDownloadError extends AbstractError {
 	constructor(message: string, options?: ErrorOptions) {
 		super(message, options);
 		this.name = 'FetchPostDownloadError';
+	}
+}
+
+/**
+ * Error thrown when download payload does not have exactly one geographic selector.
+ */
+class ExactlyOneGeographicSelectorError extends AbstractError {
+	constructor(message: string, options?: ErrorOptions) {
+		super(message, options);
+		this.name = 'ExactlyOneGeographicSelectorError';
 	}
 }
 
@@ -28,7 +39,7 @@ export interface PostDownloadToBlobObjectURLPayload {
  * Validates that a download payload has exactly one geographic selector: bbox OR points.
  *
  * @param payload - The download payload to validate
- * @throws {Error} If neither bbox nor points is present, or if both are present
+ * @throws {ExactlyOneGeographicSelectorError} If neither bbox nor points is present, or if both are present
  */
 export const assertHasExactlyOneGeographicSelector = (
 	payload: PostDownloadToBlobObjectURLPayload
@@ -37,13 +48,13 @@ export const assertHasExactlyOneGeographicSelector = (
 	const hasPoints = 'points' in payload && payload.points !== undefined;
 
 	if (!hasBbox && !hasPoints) {
-		throw new Error(
+		throw new ExactlyOneGeographicSelectorError(
 			'Download requires either a selected region (bbox) or selected grid cells (points)'
 		);
 	}
 
 	if (hasBbox && hasPoints) {
-		throw new Error(
+		throw new ExactlyOneGeographicSelectorError(
 			'Download cannot have both bbox and points - only one geographic selector allowed'
 		);
 	}

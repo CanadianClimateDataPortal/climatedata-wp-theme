@@ -40,7 +40,12 @@ function buildCorrectTypeAsserter<T>(
  * throw new AssertionError('Invalid type', { cause: originalError });
  * ```
  */
-export class AssertionError extends AbstractError {}
+export class AssertionError extends AbstractError {
+	constructor(message: string, options?: ErrorOptions) {
+		super(message, options);
+		this.name = 'AssertionError';
+	}
+}
 
 export const assertIsFrequencyType: (
 	value: string
@@ -49,6 +54,9 @@ export const assertIsFrequencyType: (
 	'FrequencyType'
 );
 
+/**
+ * @throws {AssertionError} if value is not a valid {@link S2DFrequencyType}
+ */
 export const assertIsS2DFrequencyType: (
 	value: string
 ) => asserts value is S2DFrequencyType = buildCorrectTypeAsserter<S2DFrequencyType>(
@@ -60,6 +68,7 @@ export const assertIsS2DFrequencyType: (
  * Assert that a value is a valid ForecastType.
  *
  * @param value - The value to assert.
+ * @throws {AssertionError} if value is not a valid {@link ForecastType}
  */
 export const assertIsForecastType: (
 	value: string
@@ -72,6 +81,7 @@ export const assertIsForecastType: (
  * Assert that a value is a valid ForecastDisplay.
  *
  * @param value - The value to assert.
+ * @throws {AssertionError} if value is not a valid {@link ForecastDisplay}
  */
 export const assertIsForecastDisplay: (
 	value: string

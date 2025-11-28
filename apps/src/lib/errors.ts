@@ -11,7 +11,12 @@
  *
  * @example
  * ```typescript
- * class ValidationError extends AbstractError {}
+ * class ValidationError extends AbstractError {
+ * 	constructor(message: string, options?: ErrorOptions) {
+ * 		super(message, options);
+ * 		this.name = 'ValidationError'; // Otherwise we do not get a useful name
+ * 	}
+ * }
  *
  * throw new ValidationError('Invalid data', {
  *   cause: originalError
@@ -22,6 +27,8 @@ export abstract class AbstractError extends Error {
 	constructor(message: string, options?: ErrorOptions) {
 		super(message, options);
 		// Automatically sets name to FetchError, ValidationError, etc.
+		// Due to WebPack minification, we can't really use this to give a useful name.
+		// So we will have to set the name explicitly in subclasses.
 		this.name = this.constructor.name;
 	}
 

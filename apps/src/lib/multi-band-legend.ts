@@ -63,7 +63,12 @@ export type MultiBandLegend = {
 /**
  * Base error class for multi-band legend operations
  */
-export class MultiBandLegendError extends AbstractError {}
+export class MultiBandLegendError extends AbstractError {
+	constructor(message: string, options?: ErrorOptions) {
+		super(message, options);
+		this.name = 'MultiBandLegendError';
+	}
+}
 
 /**
  * Thrown when quantity format is invalid

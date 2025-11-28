@@ -47,6 +47,7 @@ import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 import MarineClimateVariable from '@/lib/marine-climate-variable';
 import LowSkillLayer from '@/components/map-layers/low-skill-layer';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import { useS2D } from '@/hooks/use-s2d';
 
 interface MapContainerProps {
 	onMapReady: (map: L.Map) => void;
@@ -80,6 +81,7 @@ export default function MapContainer({
 }: MapContainerProps): React.ReactElement {
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
 	const [selectedStation, setSelectedStation] = useState<Station | null>(null);
+	const { isS2DVariable } = useS2D();
 
 	const {
 		opacity: { labels: labelsOpacity },
@@ -294,7 +296,8 @@ export default function MapContainer({
 			/>
 
 			{/* show current scenario label */}
-			{ scenarioLabel && (
+			{ !isS2DVariable &&
+					scenarioLabel && (
 				<div className={cn(
 					'absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20',
 					'text-sm text-zinc-900 font-normal leading-5',

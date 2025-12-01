@@ -68,7 +68,17 @@ class StationDataClimateVariable extends StationClimateVariable {
 			console.error(`Unexpected data received. Was expecting an array, received: ${links}`);
 			return [];
 		}
-		
+		if (links.length === 0) {
+			console.warn('No download links available for the selected stations and date range.');
+			return [{
+				label: 'No data available',
+				linkAttributes: {
+					disabled: 'disabled',
+				},
+				url: 'http://localhost',
+			}];
+		}
+
 		return links.map(link => ({
 			label: sprintf(__('Download Records %d to %d'), link.start_index + 1, link.end_index + 1),
 			linkAttributes: {

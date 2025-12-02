@@ -334,7 +334,6 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getStationDownloadFiles(): Promise<DownloadFile[]> {
-		console.log('getStationDownloadFiles 1 ClimateVariableBase\n', { id: this.getId() ?? null });
 		return Promise.resolve([]);
 	}
 

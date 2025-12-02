@@ -35,7 +35,6 @@ export class StationDataFetchError extends AbstractError {
 	withHttpDetails(
 		response: Response,
 	): this {
-		console.log('StationDataFetchError.withHttpDetails\n', { response });
 		const picked = {
 			url: response.url,
 			status: response.status,
@@ -101,12 +100,6 @@ class StationDataClimateVariable extends StationClimateVariable {
 	}
 
 	async getStationDownloadFiles(props?: StationDownloadUrlsProps): Promise<DownloadFile[]> {
-		// But we need before That!
-		console.log('CLIM-1088 Tracing execution flow honk(3)\n', {
-			path: 'StationDataClimateVariable.getDownloadFiles(props)',
-			id: this.getId(),
-			props,
-		});
 		if(!props?.stationIds || !props?.dateRange || !props?.fileFormat) return [];
 
 		const stations = props?.stationIds?.map(stationId => stationId).join('|');

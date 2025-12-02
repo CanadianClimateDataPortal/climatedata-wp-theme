@@ -6,7 +6,12 @@
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { DownloadState, Station, TaxonomyData } from '@/types/types';
+import type {
+	DownloadRequestStatus,
+	DownloadState,
+	Station,
+	TaxonomyData,
+} from '@/types/types';
 import { CANADA_CENTER, DEFAULT_ZOOM } from '@/lib/constants';
 import { LatLngExpression } from 'leaflet';
 import { DownloadFile } from '@/types/climate-variable-interface';
@@ -65,7 +70,7 @@ const downloadSlice = createSlice({
 		setVariableListLoading(state, action: PayloadAction<boolean>) {
 			state.variableListLoading = action.payload;
 		},
-		setRequestStatus(state, action: PayloadAction<'idle' | 'loading' | 'success' | 'error'>) {
+		setRequestStatus(state, action: PayloadAction<DownloadRequestStatus>) {
 			state.requestStatus = action.payload;
 		},
 		setRequestResult(state, action: PayloadAction<any>) {

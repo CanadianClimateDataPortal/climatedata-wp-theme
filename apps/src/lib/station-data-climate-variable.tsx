@@ -23,6 +23,7 @@ export class StationDataFetchError extends AbstractError {
 		options?: ErrorOptions,
 	) {
 		super(message, options);
+		this.name = 'StationDataFetchError';
 	}
 
 	/**
@@ -40,7 +41,7 @@ export class StationDataFetchError extends AbstractError {
 			status: response.status,
 			statusText: response.statusText,
 		} as Pick<Response, 'url' | 'status' | 'statusText'>;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 		(this as any).response = picked;
 		return this;
 	}
@@ -57,6 +58,7 @@ export class StationDataResponseError extends AbstractError {
 		options?: ErrorOptions,
 	) {
 		super(message, options);
+		this.name = 'StationDataResponseError';
 	}
 }
 

@@ -37,7 +37,14 @@ const Steps: React.FC = () => {
 	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
 	const { climateVariable } = useClimateVariable();
 
-	const { subscribe, email, requestStatus, captchaValue, selectedStation } = useAppSelector((state) => state.download);
+	const {
+		subscribe,
+		email,
+		requestStatus,
+		captchaValue,
+		selectedStation,
+		requestError,
+	} = useAppSelector((state) => state.download);
 
 	const isLastStep = currentStep === steps.length;
 	const isSecondToLastStep = currentStep === steps.length - 1;
@@ -468,13 +475,21 @@ const Steps: React.FC = () => {
 							// - Find a way to detect `downloadFiles.length === 0` (DONE!)
 							// - Find a way to "tell" that there's nothing to download, somewhere. Somehow. As a child of StepComponent?
 
-							dispatch(setDownloadLinks(downloadFiles));
-							dispatch(setRequestStatus('success'));
+							if (downloadFiles.length === 0) {
+								// No data available
+								dispatch(setRequestStatus('no-data'));
+								dispatch(setRequestError(__('The selected station does not have data for the selected time period.'))); // TODO: Use proper message text.
+							} else {
+								dispatch(setDownloadLinks(downloadFiles));
+								dispatch(setRequestStatus('success'));
+							}
 
 							goToNextStep();
 						})
-						.catch(() => {
+						.catch((e) => {
+							console.error('Error fetching station download files:', e);
 							dispatch(setRequestStatus('error'));
+							dispatch(setRequestError(e?.message || 'Unknown error'));
 							dispatch(setDownloadLinks(undefined));
 							// CLIM-1088: Maybe catch errors and put a message instead of console.error here
 							// ... which would be making distinction between "no data available" and "error occurred"
@@ -522,6 +537,11 @@ const Steps: React.FC = () => {
 						{buttonText}
 					</a>
 				</div>
+			)}
+			{isLastStep && (
+				<>
+					{(typeof requestError === 'string') && <div className="text-red-600 text-sm mt-2">{requestError}</div>}
+				</>
 			)}
 		</div>
 	);

@@ -78,13 +78,6 @@ class StationDataClimateVariable extends StationClimateVariable {
 		// Handle when no data available
 		if (links.length === 0) {
 			console.warn('No download links available for the selected stations and date range.');
-			return [{
-				label: 'No data available',
-				linkAttributes: {
-					disabled: 'disabled',
-				},
-				url: 'http://localhost',
-			}];
 		}
 
 		return links.map(link => ({

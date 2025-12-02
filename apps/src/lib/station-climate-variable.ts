@@ -82,6 +82,8 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 	}
 
 	async getStationDownloadFiles(props?: StationDownloadUrlsProps): Promise<DownloadFile[]> {
+		console.log('getStationDownloadFiles 0\n', { id: this.getId(), props });
+
 		// For MSC Climate Normals 1981-2010
 		if(this.getId() === 'msc_climate_normals') {
 			if(!props?.stationIds || !props?.fileFormat) return [];

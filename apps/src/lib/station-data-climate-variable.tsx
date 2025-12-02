@@ -38,17 +38,23 @@ class StationDataClimateVariable extends StationClimateVariable {
 			new Date().toISOString().split('T')[0]
 		]
 	}
-	
+
 	getFileFormatTypes(): FileFormatType[] {
 		return [
 			FileFormatType.CSV,
 			FileFormatType.GeoJSON,
 		];
 	}
-	
+
 	async getStationDownloadFiles(props?: StationDownloadUrlsProps): Promise<DownloadFile[]> {
+		// But we need before That!
+		console.log('CLIM-1088 Tracing execution flow honk(3)\n', {
+			path: 'StationDataClimateVariable.getDownloadFiles(props)',
+			id: this.getId(),
+			props,
+		});
 		if(!props?.stationIds || !props?.dateRange || !props?.fileFormat) return [];
-		
+
 		const stations = props?.stationIds?.map(stationId => stationId).join('|');
 		const start = props?.dateRange.start + ' 00:00:00';
 		const end = props?.dateRange.end + ' 00:00:00';
@@ -63,11 +69,13 @@ class StationDataClimateVariable extends StationClimateVariable {
 		}
 
 		const links = await response.json();
-		
+
 		if (!Array.isArray(links)) {
 			console.error(`Unexpected data received. Was expecting an array, received: ${links}`);
 			return [];
 		}
+
+		// Handle when no data available
 		if (links.length === 0) {
 			console.warn('No download links available for the selected stations and date range.');
 			return [{

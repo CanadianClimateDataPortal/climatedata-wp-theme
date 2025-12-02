@@ -87,6 +87,27 @@ const Steps: React.FC = () => {
 	};
 
 	const handleNext = async () => {
+
+		if (isPrecalculatedDownload) {
+			console.log('CLIM-1088 Tracing execution flow honk(0)\n', {
+				path: 'Steps.handleNext',
+				id: climateVariable?.getId() ?? null,
+				isDailyRequest /* should be false */,
+				isPrecalculatedDownload /* should be true */,
+				isAnalyzeRequest /* should be false */,
+				interactiveMode: climateVariable?.getInteractiveMode() /* should be 'station' */,
+				isLastStep,
+				isSecondToLastStep,
+				testAssertions: {
+					isDailyRequest: isDailyRequest === false,
+					isPrecalculatedDownload: isPrecalculatedDownload === true,
+					isAnalyzeRequest: isAnalyzeRequest === false,
+					interactiveMode: climateVariable?.getInteractiveMode() === 'station',
+				},
+			});
+		}
+
+
 		if (!isStepValid || requestStatus === 'loading') {
 			return;
 		}
@@ -97,6 +118,7 @@ const Steps: React.FC = () => {
 		}
 
 		if (climateVariable) {
+
 			if (isAnalyzeRequest || isDailyRequest) {
 				dispatch(setRequestStatus('loading'));
 				dispatch(setRequestError(null));
@@ -120,6 +142,7 @@ const Steps: React.FC = () => {
 
 				let latList = '';
 				let lonList = '';
+
 
 				if (
 					interactiveRegion &&
@@ -387,6 +410,14 @@ const Steps: React.FC = () => {
 
 
 				} else {
+					// Just before the download
+					console.log('CLIM-1088 Tracing execution flow honk(1)\n', {
+						path: 'Steps.handleNext with conditions: !isDailyRequest && !isAnalyzeRequest',
+						id: climateVariable?.getId(),
+						interactiveMode: climateVariable?.getInteractiveMode(),
+						isLastStep,
+						isSecondToLastStep,
+					});
 					// For station variables
 					const selectedPoints = climateVariable.getSelectedPoints?.() ?? {};
 					const fileFormat = climateVariable.getFileFormat?.() ?? null;
@@ -419,8 +450,24 @@ const Steps: React.FC = () => {
 						}
 					}
 
+					console.log('CLIM-1088 Tracing execution flow honk(2)\n', {
+						path: 'Steps.handleNext Just before getStationDownloadFiles call',
+						stationDownloadUrlsProps,
+					});
 					climateVariable.getStationDownloadFiles(stationDownloadUrlsProps)
 						.then((downloadFiles) => {
+							console.log('CLIM-1088 Tracing execution flow honk(4)\n', {
+								path: 'Steps.handleNext at getStationDownloadFiles().then',
+								downloadFiles,
+								'downloadFiles.length': downloadFiles.length /* Should be 0 */,
+								testAssertions: {
+									'downloadFiles.length': downloadFiles.length === 0,
+								}
+							});
+							// To complete CLIM-1088:
+							// - Find a way to detect `downloadFiles.length === 0` (DONE!)
+							// - Find a way to "tell" that there's nothing to download, somewhere. Somehow. As a child of StepComponent?
+
 							dispatch(setDownloadLinks(downloadFiles));
 							dispatch(setRequestStatus('success'));
 
@@ -429,6 +476,8 @@ const Steps: React.FC = () => {
 						.catch(() => {
 							dispatch(setRequestStatus('error'));
 							dispatch(setDownloadLinks(undefined));
+							// CLIM-1088: Maybe catch errors and put a message instead of console.error here
+							// ... which would be making distinction between "no data available" and "error occurred"
 						});
 				}
 			}

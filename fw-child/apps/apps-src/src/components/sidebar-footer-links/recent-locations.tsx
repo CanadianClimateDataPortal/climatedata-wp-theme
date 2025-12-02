@@ -7,7 +7,7 @@ import React from "react";
 import { History, ArrowRight } from "lucide-react";
 import { useI18n } from "@wordpress/react-i18n";
 
-// components
+// componennts
 import { Button } from "@/components/ui/button";
 import { SidebarPanel, useSidebar } from "@/components/ui/sidebar";
 
@@ -30,7 +30,7 @@ const RecentLocationsLink: React.FC = () => {
     <Button
       variant="link"
       onClick={() => togglePanel(slug)}
-      className="justify-start p-2 text-dark-purple hover:-underline font-normal"
+      className="justify-start p-2 text-dark-purple hover:-underline"
     >
       <History size={16} />
       <span

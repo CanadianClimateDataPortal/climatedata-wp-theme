@@ -129,10 +129,10 @@ export function AppSidebar() {
 
 				<SidebarGroup className="mt-auto gap-0">
 					<RecentLocationsLink />
-					<LinkWithIcon icon={BadgeInfo} target="_blank" href="/about" className="font-normal text-brand-blue hover:text-soft-purple">
+					<LinkWithIcon icon={BadgeInfo} target="_blank" href="#">
 						{__('About our data')}
 					</LinkWithIcon>
-					<LinkWithIcon icon={MessageCircleQuestion} onClick={() => setExtendInfo(true)} className="font-normal text-brand-blue hover:text-soft-purple">
+					<LinkWithIcon icon={MessageCircleQuestion} onClick={() => setExtendInfo(true)}>
 						{__('Support')}
 					</LinkWithIcon>
 				</SidebarGroup>

@@ -541,6 +541,7 @@ const Steps: React.FC = () => {
 			{isLastStep && (
 				<>
 					{(typeof requestError === 'string') && <div className="text-red-600 text-sm mt-2">{requestError}</div>}
+					{/* TODO Make this look better, the way this should look like; but couldn't find design for it yet */}
 				</>
 			)}
 		</div>

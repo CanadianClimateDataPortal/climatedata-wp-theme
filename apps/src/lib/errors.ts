@@ -43,3 +43,41 @@ export abstract class AbstractError extends Error {
 		return `${baseStack}\nCaused by: ${cause.stack}`;
 	}
 }
+
+/**
+ * Error thrown when a function's preconditions are not met at runtime.
+ *
+ * This error indicates that required state or arguments that should have been
+ * validated earlier in the call chain were not properly checked.
+ * It's used when extracting functions from deeply nested contexts where precondition
+ * checks exist at the call site, but the extracted function needs to assert those same
+ * conditions defensively.
+ *
+ * Use this error to:
+ * - Signal "should never happen" conditions in refactored code
+ * - Document expectations about calling context without polluting function signatures
+ * - Provide clear debugging information when architectural assumptions are violated
+ *
+ * @example
+ * ```typescript
+ * function generateS2DFilename(releaseDate: Date | null) {
+ *   // Call site already checked for S2D state, but we assert defensively
+ *   if (!releaseDate) {
+ *     throw new PreconditionError(
+ *       'S2D download filename generation requires a release date. ' +
+ *       'This indicates S2D state validation was bypassed in the call chain.'
+ *     );
+ *   }
+ *   // ... generate filename
+ * }
+ * ```
+ */
+export class PreconditionError extends AbstractError {
+	constructor(
+		message: string,
+		options?: ErrorOptions,
+	) {
+		super(message, options);
+		this.name = 'PreconditionError';
+	}
+}

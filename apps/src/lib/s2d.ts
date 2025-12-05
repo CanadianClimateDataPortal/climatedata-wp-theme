@@ -243,6 +243,30 @@ export function getForecastTypeName(forecastType: ForecastType): string {
 }
 
 /**
+ * Map S2D API variable IDs to filename component values.
+ */
+export const S2D_VARIABLE_FILENAME_MAP: Record<string, string> = {
+	air_temp: 'MeanTemp',
+	precip_accum: 'TotalPrecip',
+};
+
+/**
+ * Map S2D forecast types to filename component values.
+ */
+export const S2D_FORECAST_TYPE_FILENAME_MAP: Record<string, string> = {
+	expected: 'ExpectedCond',
+	unusual: 'UnusualCond',
+};
+
+/**
+ * Map S2D frequency types to filename component values.
+ */
+export const S2D_FREQUENCY_FILENAME_MAP: Record<string, string> = {
+	[FrequencyType.MONTHLY]: 'Monthly',
+	[FrequencyType.SEASONAL]: 'Seasonal',
+};
+
+/**
  * Convert an S2D climate variable's id to the one to use in S2D API requests.
  *
  * @param variableId - The variable id used in the app, e.g. `"s2d_air_temp"`.
@@ -270,3 +294,41 @@ export function normalizeForApiFrequencyName(
 
 	return frequencyNameMap[frequency] ?? frequency;
 }
+
+export interface ExtractS2DDownloadStepFilenameComponent {
+	variableName: string;
+	forecastType: string;
+	frequency: string;
+}
+
+/**
+ * Extract and map S2D filename components from a climate variable.
+ *
+ * @param climateVariable - The S2D climate variable instance.
+ * @returns Object containing mapped variable name, forecast type, and frequency for filename use.
+ */
+export const extractS2DDownloadStepFilenameComponents = (
+	climateVariable: Pick<
+		ClimateVariableInterface,
+		'getId' | 'getForecastType' | 'getFrequency'
+	>
+): ExtractS2DDownloadStepFilenameComponent => {
+	const variableId = climateVariable.getId() ?? '';
+	const apiVariableId = normalizeForApiVariableId(variableId);
+	const variableName =
+		S2D_VARIABLE_FILENAME_MAP[apiVariableId] ?? apiVariableId;
+
+	const forecastTypeRaw = climateVariable.getForecastType() ?? '';
+	const forecastType =
+		S2D_FORECAST_TYPE_FILENAME_MAP[forecastTypeRaw] ?? forecastTypeRaw;
+
+	const frequencyRaw = climateVariable.getFrequency() ?? '';
+	const frequency = S2D_FREQUENCY_FILENAME_MAP[frequencyRaw] ?? frequencyRaw;
+
+	const out: ExtractS2DDownloadStepFilenameComponent = {
+		variableName,
+		forecastType,
+		frequency,
+	};
+	return out;
+};

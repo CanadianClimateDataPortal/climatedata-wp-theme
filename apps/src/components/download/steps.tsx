@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { __ } from '@/context/locale-provider';
 
@@ -23,6 +24,7 @@ import {
 	StationDownloadUrlsProps,
 } from '@/types/climate-variable-interface';
 import { useLocale } from "@/hooks/use-locale";
+import { useS2D } from '@/hooks/use-s2d';
 import { sprintf } from "@wordpress/i18n";
 import { trackFinchDownload } from '@/lib/google-analytics';
 
@@ -36,6 +38,8 @@ const Steps: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
 	const { climateVariable } = useClimateVariable();
+
+	const { isS2DVariable } = useS2D();
 
 	const { subscribe, email, requestStatus, captchaValue, selectedStation } = useAppSelector((state) => state.download);
 
@@ -136,7 +140,7 @@ const Steps: React.FC = () => {
 						const points = await response.json(); // array of [lat, lon]
 						latList = points.map((x: [number, number]) => x[0]).join(',');
 						lonList = points.map((x: [number, number]) => x[1]).join(',');
-					} catch (err) {
+					} catch {
 						dispatch(setRequestStatus('error'));
 						dispatch(setRequestError('Failed to fetch region grid points'));
 						return;
@@ -352,7 +356,17 @@ const Steps: React.FC = () => {
 					// Precalculated variables (no station)
 					const fileFormat = climateVariable.getFileFormat?.() ?? '';
 					const fileName = climateVariable.getId() ?? 'file';
-					const downloadFileName = fileName + (fileFormat === FileFormatType.NetCDF ? '.nc' : '.zip');
+					/**
+					 * The file extension may be specific to the variable type and format
+					 * but in the case of the backends for S2D variables, they're always
+					 * served by the backend as a zip file since they always contain multiple files.
+					 */
+					const downloadFileExtension = isS2DVariable
+						? '.zip'
+						: fileFormat === FileFormatType.NetCDF
+							? '.nc'
+							: '.zip';
+					const downloadFileName = fileName + downloadFileExtension;
 
 					// Generate the file to be downloaded
 					climateVariable.getDownloadUrl()

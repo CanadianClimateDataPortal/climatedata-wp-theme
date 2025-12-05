@@ -198,6 +198,22 @@ export interface MapState {
 }
 
 /**
+ * When requesting a download, represents the possible final statuses.
+ *
+ * @example 'success' - The download request parameters was accepted by the backend and it returned something we're expecting
+ * @example 'error' - There was an error processing the download request or parameters had something unexpected by the backend
+ * @example 'no-data' - The request was valid but there was no data available (i.e. an empty result) for the requested parameters
+ */
+export type DownloadRequestFinalStatus = 'success' | 'error' | 'no-data';
+
+/**
+ * Represents the possible statuses during a download request.
+ *
+ * @see {@link DownloadRequestFinalStatus} - The possible final statuses after loading
+ */
+export type DownloadRequestStatus = 'idle' | 'loading' | DownloadRequestFinalStatus;
+
+/**
  * Represents the download app state in redux store.
  */
 export interface DownloadState {
@@ -210,7 +226,7 @@ export interface DownloadState {
 	email: string;
 	subscribe: boolean;
 	variableListLoading: boolean;
-	requestStatus?: 'idle' | 'loading' | 'success' | 'error';
+	requestStatus?: DownloadRequestStatus;
 	requestResult?: any;
 	requestError?: string | null;
 	captchaValue: string;

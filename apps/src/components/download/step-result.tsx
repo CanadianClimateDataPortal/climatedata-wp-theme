@@ -56,8 +56,20 @@ function trackDownloadClick(
  */
 const StepResult = React.forwardRef(() => {
 	const { climateVariable } = useClimateVariable();
-	const { requestResult, downloadLinks } = useAppSelector((state) => state.download);
+	const {
+		requestResult,
+		downloadLinks,
+		requestStatus,
+	} = useAppSelector((state) => state.download);
 	const { isS2DVariable } = useS2D();
+	const isEmptyStationDataList = climateVariable?.getId() === 'station_data'
+		&& downloadLinks?.length === 0
+		&& requestStatus === 'no-data';
+	const externalLinkAttrs = [
+		'target="_blank"',
+		'rel="noopener noreferrer"',
+		'class="hover:underline text-brand-blue"',
+		].join(' ');
 
 	const [containerTitle, setContainerTitle] = useState<string | null>(null);
 	const [containerDescription, setContainerDescription] = useState<string | null>(null);
@@ -128,32 +140,52 @@ const StepResult = React.forwardRef(() => {
 						))}
 					</div>
 				)}
-				{climateVariable?.getId() === 'msc_climate_normals' && (
-					<p className="mt-4" dangerouslySetInnerHTML={{ __html:
+				{isEmptyStationDataList && (
+					<p className="mt-4">
+						<span>⚠️ </span>
+						<span dangerouslySetInnerHTML={{ __html:
 							sprintf(
 								__(
-									'Additional Climate Normals variables are available from the ' +
-									'<a href="https://climate-change.canada.ca/climate-data/#/climate-normals" %s>' +
-									'Canadian Centre for Climate Services</a> and the ' +
-									'<a href="https://climate.weather.gc.ca/climate_normals/index_e.html" %s>' +
-									'Government of Canada Historical Climate Data</a> websites.'
+									"The selected station(s) don't have data for the selected time period, please " +
+									'consult the <a href="https://api.weather.gc.ca/collections/climate-stations/items?f=csv&limit=10000" %s>station list</a> ' +
+									'for more information. The "Search by proximity" tab on the ' +
+									'<a href="https://climate.weather.gc.ca/historical_data/search_historic_data_e.html" %s>Historical ' +
+									'Data - Climate</a> webpage can be used to locate nearby weather stations that ' +
+									'include data for a specified time period.'
 								),
-								'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
-								'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
+								externalLinkAttrs,
+								externalLinkAttrs,
 							)
+						}}
+						/>
+					</p>
+				)}
+				{climateVariable?.getId() === 'msc_climate_normals' && (
+					<p className="mt-4" dangerouslySetInnerHTML={{ __html:
+						sprintf(
+							__(
+								'Additional Climate Normals variables are available from the ' +
+								'<a href="https://climate-change.canada.ca/climate-data/#/climate-normals" %s>' +
+								'Canadian Centre for Climate Services</a> and the ' +
+								'<a href="https://climate.weather.gc.ca/climate_normals/index_e.html" %s>' +
+								'Government of Canada Historical Climate Data</a> websites.'
+							),
+							externalLinkAttrs,
+							externalLinkAttrs,
+						)
 					}}
 					/>
 				)}
 				{isS2DVariable && (
 					<p className="mt-4" dangerouslySetInnerHTML={{ __html:
-							sprintf(
-								__(
-									'For access to global S2D forecast data or to set up automated downloads, please ' +
-									'visit <a href="https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_en/" %s>GeoMet</a> ' +
-									'(Environment and Climate Change Canada site).'
-								),
-								'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
-							)
+						sprintf(
+							__(
+								'For access to global S2D forecast data or to set up automated downloads, please ' +
+								'visit <a href="https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_en/" %s>GeoMet</a> ' +
+								'(Environment and Climate Change Canada site).'
+							),
+							externalLinkAttrs,
+						)
 					}}
 					/>
 				)}

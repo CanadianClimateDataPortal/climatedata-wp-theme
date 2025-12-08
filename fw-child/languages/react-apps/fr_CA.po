@@ -1414,3 +1414,18 @@ msgid  "For access to global S2D forecast data or to set up automated downloads,
 msgstr "Pour accéder aux données de prévision S2D mondiales ou pour configurer des téléchargements automatiques, veuillez consulter "
        "<a href=\"https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_fr/\" %s>GeoMet</a> "
        "(site d'Environnement et Changement climatique Canada)."
+
+msgid  "An unknown error occurred. Please try again."
+msgstr "Une erreur inconnue s'est produite. Veuillez réessayer."
+
+msgid  "The selected station(s) don't have data for the selected time period, please consult the "
+       "<a href=\"https://api.weather.gc.ca/collections/climate-stations/items?f=csv&limit=10000\" %s>station list</a> "
+       "for more information. The \"Search by proximity\" tab on the "
+       "<a href=\"https://climate.weather.gc.ca/historical_data/search_historic_data_e.html\" %s>Historical Data - "
+       "Climate</a> webpage can be used to locate nearby weather stations that include data for a specified time period."
+msgstr "La ou les stations sélectionnées ne disposent pas de données pour la période sélectionnée; veuillez consulter la "
+       "<a href=\"https://api.weather.gc.ca/collections/climate-stations/items?f=csv&limit=10000\" %s>liste des stations</a> "
+       "pour plus d'informations. L'onglet « Recherche par proximité » de la page Web "
+       "<a href=\"https://climat.meteo.gc.ca/historical_data/search_historic_data_f.html\" %s>Données historiques - Climat</a> "
+       "peut être utilisé pour localiser des stations météorologiques à proximité qui contiennent des données pour une "
+       "période donnée."

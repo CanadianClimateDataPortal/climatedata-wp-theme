@@ -37,10 +37,16 @@ const Steps: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
 	const { climateVariable } = useClimateVariable();
-
 	const { isS2DVariable } = useS2D();
 
-	const { subscribe, email, requestStatus, captchaValue, selectedStation } = useAppSelector((state) => state.download);
+	const {
+		subscribe,
+		email,
+		requestStatus,
+		captchaValue,
+		selectedStation,
+		requestError,
+	} = useAppSelector((state) => state.download);
 
 	const isLastStep = currentStep === steps.length;
 	const isSecondToLastStep = currentStep === steps.length - 1;
@@ -341,8 +347,9 @@ const Steps: React.FC = () => {
 					dispatch(setCaptchaValue(''));
 					goToNextStep();
 				} catch (error: any) {
+					console.error('Error submitting Finch request:', error);
 					dispatch(setRequestStatus('error'));
-					dispatch(setRequestError(error?.message || 'Unknown error'));
+					dispatch(setRequestError(__('An unknown error occurred. Please try again.')));
 					dispatch(setCaptchaValue(''));
 				}
 			}
@@ -435,12 +442,18 @@ const Steps: React.FC = () => {
 					climateVariable.getStationDownloadFiles(stationDownloadUrlsProps)
 						.then((downloadFiles) => {
 							dispatch(setDownloadLinks(downloadFiles));
-							dispatch(setRequestStatus('success'));
-
+							if (downloadFiles.length === 0) {
+								// No data available
+								dispatch(setRequestStatus('no-data'));
+							} else {
+								dispatch(setRequestStatus('success'));
+							}
 							goToNextStep();
 						})
-						.catch(() => {
+						.catch((e) => {
+							console.error('Error fetching station download files:', e);
 							dispatch(setRequestStatus('error'));
+							dispatch(setRequestError(__('An unknown error occurred. Please try again.')));
 							dispatch(setDownloadLinks(undefined));
 						});
 				}
@@ -486,6 +499,11 @@ const Steps: React.FC = () => {
 						{buttonText}
 					</a>
 				</div>
+			)}
+			{isLastStep && (
+				<>
+					{(typeof requestError === 'string') && <div className="text-red-600 text-sm mt-2">{requestError}</div>}
+				</>
 			)}
 		</div>
 	);

@@ -41,7 +41,6 @@ import { PreconditionError } from '@/lib/errors';
 const generateS2DDownloadFileName = (
 	climateVariable: ReturnType<typeof useClimateVariable>['climateVariable'],
 	releaseDate: ReturnType<typeof useS2D>['releaseDate'],
-	locale: string,
 ): string => {
 	if (!climateVariable || !releaseDate) {
 		throw new PreconditionError(
@@ -56,17 +55,15 @@ const generateS2DDownloadFileName = (
 		frequencyType,
 	} = extractS2DDownloadStepFilenameComponents(climateVariable);
 
-	// Format release date as localized short month + year (e.g., 'Apr2025' or 'Avr2025')
-	const monthYearFormatter = Intl.DateTimeFormat(locale, {
+	// Format release date as localized short month + year (e.g., 'Apr2025')
+	const monthYearFormatter = Intl.DateTimeFormat('en-CA', {
 		month: 'short',
 		year: 'numeric',
 		timeZone: 'UTC',
 	});
 	const rawDate = monthYearFormatter.format(releaseDate);
-	// Normalize diacritics (NFD), remove combining marks, strip whitespace/periods, capitalize
-	const formattedDate = rawDate
-		.normalize('NFD')															// 'déc.2025' → 'de\u0301c.2025'
-		.replace(/[\u0300-\u036f]/g, '')							// → 'dec.2025'
+	// Normalize strip whitespace/periods, capitalize
+	const formattedDate = rawDate										// 'dec.2025'
 		.replace(/[\s.]+/g, '') 											// → 'dec2025'
 		.replace(/^./, (char) => char.toUpperCase());	// → 'Dec2025'
 
@@ -413,7 +410,7 @@ const Steps: React.FC = () => {
 
 					if (isS2DVariable) {
 						try {
-							fileName = generateS2DDownloadFileName(climateVariable, releaseDate, locale);
+							fileName = generateS2DDownloadFileName(climateVariable, releaseDate);
 							// If an error throws, and the rest is OK, we'd still have a file name.
 						} catch (error) {
 							if (error instanceof PreconditionError) {

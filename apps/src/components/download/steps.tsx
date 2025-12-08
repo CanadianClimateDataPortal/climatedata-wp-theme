@@ -35,7 +35,7 @@ import { PreconditionError } from '@/lib/errors';
  *
  * @param climateVariable - The S2D climate variable instance.
  * @param releaseDate - The release date for the S2D data.
- * @param locale - The locale for formatting the release date (e.g., 'en' or 'fr').
+ *
  * @returns The formatted filename without extension.
  */
 const generateS2DDownloadFileName = (
@@ -50,7 +50,7 @@ const generateS2DDownloadFileName = (
 	}
 
 	const {
-		climateVariableIdRef: climateVariableIdApiRef,
+		climateVariableIdRef,
 		forecastType,
 		frequencyType,
 	} = extractS2DDownloadStepFilenameComponents(climateVariable);
@@ -67,7 +67,7 @@ const generateS2DDownloadFileName = (
 		.replace(/[\s.]+/g, '') 											// → 'dec2025'
 		.replace(/^./, (char) => char.toUpperCase());	// → 'Dec2025'
 
-	return `${climateVariableIdApiRef}_${forecastType}_${frequencyType}_Release${formattedDate}`;
+	return `${climateVariableIdRef}_${forecastType}_${frequencyType}_Release${formattedDate}`;
 };
 
 /**

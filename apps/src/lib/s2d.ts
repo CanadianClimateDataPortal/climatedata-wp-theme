@@ -296,8 +296,8 @@ export function normalizeForApiFrequencyName(
 	frequency: S2DFrequencyType | string
 ): string {
 	const frequencyNameMap: Record<string, string> = {
-		[FrequencyTypes.SEASONAL]: 'seasonal',
-		[FrequencyTypes.MONTHLY]: 'monthly',
+		[FrequencyType.SEASONAL]: 'seasonal',
+		[FrequencyType.MONTHLY]: 'monthly',
 	};
 
 	return frequencyNameMap[frequency] ?? frequency;

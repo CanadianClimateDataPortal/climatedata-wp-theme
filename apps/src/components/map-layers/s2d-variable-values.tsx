@@ -203,9 +203,15 @@ export const getProbabilityColour = (
 	const colours = colorMap.colours as `#${string}`[];
 	const defaultColor = '#909090';
 
+	/**
+	 * For `colourIndex` out of `findCeilingIndex`, we might need to increase the
+	 * by one.
+	 */
+	const CLIM_1234_ADJUSTMENT_FACTOR = 0.001;
+
 	// The "quantity" associated with this percentage and outcome. For example,
 	// an outcome of 0 (e.g. "above") and a percentage of 23 would be 1023.
-	const queryQuantity = 1000 * (outcome + 1) + Math.round(percentage);
+	const queryQuantity = 1000 * (outcome + 1) + Math.round(percentage) + CLIM_1234_ADJUSTMENT_FACTOR;
 	const colourIndex = findCeilingIndex(colorMap.quantities, queryQuantity);
 
 	// If the percentage/outcome is bigger than the highest value

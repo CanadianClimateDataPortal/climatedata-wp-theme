@@ -51,9 +51,9 @@ const generateS2DDownloadFileName = (
 	}
 
 	const {
-		variableName,
+		climateVariableIdRef: climateVariableIdApiRef,
 		forecastType,
-		frequency,
+		frequencyType,
 	} = extractS2DDownloadStepFilenameComponents(climateVariable);
 
 	// Format release date as localized short month + year (e.g., 'Apr2025' or 'Avr2025')
@@ -70,7 +70,7 @@ const generateS2DDownloadFileName = (
 		.replace(/[\s.]+/g, '') 											// → 'dec2025'
 		.replace(/^./, (char) => char.toUpperCase());	// → 'Dec2025'
 
-	return `${variableName}_${forecastType}_${frequency}_Release${formattedDate}`;
+	return `${climateVariableIdApiRef}_${forecastType}_${frequencyType}_Release${formattedDate}`;
 };
 
 /**
@@ -408,9 +408,21 @@ const Steps: React.FC = () => {
 				if (climateVariable?.getInteractiveMode() === 'region') {
 					// Precalculated variables (no station)
 					const fileFormat = climateVariable.getFileFormat?.() ?? '';
-					const fileName = isS2DVariable
-						? generateS2DDownloadFileName(climateVariable, releaseDate, locale)
-						: climateVariable.getId();
+
+					let fileName = climateVariable.getId();
+
+					if (isS2DVariable) {
+						try {
+							fileName = generateS2DDownloadFileName(climateVariable, releaseDate, locale);
+							// If an error throws, and the rest is OK, we'd still have a file name.
+						} catch (error) {
+							if (error instanceof PreconditionError) {
+								// Do we say something on the FrontEnd side?
+							}
+							console.error(error)
+						}
+					}
+
 					/**
 					 * The file extension may be specific to the variable type and format
 					 * but in the case of the backends for S2D variables, they're always
@@ -421,6 +433,7 @@ const Steps: React.FC = () => {
 						: fileFormat === FileFormatType.NetCDF
 							? '.nc'
 							: '.zip';
+
 					const downloadFileName = fileName + downloadFileExtension;
 
 					// Generate the file to be downloaded

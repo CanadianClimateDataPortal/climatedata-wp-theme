@@ -4,10 +4,12 @@ import {
 	ForecastType,
 	ForecastTypes,
 	FrequencyType,
+	FrequencyTypes,
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 import { formatUTCDate, utc } from '@/lib/utils';
 import { __ } from '@/context/locale-provider';
+import { PreconditionError } from './errors';
 
 export type PeriodRange = [Date, Date];
 
@@ -243,9 +245,15 @@ export function getForecastTypeName(forecastType: ForecastType): string {
 }
 
 /**
- * Map S2D API variable IDs to filename component values.
+ * Map S2D variable IDs to their corresponding filename components.
+ *
+ * @remark
+ * The keys are the Backend API variable IDs (without the "s2d_" prefix we use on the FrontEnd),
+ * and the values are the corresponding filename components for S2D data files.
+ *
+ * @see {@link normalizeForApiVariableId}
  */
-export const S2D_VARIABLE_FILENAME_MAP: Record<string, string> = {
+export const S2D_DOWNLOAD_FILENAME_MAP_VARIABLE_ID: Record<string, string> = {
 	air_temp: 'MeanTemp',
 	precip_accum: 'TotalPrecip',
 };
@@ -253,17 +261,17 @@ export const S2D_VARIABLE_FILENAME_MAP: Record<string, string> = {
 /**
  * Map S2D forecast types to filename component values.
  */
-export const S2D_FORECAST_TYPE_FILENAME_MAP: Record<string, string> = {
-	expected: 'ExpectedCond',
-	unusual: 'UnusualCond',
+export const S2D_DOWNLOAD_FILENAME_MAP_FORECAST_TYPE = {
+	[ForecastTypes.EXPECTED]: 'ExpectedCond',
+	[ForecastTypes.UNUSUAL]: 'UnusualCond',
 };
 
 /**
  * Map S2D frequency types to filename component values.
  */
-export const S2D_FREQUENCY_FILENAME_MAP: Record<string, string> = {
-	[FrequencyType.MONTHLY]: 'Monthly',
-	[FrequencyType.SEASONAL]: 'Seasonal',
+export const S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE: Record<string, string> = {
+	[FrequencyTypes.MONTHLY]: 'Monthly',
+	[FrequencyTypes.SEASONAL]: 'Seasonal',
 };
 
 /**
@@ -296,9 +304,20 @@ export function normalizeForApiFrequencyName(
 }
 
 export interface ExtractS2DDownloadStepFilenameComponent {
-	variableName: string;
+	/**
+	 * The equivalent climateVariable ID to use in backend API requests.
+	 */
+	climateVariableIdRef: string;
+	/**
+	 * The forecast type component for S2D filenames.
+	 * @see {@link S2D_DOWNLOAD_FILENAME_MAP_FORECAST_TYPE}
+	 */
 	forecastType: string;
-	frequency: string;
+	/**
+	 * The frequency component for S2D filenames.
+	 * @see {@link S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE}
+	 */
+	frequencyType: string;
 }
 
 /**
@@ -313,22 +332,32 @@ export const extractS2DDownloadStepFilenameComponents = (
 		'getId' | 'getForecastType' | 'getFrequency'
 	>
 ): ExtractS2DDownloadStepFilenameComponent => {
-	const variableId = climateVariable.getId() ?? '';
-	const apiVariableId = normalizeForApiVariableId(variableId);
-	const variableName =
-		S2D_VARIABLE_FILENAME_MAP[apiVariableId] ?? apiVariableId;
+	const variableIdRaw = climateVariable.getId() ?? '';
+	const forecastTypeRaw = climateVariable.getForecastType() as ForecastType;
+	const frequencyTypeRaw = climateVariable.getFrequency() as FrequencyType;
 
-	const forecastTypeRaw = climateVariable.getForecastType() ?? '';
+	if (variableIdRaw === '' || !forecastTypeRaw || !frequencyTypeRaw) {
+		throw new PreconditionError(
+			'We are expecting to have valid value for ClimateVariableInterface for methods: ' +
+				'getId, getForecastType and getFrequency.'
+		);
+	}
+
+	const climateVariableId = normalizeForApiVariableId(variableIdRaw);
+
+	const climateVariableIdRef =
+		S2D_DOWNLOAD_FILENAME_MAP_VARIABLE_ID[climateVariableId] ?? climateVariableId;
+
 	const forecastType =
-		S2D_FORECAST_TYPE_FILENAME_MAP[forecastTypeRaw] ?? forecastTypeRaw;
+		S2D_DOWNLOAD_FILENAME_MAP_FORECAST_TYPE[forecastTypeRaw] ?? forecastTypeRaw;
 
-	const frequencyRaw = climateVariable.getFrequency() ?? '';
-	const frequency = S2D_FREQUENCY_FILENAME_MAP[frequencyRaw] ?? frequencyRaw;
+	const frequencyType =
+		S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE[frequencyTypeRaw] ?? frequencyTypeRaw;
 
 	const out: ExtractS2DDownloadStepFilenameComponent = {
-		variableName,
+		climateVariableIdRef,
 		forecastType,
-		frequency,
+		frequencyType,
 	};
 	return out;
 };

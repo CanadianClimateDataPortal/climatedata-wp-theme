@@ -261,7 +261,7 @@ export const S2D_DOWNLOAD_FILENAME_MAP_VARIABLE_ID: Record<string, string> = {
 /**
  * Map S2D forecast types to filename component values.
  */
-export const S2D_DOWNLOAD_FILENAME_MAP_FORECAST_TYPE = {
+export const S2D_DOWNLOAD_FILENAME_MAP_FORECAST_TYPE: Record<ForecastType, string>  = {
 	[ForecastTypes.EXPECTED]: 'ExpectedCond',
 	[ForecastTypes.UNUSUAL]: 'UnusualCond',
 };
@@ -269,7 +269,7 @@ export const S2D_DOWNLOAD_FILENAME_MAP_FORECAST_TYPE = {
 /**
  * Map S2D frequency types to filename component values.
  */
-export const S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE: Record<string, string> = {
+export const S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE: Record<S2DFrequencyType, string> = {
 	[FrequencyTypes.MONTHLY]: 'Monthly',
 	[FrequencyTypes.SEASONAL]: 'Seasonal',
 };
@@ -296,8 +296,8 @@ export function normalizeForApiFrequencyName(
 	frequency: S2DFrequencyType | string
 ): string {
 	const frequencyNameMap: Record<string, string> = {
-		[FrequencyType.SEASONAL]: 'seasonal',
-		[FrequencyType.MONTHLY]: 'monthly',
+		[FrequencyTypes.SEASONAL]: 'seasonal',
+		[FrequencyTypes.MONTHLY]: 'monthly',
 	};
 
 	return frequencyNameMap[frequency] ?? frequency;
@@ -334,7 +334,7 @@ export const extractS2DDownloadStepFilenameComponents = (
 ): ExtractS2DDownloadStepFilenameComponent => {
 	const variableIdRaw = climateVariable.getId() ?? '';
 	const forecastTypeRaw = climateVariable.getForecastType() as ForecastType;
-	const frequencyTypeRaw = climateVariable.getFrequency() as FrequencyType;
+	const frequencyTypeRaw = climateVariable.getFrequency() as S2DFrequencyType;
 
 	if (variableIdRaw === '' || !forecastTypeRaw || !frequencyTypeRaw) {
 		throw new PreconditionError(

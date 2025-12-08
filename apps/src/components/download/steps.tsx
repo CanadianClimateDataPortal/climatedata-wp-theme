@@ -345,8 +345,9 @@ const Steps: React.FC = () => {
 					dispatch(setCaptchaValue(''));
 					goToNextStep();
 				} catch (error: any) {
+					console.error('Error submitting Finch request:', error);
 					dispatch(setRequestStatus('error'));
-					dispatch(setRequestError(error?.message || 'Unknown error'));
+					dispatch(setRequestError(__('An unknown error occurred. Please try again.')));
 					dispatch(setCaptchaValue(''));
 				}
 			}
@@ -428,12 +429,11 @@ const Steps: React.FC = () => {
 
 					climateVariable.getStationDownloadFiles(stationDownloadUrlsProps)
 						.then((downloadFiles) => {
+							dispatch(setDownloadLinks(downloadFiles));
 							if (downloadFiles.length === 0) {
 								// No data available
 								dispatch(setRequestStatus('no-data'));
-								dispatch(setRequestError(__('The selected station does not have data for the selected time period.'))); // TODO: Use proper message text.
 							} else {
-								dispatch(setDownloadLinks(downloadFiles));
 								dispatch(setRequestStatus('success'));
 							}
 							goToNextStep();
@@ -441,7 +441,7 @@ const Steps: React.FC = () => {
 						.catch((e) => {
 							console.error('Error fetching station download files:', e);
 							dispatch(setRequestStatus('error'));
-							dispatch(setRequestError(e?.message || 'Unknown error'));
+							dispatch(setRequestError(__('An unknown error occurred. Please try again.')));
 							dispatch(setDownloadLinks(undefined));
 						});
 				}

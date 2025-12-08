@@ -303,18 +303,23 @@ export function normalizeForApiFrequencyName(
 	return frequencyNameMap[frequency] ?? frequency;
 }
 
+/**
+ * The extracted S2D filename components from a climate
+ * variable that's based on internal IDs into human relatable strings.
+ */
 export interface ExtractS2DDownloadStepFilenameComponent {
 	/**
-	 * The equivalent climateVariable ID to use in backend API requests.
+	 * The filename component used to represent the climate variable.
+	 * @see {@link S2D_DOWNLOAD_FILENAME_MAP_VARIABLE_ID}
 	 */
-	climateVariableIdRef: string;
+	variableId: string;
 	/**
-	 * The forecast type component for S2D filenames.
+	 * The filename componnent used to describe forecast type.
 	 * @see {@link S2D_DOWNLOAD_FILENAME_MAP_FORECAST_TYPE}
 	 */
 	forecastType: string;
 	/**
-	 * The frequency component for S2D filenames.
+	 * The filename component used to describe frequency.
 	 * @see {@link S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE}
 	 */
 	frequencyType: string;
@@ -345,7 +350,7 @@ export const extractS2DDownloadStepFilenameComponents = (
 
 	const climateVariableId = normalizeForApiVariableId(variableIdRaw);
 
-	const climateVariableIdRef =
+	const variableId =
 		S2D_DOWNLOAD_FILENAME_MAP_VARIABLE_ID[climateVariableId] ?? climateVariableId;
 
 	const forecastType =
@@ -355,7 +360,7 @@ export const extractS2DDownloadStepFilenameComponents = (
 		S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE[frequencyTypeRaw] ?? frequencyTypeRaw;
 
 	const out: ExtractS2DDownloadStepFilenameComponent = {
-		climateVariableIdRef,
+		variableId,
 		forecastType,
 		frequencyType,
 	};

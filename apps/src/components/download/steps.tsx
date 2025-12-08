@@ -50,7 +50,7 @@ const generateS2DDownloadFileName = (
 	}
 
 	const {
-		climateVariableIdRef,
+		apiVariableId,
 		forecastType,
 		frequencyType,
 	} = extractS2DDownloadStepFilenameComponents(climateVariable);
@@ -67,7 +67,7 @@ const generateS2DDownloadFileName = (
 		.replace(/[\s.]+/g, '') 											// → 'dec2025'
 		.replace(/^./, (char) => char.toUpperCase());	// → 'Dec2025'
 
-	return `${climateVariableIdRef}_${forecastType}_${frequencyType}_Release${formattedDate}`;
+	return `${apiVariableId}_${forecastType}_${frequencyType}_Release${formattedDate}`;
 };
 
 /**

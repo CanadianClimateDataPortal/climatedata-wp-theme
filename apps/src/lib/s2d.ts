@@ -225,7 +225,7 @@ export function buildSkillLayerTime(
 		periodStart.getUTCMonth(),
 		1,
 	));
-	return formatUTCDate(layerDate, 'yyyy-MM-dd\'T00:00:00Z\'');
+	return formatUTCDate(layerDate, 'yyyy-MM-dd');
 }
 
 /**

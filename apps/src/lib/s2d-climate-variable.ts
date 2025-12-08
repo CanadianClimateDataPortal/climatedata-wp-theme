@@ -226,6 +226,13 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 		const blobPayload = await postDownloadToBlobObjectURL(url, payload);
 		return blobPayload;
 	}
+
+	/**
+	 * @returns An empty array as S2D variables do not have scenarios
+	 */
+	getScenarios(): string[] {
+		return [];
+	}
 }
 
 export default S2DClimateVariable;

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { __ } from '@/context/locale-provider';
 
@@ -140,7 +139,7 @@ const Steps: React.FC = () => {
 						const points = await response.json(); // array of [lat, lon]
 						latList = points.map((x: [number, number]) => x[0]).join(',');
 						lonList = points.map((x: [number, number]) => x[1]).join(',');
-					} catch {
+					} catch (err) {
 						dispatch(setRequestStatus('error'));
 						dispatch(setRequestError('Failed to fetch region grid points'));
 						return;

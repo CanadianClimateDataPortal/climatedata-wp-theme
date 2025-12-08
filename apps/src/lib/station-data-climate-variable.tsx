@@ -129,7 +129,6 @@ class StationDataClimateVariable extends StationClimateVariable {
 			// This is a valid state (not an error). The handling of this "no data available" scenario
 			// happens in the calling code (steps.tsx), where it can display an appropriate message to the user.
 			if (links.length === 0) {
-				console.warn('No download links available for the selected stations and date range.');
 				return [];
 			}
 

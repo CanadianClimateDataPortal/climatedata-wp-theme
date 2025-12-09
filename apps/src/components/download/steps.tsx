@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { FINCH_FREQUENCY_NAMES, GEOSERVER_BASE_URL } from '@/lib/constants';
 import { FinchRequestInput, StepComponentRef } from '@/types/download-form-interface';
 import {
+	ClimateVariableInterface,
 	DownloadFile,
 	DownloadType,
 	FileFormatType,
@@ -26,6 +27,42 @@ import { useLocale } from "@/hooks/use-locale";
 import { useS2D } from '@/hooks/use-s2d';
 import { sprintf } from "@wordpress/i18n";
 import { trackFinchDownload } from '@/lib/google-analytics';
+import { extractS2DDownloadStepFilenameComponents } from '@/lib/s2d';
+
+/**
+ * Generate the S2D download filename following the pattern:
+ * <var>_<forecast-type>_<frequency>_Release<release-date>.zip
+ *
+ * @param climateVariable - The S2D climate variable instance.
+ * @param releaseDate - The release date for the S2D data.
+ *
+ * @returns The formatted filename without extension.
+ */
+const generateS2DDownloadFileName = (
+	climateVariable: ClimateVariableInterface,
+	releaseDate: Date,
+): string => {
+
+	const {
+		variableId,
+		forecastType,
+		frequencyType,
+	} = extractS2DDownloadStepFilenameComponents(climateVariable);
+
+	// Format release date as localized short month + year (e.g., 'Apr2025')
+	const monthYearFormatter = Intl.DateTimeFormat('en-CA', {
+		month: 'short',
+		year: 'numeric',
+		timeZone: 'UTC',
+	});
+	const rawDate = monthYearFormatter.format(releaseDate);
+	// Normalize strip whitespace/periods, capitalize
+	const formattedDate = rawDate                      // 'dec.2025'
+		.replace(/[\s.]+/g, '')                        // → 'dec2025'
+		.replace(/^./, (char) => char.toUpperCase());  // → 'Dec2025'
+
+	return `${variableId}_${forecastType}_${frequencyType}_Release${formattedDate}`;
+};
 
 /**
  * The Steps component dynamically renders the current step component from the STEPS configuration.
@@ -37,7 +74,8 @@ const Steps: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
 	const { climateVariable } = useClimateVariable();
-	const { isS2DVariable } = useS2D();
+
+	const { isS2DVariable, releaseDate } = useS2D();
 
 	const {
 		subscribe,
@@ -361,7 +399,13 @@ const Steps: React.FC = () => {
 				if (climateVariable?.getInteractiveMode() === 'region') {
 					// Precalculated variables (no station)
 					const fileFormat = climateVariable.getFileFormat?.() ?? '';
-					const fileName = climateVariable.getId() ?? 'file';
+
+					let fileName = climateVariable.getId();
+
+					if (isS2DVariable && releaseDate) {
+						fileName = generateS2DDownloadFileName(climateVariable, releaseDate);
+					}
+
 					/**
 					 * The file extension may be specific to the variable type and format
 					 * but in the case of the backends for S2D variables, they're always
@@ -372,6 +416,7 @@ const Steps: React.FC = () => {
 						: fileFormat === FileFormatType.NetCDF
 							? '.nc'
 							: '.zip';
+
 					const downloadFileName = fileName + downloadFileExtension;
 
 					// Generate the file to be downloaded

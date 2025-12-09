@@ -220,8 +220,9 @@ export const getProbabilityColour = (
 	 * by one.
 	 */
 	const CLIM_1234_ADJUSTMENT_FACTOR = 0.001;
-	// if(Math.round(percentage) < 100) {
-	queryQuantity += 0.001;
+	if(Math.round(percentage) < 100) {
+		queryQuantity += CLIM_1234_ADJUSTMENT_FACTOR;
+	}
 
 	const colourIndex = findCeilingIndex(colorMap.quantities, queryQuantity);
 

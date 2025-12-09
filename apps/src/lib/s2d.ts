@@ -202,6 +202,8 @@ export function buildSkillLayerName(
  *
  * @param climateVariable - The variable containing the selected date range.
  * @param releaseDate - The release date to calculate the relative year.
+ * @returns - The TIME attribute for the Skill layer in the format 'YYYY-MM-DD'.
+ *     Null is returned if the variable doesn't have a date range.
  */
 export function buildSkillLayerTime(
 	climateVariable: ClimateVariableInterface,

@@ -200,19 +200,40 @@ export const getProbabilityColour = (
 	percentage: number,
 	colorMap: ColourMap
 ): `#${string}` => {
+	if (outcome === 0) {
+		console.log('getProbabilityColour 0\n', {
+			colorMap,
+		});
+	}
+
 	const colours = colorMap.colours as `#${string}`[];
 	const defaultColor = '#909090';
+
+
+	// The "quantity" associated with this percentage and outcome. For example,
+	// an outcome of 0 (e.g. "above") and a percentage of 23 would be 1023.
+	// eslint-disable-next-line prefer-const
+	let queryQuantity = 1000 * (outcome + 1) + Math.round(percentage);
 
 	/**
 	 * For `colourIndex` out of `findCeilingIndex`, we might need to increase the
 	 * by one.
 	 */
 	const CLIM_1234_ADJUSTMENT_FACTOR = 0.001;
+	// if(Math.round(percentage) < 100) {
+	queryQuantity += 0.001;
 
-	// The "quantity" associated with this percentage and outcome. For example,
-	// an outcome of 0 (e.g. "above") and a percentage of 23 would be 1023.
-	const queryQuantity = 1000 * (outcome + 1) + Math.round(percentage) + CLIM_1234_ADJUSTMENT_FACTOR;
-	const colourIndex = findCeilingIndex(colorMap.quantities, queryQuantity);
+	const colourIndex = findCeilingIndex(colorMap.quantities, queryQuantity, outcome === 0);
+
+	if (outcome === 0) {
+		console.log('getProbabilityColour 1\n', {
+			'Math.round(percentage)': Math.round(percentage),
+			queryQuantity,
+			queryQuantity2: queryQuantity + CLIM_1234_ADJUSTMENT_FACTOR,
+			colourIndex,
+			'If the next colour is not in the same outcome': !isSameThousand(colorMap.quantities[colourIndex], queryQuantity),
+		});
+	}
 
 	// If the percentage/outcome is bigger than the highest value
 	if (colourIndex === -1) {

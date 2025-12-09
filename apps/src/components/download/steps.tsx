@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { FINCH_FREQUENCY_NAMES, GEOSERVER_BASE_URL } from '@/lib/constants';
 import { FinchRequestInput, StepComponentRef } from '@/types/download-form-interface';
 import {
+	ClimateVariableInterface,
 	DownloadFile,
 	DownloadType,
 	FileFormatType,
@@ -27,7 +28,6 @@ import { useS2D } from '@/hooks/use-s2d';
 import { sprintf } from "@wordpress/i18n";
 import { trackFinchDownload } from '@/lib/google-analytics';
 import { extractS2DDownloadStepFilenameComponents } from '@/lib/s2d';
-import { PreconditionError } from '@/lib/errors';
 
 /**
  * Generate the S2D download filename following the pattern:
@@ -39,15 +39,9 @@ import { PreconditionError } from '@/lib/errors';
  * @returns The formatted filename without extension.
  */
 const generateS2DDownloadFileName = (
-	climateVariable: ReturnType<typeof useClimateVariable>['climateVariable'],
-	releaseDate: ReturnType<typeof useS2D>['releaseDate'],
+	climateVariable: ClimateVariableInterface,
+	releaseDate: Date,
 ): string => {
-	if (!climateVariable || !releaseDate) {
-		throw new PreconditionError(
-			'S2D download filename generation requires a release date, but none was provided. ' +
-				'This indicates S2D state validation was bypassed earlier in the call chain.'
-		);
-	}
 
 	const {
 		variableId,
@@ -63,9 +57,9 @@ const generateS2DDownloadFileName = (
 	});
 	const rawDate = monthYearFormatter.format(releaseDate);
 	// Normalize strip whitespace/periods, capitalize
-	const formattedDate = rawDate										// 'dec.2025'
-		.replace(/[\s.]+/g, '') 											// → 'dec2025'
-		.replace(/^./, (char) => char.toUpperCase());	// → 'Dec2025'
+	const formattedDate = rawDate                      // 'dec.2025'
+		.replace(/[\s.]+/g, '')                        // → 'dec2025'
+		.replace(/^./, (char) => char.toUpperCase());  // → 'Dec2025'
 
 	return `${variableId}_${forecastType}_${frequencyType}_Release${formattedDate}`;
 };
@@ -408,16 +402,8 @@ const Steps: React.FC = () => {
 
 					let fileName = climateVariable.getId();
 
-					if (isS2DVariable) {
-						try {
-							fileName = generateS2DDownloadFileName(climateVariable, releaseDate);
-							// If an error throws, and the rest is OK, we'd still have a file name.
-						} catch (error) {
-							if (error instanceof PreconditionError) {
-								// Do we say something on the FrontEnd side?
-							}
-							console.error(error)
-						}
+					if (isS2DVariable && releaseDate) {
+						fileName = generateS2DDownloadFileName(climateVariable, releaseDate);
 					}
 
 					/**

@@ -9,7 +9,6 @@ import {
 } from '@/types/climate-variable-interface';
 import { formatUTCDate, utc } from '@/lib/utils';
 import { __ } from '@/context/locale-provider';
-import { PreconditionError } from './errors';
 
 export type PeriodRange = [Date, Date];
 
@@ -246,16 +245,10 @@ export function getForecastTypeName(forecastType: ForecastType): string {
 
 /**
  * Map S2D variable IDs to their corresponding filename components.
- *
- * @remark
- * The keys are the Backend API variable IDs (without the "s2d_" prefix we use on the FrontEnd),
- * and the values are the corresponding filename components for S2D data files.
- *
- * @see {@link normalizeForApiVariableId}
  */
 export const S2D_DOWNLOAD_FILENAME_MAP_VARIABLE_ID: Record<string, string> = {
-	air_temp: 'MeanTemp',
-	precip_accum: 'TotalPrecip',
+	s2d_air_temp: 'MeanTemp',
+	s2d_precip_accum: 'TotalPrecip',
 };
 
 /**
@@ -310,8 +303,8 @@ export function normalizeForApiFrequencyName(
 }
 
 /**
- * The extracted S2D filename components from a climate
- * variable that's based on internal IDs into human relatable strings.
+ * The extracted S2D filename components from a climate variable that's based on
+ * internal IDs into human relatable strings.
  */
 export interface ExtractS2DDownloadStepFilenameComponent {
 	/**
@@ -320,12 +313,12 @@ export interface ExtractS2DDownloadStepFilenameComponent {
 	 */
 	variableId: string;
 	/**
-	 * The filename componnent used to describe forecast type.
+	 * The filename component used to describe the forecast type.
 	 * @see {@link S2D_DOWNLOAD_FILENAME_MAP_FORECAST_TYPE}
 	 */
 	forecastType: string;
 	/**
-	 * The filename component used to describe frequency.
+	 * The filename component used to describe the frequency.
 	 * @see {@link S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE}
 	 */
 	frequencyType: string;
@@ -334,27 +327,23 @@ export interface ExtractS2DDownloadStepFilenameComponent {
 /**
  * Extract and map S2D filename components from a climate variable.
  *
- * @param climateVariable - The S2D climate variable instance.
- * @returns Object containing mapped variable name, forecast type, and frequency for filename use.
+ * @param climateVariable - The S2D climate variable instance. Must have the
+ *     frequency and forecast type set.
+ * @returns Object containing mapped variable name, forecast type, and frequency
+ *     for filename use.
  */
 export const extractS2DDownloadStepFilenameComponents = (
-	climateVariable: Pick<
-		ClimateVariableInterface,
-		'getId' | 'getForecastType' | 'getFrequency'
-	>
+	climateVariable: ClimateVariableInterface,
 ): ExtractS2DDownloadStepFilenameComponent => {
-	const variableIdRaw = climateVariable.getId() ?? '';
+	const climateVariableId = climateVariable.getId();
 	const forecastTypeRaw = climateVariable.getForecastType() as ForecastType;
 	const frequencyTypeRaw = climateVariable.getFrequency() as S2DFrequencyType;
 
-	if (variableIdRaw === '' || !forecastTypeRaw || !frequencyTypeRaw) {
-		throw new PreconditionError(
-			'We are expecting to have valid value for ClimateVariableInterface for methods: ' +
-				'getId, getForecastType and getFrequency.'
+	if (!forecastTypeRaw || !frequencyTypeRaw) {
+		throw new TypeError(
+			'climateVariable must have the forecast type and frequency set.'
 		);
 	}
-
-	const climateVariableId = normalizeForApiVariableId(variableIdRaw);
 
 	const variableId =
 		S2D_DOWNLOAD_FILENAME_MAP_VARIABLE_ID[climateVariableId] ??
@@ -368,10 +357,9 @@ export const extractS2DDownloadStepFilenameComponents = (
 		S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE[frequencyTypeRaw] ??
 		frequencyTypeRaw;
 
-	const out: ExtractS2DDownloadStepFilenameComponent = {
+	return {
 		variableId,
 		forecastType,
 		frequencyType,
 	};
-	return out;
 };

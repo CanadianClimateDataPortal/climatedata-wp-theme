@@ -717,16 +717,11 @@ export const fetchS2DLocationData = async (
 	const argLat = latlng.lat.toFixed(6);
 	const argLon = latlng.lng.toFixed(6);
 
-	const out = await queryDataAPI(
+	return await queryDataAPI(
 		`/get-s2d-gridded-values/${argLat}/${argLon}/${argVariableName}/${argFrequencyName}`,
 		{
 			period: `${period.getUTCFullYear()}-${String(period.getUTCMonth() + 1).padStart(2, '0')}`,
 		},
 		fetchOptions,
 	);
-
-	const { prob_above_normal, } = out;
-	console.log('fetchS2DLocationData', { prob_above_normal, latlng, variableId, frequency, period, locationData: out });
-
-	return out;
 }

@@ -223,7 +223,7 @@ export const getProbabilityColour = (
 	// if(Math.round(percentage) < 100) {
 	queryQuantity += 0.001;
 
-	const colourIndex = findCeilingIndex(colorMap.quantities, queryQuantity, outcome === 0);
+	const colourIndex = findCeilingIndex(colorMap.quantities, queryQuantity);
 
 	if (outcome === 0) {
 		console.log('getProbabilityColour 1\n', {

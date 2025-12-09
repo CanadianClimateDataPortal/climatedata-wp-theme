@@ -305,9 +305,6 @@ export function getInteractiveRegionName(region: InteractiveRegionOption): strin
  *         number.
  */
 export function findCeilingIndex(values: number[], value: number): number {
-	if (arguments[2] === true) {
-		console.log(`findCeilingIndex(values, value):\n`, { values, value });
-	}
 	if (values.length === 0) {
 		return -1;
 	}

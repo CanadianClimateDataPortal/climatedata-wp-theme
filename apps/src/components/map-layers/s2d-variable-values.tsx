@@ -219,6 +219,16 @@ export const getProbabilityColour = (
 
 	const colourIndex = findCeilingIndex(colorMap.quantities, queryQuantity);
 
+	if (outcome === 0) {
+		console.log('getProbabilityColour 1\n', {
+			percentage,
+			queryQuantity,
+			queryQuantity2: queryQuantity + CLIM_1234_ADJUSTMENT_FACTOR,
+			colourIndex,
+			colourBeforeChecks: colours[colourIndex],
+		});
+	}
+
 	// If the percentage/outcome is bigger than the highest value
 	if (colourIndex === -1) {
 		return defaultColor;
@@ -249,6 +259,12 @@ export const getProbabilityColour = (
 				break;
 			}
 		}
+	}
+
+	if (outcome === 0) {
+		console.log('getProbabilityColour 2\n', {
+			finalColour: colour,
+		});
 	}
 
 	return colour;

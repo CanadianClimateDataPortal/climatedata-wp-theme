@@ -200,15 +200,8 @@ export const getProbabilityColour = (
 	percentage: number,
 	colorMap: ColourMap
 ): `#${string}` => {
-	if (outcome === 0) {
-		console.log('getProbabilityColour 0\n', {
-			colorMap,
-		});
-	}
-
 	const colours = colorMap.colours as `#${string}`[];
 	const defaultColor = '#909090';
-
 
 	// The "quantity" associated with this percentage and outcome. For example,
 	// an outcome of 0 (e.g. "above") and a percentage of 23 would be 1023.
@@ -225,16 +218,6 @@ export const getProbabilityColour = (
 	}
 
 	const colourIndex = findCeilingIndex(colorMap.quantities, queryQuantity);
-
-	if (outcome === 0) {
-		console.log('getProbabilityColour 1\n', {
-			'Math.round(percentage)': Math.round(percentage),
-			queryQuantity,
-			queryQuantity2: queryQuantity + CLIM_1234_ADJUSTMENT_FACTOR,
-			colourIndex,
-			'If the next colour is not in the same outcome': !isSameThousand(colorMap.quantities[colourIndex], queryQuantity),
-		});
-	}
 
 	// If the percentage/outcome is bigger than the highest value
 	if (colourIndex === -1) {

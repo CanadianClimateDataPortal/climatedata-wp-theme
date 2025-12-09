@@ -476,7 +476,7 @@ export const fetchPostsData = async (
  * @param fetchOptions Any other options to pass to fetch (ex: `signal`)
  */
 export const fetchLocationByCoords = async (
-	latlng: L.LatLng | { lat: number; lng: number },
+	latlng: Pick<L.LatLng, 'lat' | 'lng'>,
 	fetchOptions?: FetchOptions,
 ) => {
 	return await queryWordPressAPI(
@@ -706,7 +706,7 @@ export const fetchS2DReleaseDate = async (
  * @returns The location data, or null if the request is aborted.
  */
 export const fetchS2DLocationData = async (
-	latlng: L.LatLng,
+	latlng: Pick<L.LatLng, 'lat' | 'lng'>,
 	variableId: string,
 	frequency: FrequencyType,
 	period: Date,

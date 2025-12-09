@@ -29,7 +29,7 @@ import S2DReleaseDate from '@/components/s2d-release-date';
 import { Spinner } from '@/components/ui/spinner';
 
 interface S2DVariableValuesProps {
-	latlng: L.LatLng;
+	latlng: Pick<L.LatLng, 'lat' | 'lng'>;
 }
 
 interface PopupContentProps {

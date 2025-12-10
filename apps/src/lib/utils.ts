@@ -324,9 +324,7 @@ export function findCeilingIndex(values: number[], value: number): number {
 		const mid = Math.floor((left + right) / 2);
 
 		if (values[mid] === value) {
-			// Exact match: return next index (entering new band)
-			const nextIndex = mid + 1;
-			return nextIndex < values.length ? nextIndex : -1;
+			return mid;
 		} else if (values[mid] < value) {
 			left = mid + 1;
 		} else {

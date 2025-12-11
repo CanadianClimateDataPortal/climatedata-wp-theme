@@ -725,8 +725,5 @@ export const fetchS2DLocationData = async (
 		fetchOptions,
 	);
 
-	const { prob_above_normal, } = out;
-	console.log('fetchS2DLocationData', { prob_above_normal, latlng, variableId, frequency, period, locationData: out });
-
 	return out;
 }

@@ -279,19 +279,19 @@ describe('buildSkillLayerTime', () => {
 	])('year always based on 1991, relative to release date (%s)', (rangeStart, expectedDate) => {
 		climateVariable.getDateRange = () => [rangeStart, rangeStart];
 		const timeValue = buildSkillLayerTime(climateVariable, releaseDate);
-		expect(timeValue).toEqual(expectedDate);
+		expect(timeValue).toEqual(`${expectedDate}T00:00:00Z`);
 	});
 
 	test('date based on the beginning of the selected date range', () => {
 		climateVariable.getDateRange = () => ['2025-08-01', '2025-11-31'];
 		const timeValue = buildSkillLayerTime(climateVariable, releaseDate);
-		expect(timeValue).toEqual('1991-08-01');
+		expect(timeValue).toEqual('1991-08-01T00:00:00Z');
 	});
 
 	test('date is the first day of the month', () => {
 		climateVariable.getDateRange = () => ['2025-05-14', '2025-06-23'];
 		const timeValue = buildSkillLayerTime(climateVariable, releaseDate);
-		expect(timeValue).toEqual('1991-05-01');
+		expect(timeValue).toEqual('1991-05-01T00:00:00Z');
 	});
 
 	test('returns null if invalid date range', () => {

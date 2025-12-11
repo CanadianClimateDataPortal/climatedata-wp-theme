@@ -203,8 +203,9 @@ export function buildSkillLayerName(
  *
  * @param climateVariable - The variable containing the selected date range.
  * @param releaseDate - The release date to calculate the relative year.
- * @returns - The TIME attribute for the Skill layer in the format 'YYYY-MM-DD'.
- *     Null is returned if the variable doesn't have a date range.
+ * @returns - The TIME attribute for the Skill layer in the format
+ *     'YYYY-MM-DDT00:00:00Z'. Null is returned if the variable doesn't have a
+ *     date range.
  */
 export function buildSkillLayerTime(
 	climateVariable: ClimateVariableInterface,
@@ -228,7 +229,7 @@ export function buildSkillLayerTime(
 		periodStart.getUTCMonth(),
 		1,
 	));
-	return formatUTCDate(layerDate, 'yyyy-MM-dd');
+	return formatUTCDate(layerDate, "yyyy-MM-dd'T00:00:00Z'");
 }
 
 /**

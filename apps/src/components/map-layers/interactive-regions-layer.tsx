@@ -108,8 +108,8 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
 			return {
 				[gridType]: (properties: { gid: number }) => ({
-					weight: 0.5,
-					color: '#fff',
+					weight: 0.75,
+					color: '#ebebeb',
 					fillColor: properties.gid
 						? getFeatureColor(properties.gid)
 						: 'transparent',
@@ -124,7 +124,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 		return {
 			[interactiveRegion]: (properties: { id: number }) => ({
 				weight: 1,
-				color: layerData ? '#fff' : '#999',
+				color: layerData ? '#ebebeb' : '#999',
 				fillColor:
 					properties.id != null && layerData?.[properties.id] !== undefined
 						? getFeatureColor(properties.id)

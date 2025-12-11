@@ -42,11 +42,11 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
     const style = {
       fill: true,
       fillColor: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
-        ? '#fff'
+        ? '#ebebeb'
         : getFeatureColor(featureId),
       fillOpacity: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA ? 0.2 : 1,
       weight: 1.5,
-      color: '#fff',
+      color: '#ebebeb',
     };
 
     [primaryLayerRef, comparisonLayerRef].forEach(ref => {

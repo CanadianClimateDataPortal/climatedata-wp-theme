@@ -202,17 +202,20 @@ export const getProbabilityColour = (
 ): `#${string}` => {
 	const colours = colorMap.colours as `#${string}`[];
 	const defaultColor = '#909090';
-
-	// The "quantity" associated with this percentage and outcome. For example,
-	// an outcome of 0 (e.g. "above") and a percentage of 23 would be 1023.
-	// eslint-disable-next-line prefer-const
-	let queryQuantity = 1000 * (outcome + 1) + Math.round(percentage);
+	const roundedPercentage = Math.round(percentage);
 
 	/**
 	 * For `colourIndex` out of `findCeilingIndex`, we might need to increase the
 	 * by one.
 	 */
-	const CLIM_1234_ADJUSTMENT_FACTOR = 0.001;
+	const CLIM_1234_ADJUSTMENT_FACTOR = 0.5;
+	if ((Math.ceil(roundedPercentage / 10) * 10) === roundedPercentage) {
+		percentage += CLIM_1234_ADJUSTMENT_FACTOR;
+	}
+
+	// The "quantity" associated with this percentage and outcome. For example,
+	// an outcome of 0 (e.g. "above") and a percentage of 23 would be 1023.
+	const queryQuantity = 1000 * (outcome + 1) + Math.round(percentage);
 
 	const colourIndex = findCeilingIndex(colorMap.quantities, queryQuantity);
 

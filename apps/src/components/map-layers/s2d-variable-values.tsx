@@ -191,9 +191,31 @@ const isWhite = (colour: `#${string}`): boolean =>
 /**
  * Given a colour map, returns the colour for a specific percentage and outcome.
  *
+ * The `colorMap.quantities` defines the boundaries where colours change. For a
+ * given quantity (calculated as `1000 * (outcome + 1) + percentage`), the
+ * returned colour will be the one associated with the *next* boundary. In other
+ * words, the boundaries serve to define the colour for values below them.
+ *
+ * Special cases:
+ * - If the calculated quantity is above the highest boundary for the same
+ *   outcome, a default colour is returned.
+ * - If the determined colour is white, the next non-white colour in the same
+ *   outcome is returned. If no such colour exists, a default colour is
+ *   returned.
+ * - If the calculated quantity is exactly on a boundary, the colour associated
+ *   with the *next* boundary will be returned (in other words, a boundary
+ *   quantity is exclusive).
+ *   - An exception to the previous case: if the percentage is 100 *and* its
+ *     calculated quantity is a boundary, the colour associated with the current
+ *     boundary (not the next one) is returned. In other words, 100 is included
+ *     in the range that ends at 100. If 100 is not a boundary, the above rules
+ *     apply (i.e. a default colour is returned if there is no next boundary in
+ *     the same outcome).
+ *
  * @param outcome - Index number of the outcome (e.g. 0 for "above", 1 for "below", ...)
  * @param percentage - Percentage for which to get the colour
  * @param colorMap - The colour map containing the colours
+ * @returns The colour associated with the given percentage and outcome.
  */
 export const getProbabilityColour = (
 	outcome: number,
@@ -202,20 +224,24 @@ export const getProbabilityColour = (
 ): `#${string}` => {
 	const colours = colorMap.colours as `#${string}`[];
 	const defaultColor = '#909090';
-	const roundedPercentage = Math.round(percentage);
+	let percentageForQuery = Math.round(percentage);
 
 	/**
-	 * For `colourIndex` out of `findCeilingIndex`, we might need to increase the
-	 * by one.
+	 * For values falling exactly on the limit between two colors, we always
+	 * use the color "on the right", except for 100, where we use the color
+	 * on the left.
+	 *
+	 * To achieve this behavior, we add 0.1 to the (rounded) percentage
+	 * (unless if 100) to ensure we always take the color on the right.
 	 */
-	const CLIM_1234_ADJUSTMENT_FACTOR = 0.5;
-	if ((Math.ceil(roundedPercentage / 10) * 10) === roundedPercentage) {
-		percentage += CLIM_1234_ADJUSTMENT_FACTOR;
+	if (percentageForQuery < 100) {
+		percentageForQuery += 0.1;
 	}
 
-	// The "quantity" associated with this percentage and outcome. For example,
-	// an outcome of 0 (e.g. "above") and a percentage of 23 would be 1023.
-	const queryQuantity = 1000 * (outcome + 1) + Math.round(percentage);
+	// The "quantity" associated with this percentage and outcome.
+	// For example, an outcome of 0 (e.g. "above") and a `percentageForQuery` of
+	// 23.1 would give 1023.1
+	const queryQuantity = 1000 * (outcome + 1) + percentageForQuery;
 
 	const colourIndex = findCeilingIndex(colorMap.quantities, queryQuantity);
 

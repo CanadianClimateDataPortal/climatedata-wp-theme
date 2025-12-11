@@ -120,9 +120,9 @@ export const EXAMPLE_COLOR_MAP_S2D_MULTIBAND: ColourQuantitiesMap = {
 	 * @example
 	 * ```ts
 	 * let locationData: LocationS2DData = {
-	 * 	 cutoff_above_normal_p66: -19.333412204398492,
+	 *   cutoff_above_normal_p66: -19.333412204398492,
 	 *   cutoff_below_normal_p33: -21.157791103706977,
-	 * 	 // ...
+	 *   // ...
 	 * };
 	 * ```
 	 *

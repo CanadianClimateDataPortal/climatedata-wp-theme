@@ -732,7 +732,7 @@ const ProbabilitiesPart = ({
 						__('Above %s'),
 						formatValue(aboveValue, unit, 0, locale)
 					),
-					percent: Math.round(abovePercentage),
+					percent: abovePercentage,
 					fillHexCode: getProbabilityColour(
 						0,
 						abovePercentage,
@@ -746,7 +746,7 @@ const ProbabilitiesPart = ({
 						formatValue(belowValue, '', 0, locale),
 						formatValue(aboveValue, unit, 0, locale)
 					),
-					percent: Math.round(nearPercentage),
+					percent: nearPercentage,
 					fillHexCode: getProbabilityColour(
 						1,
 						nearPercentage,
@@ -758,7 +758,7 @@ const ProbabilitiesPart = ({
 						__('Below %s'),
 						formatValue(belowValue, unit, 0, locale)
 					),
-					percent: Math.round(belowPercentage),
+					percent: belowPercentage,
 					fillHexCode: getProbabilityColour(
 						2,
 						belowPercentage,
@@ -778,7 +778,7 @@ const ProbabilitiesPart = ({
 						__('Higher than %s'),
 						formatValue(higherValue, unit, 0, locale)
 					),
-					percent: Math.round(higherPercentage),
+					percent: higherPercentage,
 					fillHexCode: getProbabilityColour(
 						0,
 						higherPercentage,
@@ -790,7 +790,7 @@ const ProbabilitiesPart = ({
 						__('Lower than %s'),
 						formatValue(lowerValue, unit, 0, locale)
 					),
-					percent: Math.round(lowerPercentage),
+					percent: lowerPercentage,
 					fillHexCode: getProbabilityColour(
 						1,
 						lowerPercentage,

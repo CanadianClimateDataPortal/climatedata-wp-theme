@@ -33,10 +33,11 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 	percent,
 	fillHexCode,
 }) => {
-	const screenReaderOnly = sprintf(__('Horizontal bar at %s%% filled'), percent);
+	const roundedPercent = Math.round(percent);
+	const screenReaderOnly = sprintf(__('Horizontal bar at %s%% filled'), roundedPercent);
 	const textLightColor = 'text-white';
 	const textDarkColor = 'text-black';
-	const labelColor = percent < 50
+	const labelColor = roundedPercent < 50
 		// Dark text color is used in case the percentage bar is not long enough
 		? textDarkColor
 		: bestContrastingColor(fillHexCode, textDarkColor, textLightColor);
@@ -59,8 +60,10 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 			role="meter"
 			aria-valuemin={0}
 			aria-valuemax={100}
-			aria-valuenow={percent}
+			aria-valuenow={roundedPercent}
 			style={{ '--fill-color': fillHexCode } as React.CSSProperties}
+			data-props-percent={percent}
+			data-props-fill-hex={fillHexCode}
 		>
 			{/* Layer 1: Background */}
 			<div className="absolute" />
@@ -75,7 +78,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 				<rect
 					x="0"
 					y="0"
-					width={`${percent}%`}
+					width={`${roundedPercent}%`}
 					height="100%"
 					fill="var(--fill-color)"
 					style={{ fill: 'var(--fill-color)' }}
@@ -87,8 +90,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 			<div
 				className="absolute inset-0 flex items-center text-sm overflow-hidden"
 				style={{
-					maxWidth: percent >= innerPercentageThreshold
-						? `calc(${percent}% - 2%)`
+					maxWidth: roundedPercent >= innerPercentageThreshold
+						? `calc(${roundedPercent}% - 2%)`
 						: 'none',
 				}}
 			>
@@ -98,20 +101,20 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 						'font-medium pl-3 min-w-fit',
 					)}
 					style={{
-						width: `${percent}%`,
+						width: `${roundedPercent}%`,
 					}}
 				>
 					{label}
 				</div>
 				<div
 					className={cn(
-						percent >= innerPercentageThreshold
+						roundedPercent >= innerPercentageThreshold
 							? labelColor :
 							'text-blue-600',
 						'font-medium pl-2'
 					)}
 				>
-					{percent}%
+					{roundedPercent}%
 				</div>
 			</div>
 		</div>

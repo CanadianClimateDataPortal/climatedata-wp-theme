@@ -88,16 +88,16 @@ export const EXAMPLE_COLOR_MAP_DISCRETE_SINGLE: ColourQuantitiesMap = {
  * (e.g., "Above Normal", "Near Normal", "Below Normal").
  *
  * Format: Quantities use GXYY encoding pattern
- * - G (1st digit): Grouping/layer index (1-9) - identifies which band (Above/Near/Below)
+ * - G (1st digit): Grouping/outcome index (1-9) - identifies which band (e.g. Above, Near, Below)
  * - X (2nd digit): Must be 0 or 1 (represents hundreds place of percentage, allowing 0-100%)
  * - YY (3rd-4th digits): Tens and ones place of percentage value
  *
  * Examples:
- * - 1040 → Group 1, 40%
- * - 1090 → Group 1, 90%
- * - 1100 → Group 1, 100%
- * - 2050 → Group 2, 50%
- * - 3080 → Group 3, 80%
+ * - 1040 → Grouping 1, 40%
+ * - 1090 → Grouping 1, 90%
+ * - 1100 → Grouping 1, 100%
+ * - 2050 → Grouping 2, 50%
+ * - 3080 → Grouping 3, 80%
  *
  * Invalid examples:
  * - 1200 → Invalid (2nd digit is 2, would represent 200%)
@@ -114,51 +114,68 @@ export const EXAMPLE_COLOR_MAP_DISCRETE_SINGLE: ColourQuantitiesMap = {
  * @see EXAMPLE_COLOR_MAP_DISCRETE_SINGLE - The standard format used everywhere else
  */
 export const EXAMPLE_COLOR_MAP_S2D_MULTIBAND: ColourQuantitiesMap = {
+	/**
+	 * The text outcome labels examples would assume receiving data from GeoServer like:
+	 *
+	 * @example
+	 * ```ts
+	 * let locationData: LocationS2DData = {
+	 *   cutoff_above_normal_p66: -19.333412204398492,
+	 *   cutoff_below_normal_p33: -21.157791103706977,
+	 *   // ...
+	 * };
+	 * ```
+	 *
+	 * Which would tell us the following outcome labels:
+	 * - Outcome 0: "Above -19"
+	 * - Outcome 1: "-21 to -19"
+	 * - Outcome 2: "Below -21"
+	 */
 	colours: [
 		'#FFFFFF',
-		/* Will get into "Line 1" */
+		/* Outcome 0 (or Grouping 1); labelled e.g. "Above -19" */
 		//  40%
-		'#FDD0BB',
-		'#FBAD94',
-		'#F88B6E',
-		'#F26A49',
-		'#E54E29',
+		'#FCDAC6',
+		'#F6B79A',
+		'#E98D70',
+		'#D45E4C',
+		'#BD3036',
 		// 100%
-		'#C73518',
+		'#970F27',
 
 		'#FFFFFF',
-		/* Will get into "Line 2" */
-		'#E5E5E5',
-		'#D0D0D0',
-		'#BABABA',
-		'#A5A5A5',
-		'#8F8F8F',
-		'#7A7A7A',
+		/* Outcome 1 (or Grouping 2); labelled e.g. "-21 to -19" */
+		'#E0E0E0',
+		'#C4C4C4',
+		'#A8A8A8',
+		'#8C8C8C',
+		'#707070',
+		'#545454',
 
 		'#FFFFFF',
-		/* Will get into "Line 3" */
-		'#D4E8F5',
-		'#B5D9EE',
-		'#96CAE7',
-		'#77BBE0',
-		'#58ACD9',
-		'#3A9DD2',
+		/* Outcome 2 (or Grouping 3); labelled e.g. "Below -21" */
+		'#D0E4EF',
+		'#A8CFE3',
+		'#77B4D4',
+		'#4292C2',
+		'#2C75B3',
+		'#175391',
 	],
 	/* prettier-ignore-start */
 	quantities: [
-		// Line 1 - The Red gradient (labelled: "Below" in S2D Forecasts)
+		// Outcome 0
 		// 40%  50%   60%   70%   80%   90%  100%
 		1040, 1050, 1060, 1070, 1080, 1090, 1100,
 		// |    |     |     |     |     |     |
 		// └────┴─────┴─────┴─────┴─────┴─────┘
-		// ^                                 ^
+		// ^                                  ^
 		// Left mark                 Right mark
 
-		// Line 2 - The Gray gradient (labelled: "Near" in S2D Forecasts)
+		// Outcome 1
 		// 40%  50%   60%   70%   80%   90%  100%
 		2040, 2050, 2060, 2070, 2080, 2090, 2100,
 
-		// Line 3 - The Blue gradient (labelled: "Above" in S2D Forecasts)
+		// Outcome 2
 		// 40%  50%   60%   70%   80%   90%  100%
 		3040, 3050, 3060, 3070, 3080, 3090, 3100,
 	],

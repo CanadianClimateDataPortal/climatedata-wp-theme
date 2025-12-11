@@ -65,8 +65,10 @@ describe('multi-band-legend', () => {
 				expect(result.rows[0].colors).toHaveLength(6);
 				expect(result.rows[0].label).toBe('Line 1');
 				// Validates the actual color values from the example
-				expect(result.rows[0].colors[0]).toBe('#FDD0BB');
-				expect(result.rows[2].colors[5]).toBe('#3A9DD2');
+				// The first grouping and the first colour would match the first color after #FFFFFF
+				expect(result.rows[/* outcome */ 0].colors[0]).toBe(EXAMPLE_COLOR_MAP_S2D_MULTIBAND.colours[1] /* First color (and not the #FFFFFF), of first grouping */);
+				// The last grouping last color be the last of the original array
+				expect(result.rows[/* outcome */ 2].colors[5]).toBe(EXAMPLE_COLOR_MAP_S2D_MULTIBAND.colours[EXAMPLE_COLOR_MAP_S2D_MULTIBAND.colours.length - 1]);
 			});
 
 			it('transforms standard 3-group data', () => {

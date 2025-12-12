@@ -26,6 +26,12 @@ import { useS2D } from '@/hooks/use-s2d';
 import type { MapLegendForecastS2D } from '@/components/map-layers/map-legend-forecast-s2d';
 import type { MapLegendCommon, MapLegendCommonProps } from '@/components/map-layers/map-legend-common';
 
+export interface LegendStateChangeDetail {
+	isOpen: boolean;
+	rect: DOMRect;
+	isForecastMode: boolean;
+}
+
 const LazyMapLegendForecastS2D = lazy<MapLegendForecastS2D>(() => import('@/components/map-layers/map-legend-forecast-s2d'));
 const LazyMapLegendCommon = lazy<React.MemoExoticComponent<MapLegendCommon>>(() => import('@/components/map-layers/map-legend-common'));
 
@@ -65,6 +71,7 @@ const MapLegend: React.FC = () => {
 	}
 
 	const rootRef = useRef<Root | null>	(null);
+	const containerRef = useRef<HTMLDivElement | null>(null);
 
 	/**
 	 * Open legend by default when the map container has space for legend.
@@ -85,6 +92,11 @@ const MapLegend: React.FC = () => {
 	 * This hook creates the legend control once the map is ready. It only
 	 * creates the control, the content of the legend itself is rendered by
 	 * another hook (below) that depends on other attributes.
+	 *
+	 * Dependencies:
+	 * - map: Only runs once when map instance is available
+	 * - containerRef/rootRef: Refs set inside, not dependencies
+	 * - legend: Created locally, not a dependency
 	 */
 	useEffect(() => {
 		if (!map) {
@@ -98,6 +110,7 @@ const MapLegend: React.FC = () => {
 				'div',
 				'legend-wrapper top-[9rem] md:top-24 right-5 m-0 !mt-1.5 z-30'
 			);
+			containerRef.current = container;
 			rootRef.current = createRoot(container);
 
 			// prevent interactions from affecting the map
@@ -115,10 +128,37 @@ const MapLegend: React.FC = () => {
 			} finally {
 				legend.remove();
 				rootRef.current = null;
+				containerRef.current = null;
 			}
 
 		};
 	}, [map]);
+
+	/**
+	 * Broadcast legend state changes via DOM custom event.
+	 * LocationModal listens to this to avoid overlapping.
+	 */
+	useEffect(() => {
+		console.log('map-legend useEffect');
+		if (!containerRef.current) return;
+
+		console.log('map-legend useEffect dispatching legend:statechange event', { showForecastLegendOfS2D, isOpen });
+
+		const rect = containerRef.current.getBoundingClientRect();
+		const event = new CustomEvent<LegendStateChangeDetail>('legend:statechange', {
+			bubbles: true,
+			detail: {
+				isOpen,
+				rect,
+				isForecastMode: showForecastLegendOfS2D,
+			}
+		});
+
+		containerRef.current.dispatchEvent(event);
+	}, [
+		isOpen,
+		showForecastLegendOfS2D,
+	]);
 
 	/**
 	 * This hook renders the legend content inside the legend control container

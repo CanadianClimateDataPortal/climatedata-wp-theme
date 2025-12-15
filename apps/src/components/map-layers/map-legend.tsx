@@ -67,6 +67,19 @@ const MapLegend: React.FC = () => {
 	const rootRef = useRef<Root | null>	(null);
 
 	/**
+	 * Open legend by default when map container has space for legend.
+	 * Legend max width is 430px (MapLegendOpenControl.MAX_LEGEND_WIDTH)
+	 * Only check on initial mount, no resize handling needed
+	 */
+	useEffect(() => {
+		if (!map) return;
+		const container = map.getContainer();
+		const { width } = container.getBoundingClientRect();
+		const shouldBeOpen = width >= MapLegendOpenControl.maxLegendWidth;
+		setIsOpen(shouldBeOpen);
+	}, [map]);
+
+	/**
 	 * This hook creates the legend control once the map is ready. It only
 	 * creates the control, the content of the legend itself is rendered by
 	 * another hook (below) that depends on other attributes.

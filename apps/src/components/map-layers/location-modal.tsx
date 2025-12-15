@@ -6,8 +6,6 @@ import React, {
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-import type { LegendStateChangeDetail } from '@/components/map-layers/map-legend';
-
 interface LocationModalProps {
 	isOpen: boolean;
 	onClose: () => void;
@@ -69,54 +67,7 @@ const INITIAL_LOCATION_MODAL_CLASS_NAME_LIST = figureOutClassList('');
  */
 const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {
-		const [shouldShiftLeft, setShouldShiftLeft] = useState(false);
 		const [locationModalClassNameList, locationModalClassNameListSet] = useState<string>(INITIAL_LOCATION_MODAL_CLASS_NAME_LIST);
-		const modalRef = useRef<HTMLDivElement>(null);
-
-		/**
-		 * Listen for legend state changes and adjust position if overlapping.
-		 * Only shifts when legend is open AND in forecast mode (requirement).
-		 */
-		useEffect(() => {
-			console.log('location-modal useEffect');
-			if (!isOpen) {
-				// Reset position when modal closes
-				setShouldShiftLeft(false);
-				return;
-			}
-
-			const handleLegendStateChange = (e: Event) => {
-				console.log('location-modal useEffect handleLegendStateChange event', e);
-
-				const customEvent = e as CustomEvent<LegendStateChangeDetail>;
-				const { isOpen: legendIsOpen, rect: legendRect, isForecastMode } = customEvent.detail;
-
-				// Only adjust if legend is open AND in forecast mode (requirement)
-				if (!legendIsOpen || !isForecastMode) {
-					setShouldShiftLeft(false);
-					return;
-				}
-
-				// Check if modal and legend overlap
-				const modalRect = modalRef.current?.getBoundingClientRect();
-				if (!modalRect) return;
-
-				const overlaps = !(
-					legendRect.right < modalRect.left ||
-					legendRect.left > modalRect.right ||
-					legendRect.bottom < modalRect.top ||
-					legendRect.top > modalRect.bottom
-				);
-
-				setShouldShiftLeft(overlaps);
-			};
-
-			document.addEventListener('legend:statechange', handleLegendStateChange);
-
-			return () => {
-				document.removeEventListener('legend:statechange', handleLegendStateChange);
-			};
-		}, [isOpen]);
 
 		useEffect(() => {
 			console.log('locationModalClassNameListSet');
@@ -130,18 +81,7 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 
 		return (
 			<div
-				ref={(node) => {
-					// Store internal ref
-					if (modalRef.current !== node) {
-						(modalRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-					}
-					// Forward to external ref
-					if (typeof ref === 'function') {
-						ref(node);
-					} else if (ref) {
-						(ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
-					}
-				}}
+				ref={ref}
 				className={locationModalClassNameList}
 				role="dialog"
 				aria-modal="true"

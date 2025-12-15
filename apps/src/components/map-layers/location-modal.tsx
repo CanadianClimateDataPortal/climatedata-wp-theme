@@ -15,10 +15,6 @@ interface LocationModalProps {
  * ---------------------------
  * A modal component specifically designed for displaying location information.
  * It's positioned on the right side of the screen, vertically centered.
- *
- * Positioning adjusts automatically based on legend state:
- * - When legend is closed: `md:right-28` (~112px from right)
- * - When legend is open: `md:right-[480px]` (~480px from right to avoid overlap)
  */
 const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {

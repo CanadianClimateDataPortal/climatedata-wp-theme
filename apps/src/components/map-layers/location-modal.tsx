@@ -1,7 +1,4 @@
-import React, {
-	useEffect,
-	useState,
-} from 'react';
+import React from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppSelector } from '@/app/hooks';
@@ -13,88 +10,44 @@ interface LocationModalProps {
 	children: React.ReactNode;
 }
 
-// MUST ALWAYS BE THERE
-const LOCATION_MODAL_CLASS_LIST_0 = 'location-modal';
-// Font and text
-const LOCATION_MODAL_CLASS_LIST_1 = 'font-sans';
-// Background and effects
-const LOCATION_MODAL_CLASS_LIST_2 = 'bg-white rounded-lg shadow-lg';
-// Positioning mode and display type (flex)
-const LOCATION_MODAL_CLASS_LIST_3 = 'absolute z-30 flex flex-col';
-// Size constraints
-const LOCATION_MODAL_CLASS_LIST_4 = 'max-w-md w-full';
-// Spacing between elements and padding
-const LOCATION_MODAL_CLASS_LIST_5 = 'gap-6 p-6';
-// Vertical centering
-const LOCATION_MODAL_CLASS_LIST_6 = 'top-1/2 -translate-y-1/2';
-// Static adjustments for ...
-const LOCATION_MODAL_CLASS_LIST_7 = 'md:left-auto md:translate-x-0 md:right-28';
-// Static adjustments for small screens and below
-const LOCATION_MODAL_CLASS_LIST_8 = 'sm:left-1/2 sm:-translate-x-1/2'; // Center horizontally by default (sm and below) -- Was missing :sm
-
-const figureOutClassList = (
-	fromOutside: string,
-) => {
-	return cn(
-		/**
-		 * Reminder that cn's first argument has different treatment than the rest.
-		 */
-		[
-			LOCATION_MODAL_CLASS_LIST_0,
-			LOCATION_MODAL_CLASS_LIST_1,
-			LOCATION_MODAL_CLASS_LIST_2,
-			LOCATION_MODAL_CLASS_LIST_3,
-		].join(' '),
-		[
-			LOCATION_MODAL_CLASS_LIST_4,
-			LOCATION_MODAL_CLASS_LIST_5,
-			LOCATION_MODAL_CLASS_LIST_6,
-			LOCATION_MODAL_CLASS_LIST_7,
-			LOCATION_MODAL_CLASS_LIST_8,
-		].join(' '),
-		fromOutside,
-	);
-};
-
-
-const INITIAL_LOCATION_MODAL_CLASS_NAME_LIST = figureOutClassList('');
-
 /**
  * LocationModal Component
  * ---------------------------
  * A modal component specifically designed for displaying location information.
  * It's positioned on the right side of the screen, vertically centered.
+ *
+ * Positioning adjusts automatically based on legend state:
+ * - When legend is closed: `md:right-28` (~112px from right)
+ * - When legend is open: `md:right-[480px]` (~480px from right to avoid overlap)
  */
 const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {
 		const isLegendOpen = useAppSelector((state) => state.map.legend.isOpen);
-		const [locationModalClassNameList, locationModalClassNameListSet] = useState<string>(INITIAL_LOCATION_MODAL_CLASS_NAME_LIST);
-
-		useEffect(() => {
-			// If legend is open, shift modal further left to avoid overlap
-			const legendOverlapAdjustment = isLegendOpen ? 'md:right-[480px]' : '';
-
-			locationModalClassNameListSet(
-				figureOutClassList([className ?? '', legendOverlapAdjustment].join(' '))
-			);
-
-			Reflect.set(window, 'setter', (mine: string) =>
-				locationModalClassNameListSet(
-					figureOutClassList([mine, className ?? '', legendOverlapAdjustment].join(' '))
-				)
-			);
-		}, [
-			className,
-			isOpen,
-			isLegendOpen,
-		]);
 
 		if (!isOpen) return null;
+
+		// classNames for the top-level element of this component.
+		const topElementClassNames = cn(
+			'location-modal',
+			'font-sans',
+			'bg-white rounded-lg shadow-lg',
+			'absolute z-30 flex flex-col',
+			'max-w-md w-full',
+			'gap-6 p-6',
+			'top-1/2 -translate-y-1/2',
+			// Small screens: center horizontally
+			'left-1/2 -translate-x-1/2', // TODO: Check why these aren't prefixed with "sm:"
+			// Medium screens and up: position from right, adjust based on legend state
+			'md:left-auto md:translate-x-0',
+			isLegendOpen ? 'md:right-[480px]' : 'md:right-28',
+			// External overrides from className prop
+			className
+		);
 
 		return (
 			<div
 				ref={ref}
-				className={locationModalClassNameList}
+				className={topElementClassNames}
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="modal-title" // Links to the title for accessibility

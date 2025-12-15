@@ -39,7 +39,7 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 			'left-1/2 -translate-x-1/2', // TODO: Check why these aren't prefixed with "sm:"
 			// Medium screens and up: position from right, adjust based on legend state
 			'md:left-auto md:translate-x-0',
-			isLegendOpen ? 'md:right-[480px]' : 'md:right-28',
+			isLegendOpen ? 'md:right-[480px] sm:top-[750px]' : 'md:right-28',
 			// External overrides from className prop
 			className
 		);

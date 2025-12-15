@@ -75,6 +75,12 @@ const initialState: MapState = {
 	 */
 	messageDisplayStates: {},
 	isLowSkillVisible: true,
+	legend: {
+		isOpen: false,  // Legend starts collapsed
+	},
+	locationModal: {
+		isOpen: false,  // LocationModal starts hidden
+	},
 };
 
 // Create the slice
@@ -164,6 +170,12 @@ const mapSlice = createSlice({
 		setLowSkillVisibility(state, action: PayloadAction<{ visible: boolean }>) {
 			state.isLowSkillVisible = action.payload.visible;
 		},
+		setLegendOpen(state, action: PayloadAction<boolean>) {
+			state.legend.isOpen = action.payload;
+		},
+		setLocationModalOpen(state, action: PayloadAction<boolean>) {
+			state.locationModal.isOpen = action.payload;
+		},
 	},
 });
 
@@ -188,6 +200,8 @@ export const {
 	setMapCoordinates,
 	setMessageDisplay,
 	setLowSkillVisibility,
+	setLegendOpen,
+	setLocationModalOpen,
 } = mapSlice.actions;
 
 /**

@@ -171,6 +171,23 @@ export interface MapCoordinates {
 }
 
 /**
+ * Represents the state of a UI overlay component on the map (e.g., legend, location modal).
+ * These are UI elements that sit on top of the map and may obscure each other.
+ */
+export interface MapOverlayState {
+	/**
+	 * Whether the overlay is open/expanded (true) or closed/collapsed (false).
+	 */
+	isOpen: boolean;
+	// Future properties for overlap detection and positioning:
+	// width?: number;       // Overlay width in pixels
+	// height?: number;      // Overlay height in pixels
+	// x?: number;           // X coordinate relative to map container
+	// y?: number;           // Y coordinate relative to map container
+	// bounds?: DOMRect;     // Complete bounding box for precise overlap calculation
+}
+
+/**
  * Represents the map state in redux store.
  */
 export interface MapState {
@@ -195,6 +212,16 @@ export interface MapState {
 	mapCoordinates: MapCoordinates;
 	messageDisplayStates: {[key: string]: boolean};
 	isLowSkillVisible: boolean;
+	/**
+	 * Represents the state of the map legend overlay.
+	 * The graphical legend that explains the map's color coding.
+	 */
+	legend: MapOverlayState;
+	/**
+	 * Represents the state of the location modal overlay.
+	 * When we've clicked on a location on the map and want to show details.
+	 */
+	locationModal: MapOverlayState;
 }
 
 /**

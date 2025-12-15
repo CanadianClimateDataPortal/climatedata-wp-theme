@@ -3,7 +3,6 @@ import React, {
 	Suspense,
 	useEffect,
 	useRef,
-	useState,
 } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import L from 'leaflet';
@@ -20,7 +19,8 @@ import {
 } from '@/types/climate-variable-interface';
 import { MapDisplayType } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
-import { useAppSelector } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { setLegendOpen } from '@/features/map/map-slice';
 import { useS2D } from '@/hooks/use-s2d';
 
 import type { MapLegendForecastS2D } from '@/components/map-layers/map-legend-forecast-s2d';
@@ -31,7 +31,8 @@ const LazyMapLegendCommon = lazy<React.MemoExoticComponent<MapLegendCommon>>(() 
 
 
 const MapLegend: React.FC = () => {
-	const [isOpen, setIsOpen] = useState<boolean>(false);
+	const dispatch = useAppDispatch();
+	const isOpen = useAppSelector((state) => state.map.legend.isOpen);
 
 	const map = useMap();
 	const { locale } = useLocale();
@@ -78,8 +79,8 @@ const MapLegend: React.FC = () => {
 		const container = map.getContainer();
 		const { width } = container.getBoundingClientRect();
 		const shouldBeOpen = width >= MapLegendOpenControl.maxLegendWidth * 1.5;
-		setIsOpen(shouldBeOpen);
-	}, [map]);
+		dispatch(setLegendOpen(shouldBeOpen));
+	}, [map, dispatch]);
 
 	/**
 	 * This hook creates the legend control once the map is ready. It only
@@ -138,7 +139,7 @@ const MapLegend: React.FC = () => {
 			rootRef.current.render(
 				<MapLegendOpenControl
 					isOpen={isOpen}
-					toggleOpen={() => setIsOpen((prev) => !prev)}
+					toggleOpen={() => dispatch(setLegendOpen(!isOpen))}
 				>
 					<Suspense fallback={'...'}>
 						<LazyMapLegendForecastS2D
@@ -166,7 +167,7 @@ const MapLegend: React.FC = () => {
 		rootRef.current.render(
 			<MapLegendOpenControl
 				isOpen={isOpen}
-				toggleOpen={() => setIsOpen((prev) => !prev)}
+				toggleOpen={() => dispatch(setLegendOpen(!isOpen))}
 				width={100}
 			>
 				<Suspense fallback={'...'}>
@@ -198,6 +199,7 @@ const MapLegend: React.FC = () => {
 		showForecastLegendOfS2D,
 		showClimatologyLegendOfS2D,
 		variableName,
+		dispatch,
 	]);
 
 	return null;

@@ -1,10 +1,10 @@
 import React, {
 	useEffect,
-	useRef,
 	useState,
 } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAppSelector } from '@/app/hooks';
 
 interface LocationModalProps {
 	isOpen: boolean;
@@ -67,14 +67,26 @@ const INITIAL_LOCATION_MODAL_CLASS_NAME_LIST = figureOutClassList('');
  */
 const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {
+		const isLegendOpen = useAppSelector((state) => state.map.legend.isOpen);
 		const [locationModalClassNameList, locationModalClassNameListSet] = useState<string>(INITIAL_LOCATION_MODAL_CLASS_NAME_LIST);
 
 		useEffect(() => {
-			console.log('locationModalClassNameListSet');
-			locationModalClassNameListSet(figureOutClassList(className ?? ''));
-			Reflect.set(window, 'setter', (mine: string) => locationModalClassNameListSet(figureOutClassList(mine + ' ' + (className ?? ''))) );
+			// If legend is open, shift modal further left to avoid overlap
+			const legendOverlapAdjustment = isLegendOpen ? 'md:right-[480px]' : '';
+
+			locationModalClassNameListSet(
+				figureOutClassList([className ?? '', legendOverlapAdjustment].join(' '))
+			);
+
+			Reflect.set(window, 'setter', (mine: string) =>
+				locationModalClassNameListSet(
+					figureOutClassList([mine, className ?? '', legendOverlapAdjustment].join(' '))
+				)
+			);
 		}, [
 			className,
+			isOpen,
+			isLegendOpen,
 		]);
 
 		if (!isOpen) return null;

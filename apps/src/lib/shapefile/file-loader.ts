@@ -5,6 +5,7 @@
  */
 
 import JSZip from 'jszip';
+import { introspectFile } from './file-introspection';
 
 /**
  * Extracted shapefile data.
@@ -35,26 +36,6 @@ export class ShapefileLoadError extends Error {
 }
 
 /**
- * Validates file extension is .zip
- *
- * @param file - File to validate
- * @throws {ShapefileLoadError} If file extension is not .zip
- */
-const assertIsZipFile = (
-  file: File,
-): void => {
-  const fileName = file.name.toLowerCase();
-  const parts = fileName.split('.');
-  const extension = parts.pop();
-
-  if (extension !== 'zip') {
-    throw new ShapefileLoadError(
-      'Shapefile must be a ZIP file containing at least .shp and .prj files',
-    );
-  }
-};
-
-/**
  * Validates extracted data contains required files
  *
  * @param data - Extracted shapefile data
@@ -72,6 +53,11 @@ const assertHasRequiredFiles = (
 
 /**
  * Load and extract shapefile data from a ZIP file.
+ *
+ * Validation steps:
+ * 1. Verify file is not empty (native introspection)
+ * 2. Verify ZIP magic bytes (native introspection)
+ * 3. Extract .shp and .prj files with JSZip
  *
  * A valid shapefile ZIP must contain:
  * - `.shp` file: Binary geometry data
@@ -101,12 +87,26 @@ const assertHasRequiredFiles = (
 export const loadShapeFile = async (
   file: File,
 ): Promise<ShapefileData> => {
-  assertIsZipFile(file);
+  // Step 1-2: Validate file content (not empty + ZIP magic bytes)
+  const inspection = await introspectFile(file);
 
+  if (inspection.isEmpty) {
+    throw new ShapefileLoadError(
+      'File is empty',
+    );
+  }
+
+  if (!inspection.isZip) {
+    throw new ShapefileLoadError(
+      'File is not a valid ZIP archive (invalid magic bytes)',
+  if (!inspection.isZip) {
+    throw new ShapefileLoadError(
+      'File is not a valid ZIP archive (invalid magic bytes)',
+    );
+  }
+
+  // Step 3: Extract files with JSZip
   try {
-    const arrayBuffer = await file.arrayBuffer();
-    const zip = await JSZip.loadAsync(arrayBuffer);
-
     const data: Partial<ShapefileData> = {};
     const promises: Promise<void>[] = [];
 

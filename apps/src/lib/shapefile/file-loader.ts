@@ -2,8 +2,6 @@
  * Shapefile file loading and extraction utilities.
  *
  * Extracts .shp (binary geometry) and .prj (projection) files from ZIP archives.
- *
- * @module lib/shapefile/file-loader
  */
 
 import JSZip from 'jszip';
@@ -45,12 +43,11 @@ export class ShapefileLoadError extends Error {
 const assertIsZipFile = (
   file: File,
 ): void => {
-  const fileExt = file.name
-    .toLowerCase()
-    .split('.')
-    .pop();
+  const fileName = file.name.toLowerCase();
+  const parts = fileName.split('.');
+  const extension = parts.pop();
 
-  if (fileExt !== 'zip') {
+  if (extension !== 'zip') {
     throw new ShapefileLoadError(
       'Shapefile must be a ZIP file containing at least .shp and .prj files',
     );
@@ -115,10 +112,9 @@ export const loadShapeFile = async (
 
     // Extract only .shp and .prj files
     for (const filename in zip.files) {
-      const extension = filename
-        .toLowerCase()
-        .split('.')
-        .pop();
+      const lowerName = filename.toLowerCase();
+      const parts = lowerName.split('.');
+      const extension = parts.pop();
 
       if (extension === 'shp') {
         const promise = zip.files[filename]

@@ -58,7 +58,9 @@ export interface FileIntrospection {
  * }
  * ```
  */
-export const introspectFile = async (file: File): Promise<FileIntrospection> => {
+export const introspectFile = async (
+  file: File,
+): Promise<FileIntrospection> => {
   const arrayBuffer = await file.arrayBuffer();
   const bytes = new Uint8Array(arrayBuffer);
 
@@ -68,24 +70,26 @@ export const introspectFile = async (file: File): Promise<FileIntrospection> => 
   // Read first 16 bytes for magic byte detection
   const headerBytes = bytes.slice(0, 16);
   const firstBytes = Array.from(headerBytes)
-    .map(b => b.toString(16).padStart(2, '0'))
+    .map((b) => b.toString(16).padStart(2, '0'))
     .join(' ');
 
-  // ZIP magic bytes: 50 4B 03 04 (PK..)
-  const isZip = bytes.length >= 4 &&
-                bytes[0] === 0x50 &&
-                bytes[1] === 0x4B &&
-                bytes[2] === 0x03 &&
-                bytes[3] === 0x04;
+  // ZIP magic bytes: 50 4B 03 04 ("PK" for Phil Katz, creator of PKZIP)
+  const isZip =
+    bytes.length >= 4 &&
+    bytes[0] === 0x50 &&
+    bytes[1] === 0x4b &&
+    bytes[2] === 0x03 &&
+    bytes[3] === 0x04;
 
-  // Raw data preview for visualization
+  // Raw data preview for visualization - escape non-printable characters
   const decoder = new TextDecoder('utf-8', { fatal: false });
   const previewBytes = bytes.slice(0, 100);
   const textPreview = decoder.decode(previewBytes);
   const rawDataPreview = textPreview
     .split('')
-    .map(char => {
+    .map((char) => {
       const code = char.charCodeAt(0);
+      // Non-printable characters (below space or above tilde)
       return code < 32 || code > 126
         ? `\\x${code.toString(16).padStart(2, '0')}`
         : char;

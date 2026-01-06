@@ -1,7 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAppSelector } from '@/app/hooks';
 
 interface LocationModalProps {
 	isOpen: boolean;
@@ -18,8 +17,6 @@ interface LocationModalProps {
  */
 const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {
-		const isLegendOpen = useAppSelector((state) => state.map.legend.isOpen);
-
 		if (!isOpen) return null;
 
 		// classNames for the top-level element of this component.
@@ -27,15 +24,8 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 			'location-modal',
 			'font-sans',
 			'bg-white rounded-lg shadow-lg',
-			'absolute z-30 flex flex-col',
-			'max-w-md w-full',
+			'flex flex-col',
 			'gap-6 p-6',
-			'top-1/2 -translate-y-1/2',
-			// Small screens: center horizontally
-			'left-1/2 -translate-x-1/2', // TODO: Check why these aren't prefixed with "sm:"
-			// Medium screens and up: position from right, adjust based on legend state
-			'md:left-auto md:translate-x-0',
-			isLegendOpen ? 'md:right-[480px] sm:top-[750px]' : 'md:right-28',
 			// External overrides from className prop
 			className
 		);

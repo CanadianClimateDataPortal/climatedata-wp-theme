@@ -183,7 +183,7 @@ const MapLegend: React.FC = () => {
 						title={title}
 						tooltipContents={tooltipContents}
 					/>
-					</Suspense>
+				</Suspense>
 			</MapLegendOpenControl>
 		);
 	}, [

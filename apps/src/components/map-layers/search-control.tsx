@@ -20,6 +20,25 @@ import { SearchControlLocationItem, SearchControlResponse } from '@/types/types'
 import { LOCATION_SEARCH_ENDPOINT, SEARCH_DEFAULT_ZOOM, SEARCH_PLACEHOLDER } from '@/lib/constants';
 
 /**
+ * Lat/lng object returned by the Search component.
+ */
+type SearchLatLng = {
+	lat: string;
+	lng: string;
+};
+
+/**
+ * Converts a "LatLng" object returned by the search component to a Leaflet
+ * LatLng object.
+ */
+function convertSearchLatLng(inputLatLng: SearchLatLng): L.LatLng {
+	return new L.LatLng(
+		parseFloat(inputLatLng.lat),
+		parseFloat(inputLatLng.lng),
+	);
+}
+
+/**
  * SearchControl Component
  * ---------------------------
  * A React component that adds a search control to a Leaflet map using the `leaflet-search` plugin.
@@ -60,7 +79,8 @@ export default function SearchControl({
 	const map = useMap();
 
 	const handleLocationChange = useCallback(
-		(latlng: L.LatLng) => {
+		(inputLatlng: SearchLatLng) => {
+			const latlng = convertSearchLatLng(inputLatlng);
 			// clear all existing markers from the map
 			map.eachLayer(layer => {
 				if (layer instanceof L.Marker) {
@@ -96,8 +116,12 @@ export default function SearchControl({
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
 					const { latitude, longitude } = position.coords;
+					const equivalentSearchLocation = {
+						lat: latitude.toString(),
+						lng: longitude.toString(),
+					}
 					const title = __('Your current location');
-					handleLocationChange(L.latLng(latitude, longitude));
+					handleLocationChange(equivalentSearchLocation);
 					L.marker([latitude, longitude], {
 						title: title,
 						icon: L.icon({
@@ -220,7 +244,7 @@ export default function SearchControl({
 			}).on('click', async (e: L.LayerEvent) => {
 				console.log(e);
 			}),
-			moveToLocation: (latlng: L.LatLng) => {
+			moveToLocation: (latlng: SearchLatLng) => {
 				handleLocationChange(latlng);
 			},
 		});

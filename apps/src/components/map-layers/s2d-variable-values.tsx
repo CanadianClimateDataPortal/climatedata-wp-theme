@@ -493,7 +493,7 @@ const ForecastValuesPart = ({
 
 	const HistoricalMedianLine = medianValue ? (
 		<data value={medianValue}>
-			{formatValue(medianValue, unit, 0, locale)}
+			{formatValue(medianValue, unit, 1, locale)}
 		</data>
 	) : (
 		<TextLoader />
@@ -504,8 +504,8 @@ const ForecastValuesPart = ({
 			{sprintf(
 				__('%s to %s'),
 				// We don't show the unit for the range start
-				formatValue(nearNormalRange[0], '', 0, locale),
-				formatValue(nearNormalRange[1], unit, 0, locale)
+				formatValue(nearNormalRange[0], '', 1, locale),
+				formatValue(nearNormalRange[1], unit, 1, locale)
 			)}
 		</data>
 	) : (
@@ -607,7 +607,7 @@ const ClimatologyValuesPart = ({
 
 	const HighCutoffLine = locationData ? (
 		<data value={lowValue}>
-			{formatValue(highValue, unit, 0, locale)}
+			{formatValue(highValue, unit, 1, locale)}
 		</data>
 	) : (
 		<TextLoader />
@@ -615,7 +615,7 @@ const ClimatologyValuesPart = ({
 
 	const LowCutoffLine = locationData ? (
 		<data value={lowValue}>
-			{formatValue(lowValue, unit, 0, locale)}
+			{formatValue(lowValue, unit, 1, locale)}
 		</data>
 	) : (
 		<TextLoader />
@@ -623,7 +623,7 @@ const ClimatologyValuesPart = ({
 
 	const HistoricalMedianLine = locationData ? (
 		<data value={medianValue}>
-			{formatValue(medianValue, unit, 0, locale)}
+			{formatValue(medianValue, unit, 1, locale)}
 		</data>
 	) : (
 		<TextLoader />
@@ -740,7 +740,7 @@ const ProbabilitiesPart = ({
 				{
 					label: sprintf(
 						__('Above %s'),
-						formatValue(aboveValue, unit, 0, locale)
+						formatValue(aboveValue, unit, 1, locale)
 					),
 					percent: abovePercentage,
 					fillHexCode: getProbabilityColour(
@@ -753,8 +753,8 @@ const ProbabilitiesPart = ({
 					label: sprintf(
 						__('%s to %s'),
 						// No unit for the first value of the range
-						formatValue(belowValue, '', 0, locale),
-						formatValue(aboveValue, unit, 0, locale)
+						formatValue(belowValue, '', 1, locale),
+						formatValue(aboveValue, unit, 1, locale)
 					),
 					percent: nearPercentage,
 					fillHexCode: getProbabilityColour(
@@ -766,7 +766,7 @@ const ProbabilitiesPart = ({
 				{
 					label: sprintf(
 						__('Below %s'),
-						formatValue(belowValue, unit, 0, locale)
+						formatValue(belowValue, unit, 1, locale)
 					),
 					percent: belowPercentage,
 					fillHexCode: getProbabilityColour(
@@ -786,7 +786,7 @@ const ProbabilitiesPart = ({
 				{
 					label: sprintf(
 						__('Higher than %s'),
-						formatValue(higherValue, unit, 0, locale)
+						formatValue(higherValue, unit, 1, locale)
 					),
 					percent: higherPercentage,
 					fillHexCode: getProbabilityColour(
@@ -798,7 +798,7 @@ const ProbabilitiesPart = ({
 				{
 					label: sprintf(
 						__('Lower than %s'),
-						formatValue(lowerValue, unit, 0, locale)
+						formatValue(lowerValue, unit, 1, locale)
 					),
 					percent: lowerPercentage,
 					fillHexCode: getProbabilityColour(

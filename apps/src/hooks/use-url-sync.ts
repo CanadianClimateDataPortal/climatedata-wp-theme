@@ -49,7 +49,7 @@ const URL_PARAMS = {
 	DATE_RANGE: 'dateRange',
 	FORECAST_TYPE: 'fcastType',
 	FORECAST_DISPLAY: 'fcastDisp',
-	LOW_SKILL_MASKED: 'hideLowSkill',
+	LOW_SKILL_MASKED: 'maskLowSkill',
 	DATASET: 'dataset',
 	DATA_OPACITY: 'dataOpacity',
 	LABEL_OPACITY: 'labelOpacity',
@@ -192,7 +192,7 @@ export const useUrlSync = () => {
 		}
 
 		if (lowSkillVisibility === false) {
-			params.set(URL_PARAMS.LOW_SKILL_MASKED, '1');
+			params.set(URL_PARAMS.LOW_SKILL_MASKED, '0');
 		}
 	};
 
@@ -466,8 +466,8 @@ export const useUrlSync = () => {
 		updateMapCoordinatesFromUrlParams(params);
 
 		if (params.has(URL_PARAMS.LOW_SKILL_MASKED)) {
-			const lowSkillMasked = params.get(URL_PARAMS.LOW_SKILL_MASKED) === '1';
-			dispatch(setLowSkillVisibility({ visible: !lowSkillMasked }));
+			const lowSkillNotVisible = params.get(URL_PARAMS.LOW_SKILL_MASKED) === '0';
+			dispatch(setLowSkillVisibility({ visible: !lowSkillNotVisible }));
 		}
 	}
 

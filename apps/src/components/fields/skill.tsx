@@ -17,10 +17,9 @@ export const MaskLowSkillField = (
 ) => {
 	const dispatch = useAppDispatch();
 
-	const checked = !useAppSelector(selectLowSkillVisibility());
+	const checked = useAppSelector(selectLowSkillVisibility());
 	const onCheckedChange = (checked: boolean) => {
-		const isVisible = !checked; // "checked" means "hide low skill"
-		dispatch(setLowSkillVisibility({visible: isVisible}));
+		dispatch(setLowSkillVisibility({visible: checked}));
 	};
 
 	const {

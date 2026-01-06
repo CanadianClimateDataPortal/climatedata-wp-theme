@@ -211,6 +211,10 @@ export interface MapState {
 	variableListLoading: boolean;
 	mapCoordinates: MapCoordinates;
 	messageDisplayStates: {[key: string]: boolean};
+	/**
+	 * True if the "low skill" layer is visible (i.e. true if "mask low skill"
+	 * is checked)
+	 */
 	isLowSkillVisible: boolean;
 	/**
 	 * Represents the state of the map legend overlay.

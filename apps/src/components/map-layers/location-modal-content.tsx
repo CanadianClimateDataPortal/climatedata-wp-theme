@@ -73,7 +73,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	}
 
 	return (
-		<div>
+		<div className="min-h-0 overflow-y-auto">
 			<h2 className="mb-1 text-2xl font-semibold leading-7 text-cdc-black">
 				{title}
 			</h2>

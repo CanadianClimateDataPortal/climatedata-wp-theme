@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import L from 'leaflet';
 import { cn } from '@/lib/utils';
 
 interface LocationModalProps {
@@ -17,6 +18,18 @@ interface LocationModalProps {
  */
 const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {
+		const internalRef = useRef<HTMLDivElement>(null);
+
+		// Prevent Leaflet from capturing mouse events, to allow the user
+		// to scroll inside the modal, and select the text
+		useEffect(() => {
+			const element = internalRef.current;
+			if (element) {
+				L.DomEvent.disableClickPropagation(element);
+				L.DomEvent.disableScrollPropagation(element);
+			}
+		}, [isOpen]);
+
 		if (!isOpen) return null;
 
 		// classNames for the top-level element of this component.
@@ -32,7 +45,16 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 
 		return (
 			<div
-				ref={ref}
+				ref={(node) => {
+					// Handle both the forwarded ref and the internal ref
+					if (typeof ref === 'function') {
+						ref(node);
+					} else if (ref) {
+						ref.current = node;
+					}
+					// @ts-expect-error: internalRef is used for DOM manipulation
+					internalRef.current = node;
+				}}
 				className={topElementClassNames}
 				role="dialog"
 				aria-modal="true"

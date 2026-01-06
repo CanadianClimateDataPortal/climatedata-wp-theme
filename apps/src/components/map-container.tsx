@@ -102,16 +102,16 @@ export default function MapContainer({
 
 	// CSS classes to position the location modal
 	const locationModalClassName = cn(
-		'absolute z-30',
+		'absolute z-50',
 		'max-w-md w-full',
 		'top-1/2 -translate-y-1/2',
-		// Small screens: center horizontally
 		'left-1/2 -translate-x-1/2',
+		'max-h-[calc(100%-10rem)]',
 		// Medium screens and up: position from top left
+		'md:z-30',
 		'md:top-[10rem] md:translate-y-0',
 		'md:left-16 md:translate-x-0',
-		'max-h-[calc(100%-12rem)]',
-		'leaflet-control',
+		'md:max-h-[calc(100%-12rem)]',
 	);
 
 	const handleLocationModalOpen = (content: React.ReactNode) => {

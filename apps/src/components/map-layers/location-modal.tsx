@@ -19,16 +19,21 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {
 		if (!isOpen) return null;
 
+		// classNames for the top-level element of this component.
+		const topElementClassNames = cn(
+			'location-modal',
+			'font-sans',
+			'bg-white rounded-lg shadow-lg',
+			'flex flex-col',
+			'gap-6 p-6',
+			// External overrides from className prop
+			className
+		);
+
 		return (
 			<div
 				ref={ref}
-				className={cn(
-					'location-modal font-sans',
-					'absolute z-30 top-1/2 -translate-y-1/2 max-w-md w-full flex flex-col gap-6 p-6 bg-white rounded-lg shadow-lg',
-					'md:right-28 md:left-auto md:translate-x-0',
-					'left-1/2 -translate-x-1/2', // Center horizontally by default (sm and below)
-					className
-				)}
+				className={topElementClassNames}
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="modal-title" // Links to the title for accessibility

@@ -120,13 +120,18 @@ export const postDownloadToBlobObjectURL = async (
 
 		// Validate response contains binary file data, not an error page
 		const contentType = response.headers.get('Content-Type');
-		if (
-			!contentType?.includes('application/zip') &&
-			!contentType?.includes('application/octet-stream')
-		) {
-			throw new FetchPostDownloadError(
-				`Unexpected content type: ${contentType}`
-			);
+		if (contentType) {
+			const validContentTypes = [
+				'application/zip',
+				'application/octet-stream',
+				'application/x-netcdf4',
+			];
+
+			if (!validContentTypes.includes(contentType)) {
+				throw new FetchPostDownloadError(
+					`Unexpected content type: ${contentType}`
+				);
+			}
 		}
 
 		// Check response isn't empty before reading stream

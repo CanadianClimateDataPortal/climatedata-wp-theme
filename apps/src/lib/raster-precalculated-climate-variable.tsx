@@ -246,8 +246,8 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 
 			// Create a list of promises for each variable's download request
 			const downloadPromises = availableVars.map(async (allCanDcsVar) => {
-					const payloadCopy = { ...payload, var: allCanDcsVar };
-					return this.fetchDownloadUrl(payloadCopy); // Returns a blob URL or null
+				const payloadCopy = { ...payload, var: allCanDcsVar };
+				return this.fetchDownloadUrl(payloadCopy); // Returns a blob URL or null
 			});
 
 			// Wait for all download requests to resolve

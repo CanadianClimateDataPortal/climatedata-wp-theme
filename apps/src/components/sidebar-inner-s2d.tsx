@@ -36,7 +36,7 @@ const tooltipFrequencies = __(
 
 const tooltipTimePeriods = __(
 	'The available time periods will change if a different frequency is selected. ' +
-		'Move the slider to select the forecast for your time period of interest.'
+		'Move the slider to select the time period of interest.'
 );
 
 const SidebarInnerS2D = () => {

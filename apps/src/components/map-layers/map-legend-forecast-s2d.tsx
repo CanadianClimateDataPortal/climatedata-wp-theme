@@ -80,7 +80,8 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 		afterStatementParagraph = sprintf(
 			__(
 			'If the probability is below %s, no single outcome is significantly more likely ' +
-				'than the others, and the climatology should be used instead.'
+				'than the others, the map is white at that location, and the climatology should ' +
+				'be used instead.'
 			),
 			'40%',
 		);
@@ -96,7 +97,8 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 		afterStatementParagraph = sprintf(
 			__(
 			'If the probability is below %s, no single outcome is significantly more likely ' +
-				'than the others, and the climatology should be used instead.'
+				'than the others, the map is white at that location, and the climatology should ' +
+				'be used instead.'
 			),
 			'30%',
 		);

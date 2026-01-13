@@ -90,10 +90,9 @@ const tooltipSkillLevelSuffix = __(
 const tooltipClimatology = __(
 	'The historical climatology contains data corresponding to the month, ' +
 		'season, or decadal time period of interest for the 30 years between ' +
-		'1991 and 2020. The historical median and near-normal range provide ' +
-		'context for typical past conditions at this location. The cutoff ' +
-		'values provide the exact values that define the forecast outcomes ' +
-		'for this location.'
+		'1991 and 2020. The historical median provides context for typical ' +
+		'past conditions at this location. The cutoff values provide the ' +
+		'exact values that define the forecast outcomes for this location.'
 );
 
 const SKILL_LEVEL_LABELS = [

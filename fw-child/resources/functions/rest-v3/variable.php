@@ -170,6 +170,7 @@ function cdc_rest_v3_get_relevant_sectors( $post_id ) {
 
 			$sectors[] = array(
 				'term_id'     => $term->term_id,
+				'slug'        => $term->slug,
 				'name'        => cdc_rest_v3_build_multilingual_field(
 					$term->name,
 					get_field( 'title_fr', $term )

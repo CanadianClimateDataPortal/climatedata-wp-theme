@@ -732,7 +732,7 @@ export interface Sector {
 	term_id: number;
 	name: LocalizedString;
 	description: LocalizedString;
-	link: string;
+	slug: string;
 }
 
 // Represents a training with localized title, description, and a localized link

@@ -145,6 +145,7 @@ function cdc_rest_v3_get_taxonomy_terms_data( $post_id, $taxonomy ) {
 		foreach ( $terms as $term ) {
 			$formatted_terms[] = array(
 				'term_id' => $term->term_id,
+				'slug'    => $term->slug,
 				'title'   => cdc_rest_v3_build_multilingual_field(
 					$term->name,
 					get_field( 'title_fr', $term )

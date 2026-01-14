@@ -17,6 +17,7 @@ import { MapInfoData, Training, Sector } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from '@/app/hooks';
 import { cn } from '@/lib/utils';
+import { INTERNAL_URLS } from '@/lib/constants';
 
 /**
  * VariableDetailsPanel component, displaying details such as description and related data
@@ -182,7 +183,11 @@ RelevantTrainings.displayName = 'RelevantTrainings';
 const SectorsArea: React.FC<{ items: Sector[] }> = ({ items }) => {
 	const [selectedItem, setSelectedItem] = useState(items[0] || null);
 
-    const { locale } = useLocale();
+	const { locale } = useLocale();
+	const sectorBaseUrl = INTERNAL_URLS[`sector-page-${locale}`] || '';
+	const sectorLink = selectedItem
+		? sectorBaseUrl.replace('{sector}', selectedItem.slug)
+		: '';
 
 	return (
 		<>
@@ -213,7 +218,7 @@ const SectorsArea: React.FC<{ items: Sector[] }> = ({ items }) => {
 					<p className="text-sm font-semibold text-dark-purple">
 						<span className="mr-1">{selectedItem.description[locale]}</span>
 						<Link
-							href={selectedItem.link}
+							href={sectorLink}
 							icon={<ExternalLink size={12} />}
 							className="text-brand-blue"
 						>

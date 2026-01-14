@@ -8,7 +8,6 @@ import {
 	DeltaValuesOptions,
 	FetchOptions,
 	MapInfoData,
-	Sector,
 	TaxonomyData,
 	WMSLegendData,
 } from '@/types/types';
@@ -201,29 +200,13 @@ export const fetchMapInfoData = async (
 	// @todo Add fallback for empty dataset.
 	const dataset = taxonomy?.['variable-dataset']?.terms;
 
-	// Map sectors if available and valid.
-	// @todo Add dynamic lear URL and slug.
-	const baseLearnUrl = '/learn/?q=sector:';
-	const sectors = Array.isArray(content?.relevant_sectors)
-		? content.relevant_sectors.map((item: Sector) => {
-				const slug = item.name.en
-					.toLowerCase()
-					.replace(/\s+/g, '-');
-				const link = `${baseLearnUrl}${slug}`;
-				return {
-					...item,
-					link,
-				};
-			})
-		: [];
-
 	// Generate the mapInfo object.
 	const mapInfo: MapInfoData = {
 		title: content?.title || { en: '', fr: '' },
 		tagline: content?.tagline || { en: '', fr: '' },
 		fullDescription: content?.full_description || { en: '', fr: '' },
 		techDescription: content?.tech_description || { en: '', fr: '' },
-		relevantSectors: sectors,
+		relevantSectors: content?.relevant_sectors || [],
 		relevantTrainings: Array.isArray(content?.relevant_trainings)
 			? content.relevant_trainings
 			: [],

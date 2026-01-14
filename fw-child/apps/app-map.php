@@ -41,6 +41,9 @@ $internal_urls = [
 
 	'download-en' => '/download/',
 	'download-fr' => '/telechargement/',
+
+	'sector-page-en' => '/learn/?q=sector:{sector}',
+	'sector-page-fr' => '/apprendre/?q=sector:{sector}',
 ];
 
 $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );

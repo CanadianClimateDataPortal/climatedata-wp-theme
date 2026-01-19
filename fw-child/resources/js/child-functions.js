@@ -582,6 +582,16 @@ const $ = jQuery;
     }
 
     //
+    // OTHER INLINE GRID TYPES
+    //
+
+    if ($('.inline-query-grid').length) {
+      $('.inline-query-grid').fw_query({
+        elements: {},
+      });
+    }
+
+    //
     // LEARN
     //
 

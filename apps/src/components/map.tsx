@@ -5,15 +5,12 @@ import 'leaflet.vectorgrid';
 
 // components
 import MapContainer from '@/components/map-container';
-import WarningRSLCCMIP6 from '@/components/warning-rslc-cmip6';
 
 // other
 import { cn } from '@/lib/utils';
 import { useMap } from '@/hooks/use-map';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useMapInteractions } from '@/hooks/use-map-interactions';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setMessageDisplay } from '@/features/map/map-slice';
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
@@ -21,11 +18,6 @@ import { setMessageDisplay } from '@/features/map/map-slice';
 export default function Map(): React.ReactElement {
 	const { setMap, setComparisonMap } = useMap();
 	const { climateVariable } = useClimateVariable();
-	const dispatch = useAppDispatch();
-
-	const messageDisplayStates = useAppSelector(state => state.map.messageDisplayStates);
-	const warningRSLCCMIP6Id = 'warningRSLCCMIP6';
-	const warningRSLCCMIP6Displayed = messageDisplayStates[warningRSLCCMIP6Id] ?? true;
 
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const mapRef = useRef<L.Map | null>(null);
@@ -83,10 +75,6 @@ export default function Map(): React.ReactElement {
 		mapRef.current = null;
 	}, []);
 
-	const handleHideWarning = () => {
-		dispatch(setMessageDisplay({message: warningRSLCCMIP6Id, displayed: false}));
-	}
-
 	return (
 		<div
 			id='wrapper-map'
@@ -97,11 +85,6 @@ export default function Map(): React.ReactElement {
 				showComparisonMap ? 'grid-cols-2' : 'grid-cols-1'
 			)}
 		>
-			<WarningRSLCCMIP6
-				className="absolute top-48 md:top-40 z-20 w-full px-4"
-				displayed={warningRSLCCMIP6Displayed}
-				onHide={handleHideWarning}
-			/>
 			<MapContainer
 				onMapReady={handleMapReady}
 				onUnmount={handleUnmount}

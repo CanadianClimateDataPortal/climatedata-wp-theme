@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { setMessageDisplay, setSelectedStation, setSelectionMode } from '@/features/download/download-slice';
+import { setSelectedStation, setSelectionMode } from '@/features/download/download-slice';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import MapEvents from '@/components/map-layers/map-events';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
@@ -24,7 +24,6 @@ import {
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
 } from '@/lib/constants';
-import WarningRSLCCMIP6 from '@/components/warning-rslc-cmip6';
 import { MAP_CONFIG } from '@/config/map.config';
 
 export default function RasterDownloadMap(): React.ReactElement {
@@ -37,11 +36,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 	const { zoom, center, selectionMode } = useAppSelector(
 		(state) => state.download
 	);
-	const messageDisplayStates = useAppSelector(state => state.download.messageDisplayStates);
 	const dispatch = useAppDispatch();
-
-	const warningRSLCCMIP6Id = 'warningRSLCCMIP6';
-	const warningRSLCCMIP6Displayed = messageDisplayStates[warningRSLCCMIP6Id] ?? true;
 
 	let stationTypeFilters = climateVariable?.getStationTypeFilter() ?? ['T', 'P', 'B'];
 	// Add B if not included to the default enabled filters.
@@ -151,10 +146,6 @@ export default function RasterDownloadMap(): React.ReactElement {
 	const clearSelection = () => {
 		interactiveLayerRef.current?.clearSelection();
 	};
-
-	const handleHideWarning = () => {
-		dispatch(setMessageDisplay({message: warningRSLCCMIP6Id, displayed: false}));
-	}
 
 	const renderInteractiveLayer = useCallback(() => {
 		// For station type maps
@@ -270,12 +261,6 @@ export default function RasterDownloadMap(): React.ReactElement {
 			)}
 
 			<div className="h-[560px] font-sans relative">
-				<WarningRSLCCMIP6
-					className="absolute top-20 z-30 w-full px-4"
-					displayed={warningRSLCCMIP6Displayed}
-					onHide={handleHideWarning}
-				/>
-
 				<MapContainer
 					attributionControl={false}
 					center={center}

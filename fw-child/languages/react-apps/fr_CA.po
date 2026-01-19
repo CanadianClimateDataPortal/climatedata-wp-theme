@@ -1088,23 +1088,6 @@ msgstr "Les observations sont manquantes pendant une période de 5 jours conséc
 msgid "Presence of a single invalid month within an annual or seasonal calculation will result in a no-data (NaN) value in the output."
 msgstr "La présence d'un seul mois non valide dans un calcul annuel ou saisonnier se traduira par une valeur sans données (NaN) dans la sortie."
 
-msgid "Note: Issue with St. Lawrence River CMIP6 Relative Sea Level Change"
-msgstr "Remarque : Problème avec les données relatives aux changements relatifs projetés du niveau de la mer CMIP6 dans le fleuve Saint-Laurent"
-
-msgid "The ClimateData.ca team has been made aware of an error in the CMIP6 Relative Sea Level change data. This error "
-"affects only those data in the St. Lawrence River south of Rimouski. During data processing, the contribution of "
-"ocean dynamics to sea level change was not applied in this area due to its proximity to land. We are working with the "
-"data owners to address this as soon as possible. In the meantime, the CMIP5 projections can be used in this area."
-msgstr "L'équipe de Donneesclimatiques.ca a été informée d'une erreur dans les données relatives aux changements "
-"relatifs projetés du niveau de la mer CMIP6. Cette erreur affecte uniquement les données dans le fleuve Saint-Laurent "
-"au sud de Rimouski. Lors du traitement des données, la contribution de la dynamique océanique au changement du niveau "
-"de la mer n'a pas été prise en compte dans cette zone en raison de sa proximité avec la terre. Nous collaborons avec "
-"les propriétaires des données pour corriger ce problème dans les meilleurs délais. En attendant, les projections "
-"CMIP5 peuvent être utilisées dans cette zone."
-
-msgid "We’re here to help. For further details, please contact <a href=\"/feedback/\">the Climate Services Support Desk</a>."
-msgstr "Nous sommes là pour vous aider. Pour plus de détails, veuillez contacter <a href=\"/retroaction/\">le Centre de soutien des services climatiques</a>."
-
 msgid "Read more"
 msgstr "Lire plus"
 

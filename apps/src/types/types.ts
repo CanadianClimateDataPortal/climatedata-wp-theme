@@ -210,6 +210,10 @@ export interface MapState {
 	variableList: PostData[];
 	variableListLoading: boolean;
 	mapCoordinates: MapCoordinates;
+	/**
+	 * Display state of various messages. The key is the message's name, and
+	 * the value is a boolean indicating if the message is to be displayed.
+	 */
 	messageDisplayStates: {[key: string]: boolean};
 	/**
 	 * True if the "low skill" layer is visible (i.e. true if "mask low skill"

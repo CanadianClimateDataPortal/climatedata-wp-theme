@@ -69,10 +69,6 @@ const initialState: MapState = {
 		lng: Array.isArray(CANADA_CENTER) ? CANADA_CENTER[1] : -98.48144531250001,
 		zoom: DEFAULT_ZOOM
 	},
-	/**
-	 * Display state of various messages. The key is the message's name, and
-	 * the value is a boolean indicating if the message should be displayed.
-	 */
 	messageDisplayStates: {},
 	isLowSkillVisible: true,
 	legend: {

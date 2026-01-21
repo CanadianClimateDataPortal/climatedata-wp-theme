@@ -1012,6 +1012,9 @@ $query-card-hover-padding: 0.75rem;
 
 .query-page,
 .inline-query-grid {
+  .min-width-col {
+    min-width: 300px;
+  }
 
   &.over-white-bg {
     .card {
@@ -1089,7 +1092,7 @@ $query-card-hover-padding: 0.75rem;
   }
 }
 
-.inline-query-grid {
+.s2d-resources-grid {
   .min-width-col {
     min-width: 300px;
   }

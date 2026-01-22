@@ -29,8 +29,8 @@ $module_args = array(
             'terms'    => $S2D_TOPIC_SLUG,
         ),
     ),
-    'orderby'        => 'menu_order',
-    'order'          => 'ASC',
+    'orderby'        => 'date',
+    'order'          => 'DESC',
 );
 
 ?>

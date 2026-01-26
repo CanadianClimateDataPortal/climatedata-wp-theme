@@ -36,10 +36,6 @@ variables:
       INSTANCE_USER: $INSTANCE_USER_PREPROD
       INSTANCE_IP: $INSTANCE_IP_PREPROD
 
-  - if: $CI_COMMIT_TAG =~ /v[0-9]+\.[0-9]+\.[0-9]+/ && $CI_JOB_STAGE == "tag"
-    variables:
-      DEPLOYMENT_TAG: $CI_COMMIT_TAG
-
 .log-macros: &log-macros
   # The `log_section_start` and `log_section_end` functions are to create
   # collapsible sections in the GitLab CI/CD job log.

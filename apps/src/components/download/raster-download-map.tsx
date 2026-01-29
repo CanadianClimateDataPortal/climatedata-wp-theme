@@ -1,5 +1,9 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { setSelectedStation, setSelectionMode } from '@/features/download/download-slice';
+import {
+	setMessageDisplay,
+	setSelectedStation,
+	setSelectionMode,
+} from '@/features/download/download-slice';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import MapEvents from '@/components/map-layers/map-events';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
@@ -24,6 +28,7 @@ import {
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
 } from '@/lib/constants';
+import NoticeRSLCCMIP6 from '@/components/notice-rslc-cmip6';
 import { MAP_CONFIG } from '@/config/map.config';
 
 export default function RasterDownloadMap(): React.ReactElement {
@@ -36,7 +41,11 @@ export default function RasterDownloadMap(): React.ReactElement {
 	const { zoom, center, selectionMode } = useAppSelector(
 		(state) => state.download
 	);
+	const messageDisplayStates = useAppSelector(state => state.download.messageDisplayStates);
 	const dispatch = useAppDispatch();
+
+	const noticeRSLCCMIP6Id = 'noticeRSLCCMIP6';
+	const noticeRSLCCMIP6Displayed = messageDisplayStates[noticeRSLCCMIP6Id] ?? true;
 
 	let stationTypeFilters = climateVariable?.getStationTypeFilter() ?? ['T', 'P', 'B'];
 	// Add B if not included to the default enabled filters.
@@ -146,6 +155,10 @@ export default function RasterDownloadMap(): React.ReactElement {
 	const clearSelection = () => {
 		interactiveLayerRef.current?.clearSelection();
 	};
+
+	const handleHideRSLCCMIP6Notice = () => {
+		dispatch(setMessageDisplay({message: noticeRSLCCMIP6Id, displayed: false}));
+	}
 
 	const renderInteractiveLayer = useCallback(() => {
 		// For station type maps
@@ -261,6 +274,12 @@ export default function RasterDownloadMap(): React.ReactElement {
 			)}
 
 			<div className="h-[560px] font-sans relative">
+				<NoticeRSLCCMIP6
+					className="absolute top-20 z-30 w-full px-4"
+					displayed={noticeRSLCCMIP6Displayed}
+					onHide={handleHideRSLCCMIP6Notice}
+				/>
+
 				<MapContainer
 					attributionControl={false}
 					center={center}

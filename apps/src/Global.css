@@ -66,10 +66,30 @@
 		--grey-dark: 210 11.1% 13.1%;
 		--neutral-grey-medium: 0 0% 46.27%;
 		--neutral-grey-light: 0 0% 97.8%;
+
+		/**
+		 * Colors for status indicators
+		 */
+
+		--info: 190, 90%, 20%;
+		--info-foreground: 190, 90%, 20%;
+		--info-background: 204, 100%, 98%;
+		--info-border: 190, 46%, 74%;
+
+		--success: 152, 69%, 19%;
+		--success-foreground: 152, 69%, 19%;
+		--success-background: 154, 100%, 97%;
+		--success-border: 153, 31%, 79%;
+
 		--warning: 45, 96%, 21%;
 		--warning-foreground: 45, 96%, 21%;
 		--warning-background: 46, 100%, 90%;
 		--warning-border: 45, 100%, 86%;
+
+		--error: 355, 61%, 32%;
+		--error-foreground: 355, 61%, 32%;
+		--error-background: 354, 72%, 94%;
+		--error-border: 354, 72%, 86%;
 	}
 
 	.dark {

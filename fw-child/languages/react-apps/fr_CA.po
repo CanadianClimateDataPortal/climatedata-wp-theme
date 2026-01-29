@@ -1088,6 +1088,19 @@ msgstr "Les observations sont manquantes pendant une période de 5 jours conséc
 msgid "Presence of a single invalid month within an annual or seasonal calculation will result in a no-data (NaN) value in the output."
 msgstr "La présence d'un seul mois non valide dans un calcul annuel ou saisonnier se traduira par une valeur sans données (NaN) dans la sortie."
 
+msgid "Issue addressed: St. Lawrence River in CMIP6 Relative Sea Level Change"
+msgstr "Problème résolu : les données du changement du niveau de la mer CMIP6 dans le fleuve Saint-Laurent"
+
+msgid  "The ClimateData.ca team has addressed the error in the St. Lawrence River in the CMIP6 Relative Sea Level "
+       "change data. Users should note that re-running the data resulted in changes on the order of millimeters in "
+       "other parts of the dataset."
+msgstr "L'équipe de DonneesClimatiques.ca a corrigé l'erreur de la région du fleuve Saint-Laurent dans la version "
+       "CMIP6 des données du changement du niveau de la mer. À noter que la nouvelle analyse des données a entraîné "
+       "des modifications de l'ordre du millimètre dans d'autres parties du jeu de données."
+
+msgid  "We’re here to help. For further details, please contact <a href=\"/feedback/\">the Climate Services Support Desk</a>."
+msgstr "Nous sommes là pour vous aider. Pour plus de détails, veuillez contacter <a href=\"/retroaction/\">le Centre de soutien des services climatiques</a>."
+
 msgid "Read more"
 msgstr "Lire plus"
 

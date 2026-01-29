@@ -95,7 +95,7 @@ function release-minor {
   fi
 
   echo "-> Retrieving the last used version tag..."
-  latest_version_tag=$(git ls-remote --tags origin "v*" | cut -f2 | cut -d'/' -f3 | sort -r | head -n 1)
+  latest_version_tag=$(git ls-remote --tags origin "v*" | cut -f2 | cut -d'/' -f3 | sort -Vr | head -n 1)
 
   if [[ ! ("$latest_version_tag" =~ ^v([0-9]+)\.([0-9]+)\.[0-9]+$) ]]; then
     echo "ERROR: Was expecting latest version tag to be vX.Y.Z, instead received: '$latest_version_tag'"

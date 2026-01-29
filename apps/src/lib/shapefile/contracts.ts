@@ -1,47 +1,14 @@
 /**
- * TypeScript contracts for shapefile processing pipeline.
+ * Data shape interfaces for the shapefile processing pipeline.
  *
- * This file defines the type architecture for the entire shapefile
- * upload and processing workflow, from file extraction through validation,
- * transformation, and selection.
+ * This file defines what data looks like at each stage:
+ * Extract → Validate → Transform → Display → Select → Validate Area → Finch
  *
- * ARCHITECTURE OVERVIEW:
- * ======================
- *
- * The shapefile processing follows a strict pipeline with typed stages:
- *
- * 1. Extraction Layer (✅ Implemented in file-loader.ts)
- *    File → ExtractedShapefile
- *
- * 2. Validation Layer (⏳ To implement in CLIM-1267)
- *    ExtractedShapefile → ValidatedShapefile
- *
- * 3. Transformation Layer (⏳ To implement)
- *    ValidatedShapefile → SimplifiedTopoJSON
- *
- * 4. Display Layer (⏳ To implement in CLIM-1268)
- *    SimplifiedTopoJSON → DisplayableShapes
- *
- * 5. Selection Layer (⏳ To implement in CLIM-1269)
- *    DisplayableShapes → SelectedRegion
- *
- * 6. Area Validation Layer (⏳ To implement in CLIM-1270)
- *    SelectedRegion → ValidatedRegion
- *
- * 7. Finch Integration Layer (⏳ To implement in CLIM-1274)
- *    ValidatedRegion → FinchShapeParameter
- *
- * Each stage uses Result types (success/failure) for explicit error handling.
+ * For pipeline function signatures, see ./pipeline.ts
+ * For Result types, see ./result.ts
  */
 
 import type { Feature, Polygon } from 'geojson';
-import type {
-  InvalidGeometryTypeError,
-  AreaExceedsLimitError,
-  AreaBelowLimitError,
-  ProcessingError,
-  ProjectionError,
-} from './errors';
 
 // ============================================================================
 // LAYER 1: EXTRACTION (Implemented in file-loader.ts)
@@ -55,17 +22,6 @@ import type {
  * - .prj: Projection definition (string)
  *
  * Other files such as .dbf and .shx are ignored to minimize data exposure.
- *
- * @example Extracting from ZIP
- * ```typescript
- * const file = fileInput.files[0]; // User-selected ZIP file
- * const result = await extractShapefileFromZip(file);
- * if (result.ok) {
- *   const shapefile: ExtractedShapefile = result.value;
- *   console.log('SHP size:', shapefile['file.shp'].byteLength);
- *   console.log('Projection:', shapefile['file.prj']);
- * }
- * ```
  *
  * @see file-loader.ts - Implementation
  */
@@ -112,26 +68,9 @@ export interface ShapefileInfo {
 /**
  * Branded type proving shapefile has passed geometry validation.
  *
- * This is a "phantom type" that enforces validation at compile time. It's
- * identical to ExtractedShapefile at runtime, but TypeScript treats it as a
- * distinct type, preventing unvalidated shapefiles from being used in functions
- * that require validated input.
- *
- * The validation confirms the shapefile contains only polygon geometries, as
- * required by the ClimateData upload feature (points and lines are rejected).
- *
- * @example Type Safety Enforcement
- * ```typescript
- * // ❌ Cannot use ExtractedShapefile directly
- * function transform(shapefile: ValidatedShapefile) { ... }
- * transform(extractedData); // Type error!
- *
- * // ✅ Must validate first
- * const validated = await validateShapefileGeometry(extractedData);
- * if (validated.ok) {
- *   transform(validated.value); // Works!
- * }
- * ```
+ * Phantom type that enforces validation at compile time. Identical to
+ * ExtractedShapefile at runtime, but TypeScript treats it as distinct,
+ * preventing unvalidated shapefiles from reaching transformation stage.
  */
 export type ValidatedShapefile = ExtractedShapefile & {
   readonly __validated: unique symbol;
@@ -214,19 +153,6 @@ export interface ProjectionConfig {
  * Represents a single polygon from the shapefile, converted from TopoJSON to
  * GeoJSON format for rendering with Leaflet. Each shape includes its computed
  * area for validation against size constraints.
- *
- * @example Creating DisplayableShape
- * ```typescript
- * const shape: DisplayableShape = {
- *   id: nanoid(),
- *   feature: {
- *     type: 'Feature',
- *     geometry: { type: 'Polygon', coordinates: [...] },
- *     properties: {}
- *   },
- *   areaKm2: turf.area(feature) / 1_000_000 // Convert m² to km²
- * };
- * ```
  */
 export interface DisplayableShape {
   /** Unique identifier for this shape */
@@ -256,21 +182,9 @@ export interface DisplayableShapes {
 /**
  * User-selected region from shapefile.
  *
- * One polygon selected by clicking on the map.
- *
- * Only one region can be selected at a time, and it must pass area
- * validation (between 100 km² and 500,000 km²) before being used for climate
- * data downloads.
- *
- * @example Storing Selected Region
- * ```typescript
- * const selected: SelectedRegion = {
- *   id: displayableShape.id,
- *   feature: displayableShape.feature,
- *   areaKm2: displayableShape.areaKm2,
- *   areaFormatted: `${displayableShape.areaKm2.toLocaleString()} km²`
- * };
- * ```
+ * One polygon selected by clicking on the map. Must pass area
+ * validation (between 100 km² and 500,000 km²) before being used
+ * for climate data downloads.
  */
 export interface SelectedRegion {
   /** Unique identifier (from DisplayableShape.id) */
@@ -354,184 +268,6 @@ export interface FinchShapefileQuery {
   /** Other query params (dataset, variable, etc.) */
   [key: string]: string | number | boolean;
 }
-
-
-// ============================================================================
-// RESULT TYPES (Discriminated Unions)
-// ============================================================================
-
-/**
- * Success result wrapper.
- */
-export interface Ok<T> {
-  ok: true;
-  value: T;
-}
-
-/**
- * Failure result wrapper.
- */
-export interface Err<E extends Error> {
-  ok: false;
-  error: E;
-}
-
-/**
- * Result type for operations that can fail.
- *
- * Explicit error handling without try-catch.
- *
- * A discriminated union that forces explicit error handling without relying on
- * try-catch blocks. The `ok` property acts as a type guard, allowing TypeScript
- * to narrow the type to either the success value or the error.
- *
- * This pattern is used throughout the shapefile processing pipeline to make
- * error handling explicit and type-safe at compile time.
- *
- * @example Checking Result Success
- * ```typescript
- * const result = await validateShapefile(data);
- * if (result.ok) {
- *   // TypeScript knows result.value exists
- *   console.log('Valid:', result.value);
- * } else {
- *   // TypeScript knows result.error exists
- *   console.error('Error:', result.error.message);
- * }
- * ```
- */
-export type Result<T, E extends Error = Error> = Ok<T> | Err<E>;
-
-// ============================================================================
-// PIPELINE FUNCTION SIGNATURES
-// ============================================================================
-
-/**
- * Stage 1: Extract shapefile from ZIP (✅ Implemented in file-loader.ts).
- */
-export type ExtractShapefileFromZip = (
-  file: File,
-) => Promise<Result<ExtractedShapefile, Error>>;
-
-/**
- * Stage 2: Validate shapefile geometry type.
- *
- * Validates that the shapefile contains only polygon geometries. Points,
- * polylines, and other geometry types are rejected as they cannot be used
- * for defining climate data download regions.
- *
- * @param shapefile - The extracted shapefile data to validate.
- * @returns A Result containing the validated shapefile on success, or an error
- *     indicating invalid geometry type or processing failure.
- *
- * @example Validating Geometry
- * ```typescript
- * const extracted = await extractShapefileFromZip(file);
- * if (extracted.ok) {
- *   const validated = await validateShapefileGeometry(extracted.value);
- *   if (!validated.ok) {
- *     if (validated.error instanceof InvalidGeometryTypeError) {
- *       console.error(`Wrong type: ${validated.error.geometryType}`);
- *     }
- *   }
- * }
- * ```
- */
-export type ValidateShapefileGeometry = (
-  shapefile: ExtractedShapefile,
-) => Promise<Result<ValidatedShapefile, InvalidGeometryTypeError | ProcessingError>>;
-
-/**
- * Stage 3: Transform and simplify to TopoJSON.
- *
- * Projects the shapefile to WGS84 coordinate system, cleans the geometry
- * (fixes topology errors, snaps coordinates), and converts to TopoJSON format
- * for efficient storage and transmission.
- *
- * @param shapefile - The validated shapefile to transform.
- * @param config - Projection configuration (target system and precision).
- * @returns A Result containing the simplified TopoJSON topology on success,
- *     or an error indicating processing or projection failure.
- *
- * @example Transforming to TopoJSON
- * ```typescript
- * const config: ProjectionConfig = {
- *   target: 'wgs84',
- *   snapPrecision: 0.001
- * };
- * const result = await transformToTopoJSON(validated, config);
- * if (result.ok) {
- *   console.log(`Simplified from ${result.value.originalFeatureCount} to ${result.value.simplifiedFeatureCount} features`);
- * }
- * ```
- */
-export type TransformToTopoJSON = (
-  shapefile: ValidatedShapefile,
-  config: ProjectionConfig,
-) => Promise<Result<SimplifiedTopoJSON, ProcessingError | ProjectionError>>;
-
-/**
- * Stage 4: Convert TopoJSON to displayable shapes.
- */
-export type ConvertToDisplayableShapes = (
-  topoJSON: SimplifiedTopoJSON,
-) => Result<DisplayableShapes, ProcessingError>;
-
-/**
- * Stage 5: Validate selected region area.
- *
- * Validates that the selected region's area falls within the allowed range
- * (default: 100 km² to 500,000 km²). Regions that are too small may not
- * contain meaningful climate data, while regions that are too large may
- * exceed processing limits.
- *
- * @param region - The selected region to validate.
- * @param constraints - Area limits to enforce (min and max in km²).
- * @returns A Result containing the validated region on success, or an error
- *     indicating the area is too large or too small.
- *
- * @example Validating Selection
- * ```typescript
- * const constraints: AreaConstraints = { minKm2: 100, maxKm2: 500_000 };
- * const result = validateSelectedArea(selected, constraints);
- * if (!result.ok) {
- *   if (result.error instanceof AreaExceedsLimitError) {
- *     showError('Region too large. Please select a smaller area.');
- *   } else if (result.error instanceof AreaBelowLimitError) {
- *     showError('Region too small. Please select a larger area.');
- *   }
- * }
- * ```
- */
-export type ValidateSelectedArea = (
-  region: SelectedRegion,
-  constraints: AreaConstraints,
-) => Result<ValidatedRegion, AreaExceedsLimitError | AreaBelowLimitError>;
-
-/**
- * Stage 6: Prepare Finch API payload.
- *
- * Converts the validated region into a GeoJSON FeatureCollection suitable for
- * the Finch API's shape parameter. Coordinates are rounded to 2 decimal places
- * as required by the API specification.
- *
- * @param region - The validated region to convert.
- * @returns A FinchShapeParameter ready to be serialized and sent to the API.
- *
- * @example Preparing for API Request
- * ```typescript
- * const payload = prepareFinchPayload(validatedRegion);
- * const query = {
- *   shape: JSON.stringify(payload),
- *   dataset: 'statistically_downscaled',
- *   variable: 'days_above_tmax'
- * };
- * // Send to Finch API...
- * ```
- */
-export type PrepareFinchPayload = (
-  region: ValidatedRegion,
-) => FinchShapeParameter;
 
 // ============================================================================
 // CONSTANTS

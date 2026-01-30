@@ -1,4 +1,7 @@
 /**
+ * Experiments made before working on CLIM-1324.
+ * THIS FILE WILL BE GROSSLY SIMPLIFIED BEFORE MERGING.
+ *
  * Tests for shapefile file loading and extraction.
  *
  * These tests verify our extraction logic and error handling,

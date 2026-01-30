@@ -1,4 +1,7 @@
 /**
+ * Experiments made before working on CLIM-1324.
+ * THIS FILE WILL BE GROSSLY SIMPLIFIED BEFORE MERGING.
+ *
  * Tests for file introspection validation logic.
  *
  * Focus: Test our validation decisions (isZip, isEmpty) based on byte content.

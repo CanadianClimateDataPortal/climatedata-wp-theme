@@ -1,4 +1,7 @@
 /**
+ * Experiments made before working on CLIM-1324.
+ * THIS FILE WILL BE GROSSLY SIMPLIFIED BEFORE MERGING.
+ *
  * Shapefile file loading and extraction utilities.
  *
  * Extracts .shp (binary geometry) and .prj (projection) files from ZIP archives.

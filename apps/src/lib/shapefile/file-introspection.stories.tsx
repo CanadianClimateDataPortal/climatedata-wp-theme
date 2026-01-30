@@ -1,4 +1,7 @@
 /**
+ * Experiments made before working on CLIM-1324.
+ * THIS FILE WILL BE GROSSLY SIMPLIFIED BEFORE MERGING.
+ *
  * Ladle stories for shapefile file upload - exploring native File API capabilities.
  */
 

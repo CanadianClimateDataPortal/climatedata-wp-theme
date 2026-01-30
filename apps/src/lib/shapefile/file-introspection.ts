@@ -1,4 +1,7 @@
 /**
+ * Experiments made before working on CLIM-1324.
+ * THIS FILE WILL BE GROSSLY SIMPLIFIED BEFORE MERGING.
+ *
  * Native file introspection utilities.
  *
  * Validates file type and basic properties using only native File API.

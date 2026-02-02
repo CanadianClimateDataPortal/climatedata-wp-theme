@@ -8,9 +8,9 @@
  * - Living documentation of data shapes at each stage
  * - Source for classdiagram-ts extension visualization
  *
- * @see ./contracts.ts — Data shape interfaces
- * @see ./pipeline.ts — Function type signatures
- * @see ./result.ts — Result<T, E>
+ * @see {@link ./contracts.ts} — Data shape interfaces
+ * @see {@link ./pipeline.ts} — Function type signatures
+ * @see {@link ./result.ts} — Result<T, E>
  */
 
 import type {

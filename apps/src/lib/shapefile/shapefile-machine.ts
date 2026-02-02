@@ -5,10 +5,10 @@
  * All pipeline functions (async and sync) are injected via machine input,
  * keeping this file free of side effects and fully testable.
  *
- * @see ./contracts.ts — data shapes
- * @see ./pipeline.ts — function type signatures
- * @see ./errors.ts — error types
- * @see ./result.ts — Result<T, E>
+ * @see {@link ./contracts.ts} — data shapes
+ * @see {@link ./pipeline.ts} — function type signatures
+ * @see {@link ./errors.ts} — error types
+ * @see {@link ./result.ts} — Result<T, E>
  */
 
 import { assign, fromPromise, setup } from 'xstate';

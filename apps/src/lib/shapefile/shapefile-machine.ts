@@ -13,7 +13,7 @@
 
 import { assign, fromPromise, setup } from 'xstate';
 
-import type { Result } from './result';
+import type { Result } from '@/lib/shapefile/result';
 import type {
 	AreaConstraints,
 	AreaValidationResult,
@@ -24,8 +24,8 @@ import type {
 	SimplifiedTopoJSON,
 	ValidatedRegion,
 	ValidatedShapefile,
-} from './contracts';
-import { DEFAULT_AREA_CONSTRAINTS } from './contracts';
+} from '@/lib/shapefile/contracts';
+import { DEFAULT_AREA_CONSTRAINTS } from '@/lib/shapefile/contracts';
 import type {
 	ConvertToDisplayableShapes,
 	ExtractShapefileFromZip,
@@ -33,12 +33,12 @@ import type {
 	TransformToTopoJSON,
 	ValidateSelectedArea,
 	ValidateShapefileGeometry,
-} from './pipeline';
+} from '@/lib/shapefile/pipeline';
 import type {
 	ProcessingError,
 	ProjectionError,
 	InvalidGeometryTypeError,
-} from './errors';
+} from '@/lib/shapefile/errors';
 
 // ============================================================================
 // SERVICES (injected pipeline functions)

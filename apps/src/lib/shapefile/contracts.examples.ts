@@ -25,8 +25,8 @@ import type {
 	SimplifiedTopoJSON,
 	ValidatedRegion,
 	ValidatedShapefile,
-} from './contracts';
-import { DEFAULT_AREA_CONSTRAINTS } from './contracts';
+} from '@/lib/shapefile/contracts';
+import { DEFAULT_AREA_CONSTRAINTS } from '@/lib/shapefile/contracts';
 
 // ============================================================================
 // LAYER 1: EXTRACTION

@@ -11,8 +11,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createActor, waitFor } from 'xstate';
 
-import type { PipelineServices } from './shapefile-machine';
-import { shapefileMachine } from './shapefile-machine';
+import type { PipelineServices } from '@/lib/shapefile/shapefile-machine';
+import { shapefileMachine } from '@/lib/shapefile/shapefile-machine';
 import type {
 	DisplayableShapes,
 	ExtractedShapefile,
@@ -21,7 +21,7 @@ import type {
 	SimplifiedTopoJSON,
 	ValidatedRegion,
 	ValidatedShapefile,
-} from './contracts';
+} from '@/lib/shapefile/contracts';
 
 // ============================================================================
 // FIXTURES

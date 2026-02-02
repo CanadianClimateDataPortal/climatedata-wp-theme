@@ -8,7 +8,7 @@
  * used as invoked services on the machine.
  */
 
-import type { Result } from './result';
+import type { Result } from '@/lib/shapefile/result';
 import type {
   ExtractedShapefile,
   ValidatedShapefile,
@@ -19,14 +19,14 @@ import type {
   AreaConstraints,
   ValidatedRegion,
   FinchShapeParameter,
-} from './contracts';
+} from '@/lib/shapefile/contracts';
 import type {
   InvalidGeometryTypeError,
   AreaExceedsLimitError,
   AreaBelowLimitError,
   ProcessingError,
   ProjectionError,
-} from './errors';
+} from '@/lib/shapefile/errors';
 
 /**
  * Stage 1: Extract shapefile from ZIP (✅ Implemented in file-loader.ts).

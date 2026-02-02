@@ -14,33 +14,10 @@ import JSZip from 'jszip';
 import {
   loadShapeFile,
   ShapefileLoadError,
-} from './file-loader';
+} from '@/lib/shapefile/file-loader';
+import { createMockFile } from '@/lib/shapefile/test-utils';
 
 /**
- * Create a mock File with controlled arrayBuffer() response.
- *
- * This allows us to test our JSZip integration and validation
- * logic without relying on browser File API implementation.
- */
-const createMockFile = (
-  name: string,
-  content: ArrayBuffer | string,
-  type = 'application/zip',
-): File => {
-  const buffer =
-    typeof content === 'string'
-      ? new TextEncoder().encode(content).buffer
-      : content;
-
-  const file = {
-    name,
-    size: buffer.byteLength,
-    type,
-    arrayBuffer: async (): Promise<ArrayBuffer> => buffer,
-  } as File;
-
-  return file;
-};/**
  * Create a valid ZIP file containing .shp and .prj files
  */
 const createValidShapefileZip = async (): Promise<File> => {

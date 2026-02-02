@@ -1,5 +1,5 @@
-import { AbstractError } from '../errors';
-import type { GeometryType } from './contracts';
+import { AbstractError } from '@/lib/errors';
+import type { GeometryType } from '@/lib/shapefile/contracts';
 
 
 // ============================================================================

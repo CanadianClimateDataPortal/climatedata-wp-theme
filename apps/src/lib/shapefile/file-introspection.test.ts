@@ -12,33 +12,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { introspectFile } from './file-introspection';
-
-/**
- * Mock File with controlled byte content.
- *
- * Provides only what our code needs: arrayBuffer() returning specific bytes.
- * This isolates our validation logic from platform File API implementation.
- */
-const createMockFile = (
-  name: string,
-  content: Uint8Array | string,
-  type = 'application/octet-stream',
-): File => {
-  const buffer =
-    typeof content === 'string'
-      ? new TextEncoder().encode(content).buffer
-      : content.buffer;
-
-  const file = {
-    name,
-    size: buffer.byteLength,
-    type,
-    arrayBuffer: async (): Promise<ArrayBuffer> => buffer,
-  } as File;
-
-  return file;
-};
+import { introspectFile } from '@/lib/shapefile/file-introspection';
+import { createMockFile } from '@/lib/shapefile/test-utils';
 
 describe('introspectFile', () => {
   describe('validation logic - ZIP detection', () => {

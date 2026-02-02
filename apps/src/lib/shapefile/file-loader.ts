@@ -63,15 +63,15 @@ const assertIsZipFile = (
  * @param data - Extracted shapefile data
  * @throws {ShapefileLoadError} If required files are missing
  */
-const assertHasRequiredFiles = (
+function assertHasRequiredFiles(
   data: Partial<ShapefileData>,
-): asserts data is ShapefileData => {
+): asserts data is ShapefileData {
   if (!data['file.shp'] || !data['file.prj']) {
     throw new ShapefileLoadError(
       'ZIP file must contain both .shp and .prj files',
     );
   }
-};
+}
 
 /**
  * Load and extract shapefile data from a ZIP file.

@@ -10,6 +10,37 @@
 
 import type { Feature, Polygon } from 'geojson';
 
+/**
+ * Area validation result type.
+ */
+export const VALUES_AREA_VALIDATION_STATUSES = [
+	'too-large',
+	'too-small',
+	'valid',
+] as const;
+
+/**
+ * Geometry types supported by shapefiles.
+ *
+ * Only 'Polygon' is valid for ClimateData uploads.
+ * Other types (Point, Polyline) are rejected.
+ */
+export const VALUES_SUPPORTED_GEOMETRY_TYPES = [
+	'MultiPatch',
+	'MultiPoint',
+	'Point',
+	'Polygon',
+	'Polyline',
+] as const;
+
+/**
+ * Result of area validation.
+ */
+export const VALUES_AREA_VALIDATION_RESULT_ERRORS = [
+	'area-too-large',
+	'area-too-small',
+] as const;
+
 // ============================================================================
 // LAYER 1: EXTRACTION (Implemented in file-loader.ts)
 // ============================================================================
@@ -23,13 +54,13 @@ import type { Feature, Polygon } from 'geojson';
  *
  * Other files such as .dbf and .shx are ignored to minimize data exposure.
  *
- * @see file-loader.ts - Implementation
+ * @see {@link ./file-loader.ts} for implementation
  */
 export interface ExtractedShapefile {
-  /** Binary shapefile geometry data */
-  'file.shp': ArrayBuffer;
-  /** Projection definition string (e.g., WGS84) */
-  'file.prj': string;
+	/** Binary shapefile geometry data */
+	'file.shp': ArrayBuffer;
+	/** Projection definition string (e.g., WGS84) */
+	'file.prj': string;
 }
 
 // ============================================================================
@@ -39,15 +70,9 @@ export interface ExtractedShapefile {
 /**
  * Geometry types supported by shapefiles.
  *
- * Only 'Polygon' is valid for ClimateData uploads.
- * Other types (Point, Polyline) are rejected.
+ * @see {@link VALUES_SUPPORTED_GEOMETRY_TYPES}
  */
-export type GeometryType =
-  | 'Point'
-  | 'Polyline'
-  | 'Polygon'
-  | 'MultiPoint'
-  | 'MultiPatch';
+export type GeometryType = (typeof VALUES_SUPPORTED_GEOMETRY_TYPES)[number];
 
 /**
  * Shapefile metadata from validation inspection.
@@ -55,14 +80,14 @@ export type GeometryType =
  * Extracted via Mapshaper's `-info` command or equivalent.
  */
 export interface ShapefileInfo {
-  /** Geometry type (must be 'Polygon') */
-  geometry_type: GeometryType;
-  /** Number of features in shapefile */
-  feature_count: number;
-  /** Bounding box [minX, minY, maxX, maxY] */
-  bbox?: [number, number, number, number];
-  /** Source projection system */
-  projection?: string;
+	/** Geometry type (must be 'Polygon') */
+	geometry_type: GeometryType;
+	/** Number of features in shapefile */
+	feature_count: number;
+	/** Bounding box [minX, minY, maxX, maxY] */
+	bbox?: [number, number, number, number];
+	/** Source projection system */
+	projection?: string;
 }
 
 /**
@@ -73,12 +98,17 @@ export interface ShapefileInfo {
  * preventing unvalidated shapefiles from reaching transformation stage.
  */
 export type ValidatedShapefile = ExtractedShapefile & {
-  readonly __validated: unique symbol;
+	readonly __validated: unique symbol;
 };
 
 // ============================================================================
 // LAYER 3: TRANSFORMATION
 // ============================================================================
+
+export interface TopoJSONTopologyTransform {
+	scale: [number, number];
+	translate: [number, number];
+}
 
 /**
  * TopoJSON Topology object.
@@ -89,29 +119,26 @@ export type ValidatedShapefile = ExtractedShapefile & {
  * Reference: https://github.com/topojson/topojson-specification
  */
 export interface TopoJSONTopology {
-  type: 'Topology';
-  /** Named geometry objects */
-  objects: Record<string, TopoJSONGeometry>;
-  /** Quantized arcs (shared boundaries) */
-  arcs: number[][][];
-  /** Optional transformation for quantization */
-  transform?: {
-    scale: [number, number];
-    translate: [number, number];
-  };
-  /** Bounding box [minX, minY, maxX, maxY] */
-  bbox?: [number, number, number, number];
+	type: 'Topology';
+	/** Named geometry objects */
+	objects: Record<string, TopoJSONGeometry>;
+	/** Quantized arcs (shared boundaries) */
+	arcs: number[][][];
+	/** Optional transformation for quantization */
+	transform?: TopoJSONTopologyTransform;
+	/** Bounding box [minX, minY, maxX, maxY] */
+	bbox?: [number, number, number, number];
 }
 
 /**
  * TopoJSON geometry object.
  */
 export interface TopoJSONGeometry {
-  type: string;
-  /** Arc indices */
-  arcs: number[][] | number[][][];
-  /** Optional properties */
-  properties?: Record<string, unknown>;
+	type: string;
+	/** Arc indices */
+	arcs: number[][] | number[][][];
+	/** Optional properties */
+	properties?: Record<string, unknown>;
 }
 
 /**
@@ -125,22 +152,22 @@ export interface TopoJSONGeometry {
  * - `-o output.topojson`: Convert to TopoJSON
  */
 export interface SimplifiedTopoJSON {
-  /** TopoJSON topology */
-  topology: TopoJSONTopology;
-  /** Original feature count before simplification */
-  originalFeatureCount: number;
-  /** Feature count after simplification */
-  simplifiedFeatureCount: number;
+	/** TopoJSON topology */
+	topology: TopoJSONTopology;
+	/** Original feature count before simplification */
+	originalFeatureCount: number;
+	/** Feature count after simplification */
+	simplifiedFeatureCount: number;
 }
 
 /**
  * Projection configuration.
  */
 export interface ProjectionConfig {
-  /** Target coordinate system (always 'wgs84' for ClimateData) */
-  target: 'wgs84';
-  /** Precision for coordinate snapping */
-  snapPrecision: number;
+	/** Target coordinate system (always 'wgs84' for ClimateData) */
+	target: 'wgs84';
+	/** Precision for coordinate snapping */
+	snapPrecision: number;
 }
 
 // ============================================================================
@@ -155,24 +182,24 @@ export interface ProjectionConfig {
  * area for validation against size constraints.
  */
 export interface DisplayableShape {
-  /** Unique identifier for this shape */
-  id: string;
-  /** GeoJSON Feature with Polygon geometry */
-  feature: Feature<Polygon>;
-  /** Area in square kilometers (computed via Turf.js) */
-  areaKm2: number;
+	/** Unique identifier for this shape */
+	id: string;
+	/** GeoJSON Feature with Polygon geometry */
+	feature: Feature<Polygon>;
+	/** Area in square kilometers (computed via Turf.js) */
+	areaKm2: number;
 }
 
 /**
  * Collection of shapes ready for map display.
  */
 export interface DisplayableShapes {
-  /** Array of individual polygons */
-  shapes: DisplayableShape[];
-  /** Bounding box for map zoom [minLng, minLat, maxLng, maxLat] */
-  bounds: [number, number, number, number];
-  /** Total number of polygons */
-  totalCount: number;
+	/** Array of individual polygons */
+	shapes: DisplayableShape[];
+	/** Bounding box for map zoom [minLng, minLat, maxLng, maxLat] */
+	bounds: [number, number, number, number];
+	/** Total number of polygons */
+	totalCount: number;
 }
 
 // ============================================================================
@@ -187,14 +214,14 @@ export interface DisplayableShapes {
  * for climate data downloads.
  */
 export interface SelectedRegion {
-  /** Unique identifier (from DisplayableShape.id) */
-  id: string;
-  /** GeoJSON Feature of selected polygon */
-  feature: Feature<Polygon>;
-  /** Area in square kilometers */
-  areaKm2: number;
-  /** Human-readable area string (e.g., "1,234.5 km²") */
-  areaFormatted: string;
+	/** Unique identifier (from DisplayableShape.id) */
+	id: string;
+	/** GeoJSON Feature of selected polygon */
+	feature: Feature<Polygon>;
+	/** Area in square kilometers */
+	areaKm2: number;
+	/** Human-readable area string (e.g., "1,234.5 km²") */
+	areaFormatted: string;
 }
 
 // ============================================================================
@@ -207,29 +234,38 @@ export interface SelectedRegion {
  * From requirements U13, U14.
  */
 export interface AreaConstraints {
-  /** Minimum area in km² (default: 100) */
-  minKm2: number;
-  /** Maximum area in km² (default: 500,000) */
-  maxKm2: number;
+	/**
+	 * Minimum area in km²
+	 * (default: 100)
+	 * @see {@link DEFAULT_AREA_CONSTRAINTS}
+	 */
+	minKm2: number;
+	/**
+	 * Maximum area in km²
+	 * (default: 500,000)
+	 * @see {@link DEFAULT_AREA_CONSTRAINTS}
+	 */
+	maxKm2: number;
 }
 
 /**
- * Area validation result type.
+ * @see {@link VALUES_AREA_VALIDATION_STATUSES}
  */
-export type AreaValidationStatus = 'valid' | 'too-small' | 'too-large';
+export type AreaValidationStatus =
+	(typeof VALUES_AREA_VALIDATION_STATUSES)[number];
 
 /**
  * Result of area validation.
  */
 export interface AreaValidationResult {
-  /** Validation outcome */
-  status: AreaValidationStatus;
-  /** Selected region area in km² */
-  areaKm2: number;
-  /** Applied constraints */
-  constraints: AreaConstraints;
-  /** Error message key (for i18n) if invalid */
-  errorMessageKey?: 'area-too-small' | 'area-too-large';
+	/** Validation outcome */
+	status: AreaValidationStatus;
+	/** Selected region area in km² */
+	areaKm2: number;
+	/** Applied constraints */
+	constraints: AreaConstraints;
+	/** Error message key (for i18n) if invalid */
+	errorMessageKey?: (typeof VALUES_AREA_VALIDATION_RESULT_ERRORS)[number];
 }
 
 /**
@@ -239,7 +275,7 @@ export interface AreaValidationResult {
  * validation must occur before using the region.
  */
 export type ValidatedRegion = SelectedRegion & {
-  readonly __areaValidated: unique symbol;
+	readonly __areaValidated: unique symbol;
 };
 
 // ============================================================================
@@ -255,18 +291,18 @@ export type ValidatedRegion = SelectedRegion & {
  * - Replaces lat/lon parameters
  */
 export interface FinchShapeParameter {
-  type: 'FeatureCollection';
-  features: [Feature<Polygon>]; // Exactly one feature
+	type: 'FeatureCollection';
+	features: [Feature<Polygon>]; // Exactly one feature
 }
 
 /**
  * Finch query parameters for shapefile request.
  */
 export interface FinchShapefileQuery {
-  /** GeoJSON shape parameter (serialized) */
-  shape: string; // JSON.stringify(FinchShapeParameter)
-  /** Other query params (dataset, variable, etc.) */
-  [key: string]: string | number | boolean;
+	/** GeoJSON shape parameter (serialized) */
+	shape: string; // JSON.stringify(FinchShapeParameter)
+	/** Other query params (dataset, variable, etc.) */
+	[key: string]: string | number | boolean;
 }
 
 // ============================================================================
@@ -277,16 +313,16 @@ export interface FinchShapefileQuery {
  * Default area constraints (from requirements U13, U14).
  */
 export const DEFAULT_AREA_CONSTRAINTS: AreaConstraints = {
-  minKm2: 100,
-  maxKm2: 500_000,
+	minKm2: 100,
+	maxKm2: 500_000,
 };
 
 /**
  * Default projection config.
  */
 export const DEFAULT_PROJECTION_CONFIG: ProjectionConfig = {
-  target: 'wgs84',
-  snapPrecision: 0.001,
+	target: 'wgs84',
+	snapPrecision: 0.001,
 };
 
 /**

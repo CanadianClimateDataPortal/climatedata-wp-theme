@@ -1,4 +1,33 @@
 /**
+ * Interface for errors with typed codes.
+ *
+ * Enables discriminated union handling via `error.code` property.
+ * Gradual adoption - not required on AbstractError.
+ *
+ * @example
+ * ```typescript
+ * type MyErrorCode = 'example/type-a';
+ *
+ * class MyError
+ *   extends AbstractError
+ *   implements WithErrorCode<MyErrorCode>
+ * {
+ *   readonly code: MyErrorCode;
+ *   constructor(
+ *     message: string,
+ *     options: ErrorOptions & { code: MyErrorCode },
+ *   ) {
+ *     super(message, options);
+ *     this.code = options.code;
+ *   }
+ * }
+ * ```
+ */
+export interface WithErrorCode<T = string> {
+	readonly code: T;
+}
+
+/**
  * Base error class with enhanced error chaining support.
  *
  * Provides:

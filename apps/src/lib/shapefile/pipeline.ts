@@ -21,6 +21,7 @@ import type {
   FinchShapeParameter,
 } from '@/lib/shapefile/contracts';
 import type {
+  ShapefileError,
   InvalidGeometryTypeError,
   AreaExceedsLimitError,
   AreaBelowLimitError,
@@ -29,11 +30,15 @@ import type {
 } from '@/lib/shapefile/errors';
 
 /**
- * Stage 1: Extract shapefile from ZIP (✅ Implemented in file-loader.ts).
+ * Stage 1: Extract shapefile from ZIP.
+ *
+ * Validates the file is a ZIP archive and extracts .shp and .prj files.
+ *
+ * @see {@link ./extraction.ts} for implementation
  */
 export type ExtractShapefileFromZip = (
   file: File,
-) => Promise<Result<ExtractedShapefile, Error>>;
+) => Promise<Result<ExtractedShapefile, ShapefileError>>;
 
 /**
  * Stage 2: Validate shapefile geometry type.

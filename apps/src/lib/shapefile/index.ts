@@ -1,3 +1,3 @@
-export * from './file-introspection';
-export * from './file-loader';
+export * from './detect-zip';
+export * from './extraction';
 export * from './shapefile-machine';

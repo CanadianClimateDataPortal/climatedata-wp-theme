@@ -241,6 +241,7 @@ export const shapefileMachine = setup({
 					target: 'extracting',
 					actions: 'assignFile',
 				},
+				RESET: { target: 'idle', actions: 'resetContext' },
 			},
 		},
 

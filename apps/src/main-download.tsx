@@ -10,6 +10,7 @@ import { I18nProvider } from '@wordpress/react-i18n';
 import App from '@/components/download/app';
 import { store } from '@/app/store';
 import SectionContext from "@/context/section-provider";
+import { ShapefileProvider } from '@/context/shapefile-provider';
 
 import '@/Global.css';
 import { ClimateVariableProvider } from "@/context/climate-variable-provider";
@@ -22,7 +23,9 @@ createRoot(document.getElementById('root')!).render(
 			<I18nProvider i18n={i18n}>
 				<SectionContext.Provider value={'download'}>
 					<ClimateVariableProvider>
-						<App />
+						<ShapefileProvider>
+							<App />
+						</ShapefileProvider>
 					</ClimateVariableProvider>
 				</SectionContext.Provider>
 			</I18nProvider>

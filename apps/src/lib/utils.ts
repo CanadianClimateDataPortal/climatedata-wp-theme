@@ -291,6 +291,7 @@ export function getInteractiveRegionName(region: InteractiveRegionOption): strin
 		[InteractiveRegionOption.CENSUS]: __('Census Subdivisions'),
 		[InteractiveRegionOption.HEALTH]: __('Health Regions'),
 		[InteractiveRegionOption.WATERSHED]: __('Watersheds'),
+		[InteractiveRegionOption.USER]: __('Upload a Custom Shapefile'),
 	}
 	return nameMap[region] ?? region;
 }

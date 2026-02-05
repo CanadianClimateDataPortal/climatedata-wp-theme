@@ -1426,3 +1426,31 @@ msgstr "La ou les stations sélectionnées ne disposent pas de données pour la 
        "<a href=\"https://climat.meteo.gc.ca/historical_data/search_historic_data_f.html\" %s>Données historiques - Climat</a> "
        "peut être utilisé pour localiser des stations météorologiques à proximité qui contiennent des données pour une "
        "période donnée."
+
+msgid  "Choose file"
+msgstr "Choisir un fichier"
+
+msgid  "No file selected"
+msgstr "Aucun fichier sélectionné"
+
+msgid  "Upload a Custom Shapefile"
+msgstr "Utiliser un fichier Shapefile"
+
+msgid  "This feature allows you to upload your shapefile to select a custom region. Once your shapefile is selected, "
+       "the shapes will appear on the map. Click the region of interest to continue."
+msgstr "Cette fonctionalité vous permet de téléverser un shapefile pour sélectionner une région personalisée. Une fois "
+       "votre fichier sélectionné, ses régions apparaitront sur la carte. Cliquez la région d’intérêt pour continuer."
+
+msgid  "What are the supported files?"
+msgstr "Quels sont les fichiers supportés ?"
+
+msgid  "The selected file is not a supported shapefile"
+msgstr "Le fichier sélectionné n'est pas un fichier supporté"
+
+msgid  "A supported shapefile is a ZIP file containing at least the .shp and .prj files. The file’s shapes must be "
+       "closed polygons and be, at least partially, within Canada (data is available only for land areas of Canada). "
+       "Only the WGS84 coordinate system is supported, which is the most common."
+msgstr "Un fichier shapefile compatible est un fichier ZIP contenant au moins les fichiers .shp et .prj. Les formes "
+       "(shapes) du fichier doivent être des polygones fermés et se situer, au moins partiellement, au Canada (les "
+       "données sont disponibles uniquement pour les zones terrestres du Canada). Seul le système de coordonnées "
+       "WGS84, le plus courant, est pris en charge."

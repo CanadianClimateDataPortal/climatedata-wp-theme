@@ -46,6 +46,7 @@ export enum InteractiveRegionOption {
 	CENSUS = 'census',
 	HEALTH = 'health',
 	WATERSHED = 'watershed',
+	USER = 'user', // user defined region, i.e. shapefile
 }
 
 export enum InteractiveRegionDisplay {

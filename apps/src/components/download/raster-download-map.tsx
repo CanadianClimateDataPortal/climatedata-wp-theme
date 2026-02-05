@@ -29,6 +29,7 @@ import {
 	DEFAULT_MIN_ZOOM,
 } from '@/lib/constants';
 import NoticeRSLCCMIP6 from '@/components/notice-rslc-cmip6';
+import ShapefileUpload from '@/components/download/shapefile-upload';
 import { MAP_CONFIG } from '@/config/map.config';
 
 export default function RasterDownloadMap(): React.ReactElement {
@@ -81,6 +82,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 		'future_building_design_value_summaries',
 		'short_duration_rainfall_idf_data'
 	].includes(climateVariable?.getId() ?? '') || climateVariable?.getDatasetType() === 'ahccd';
+	const isUserCustomInteractiveRegion = climateVariable?.getInteractiveRegion() === InteractiveRegionOption.USER;
 
 	const stationOptions = stations.map(station => ({ value: String(station.id), label: station.name }))
 	.sort((a, b) => a.label.localeCompare(b.label));
@@ -240,7 +242,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 					<div className="sm:w-64">
 						<InteractiveRegionSelect
 							displayMode={InteractiveRegionDisplay.DOWNLOAD}
-							onChange={(_) => {
+							onChange={() => {
 								clearSelection();
 							}}
 						/>
@@ -271,6 +273,10 @@ export default function RasterDownloadMap(): React.ReactElement {
 						</div>
 					</div>
 				</div>
+			)}
+
+			{isUserCustomInteractiveRegion && (
+				<ShapefileUpload />
 			)}
 
 			<div className="h-[560px] font-sans relative">

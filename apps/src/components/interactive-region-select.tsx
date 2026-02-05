@@ -34,10 +34,27 @@ const InteractiveRegionSelect: React.FC<InteractiveRegionSelectProps> = ({
 		InteractiveRegionOption.CENSUS,
 		InteractiveRegionOption.HEALTH,
 		InteractiveRegionOption.WATERSHED,
+		// InteractiveRegionOption.USER,
 	].map((type) => ({
 		value: type,
 		label: getInteractiveRegionName(type),
 	}));
+
+	// TEMPORARY
+	// The "Custom Shapefile" option is temporarily available only if the
+	// `shapefile=1` GET parameter is present in the URL.
+	// Once we are ready to make this option available to all users, we
+	// have to delete this temporary code and uncomment the
+	// `InteractiveRegionOption.USER` in the creation of the `options` array
+	// above.
+	const urlParams = new URLSearchParams(window.location.search);
+	if (urlParams.get('shapefile') === '1') {
+		options.push({
+			value: InteractiveRegionOption.USER,
+			label: getInteractiveRegionName(InteractiveRegionOption.USER),
+		});
+	}
+	// END TEMPORARY
 
 	const interactiveRegionConfig =
 		climateVariable?.getInteractiveRegionConfig() ??
@@ -45,7 +62,7 @@ const InteractiveRegionSelect: React.FC<InteractiveRegionSelectProps> = ({
 
 	// Filter options based on the config.
 	const availableOptions = options.filter((option) => {
-		let optionDisplay =
+		const optionDisplay =
 			interactiveRegionConfig[option.value];
 		return (
 			optionDisplay &&

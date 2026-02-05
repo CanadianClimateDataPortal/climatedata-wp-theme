@@ -44,6 +44,7 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 				[InteractiveRegionOption.CENSUS]: InteractiveRegionDisplay.ALWAYS,
 				[InteractiveRegionOption.HEALTH]: InteractiveRegionDisplay.ALWAYS,
 				[InteractiveRegionOption.WATERSHED]: InteractiveRegionDisplay.ALWAYS,
+				[InteractiveRegionOption.USER]: InteractiveRegionDisplay.ALWAYS,
 			};
 	}
 

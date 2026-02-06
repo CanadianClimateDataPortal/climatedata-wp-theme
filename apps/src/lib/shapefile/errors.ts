@@ -1,5 +1,5 @@
 import { AbstractError, type WithErrorCode } from '@/lib/errors';
-import type { GeometryType } from '@/lib/shapefile/contracts';
+import { type GeometryType } from '@/lib/shapefile/contracts';
 
 // ============================================================================
 // ERROR CODES
@@ -80,22 +80,38 @@ export class ShapefileError
 }
 
 // ============================================================================
-// EARLIER ERROR TYPES (to be migrated/adjusted)
+// VALIDATION ERRORS
 // ============================================================================
 
 /**
  * Error: Invalid geometry type (not polygon).
  *
- * Thrown during validation (CLIM-1266).
+ * Thrown during validation when shapefile geometry is not Polygon.
+ * The error code is always `'validation/invalid-geometry-type'`.
+ *
+ * @param geometryType - The actual geometry type found (e.g. 'Point', 'Polyline')
+ * @param options - Standard `ErrorOptions` (e.g. `{ cause }`)
+ *
+ * @example
+ * ```typescript
+ * const err = new InvalidGeometryTypeError('Point');
+ * err.code;          // 'validation/invalid-geometry-type'
+ * err.geometryType;  // 'Point'
+ * ```
+ *
+ * @see {@link ./contracts.ts} for `GeometryType` definition
  */
-export class InvalidGeometryTypeError extends AbstractError {
+export class InvalidGeometryTypeError extends ShapefileError {
 	constructor(
 		public readonly geometryType: GeometryType,
 		options?: ErrorOptions,
 	) {
 		super(
 			`Invalid geometry type: ${geometryType}. Only polygons are supported.`,
-			options,
+			{
+				...options,
+				code: 'validation/invalid-geometry-type',
+			}
 		);
 		// Explicit name - survives minification
 		this.name = 'InvalidGeometryTypeError';
@@ -106,6 +122,13 @@ export class InvalidGeometryTypeError extends AbstractError {
  * Error: Area exceeds maximum limit.
  *
  * Thrown during area validation (CLIM-1270, U13).
+ *
+ * @remarks
+ * TODO (CLIM-1270): We will not use this error as-is, we do not want to
+ * change the contract of errors and this is not the same constructor
+ * signature as typical errors. Migrate to standard `(message, options?)`
+ * pattern. Use `DEFAULT_AREA_CONSTRAINTS` field names (`minKm2`, `maxKm2`)
+ * for consistency with the constraint config.
  */
 export class AreaExceedsLimitError extends AbstractError {
 	constructor(
@@ -126,6 +149,14 @@ export class AreaExceedsLimitError extends AbstractError {
  * Error: Area below minimum limit.
  *
  * Thrown during area validation (CLIM-1270, U14).
+ *
+ * @remarks
+ * TODO (CLIM-1270): Migrate to standard constructor signature
+ * `(message: string, options?: ErrorOptions)` like other ShapefileError
+ * subclasses. Current signature uses domain-specific positional args
+ * (`areaKm2`, `minKm2`) which diverges from the established pattern.
+ * Use `DEFAULT_AREA_CONSTRAINTS` field names (`minKm2`, `maxKm2`)
+ * for consistency with the constraint config.
  */
 export class AreaBelowLimitError extends AbstractError {
 	constructor(
@@ -146,10 +177,26 @@ export class AreaBelowLimitError extends AbstractError {
  * Error: Shapefile processing failed.
  *
  * Generic error for Mapshaper or transformation failures.
+ * The error code is always `'processing/failed'`.
+ *
+ * @param message - Descriptive message including diagnostic details
+ * @param options - Standard `ErrorOptions` (e.g. `{ cause }`)
+ *
+ * @example
+ * ```typescript
+ * const err = new ProcessingError('Mapshaper info command failed: timeout');
+ * err.code;  // 'processing/failed'
+ * ```
  */
-export class ProcessingError extends AbstractError {
-	constructor(message: string, options?: ErrorOptions) {
-		super(message, options);
+export class ProcessingError extends ShapefileError {
+	constructor(
+		message: string,
+		options?: ErrorOptions,
+	) {
+		super(
+			message,
+			{ ...options, code: 'processing/failed', }
+		);
 		// Explicit name - survives minification
 		this.name = 'ProcessingError';
 	}
@@ -159,15 +206,26 @@ export class ProcessingError extends AbstractError {
  * Error: Projection not supported.
  *
  * Thrown if shapefile uses non-WGS84 projection that cannot be converted.
+ * The error code is always `'processing/projection-unsupported'`.
+ *
+ * @param projection - The unsupported projection string found in the .prj file
+ * @param options - Standard `ErrorOptions` (e.g. `{ cause }`)
+ *
+ * @example
+ * ```typescript
+ * const err = new ProjectionError('NAD83');
+ * err.code;        // 'processing/projection-unsupported'
+ * err.projection;  // 'NAD83'
+ * ```
  */
-export class ProjectionError extends AbstractError {
+export class ProjectionError extends ShapefileError {
 	constructor(
 		public readonly projection: string,
 		options?: ErrorOptions,
 	) {
 		super(
 			`Unsupported projection: ${projection}. Only WGS84 is supported.`,
-			options,
+			{ ...options, code: 'processing/projection-unsupported', }
 		);
 		// Explicit name - survives minification
 		this.name = 'ProjectionError';

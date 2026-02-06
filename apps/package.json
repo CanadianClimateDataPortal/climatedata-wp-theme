@@ -49,6 +49,7 @@
     "leaflet.sync": "^0.2.4",
     "leaflet.vectorgrid": "^1.3.0",
     "lucide-react": "^0.453.0",
+    "mapshaper": "^0.6.113",
     "nanoid": "^5.1.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",

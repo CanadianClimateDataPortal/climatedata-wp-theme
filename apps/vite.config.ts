@@ -9,6 +9,13 @@ import { defineConfig, type Plugin } from 'vite'
  *
  * - zlib: guarded by runningInBrowser() — mapshaper uses fflate instead
  * - os: only os.endianness() is called at runtime
+ * - iconv-lite: top-level require$1('iconv-lite') at line 3951 — only used
+ *   for .dbf character encoding, never hit by our .shp/.prj pipeline
+ * - Buffer: mapshaper.js line 154 runs at module load time:
+ *     var B$3 = typeof Buffer != 'undefined' ? Buffer : require$1('buffer').Buffer;
+ *   In browser, require$1 is a no-op returning undefined → TypeError.
+ *   We inject a minimal Uint8Array-backed Buffer on globalThis so the
+ *   typeof check passes and require$1('buffer') is never reached.
  */
 function mapshaperNodeStubs(): Plugin {
     const stubs: Record<string, string> = {
@@ -21,7 +28,43 @@ function mapshaperNodeStubs(): Plugin {
             '}',
             'export default { endianness };',
         ].join('\n'),
+        'iconv-lite': [
+            'export function encodingExists() { return false; }',
+            'export function encode(str) { return new TextEncoder().encode(str); }',
+            'export function decode(buf) { return new TextDecoder().decode(buf); }',
+            'export const encodings = {};',
+            'export default { encodingExists, encode, decode, encodings };',
+        ].join('\n'),
     };
+
+    // Minimal Buffer polyfill covering the 6 methods mapshaper uses:
+    // allocUnsafe, from, isBuffer, concat, alloc, toString
+    const bufferPolyfill = [
+        'if (typeof globalThis.Buffer === "undefined") {',
+        '  class _B extends Uint8Array {',
+        '    static alloc(n) { return new _B(n); }',
+        '    static allocUnsafe(n) { return new _B(n); }',
+        '    static isBuffer(o) { return o instanceof _B; }',
+        '    static from(v, a, b) {',
+        '      if (typeof v === "string") return new _B(new TextEncoder().encode(v));',
+        '      if (v instanceof ArrayBuffer) return typeof a === "number" ? new _B(v, a, b) : new _B(v);',
+        '      if (ArrayBuffer.isView(v)) return new _B(v.buffer, v.byteOffset, v.byteLength);',
+        '      return new _B(v);',
+        '    }',
+        '    static concat(list) {',
+        '      const total = list.reduce((s, b) => s + b.length, 0);',
+        '      const result = new _B(total);',
+        '      let offset = 0;',
+        '      for (const buf of list) { result.set(buf, offset); offset += buf.length; }',
+        '      return result;',
+        '    }',
+        '    toString(encoding) {',
+        '      return new TextDecoder(encoding || "utf-8").decode(this);',
+        '    }',
+        '  }',
+        '  globalThis.Buffer = _B;',
+        '}',
+    ].join('\n');
 
     return {
         name: 'mapshaper-node-stubs',
@@ -34,6 +77,20 @@ function mapshaperNodeStubs(): Plugin {
             const match = id.match(/^\0stub:(.+)$/);
             if (match && match[1] in stubs) return stubs[match[1]];
             return null;
+        },
+        transform(code, id) {
+            if (!id.includes('node_modules/mapshaper/mapshaper.js')) return null;
+            // Force mapshaper's require shim to the browser no-op path.
+            // Without this, @rollup/plugin-commonjs provides a `require`
+            // function that intercepts require$1('iconv-lite') etc. and
+            // throws via the dynamic-require shim. The no-op path returns
+            // undefined for optional deps, which is safe — mapshaper guards
+            // usage with runningInBrowser() or try/catch.
+            const patched = code.replace(
+                "typeof require == 'function'",
+                "typeof undefined == 'function'",
+            );
+            return bufferPolyfill + '\n' + patched;
         },
     };
 }

@@ -12,9 +12,7 @@ import type { Result } from '@/lib/shapefile/result';
 import type {
   ExtractedShapefile,
   ValidatedShapefile,
-  SimplifiedTopoJSON,
-  ProjectionConfig,
-  DisplayableShapes,
+  SimplifiedGeometry,
   SelectedRegion,
   AreaConstraints,
   ValidatedRegion,
@@ -52,22 +50,14 @@ export type ValidateShapefileGeometry = (
 ) => Promise<Result<ValidatedShapefile, InvalidGeometryTypeError | ProcessingError>>;
 
 /**
- * Stage 3: Transform and simplify to TopoJSON.
+ * Stage 3: Simplify shapefile geometry.
  *
- * Projects the shapefile to WGS84 coordinate system, cleans the geometry,
- * and converts to TopoJSON format.
+ * Cleans, snaps, fixes geometry, projects to WGS84,
+ * and outputs simplified GeoJSON via mapshaper.
  */
-export type TransformToTopoJSON = (
+export type SimplifyShapefile = (
   shapefile: ValidatedShapefile,
-  config: ProjectionConfig,
-) => Promise<Result<SimplifiedTopoJSON, ProcessingError | ProjectionError>>;
-
-/**
- * Stage 4: Convert TopoJSON to displayable shapes.
- */
-export type ConvertToDisplayableShapes = (
-  topoJSON: SimplifiedTopoJSON,
-) => Result<DisplayableShapes, ProcessingError>;
+) => Promise<Result<SimplifiedGeometry, ProcessingError | ProjectionError>>;
 
 /**
  * Stage 5: Validate selected region area.

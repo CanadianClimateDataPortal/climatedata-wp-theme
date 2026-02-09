@@ -22,7 +22,7 @@ import type {
 	FinchShapeParameter,
 	SelectedRegion,
 	ShapefileInfo,
-	SimplifiedTopoJSON,
+	SimplifiedGeometry,
 	ValidatedRegion,
 	ValidatedShapefile,
 } from '@/lib/shapefile/contracts';
@@ -81,27 +81,36 @@ export const EXAMPLE_VALIDATED_SHAPEFILE = {
 // ============================================================================
 
 /**
- * Simplified TopoJSON output from Mapshaper pipeline.
+ * Simplified GeoJSON output from mapshaper pipeline.
  *
- * Minimal topology with one named object and empty arcs.
- * Production data would have quantized arc arrays and transform.
+ * Minimal FeatureCollection with one polygon feature.
+ * Production data would have real coordinates from mapshaper processing.
  *
- * @see {@link SimplifiedTopoJSON}
+ * @see {@link SimplifiedGeometry}
  */
-export const EXAMPLE_SIMPLIFIED_TOPOJSON: SimplifiedTopoJSON = {
-	topology: {
-		type: 'Topology',
-		objects: {
-			shapefile: {
-				type: 'GeometryCollection',
-				arcs: [],
+export const EXAMPLE_SIMPLIFIED_GEOMETRY: SimplifiedGeometry = {
+	featureCollection: {
+		type: 'FeatureCollection',
+		features: [
+			{
+				type: 'Feature',
+				geometry: {
+					type: 'Polygon',
+					coordinates: [
+						[
+							[-75.8, 45.2],
+							[-73.5, 45.2],
+							[-73.5, 46.1],
+							[-75.8, 46.1],
+							[-75.8, 45.2],
+						],
+					],
+				},
+				properties: {},
 			},
-		},
-		arcs: [],
-		bbox: [-75.8, 45.2, -73.5, 46.1],
+		],
 	},
-	originalFeatureCount: 3,
-	simplifiedFeatureCount: 3,
+	featureCount: 1,
 };
 
 // ============================================================================

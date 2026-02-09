@@ -42,7 +42,7 @@ export const VALUES_AREA_VALIDATION_RESULT_ERRORS = [
 ] as const;
 
 // ============================================================================
-// LAYER 1: EXTRACTION (Implemented in file-loader.ts)
+// LAYER 1: EXTRACTION (Implemented in extraction.ts)
 // ============================================================================
 
 /**
@@ -54,7 +54,7 @@ export const VALUES_AREA_VALIDATION_RESULT_ERRORS = [
  *
  * Other files such as .dbf and .shx are ignored to minimize data exposure.
  *
- * @see {@link ./file-loader.ts} for implementation
+ * @see {@link ./extraction.ts} for implementation
  */
 export interface ExtractedShapefile {
 	/** Binary shapefile geometry data */
@@ -132,8 +132,8 @@ export interface SimplifiedGeometry {
 /**
  * Individual polygon shape ready for display on map.
  *
- * Represents a single polygon from the shapefile, converted from TopoJSON to
- * GeoJSON format for rendering with Leaflet. Each shape includes its computed
+ * Represents a single polygon from the shapefile, extracted from simplified
+ * GeoJSON for rendering with Leaflet. Each shape includes its computed
  * area for validation against size constraints.
  */
 export interface DisplayableShape {

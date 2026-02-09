@@ -5,7 +5,7 @@ import {
 	ShapefileContext,
 	type ShapefileContextValue,
 } from '@/context/shapefile-provider';
-import { ShapefileLoadError } from '@/lib/shapefile';
+import { ShapefileError } from '@/lib/shapefile';
 
 export type UseShapefileHook = {
 	file: File | null;
@@ -37,7 +37,7 @@ export function useShapefile(): UseShapefileHook {
 
 	const isProcessingFile =
 		snapshot.matches('extracting') || snapshot.matches('validating') || snapshot.matches('transforming');
-	const isFileInvalid = hasError && error instanceof ShapefileLoadError;
+	const isFileInvalid = hasError && error instanceof ShapefileError;
 
 	const reset = () => {
 		send({ type: 'RESET' });

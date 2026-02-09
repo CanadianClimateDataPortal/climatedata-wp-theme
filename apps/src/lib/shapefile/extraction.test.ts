@@ -6,36 +6,41 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import JSZip from 'jszip';
+import { zipSync, strToU8 as _strToU8 } from 'fflate';
 import { extractShapefileFromZip } from './extraction';
 import { ShapefileError } from './errors';
 import { createMockFile } from './test-utils';
 
 /**
+ * Realm-safe wrapper for fflate's strToU8.
+ *
+ * In jsdom, fflate's strToU8 returns a Node.js-realm Uint8Array that
+ * fails zipSync's `instanceof Uint8Array` check (jsdom realm), causing
+ * string entries to be treated as directories instead of file content.
+ * Re-wrapping with the global Uint8Array constructor fixes this.
+ */
+const strToU8 = (s: string): Uint8Array => new Uint8Array(_strToU8(s));
+
+/**
  * Create a valid ZIP file containing .shp and .prj files.
  */
-const createValidShapefileZip = async (): Promise<File> => {
-	const zip = new JSZip();
-
-	// Mock binary .shp file (shapefile header starts with file code)
-	const shpData = new Uint8Array([
-		0x00, 0x00, 0x27, 0x0a, // File code
-		0x00, 0x00, 0x00, 0x00, // Unused
-	]);
-	zip.file('test.shp', shpData);
-
-	// Mock .prj file (WGS84 projection)
-	const prjData = 'GEOGCS["WGS 84",DATUM["WGS_1984"]]';
-	zip.file('test.prj', prjData);
-
-	const zipBlob = await zip.generateAsync({ type: 'arraybuffer' });
-	return createMockFile('test.zip', zipBlob);
+const createValidShapefileZip = (): File => {
+	const zipData = zipSync({
+		// Mock binary .shp file (shapefile header starts with file code)
+		'test.shp': new Uint8Array([
+			0x00, 0x00, 0x27, 0x0a, // File code
+			0x00, 0x00, 0x00, 0x00, // Unused
+		]),
+		// Mock .prj file (WGS84 projection)
+		'test.prj': strToU8('GEOGCS["WGS 84",DATUM["WGS_1984"]]'),
+	});
+	return createMockFile('test.zip', zipData);
 };
 
 describe('extractShapefileFromZip', () => {
 	describe('successful extraction', () => {
 		it('should extract .shp and .prj files from valid ZIP', async () => {
-			const file = await createValidShapefileZip();
+			const file = createValidShapefileZip();
 			const result = await extractShapefileFromZip(file);
 
 			expect(result.ok).toBe(true);
@@ -48,15 +53,14 @@ describe('extractShapefileFromZip', () => {
 		});
 
 		it('should ignore other files in ZIP (dbf, shx, etc)', async () => {
-			const zip = new JSZip();
-			zip.file('test.shp', new Uint8Array([0x00]));
-			zip.file('test.prj', 'GEOGCS["WGS 84"]');
-			zip.file('test.dbf', 'ignored data');
-			zip.file('test.shx', 'ignored data');
-			zip.file('readme.txt', 'ignored data');
-
-			const zipBlob = await zip.generateAsync({ type: 'arraybuffer' });
-			const file = createMockFile('test.zip', zipBlob);
+			const zipData = zipSync({
+				'test.shp': new Uint8Array([0x00]),
+				'test.prj': strToU8('GEOGCS["WGS 84"]'),
+				'test.dbf': strToU8('ignored data'),
+				'test.shx': strToU8('ignored data'),
+				'readme.txt': strToU8('ignored data'),
+			});
+			const file = createMockFile('test.zip', zipData);
 
 			const result = await extractShapefileFromZip(file);
 
@@ -69,12 +73,11 @@ describe('extractShapefileFromZip', () => {
 		});
 
 		it('should handle case-insensitive file extensions', async () => {
-			const zip = new JSZip();
-			zip.file('TEST.SHP', new Uint8Array([0x00]));
-			zip.file('TEST.PRJ', 'GEOGCS["WGS 84"]');
-
-			const zipBlob = await zip.generateAsync({ type: 'arraybuffer' });
-			const file = createMockFile('test.zip', zipBlob);
+			const zipData = zipSync({
+				'TEST.SHP': new Uint8Array([0x00]),
+				'TEST.PRJ': strToU8('GEOGCS["WGS 84"]'),
+			});
+			const file = createMockFile('test.zip', zipData);
 
 			const result = await extractShapefileFromZip(file);
 
@@ -121,12 +124,11 @@ describe('extractShapefileFromZip', () => {
 
 	describe('error: missing required files', () => {
 		it('should return error for ZIP without .shp file', async () => {
-			const zip = new JSZip();
-			zip.file('test.prj', 'GEOGCS["WGS 84"]');
-			zip.file('readme.txt', 'data');
-
-			const zipBlob = await zip.generateAsync({ type: 'arraybuffer' });
-			const file = createMockFile('test.zip', zipBlob);
+			const zipData = zipSync({
+				'test.prj': strToU8('GEOGCS["WGS 84"]'),
+				'readme.txt': strToU8('data'),
+			});
+			const file = createMockFile('test.zip', zipData);
 
 			const result = await extractShapefileFromZip(file);
 
@@ -138,12 +140,11 @@ describe('extractShapefileFromZip', () => {
 		});
 
 		it('should return error for ZIP without .prj file', async () => {
-			const zip = new JSZip();
-			zip.file('test.shp', new Uint8Array([0x00]));
-			zip.file('readme.txt', 'data');
-
-			const zipBlob = await zip.generateAsync({ type: 'arraybuffer' });
-			const file = createMockFile('test.zip', zipBlob);
+			const zipData = zipSync({
+				'test.shp': new Uint8Array([0x00]),
+				'readme.txt': strToU8('data'),
+			});
+			const file = createMockFile('test.zip', zipData);
 
 			const result = await extractShapefileFromZip(file);
 
@@ -155,11 +156,11 @@ describe('extractShapefileFromZip', () => {
 		});
 
 		it('should return error for ZIP with only unrelated files', async () => {
-			const zip = new JSZip();
-			zip.file('readme.txt', 'some content');
-			zip.file('data.csv', 'a,b,c');
-			const zipBlob = await zip.generateAsync({ type: 'arraybuffer' });
-			const file = createMockFile('no-shapefile.zip', zipBlob);
+			const zipData = zipSync({
+				'readme.txt': strToU8('some content'),
+				'data.csv': strToU8('a,b,c'),
+			});
+			const file = createMockFile('no-shapefile.zip', zipData);
 
 			const result = await extractShapefileFromZip(file);
 

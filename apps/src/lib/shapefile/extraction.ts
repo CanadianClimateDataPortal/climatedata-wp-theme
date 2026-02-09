@@ -5,7 +5,7 @@
  * Returns Result type for explicit error handling.
  */
 
-import JSZip from 'jszip';
+import { unzipSync } from 'fflate';
 import { detectZip } from './detect-zip';
 import { ShapefileError } from './errors';
 import type { ExtractedShapefile } from './contracts';
@@ -68,11 +68,11 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 		};
 	}
 
-	// 2. Parse ZIP with JSZip
-	let zip: JSZip;
+	// 2. Parse ZIP with fflate
+	let unzipped: Record<string, Uint8Array>;
 	try {
 		const arrayBuffer = await file.arrayBuffer();
-		zip = await JSZip.loadAsync(arrayBuffer);
+		unzipped = unzipSync(new Uint8Array(arrayBuffer));
 	} catch (err) {
 		return {
 			ok: false,
@@ -90,40 +90,16 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 	let shpBuffer: ArrayBuffer | null = null;
 	let prjContent: string | null = null;
 
-	const extractionPromises: Promise<void>[] = [];
-
-	for (const filename of Object.keys(zip.files)) {
+	for (const filename of Object.keys(unzipped)) {
 		const lowerName = filename.toLowerCase();
 		const ext = lowerName.split('.').pop();
 
 		if (ext === 'shp') {
-			extractionPromises.push(
-				zip.files[filename].async('arraybuffer').then((buffer) => {
-					shpBuffer = buffer;
-				}),
-			);
+			// .slice() creates a copy with its own ArrayBuffer
+			shpBuffer = unzipped[filename].slice().buffer;
 		} else if (ext === 'prj') {
-			extractionPromises.push(
-				zip.files[filename].async('string').then((content) => {
-					prjContent = content;
-				}),
-			);
+			prjContent = new TextDecoder().decode(unzipped[filename]);
 		}
-	}
-
-	try {
-		await Promise.all(extractionPromises);
-	} catch (err) {
-		return {
-			ok: false,
-			error: new ShapefileError(
-				`Failed to extract files from ZIP: ${err instanceof Error ? err.message : 'Unknown error'}`,
-				{
-					code: 'extraction/zip-parse-failed',
-					cause: err instanceof Error ? err : undefined,
-				},
-			),
-		};
 	}
 
 	// 4. Validate required files exist

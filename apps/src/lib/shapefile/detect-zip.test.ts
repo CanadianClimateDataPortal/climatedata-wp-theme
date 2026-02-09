@@ -9,12 +9,12 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { createMockFile } from '@/lib/shapefile/test-utils';
+import { createMockFile } from './test-utils';
 import {
 	detectZip,
 	formatMagicBytes,
 	ZIP_MAGIC_BYTES,
-} from '@/lib/shapefile/detect-zip';
+} from './detect-zip';
 
 
 describe('detectZip', () => {

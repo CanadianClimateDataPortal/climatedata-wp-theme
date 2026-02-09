@@ -6,11 +6,11 @@
  */
 
 import JSZip from 'jszip';
-import { detectZip } from '@/lib/shapefile/detect-zip';
-import { ShapefileError } from '@/lib/shapefile/errors';
-import type { ExtractedShapefile } from '@/lib/shapefile/contracts';
-import type { Result } from '@/lib/shapefile/result';
-import type { ExtractShapefileFromZip } from '@/lib/shapefile/pipeline';
+import { detectZip } from './detect-zip';
+import { ShapefileError } from './errors';
+import type { ExtractedShapefile } from './contracts';
+import type { Result } from './result';
+import type { ExtractShapefileFromZip } from './pipeline';
 
 /**
  * Extract shapefile data from a ZIP archive.

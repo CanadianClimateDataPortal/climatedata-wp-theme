@@ -11,17 +11,17 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createActor, waitFor } from 'xstate';
 
-import type { PipelineServices } from '@/lib/shapefile/shapefile-machine';
-import { shapefileMachine } from '@/lib/shapefile/shapefile-machine';
-import type {
-	DisplayableShapes,
-	ExtractedShapefile,
-	FinchShapeParameter,
-	SelectedRegion,
-	SimplifiedGeometry,
-	ValidatedRegion,
-	ValidatedShapefile,
-} from '@/lib/shapefile/contracts';
+import type { PipelineServices } from './shapefile-machine';
+import { shapefileMachine } from './shapefile-machine';
+import {
+	type DisplayableShapes,
+	type ExtractedShapefile,
+	type FinchShapeParameter,
+	type SelectedRegion,
+	type SimplifiedGeometry,
+	type ValidatedRegion,
+	type ValidatedShapefile,
+} from './contracts';
 
 // ============================================================================
 // FIXTURES

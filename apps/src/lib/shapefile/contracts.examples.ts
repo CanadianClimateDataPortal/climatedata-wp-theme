@@ -25,8 +25,8 @@ import type {
 	SimplifiedGeometry,
 	ValidatedRegion,
 	ValidatedShapefile,
-} from '@/lib/shapefile/contracts';
-import { DEFAULT_AREA_CONSTRAINTS } from '@/lib/shapefile/contracts';
+} from './contracts';
+import { DEFAULT_AREA_CONSTRAINTS } from './contracts';
 
 // ============================================================================
 // LAYER 1: EXTRACTION

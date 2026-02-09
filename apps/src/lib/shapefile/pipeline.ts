@@ -8,24 +8,26 @@
  * used as invoked services on the machine.
  */
 
-import type { Result } from '@/lib/shapefile/result';
-import type {
-  ExtractedShapefile,
-  ValidatedShapefile,
-  SimplifiedGeometry,
-  SelectedRegion,
-  AreaConstraints,
-  ValidatedRegion,
-  FinchShapeParameter,
-} from '@/lib/shapefile/contracts';
-import type {
-  ShapefileError,
-  InvalidGeometryTypeError,
-  AreaExceedsLimitError,
-  AreaBelowLimitError,
-  ProcessingError,
-  ProjectionError,
-} from '@/lib/shapefile/errors';
+import {
+	type Result,
+} from './result';
+import {
+  type ExtractedShapefile,
+  type ValidatedShapefile,
+  type SimplifiedGeometry,
+  type SelectedRegion,
+  type AreaConstraints,
+  type ValidatedRegion,
+  type FinchShapeParameter,
+} from './contracts';
+import {
+  type ShapefileError,
+  type InvalidGeometryTypeError,
+  type AreaExceedsLimitError,
+  type AreaBelowLimitError,
+  type ProcessingError,
+  type ProjectionError,
+} from './errors';
 
 /**
  * Stage 1: Extract shapefile from ZIP.

@@ -4,10 +4,10 @@
 
 import type { Story } from '@ladle/react';
 import { useState } from 'react';
-import { detectZip, type ZipDetectionResult } from '@/lib/shapefile/detect-zip';
-import { extractShapefileFromZip } from '@/lib/shapefile/extraction';
-import type { ExtractedShapefile } from '@/lib/shapefile/contracts';
-import type { ShapefileError } from '@/lib/shapefile/errors';
+import { detectZip, type ZipDetectionResult } from './detect-zip';
+import { extractShapefileFromZip } from './extraction';
+import type { ExtractedShapefile } from './contracts';
+import type { ShapefileError } from './errors';
 
 type ExtractionState =
 	| { status: 'idle' }

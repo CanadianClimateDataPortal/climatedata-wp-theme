@@ -7,9 +7,9 @@
 
 import { describe, it, expect } from 'vitest';
 import JSZip from 'jszip';
-import { extractShapefileFromZip } from '@/lib/shapefile/extraction';
-import { ShapefileError } from '@/lib/shapefile/errors';
-import { createMockFile } from '@/lib/shapefile/test-utils';
+import { extractShapefileFromZip } from './extraction';
+import { ShapefileError } from './errors';
+import { createMockFile } from './test-utils';
 
 /**
  * Create a valid ZIP file containing .shp and .prj files.

@@ -15,31 +15,33 @@ import { assign, fromPromise, setup } from 'xstate';
 
 import type { Feature, Polygon } from 'geojson';
 
-import type { Result } from '@/lib/shapefile/result';
-import type {
-	AreaConstraints,
-	AreaValidationResult,
-	DisplayableShapes,
-	ExtractedShapefile,
-	FinchShapeParameter,
-	SelectedRegion,
-	SimplifiedGeometry,
-	ValidatedRegion,
-	ValidatedShapefile,
-} from '@/lib/shapefile/contracts';
-import { DEFAULT_AREA_CONSTRAINTS } from '@/lib/shapefile/contracts';
-import type {
-	ExtractShapefileFromZip,
-	PrepareFinchPayload,
-	SimplifyShapefile,
-	ValidateSelectedArea,
-	ValidateShapefileGeometry,
-} from '@/lib/shapefile/pipeline';
-import type {
-	ProcessingError,
-	ProjectionError,
-	InvalidGeometryTypeError,
-} from '@/lib/shapefile/errors';
+import {
+	type Result,
+} from './result';
+import {
+	type AreaConstraints,
+	type AreaValidationResult,
+	type DisplayableShapes,
+	type ExtractedShapefile,
+	type FinchShapeParameter,
+	type SelectedRegion,
+	type SimplifiedGeometry,
+	type ValidatedRegion,
+	type ValidatedShapefile,
+	DEFAULT_AREA_CONSTRAINTS,
+} from './contracts';
+import {
+	type ExtractShapefileFromZip,
+	type PrepareFinchPayload,
+	type SimplifyShapefile,
+	type ValidateSelectedArea,
+	type ValidateShapefileGeometry,
+} from './pipeline';
+import {
+	type ProcessingError,
+	type ProjectionError,
+	type InvalidGeometryTypeError,
+} from './errors';
 
 // ============================================================================
 // SERVICES (injected pipeline functions)

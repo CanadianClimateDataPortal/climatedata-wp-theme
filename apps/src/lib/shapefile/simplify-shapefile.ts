@@ -2,10 +2,10 @@ import mapshaper from 'mapshaper';
 
 import type { FeatureCollection } from 'geojson';
 
-import type { Result } from '@/lib/shapefile/result';
-import type { SimplifiedGeometry } from '@/lib/shapefile/contracts';
-import { ProcessingError } from '@/lib/shapefile/errors';
-import type { SimplifyShapefile } from '@/lib/shapefile/pipeline';
+import type { Result } from './result';
+import type { SimplifiedGeometry } from './contracts';
+import { ProcessingError } from './errors';
+import type { SimplifyShapefile } from './pipeline';
 
 /**
  * Simplify and project a validated shapefile to GeoJSON.

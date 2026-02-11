@@ -1,13 +1,49 @@
 import path from "path";
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
+
+/**
+ * Stub Node.js built-in modules that mapshaper imports but doesn't
+ * actually use in browser context.
+ *
+ * - zlib: guarded by runningInBrowser() — mapshaper uses fflate instead
+ * - os: only os.endianness() is called at runtime
+ */
+function mapshaperNodeStubs(): Plugin {
+    const stubs: Record<string, string> = {
+        zlib: 'export default {};',
+        os: [
+            'export function endianness() {',
+            '  const b = new ArrayBuffer(2);',
+            '  new DataView(b).setInt16(0, 256, true);',
+            '  return new Int16Array(b)[0] === 256 ? "LE" : "BE";',
+            '}',
+            'export default { endianness };',
+        ].join('\n'),
+    };
+
+    return {
+        name: 'mapshaper-node-stubs',
+        enforce: 'pre',
+        resolveId(id) {
+            if (id in stubs) return `\0stub:${id}`;
+            return null;
+        },
+        load(id) {
+            const match = id.match(/^\0stub:(.+)$/);
+            if (match && match[1] in stubs) return stubs[match[1]];
+            return null;
+        },
+    };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
     base: '/assets/themes/fw-child/apps/dist/',
     plugins: [
         react(),
+        mapshaperNodeStubs(),
         {
             name: 'custom-startup-message',
             configureServer(server) {

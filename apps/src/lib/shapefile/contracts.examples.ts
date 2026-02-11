@@ -81,10 +81,10 @@ export const EXAMPLE_VALIDATED_SHAPEFILE = {
 // ============================================================================
 
 /**
- * Simplified GeoJSON output from mapshaper pipeline.
+ * Simplified GeoJSON output.
  *
  * Minimal FeatureCollection with one polygon feature.
- * Production data would have real coordinates from mapshaper processing.
+ * Production data would have real coordinates.
  *
  * @see {@link SimplifiedGeometry}
  */

@@ -55,7 +55,7 @@ export type ValidateShapefileGeometry = (
  * Stage 3: Simplify shapefile geometry.
  *
  * Cleans, snaps, fixes geometry, projects to WGS84,
- * and outputs simplified GeoJSON via mapshaper.
+ * and outputs simplified GeoJSON.
  */
 export type SimplifyShapefile = (
   shapefile: ValidatedShapefile,

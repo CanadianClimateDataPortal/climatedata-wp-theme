@@ -10,7 +10,7 @@ import type { SimplifyShapefile } from './pipeline';
 /**
  * Simplify and project a validated shapefile to GeoJSON.
  *
- * Uses mapshaper to clean, snap, fix geometry, project to WGS84,
+ * Clean, snap, fix geometry, project to WGS84,
  * and output as GeoJSON FeatureCollection.
  *
  * Legacy equivalent: `simplify_polygons()` in shapefile-upload.js:654-670

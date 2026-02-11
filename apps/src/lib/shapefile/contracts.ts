@@ -76,8 +76,6 @@ export type GeometryType = (typeof VALUES_SUPPORTED_GEOMETRY_TYPES)[number];
 
 /**
  * Shapefile metadata from validation inspection.
- *
- * Extracted via Mapshaper's `-info` command or equivalent.
  */
 export interface ShapefileInfo {
 	/** Geometry type (must be 'Polygon') */
@@ -106,22 +104,22 @@ export type ValidatedShapefile = ExtractedShapefile & {
 // ============================================================================
 
 /**
- * GeoJSON FeatureCollection output from mapshaper simplification.
+ * GeoJSON FeatureCollection output from the simplification process.
  *
- * Result of mapshaper processing:
+ * Result of processing:
  * - `-clean`: Fix topology errors
  * - `-snap precision=0.001`: Snap coordinates
  * - `-fix-geometry`: Repair invalid geometries
  * - `-proj wgs84`: Project to WGS84
  * - `-o format=geojson`: Output as GeoJSON
  *
- * This is the raw parsed output from mapshaper. The UI layer
- * (downstream tickets) handles conversion to displayable shapes.
+ * This is the raw parsed output. The UI layer (downstream tickets)
+ * handles conversion to displayable shapes.
  */
 export interface SimplifiedGeometry {
-	/** Parsed GeoJSON FeatureCollection from mapshaper */
+	/** Parsed GeoJSON FeatureCollection */
 	featureCollection: FeatureCollection;
-	/** Feature count (from mapshaper output) */
+	/** Feature count */
 	featureCount: number;
 }
 

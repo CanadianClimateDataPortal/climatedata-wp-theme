@@ -1,9 +1,9 @@
 /**
- * Shapefile geometry type validation via Mapshaper.
+ * Shapefile geometry type validation.
  *
- * Inspects the extracted shapefile using Mapshaper's `-info` command
- * to determine the geometry type. Only polygon geometries are accepted
- * for ClimateData's custom region uploads.
+ * Inspects the extracted shapefile to determine the geometry type.
+ * Only polygon geometries are accepted for ClimateData's custom
+ * region uploads.
  *
  * @see {@link ./pipeline.ts} for the type signature
  * @see {@link ./extraction.ts} for the preceding pipeline stage
@@ -23,7 +23,7 @@ import {
 import type { ValidateShapefileGeometry } from '@/lib/shapefile/pipeline';
 
 /**
- * Mapshaper layer info structure returned by `-info save-to=info`.
+ * Layer info structure returned by `-info save-to=info`.
  *
  * Only the fields we inspect are typed here.
  */
@@ -35,11 +35,8 @@ interface MapLayerInfo {
 }
 
 /**
- * Normalize mapshaper's lowercase geometry type to the PascalCase
+ * Normalize geometry type to the PascalCase
  * convention used in our GeometryType contract.
- *
- * Mapshaper returns 'polygon', 'point', 'polyline', etc.
- * Our contract defines 'Polygon', 'Point', 'Polyline', etc.
  *
  * @example
  * normalizeGeometryType('polygon')  // 'Polygon'
@@ -56,11 +53,8 @@ const normalizeGeometryType = (
 /**
  * Validate that an extracted shapefile contains polygon geometry.
  *
- * Uses Mapshaper's `-info` command to inspect the shapefile.
  * Rejects non-polygon geometry types (Point, Polyline, MultiPoint, etc.)
- * with an `InvalidGeometryTypeError`. Mapshaper returns geometry types
- * in lowercase ('polygon'); these are normalized to PascalCase ('Polygon')
- * to match the `GeometryType` contract.
+ * with an `InvalidGeometryTypeError`.
  *
  * @param shapefile - Previously extracted .shp and .prj data
  *
@@ -84,13 +78,13 @@ const normalizeGeometryType = (
 export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 	shapefile,
 ): Promise<Result<ValidatedShapefile, InvalidGeometryTypeError | ProcessingError>> => {
-	// 1. Build input for mapshaper
+	// 1. Build filename input to be validated
 	const input = {
 		'file.shp': shapefile['file.shp'],
 		'file.prj': shapefile['file.prj'],
 	};
 
-	// 2. Run mapshaper -info command
+	// 2. Run initial check
 	let output: Record<string, string>;
 	try {
 		output = await mapshaper.applyCommands(
@@ -101,7 +95,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		return {
 			ok: false,
 			error: new ProcessingError(
-				`Mapshaper info command failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+				`Validation Step 1 Failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
 				{ cause: err instanceof Error ? err : undefined },
 			),
 		};
@@ -113,7 +107,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		return {
 			ok: false,
 			error: new ProcessingError(
-				'Mapshaper returned no info output (expected info.json)',
+				'Validation Step 2 Missing info output (expected info.json)',
 			),
 		};
 	}
@@ -125,7 +119,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		return {
 			ok: false,
 			error: new ProcessingError(
-				`Failed to parse mapshaper info output: ${err instanceof Error ? err.message : 'Unknown error'}`,
+				`Validation Step 3 Failed to parse: ${err instanceof Error ? err.message : 'Unknown error'}`,
 				{ cause: err instanceof Error ? err : undefined },
 			),
 		};
@@ -136,7 +130,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		return {
 			ok: false,
 			error: new ProcessingError(
-				'Mapshaper info returned no layer data or missing geometry_type',
+				'Validation Step 4 No layer data or missing geometry_type',
 			),
 		};
 	}

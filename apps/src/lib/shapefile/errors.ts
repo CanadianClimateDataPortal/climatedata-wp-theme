@@ -176,7 +176,7 @@ export class AreaBelowLimitError extends AbstractError {
 /**
  * Error: Shapefile processing failed.
  *
- * Generic error for Mapshaper or transformation failures.
+ * Generic error for transformation failures.
  * The error code is always `'processing/failed'`.
  *
  * @param message - Descriptive message including diagnostic details
@@ -184,7 +184,7 @@ export class AreaBelowLimitError extends AbstractError {
  *
  * @example
  * ```typescript
- * const err = new ProcessingError('Mapshaper info command failed: timeout');
+ * const err = new ProcessingError('Validation step failed: timeout');
  * err.code;  // 'processing/failed'
  * ```
  */

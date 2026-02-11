@@ -48,6 +48,9 @@ import type { SimplifyShapefile } from './pipeline';
 export const simplifyShapefile: SimplifyShapefile = async (
 	shapefile,
 ): Promise<Result<SimplifiedGeometry, ProcessingError>> => {
+	// --- TEMPORARY DEBUG (CLIM-1267) ---
+	console.log('[SHAPEFILE DEBUG] simplify-shapefile: starting');
+
 	const input = {
 		'file.shp': shapefile['file.shp'],
 		'file.prj': shapefile['file.prj'],
@@ -61,10 +64,27 @@ export const simplifyShapefile: SimplifyShapefile = async (
 		'-o format=geojson',
 		'output.geojson',
 	].join(' ');
+	console.log('[SHAPEFILE DEBUG] simplify-shapefile: cmd =', cmd);
 
 	// Lazy-load mapshaper (only when actually needed, not at page load)
-	const mapshaper = (await import('mapshaper')).default;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let mapshaper: any;
+	try {
+		const mod = await import('mapshaper');
+		mapshaper = mod.default;
+		console.log('[SHAPEFILE DEBUG] simplify-shapefile: mapshaper loaded');
+	} catch (importErr) {
+		console.error('[SHAPEFILE DEBUG] simplify-shapefile: DYNAMIC IMPORT FAILED:', importErr);
+		return {
+			ok: false,
+			error: new ProcessingError(
+				`Failed to load mapshaper: ${importErr instanceof Error ? importErr.message : 'Unknown error'}`,
+				{ cause: importErr instanceof Error ? importErr : undefined },
+			),
+		};
+	}
 
+	console.log('[SHAPEFILE DEBUG] simplify-shapefile: calling applyCommands');
 	let output: Record<string, string>;
 	try {
 		output = await mapshaper.applyCommands(
@@ -72,6 +92,7 @@ export const simplifyShapefile: SimplifyShapefile = async (
 			input,
 		);
 	} catch (err) {
+		console.error('[SHAPEFILE DEBUG] simplify-shapefile: applyCommands THREW:', err);
 		return {
 			ok: false,
 			error: new ProcessingError(
@@ -80,9 +101,12 @@ export const simplifyShapefile: SimplifyShapefile = async (
 			),
 		};
 	}
+	console.log('[SHAPEFILE DEBUG] simplify-shapefile: applyCommands returned, output keys =', Object.keys(output || {}));
 
 	const rawJson = output['output.geojson'];
+	console.log('[SHAPEFILE DEBUG] simplify-shapefile: output.geojson exists =', !!rawJson, ', length =', rawJson?.length);
 	if (!rawJson || typeof rawJson !== 'string') {
+		console.error('[SHAPEFILE DEBUG] simplify-shapefile: NO output.geojson! Keys:', Object.keys(output || {}));
 		return {
 			ok: false,
 			error: new ProcessingError(
@@ -95,6 +119,7 @@ export const simplifyShapefile: SimplifyShapefile = async (
 	try {
 		featureCollection = JSON.parse(rawJson);
 	} catch (err) {
+		console.error('[SHAPEFILE DEBUG] simplify-shapefile: JSON.parse FAILED:', err);
 		return {
 			ok: false,
 			error: new ProcessingError(
@@ -104,6 +129,7 @@ export const simplifyShapefile: SimplifyShapefile = async (
 		};
 	}
 
+	console.log('[SHAPEFILE DEBUG] simplify-shapefile: SUCCESS —', featureCollection.features?.length ?? 0, 'features');
 	return {
 		ok: true,
 		value: {

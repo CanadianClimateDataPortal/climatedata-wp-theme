@@ -98,17 +98,44 @@ const normalizeGeometryType = (
 export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 	shapefile,
 ): Promise<Result<ValidatedShapefile, InvalidGeometryTypeError | ProcessingError>> => {
+	// --- TEMPORARY DEBUG (CLIM-1267) ---
+	console.log('[SHAPEFILE DEBUG] validate-geometry: starting');
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const _win = typeof window !== 'undefined' ? (window as any) : null;
+	console.log('[SHAPEFILE DEBUG] validate-geometry: window.modules keys =',
+		_win?.modules ? Object.keys(_win.modules) : 'NO window.modules');
+
 	// 1. Build filename input to be validated
 	const input = {
 		'file.shp': shapefile['file.shp'],
 		'file.prj': shapefile['file.prj'],
 	};
+	console.log('[SHAPEFILE DEBUG] validate-geometry: input shp =', input['file.shp'] instanceof ArrayBuffer ? `ArrayBuffer(${input['file.shp'].byteLength})` : typeof input['file.shp'],
+		', prj =', typeof input['file.prj'], input['file.prj']?.length, 'chars');
 
 	// 2. Run initial check
 	// Lazy-load mapshaper (only when actually needed, not at page load)
-	const mapshaper = (await import('mapshaper')).default;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let mapshaper: any;
+	try {
+		const mod = await import('mapshaper');
+		mapshaper = mod.default;
+		console.log('[SHAPEFILE DEBUG] validate-geometry: mapshaper loaded, typeof =', typeof mapshaper);
+		console.log('[SHAPEFILE DEBUG] validate-geometry: applyCommands =', typeof mapshaper?.applyCommands);
+		console.log('[SHAPEFILE DEBUG] validate-geometry: mapshaper keys =', Object.keys(mapshaper || {}));
+	} catch (importErr) {
+		console.error('[SHAPEFILE DEBUG] validate-geometry: DYNAMIC IMPORT FAILED:', importErr);
+		return {
+			ok: false,
+			error: new ProcessingError(
+				`Failed to load mapshaper: ${importErr instanceof Error ? importErr.message : 'Unknown error'}`,
+				{ cause: importErr instanceof Error ? importErr : undefined },
+			),
+		};
+	}
 
 	// 3. Run mapshaper -info command
+	console.log('[SHAPEFILE DEBUG] validate-geometry: calling applyCommands("file.shp -info save-to=info")');
 	let output: Record<string, string>;
 	try {
 		output = await mapshaper.applyCommands(
@@ -116,6 +143,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 			input,
 		);
 	} catch (err) {
+		console.error('[SHAPEFILE DEBUG] validate-geometry: applyCommands THREW:', err);
 		return {
 			ok: false,
 			error: new ProcessingError(
@@ -124,10 +152,13 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 			),
 		};
 	}
+	console.log('[SHAPEFILE DEBUG] validate-geometry: applyCommands returned, output keys =', Object.keys(output || {}));
 
 	// 4. Parse info.json output
 	const rawJson = output['info.json'];
+	console.log('[SHAPEFILE DEBUG] validate-geometry: info.json exists =', !!rawJson, ', type =', typeof rawJson, ', length =', rawJson?.length);
 	if (!rawJson || typeof rawJson !== 'string') {
+		console.error('[SHAPEFILE DEBUG] validate-geometry: NO info.json in output! Keys:', Object.keys(output || {}));
 		return {
 			ok: false,
 			error: new ProcessingError(
@@ -140,6 +171,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 	try {
 		layerInfoList = JSON.parse(rawJson);
 	} catch (err) {
+		console.error('[SHAPEFILE DEBUG] validate-geometry: JSON.parse of info.json FAILED:', err, 'rawJson:', rawJson.substring(0, 200));
 		return {
 			ok: false,
 			error: new ProcessingError(
@@ -148,6 +180,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 			),
 		};
 	}
+	console.log('[SHAPEFILE DEBUG] validate-geometry: layerInfoList =', JSON.stringify(layerInfoList));
 
 	// 5. Validate layer data exists
 	if (!layerInfoList.length || !layerInfoList[0].geometry_type) {
@@ -161,8 +194,10 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 
 	// 6. Check geometry type — only Polygon is accepted
 	const normalizedType = normalizeGeometryType(layerInfoList[0].geometry_type);
+	console.log('[SHAPEFILE DEBUG] validate-geometry: geometry_type =', layerInfoList[0].geometry_type, '→ normalized =', normalizedType);
 
 	if (normalizedType !== 'Polygon') {
+		console.error('[SHAPEFILE DEBUG] validate-geometry: REJECTED geometry type:', normalizedType);
 		return {
 			ok: false,
 			error: new InvalidGeometryTypeError(normalizedType),
@@ -170,6 +205,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 	}
 
 	// 7. Return branded ValidatedShapefile
+	console.log('[SHAPEFILE DEBUG] validate-geometry: SUCCESS — polygon geometry confirmed');
 	const validated = shapefile as unknown as ValidatedShapefile;
 	return { ok: true, value: validated };
 };

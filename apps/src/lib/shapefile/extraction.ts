@@ -47,10 +47,14 @@ import type { ExtractShapefileFromZip } from './pipeline';
 export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 	file,
 ): Promise<Result<ExtractedShapefile, ShapefileError>> => {
+	// --- TEMPORARY DEBUG (CLIM-1267) ---
+	console.log('[SHAPEFILE DEBUG] extraction: starting with file', file.name, file.size, 'bytes');
+
 	// 1. Detect if file is a valid ZIP
 	const detection = await detectZip(file);
 
 	if (detection.isEmpty) {
+		console.error('[SHAPEFILE DEBUG] extraction: file is empty');
 		return {
 			ok: false,
 			error: new ShapefileError('File is empty (zero bytes)', {
@@ -60,6 +64,7 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 	}
 
 	if (!detection.isZip) {
+		console.error('[SHAPEFILE DEBUG] extraction: not a ZIP, firstBytes =', detection.firstBytes);
 		return {
 			ok: false,
 			error: new ShapefileError(
@@ -75,6 +80,7 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 		const arrayBuffer = await file.arrayBuffer();
 		unzipped = unzipSync(new Uint8Array(arrayBuffer));
 	} catch (err) {
+		console.error('[SHAPEFILE DEBUG] extraction: ZIP parse failed:', err);
 		return {
 			ok: false,
 			error: new ShapefileError(
@@ -88,6 +94,7 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 	}
 
 	// 3. Find and extract .shp and .prj files
+	console.log('[SHAPEFILE DEBUG] extraction: ZIP parsed, entries:', Object.keys(unzipped));
 	let shpBuffer: ArrayBuffer | null = null;
 	let prjContent: string | null = null;
 
@@ -104,6 +111,7 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 	}
 
 	// 4. Validate required files exist
+	console.log('[SHAPEFILE DEBUG] extraction: shpBuffer =', shpBuffer ? `${shpBuffer.byteLength} bytes` : 'null', ', prjContent =', prjContent ? `${prjContent.length} chars` : 'null');
 	if (!shpBuffer) {
 		return {
 			ok: false,
@@ -128,5 +136,6 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 		'file.prj': prjContent,
 	};
 
+	console.log('[SHAPEFILE DEBUG] extraction: SUCCESS');
 	return { ok: true, value: extracted };
 };

@@ -11,16 +11,16 @@
 
 import mapshaper from 'mapshaper';
 
-import type { Result } from './result';
+import type { Result } from '@/lib/shapefile/result';
 import type {
 	GeometryType,
 	ValidatedShapefile,
-} from './contracts';
+} from '@/lib/shapefile/contracts';
 import {
 	InvalidGeometryTypeError,
 	ProcessingError,
-} from './errors';
-import type { ValidateShapefileGeometry } from './pipeline';
+} from '@/lib/shapefile/errors';
+import type { ValidateShapefileGeometry } from '@/lib/shapefile/pipeline';
 
 /**
  * Mapshaper layer info structure returned by `-info save-to=info`.

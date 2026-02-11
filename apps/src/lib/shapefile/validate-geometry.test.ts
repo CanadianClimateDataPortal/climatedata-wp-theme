@@ -13,9 +13,9 @@ import {
 	vi,
 } from 'vitest';
 
-import { validateShapefileGeometry } from './validate-geometry';
-import { InvalidGeometryTypeError, ProcessingError } from './errors';
-import { EXAMPLE_EXTRACTED_SHAPEFILE } from './contracts.examples';
+import { validateShapefileGeometry } from '@/lib/shapefile/validate-geometry';
+import { InvalidGeometryTypeError, ProcessingError } from '@/lib/shapefile/errors';
+import { EXAMPLE_EXTRACTED_SHAPEFILE } from '@/lib/shapefile/contracts.examples';
 
 // Mock mapshaper module
 vi.mock('mapshaper', () => ({

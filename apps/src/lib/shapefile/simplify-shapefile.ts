@@ -62,6 +62,9 @@ export const simplifyShapefile: SimplifyShapefile = async (
 		'output.geojson',
 	].join(' ');
 
+	// Lazy-load mapshaper (only when actually needed, not at page load)
+	const mapshaper = (await import('mapshaper')).default;
+
 	let output: Record<string, string>;
 	try {
 		output = await mapshaper.applyCommands(

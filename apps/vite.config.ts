@@ -24,11 +24,13 @@ import { defineConfig, type Plugin } from 'vite'
  *    always false. This prevents @rollup/plugin-commonjs from
  *    hijacking mapshaper's require calls. Falls to branch 2.
  *
- * 2. WINDOW.MODULES BRIDGE — a virtual wrapper module intercepts
- *    `import mapshaper from 'mapshaper'`. The wrapper imports real
- *    npm dependencies (flatbush, kdbush, mproj, iconv-lite, etc.)
- *    via standard ESM imports and populates `window.modules` so the
- *    branch 2 shim finds them. Then re-exports actual mapshaper.
+ * 2. WINDOW.MODULES BRIDGE — two virtual modules ensure correct
+ *    ESM evaluation order. A "setup" module imports real npm deps
+ *    (flatbush, kdbush, mproj, iconv-lite, etc.) and populates
+ *    `window.modules`. A "wrapper" module imports setup first
+ *    (side-effect), then re-exports mapshaper. ESM depth-first
+ *    evaluation guarantees window.modules is populated BEFORE
+ *    mapshaper.js runs its require shim (branch 2).
  *    Node.js builtins (fs, path, etc.) are NOT in window.modules,
  *    so require$1('fs') returns undefined — safe because mapshaper
  *    guards those with runningInBrowser() or try/catch.
@@ -153,12 +155,26 @@ function mapshaperNodeStubs(): Plugin {
         '}',
     ].join('\n');
 
-    // Virtual wrapper module for mapshaper that:
-    // 1. Imports real npm deps via standard ESM resolution
-    // 2. Populates window.modules so mapshaper's branch-2 shim finds them
-    // 3. Re-exports the real mapshaper module
+    // Two-stage virtual module approach for correct ESM evaluation order.
+    //
+    // Problem: In ESM, all import/export-from declarations are evaluated
+    // BEFORE the module body runs. A single wrapper that imports deps,
+    // populates window.modules, AND re-exports mapshaper would evaluate
+    // mapshaper BEFORE window.modules is populated (because export-from
+    // is a declaration evaluated alongside imports, before the body).
+    //
+    // Solution: Split into two modules:
+    //   1. SETUP — imports deps, populates window.modules (body runs)
+    //   2. WRAPPER — imports setup (side-effect), then re-exports mapshaper
+    //
+    // ESM depth-first evaluation guarantees the setup subtree (including
+    // its body) completes before mapshaper.js is evaluated, because
+    // 'import "mapshaper-browser-setup"' precedes 'export { default }
+    // from "mapshaper"' in the wrapper's source order.
+    const SETUP_ID = '\0mapshaper-browser-setup';
     const WRAPPER_ID = '\0mapshaper-browser-wrapper';
-    const wrapperSource = [
+
+    const setupSource = [
         'import _ms_flatbush from "flatbush";',
         'import _ms_kdbush from "kdbush";',
         'import * as _ms_iconv from "iconv-lite";',
@@ -172,8 +188,13 @@ function mapshaperNodeStubs(): Plugin {
         '  window.modules["mproj"] = _ms_mproj;',
         '  window.modules["geographiclib-geodesic"] = _ms_geographiclib;',
         '}',
-        // Re-export the real mapshaper (resolved by Rollup, not intercepted
-        // because the importer is this virtual module which starts with \0)
+    ].join('\n');
+
+    // Wrapper: side-effect import ensures setup runs first, then
+    // re-export the real mapshaper (resolved by Rollup, not intercepted
+    // because the importer is this virtual module which starts with \0).
+    const wrapperSource = [
+        'import "mapshaper-browser-setup";',
         'export { default } from "mapshaper";',
     ].join('\n');
 
@@ -188,6 +209,10 @@ function mapshaperNodeStubs(): Plugin {
             if (id === 'mapshaper' && importer && !importer.startsWith('\0')) {
                 return WRAPPER_ID;
             }
+            // Route the setup module import from the wrapper
+            if (id === 'mapshaper-browser-setup') {
+                return SETUP_ID;
+            }
             // Stub Node.js builtins for both mapshaper and its transitive
             // deps (mproj → fs/path, iconv-lite → safer-buffer → buffer)
             if (id in stubs) return `\0stub:${id}`;
@@ -195,6 +220,7 @@ function mapshaperNodeStubs(): Plugin {
         },
         load(id) {
             if (id === WRAPPER_ID) return wrapperSource;
+            if (id === SETUP_ID) return setupSource;
             const match = id.match(/^\0stub:(.+)$/);
             if (match && match[1] in stubs) return stubs[match[1]];
             return null;

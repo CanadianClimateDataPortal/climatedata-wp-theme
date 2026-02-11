@@ -27,8 +27,6 @@
  * @see {@link ./extraction.ts} for the preceding pipeline stage
  */
 
-import mapshaper from 'mapshaper';
-
 import {
 	type Result,
 } from './result';
@@ -107,6 +105,10 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 	};
 
 	// 2. Run initial check
+	// Lazy-load mapshaper (only when actually needed, not at page load)
+	const mapshaper = (await import('mapshaper')).default;
+
+	// 3. Run mapshaper -info command
 	let output: Record<string, string>;
 	try {
 		output = await mapshaper.applyCommands(
@@ -123,7 +125,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		};
 	}
 
-	// 3. Parse info.json output
+	// 4. Parse info.json output
 	const rawJson = output['info.json'];
 	if (!rawJson || typeof rawJson !== 'string') {
 		return {
@@ -147,7 +149,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		};
 	}
 
-	// 4. Validate layer data exists
+	// 5. Validate layer data exists
 	if (!layerInfoList.length || !layerInfoList[0].geometry_type) {
 		return {
 			ok: false,
@@ -157,7 +159,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		};
 	}
 
-	// 5. Check geometry type — only Polygon is accepted
+	// 6. Check geometry type — only Polygon is accepted
 	const normalizedType = normalizeGeometryType(layerInfoList[0].geometry_type);
 
 	if (normalizedType !== 'Polygon') {
@@ -167,7 +169,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		};
 	}
 
-	// 6. Return branded ValidatedShapefile
+	// 7. Return branded ValidatedShapefile
 	const validated = shapefile as unknown as ValidatedShapefile;
 	return { ok: true, value: validated };
 };

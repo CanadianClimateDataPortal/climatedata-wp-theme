@@ -1,4 +1,4 @@
-import mapshaper from 'mapshaper';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import type { FeatureCollection } from 'geojson';
 
@@ -33,26 +33,12 @@ import type { SimplifyShapefile } from './pipeline';
 export const simplifyShapefile: SimplifyShapefile = async (
 	shapefile,
 ): Promise<Result<SimplifiedGeometry, ProcessingError>> => {
-	const input = {
-		'file.shp': shapefile['file.shp'],
-		'file.prj': shapefile['file.prj'],
-	};
-
-	const cmd = [
-		'-i file.shp encoding=utf-8',
-		'-clean',
-		'-snap precision=0.001 fix-geometry',
-		'-proj wgs84',
-		'-o format=geojson',
-		'output.geojson',
-	].join(' ');
 
 	let output: Record<string, string>;
 	try {
-		output = await mapshaper.applyCommands(
-			cmd,
-			input,
-		);
+		// STUB TODO
+		output = {
+		};
 	} catch (err) {
 		return {
 			ok: false,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Shapefile geometry type validation.
  *
@@ -8,8 +9,6 @@
  * @see {@link ./pipeline.ts} for the type signature
  * @see {@link ./extraction.ts} for the preceding pipeline stage
  */
-
-import mapshaper from 'mapshaper';
 
 import type { Result } from '@/lib/shapefile/result';
 import type {
@@ -73,29 +72,23 @@ const normalizeGeometryType = (
  * ```
  *
  * @see {@link ./pipeline.ts} for the type signature
- * @see {@link https://github.com/mbloch/mapshaper/wiki/Using-mapshaper-programmatically Mapshaper programmatic API}
  */
 export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 	shapefile,
 ): Promise<Result<ValidatedShapefile, InvalidGeometryTypeError | ProcessingError>> => {
 	// 1. Build filename input to be validated
-	const input = {
-		'file.shp': shapefile['file.shp'],
-		'file.prj': shapefile['file.prj'],
-	};
 
 	// 2. Run initial check
 	let output: Record<string, string>;
 	try {
-		output = await mapshaper.applyCommands(
-			'file.shp -info save-to=info',
-			input,
-		);
+		// STUB TODO
+		output = {
+		};
 	} catch (err) {
 		return {
 			ok: false,
 			error: new ProcessingError(
-				`Validation Step 1 Failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+				`Mapshaper info command failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
 				{ cause: err instanceof Error ? err : undefined },
 			),
 		};
@@ -107,7 +100,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		return {
 			ok: false,
 			error: new ProcessingError(
-				'Validation Step 2 Missing info output (expected info.json)',
+				'Mapshaper returned no info output (expected info.json)',
 			),
 		};
 	}
@@ -119,7 +112,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		return {
 			ok: false,
 			error: new ProcessingError(
-				`Validation Step 3 Failed to parse: ${err instanceof Error ? err.message : 'Unknown error'}`,
+				`Failed to parse mapshaper info output: ${err instanceof Error ? err.message : 'Unknown error'}`,
 				{ cause: err instanceof Error ? err : undefined },
 			),
 		};
@@ -130,7 +123,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		return {
 			ok: false,
 			error: new ProcessingError(
-				'Validation Step 4 No layer data or missing geometry_type',
+				'Mapshaper info returned no layer data or missing geometry_type',
 			),
 		};
 	}

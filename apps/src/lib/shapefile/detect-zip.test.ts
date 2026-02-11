@@ -9,7 +9,10 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { createMockFile } from './test-utils';
+
+import {
+	createMockFile,
+} from './test-utils';
 import {
 	detectZip,
 	formatMagicBytes,

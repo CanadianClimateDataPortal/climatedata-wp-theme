@@ -1,5 +1,8 @@
 import { AbstractError, type WithErrorCode } from '@/lib/errors';
-import { type GeometryType } from './contracts';
+
+import {
+	type GeometryType,
+} from './contracts';
 
 // ============================================================================
 // ERROR CODES

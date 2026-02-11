@@ -6,6 +6,7 @@
  */
 
 import { unzipSync } from 'fflate';
+
 import { detectZip } from './detect-zip';
 import { ShapefileError } from './errors';
 import type { ExtractedShapefile } from './contracts';

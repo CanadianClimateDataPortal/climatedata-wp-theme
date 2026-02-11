@@ -1,4 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+
+
+/**
+ * @file
+ *
+ * IMPORTANT — STUB FILE. Avoid modifying.
+ *
+ * The body of this function is scaffolding only. A follow-up PR will
+ * replace the stub output with a real client-side geometry inspection.
+ * Keep changes minimal to avoid merge conflicts with that work.
+ *
+ * Do not reference dependency names in comments or error messages.
+ * Describe operations and contracts, not the library that implements them.
+ *
+ * @see [[LLM-Context-ClimateData-Ticket-CLIM-1267-Client-Side-Escaped-Defect]]
+ */
+
 /**
  * Shapefile geometry type validation.
  *
@@ -10,19 +27,19 @@
  * @see {@link ./extraction.ts} for the preceding pipeline stage
  */
 
-import type { Result } from '@/lib/shapefile/result';
+import type { Result } from './result';
 import type {
 	GeometryType,
 	ValidatedShapefile,
-} from '@/lib/shapefile/contracts';
+} from './contracts';
 import {
 	InvalidGeometryTypeError,
 	ProcessingError,
-} from '@/lib/shapefile/errors';
-import type { ValidateShapefileGeometry } from '@/lib/shapefile/pipeline';
+} from './errors';
+import type { ValidateShapefileGeometry } from './pipeline';
 
 /**
- * Layer info structure returned by `-info save-to=info`.
+ * Layer info from geometry inspection.
  *
  * Only the fields we inspect are typed here.
  */
@@ -78,17 +95,22 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 ): Promise<Result<ValidatedShapefile, InvalidGeometryTypeError | ProcessingError>> => {
 	// 1. Build filename input to be validated
 
+	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
+	// ... Reason being that this file, in this state, is the base for either Follow-Up implementation PR.
+	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
+
 	// 2. Run initial check
 	let output: Record<string, string>;
 	try {
-		// STUB TODO
+		// STUB: pass-through — real geometry inspection in follow-up PR
 		output = {
+			'info.json': JSON.stringify([{ geometry_type: 'polygon', feature_count: 0 }]),
 		};
 	} catch (err) {
 		return {
 			ok: false,
 			error: new ProcessingError(
-				`Mapshaper info command failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+				`Validation Step Error: ${err instanceof Error ? err.message : 'Unknown error'}`,
 				{ cause: err instanceof Error ? err : undefined },
 			),
 		};
@@ -100,7 +122,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		return {
 			ok: false,
 			error: new ProcessingError(
-				'Mapshaper returned no info output (expected info.json)',
+				'Validation Step Error: returned no info output (expected info.json)',
 			),
 		};
 	}
@@ -112,7 +134,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		return {
 			ok: false,
 			error: new ProcessingError(
-				`Failed to parse mapshaper info output: ${err instanceof Error ? err.message : 'Unknown error'}`,
+				`Validation Step Error Failed to parse info output: ${err instanceof Error ? err.message : 'Unknown error'}`,
 				{ cause: err instanceof Error ? err : undefined },
 			),
 		};
@@ -123,7 +145,7 @@ export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 		return {
 			ok: false,
 			error: new ProcessingError(
-				'Mapshaper info returned no layer data or missing geometry_type',
+				'Validation Step Error: received no layer data or missing geometry_type',
 			),
 		};
 	}

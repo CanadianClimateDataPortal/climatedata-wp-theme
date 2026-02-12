@@ -412,6 +412,7 @@ const SkillLevelPart = ({ locationData }: SkillLevelPartProps) => {
 	const skillLevel = locationData?.skill_level;
 	const hasSkillLevel = skillLevel != null;
 	const skillCRPSS = locationData?.skill_CRPSS;
+	const hasSkillCRPSS = skillCRPSS != null;
 
 	const tooltipSkillLevel = hasSkillLevel ? (
 		<>
@@ -421,7 +422,7 @@ const SkillLevelPart = ({ locationData }: SkillLevelPartProps) => {
 	) : null;
 
 	const SkillLevelLine =
-		skillCRPSS && hasSkillLevel ? (
+		hasSkillCRPSS && hasSkillLevel ? (
 			<>
 				{SKILL_LEVEL_LABELS[skillLevel]}
 				{' - '}

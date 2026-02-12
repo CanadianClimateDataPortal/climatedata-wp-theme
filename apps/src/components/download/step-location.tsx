@@ -13,6 +13,7 @@ import { StepComponentRef } from '@/types/download-form-interface';
 import { useAppDispatch } from '@/app/hooks';
 import { setSelectionMode } from '@/features/download/download-slice';
 import RasterDownloadMap from '@/components/download/raster-download-map';
+import { useShapefile } from '@/hooks/use-shapefile';
 
 import 'leaflet/dist/leaflet.css';
 
@@ -23,6 +24,7 @@ import 'leaflet/dist/leaflet.css';
  */
 const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { climateVariable } = useClimateVariable();
+	const { reset: resetShapefile } = useShapefile();
 
 	const dispatch = useAppDispatch();
 
@@ -32,14 +34,17 @@ const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
 		reset: () => {
 			// Reset the selection mode
 			dispatch(setSelectionMode('cells'));
+			// Reset the shapefile state
+			resetShapefile();
 		},
 		getResetPayload: () => {
 			return {
 				selectedPoints: {},
 				selectedRegion: null,
+				interactiveRegion: null,
 			};
 		}
-	}), [climateVariable]);
+	}), [climateVariable, dispatch, resetShapefile]);
 
 	return (
 		<StepContainer title={__('Select a location or area')}>

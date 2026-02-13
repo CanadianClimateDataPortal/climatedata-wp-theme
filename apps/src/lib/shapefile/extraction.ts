@@ -7,7 +7,7 @@
 
 import { unzipSync } from 'fflate';
 
-import { detectZip } from './detect-zip';
+import { detectZip } from './magic-bytes';
 import { ShapefileError } from './errors';
 import type { ExtractedShapefile } from './contracts';
 import type { Result } from './result';

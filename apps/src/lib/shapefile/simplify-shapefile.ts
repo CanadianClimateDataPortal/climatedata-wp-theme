@@ -1,25 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /**
- * @file
+ * Shapefile simplification and projection to GeoJSON.
  *
- * IMPORTANT — STUB FILE. Avoid modifying.
+ * Thin wrapper that lazy-loads the implementation via dynamic import.
+ * This enables Vite code-splitting — shpjs, @turf, and proj4 are only
+ * loaded when this function is first called.
  *
- * The body of this function is scaffolding only. A follow-up PR will
- * replace the stub output with a real client-side simplification pipeline.
- * Keep changes minimal to avoid merge conflicts with that work.
- *
- * Do not reference dependency names in comments or error messages.
- * Describe operations and contracts, not the library that implements them.
- *
- * @see [[LLM-Context-ClimateData-Ticket-CLIM-1267-Client-Side-Escaped-Defect]]
+ * @see {@link ./simplify-shapefile-impl.ts} for the actual logic
+ * @see {@link ./pipeline.ts} for the type signature
+ * @see {@link ./validate-geometry.ts} for the preceding pipeline stage
  */
 
-import type { FeatureCollection } from 'geojson';
-
-import type { Result } from './result';
-import type { SimplifiedGeometry } from './contracts';
-import { ProcessingError } from './errors';
 import type { SimplifyShapefile } from './pipeline';
 
 /**
@@ -46,57 +36,8 @@ import type { SimplifyShapefile } from './pipeline';
  * ```
  */
 export const simplifyShapefile: SimplifyShapefile = async (
-	_shapefile,
-): Promise<Result<SimplifiedGeometry, ProcessingError>> => {
-
-	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
-	// ... Reason being that this file, in this state, is the base for either Follow-Up implementation PR.
-	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
-
-	let output: Record<string, string>;
-	try {
-		// STUB: pass-through — real simplification in follow-up PR
-		output = {
-			'output.geojson': JSON.stringify({ type: 'FeatureCollection', features: [] }),
-		};
-	} catch (err) {
-		return {
-			ok: false,
-			error: new ProcessingError(
-				`Simplification Step Error: ${err instanceof Error ? err.message : 'Unknown error'}`,
-				{ cause: err instanceof Error ? err : undefined },
-			),
-		};
-	}
-
-	const rawJson = output['output.geojson'];
-	if (!rawJson || typeof rawJson !== 'string') {
-		return {
-			ok: false,
-			error: new ProcessingError(
-				'Simplification Step Error Receiving no GeoJSON output',
-			),
-		};
-	}
-
-	let featureCollection: FeatureCollection;
-	try {
-		featureCollection = JSON.parse(rawJson);
-	} catch (err) {
-		return {
-			ok: false,
-			error: new ProcessingError(
-				`Simplification Step Failed to parse GeoJSON output: ${err instanceof Error ? err.message : 'Unknown error'}`,
-				{ cause: err instanceof Error ? err : undefined },
-			),
-		};
-	}
-
-	return {
-		ok: true,
-		value: {
-			featureCollection,
-			featureCount: featureCollection.features?.length ?? 0,
-		},
-	};
+	shapefile,
+) => {
+	const { simplifyShapefileImpl } = await import('./simplify-shapefile-impl');
+	return simplifyShapefileImpl(shapefile);
 };

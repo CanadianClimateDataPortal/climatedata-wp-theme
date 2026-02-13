@@ -9,7 +9,7 @@ import FileInput from '@/components/ui/file-input';
 
 interface ShapefileUploadComponentProps {
 	file: File | null;
-	isFileInvalid: boolean;
+	isFileValid: boolean;
 	isProcessingFile: boolean;
 	isModalOpened: boolean;
 	onModalClose: () => void;
@@ -28,7 +28,7 @@ export default function ShapefileUpload(): React.ReactElement {
 
 	const {
 		isProcessingFile,
-		isFileInvalid,
+		isFileValid,
 		file,
 		reset,
 		setFile,
@@ -38,14 +38,14 @@ export default function ShapefileUpload(): React.ReactElement {
 		<ShapefileUploadComponent
 			file={file}
 			isProcessingFile={isProcessingFile}
-			isFileInvalid={isFileInvalid}
+			isFileValid={isFileValid}
 			isModalOpened={isModalOpened}
 			onModalClose={() => setModalOpened(false)}
 			onSupportedFilesClick={() => setModalOpened(true)}
 			onChangeFile={setFile}
 			onRemoveFile={reset}
 		/>
-	)
+	);
 }
 
 /**
@@ -54,7 +54,7 @@ export default function ShapefileUpload(): React.ReactElement {
 function ShapefileUploadComponent({
 	file,
 	isProcessingFile,
-	isFileInvalid,
+	isFileValid,
 	isModalOpened,
 	onModalClose,
 	onSupportedFilesClick,
@@ -64,7 +64,7 @@ function ShapefileUploadComponent({
 	const tooltip = __(
 		'This feature allows you to upload your shapefile to select a custom ' +
 		'region. Once your shapefile is selected, the shapes will appear on ' +
-		'the map. Click the region of interest to continue.',
+		'the map. Click the region of interest to continue.'
 	);
 
 	const modalContent = __(
@@ -73,7 +73,10 @@ function ShapefileUploadComponent({
 		'at least partially, within Canada (data is available only for land ' +
 		'areas of Canada). Only the WGS84 coordinate system is supported, ' +
 		'which is the most common.'
-	)
+	);
+
+	const hasFile = file != null;
+	const isFileInvalid = hasFile && !isFileValid;
 
 	const modal = (
 		<Modal isOpen={isModalOpened} onClose={onModalClose}>
@@ -114,7 +117,7 @@ function ShapefileUploadComponent({
 					className="text-sm flex flex-row items-center gap-1 text-neutral-grey-medium sm:mt-2 hover:text-dark-purple cursor-pointer"
 					onClick={onSupportedFilesClick}
 				>
-					<MessageCircleQuestion size={16}/>
+					<MessageCircleQuestion size={16} />
 					<span className="underline">
 						{__('What are the supported files?')}
 					</span>

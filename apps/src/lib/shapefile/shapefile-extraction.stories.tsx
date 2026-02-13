@@ -355,10 +355,12 @@ const PipelineInner = () => {
 	const {
 		file,
 		isProcessingFile,
-		isFileInvalid,
+		isFileValid,
 		setFile,
 		reset,
 	} = useShapefile();
+
+	const isFileInvalid = file !==null && !isFileValid;
 
 	const context = useContext(ShapefileContext);
 	const snapshot = useSelector(context!.actor, (s) => s);

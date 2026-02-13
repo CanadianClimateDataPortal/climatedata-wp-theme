@@ -16,6 +16,7 @@ import RasterDownloadMap from '@/components/download/raster-download-map';
 import { useShapefile } from '@/hooks/use-shapefile';
 
 import 'leaflet/dist/leaflet.css';
+import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 
 /**
  * Step 4
@@ -24,13 +25,24 @@ import 'leaflet/dist/leaflet.css';
  */
 const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { climateVariable } = useClimateVariable();
-	const { reset: resetShapefile } = useShapefile();
+	const {
+		reset: resetShapefile,
+		isSelectedRegionValid: isShapefileSelectedRegionValid,
+	} = useShapefile();
+	const isShapefileMode = climateVariable?.getInteractiveRegion() === InteractiveRegionOption.USER;
+	const isRegionSelected = Boolean(climateVariable?.getSelectedRegion());
+	const selectedPointsCount = climateVariable?.getSelectedPointsCount() ?? 0;
 
 	const dispatch = useAppDispatch();
 
 	React.useImperativeHandle(ref, () => ({
-		isValid: () =>
-			(climateVariable?.getSelectedPointsCount() ?? 0) > 0 || Boolean(climateVariable?.getSelectedRegion()),
+		isValid: () => {
+			if (isShapefileMode) {
+				return isShapefileSelectedRegionValid;
+			}
+
+			return selectedPointsCount > 0 || isRegionSelected;
+		},
 		reset: () => {
 			// Reset the selection mode
 			dispatch(setSelectionMode('cells'));
@@ -44,7 +56,14 @@ const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
 				interactiveRegion: null,
 			};
 		}
-	}), [climateVariable, dispatch, resetShapefile]);
+	}), [
+		isRegionSelected,
+		isShapefileSelectedRegionValid,
+		selectedPointsCount,
+		dispatch,
+		resetShapefile,
+		isShapefileMode,
+	]);
 
 	return (
 		<StepContainer title={__('Select a location or area')}>

@@ -8,9 +8,10 @@ import {
 import { ShapefileError } from '@/lib/shapefile';
 
 export type UseShapefileHook = {
-	file: File | null;
 	isProcessingFile: boolean;
-	isFileInvalid: boolean;
+	isFileValid: boolean;
+	isSelectedRegionValid: boolean;
+	file: File | null;
 	reset: () => void;
 	setFile: (file: File | null) => void;
 };
@@ -33,6 +34,8 @@ export function useShapefile(): UseShapefileHook {
 	const snapshot = useSelector(actor, (snapshot) => snapshot);
 	const send = actor.send;
 	const error = snapshot.context.error;
+	const file = snapshot.context.file;
+	const hasFile = !!file;
 	const hasError = !!error;
 	const errorCode: string | null =
 		error instanceof ShapefileError ? error.code : null;
@@ -47,6 +50,8 @@ export function useShapefile(): UseShapefileHook {
 		(errorCode.startsWith('extraction/') ||
 			errorCode.startsWith('validation/') ||
 			errorCode.startsWith('processing/'));
+	const isFileValid = hasFile && !isFileInvalid;
+	const isSelectedRegionValid = snapshot.matches('ready');
 
 	const reset = () => {
 		send({ type: 'RESET' });
@@ -64,9 +69,10 @@ export function useShapefile(): UseShapefileHook {
 	};
 
 	return {
-		file: snapshot.context.file,
 		isProcessingFile,
-		isFileInvalid,
+		isFileValid,
+		isSelectedRegionValid,
+		file,
 		reset,
 		setFile,
 	};

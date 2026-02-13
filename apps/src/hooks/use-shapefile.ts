@@ -34,14 +34,23 @@ export function useShapefile(): UseShapefileHook {
 	const send = actor.send;
 	const error = snapshot.context.error;
 	const hasError = !!error;
+	const errorCode: string | null =
+		error instanceof ShapefileError ? error.code : null;
 
 	const isProcessingFile =
-		snapshot.matches('extracting') || snapshot.matches('validating') || snapshot.matches('transforming');
-	const isFileInvalid = hasError && error instanceof ShapefileError;
+		snapshot.matches('extracting') ||
+		snapshot.matches('validating') ||
+		snapshot.matches('transforming');
+	const isFileInvalid =
+		hasError &&
+		errorCode != null &&
+		(errorCode.startsWith('extraction/') ||
+			errorCode.startsWith('validation/') ||
+			errorCode.startsWith('processing/'));
 
 	const reset = () => {
 		send({ type: 'RESET' });
-	}
+	};
 
 	const setFile = (file: File | null) => {
 		if (!file) {
@@ -52,7 +61,7 @@ export function useShapefile(): UseShapefileHook {
 				file,
 			});
 		}
-	}
+	};
 
 	return {
 		file: snapshot.context.file,

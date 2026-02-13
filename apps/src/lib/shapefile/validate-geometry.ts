@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 
 /**
  * @file
@@ -17,6 +15,8 @@
  */
 
 /**
+ * @file
+ *
  * Shapefile geometry type validation.
  *
  * Inspects the extracted shapefile to determine the geometry type.
@@ -27,16 +27,22 @@
  * @see {@link ./extraction.ts} for the preceding pipeline stage
  */
 
-import type { Result } from './result';
-import type {
-	GeometryType,
-	ValidatedShapefile,
+import mapshaper from 'mapshaper';
+
+import {
+	type Result,
+} from './result';
+import {
+	type GeometryType,
+	type ValidatedShapefile,
 } from './contracts';
 import {
 	InvalidGeometryTypeError,
 	ProcessingError,
 } from './errors';
-import type { ValidateShapefileGeometry } from './pipeline';
+import {
+	type ValidateShapefileGeometry,
+} from './pipeline';
 
 /**
  * Layer info from geometry inspection.
@@ -89,23 +95,24 @@ const normalizeGeometryType = (
  * ```
  *
  * @see {@link ./pipeline.ts} for the type signature
+ * @see {@link https://github.com/mbloch/mapshaper/wiki/Using-mapshaper-programmatically Mapshaper programmatic API}
  */
 export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 	shapefile,
 ): Promise<Result<ValidatedShapefile, InvalidGeometryTypeError | ProcessingError>> => {
 	// 1. Build filename input to be validated
-
-	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
-	// ... Reason being that this file, in this state, is the base for either Follow-Up implementation PR.
-	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
+	const input = {
+		'file.shp': shapefile['file.shp'],
+		'file.prj': shapefile['file.prj'],
+	};
 
 	// 2. Run initial check
 	let output: Record<string, string>;
 	try {
-		// STUB: pass-through — real geometry inspection in follow-up PR
-		output = {
-			'info.json': JSON.stringify([{ geometry_type: 'polygon', feature_count: 0 }]),
-		};
+		output = await mapshaper.applyCommands(
+			'file.shp -info save-to=info',
+			input,
+		);
 	} catch (err) {
 		return {
 			ok: false,

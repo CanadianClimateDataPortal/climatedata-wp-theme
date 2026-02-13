@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 /**
  * @file
@@ -15,6 +14,7 @@
  * @see [[LLM-Context-ClimateData-Ticket-CLIM-1267-Client-Side-Escaped-Defect]]
  */
 
+import mapshaper from 'mapshaper';
 import type { FeatureCollection } from 'geojson';
 
 import type { Result } from './result';
@@ -46,19 +46,28 @@ import type { SimplifyShapefile } from './pipeline';
  * ```
  */
 export const simplifyShapefile: SimplifyShapefile = async (
-	_shapefile,
+	shapefile,
 ): Promise<Result<SimplifiedGeometry, ProcessingError>> => {
+	const input = {
+		'file.shp': shapefile['file.shp'],
+		'file.prj': shapefile['file.prj'],
+	};
 
-	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
-	// ... Reason being that this file, in this state, is the base for either Follow-Up implementation PR.
-	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
+	const cmd = [
+		'-i file.shp encoding=utf-8',
+		'-clean',
+		'-snap precision=0.001 fix-geometry',
+		'-proj wgs84',
+		'-o format=geojson',
+		'output.geojson',
+	].join(' ');
 
 	let output: Record<string, string>;
 	try {
-		// STUB: pass-through — real simplification in follow-up PR
-		output = {
-			'output.geojson': JSON.stringify({ type: 'FeatureCollection', features: [] }),
-		};
+		output = await mapshaper.applyCommands(
+			cmd,
+			input,
+		);
 	} catch (err) {
 		return {
 			ok: false,

@@ -17,6 +17,7 @@ import {
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
 import { getInteractiveRegionName } from '@/lib/utils';
+import { useShapefile } from '@/hooks/use-shapefile';
 
 interface InteractiveRegionSelectProps {
 	onChange?: (value: InteractiveRegionOption) => void;
@@ -28,6 +29,7 @@ const InteractiveRegionSelect: React.FC<InteractiveRegionSelectProps> = ({
 	displayMode,
 }) => {
 	const { climateVariable, setInteractiveRegion } = useClimateVariable();
+	const { reset: resetShapefile } = useShapefile();
 
 	const options: { value: InteractiveRegionOption; label: string }[] = [
 		InteractiveRegionOption.GRIDDED_DATA,
@@ -86,6 +88,12 @@ const InteractiveRegionSelect: React.FC<InteractiveRegionSelectProps> = ({
 		if (onChange) {
 			onChange(value);
 		}
+
+		// If changing from the shapefile option, we clear the shapefile state.
+		if (climateVariable?.getInteractiveRegion() === InteractiveRegionOption.USER) {
+			resetShapefile();
+		}
+
 		setInteractiveRegion(value);
 	};
 

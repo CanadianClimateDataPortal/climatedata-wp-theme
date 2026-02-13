@@ -13,32 +13,35 @@
 
 import { assign, fromPromise, setup } from 'xstate';
 
-import type { Result } from '@/lib/shapefile/result';
-import type {
-	AreaConstraints,
-	AreaValidationResult,
-	DisplayableShapes,
-	ExtractedShapefile,
-	FinchShapeParameter,
-	SelectedRegion,
-	SimplifiedTopoJSON,
-	ValidatedRegion,
-	ValidatedShapefile,
-} from '@/lib/shapefile/contracts';
-import { DEFAULT_AREA_CONSTRAINTS } from '@/lib/shapefile/contracts';
-import type {
-	ConvertToDisplayableShapes,
-	ExtractShapefileFromZip,
-	PrepareFinchPayload,
-	TransformToTopoJSON,
-	ValidateSelectedArea,
-	ValidateShapefileGeometry,
-} from '@/lib/shapefile/pipeline';
-import type {
-	ProcessingError,
-	ProjectionError,
-	InvalidGeometryTypeError,
-} from '@/lib/shapefile/errors';
+import type { Feature, Polygon } from 'geojson';
+
+import {
+	type Result,
+} from './result';
+import {
+	type AreaConstraints,
+	type AreaValidationResult,
+	type DisplayableShapes,
+	type ExtractedShapefile,
+	type FinchShapeParameter,
+	type SelectedRegion,
+	type SimplifiedGeometry,
+	type ValidatedRegion,
+	type ValidatedShapefile,
+	DEFAULT_AREA_CONSTRAINTS,
+} from './contracts';
+import {
+	type ExtractShapefileFromZip,
+	type PrepareFinchPayload,
+	type SimplifyShapefile,
+	type ValidateSelectedArea,
+	type ValidateShapefileGeometry,
+} from './pipeline';
+import {
+	type ProcessingError,
+	type ProjectionError,
+	type InvalidGeometryTypeError,
+} from './errors';
 
 // ============================================================================
 // SERVICES (injected pipeline functions)
@@ -48,9 +51,8 @@ export type PipelineServices = {
 	// Async (invoked as actors)
 	extractShapefileFromZip: ExtractShapefileFromZip;
 	validateShapefileGeometry: ValidateShapefileGeometry;
-	transformToTopoJSON: TransformToTopoJSON;
+	simplifyShapefile: SimplifyShapefile;
 	// Sync (called in actions)
-	convertToDisplayableShapes: ConvertToDisplayableShapes;
 	validateSelectedArea: ValidateSelectedArea;
 	prepareFinchPayload: PrepareFinchPayload;
 };
@@ -63,7 +65,7 @@ export type MachineContext = {
 	file: File | null;
 	extractedShapefile: ExtractedShapefile | null;
 	validatedShapefile: ValidatedShapefile | null;
-	simplifiedTopoJSON: SimplifiedTopoJSON | null;
+	simplifiedGeometry: SimplifiedGeometry | null;
 	displayableShapes: DisplayableShapes | null;
 	selectedRegion: SelectedRegion | null;
 	validatedRegion: ValidatedRegion | null;
@@ -86,7 +88,7 @@ function initialContext(services: PipelineServices): MachineContext {
 		file: null,
 		extractedShapefile: null,
 		validatedShapefile: null,
-		simplifiedTopoJSON: null,
+		simplifiedGeometry: null,
 		displayableShapes: null,
 		selectedRegion: null,
 		validatedRegion: null,
@@ -103,7 +105,7 @@ function downstreamReset(): Partial<MachineContext> {
 	return {
 		extractedShapefile: null,
 		validatedShapefile: null,
-		simplifiedTopoJSON: null,
+		simplifiedGeometry: null,
 		displayableShapes: null,
 		selectedRegion: null,
 		validatedRegion: null,
@@ -150,12 +152,10 @@ export const shapefileMachine = setup({
 			{ fn: ValidateShapefileGeometry; shapefile: ExtractedShapefile }
 		>(({ input }) => input.fn(input.shapefile)),
 
-		transformToTopoJSON: fromPromise<
-			Result<SimplifiedTopoJSON, ProcessingError | ProjectionError>,
-			{ fn: TransformToTopoJSON; shapefile: ValidatedShapefile }
-		>(({ input }) =>
-			input.fn(input.shapefile, { target: 'wgs84', snapPrecision: 0.001 })
-		),
+		simplifyShapefile: fromPromise<
+			Result<SimplifiedGeometry, ProcessingError | ProjectionError>,
+			{ fn: SimplifyShapefile; shapefile: ValidatedShapefile }
+		>(({ input }) => input.fn(input.shapefile)),
 	},
 
 	guards: {
@@ -176,13 +176,27 @@ export const shapefileMachine = setup({
 			};
 		}),
 		runDisplayConversion: assign(({ context }) => {
-			const result = context.services.convertToDisplayableShapes(
-				context.simplifiedTopoJSON!
-			);
-			if (result.ok) {
-				return { displayableShapes: result.value, error: null };
-			}
-			return { displayableShapes: null, error: result.error };
+			// Simplified GeoJSON is already available in context.
+			// UI layer reads simplifiedGeometry directly.
+			// Keep displayableShapes for compatibility, populate trivially.
+			const geometry = context.simplifiedGeometry!;
+			// Type assertion safe: validation confirmed all features are polygons
+			const shapes = geometry.featureCollection.features.map((feature, index) => ({
+				id: `shape-${index}`,
+				feature: feature as Feature<Polygon>,
+				areaKm2: 0, // Area computation deferred to CLIM-1270
+			}));
+			const bounds = geometry.featureCollection.bbox as
+				| [number, number, number, number]
+				| undefined;
+			return {
+				displayableShapes: {
+					shapes,
+					bounds: bounds ?? [0, 0, 0, 0],
+					totalCount: shapes.length,
+				},
+				error: null,
+			};
 		}),
 		runSelectionValidation: assign(({ context, event }) => {
 			if (event.type !== 'SHAPE_CLICKED') return {};
@@ -313,9 +327,9 @@ export const shapefileMachine = setup({
 
 		transforming: {
 			invoke: {
-				src: 'transformToTopoJSON',
+				src: 'simplifyShapefile',
 				input: ({ context }) => ({
-					fn: context.services.transformToTopoJSON,
+					fn: context.services.simplifyShapefile,
 					shapefile: context.validatedShapefile!,
 				}),
 				onDone: [
@@ -328,7 +342,7 @@ export const shapefileMachine = setup({
 						actions: assign(({ event }) => {
 							const output = event.output;
 							return output.ok
-								? { simplifiedTopoJSON: output.value }
+								? { simplifiedGeometry: output.value }
 								: {};
 						}),
 					},

@@ -11,17 +11,17 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createActor, waitFor } from 'xstate';
 
-import type { PipelineServices } from '@/lib/shapefile/shapefile-machine';
-import { shapefileMachine } from '@/lib/shapefile/shapefile-machine';
-import type {
-	DisplayableShapes,
-	ExtractedShapefile,
-	FinchShapeParameter,
-	SelectedRegion,
-	SimplifiedTopoJSON,
-	ValidatedRegion,
-	ValidatedShapefile,
-} from '@/lib/shapefile/contracts';
+import type { PipelineServices } from './shapefile-machine';
+import { shapefileMachine } from './shapefile-machine';
+import {
+	type DisplayableShapes,
+	type ExtractedShapefile,
+	type FinchShapeParameter,
+	type SelectedRegion,
+	type SimplifiedGeometry,
+	type ValidatedRegion,
+	type ValidatedShapefile,
+} from './contracts';
 
 // ============================================================================
 // FIXTURES
@@ -41,14 +41,29 @@ const STUB_VALIDATED = {
 	__validated: Symbol('validated'),
 } as unknown as ValidatedShapefile;
 
-const STUB_TOPOJSON: SimplifiedTopoJSON = {
-	topology: {
-		type: 'Topology',
-		objects: {},
-		arcs: [],
+const STUB_SIMPLIFIED_GEOMETRY: SimplifiedGeometry = {
+	featureCollection: {
+		type: 'FeatureCollection',
+		features: [
+			{
+				type: 'Feature',
+				geometry: {
+					type: 'Polygon',
+					coordinates: [
+						[
+							[-75, 45],
+							[-74, 45],
+							[-74, 46],
+							[-75, 46],
+							[-75, 45],
+						],
+					],
+				},
+				properties: {},
+			},
+		],
 	},
-	originalFeatureCount: 1,
-	simplifiedFeatureCount: 1,
+	featureCount: 1,
 };
 
 const STUB_DISPLAYABLE: DisplayableShapes = {
@@ -113,13 +128,9 @@ function createHappyServices(): PipelineServices {
 			ok: true,
 			value: STUB_VALIDATED,
 		}),
-		transformToTopoJSON: vi.fn().mockResolvedValue({
+		simplifyShapefile: vi.fn().mockResolvedValue({
 			ok: true,
-			value: STUB_TOPOJSON,
-		}),
-		convertToDisplayableShapes: vi.fn().mockReturnValue({
-			ok: true,
-			value: STUB_DISPLAYABLE,
+			value: STUB_SIMPLIFIED_GEOMETRY,
 		}),
 		validateSelectedArea: vi.fn().mockReturnValue({
 			ok: true,
@@ -168,13 +179,13 @@ describe('shapefile machine — happy path', () => {
 		// Each async service was called once
 		expect(services.extractShapefileFromZip).toHaveBeenCalledOnce();
 		expect(services.validateShapefileGeometry).toHaveBeenCalledOnce();
-		expect(services.transformToTopoJSON).toHaveBeenCalledOnce();
-
-		// Sync display conversion ran on entry
-		expect(services.convertToDisplayableShapes).toHaveBeenCalledOnce();
+		expect(services.simplifyShapefile).toHaveBeenCalledOnce();
 
 		// Context has the pipeline results
-		expect(snapshot.context.displayableShapes).toBe(STUB_DISPLAYABLE);
+		// displayableShapes is now generated from simplifiedGeometry
+		expect(snapshot.context.displayableShapes).not.toBeNull();
+		expect(snapshot.context.displayableShapes?.shapes).toHaveLength(1);
+		expect(snapshot.context.displayableShapes?.totalCount).toBe(1);
 		expect(snapshot.context.error).toBeNull();
 
 		actor.stop();
@@ -252,8 +263,7 @@ describe('shapefile machine — error path', () => {
 		// Extraction was called, but downstream services were not
 		expect(services.extractShapefileFromZip).toHaveBeenCalledOnce();
 		expect(services.validateShapefileGeometry).not.toHaveBeenCalled();
-		expect(services.transformToTopoJSON).not.toHaveBeenCalled();
-		expect(services.convertToDisplayableShapes).not.toHaveBeenCalled();
+		expect(services.simplifyShapefile).not.toHaveBeenCalled();
 
 		actor.stop();
 	});

@@ -8,7 +8,7 @@
  * For Result types, see ./result.ts
  */
 
-import type { Feature, Polygon } from 'geojson';
+import type { Feature, FeatureCollection, Polygon } from 'geojson';
 
 /**
  * Area validation result type.
@@ -42,7 +42,7 @@ export const VALUES_AREA_VALIDATION_RESULT_ERRORS = [
 ] as const;
 
 // ============================================================================
-// LAYER 1: EXTRACTION (Implemented in file-loader.ts)
+// LAYER 1: EXTRACTION (Implemented in extraction.ts)
 // ============================================================================
 
 /**
@@ -54,7 +54,7 @@ export const VALUES_AREA_VALIDATION_RESULT_ERRORS = [
  *
  * Other files such as .dbf and .shx are ignored to minimize data exposure.
  *
- * @see {@link ./file-loader.ts} for implementation
+ * @see {@link ./extraction.ts} for implementation
  */
 export interface ExtractedShapefile {
 	/** Binary shapefile geometry data */
@@ -76,8 +76,6 @@ export type GeometryType = (typeof VALUES_SUPPORTED_GEOMETRY_TYPES)[number];
 
 /**
  * Shapefile metadata from validation inspection.
- *
- * Extracted via Mapshaper's `-info` command or equivalent.
  */
 export interface ShapefileInfo {
 	/** Geometry type (must be 'Polygon') */
@@ -105,69 +103,24 @@ export type ValidatedShapefile = ExtractedShapefile & {
 // LAYER 3: TRANSFORMATION
 // ============================================================================
 
-export interface TopoJSONTopologyTransform {
-	scale: [number, number];
-	translate: [number, number];
-}
-
 /**
- * TopoJSON Topology object.
+ * GeoJSON FeatureCollection output from the simplification process.
  *
- * Output format from Mapshaper simplification pipeline.
- * More compact than GeoJSON for polygon data.
- *
- * Reference: https://github.com/topojson/topojson-specification
- */
-export interface TopoJSONTopology {
-	type: 'Topology';
-	/** Named geometry objects */
-	objects: Record<string, TopoJSONGeometry>;
-	/** Quantized arcs (shared boundaries) */
-	arcs: number[][][];
-	/** Optional transformation for quantization */
-	transform?: TopoJSONTopologyTransform;
-	/** Bounding box [minX, minY, maxX, maxY] */
-	bbox?: [number, number, number, number];
-}
-
-/**
- * TopoJSON geometry object.
- */
-export interface TopoJSONGeometry {
-	type: string;
-	/** Arc indices */
-	arcs: number[][] | number[][][];
-	/** Optional properties */
-	properties?: Record<string, unknown>;
-}
-
-/**
- * Simplified and projected shapefile data.
- *
- * Result of Mapshaper's processing:
+ * Result of processing:
  * - `-clean`: Fix topology errors
  * - `-snap precision=0.001`: Snap coordinates
  * - `-fix-geometry`: Repair invalid geometries
  * - `-proj wgs84`: Project to WGS84
- * - `-o output.topojson`: Convert to TopoJSON
+ * - `-o format=geojson`: Output as GeoJSON
+ *
+ * This is the raw parsed output. The UI layer (downstream tickets)
+ * handles conversion to displayable shapes.
  */
-export interface SimplifiedTopoJSON {
-	/** TopoJSON topology */
-	topology: TopoJSONTopology;
-	/** Original feature count before simplification */
-	originalFeatureCount: number;
-	/** Feature count after simplification */
-	simplifiedFeatureCount: number;
-}
-
-/**
- * Projection configuration.
- */
-export interface ProjectionConfig {
-	/** Target coordinate system (always 'wgs84' for ClimateData) */
-	target: 'wgs84';
-	/** Precision for coordinate snapping */
-	snapPrecision: number;
+export interface SimplifiedGeometry {
+	/** Parsed GeoJSON FeatureCollection */
+	featureCollection: FeatureCollection;
+	/** Feature count */
+	featureCount: number;
 }
 
 // ============================================================================
@@ -177,8 +130,8 @@ export interface ProjectionConfig {
 /**
  * Individual polygon shape ready for display on map.
  *
- * Represents a single polygon from the shapefile, converted from TopoJSON to
- * GeoJSON format for rendering with Leaflet. Each shape includes its computed
+ * Represents a single polygon from the shapefile, extracted from simplified
+ * GeoJSON for rendering with Leaflet. Each shape includes its computed
  * area for validation against size constraints.
  */
 export interface DisplayableShape {
@@ -315,14 +268,6 @@ export interface FinchShapefileQuery {
 export const DEFAULT_AREA_CONSTRAINTS: AreaConstraints = {
 	minKm2: 100,
 	maxKm2: 500_000,
-};
-
-/**
- * Default projection config.
- */
-export const DEFAULT_PROJECTION_CONFIG: ProjectionConfig = {
-	target: 'wgs84',
-	snapPrecision: 0.001,
 };
 
 /**

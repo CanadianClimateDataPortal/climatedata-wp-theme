@@ -8,32 +8,35 @@
  * used as invoked services on the machine.
  */
 
-import type { Result } from '@/lib/shapefile/result';
-import type {
-  ExtractedShapefile,
-  ValidatedShapefile,
-  SimplifiedTopoJSON,
-  ProjectionConfig,
-  DisplayableShapes,
-  SelectedRegion,
-  AreaConstraints,
-  ValidatedRegion,
-  FinchShapeParameter,
-} from '@/lib/shapefile/contracts';
-import type {
-  InvalidGeometryTypeError,
-  AreaExceedsLimitError,
-  AreaBelowLimitError,
-  ProcessingError,
-  ProjectionError,
-} from '@/lib/shapefile/errors';
+import { type Result } from './result';
+import {
+	type ExtractedShapefile,
+	type ValidatedShapefile,
+	type SimplifiedGeometry,
+	type SelectedRegion,
+	type AreaConstraints,
+	type ValidatedRegion,
+	type FinchShapeParameter,
+} from './contracts';
+import {
+	type ShapefileError,
+	type InvalidGeometryTypeError,
+	type AreaExceedsLimitError,
+	type AreaBelowLimitError,
+	type ProcessingError,
+	type ProjectionError,
+} from './errors';
 
 /**
- * Stage 1: Extract shapefile from ZIP (✅ Implemented in file-loader.ts).
+ * Stage 1: Extract shapefile from ZIP.
+ *
+ * Validates the file is a ZIP archive and extracts .shp and .prj files.
+ *
+ * @see {@link ./extraction.ts} for implementation
  */
 export type ExtractShapefileFromZip = (
-  file: File,
-) => Promise<Result<ExtractedShapefile, Error>>;
+	file: File,
+) => Promise<Result<ExtractedShapefile, ShapefileError>>;
 
 /**
  * Stage 2: Validate shapefile geometry type.
@@ -43,26 +46,18 @@ export type ExtractShapefileFromZip = (
  * for defining climate data download regions.
  */
 export type ValidateShapefileGeometry = (
-  shapefile: ExtractedShapefile,
+	shapefile: ExtractedShapefile,
 ) => Promise<Result<ValidatedShapefile, InvalidGeometryTypeError | ProcessingError>>;
 
 /**
- * Stage 3: Transform and simplify to TopoJSON.
+ * Stage 3: Simplify shapefile geometry.
  *
- * Projects the shapefile to WGS84 coordinate system, cleans the geometry,
- * and converts to TopoJSON format.
+ * Cleans, snaps, fixes geometry, projects to WGS84,
+ * and outputs simplified GeoJSON.
  */
-export type TransformToTopoJSON = (
-  shapefile: ValidatedShapefile,
-  config: ProjectionConfig,
-) => Promise<Result<SimplifiedTopoJSON, ProcessingError | ProjectionError>>;
-
-/**
- * Stage 4: Convert TopoJSON to displayable shapes.
- */
-export type ConvertToDisplayableShapes = (
-  topoJSON: SimplifiedTopoJSON,
-) => Result<DisplayableShapes, ProcessingError>;
+export type SimplifyShapefile = (
+	shapefile: ValidatedShapefile,
+) => Promise<Result<SimplifiedGeometry, ProcessingError | ProjectionError>>;
 
 /**
  * Stage 5: Validate selected region area.
@@ -71,8 +66,8 @@ export type ConvertToDisplayableShapes = (
  * (default: 100 km² to 500,000 km²).
  */
 export type ValidateSelectedArea = (
-  region: SelectedRegion,
-  constraints: AreaConstraints,
+	region: SelectedRegion,
+	constraints: AreaConstraints,
 ) => Result<ValidatedRegion, AreaExceedsLimitError | AreaBelowLimitError>;
 
 /**
@@ -82,5 +77,5 @@ export type ValidateSelectedArea = (
  * for the Finch API's shape parameter.
  */
 export type PrepareFinchPayload = (
-  region: ValidatedRegion,
+	region: ValidatedRegion,
 ) => FinchShapeParameter;

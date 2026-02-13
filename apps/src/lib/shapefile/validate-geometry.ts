@@ -11,6 +11,10 @@
  */
 
 import type { ValidateShapefileGeometry } from './pipeline';
+import {
+	ProcessingError,
+	ShapefileError,
+} from './errors';
 
 /**
  * Validate that an extracted shapefile contains polygon geometry.
@@ -39,6 +43,22 @@ import type { ValidateShapefileGeometry } from './pipeline';
 export const validateShapefileGeometry: ValidateShapefileGeometry = async (
 	shapefile,
 ) => {
-	const { validateShapefileGeometryImpl } = await import('./validate-geometry-impl');
-	return validateShapefileGeometryImpl(shapefile);
+	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
+	try {
+		const { validateShapefileGeometryImpl } = await import('./validate-geometry-impl');
+		const value = await validateShapefileGeometryImpl(shapefile);
+		return { ok: true, value };
+	} catch (err) {
+		if (err instanceof ShapefileError) {
+			return { ok: false, error: err };
+		}
+		return {
+			ok: false,
+			error: new ProcessingError(
+				`Validation Step Error: ${err instanceof Error ? err.message : 'Unknown error'}`,
+				{ cause: err instanceof Error ? err : undefined },
+			),
+		};
+	}
+	// END: The Bulk of the Follow-Up PR LOGIC should be around here
 };

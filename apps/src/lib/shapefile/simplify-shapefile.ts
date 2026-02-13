@@ -1,16 +1,23 @@
 /**
- * Shapefile simplification and projection to GeoJSON.
+ * @file
  *
- * Thin wrapper that lazy-loads the implementation via dynamic import.
- * This enables Vite code-splitting — shpjs, @turf, and proj4 are only
- * loaded when this function is first called.
+ * IMPORTANT — STUB FILE. Avoid modifying.
  *
- * @see {@link ./simplify-shapefile-impl.ts} for the actual logic
- * @see {@link ./pipeline.ts} for the type signature
- * @see {@link ./validate-geometry.ts} for the preceding pipeline stage
+ * The body of this function is scaffolding only. A follow-up PR will
+ * replace the stub output with a real client-side simplification pipeline.
+ * Keep changes minimal to avoid merge conflicts with that work.
+ *
+ * Do not reference dependency names in comments or error messages.
+ * Describe operations and contracts, not the library that implements them.
+ *
+ * @see [[LLM-Context-ClimateData-Ticket-CLIM-1267-Client-Side-Escaped-Defect]]
  */
 
 import type { SimplifyShapefile } from './pipeline';
+import {
+	ProcessingError,
+	ShapefileError,
+} from './errors';
 
 /**
  * Simplify and project a validated shapefile to GeoJSON.
@@ -23,7 +30,7 @@ import type { SimplifyShapefile } from './pipeline';
  * @param shapefile - Previously validated .shp and .prj data
  *
  * @returns Result with `SimplifiedGeometry` on success,
- *   or `ProcessingError` on failure
+ *   or `ProcessingError` / `ProjectionError` on failure
  *
  * @example
  * ```typescript
@@ -34,10 +41,28 @@ import type { SimplifyShapefile } from './pipeline';
  *   console.log(`${result.value.featureCount} features simplified`);
  * }
  * ```
+ *
+ * @see {@link ./pipeline.ts} for the type signature
  */
 export const simplifyShapefile: SimplifyShapefile = async (
 	shapefile,
 ) => {
-	const { simplifyShapefileImpl } = await import('./simplify-shapefile-impl');
-	return simplifyShapefileImpl(shapefile);
+	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
+	try {
+		const { simplifyShapefileImpl } = await import('./simplify-shapefile-impl');
+		const value = await simplifyShapefileImpl(shapefile);
+		return { ok: true, value };
+	} catch (err) {
+		if (err instanceof ShapefileError) {
+			return { ok: false, error: err };
+		}
+		return {
+			ok: false,
+			error: new ProcessingError(
+				`Simplification Step Error: ${err instanceof Error ? err.message : 'Unknown error'}`,
+				{ cause: err instanceof Error ? err : undefined },
+			),
+		};
+	}
+	// END: The Bulk of the Follow-Up PR LOGIC should be around here
 };

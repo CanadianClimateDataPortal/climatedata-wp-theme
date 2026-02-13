@@ -1,4 +1,6 @@
 /**
+ * @file
+ *
  * Shapefile simplification implementation using shpjs + @turf.
  *
  * Candidate A: shpjs parses .shp + .prj → GeoJSON with proj4 reprojection,
@@ -6,6 +8,9 @@
  *
  * This file contains all external dependencies for this pipeline stage.
  * Vite code-splits it into a separate chunk, loaded on demand.
+ *
+ * @todo
+ * - Make this file (and the other -impl.ts) to be loaded with their dependencies once, and next time called to re-use what's already loaded.
  */
 
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
@@ -17,9 +22,14 @@ import truncate from '@turf/truncate';
 import cleanCoords from '@turf/clean-coords';
 import rewind from '@turf/rewind';
 
-import type { ValidatedShapefile, SimplifiedGeometry } from './contracts';
-import { ProcessingError, ProjectionError } from './errors';
-import type { Result } from './result';
+import {
+	ProcessingError,
+	ProjectionError,
+} from './errors';
+import {
+	type ValidatedShapefile,
+	type SimplifiedGeometry,
+} from './contracts';
 
 /**
  * Check if a GeoJSON geometry type is a polygon variant.
@@ -117,12 +127,16 @@ const processFeature = (feature: Feature): Feature | null => {
  * 4. Process each feature through @turf pipeline
  * 5. Return simplified FeatureCollection with feature count
  *
- * @param shapefile - Previously validated .shp and .prj data
- * @returns Result with SimplifiedGeometry on success
+ * @throws {ProjectionError} when received format doesn't match supported shp projection
+ * @throws {ProcessingError} when something else unexpected happen
+ *
+ * @param shapefile - Received files from earlier step {@link ValidateShapefileGeometry} .shp and .prj
+ * @returns SimplifiedGeometry on success
  */
 export const simplifyShapefileImpl = async (
 	shapefile: ValidatedShapefile,
-): Promise<Result<SimplifiedGeometry, ProcessingError | ProjectionError>> => {
+): Promise<SimplifiedGeometry> => {
+
 	// 1. Parse .shp + .prj with shpjs
 	let geometries: Geometry[];
 	try {
@@ -132,22 +146,16 @@ export const simplifyShapefileImpl = async (
 
 		// shpjs uses proj4 internally — projection failures surface here
 		if (message.includes('proj4') || message.includes('projection')) {
-			return {
-				ok: false,
-				error: new ProjectionError(
-					shapefile['file.prj'].slice(0, 100),
-					{ cause: err instanceof Error ? err : undefined },
-				),
-			};
+			throw new ProjectionError(
+				shapefile['file.prj'].slice(0, 100),
+				{ cause: err instanceof Error ? err : undefined },
+			);
 		}
 
-		return {
-			ok: false,
-			error: new ProcessingError(
-				`Failed to parse shapefile: ${message}`,
-				{ cause: err instanceof Error ? err : undefined },
-			),
-		};
+		throw new ProcessingError(
+			`Failed to parse shapefile: ${message}`,
+			{ cause: err instanceof Error ? err : undefined },
+		);
 	}
 
 	// 2. Build FeatureCollection (no .dbf = empty properties)
@@ -155,13 +163,10 @@ export const simplifyShapefileImpl = async (
 	try {
 		featureCollection = combine([geometries, undefined]);
 	} catch (err) {
-		return {
-			ok: false,
-			error: new ProcessingError(
-				`Failed to build feature collection: ${err instanceof Error ? err.message : 'Unknown error'}`,
-				{ cause: err instanceof Error ? err : undefined },
-			),
-		};
+		throw new ProcessingError(
+			`Failed to build feature collection: ${err instanceof Error ? err.message : 'Unknown error'}`,
+			{ cause: err instanceof Error ? err : undefined },
+		);
 	}
 
 	// 3. Filter: keep only polygon features
@@ -170,12 +175,9 @@ export const simplifyShapefileImpl = async (
 	);
 
 	if (polygonFeatures.length === 0) {
-		return {
-			ok: false,
-			error: new ProcessingError(
-				'No polygon features found after parsing shapefile',
-			),
-		};
+		throw new ProcessingError(
+			'No polygon features found after parsing shapefile',
+		);
 	}
 
 	// 4. Process each feature through @turf pipeline
@@ -185,12 +187,9 @@ export const simplifyShapefileImpl = async (
 		.filter((f): f is Feature => f !== null);
 
 	if (processedFeatures.length === 0) {
-		return {
-			ok: false,
-			error: new ProcessingError(
-				'All polygon features degenerated during simplification (none remained valid)',
-			),
-		};
+		throw new ProcessingError(
+			'All polygon features degenerated during simplification (none remained valid)',
+		);
 	}
 
 	// 5. Build final FeatureCollection
@@ -200,10 +199,7 @@ export const simplifyShapefileImpl = async (
 	};
 
 	return {
-		ok: true,
-		value: {
-			featureCollection: simplified,
-			featureCount: processedFeatures.length,
-		},
+		featureCollection: simplified,
+		featureCount: processedFeatures.length,
 	};
 };

@@ -6,7 +6,7 @@ import type { Story } from '@ladle/react';
 
 import { useContext, useState } from 'react';
 import { useSelector } from '@xstate/react';
-import { detectZip, type ZipDetectionResult } from './magic-bytes';
+import { detectZip, type ZipDetectionResult } from './detect-zip';
 import { extractShapefileFromZip } from './extraction';
 import type { ExtractedShapefile } from './contracts';
 import type { ShapefileError } from './errors';

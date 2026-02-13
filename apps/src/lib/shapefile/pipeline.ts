@@ -8,25 +8,23 @@
  * used as invoked services on the machine.
  */
 
+import { type Result } from './result';
 import {
-	type Result,
-} from './result';
-import {
-  type ExtractedShapefile,
-  type ValidatedShapefile,
-  type SimplifiedGeometry,
-  type SelectedRegion,
-  type AreaConstraints,
-  type ValidatedRegion,
-  type FinchShapeParameter,
+	type ExtractedShapefile,
+	type ValidatedShapefile,
+	type SimplifiedGeometry,
+	type SelectedRegion,
+	type AreaConstraints,
+	type ValidatedRegion,
+	type FinchShapeParameter,
 } from './contracts';
 import {
-  type ShapefileError,
-  type InvalidGeometryTypeError,
-  type AreaExceedsLimitError,
-  type AreaBelowLimitError,
-  type ProcessingError,
-  type ProjectionError,
+	type ShapefileError,
+	type InvalidGeometryTypeError,
+	type AreaExceedsLimitError,
+	type AreaBelowLimitError,
+	type ProcessingError,
+	type ProjectionError,
 } from './errors';
 
 /**
@@ -37,7 +35,7 @@ import {
  * @see {@link ./extraction.ts} for implementation
  */
 export type ExtractShapefileFromZip = (
-  file: File,
+	file: File,
 ) => Promise<Result<ExtractedShapefile, ShapefileError>>;
 
 /**
@@ -48,7 +46,7 @@ export type ExtractShapefileFromZip = (
  * for defining climate data download regions.
  */
 export type ValidateShapefileGeometry = (
-  shapefile: ExtractedShapefile,
+	shapefile: ExtractedShapefile,
 ) => Promise<Result<ValidatedShapefile, InvalidGeometryTypeError | ProcessingError>>;
 
 /**
@@ -58,7 +56,7 @@ export type ValidateShapefileGeometry = (
  * and outputs simplified GeoJSON.
  */
 export type SimplifyShapefile = (
-  shapefile: ValidatedShapefile,
+	shapefile: ValidatedShapefile,
 ) => Promise<Result<SimplifiedGeometry, ProcessingError | ProjectionError>>;
 
 /**
@@ -68,8 +66,8 @@ export type SimplifyShapefile = (
  * (default: 100 km² to 500,000 km²).
  */
 export type ValidateSelectedArea = (
-  region: SelectedRegion,
-  constraints: AreaConstraints,
+	region: SelectedRegion,
+	constraints: AreaConstraints,
 ) => Result<ValidatedRegion, AreaExceedsLimitError | AreaBelowLimitError>;
 
 /**
@@ -79,5 +77,5 @@ export type ValidateSelectedArea = (
  * for the Finch API's shape parameter.
  */
 export type PrepareFinchPayload = (
-  region: ValidatedRegion,
+	region: ValidatedRegion,
 ) => FinchShapeParameter;

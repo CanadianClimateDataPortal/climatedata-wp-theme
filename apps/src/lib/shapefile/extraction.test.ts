@@ -112,7 +112,7 @@ describe('extractShapefileFromZip', () => {
 			}
 		});
 
-		it('should return error for files with wrong extension but valid-looking content', async () => {
+		it('should return error for files with non-ZIP content but correct extension', async () => {
 			const file = createMockFile('fake.zip', 'not a zip', 'application/zip');
 			const result = await extractShapefileFromZip(file);
 

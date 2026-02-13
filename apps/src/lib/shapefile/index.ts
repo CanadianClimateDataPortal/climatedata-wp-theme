@@ -1,5 +1,5 @@
 export * from './contracts';
-export * from './detect-zip';
+export * from './magic-bytes';
 export * from './errors';
 export * from './extraction';
 export * from './pipeline';

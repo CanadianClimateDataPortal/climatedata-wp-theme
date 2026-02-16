@@ -2,19 +2,23 @@
  * Ladle stories for shapefile processing — extraction demo, pipeline, and map display.
  */
 
+import {
+	useContext,
+	useEffect,
+	useState,
+} from 'react';
 import type { Story } from '@ladle/react';
-
-import { useContext, useEffect, useState } from 'react';
 import { useSelector } from '@xstate/react';
 import L from 'leaflet';
-import { GeoJSON, MapContainer, TileLayer, useMap } from 'react-leaflet';
+import {
+	GeoJSON,
+	MapContainer,
+	TileLayer,
+	useMap,
+} from 'react-leaflet';
 
 import 'leaflet/dist/leaflet.css';
 
-import { detectZip, type ZipDetectionResult } from './detect-zip';
-import { extractShapefileFromZip } from './extraction';
-import type { ExtractedShapefile } from './contracts';
-import type { ShapefileError } from './errors';
 import {
 	ShapefileProvider,
 	ShapefileContext,
@@ -27,6 +31,16 @@ import {
 	DEFAULT_MIN_ZOOM,
 } from '@/lib/constants';
 
+import {
+	detectZip,
+	type ZipDetectionResult,
+} from './detect-zip';
+import { extractShapefileFromZip } from './extraction';
+import type { ExtractedShapefile } from './contracts';
+import {
+	ShapefileError,
+	InvalidGeometryTypeError,
+} from './errors';
 
 // STORY Extraction
 export const StoryExtraction: Story = () => <StoryBodyExtraction />;
@@ -59,8 +73,8 @@ export const StoryDisplayMap: Story = () => (
 					Shapefile Display on a Map
 				</h2>
 				<p className="text-gray-500 mb-6">
-					Upload a shapefile ZIP to run the pipeline and display the
-					resulting polygons on a Leaflet map.
+					Upload a shapefile ZIP to run the pipeline and display the resulting
+					polygons on a Leaflet map.
 				</p>
 				<PipelineUpload />
 			</div>
@@ -70,7 +84,6 @@ export const StoryDisplayMap: Story = () => (
 );
 
 StoryDisplayMap.storyName = 'Shapefile Display on a Map';
-
 
 // ============================================================================
 // STORY Extraction —
@@ -92,7 +105,7 @@ const StoryBodyExtraction = () => {
 	const [state, setState] = useState<ExtractionState>({ status: 'idle' });
 
 	const handleFileChange = async (
-		event: React.ChangeEvent<HTMLInputElement>,
+		event: React.ChangeEvent<HTMLInputElement>
 	) => {
 		const files = event.target.files;
 		if (!files || files.length === 0) {
@@ -119,10 +132,7 @@ const StoryBodyExtraction = () => {
 				extracted: result.value,
 			});
 		} else {
-			setState({ status: 'error',
-				detection,
-				error: result.error,
-			});
+			setState({ status: 'error', detection, error: result.error });
 		}
 	};
 
@@ -393,22 +403,39 @@ const StoryBodyExtraction = () => {
 	);
 };
 
-
 // ============================================================================
 // Shared — PipelineUpload (self-contained upload + machine state display)
 // ============================================================================
 
 const STATE_LABELS: Record<string, { label: string; className: string }> = {
-	idle: { label: 'Idle', className: 'text-gray-500 bg-gray-100' },
-	extracting: { label: 'Extracting...', className: 'text-blue-600 bg-blue-50' },
-	validating: { label: 'Validating...', className: 'text-blue-600 bg-blue-50' },
+	idle: {
+		label: 'Idle',
+		className: 'text-gray-500 bg-gray-100',
+	},
+	extracting: {
+		label: 'Extracting...',
+		className: 'text-blue-600 bg-blue-50',
+	},
+	validating: {
+		label: 'Validating...',
+		className: 'text-blue-600 bg-blue-50',
+	},
 	transforming: {
 		label: 'Transforming...',
 		className: 'text-blue-600 bg-blue-50',
 	},
-	displaying: { label: 'Displaying', className: 'text-green-600 bg-green-50' },
-	selected: { label: 'Selected', className: 'text-violet-600 bg-violet-50' },
-	ready: { label: 'Ready', className: 'text-green-600 bg-green-50' },
+	displaying: {
+		label: 'Displaying',
+		className: 'text-green-600 bg-green-50',
+	},
+	selected: {
+		label: 'Selected',
+		className: 'text-violet-600 bg-violet-50',
+	},
+	ready: {
+		label: 'Ready',
+		className: 'text-green-600 bg-green-50',
+	},
 };
 
 /**
@@ -460,6 +487,7 @@ const PipelineUpload = () => {
 					Reset
 				</button>
 			</div>
+			<ShapefileErrorMessage />
 
 			{/* Machine state */}
 			<section className="p-4 border border-gray-300 rounded">
@@ -622,6 +650,66 @@ const GeoJsonFromMachine = () => {
 	);
 };
 
+// ============================================================================
+// Shared — ShapefileErrorMessage (precise error from machine context)
+//
+// Future work: move to apps/src/components/download/ and replace the
+// generic "The selected file is not a supported shapefile" in
+// shapefile-upload.tsx. When moving to production:
+//   - Wrap message strings in __() for i18n
+//   - Consider extending useShapefile() to expose the error directly
+//     so consumers don't need ShapefileContext access
+// ============================================================================
+
+/**
+ * Maps a machine error to a user-facing message string.
+ *
+ * - InvalidGeometryTypeError → includes the actual geometry type found
+ * - ShapefileError with known code → specific message from map
+ * - Unknown code or non-ShapefileError → generic fallback
+ */
+const getShapefileErrorMessage = (error: Error): string => {
+	if (error instanceof InvalidGeometryTypeError) {
+		return (
+			`The shapefile contains ${error.geometryType} geometry.` +
+			' Only polygons are supported.'
+		);
+	}
+
+	if (error instanceof ShapefileError) {
+		return error.code ?? 'The selected file is not a supported shapefile.';
+	}
+
+	return 'An unexpected error occurred while processing the file.';
+};
+
+/**
+ * Displays a precise error message from the shapefile state machine.
+ *
+ * Reads error state via ShapefileContext. Renders nothing when no error.
+ * Same visual footprint as the current generic error in shapefile-upload.tsx
+ * (text-xs text-red-600 mt-1) so it serves as a drop-in replacement.
+ *
+ * Must be rendered inside a ShapefileProvider.
+ */
+const ShapefileErrorMessage = () => {
+	const { isFileInvalid } = useShapefile();
+	const context = useContext(ShapefileContext);
+	const error = useSelector(context!.actor, (s) => s.context.error);
+
+	if (!isFileInvalid || !error) return null;
+
+	return (
+		<div className="text-xs text-red-600 mt-1">
+			{getShapefileErrorMessage(error)}
+		</div>
+	);
+};
+
+// ============================================================================
+// Shared — ShapefileMap (Leaflet map with GeoJSON from machine context)
+// ============================================================================
+
 const ShapefileMap = () => (
 	<div className="h-[560px] w-full">
 		<MapContainer
@@ -639,9 +727,7 @@ const ShapefileMap = () => (
 				subdomains="abcd"
 				maxZoom={DEFAULT_MAX_ZOOM}
 			/>
-			<TileLayer
-				url={MAP_CONFIG.labelsTileUrl}
-			/>
+			<TileLayer url={MAP_CONFIG.labelsTileUrl} />
 			<GeoJsonFromMachine />
 		</MapContainer>
 	</div>

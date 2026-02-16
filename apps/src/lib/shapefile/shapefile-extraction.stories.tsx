@@ -105,7 +105,7 @@ const StoryBodyExtraction = () => {
 	const [state, setState] = useState<ExtractionState>({ status: 'idle' });
 
 	const handleFileChange = async (
-		event: React.ChangeEvent<HTMLInputElement>
+		event: React.ChangeEvent<HTMLInputElement>,
 	) => {
 		const files = event.target.files;
 		if (!files || files.length === 0) {
@@ -132,7 +132,11 @@ const StoryBodyExtraction = () => {
 				extracted: result.value,
 			});
 		} else {
-			setState({ status: 'error', detection, error: result.error });
+			setState({
+				status: 'error',
+				detection,
+				error: result.error,
+			});
 		}
 	};
 
@@ -693,7 +697,12 @@ const getShapefileErrorMessage = (error: Error): string => {
  * Must be rendered inside a ShapefileProvider.
  */
 const ShapefileErrorMessage = () => {
-	const { isFileInvalid } = useShapefile();
+	const {
+		file,
+		isFileValid,
+	} = useShapefile();
+	const isFileInvalid = file !==null && !isFileValid;
+
 	const context = useContext(ShapefileContext);
 	const error = useSelector(context!.actor, (s) => s.context.error);
 

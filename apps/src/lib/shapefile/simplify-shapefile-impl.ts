@@ -157,7 +157,7 @@ export const simplifyShapefileImpl = async (
 		// shpjs uses proj4 internally — projection failures surface here
 		if (message.includes('proj4') || message.includes('projection')) {
 			throw new ProjectionError(
-				shapefile['file.prj'].slice(0, 100),
+				shapefile['file.prj'],
 				{ cause: err instanceof Error ? err : undefined },
 			);
 		}

@@ -2,7 +2,7 @@ export * from './contracts';
 export * from './detect-shp';
 export * from './detect-zip';
 export * from './errors';
-export * from './extraction';
+export * from './extract-shapefile';
 export * from './pipeline';
 export * from './result';
 export * from './services';

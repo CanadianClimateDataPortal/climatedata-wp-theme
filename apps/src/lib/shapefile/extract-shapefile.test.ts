@@ -8,7 +8,7 @@
 import { describe, it, expect } from 'vitest';
 import { zipSync, strToU8 as _strToU8 } from 'fflate';
 
-import { extractShapefileFromZip } from './extraction';
+import { extractShapefileFromZip } from './extract-shapefile';
 import { ShapefileError } from './errors';
 import { createMockFile } from './test-utils';
 

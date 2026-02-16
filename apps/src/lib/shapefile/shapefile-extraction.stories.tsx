@@ -35,7 +35,7 @@ import {
 	detectZip,
 	type ZipDetectionResult,
 } from './detect-zip';
-import { extractShapefileFromZip } from './extraction';
+import { extractShapefileFromZip } from './extract-shapefile';
 import type { ExtractedShapefile } from './contracts';
 import {
 	ShapefileError,

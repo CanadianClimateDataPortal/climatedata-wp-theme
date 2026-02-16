@@ -25,7 +25,7 @@
  *
  * @see {@link ./validate-geometry-impl.ts} for the actual logic
  * @see {@link ./pipeline.ts} for the type signature
- * @see {@link ./extraction.ts} for the preceding pipeline stage
+ * @see {@link ./extract-shapefile.ts} for the preceding pipeline stage
  */
 
 import type { ValidateShapefileGeometry } from './pipeline';

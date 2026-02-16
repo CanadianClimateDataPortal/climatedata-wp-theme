@@ -1,16 +1,31 @@
 /**
  * @file
  *
- * IMPORTANT — STUB FILE. Avoid modifying.
+ * Shapefile simplification — state machine service wrapper.
  *
- * The body of this function is scaffolding only. A follow-up PR will
- * replace the stub output with a real client-side simplification pipeline.
- * Keep changes minimal to avoid merge conflicts with that work.
+ * Convention: `-impl.ts` pattern
+ *
+ * This wrapper file is what the XState state machine calls via its
+ * injected services. It maintains the Result<T, E> contract boundary
+ * that the machine expects (ok/error discrimination for guard checks).
+ *
+ * The actual parsing and geometry processing lives in the `-impl`
+ * module, which:
+ * - Can be used independently of the state machine
+ * - Throws typed errors instead of returning Result
+ * - Is lazy-loaded via dynamic import() for Vite code-splitting
+ * - Contains all external dependencies (shpjs, @turf modules)
+ *
+ * This separation means the implementation functions are reusable
+ * outside the state machine context (e.g., in tests, CLI tools, or
+ * other pipelines) without coupling to the Result pattern.
  *
  * Do not reference dependency names in comments or error messages.
  * Describe operations and contracts, not the library that implements them.
  *
- * @see [[LLM-Context-ClimateData-Ticket-CLIM-1267-Client-Side-Escaped-Defect]]
+ * @see {@link ./simplify-shapefile-impl.ts} for the actual logic
+ * @see {@link ./pipeline.ts} for the type signature
+ * @see {@link ./validate-geometry.ts} for the preceding pipeline stage
  */
 
 import type { SimplifyShapefile } from './pipeline';
@@ -47,7 +62,6 @@ import {
 export const simplifyShapefile: SimplifyShapefile = async (
 	shapefile,
 ) => {
-	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
 	try {
 		const { simplifyShapefileImpl } = await import('./simplify-shapefile-impl');
 		const value = await simplifyShapefileImpl(shapefile);
@@ -64,5 +78,4 @@ export const simplifyShapefile: SimplifyShapefile = async (
 			),
 		};
 	}
-	// END: The Bulk of the Follow-Up PR LOGIC should be around here
 };

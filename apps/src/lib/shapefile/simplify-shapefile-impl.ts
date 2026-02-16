@@ -1,16 +1,26 @@
 /**
  * @file
  *
- * Shapefile simplification implementation using shpjs + @turf.
+ * Shapefile simplification — implementation (reusable outside state machine).
  *
- * Candidate A: shpjs parses .shp + .prj → GeoJSON with proj4 reprojection,
+ * Convention: `-impl.ts` pattern
+ *
+ * This file contains the actual simplification logic, separated from the
+ * state machine service wrapper (simplify-shapefile.ts). It throws typed
+ * errors on failure instead of returning Result<T, E>, making it usable
+ * in any context — not just the XState pipeline.
+ *
+ * All external dependencies for this pipeline stage live here:
+ * shpjs parses .shp + .prj → GeoJSON with proj4 reprojection,
  * then @turf modules clean and simplify the geometry.
- *
- * This file contains all external dependencies for this pipeline stage.
- * Vite code-splits it into a separate chunk, loaded on demand.
+ * Vite code-splits this file into a separate chunk, loaded on demand.
  *
  * @todo
- * - Make this file (and the other -impl.ts) to be loaded with their dependencies once, and next time called to re-use what's already loaded.
+ * - Make this file (and the other -impl.ts) to be loaded with their
+ *   dependencies once, and next time called to re-use what's already loaded.
+ *
+ * @see {@link ./simplify-shapefile.ts} for the state machine wrapper
+ * @see {@link ./validate-geometry-impl.ts} for the preceding impl stage
  */
 
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
@@ -158,7 +168,9 @@ export const simplifyShapefileImpl = async (
 		);
 	}
 
-	// 2. Build FeatureCollection (no .dbf = empty properties)
+	// 2. Build FeatureCollection
+	// Second argument is .dbf attributes — undefined because our extraction
+	// only provides .shp + .prj. Features will have empty properties: {}.
 	let featureCollection: FeatureCollection;
 	try {
 		featureCollection = combine([geometries, undefined]);

@@ -32,7 +32,7 @@ import {
  *
  * Validates the file is a ZIP archive and extracts .shp and .prj files.
  *
- * @see {@link ./extraction.ts} for implementation
+ * @see {@link ./extract-shapefile.ts} for implementation
  */
 export type ExtractShapefileFromZip = (
 	file: File,

@@ -22,6 +22,10 @@ import {
 import { useShapefile } from '@/hooks/use-shapefile';
 import FileInput from '@/components/ui/file-input';
 import { MAP_CONFIG } from '@/config/map.config';
+import {
+	DEFAULT_MAX_ZOOM,
+	DEFAULT_MIN_ZOOM,
+} from '@/lib/constants';
 
 
 // STORY Extraction
@@ -533,7 +537,7 @@ const PipelineUpload = () => {
 									{snapshot.context.simplifiedGeometry.featureCount}
 									{snapshot.context.simplifiedGeometry.featureCount === 0 && (
 										<span className="text-gray-400 ml-2">
-											(stub — real simplification in follow-up PR)
+											(no features remained after simplification)
 										</span>
 									)}
 								</td>
@@ -621,14 +625,22 @@ const GeoJsonFromMachine = () => {
 const ShapefileMap = () => (
 	<div className="h-[560px] w-full">
 		<MapContainer
+			attributionControl={false}
 			center={MAP_CONFIG.center}
 			zoom={MAP_CONFIG.zoom}
+			minZoom={DEFAULT_MIN_ZOOM}
+			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}
 			className="h-full w-full rounded"
 		>
 			<TileLayer
-				url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+				url={MAP_CONFIG.baseTileUrl}
+				attribution=""
+				subdomains="abcd"
+				maxZoom={DEFAULT_MAX_ZOOM}
+			/>
+			<TileLayer
+				url={MAP_CONFIG.labelsTileUrl}
 			/>
 			<GeoJsonFromMachine />
 		</MapContainer>

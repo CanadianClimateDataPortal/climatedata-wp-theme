@@ -1,10 +1,24 @@
 /**
- * Shapefile geometry validation implementation.
+ * @file
+ *
+ * Shapefile geometry validation — implementation (reusable outside state machine).
+ *
+ * Convention: `-impl.ts` pattern
+ *
+ * This file contains the actual validation logic, separated from the
+ * state machine service wrapper (validate-geometry.ts). It throws typed
+ * errors on failure instead of returning Result<T, E>, making it usable
+ * in any context — not just the XState pipeline.
+ *
+ * Zero external dependencies — uses only `detectShp` from detect-shp.ts.
+ * The `-impl` split is kept for structural consistency with
+ * simplify-shapefile-impl.ts, not for code-splitting purposes.
  *
  * Reads the .shp binary header to determine geometry type.
  * Only polygon geometries (type 5, 15, 25) are accepted.
  *
- * Zero external dependencies — uses only `detectShp` from detect-shp.ts.
+ * @see {@link ./validate-geometry.ts} for the state machine wrapper
+ * @see {@link ./detect-shp.ts} for the binary header reader
  */
 
 import type { ExtractedShapefile, ValidatedShapefile } from './contracts';

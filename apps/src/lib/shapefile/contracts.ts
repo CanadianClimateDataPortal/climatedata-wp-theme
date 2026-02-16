@@ -106,12 +106,13 @@ export type ValidatedShapefile = ExtractedShapefile & {
 /**
  * GeoJSON FeatureCollection output from the simplification process.
  *
- * Result of processing:
- * - `-clean`: Fix topology errors
- * - `-snap precision=0.001`: Snap coordinates
- * - `-fix-geometry`: Repair invalid geometries
- * - `-proj wgs84`: Project to WGS84
- * - `-o format=geojson`: Output as GeoJSON
+ * Processing steps:
+ * 1. Parse .shp binary with projection reprojection to WGS84
+ * 2. Filter to polygon geometries only
+ * 3. Clean redundant coordinates
+ * 4. Truncate coordinate precision
+ * 5. Enforce RFC 7946 winding order
+ * 6. Simplify geometry
  *
  * This is the raw parsed output. The UI layer (downstream tickets)
  * handles conversion to displayable shapes.

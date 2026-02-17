@@ -31,6 +31,7 @@ import {
 } from '@/lib/constants';
 import NoticeRSLCCMIP6 from '@/components/notice-rslc-cmip6';
 import ShapefileUpload from '@/components/download/ui/shapefile-upload';
+import { ShapefileGeoJsonLayer } from '@/components/download/map-layers';
 import { MAP_CONFIG } from '@/config/map.config';
 
 export default function RasterDownloadMap(): React.ReactElement {
@@ -165,6 +166,9 @@ export default function RasterDownloadMap(): React.ReactElement {
 	}
 
 	const renderInteractiveLayer = useCallback(() => {
+		// Shapefile mode uses its own GeoJSON layer (`<ShapefileGeoJsonLayer />`), not the standard interactive layers.
+		if (isUserCustomInteractiveRegion) return null;
+
 		// For station type maps
 		if (isInteractiveModeStation) {
 			// Only one id currently will show the station type filters
@@ -309,6 +313,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 					<SearchControl className="top-6 left-6" />
 
 					{renderInteractiveLayer()}
+					{isUserCustomInteractiveRegion && <ShapefileGeoJsonLayer />}
 
 					{/* Basemap TileLayer */}
 					<TileLayer

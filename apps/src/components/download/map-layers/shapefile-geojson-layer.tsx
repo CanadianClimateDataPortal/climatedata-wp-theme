@@ -22,6 +22,7 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 	const map = useMap();
 
 	const featureCollection = simplifiedGeometry?.featureCollection ?? null;
+	const pane = map.getPane('custom_shapefile') ? 'custom_shapefile' : undefined;
 
 	useEffect(() => {
 		if (!featureCollection) return;
@@ -39,7 +40,7 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 		<GeoJSON
 			key={file?.name ?? 'empty'}
 			data={featureCollection}
-			pane="custom_shapefile"
+			pane={pane}
 			style={{
 				color: '#3B82F6',
 				weight: 2,

@@ -87,24 +87,12 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 		};
 	}
 
-	// 3. Find and extract .shp and .prj files
-	let shpBuffer: ArrayBuffer | null = null;
-	let prjContent: string | null = null;
+	// 3. Find .shp entries — pick largest when multiple exist
+	const shpEntries = Object.keys(unzipped).filter(
+		(name) => name.toLowerCase().endsWith('.shp'),
+	);
 
-	for (const filename of Object.keys(unzipped)) {
-		const lowerName = filename.toLowerCase();
-		const ext = lowerName.split('.').pop();
-
-		if (ext === 'shp') {
-			// .slice() creates a copy with its own ArrayBuffer
-			shpBuffer = unzipped[filename].slice().buffer;
-		} else if (ext === 'prj') {
-			prjContent = new TextDecoder().decode(unzipped[filename]);
-		}
-	}
-
-	// 4. Validate required files exist
-	if (!shpBuffer) {
+	if (shpEntries.length === 0) {
 		return {
 			ok: false,
 			error: new ShapefileError('ZIP does not contain a .shp file', {
@@ -113,7 +101,24 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 		};
 	}
 
-	if (prjContent === null) {
+	// When a ZIP bundles multiple shapefiles (e.g. government data portals),
+	// pick the largest .shp — it contains the most geometry detail.
+	// Legacy's JSZip async decompression had the same effect accidentally
+	// (largest file resolved last → overwrote earlier ones).
+	const shpName = shpEntries.reduce((largest, current) =>
+		unzipped[current].length > unzipped[largest].length ? current : largest,
+	);
+	const prjName = Object.keys(unzipped).find((name) => {
+		const baseSame =
+			name.toLowerCase().replace(/\.prj$/i, '') ===
+			shpName.toLowerCase().replace(/\.shp$/i, '');
+		return baseSame && name.toLowerCase().endsWith('.prj');
+	});
+
+	// .slice() creates a copy with its own ArrayBuffer
+	const shpBuffer = unzipped[shpName].slice().buffer;
+
+	if (!prjName) {
 		return {
 			ok: false,
 			error: new ShapefileError('ZIP does not contain a .prj file', {
@@ -121,6 +126,8 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 			}),
 		};
 	}
+
+	const prjContent = new TextDecoder().decode(unzipped[prjName]);
 
 	// 5. Return success
 	const extracted: ExtractedShapefile = {

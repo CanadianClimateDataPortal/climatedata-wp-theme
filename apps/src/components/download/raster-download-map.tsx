@@ -20,6 +20,7 @@ import SelectionModeControls from '@/components/download/ui/selection-mode-contr
 import SelectedCellsSummary from '@/components/download/ui/selected-cells-summary';
 import { __, _n } from '@/context/locale-provider';
 import { useMap } from '@/hooks/use-map';
+import { useShapefile } from '@/hooks/use-shapefile';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { DownloadType, InteractiveRegionDisplay, InteractiveRegionOption } from '@/types/climate-variable-interface';
@@ -39,6 +40,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 	const { climateVariable, removeSelectedPoint, addSelectedPoints, setSelectedPoints, resetSelectedPoints } = useClimateVariable();
 	const { setMap } = useMap();
+	const { reset: resetShapefile } = useShapefile();
 	const { zoom, center, selectionMode } = useAppSelector(
 		(state) => state.download
 	);
@@ -244,6 +246,11 @@ export default function RasterDownloadMap(): React.ReactElement {
 							displayMode={InteractiveRegionDisplay.DOWNLOAD}
 							onChange={() => {
 								clearSelection();
+
+								// If changing from the shapefile option, we clear the shapefile state.
+								if (isUserCustomInteractiveRegion) {
+									resetShapefile();
+								}
 							}}
 						/>
 					</div>

@@ -18,7 +18,7 @@ import {
 	setRequestError,
 	setSubscribe,
 } from '@/features/download/download-slice';
-import { StepComponentRef } from "@/types/download-form-interface";
+import { StepComponentProps, StepComponentRef } from '@/types/download-form-interface';
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
 
@@ -77,7 +77,10 @@ Captcha.displayName = 'Captcha';
  *
  * Send download request step
  */
-const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
+const StepSendRequest = React.forwardRef<
+	StepComponentRef,
+	StepComponentProps
+>(({ onChangeValidity }, ref) => {
 	const captchaValue = useAppSelector((state) => state.download.captchaValue) || '';
 	const [captchaRefresh, setCaptchaRefresh] = useState(Math.random());
 	const {climateVariable, setFileFormat, resetFileFormat, setDecimalPlace} = useClimateVariable();
@@ -90,8 +93,11 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	// get the download type
 	const downloadType = climateVariable?.getDownloadType();
 
-	React.useImperativeHandle(ref, () => ({
-		isValid: () => {
+	/**
+	 * Step validation
+	 */
+	useEffect(() => {
+		const isValid = () => {
 			if (!climateVariable) {
 				return false;
 			}
@@ -111,13 +117,17 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			return validations.every(Boolean);
-		},
+		}
+		onChangeValidity(isValid())
+	}, [climateVariable, downloadType, email, onChangeValidity]);
+
+	React.useImperativeHandle(ref, () => ({
 		reset: () => {
 			resetFileFormat();
 			dispatch(resetRequestState());
 			dispatch(setCaptchaValue(''));
 		},
-	}), [climateVariable, email]);
+	}), [dispatch, resetFileFormat]);
 
 
 	const formatOptions = [

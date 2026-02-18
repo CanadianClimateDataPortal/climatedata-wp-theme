@@ -14,7 +14,7 @@ import VariableFilterCount from '@/components/sidebar-menu-items/variables';
 import { VariableSearchFilter } from '@/components/variable-search-filter';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { StepComponentRef } from "@/types/download-form-interface";
+import { StepComponentProps, StepComponentRef } from '@/types/download-form-interface';
 import SectionContext from "@/context/section-provider";
 import useFilteredVariables from '@/hooks/use-filtered-variables';
 
@@ -23,7 +23,10 @@ import useFilteredVariables from '@/hooks/use-filtered-variables';
  *
  * Variable step
  */
-const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
+const StepVariable = React.forwardRef<
+    StepComponentRef,
+    StepComponentProps
+>(({ onChangeValidity }, ref) => {
     const { climateVariable, selectClimateVariable } = useClimateVariable();
     const [varType, setVarType] = useState<string>('');
     const [sector, setSector] = useState<string>('');
@@ -33,15 +36,21 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
     const { variableList } = useAppSelector((state) => state.map);
     const searchQuery = useAppSelector(selectSearchQuery);
 
+    /**
+     * Step validation
+     */
+    useEffect(() => {
+        onChangeValidity(Boolean(climateVariable?.getId()))
+    }, [climateVariable, onChangeValidity]);
+
     React.useImperativeHandle(
         ref,
         () => ({
-            isValid: () => Boolean(climateVariable?.getId()),
             reset: () => {
                 dispatch(setClimateVariable(null));
             },
         }),
-        [climateVariable]
+        [dispatch]
     );
 
     const filterValues = useMemo(

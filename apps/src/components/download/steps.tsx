@@ -14,7 +14,11 @@ import {
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { cn } from '@/lib/utils';
 import { FINCH_FREQUENCY_NAMES, GEOSERVER_BASE_URL } from '@/lib/constants';
-import { FinchRequestInput, StepComponentRef } from '@/types/download-form-interface';
+import {
+	FinchRequestInput,
+	StepComponent,
+	StepComponentRef,
+} from '@/types/download-form-interface';
 import {
 	ClimateVariableInterface,
 	DownloadFile,
@@ -506,12 +510,12 @@ const Steps: React.FC = () => {
 		}
 	};
 
-	const StepComponent = steps[currentStep - 1] as React.ElementType;
+	const Step = steps[currentStep - 1] as StepComponent;
 	return (
 		<div className="steps flex flex-col px-4">
 			<StepNavigation totalSteps={steps.length} />
 			<div className="mb-8">
-				<StepComponent
+				<Step
 					// Register the step's ref to enable communication between the step component
 					// and the download context. This allows the step to validate itself and
 					// notify the parent when its state changes.
@@ -519,11 +523,10 @@ const Steps: React.FC = () => {
 						if (ref) {
 							// Store the ref in the download context to access it from other components
 							registerStepRef(currentStep, ref);
-
-							// Update the validation state based on the step's current state
-							setIsStepValid(ref.isValid());
 						}
 					}}
+					onChangeValidity={setIsStepValid}
+					onChangeErrorMessages={() => {}}
 				/>
 			</div>
 			{!isLastStep && (

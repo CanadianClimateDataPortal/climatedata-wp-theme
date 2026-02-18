@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { __, _n } from '@/context/locale-provider';
 import { getPeriods, PeriodRange } from '@/lib/s2d';
 
@@ -15,7 +15,11 @@ import {
 	DownloadType,
 	FrequencyType,
 } from '@/types/climate-variable-interface';
-import { StepComponentRef, StepResetPayload } from "@/types/download-form-interface";
+import {
+	StepComponentProps,
+	StepComponentRef,
+	StepResetPayload,
+} from "@/types/download-form-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
 import { YearRange } from "@/components/year-range";
@@ -254,7 +258,10 @@ const PeriodsSelector = (props: PeriodsSelectorProps) => {
  *
  * Additional details step will allow the user to customize the download request
  */
-const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
+const StepAdditionalDetails = React.forwardRef<
+	StepComponentRef,
+	StepComponentProps
+>(({ onChangeValidity }, ref) => {
 	const { locale } = useLocale();
 	const {
 		climateVariable,
@@ -285,8 +292,11 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		}
 	}
 
-	React.useImperativeHandle(ref, () => ({
-		isValid: () => {
+	/**
+	 * Step validation
+	 */
+	useEffect(() => {
+		const isValid = () => {
 			if (!climateVariable) {
 				return false;
 			}
@@ -330,7 +340,11 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			return validations.every(Boolean);
-		},
+		}
+		onChangeValidity(isValid())
+	}, [climateVariable, isS2DVariable, onChangeValidity]);
+
+	React.useImperativeHandle(ref, () => ({
 		getResetPayload: () => {
 			if (!climateVariable) return {};
 

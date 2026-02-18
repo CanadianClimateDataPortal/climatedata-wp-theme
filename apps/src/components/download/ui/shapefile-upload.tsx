@@ -62,17 +62,17 @@ function ShapefileUploadComponent({
 	onRemoveFile,
 }: ShapefileUploadComponentProps): React.ReactElement {
 	const tooltip = __(
-		'This feature allows you to upload your shapefile to select a custom ' +
-		'region. Once your shapefile is selected, the shapes will appear on ' +
-		'the map. Click the region of interest to continue.'
+		'This feature allows you to upload a shapefile of your custom ' +
+		'region. Once your shapefile is uploaded, the shapes will appear on ' +
+		'the map. Click the shape of interest to continue.'
 	);
 
 	const modalContent = __(
-		'A supported shapefile is a ZIP file containing at least the .shp ' +
-		'and .prj files. The file’s shapes must be closed polygons and be, ' +
-		'at least partially, within Canada (data is available only for land ' +
-		'areas of Canada). Only the WGS84 coordinate system is supported, ' +
-		'which is the most common.'
+		'All uploads must be a ZIP file containing at least the .shp and ' +
+		'.prj files. The file’s shapes must be closed polygons and be, at ' +
+		'least partially, within Canada (data is available only for land ' +
+		'areas of Canada). Files must use the WGS84 coordinate system, this ' +
+		'is the most common system and the default for most files.'
 	);
 
 	const hasFile = file != null;
@@ -81,7 +81,7 @@ function ShapefileUploadComponent({
 	const modal = (
 		<Modal isOpen={isModalOpened} onClose={onModalClose}>
 			<div className="formatted-content text-sm">
-				<h4>{__('What are the supported files?')}</h4>
+				<h4>{__('Which file types are supported?')}</h4>
 				<div className="text-neutral-grey-medium text-sm">
 					{modalContent}
 				</div>
@@ -119,7 +119,7 @@ function ShapefileUploadComponent({
 				>
 					<MessageCircleQuestion size={16} />
 					<span className="underline">
-						{__('What are the supported files?')}
+						{__('Which file types are supported?')}
 					</span>
 				</div>
 			</div>

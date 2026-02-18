@@ -30,7 +30,7 @@ import {
 	DEFAULT_MIN_ZOOM,
 } from '@/lib/constants';
 import NoticeRSLCCMIP6 from '@/components/notice-rslc-cmip6';
-import ShapefileUpload from '@/components/download/shapefile-upload';
+import ShapefileUpload from '@/components/download/ui/shapefile-upload';
 import { MAP_CONFIG } from '@/config/map.config';
 
 export default function RasterDownloadMap(): React.ReactElement {

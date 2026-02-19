@@ -1445,8 +1445,8 @@ msgstr "Cette fonctionnalité vous permet de téléverser un fichier shapefile p
 msgid  "Which file types are supported?"
 msgstr "Quels sont les fichiers supportés ?"
 
-msgid  "The selected file is not a supported shapefile"
-msgstr "Le fichier sélectionné n'est pas un fichier supporté"
+msgid  "The selected file is not a supported shapefile."
+msgstr "Le fichier sélectionné n'est pas un fichier supporté."
 
 msgid  "All uploads must be a ZIP file containing at least the .shp and .prj files. The file’s shapes must be closed "
        "polygons and be, at least partially, within Canada (data is available only for land areas of Canada). Files "
@@ -1455,3 +1455,17 @@ msgstr "Un fichier shapefile compatible est un fichier ZIP contenant au moins le
        "(shapes) du fichier doivent être des polygones fermés et se situer, au moins partiellement, au Canada (les "
        "données sont disponibles uniquement pour les zones terrestres du Canada). Seul le système de coordonnées "
        "WGS84, le plus courant, est pris en charge."
+
+msgid  "Please select a region on the map."
+msgstr "Veuillez sélectionner une région sur la carte."
+
+msgid  "Please upload a shapefile."
+msgstr "Veuillez télécharger un fichier shapefile."
+
+msgid  "The selected region is too large. Try selecting a smaller region."
+msgstr "La région sélectionnée est trop grande. Veuillez sélectionner une plus petite région."
+
+msgid  "The selected region is smaller than our data resolution. Try selecting a larger region or use the "
+       "\"Grid Cells\" interactive region."
+msgstr "La région sélectionnée est plus petite que la résolution de nos données. Veuillez sélectionner une région "
+       "plus grande, ou utilisez l'option « Points de grille » comme région interactive."

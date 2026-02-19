@@ -119,7 +119,7 @@ function ShapefileUploadComponent({
 					</div>
 					{isFileInvalid && (
 						<div className="text-xs text-red-600 mt-1">
-							{__('The selected file is not a supported shapefile')}
+							{__('The selected file is not a supported shapefile.')}
 						</div>
 					)}
 				</div>

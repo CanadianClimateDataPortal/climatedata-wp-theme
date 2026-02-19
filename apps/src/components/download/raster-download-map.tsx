@@ -166,8 +166,13 @@ export default function RasterDownloadMap(): React.ReactElement {
 	}
 
 	const renderInteractiveLayer = useCallback(() => {
-		// Shapefile mode uses its own GeoJSON layer (`<ShapefileGeoJsonLayer />`), not the standard interactive layers.
-		if (isUserCustomInteractiveRegion) return null;
+		if (isUserCustomInteractiveRegion) {
+			return (
+				<>
+					<ShapefileGeoJsonLayer />
+				</>
+			);
+		}
 
 		// For station type maps
 		if (isInteractiveModeStation) {
@@ -313,7 +318,6 @@ export default function RasterDownloadMap(): React.ReactElement {
 					<SearchControl className="top-6 left-6" />
 
 					{renderInteractiveLayer()}
-					{isUserCustomInteractiveRegion && <ShapefileGeoJsonLayer />}
 
 					{/* Basemap TileLayer */}
 					<TileLayer

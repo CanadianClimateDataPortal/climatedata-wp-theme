@@ -13,11 +13,13 @@ export type UseShapefileHook = {
 	isFileValid: boolean;
 	isSelectedRegionValid: boolean;
 	file: File | null;
+	errorCode: string | null;
 	reset: () => void;
 	setFile: (file: File | null) => void;
 	isDisplaying: boolean;
 	displayableShapes: DisplayableShapes | null;
 	simplifiedGeometry: SimplifiedGeometry | null;
+	selectedShape: number | null;
 };
 
 /**
@@ -85,10 +87,12 @@ export function useShapefile(): UseShapefileHook {
 		isFileValid,
 		isSelectedRegionValid,
 		file,
+		errorCode,
 		reset,
 		setFile,
 		isDisplaying,
 		displayableShapes,
 		simplifiedGeometry,
+		selectedShape: null, // Temporarily set to null while waiting implementation
 	};
 }

@@ -22,10 +22,6 @@
  * a `-simplify` step. Sensors are spaced by kilometres; sub-metre
  * coordinate noise is the only thing removed here.
  *
- * @todo
- * - Make this file (and the other -impl.ts) to be loaded with their
- *   dependencies once, and next time called to re-use what's already loaded.
- *
  * @see {@link ./simplify-shapefile.ts} for the state machine wrapper
  * @see {@link ./validate-geometry-impl.ts} for the preceding impl stage
  */

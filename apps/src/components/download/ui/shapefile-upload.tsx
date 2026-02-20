@@ -34,6 +34,16 @@ export default function ShapefileUpload(): React.ReactElement {
 		setFile,
 	} = useShapefile();
 
+	const onChangeFile = (file: File | null) => {
+		// In Chromium browsers, the `file` will be null if the user cancels
+		// the file selection dialog. In other browsers, this callback will
+		// simply not be called in that case. To uniformize, we thus ignore the
+		// change if the file is null.
+		if (file !== null) {
+			setFile(file);
+		}
+	}
+
 	return (
 		<ShapefileUploadComponent
 			file={file}
@@ -42,7 +52,7 @@ export default function ShapefileUpload(): React.ReactElement {
 			isModalOpened={isModalOpened}
 			onModalClose={() => setModalOpened(false)}
 			onSupportedFilesClick={() => setModalOpened(true)}
-			onChangeFile={setFile}
+			onChangeFile={onChangeFile}
 			onRemoveFile={reset}
 		/>
 	);

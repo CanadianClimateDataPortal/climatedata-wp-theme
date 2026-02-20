@@ -20,12 +20,17 @@ type FileInputProps = {
 /**
  * File input field.
  *
+ * The input supports only single file selection (could eventually be extended
+ * to support multiple files).
+ *
  * @param file - The currently selected file object. Its name will be displayed.
  * @param className - Custom CSS classes for the container.
  * @param accept - Accept attribut of the file input.
  * @param isInvalid - If the selected file is considered "invalid".
  * @param isProcessing - If the selected file is being processed.
- * @param onChange - Callback when the selected file changes. The file can be null.
+ * @param onChange - Callback when the selected file changes.
+ *                   In Chromium, if the user cancels the file selection dialog,
+ *                   the `file` attribute received by this callback can be null.
  * @param onClear - When the user clicks on the "clear" button.
  * @param disabled - If the field must be disabled.
  */
@@ -42,8 +47,17 @@ export default function FileInput({
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
 	const handleFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (onChange) {
-			const file = event.target.files?.[0];
-			onChange(file || null);
+			const files = event.target.files;
+			// Note: when the user cancels the file selection dialog, the
+			// behavior depends on the browser. In Firefox, the "change" event
+			// is not triggered, but in Chrome, it's triggered with an empty
+			// list. That is why the `onChange` callback may receive a `null`
+			// value.
+			let file = null;
+			if (files && files.length > 0) {
+				file = files[0];
+			}
+			onChange(file);
 		}
 	}
 

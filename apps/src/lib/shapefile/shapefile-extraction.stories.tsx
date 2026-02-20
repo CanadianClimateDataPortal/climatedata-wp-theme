@@ -4,17 +4,13 @@
 
 import {
 	useContext,
-	useEffect,
 	useState,
 } from 'react';
 import type { Story } from '@ladle/react';
 import { useSelector } from '@xstate/react';
-import L from 'leaflet';
 import {
-	GeoJSON,
 	MapContainer,
 	TileLayer,
-	useMap,
 } from 'react-leaflet';
 
 import 'leaflet/dist/leaflet.css';
@@ -24,6 +20,7 @@ import {
 	ShapefileContext,
 } from '@/context/shapefile-provider';
 import { useShapefile } from '@/hooks/use-shapefile';
+import { ShapefileGeoJsonLayer } from '@/components/download/map-layers';
 import FileInput from '@/components/ui/file-input';
 import { MAP_CONFIG } from '@/config/map.config';
 import {
@@ -615,46 +612,6 @@ const PipelineUpload = () => {
 };
 
 // ============================================================================
-// Shared — ShapefileMap (Leaflet map with GeoJSON from machine context)
-// ============================================================================
-
-/**
- * Reads simplifiedGeometry from the machine context and renders it
- * as a GeoJSON layer, fitting the map bounds to the data.
- */
-const GeoJsonFromMachine = () => {
-	const context = useContext(ShapefileContext);
-	const snapshot = useSelector(context!.actor, (s) => s);
-	const { simplifiedGeometry, file } = snapshot.context;
-	const map = useMap();
-
-	useEffect(() => {
-		if (simplifiedGeometry?.featureCollection) {
-			const layer = L.geoJSON(simplifiedGeometry.featureCollection);
-			const bounds = layer.getBounds();
-			if (bounds.isValid()) {
-				map.fitBounds(bounds, { padding: [20, 20] });
-			}
-		}
-	}, [simplifiedGeometry, map]);
-
-	if (!simplifiedGeometry?.featureCollection) return null;
-
-	return (
-		<GeoJSON
-			key={file?.name ?? 'empty'}
-			data={simplifiedGeometry.featureCollection}
-			style={{
-				color: '#3B82F6',
-				weight: 2,
-				fillColor: '#3B82F6',
-				fillOpacity: 0.15,
-			}}
-		/>
-	);
-};
-
-// ============================================================================
 // Shared — ShapefileErrorMessage (precise error from machine context)
 //
 // Future work: move to apps/src/components/download/ and replace the
@@ -716,7 +673,7 @@ const ShapefileErrorMessage = () => {
 };
 
 // ============================================================================
-// Shared — ShapefileMap (Leaflet map with GeoJSON from machine context)
+// Shared — ShapefileMap (Leaflet map using production ShapefileGeoJsonLayer)
 // ============================================================================
 
 const ShapefileMap = () => (
@@ -737,7 +694,7 @@ const ShapefileMap = () => (
 				maxZoom={DEFAULT_MAX_ZOOM}
 			/>
 			<TileLayer url={MAP_CONFIG.labelsTileUrl} />
-			<GeoJsonFromMachine />
+			<ShapefileGeoJsonLayer />
 		</MapContainer>
 	</div>
 );

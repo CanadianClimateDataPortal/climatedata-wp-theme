@@ -6,6 +6,7 @@ import {
 	type ShapefileContextValue,
 } from '@/context/shapefile-provider';
 import { ShapefileError } from '@/lib/shapefile';
+import type { DisplayableShapes, SimplifiedGeometry } from '@/lib/shapefile/contracts';
 
 export type UseShapefileHook = {
 	isProcessingFile: boolean;
@@ -14,6 +15,9 @@ export type UseShapefileHook = {
 	file: File | null;
 	reset: () => void;
 	setFile: (file: File | null) => void;
+	isDisplaying: boolean;
+	displayableShapes: DisplayableShapes | null;
+	simplifiedGeometry: SimplifiedGeometry | null;
 };
 
 /**
@@ -53,6 +57,14 @@ export function useShapefile(): UseShapefileHook {
 	const isFileValid = hasFile && !isFileInvalid;
 	const isSelectedRegionValid = snapshot.matches('ready');
 
+	const isDisplaying =
+		snapshot.matches('displaying') ||
+		snapshot.matches('selected') ||
+		snapshot.matches('ready');
+
+	const displayableShapes = snapshot.context.displayableShapes;
+	const simplifiedGeometry = snapshot.context.simplifiedGeometry;
+
 	const reset = () => {
 		send({ type: 'RESET' });
 	};
@@ -75,5 +87,8 @@ export function useShapefile(): UseShapefileHook {
 		file,
 		reset,
 		setFile,
+		isDisplaying,
+		displayableShapes,
+		simplifiedGeometry,
 	};
 }

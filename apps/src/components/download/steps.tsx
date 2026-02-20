@@ -139,6 +139,8 @@ const Steps: React.FC = () => {
 
 	const isDailyRequest = climateVariable?.getFrequency() === 'daily';
 	const isAnalyzeRequest = climateVariable?.getDownloadType() === DownloadType.ANALYZED;
+	// User custom region, i.e. shapefile
+	const isUserRegion = climateVariable?.getInteractiveRegion() === InteractiveRegionOption.USER;
 	const isPrecalculatedDownload =
 		climateVariable?.getDownloadType() === DownloadType.PRECALCULATED &&
 		!isDailyRequest;
@@ -276,13 +278,29 @@ const Steps: React.FC = () => {
 							inputs.push({ id: 'lon0', data: lonList });
 						}
 					}
-				} else {
+				} else if (!isUserRegion) {
+					// User custom region (i.e. shapefile): a region is selected,
+					// not points, so we don't include the lat and lon.
+
 					if (latList) {
 						inputs.push({ id: 'lat', data: latList });
 					}
 					if (lonList) {
 						inputs.push({ id: 'lon', data: lonList });
 					}
+				}
+
+				// If a user custom region (i.e. shapefile): add the selected
+				// region as a stringified GeoJSON
+				if (isUserRegion) {
+					const shape = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[-65.99,46],[-68,46],[-68,47],[-65.99,47],[-65.99,46]]]}}]};
+					const stringifiedShape = JSON.stringify(
+						shape,
+						// Limit numbers to 2 decimals
+						(_, value) =>
+							typeof value === 'number' ? value.toFixed(2) : value
+					);
+					inputs.push({ id: 'shape', data: stringifiedShape});
 				}
 
 				// Add average (True for any region except GRIDDED_DATA)

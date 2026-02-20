@@ -184,11 +184,20 @@ export const StepSummaryLocation = (): React.ReactNode | null => {
 
 	if (!climateVariable) return null;
 
+	const isShapefileMode = climateVariable?.getInteractiveRegion() === InteractiveRegionOption.USER;
 	const isRegion = Boolean(climateVariable.getSelectedRegion());
 
-	const selectedCount = isRegion
-		? climateVariable.getSelectedRegion()?.cellCount ?? 0
-		: climateVariable.getSelectedPointsCount() ?? 0;
+	let selectedCount: number;
+
+	if (isShapefileMode) {
+		// Shapefile supports exactly 1 selected shape
+		selectedCount = 1;
+	} else {
+		selectedCount = isRegion
+			? climateVariable.getSelectedRegion()?.cellCount ?? 0
+			: climateVariable.getSelectedPointsCount() ?? 0;
+	}
+
 
 	return (
 		(isRegion ? '~ ' : '') +

@@ -350,7 +350,12 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		} else {
 			// If projection
 			if (this.getDatasetType() === 'projection') {
-				analysisUrl += 'ensemble_grid_point_';
+				// The endpoint is different for user custom (i.e. shapefile)
+				// requests
+				const isUserRegion = this.getInteractiveRegion() === InteractiveRegionOption.USER;
+				analysisUrl += isUserRegion ?
+					'ensemble_polygon_' :
+					'ensemble_grid_point_';
 			}
 
 			// Add climate variable finch

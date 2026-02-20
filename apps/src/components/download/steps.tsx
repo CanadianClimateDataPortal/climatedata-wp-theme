@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { __ } from '@/context/locale-provider';
 
 import StepNavigation from '@/components/download/step-navigation';
@@ -14,7 +14,11 @@ import {
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { cn } from '@/lib/utils';
 import { FINCH_FREQUENCY_NAMES, GEOSERVER_BASE_URL } from '@/lib/constants';
-import { FinchRequestInput, StepComponentRef } from '@/types/download-form-interface';
+import {
+	FinchRequestInput,
+	StepComponent,
+	StepComponentRef,
+} from '@/types/download-form-interface';
 import {
 	ClimateVariableInterface,
 	DownloadFile,
@@ -28,6 +32,12 @@ import { useS2D } from '@/hooks/use-s2d';
 import { sprintf } from "@wordpress/i18n";
 import { trackFinchDownload } from '@/lib/google-analytics';
 import { extractS2DDownloadStepFilenameComponents } from '@/lib/s2d';
+import { StepErrorMessage } from '@/lib/step-error-message';
+import { CircleAlert, InfoIcon } from 'lucide-react';
+
+type ErrorMessagesProps = {
+	messages: StepErrorMessage[];
+}
 
 /**
  * Generate the S2D download filename following the pattern:
@@ -65,11 +75,49 @@ const generateS2DDownloadFileName = (
 };
 
 /**
+ * Renders a StepErrorMessage.
+ */
+function renderErrorMessage(errorMessage: StepErrorMessage) {
+	return (
+		<div className={cn(
+			errorMessage.type === 'error' ? 'text-red-500' : 'text-dark-purple',
+			'flex items-start gap-1',
+		)}>
+			<span className="pt-[0.3em]">
+				{errorMessage.type === 'info' && <InfoIcon size={14} />}
+				{errorMessage.type === 'error' && <CircleAlert size={14} />}
+			</span>
+			<span>
+				{errorMessage.message}
+			</span>
+		</div>
+	);
+}
+
+/**
+ * Component displaying a list of StepErrorMessage.
+ *
+ * Displays nothing if no errors.
+ */
+function ErrorMessages({ messages }: ErrorMessagesProps) {
+	if (!messages.length) {
+		return <></>;
+	}
+
+	return (
+		<div>
+			{messages.map(renderErrorMessage)}
+		</div>
+	);
+}
+
+/**
  * The Steps component dynamically renders the current step component from the STEPS configuration.
  */
 const Steps: React.FC = () => {
 	const { locale } = useLocale();
 	const [isStepValid, setIsStepValid] = useState<boolean>(false);
+	const [stepErrorMessages, setStepErrorMessages] = useState<StepErrorMessage[]>([]);
 
 	const dispatch = useAppDispatch();
 	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
@@ -131,6 +179,19 @@ const Steps: React.FC = () => {
 		} else if (data !== undefined) {
 			formData.append(parentKey, String(data));
 		}
+	};
+
+	const updateErrorMessages = (newMessages: StepErrorMessage[]) => {
+		// To prevent useless re-render, only update if the errors have changed
+		// (the list may be a different instance, but the messages may be the same)
+		const currentMessages = stepErrorMessages;
+		if (currentMessages.length === newMessages.length) {
+			if (newMessages.every((message, index) => message.equals(currentMessages[index]))) {
+				return;
+			}
+		}
+
+		setStepErrorMessages(newMessages);
 	};
 
 	const handleNext = async () => {
@@ -506,12 +567,20 @@ const Steps: React.FC = () => {
 		}
 	};
 
-	const StepComponent = steps[currentStep - 1] as React.ElementType;
+	const Step = steps[currentStep - 1] as StepComponent;
+
+	/**
+	 * Reset the error messages when the step changes.
+	 */
+	useEffect(() => {
+		updateErrorMessages([]);
+	}, [Step]);
+
 	return (
 		<div className="steps flex flex-col px-4">
 			<StepNavigation totalSteps={steps.length} />
 			<div className="mb-8">
-				<StepComponent
+				<Step
 					// Register the step's ref to enable communication between the step component
 					// and the download context. This allows the step to validate itself and
 					// notify the parent when its state changes.
@@ -519,15 +588,15 @@ const Steps: React.FC = () => {
 						if (ref) {
 							// Store the ref in the download context to access it from other components
 							registerStepRef(currentStep, ref);
-
-							// Update the validation state based on the step's current state
-							setIsStepValid(ref.isValid());
 						}
 					}}
+					onChangeValidity={setIsStepValid}
+					onChangeErrorMessages={updateErrorMessages}
 				/>
 			</div>
 			{!isLastStep && (
-				<div>
+				<div className="flex flex-col gap-y-2">
+					<ErrorMessages messages={stepErrorMessages} />
 					{/* The button is a <a> element to be compatible with Google Tag Manager event tracking*/}
 					<a
 						id={buttonId}

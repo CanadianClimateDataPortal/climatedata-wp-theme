@@ -14,14 +14,17 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setDataset } from '@/features/download/download-slice';
 import { fetchTaxonomyData } from '@/services/services';
 import { TaxonomyData } from '@/types/types';
-import { StepComponentRef } from '@/types/download-form-interface';
+import { StepComponentProps, StepComponentRef } from '@/types/download-form-interface';
 
 /**
  * Step 1.
  *
  * Dataset step
  */
-const StepDataset = React.forwardRef<StepComponentRef>((_, ref) => {
+const StepDataset = React.forwardRef<
+	StepComponentRef,
+	StepComponentProps
+>(({ onChangeValidity }, ref) => {
 	const [options, setOptions] = useState<TaxonomyData[]>([]);
 
 	const { locale } = useLocale();
@@ -29,14 +32,20 @@ const StepDataset = React.forwardRef<StepComponentRef>((_, ref) => {
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
 
+	/**
+	 * Step validation
+	 */
+	useEffect(() => {
+		onChangeValidity(Boolean(dataset))
+	}, [dataset, onChangeValidity]);
+
 	React.useImperativeHandle(ref, () => ({
-		isValid: () => Boolean(dataset),
 		getResetPayload: () => {
 			return {
 				dataset: null
 			};
 		}
-	}), [dataset]);
+	}), []);
 
 	useEffect(() => {
 		fetchTaxonomyData('datasets', 'download').then((data) => {

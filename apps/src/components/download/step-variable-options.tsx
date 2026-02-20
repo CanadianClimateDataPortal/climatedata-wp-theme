@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from 'react';
 import { __ } from '@/context/locale-provider';
 import {
 	StepContainer,
@@ -13,7 +13,11 @@ import { useS2D } from '@/hooks/use-s2d';
 import { dateFormatCheck } from '@/lib/utils';
 
 import { ClimateVariableInterface, ForecastTypes } from '@/types/climate-variable-interface';
-import type { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
+import type {
+	StepComponentProps,
+	StepComponentRef,
+	StepResetPayload,
+} from '@/types/download-form-interface';
 import { getForecastTypeName } from '@/lib/s2d';
 
 const validateS2DVariable = (
@@ -67,12 +71,18 @@ const tooltipForecastType = __(
  *
  * Variable options step
  */
-const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
+const StepVariableOptions = React.forwardRef<
+	StepComponentRef,
+	StepComponentProps
+>(({ onChangeValidity }, ref) => {
 	const { climateVariable } = useClimateVariable();
 	const { isS2DVariable } = useS2D();
 
-	React.useImperativeHandle(ref, () => ({
-		isValid: () => {
+	/**
+	 * Step validation
+	 */
+	useEffect(() => {
+		const isValid = () => {
 			if (!climateVariable) {
 				return false;
 			}
@@ -85,7 +95,11 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			return validations.every(Boolean);
-		},
+		}
+		onChangeValidity(isValid())
+	}, [climateVariable, isS2DVariable, onChangeValidity]);
+
+	React.useImperativeHandle(ref, () => ({
 		getResetPayload: () => {
 			if (!climateVariable) return {};
 

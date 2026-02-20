@@ -1,4 +1,6 @@
 /**
+ * @file
+ *
  * Data shape interfaces for the shapefile processing pipeline.
  *
  * This file defines what data looks like at each stage:
@@ -6,6 +8,37 @@
  *
  * For pipeline function signatures, see ./pipeline.ts
  * For Result types, see ./result.ts
+ *
+ * @remarks
+ *
+ * Geographic Concepts — Quick Reference
+ *
+ * ```
+ * Coordinate system  A mathematical model that assigns (x, y) numbers to
+ *                    locations on Earth. Different models optimize for
+ *                    different regions or purposes.
+ *
+ * Projection         The specific math used to flatten the curved surface
+ *                    onto a 2D plane. Each coordinate system uses one.
+ *
+ * WGS84              World Geodetic System 1984. The global standard used
+ *                    by GPS, web maps (Leaflet, Google Maps), and the
+ *                    GeoJSON spec. Coordinates are latitude/longitude
+ *                    in degrees.
+ *
+ * .prj file          Declares which coordinate system a shapefile uses,
+ *                    as a WKT (Well-Known Text) string.
+ *
+ * Convert to WGS84   Transform coordinates from the shapefile's native
+ *                    system into standard lat/long. Handled by proj4
+ *                    during .shp parsing. GIS jargon: "reprojection".
+ * ```
+ *
+ * Our pipeline converts coordinates to WGS84 so that all geometry is in
+ * the same lat/long system that Leaflet and downstream services expect.
+ *
+ * @see {@link ./pipeline.ts} for pipeline function signatures
+ * @see {@link ./result.ts} for Result types
  */
 
 import type { Feature, FeatureCollection, Polygon } from 'geojson';
@@ -107,12 +140,11 @@ export type ValidatedShapefile = ExtractedShapefile & {
  * GeoJSON FeatureCollection output from the simplification process.
  *
  * Processing steps:
- * 1. Parse .shp binary with projection reprojection to WGS84
+ * 1. Parse .shp binary and convert coordinates to WGS84 (standard lat/long)
  * 2. Filter to polygon geometries only
  * 3. Clean redundant coordinates
  * 4. Truncate coordinate precision
  * 5. Enforce RFC 7946 winding order
- * 6. Simplify geometry
  *
  * This is the raw parsed output. The UI layer (downstream tickets)
  * handles conversion to displayable shapes.

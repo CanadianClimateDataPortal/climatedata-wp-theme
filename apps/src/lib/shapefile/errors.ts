@@ -211,14 +211,19 @@ export class ProcessingError extends ShapefileError {
  * Thrown if shapefile uses non-WGS84 projection that cannot be converted.
  * The error code is always `'processing/projection-unsupported'`.
  *
- * @param projection - The unsupported projection string found in the .prj file
+ * The human-readable message contains the projection label extracted from
+ * the WKT (e.g. `"GCS_North_American_1983"`). The full raw WKT string
+ * is preserved on the {@link projection} property for diagnostics.
+ *
+ * @param projection - The raw WKT projection string from the .prj file
  * @param options - Standard `ErrorOptions` (e.g. `{ cause }`)
  *
  * @example
  * ```typescript
- * const err = new ProjectionError('NAD83');
+ * const err = new ProjectionError('GEOGCS["GCS_North_American_1983",DATUM[...]]');
  * err.code;        // 'processing/projection-unsupported'
- * err.projection;  // 'NAD83'
+ * err.message;     // 'Unsupported projection: GCS_North_American_1983. ...'
+ * err.projection;  // 'GEOGCS["GCS_North_American_1983",DATUM[...]]'
  * ```
  */
 export class ProjectionError extends ShapefileError {
@@ -227,10 +232,15 @@ export class ProjectionError extends ShapefileError {
 		options?: ErrorOptions,
 	) {
 		super(
-			`Unsupported projection: ${projection}. Only WGS84 is supported.`,
+			`Unsupported projection: ${ProjectionError.extractLabel(projection)}. Only WGS84 (EPSG:4326) is supported.`,
 			{ ...options, code: 'processing/projection-unsupported', }
 		);
 		// Explicit name - survives minification
 		this.name = 'ProjectionError';
+	}
+
+	/** Extract the projection name from a WKT string for human-readable messages. */
+	private static extractLabel(wkt: string): string {
+		return wkt.match(/^(?:GEOGCS|PROJCS|GEOCCS)\["([^"]+)"/)?.[1] ?? 'Unknown';
 	}
 }

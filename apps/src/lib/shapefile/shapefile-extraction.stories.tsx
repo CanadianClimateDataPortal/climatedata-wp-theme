@@ -1,20 +1,93 @@
 /**
- * Ladle stories for shapefile processing — extraction demo and full machine pipeline.
+ * Ladle stories for shapefile processing — extraction demo, pipeline, and map display.
  */
 
+import {
+	useContext,
+	useEffect,
+	useState,
+} from 'react';
 import type { Story } from '@ladle/react';
-
-import { useContext, useState } from 'react';
 import { useSelector } from '@xstate/react';
-import { detectZip, type ZipDetectionResult } from './detect-zip';
-import { extractShapefileFromZip } from './extraction';
-import type { ExtractedShapefile } from './contracts';
-import type { ShapefileError } from './errors';
+import L from 'leaflet';
+import {
+	GeoJSON,
+	MapContainer,
+	TileLayer,
+	useMap,
+} from 'react-leaflet';
+
+import 'leaflet/dist/leaflet.css';
+
 import {
 	ShapefileProvider,
 	ShapefileContext,
 } from '@/context/shapefile-provider';
 import { useShapefile } from '@/hooks/use-shapefile';
+import FileInput from '@/components/ui/file-input';
+import { MAP_CONFIG } from '@/config/map.config';
+import {
+	DEFAULT_MAX_ZOOM,
+	DEFAULT_MIN_ZOOM,
+} from '@/lib/constants';
+
+import {
+	detectZip,
+	type ZipDetectionResult,
+} from './detect-zip';
+import { extractShapefileFromZip } from './extract-shapefile';
+import type { ExtractedShapefile } from './contracts';
+import {
+	ShapefileError,
+	InvalidGeometryTypeError,
+} from './errors';
+
+// STORY Extraction
+export const StoryExtraction: Story = () => <StoryBodyExtraction />;
+
+StoryExtraction.storyName = 'Shapefile Extraction';
+
+// STORY Pipeline
+export const StoryPipeline: Story = () => (
+	<ShapefileProvider>
+		<div className="p-8 max-w-4xl font-sans">
+			<h2 className="text-xl font-semibold mb-2">Shapefile Pipeline Demo</h2>
+			<p className="text-gray-500 mb-6">
+				Upload a ZIP shapefile to exercise the full XState machine pipeline:
+				idle &rarr; extracting &rarr; validating &rarr; transforming &rarr;
+				displaying
+			</p>
+			<PipelineUpload />
+		</div>
+	</ShapefileProvider>
+);
+
+StoryPipeline.storyName = 'Shapefile Pipeline';
+
+// STORY DisplayMap
+export const StoryDisplayMap: Story = () => (
+	<ShapefileProvider>
+		<div className="font-sans">
+			<div className="p-8 max-w-4xl">
+				<h2 className="text-xl font-semibold mb-2">
+					Shapefile Display on a Map
+				</h2>
+				<p className="text-gray-500 mb-6">
+					Upload a shapefile ZIP to run the pipeline and display the resulting
+					polygons on a Leaflet map.
+				</p>
+				<PipelineUpload />
+			</div>
+			<ShapefileMap />
+		</div>
+	</ShapefileProvider>
+);
+
+StoryDisplayMap.storyName = 'Shapefile Display on a Map';
+
+// ============================================================================
+// STORY Extraction —
+// ============================================================================
 
 type ExtractionState =
 	| { status: 'idle' }
@@ -27,7 +100,7 @@ type ExtractionState =
 			detection: ZipDetectionResult | null;
 			error: ShapefileError; };
 
-const ShapefileExtractor = () => {
+const StoryBodyExtraction = () => {
 	const [file, setFile] = useState<File | null>(null);
 	const [state, setState] = useState<ExtractionState>({ status: 'idle' });
 
@@ -59,7 +132,8 @@ const ShapefileExtractor = () => {
 				extracted: result.value,
 			});
 		} else {
-			setState({ status: 'error',
+			setState({
+				status: 'error',
 				detection,
 				error: result.error,
 			});
@@ -333,25 +407,49 @@ const ShapefileExtractor = () => {
 	);
 };
 
-export const Extraction: Story = () => <ShapefileExtractor />;
-
-Extraction.storyName = 'Shapefile Extraction';
-
 // ============================================================================
-// PIPELINE STORY — full XState machine via ShapefileProvider + useShapefile
+// Shared — PipelineUpload (self-contained upload + machine state display)
 // ============================================================================
 
-const STATE_LABELS: Record<string, { label: string; color: string }> = {
-	idle: { label: 'Idle', color: '#666' },
-	extracting: { label: 'Extracting...', color: '#0070f3' },
-	validating: { label: 'Validating...', color: '#0070f3' },
-	transforming: { label: 'Transforming...', color: '#0070f3' },
-	displaying: { label: 'Displaying', color: 'green' },
-	selected: { label: 'Selected', color: '#8b5cf6' },
-	ready: { label: 'Ready', color: 'green' },
+const STATE_LABELS: Record<string, { label: string; className: string }> = {
+	idle: {
+		label: 'Idle',
+		className: 'text-gray-500 bg-gray-100',
+	},
+	extracting: {
+		label: 'Extracting...',
+		className: 'text-blue-600 bg-blue-50',
+	},
+	validating: {
+		label: 'Validating...',
+		className: 'text-blue-600 bg-blue-50',
+	},
+	transforming: {
+		label: 'Transforming...',
+		className: 'text-blue-600 bg-blue-50',
+	},
+	displaying: {
+		label: 'Displaying',
+		className: 'text-green-600 bg-green-50',
+	},
+	selected: {
+		label: 'Selected',
+		className: 'text-violet-600 bg-violet-50',
+	},
+	ready: {
+		label: 'Ready',
+		className: 'text-green-600 bg-green-50',
+	},
 };
 
-const PipelineInner = () => {
+/**
+ * Self-contained pipeline upload component.
+ *
+ * Uses ShapefileContext internally — must be rendered inside a ShapefileProvider.
+ * Handles file upload, displays machine state, errors, and success info.
+ * Reused by both the Pipeline and DisplayMap stories.
+ */
+const PipelineUpload = () => {
 	const {
 		file,
 		isProcessingFile,
@@ -368,90 +466,50 @@ const PipelineInner = () => {
 
 	const stateInfo = STATE_LABELS[machineState] ?? {
 		label: machineState,
-		color: '#666',
-	};
-
-	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const files = event.target.files;
-		if (!files || files.length === 0) {
-			reset();
-			return;
-		}
-		setFile(files[0]);
+		className: 'text-gray-500 bg-gray-100',
 	};
 
 	return (
-		<div
-			style={{ padding: '2rem', maxWidth: '900px', fontFamily: 'system-ui' }}
-		>
-			<h2>Shapefile Pipeline Demo</h2>
-			<p style={{ color: '#666', marginBottom: '1.5rem' }}>
-				Upload a ZIP shapefile to exercise the full XState machine pipeline:
-				idle &rarr; extracting &rarr; validating &rarr; transforming &rarr;
-				displaying
-			</p>
-
-			<div
-				style={{
-					display: 'flex',
-					gap: '1rem',
-					alignItems: 'center',
-					marginBottom: '1.5rem',
-				}}
-			>
-				<input type="file" accept=".zip" onChange={handleFileChange} />
+		<div className="space-y-4">
+			{/* File input + reset */}
+			<div className="flex gap-3 items-center">
+				<div className="flex-1">
+					<FileInput
+						file={file}
+						accept=".zip"
+						isProcessing={isProcessingFile}
+						isInvalid={isFileInvalid}
+						onChange={(f) => (f ? setFile(f) : reset())}
+						onClear={reset}
+					/>
+				</div>
 				<button
 					type="button"
 					onClick={reset}
-					style={{
-						padding: '0.25rem 0.75rem',
-						border: '1px solid #ccc',
-						borderRadius: '4px',
-						cursor: 'pointer',
-					}}
+					className="px-3 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50"
 				>
 					Reset
 				</button>
 			</div>
+			<ShapefileErrorMessage />
 
-			{/* Machine state badge */}
-			<section
-				style={{
-					padding: '1rem',
-					border: '1px solid #ddd',
-					borderRadius: '4px',
-					marginBottom: '1rem',
-				}}
-			>
-				<h3 style={{ marginTop: 0 }}>Machine State</h3>
-				<table style={{ width: '100%', borderCollapse: 'collapse' }}>
+			{/* Machine state */}
+			<section className="p-4 border border-gray-300 rounded">
+				<h3 className="mt-0 mb-2 text-sm font-semibold">Machine State</h3>
+				<table className="w-full border-collapse text-sm">
 					<tbody>
 						<tr>
-							<td
-								style={{
-									padding: '0.25rem',
-									fontWeight: 'bold',
-									width: '140px',
-								}}
-							>
-								State:
-							</td>
+							<td className="p-1 font-bold w-36">State:</td>
 							<td>
 								<code
-									style={{
-										backgroundColor: '#f5f5f5',
-										padding: '0.25rem 0.5rem',
-										borderRadius: '4px',
-										color: stateInfo.color,
-										fontWeight: 'bold',
-									}}
+									className={`px-2 py-0.5 rounded font-bold ${stateInfo.className}`}
 								>
 									{stateInfo.label}
 								</code>
 							</td>
 						</tr>
 						<tr>
-							<td style={{ padding: '0.25rem', fontWeight: 'bold' }}>File:</td>
+							<td className="p-1 font-bold">File:</td>
 							<td>
 								{file
 									? `${file.name} (${file.size.toLocaleString()} bytes)`
@@ -459,9 +517,7 @@ const PipelineInner = () => {
 							</td>
 						</tr>
 						<tr>
-							<td style={{ padding: '0.25rem', fontWeight: 'bold' }}>
-								Processing:
-							</td>
+							<td className="p-1 font-bold">Processing:</td>
 							<td>{isProcessingFile ? 'Yes' : 'No'}</td>
 						</tr>
 					</tbody>
@@ -470,42 +526,20 @@ const PipelineInner = () => {
 
 			{/* Error display */}
 			{isFileInvalid && snapshot.context.error && (
-				<section
-					style={{
-						padding: '1rem',
-						border: '2px solid red',
-						borderRadius: '4px',
-						backgroundColor: '#fff0f0',
-						marginBottom: '1rem',
-					}}
-				>
-					<h3 style={{ marginTop: 0, color: 'red' }}>Pipeline Error</h3>
-					<table style={{ width: '100%', borderCollapse: 'collapse' }}>
+				<section className="p-4 border-2 border-red-500 rounded bg-red-50">
+					<h3 className="mt-0 mb-2 text-red-600 font-semibold">
+						Pipeline Error
+					</h3>
+					<table className="w-full border-collapse text-sm">
 						<tbody>
 							<tr>
-								<td
-									style={{
-										padding: '0.25rem',
-										fontWeight: 'bold',
-										width: '140px',
-									}}
-								>
-									Error:
-								</td>
+								<td className="p-1 font-bold w-36">Error:</td>
 								<td>{snapshot.context.error.name}</td>
 							</tr>
 							<tr>
-								<td style={{ padding: '0.25rem', fontWeight: 'bold' }}>
-									Code:
-								</td>
+								<td className="p-1 font-bold">Code:</td>
 								<td>
-									<code
-										style={{
-											backgroundColor: '#ffe0e0',
-											padding: '0.25rem 0.5rem',
-											borderRadius: '2px',
-										}}
-									>
+									<code className="bg-red-100 px-2 py-0.5 rounded">
 										{'code' in snapshot.context.error
 											? String(snapshot.context.error.code)
 											: '(none)'}
@@ -513,9 +547,7 @@ const PipelineInner = () => {
 								</td>
 							</tr>
 							<tr>
-								<td style={{ padding: '0.25rem', fontWeight: 'bold' }}>
-									Message:
-								</td>
+								<td className="p-1 font-bold">Message:</td>
 								<td>{snapshot.context.error.message}</td>
 							</tr>
 						</tbody>
@@ -525,33 +557,19 @@ const PipelineInner = () => {
 
 			{/* Success — machine reached displaying */}
 			{machineState === 'displaying' && snapshot.context.simplifiedGeometry && (
-				<section
-					style={{
-						padding: '1rem',
-						border: '2px solid green',
-						borderRadius: '4px',
-						backgroundColor: '#f0fff0',
-						marginBottom: '1rem',
-					}}
-				>
-					<h3 style={{ marginTop: 0, color: 'green' }}>Pipeline Complete</h3>
-					<table style={{ width: '100%', borderCollapse: 'collapse' }}>
+				<section className="p-4 border-2 border-green-500 rounded bg-green-50">
+					<h3 className="mt-0 mb-2 text-green-600 font-semibold">
+						Pipeline Complete
+					</h3>
+					<table className="w-full border-collapse text-sm">
 						<tbody>
 							<tr>
-								<td
-									style={{
-										padding: '0.25rem',
-										fontWeight: 'bold',
-										width: '140px',
-									}}
-								>
-									Features:
-								</td>
+								<td className="p-1 font-bold w-36">Features:</td>
 								<td>
 									{snapshot.context.simplifiedGeometry.featureCount}
 									{snapshot.context.simplifiedGeometry.featureCount === 0 && (
-										<span style={{ color: '#999', marginLeft: '0.5rem' }}>
-											(stub — real simplification in follow-up PR)
+										<span className="text-gray-400 ml-2">
+											(no features remained after simplification)
 										</span>
 									)}
 								</td>
@@ -559,9 +577,7 @@ const PipelineInner = () => {
 							{snapshot.context.extractedShapefile && (
 								<>
 									<tr>
-										<td style={{ padding: '0.25rem', fontWeight: 'bold' }}>
-											file.shp:
-										</td>
+										<td className="p-1 font-bold">file.shp:</td>
 										<td>
 											{snapshot.context.extractedShapefile[
 												'file.shp'
@@ -570,9 +586,7 @@ const PipelineInner = () => {
 										</td>
 									</tr>
 									<tr>
-										<td style={{ padding: '0.25rem', fontWeight: 'bold' }}>
-											file.prj:
-										</td>
+										<td className="p-1 font-bold">file.prj:</td>
 										<td>
 											{snapshot.context.extractedShapefile[
 												'file.prj'
@@ -585,23 +599,11 @@ const PipelineInner = () => {
 						</tbody>
 					</table>
 					{snapshot.context.extractedShapefile && (
-						<details style={{ marginTop: '1rem' }}>
-							<summary style={{ cursor: 'pointer', color: '#666' }}>
+						<details className="mt-4">
+							<summary className="cursor-pointer text-gray-500 text-sm">
 								View .prj content
 							</summary>
-							<pre
-								style={{
-									fontFamily: 'monospace',
-									fontSize: '0.75rem',
-									backgroundColor: '#fff',
-									padding: '0.5rem',
-									borderRadius: '4px',
-									overflow: 'auto',
-									whiteSpace: 'pre-wrap',
-									wordBreak: 'break-all',
-									marginTop: '0.5rem',
-								}}
-							>
+							<pre className="font-mono text-xs bg-white p-2 rounded overflow-auto whitespace-pre-wrap break-all mt-2">
 								{snapshot.context.extractedShapefile['file.prj']}
 							</pre>
 						</details>
@@ -612,10 +614,130 @@ const PipelineInner = () => {
 	);
 };
 
-export const Pipeline: Story = () => (
-	<ShapefileProvider>
-		<PipelineInner />
-	</ShapefileProvider>
-);
+// ============================================================================
+// Shared — ShapefileMap (Leaflet map with GeoJSON from machine context)
+// ============================================================================
 
-Pipeline.storyName = 'Shapefile Pipeline';
+/**
+ * Reads simplifiedGeometry from the machine context and renders it
+ * as a GeoJSON layer, fitting the map bounds to the data.
+ */
+const GeoJsonFromMachine = () => {
+	const context = useContext(ShapefileContext);
+	const snapshot = useSelector(context!.actor, (s) => s);
+	const { simplifiedGeometry, file } = snapshot.context;
+	const map = useMap();
+
+	useEffect(() => {
+		if (simplifiedGeometry?.featureCollection) {
+			const layer = L.geoJSON(simplifiedGeometry.featureCollection);
+			const bounds = layer.getBounds();
+			if (bounds.isValid()) {
+				map.fitBounds(bounds, { padding: [20, 20] });
+			}
+		}
+	}, [simplifiedGeometry, map]);
+
+	if (!simplifiedGeometry?.featureCollection) return null;
+
+	return (
+		<GeoJSON
+			key={file?.name ?? 'empty'}
+			data={simplifiedGeometry.featureCollection}
+			style={{
+				color: '#3B82F6',
+				weight: 2,
+				fillColor: '#3B82F6',
+				fillOpacity: 0.15,
+			}}
+		/>
+	);
+};
+
+// ============================================================================
+// Shared — ShapefileErrorMessage (precise error from machine context)
+//
+// Future work: move to apps/src/components/download/ and replace the
+// generic "The selected file is not a supported shapefile" in
+// shapefile-upload.tsx. When moving to production:
+//   - Wrap message strings in __() for i18n
+//   - Consider extending useShapefile() to expose the error directly
+//     so consumers don't need ShapefileContext access
+// ============================================================================
+
+/**
+ * Maps a machine error to a user-facing message string.
+ *
+ * - InvalidGeometryTypeError → includes the actual geometry type found
+ * - ShapefileError with known code → specific message from map
+ * - Unknown code or non-ShapefileError → generic fallback
+ */
+const getShapefileErrorMessage = (error: Error): string => {
+	if (error instanceof InvalidGeometryTypeError) {
+		return (
+			`The shapefile contains ${error.geometryType} geometry.` +
+			' Only polygons are supported.'
+		);
+	}
+
+	if (error instanceof ShapefileError) {
+		return error.code ?? 'The selected file is not a supported shapefile.';
+	}
+
+	return 'An unexpected error occurred while processing the file.';
+};
+
+/**
+ * Displays a precise error message from the shapefile state machine.
+ *
+ * Reads error state via ShapefileContext. Renders nothing when no error.
+ * Same visual footprint as the current generic error in shapefile-upload.tsx
+ * (text-xs text-red-600 mt-1) so it serves as a drop-in replacement.
+ *
+ * Must be rendered inside a ShapefileProvider.
+ */
+const ShapefileErrorMessage = () => {
+	const {
+		file,
+		isFileValid,
+	} = useShapefile();
+	const isFileInvalid = file !==null && !isFileValid;
+
+	const context = useContext(ShapefileContext);
+	const error = useSelector(context!.actor, (s) => s.context.error);
+
+	if (!isFileInvalid || !error) return null;
+
+	return (
+		<div className="text-xs text-red-600 mt-1">
+			{getShapefileErrorMessage(error)}
+		</div>
+	);
+};
+
+// ============================================================================
+// Shared — ShapefileMap (Leaflet map with GeoJSON from machine context)
+// ============================================================================
+
+const ShapefileMap = () => (
+	<div className="h-[560px] w-full">
+		<MapContainer
+			attributionControl={false}
+			center={MAP_CONFIG.center}
+			zoom={MAP_CONFIG.zoom}
+			minZoom={DEFAULT_MIN_ZOOM}
+			maxZoom={DEFAULT_MAX_ZOOM}
+			scrollWheelZoom={true}
+			className="h-full w-full rounded"
+		>
+			<TileLayer
+				url={MAP_CONFIG.baseTileUrl}
+				attribution=""
+				subdomains="abcd"
+				maxZoom={DEFAULT_MAX_ZOOM}
+			/>
+			<TileLayer url={MAP_CONFIG.labelsTileUrl} />
+			<GeoJsonFromMachine />
+		</MapContainer>
+	</div>
+);

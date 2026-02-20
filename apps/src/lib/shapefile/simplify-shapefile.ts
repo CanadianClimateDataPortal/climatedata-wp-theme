@@ -1,26 +1,38 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /**
  * @file
  *
- * IMPORTANT — STUB FILE. Avoid modifying.
+ * Shapefile simplification — state machine service wrapper.
  *
- * The body of this function is scaffolding only. A follow-up PR will
- * replace the stub output with a real client-side simplification pipeline.
- * Keep changes minimal to avoid merge conflicts with that work.
+ * Convention: `-impl.ts` pattern
+ *
+ * This wrapper file is what the XState state machine calls via its
+ * injected services. It maintains the Result<T, E> contract boundary
+ * that the machine expects (ok/error discrimination for guard checks).
+ *
+ * The actual parsing and geometry processing lives in the `-impl`
+ * module, which:
+ * - Can be used independently of the state machine
+ * - Throws typed errors instead of returning Result
+ * - Is lazy-loaded via dynamic import() for Vite code-splitting
+ * - Contains all external dependencies (shpjs, @turf modules)
+ *
+ * This separation means the implementation functions are reusable
+ * outside the state machine context (e.g., in tests, CLI tools, or
+ * other pipelines) without coupling to the Result pattern.
  *
  * Do not reference dependency names in comments or error messages.
  * Describe operations and contracts, not the library that implements them.
  *
- * @see [[LLM-Context-ClimateData-Ticket-CLIM-1267-Client-Side-Escaped-Defect]]
+ * @see {@link ./simplify-shapefile-impl.ts} for the actual logic
+ * @see {@link ./pipeline.ts} for the type signature
+ * @see {@link ./validate-geometry.ts} for the preceding pipeline stage
  */
 
-import type { FeatureCollection } from 'geojson';
-
-import type { Result } from './result';
-import type { SimplifiedGeometry } from './contracts';
-import { ProcessingError } from './errors';
 import type { SimplifyShapefile } from './pipeline';
+import {
+	ProcessingError,
+	ShapefileError,
+} from './errors';
 
 /**
  * Simplify and project a validated shapefile to GeoJSON.
@@ -33,7 +45,7 @@ import type { SimplifyShapefile } from './pipeline';
  * @param shapefile - Previously validated .shp and .prj data
  *
  * @returns Result with `SimplifiedGeometry` on success,
- *   or `ProcessingError` on failure
+ *   or `ProcessingError` / `ProjectionError` on failure
  *
  * @example
  * ```typescript
@@ -44,22 +56,20 @@ import type { SimplifyShapefile } from './pipeline';
  *   console.log(`${result.value.featureCount} features simplified`);
  * }
  * ```
+ *
+ * @see {@link ./pipeline.ts} for the type signature
  */
 export const simplifyShapefile: SimplifyShapefile = async (
-	_shapefile,
-): Promise<Result<SimplifiedGeometry, ProcessingError>> => {
-
-	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
-	// ... Reason being that this file, in this state, is the base for either Follow-Up implementation PR.
-	// BEGIN: The Bulk of the Follow-Up PR LOGIC should be around here
-
-	let output: Record<string, string>;
+	shapefile,
+) => {
 	try {
-		// STUB: pass-through — real simplification in follow-up PR
-		output = {
-			'output.geojson': JSON.stringify({ type: 'FeatureCollection', features: [] }),
-		};
+		const { simplifyShapefileImpl } = await import('./simplify-shapefile-impl');
+		const value = await simplifyShapefileImpl(shapefile);
+		return { ok: true, value };
 	} catch (err) {
+		if (err instanceof ShapefileError) {
+			return { ok: false, error: err };
+		}
 		return {
 			ok: false,
 			error: new ProcessingError(
@@ -68,35 +78,4 @@ export const simplifyShapefile: SimplifyShapefile = async (
 			),
 		};
 	}
-
-	const rawJson = output['output.geojson'];
-	if (!rawJson || typeof rawJson !== 'string') {
-		return {
-			ok: false,
-			error: new ProcessingError(
-				'Simplification Step Error Receiving no GeoJSON output',
-			),
-		};
-	}
-
-	let featureCollection: FeatureCollection;
-	try {
-		featureCollection = JSON.parse(rawJson);
-	} catch (err) {
-		return {
-			ok: false,
-			error: new ProcessingError(
-				`Simplification Step Failed to parse GeoJSON output: ${err instanceof Error ? err.message : 'Unknown error'}`,
-				{ cause: err instanceof Error ? err : undefined },
-			),
-		};
-	}
-
-	return {
-		ok: true,
-		value: {
-			featureCollection,
-			featureCount: featureCollection.features?.length ?? 0,
-		},
-	};
 };

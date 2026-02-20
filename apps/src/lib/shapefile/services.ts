@@ -17,7 +17,7 @@
 
 import type { PipelineServices } from './shapefile-machine';
 
-import { extractShapefileFromZip } from './extraction';
+import { extractShapefileFromZip } from './extract-shapefile';
 import { validateShapefileGeometry } from './validate-geometry';
 import { simplifyShapefile } from './simplify-shapefile';
 

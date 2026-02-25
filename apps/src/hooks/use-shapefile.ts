@@ -6,7 +6,12 @@ import {
 	type ShapefileContextValue,
 } from '@/context/shapefile-provider';
 import { ShapefileError } from '@/lib/shapefile';
-import type { DisplayableShapes, SimplifiedGeometry } from '@/lib/shapefile/contracts';
+import type {
+	DisplayableShape,
+	DisplayableShapes,
+	SelectedRegion,
+	SimplifiedGeometry,
+} from '@/lib/shapefile/contracts';
 
 export type UseShapefileHook = {
 	isProcessingFile: boolean;
@@ -15,6 +20,7 @@ export type UseShapefileHook = {
 	file: File | null;
 	reset: () => void;
 	setFile: (file: File | null) => void;
+	selectShape: (shape: DisplayableShape) => void;
 	isDisplaying: boolean;
 	displayableShapes: DisplayableShapes | null;
 	simplifiedGeometry: SimplifiedGeometry | null;
@@ -80,6 +86,23 @@ export function useShapefile(): UseShapefileHook {
 		}
 	};
 
+	const selectShape = (shape: DisplayableShape) => {
+		const selectedRegion = snapshot.context.selectedRegion;
+
+		// Guard: already selected? (defense-in-depth — component also guards)
+		if (selectedRegion?.id === shape.id) return;
+
+		// Build SelectedRegion envelope (shared refs, no copy)
+		const region: SelectedRegion = {
+			id: shape.id,
+			feature: shape.feature,
+			areaKm2: shape.areaKm2,
+			areaFormatted: '',
+		};
+
+		send({ type: 'SHAPE_CLICKED', region });
+	};
+
 	return {
 		isProcessingFile,
 		isFileValid,
@@ -87,6 +110,7 @@ export function useShapefile(): UseShapefileHook {
 		file,
 		reset,
 		setFile,
+		selectShape,
 		isDisplaying,
 		displayableShapes,
 		simplifiedGeometry,

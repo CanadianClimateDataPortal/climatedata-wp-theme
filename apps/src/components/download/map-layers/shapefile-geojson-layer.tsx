@@ -1,4 +1,8 @@
-import { useEffect, useMemo } from 'react';
+import {
+	useEffect,
+	useMemo,
+	useRef,
+} from 'react';
 import { default as L, type PathOptions } from 'leaflet';
 import { GeoJSON, useMap } from 'react-leaflet';
 
@@ -77,6 +81,8 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 		file,
 		isDisplaying,
 		simplifiedGeometry,
+		selectShape,
+		displayableShapes,
 	} = useShapefile();
 	const map = useMap();
 
@@ -99,6 +105,44 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 		[stateName],
 	)
 
+	const selectedLayerRef = useRef<L.Path | null>(null);
+
+	const click = (e: L.LeafletMouseEvent) => {
+		const layer = e.propagatedFrom as L.Path;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const feature = (layer as any).feature;
+
+		const shape = displayableShapes?.shapes.find(s => s.feature === feature);
+		if (!shape) return;
+
+		// Guard: already selected?
+		if (layer === selectedLayerRef.current) return;
+
+		// Reset previous selection style
+		selectedLayerRef.current?.setStyle(getStatePathOptions('default'));
+
+		// Apply selected style
+		layer.setStyle(getStatePathOptions('selected'));
+
+		// Track selected layer
+		selectedLayerRef.current = layer;
+
+		// Signal intent to hook (hook owns selection policy)
+		selectShape(shape);
+	};
+
+	const mouseover = (e: L.LeafletMouseEvent) => {
+		const layer = e.propagatedFrom as L.Path;
+		if (layer === selectedLayerRef.current) return;
+		layer.setStyle(getStatePathOptions('hover'));
+	};
+
+	const mouseout = (e: L.LeafletMouseEvent) => {
+		const layer = e.propagatedFrom as L.Path;
+		if (layer === selectedLayerRef.current) return;
+		layer.setStyle(getStatePathOptions('default'));
+	};
+
 	if (!isDisplaying || !featureCollection) return null;
 
 	return (
@@ -107,6 +151,7 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 			data={featureCollection}
 			pane={pane}
 			style={style}
+			eventHandlers={{ click, mouseover, mouseout }}
 		/>
 	);
 }

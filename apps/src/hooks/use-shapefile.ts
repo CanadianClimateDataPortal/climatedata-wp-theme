@@ -25,7 +25,7 @@ export type UseShapefileHook = {
 	isDisplaying: boolean;
 	displayableShapes: DisplayableShapes | null;
 	simplifiedGeometry: SimplifiedGeometry | null;
-	selectedShape: number | null;
+	selectedRegion: SelectedRegion | null;
 };
 
 /**
@@ -64,6 +64,7 @@ export function useShapefile(): UseShapefileHook {
 			errorCode.startsWith('processing/'));
 	const isFileValid = hasFile && !isFileInvalid;
 	const isSelectedRegionValid = snapshot.matches('ready');
+	const selectedRegion = snapshot.context.selectedRegion;
 
 	const isDisplaying =
 		snapshot.matches('displaying') ||
@@ -89,8 +90,6 @@ export function useShapefile(): UseShapefileHook {
 	};
 
 	const selectShape = (shape: DisplayableShape) => {
-		const selectedRegion = snapshot.context.selectedRegion;
-
 		// Guard: already selected? (defense-in-depth — component also guards)
 		if (selectedRegion?.id === shape.id) return;
 
@@ -117,6 +116,6 @@ export function useShapefile(): UseShapefileHook {
 		isDisplaying,
 		displayableShapes,
 		simplifiedGeometry,
-		selectedShape: null, // Temporarily set to null while waiting implementation
+		selectedRegion,
 	};
 }

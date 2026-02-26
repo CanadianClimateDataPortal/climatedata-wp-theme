@@ -18,6 +18,7 @@ import { useShapefile } from '@/hooks/use-shapefile';
 import 'leaflet/dist/leaflet.css';
 import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 import { StepErrorMessage } from '@/lib/step-error-message';
+import type { SelectedRegion } from '@/lib/shapefile';
 
 /**
  * Return the step error message to display when in shapefile mode.
@@ -27,7 +28,7 @@ function getShapefileErrorMessage(
 	file: File | null,
 	errorCode: string | null,
 	isFileValid: boolean,
-	selectedShape: number | null,
+	selectedRegion: SelectedRegion | null,
 ): StepErrorMessage | null {
 	if (!file) {
 		return new StepErrorMessage(__('Please upload a shapefile.'), 'info');
@@ -59,7 +60,7 @@ function getShapefileErrorMessage(
 		}
 	}
 
-	if (selectedShape === null) {
+	if (selectedRegion === null) {
 		return new StepErrorMessage(
 			__('Please select a region on the map.'),
 			'info',
@@ -85,7 +86,7 @@ const StepLocation = React.forwardRef<
 		file: shapefileFile,
 		errorCode: shapefileErrorCode,
 		isFileValid: isShapefileValid,
-		selectedShape: selectedShapefileShape,
+		selectedRegion: selectedShapefileRegion,
 	} = useShapefile();
 	const isShapefileMode = climateVariable?.getInteractiveRegion() === InteractiveRegionOption.USER;
 	const isRegionSelected = Boolean(climateVariable?.getSelectedRegion());
@@ -120,7 +121,7 @@ const StepLocation = React.forwardRef<
 					shapefileFile,
 					shapefileErrorCode,
 					isShapefileValid,
-					selectedShapefileShape,
+					selectedShapefileRegion,
 				);
 				if (errorMessage) {
 					errorMessages.push(errorMessage);
@@ -140,7 +141,7 @@ const StepLocation = React.forwardRef<
 		shapefileFile,
 		shapefileErrorCode,
 		isShapefileValid,
-		selectedShapefileShape,
+		selectedShapefileRegion,
 	]);
 
 	React.useImperativeHandle(ref, () => ({

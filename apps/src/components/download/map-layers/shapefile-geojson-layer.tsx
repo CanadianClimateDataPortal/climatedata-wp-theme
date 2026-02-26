@@ -6,9 +6,11 @@ import {
 import { default as L, type PathOptions } from 'leaflet';
 import { GeoJSON, useMap } from 'react-leaflet';
 
+import type { Feature } from 'geojson';
+
 import { useShapefile } from '@/hooks/use-shapefile';
 import type { SelectedRegion } from '@/lib/shapefile';
-import{ isLayerWithFeature } from '@/types/validations';
+import { isLayerWithFeature } from '@/types/validations';
 
 /**
  * Possible states a shape on a map can be
@@ -69,33 +71,6 @@ const getStatePathOptions = (
 		: normalState;
 };
 
-/**
- * Finds the map layer that corresponds to the given region. Returns null if
- * not found.
- *
- * @param region - Region to search for.
- * @param map - Map containing the layers to search.
- */
-const findRegionLayer = (region: SelectedRegion, map: L.Map): L.Path | null => {
-	let foundLayer: L.Path | null = null;
-
-	map.eachLayer((layer: L.Layer) => {
-		// Skip this iteration if the layer is already found
-		if (foundLayer) {
-			return;
-		}
-
-		if (!isLayerWithFeature<SelectedRegion['feature']>(layer)) {
-			return;
-		}
-
-		if (region.feature === layer.feature) {
-			foundLayer = layer;
-		}
-	});
-
-	return foundLayer;
-}
 
 /**
  * Renders simplified GeoJSON polygons on the Leaflet map when the
@@ -120,6 +95,9 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 	const featureCollection = simplifiedGeometry?.featureCollection ?? null;
 	const pane = map.getPane('custom_shapefile') ? 'custom_shapefile' : undefined;
 
+	const selectedLayerRef = useRef<L.Path | null>(null);
+	const layerMapRef = useRef<Map<string, L.Path>>(new Map());
+
 	useEffect(() => {
 		if (!featureCollection) return;
 
@@ -131,13 +109,32 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 	}, [featureCollection, map]);
 
 	/**
+	 * Populates the reverse index (shape ID → Leaflet layer) when GeoJSON
+	 * layers are created. Called once per feature at mount time by <GeoJSON>.
+	 * On new file upload, the key prop changes, <GeoJSON> remounts, and
+	 * this ref is recreated fresh with the new component instance.
+	 */
+	const onEachFeature = (
+		_feature: Feature,
+		layer: L.Layer,
+	) => {
+		if (!isLayerWithFeature<SelectedRegion['feature']>(layer)) return;
+
+		const shape = displayableShapes?.shapes.find(s => s.feature === layer.feature);
+		if (!shape) return;
+
+		layerMapRef.current.set(shape.id, layer);
+	};
+
+	/**
 	 * When the selected region changes, update the style of the selected region
 	 * and of the previously selected region.
+	 * Uses layerMapRef for O(1) lookup by shape ID instead of iterating all map layers.
 	 */
 	useEffect(() => {
 		if (!pane || !selectedRegion) return;
 
-		const regionLayer = findRegionLayer(selectedRegion, map);
+		const regionLayer = layerMapRef.current.get(selectedRegion.id) ?? null;
 
 		if (!regionLayer || regionLayer === selectedLayerRef.current) {
 			return;
@@ -150,7 +147,6 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 
 		// Track selected layer
 		selectedLayerRef.current = regionLayer;
-
 	}, [selectedRegion, pane, map, featureCollection]);
 
 	const stateName = 'default';
@@ -158,8 +154,6 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 		() => getStatePathOptions(stateName),
 		[stateName],
 	)
-
-	const selectedLayerRef = useRef<L.Path | null>(null);
 
 	const click = (e: L.LeafletMouseEvent) => {
 		const layer = e.propagatedFrom as L.Path;
@@ -194,6 +188,7 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 			data={featureCollection}
 			pane={pane}
 			style={style}
+			onEachFeature={onEachFeature}
 			eventHandlers={{ click, mouseover, mouseout }}
 		/>
 	);

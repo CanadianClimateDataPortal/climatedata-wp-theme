@@ -1,8 +1,8 @@
 <?php
 /**
- * Template Name: Download app
+ * Template Name: fw-child/apps/app-download.php
  *
- * To ensure the download React app loads correctly without any JavaScript or CSS conflicts
+ * To ensure the app loads correctly without any JavaScript or CSS conflicts
  * with the theme's assets, a custom WP page template was created instead of using
  * a builder template.
  *
@@ -13,7 +13,7 @@
 $assets = cdc_app_asset_load( 'download' );
 
 if ( ! is_array( $assets ) || empty( $assets ) ) {
-	wp_die( 'Error: could not load the download app!' );
+	wp_die( 'Error: could not load the app!' );
 }
 
 // Initialize current language.
@@ -34,8 +34,8 @@ $internal_urls = [
 ];
 
 $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
-?>
 
+?>
 <!DOCTYPE html>
 <html lang="<?php echo esc_attr( $current_lang ); ?>">
 <head>
@@ -48,7 +48,7 @@ $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
 	// Add favicon.
 	add_favicon();
 
-	// Load the translation data for the download app
+	// Load the translation data for the app
 	if ( count( $locale_data ) ) {
 		?>
         <script src="<?php echo esc_url( get_site_url() . '/wp-includes/js/dist/hooks.min.js' ); ?>"></script>
@@ -64,13 +64,13 @@ $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
 	?>
 
     <script>
-        // DATA URL for the download app
+        // DATA URL for the app
         window.DATA_URL = '<?php echo isset( $GLOBALS['vars']['data_url'] ) ? htmlspecialchars( $GLOBALS['vars']['data_url'], ENT_QUOTES, 'UTF-8' ) : ''; ?>';
 
         // Disable Leaflet's 3D features
         L_DISABLE_3D = true;
 
-        // WP AJAX URL for the download app
+        // WP AJAX URL for the app
         window.wpAjaxUrl = '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>';
     </script>
 

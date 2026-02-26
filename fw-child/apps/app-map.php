@@ -1,8 +1,8 @@
 <?php
 /**
- * Template Name: Map app
+ * Template Name: fw-child/apps/app-map.php
  *
- * To ensure the map React app loads correctly without any JavaScript or CSS conflicts
+ * To ensure the app loads correctly without any JavaScript or CSS conflicts
  * with the theme's assets, a custom WP page template was created instead of using
  * a builder template.
  *
@@ -13,7 +13,7 @@
 $assets = cdc_app_asset_load( 'map' );
 
 if ( ! is_array( $assets ) || empty( $assets ) ) {
-	wp_die( 'Error: could not load the map app!' );
+	wp_die( 'Error: could not load the app!' );
 }
 
 // Initialize current language.
@@ -47,8 +47,8 @@ $internal_urls = [
 ];
 
 $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
-?>
 
+?>
 <!DOCTYPE html>
 <html lang="<?php echo esc_attr( $current_lang ); ?>">
 <head>
@@ -61,7 +61,7 @@ $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
 	// Add favicon.
 	add_favicon();
 
-	// Load the translation data for the map app
+	// Load the translation data for the app
 	if ( count( $locale_data ) ) {
 		?>
         <script src="<?php echo esc_url( get_site_url() . '/wp-includes/js/dist/hooks.min.js' ); ?>"></script>
@@ -77,16 +77,16 @@ $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
 	?>
 
     <script>
-        // URL encoder salt for the map app
+        // URL encoder salt for the app
         window.URL_ENCODER_SALT = '<?php echo isset( $GLOBALS['vars']['url_encoder_salt'] ) ? htmlspecialchars( $GLOBALS['vars']['url_encoder_salt'], ENT_QUOTES, 'UTF-8' ) : ''; ?>';
 
-        // DATA URL for the map app
+        // DATA URL for the app
         window.DATA_URL = '<?php echo isset( $GLOBALS['vars']['data_url'] ) ? htmlspecialchars( $GLOBALS['vars']['data_url'], ENT_QUOTES, 'UTF-8' ) : ''; ?>';
 
         // Disable Leaflet's 3D features
         L_DISABLE_3D = true;
 
-        // WP AJAX URL for the map app
+        // WP AJAX URL for the app
         window.wpAjaxUrl = '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>';
     </script>
 

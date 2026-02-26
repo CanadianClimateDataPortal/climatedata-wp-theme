@@ -132,22 +132,25 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 	 * Uses layerMapRef for O(1) lookup by shape ID instead of iterating all map layers.
 	 */
 	useEffect(() => {
-		if (!pane || !selectedRegion) return;
+		let regionLayer: L.Path | null = null;
 
-		const regionLayer = layerMapRef.current.get(selectedRegion.id) ?? null;
+		if (selectedRegion) {
+			regionLayer = layerMapRef.current.get(selectedRegion.id) ?? null;
 
-		if (!regionLayer || regionLayer === selectedLayerRef.current) {
-			return;
+			if (!regionLayer || regionLayer === selectedLayerRef.current) {
+				return;
+			}
+
+			// Apply "selected" style
+			regionLayer.setStyle(getStatePathOptions('selected'));
 		}
 
+		// Reset the style of the previously selected region
 		selectedLayerRef.current?.setStyle(getStatePathOptions('default'));
 
-		// Apply selected style
-		regionLayer.setStyle(getStatePathOptions('selected'));
-
-		// Track selected layer
+		// Track the selected layer (can be null: when the file changes, no region is selected yet)
 		selectedLayerRef.current = regionLayer;
-	}, [selectedRegion, pane, map, featureCollection]);
+	}, [selectedRegion, featureCollection]);
 
 	const stateName = 'default';
 	const style = useMemo(

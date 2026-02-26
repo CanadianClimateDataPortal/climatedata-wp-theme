@@ -233,6 +233,11 @@ export interface MapState {
 }
 
 /**
+ * Leaflet "Path" layer with a GeoJSON feature.
+ */
+export type LayerWithFeature<F> = L.Path & { feature: F };
+
+/**
  * When requesting a download, represents the possible final statuses.
  *
  * @example 'success' - The download request parameters was accepted by the backend and it returned something we're expecting

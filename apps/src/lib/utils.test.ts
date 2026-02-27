@@ -4,6 +4,7 @@ import {
 	formatUTCDate,
 	generateRange,
 	parseLatLon,
+	toJSONString,
 	utc,
 } from './utils';
 
@@ -247,5 +248,100 @@ describe('formatUTCDate', () => {
 		const actual = formatUTCDate(date, format);
 		const expected = '2024-09-13 17:08:04';
 		expect(actual).toEqual(expected);
+	});
+});
+
+describe('toJSONString', () => {
+	test('keeps all non-number values as is', () => {
+		const obj = {
+			string: 'hello!',
+			null: null,
+			boolean: true,
+			list: ['a', 'b', null],
+			object: {
+				key: 'value',
+			},
+		};
+		const result = toJSONString(obj);
+		const parsed = JSON.parse(result);
+		expect(parsed).toEqual(obj);
+	});
+
+	test.each([1.3, 'hello', true, null])(
+		'works with primitive (%s)',
+		(value) => {
+			const result = toJSONString(value);
+			const parsed = JSON.parse(result);
+			expect(parsed).toEqual(value);
+		}
+	);
+
+	test('converts NaN to null', () => {
+		const obj = {
+			nan: Number.NaN,
+		};
+		const expected = {
+			nan: null, // JSON.stringify converts NaN to null
+		};
+		const result = toJSONString(obj);
+		const parsed = JSON.parse(result);
+		expect(parsed).toEqual(expected);
+	});
+
+	test('converts infinities to null', () => {
+		const obj = {
+			positive: Number.POSITIVE_INFINITY,
+			negative: Number.NEGATIVE_INFINITY,
+		};
+		const expected = {
+			positive: null, // JSON.stringify converts infinities to null
+			negative: null,
+		};
+		const result = toJSONString(obj);
+		const parsed = JSON.parse(result);
+		expect(parsed).toEqual(expected);
+	});
+
+	test('keeps decimals as is if no maxDecimals specified', () => {
+		const list = [0, -1, 123, -3.3, 0.230004, -5.439789546483];
+		const result = toJSONString(list);
+		const parsed = JSON.parse(result);
+		expect(parsed).toEqual(list);
+	});
+
+	test('restricts decimals with maxDecimals', () => {
+		const list = [0, -1, -3.3, 0.230004, { number: -5.439789546483 }];
+		const expected = [0, -1, -3.3, 0.23, { number: -5.44 }];
+		const result = toJSONString(list, 2);
+		const parsed = JSON.parse(result);
+		expect(parsed).toEqual(expected);
+	});
+
+	test('maxDecimals=0 rounds to the nearest integer', () => {
+		const list = [-3.3, 10.4896, { number: -0.500001 }];
+		const expected = [-3, 10, { number: -1 }];
+		const result = toJSONString(list, 0);
+		const parsed = JSON.parse(result);
+		expect(parsed).toEqual(expected);
+	});
+
+	test('rounds maxDecimals if maxDecimals is not an integer', () => {
+		const list = [-3.2, 10.4896, { number: -0.500001 }];
+		const expected = [-3.2, 10.49, { number: -0.5 }];
+		const result = toJSONString(list, 1.5);
+		const parsed = JSON.parse(result);
+		expect(parsed).toEqual(expected);
+	});
+
+	describe('invalid inputs', () => {
+		test('raises an error if value is undefined', () => {
+			const fn = () => toJSONString(undefined);
+			expect(fn).toThrow();
+		});
+
+		test('raises an error if maxDecimals is negative', () => {
+			const fn = () => toJSONString(3.5, -1);
+			expect(fn).toThrow();
+		});
 	});
 });

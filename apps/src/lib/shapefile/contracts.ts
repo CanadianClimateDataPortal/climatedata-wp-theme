@@ -281,16 +281,6 @@ export interface FinchShapeParameter {
 	features: [Feature<Polygon>]; // Exactly one feature
 }
 
-/**
- * Finch query parameters for shapefile request.
- */
-export interface FinchShapefileQuery {
-	/** GeoJSON shape parameter (serialized) */
-	shape: string; // JSON.stringify(FinchShapeParameter)
-	/** Other query params (dataset, variable, etc.) */
-	[key: string]: string | number | boolean;
-}
-
 // ============================================================================
 // CONSTANTS
 // ============================================================================

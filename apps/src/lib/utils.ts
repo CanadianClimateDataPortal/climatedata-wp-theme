@@ -475,3 +475,48 @@ export function formatUTCDate(date: Date, dateFormat: string): string {
 
 	return format(localDate, dateFormat);
 }
+
+/**
+ * Converts a given value into a JSON string, with optional rounding for numeric
+ * values.
+ *
+ * @param value - The value to be converted into a JSON string. Only values
+ *         supported by JSON.stringify() are supported. `undefined` is not
+ *         supported.
+ * @param maxDecimals - The maximum number of decimal places for numeric values.
+ *        If null, no rounding is applied.
+ * @throws {Error} If the `value` is `undefined`.
+ * @throws {Error} If `maxDecimals` is negative.
+ * @return The JSON string representation of the input value.
+ */
+export function toJSONString(
+	value: unknown,
+	maxDecimals: number | null = null,
+): string {
+	if (value === undefined) {
+		throw new Error('Value cannot be undefined');
+	}
+
+	const formatDecimals = (value: number) => {
+		if (maxDecimals != null) {
+			if (maxDecimals < 0) {
+				throw new Error('maxDecimals must be a non-negative integer');
+			}
+			const decimalsMultiplier = Math.pow(10, Math.round(maxDecimals));
+			return Math.round(value * decimalsMultiplier) / decimalsMultiplier;
+		}
+		return value;
+	}
+
+	const format = (value: unknown) => {
+		if (typeof value === 'number' && Number.isFinite(value)) {
+			return formatDecimals(value);
+		}
+		return value;
+	}
+
+	return JSON.stringify(
+		value,
+		(_, value) => format(value),
+	);
+}

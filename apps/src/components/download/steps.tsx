@@ -12,7 +12,7 @@ import {
 	setRequestStatus,
 } from '@/features/download/download-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { cn } from '@/lib/utils';
+import { cn, toJSONString } from '@/lib/utils';
 import { FINCH_FREQUENCY_NAMES, GEOSERVER_BASE_URL } from '@/lib/constants';
 import {
 	FinchRequestInput,
@@ -34,6 +34,8 @@ import { trackFinchDownload } from '@/lib/google-analytics';
 import { extractS2DDownloadStepFilenameComponents } from '@/lib/s2d';
 import { StepErrorMessage } from '@/lib/step-error-message';
 import { CircleAlert, InfoIcon } from 'lucide-react';
+import { useShapefile } from '@/hooks/use-shapefile';
+import { FINCH_COORDINATE_PRECISION } from '@/lib/shapefile';
 
 type ErrorMessagesProps = {
 	messages: StepErrorMessage[];
@@ -122,6 +124,7 @@ const Steps: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
 	const { climateVariable } = useClimateVariable();
+	const { finchPayload } = useShapefile();
 
 	const { isS2DVariable, releaseDate } = useS2D();
 
@@ -139,6 +142,8 @@ const Steps: React.FC = () => {
 
 	const isDailyRequest = climateVariable?.getFrequency() === 'daily';
 	const isAnalyzeRequest = climateVariable?.getDownloadType() === DownloadType.ANALYZED;
+	// User custom region, i.e. shapefile
+	const isUserRegion = climateVariable?.getInteractiveRegion() === InteractiveRegionOption.USER;
 	const isPrecalculatedDownload =
 		climateVariable?.getDownloadType() === DownloadType.PRECALCULATED &&
 		!isDailyRequest;
@@ -276,13 +281,30 @@ const Steps: React.FC = () => {
 							inputs.push({ id: 'lon0', data: lonList });
 						}
 					}
-				} else {
+				} else if (!isUserRegion) {
+					// User custom region (i.e. shapefile): a region is selected,
+					// not points, so we don't include the lat and lon.
+
 					if (latList) {
 						inputs.push({ id: 'lat', data: latList });
 					}
 					if (lonList) {
 						inputs.push({ id: 'lon', data: lonList });
 					}
+				}
+
+				// If a user custom region (i.e. shapefile): add the selected
+				// region as a stringified GeoJSON
+				if (isUserRegion) {
+					if (!finchPayload) {
+						// Should never get here, but just in case to prevent an erroneous request
+						console.error('A finchPayload was expected but it is not defined.');
+						dispatch(setRequestStatus('error'));
+						dispatch(setRequestError(__('An unknown error occurred. Please try again.')));
+						return;
+					}
+					const stringifiedShape = toJSONString(finchPayload, FINCH_COORDINATE_PRECISION);
+					inputs.push({ id: 'shape', data: stringifiedShape});
 				}
 
 				// Add average (True for any region except GRIDDED_DATA)
@@ -338,7 +360,9 @@ const Steps: React.FC = () => {
 					// Add output_name (getFinch + region + name)
 					let outputName = climateVariable.getFinch?.() || 'download';
 					if (interactiveRegion && interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA) {
-						outputName += `_${interactiveRegion}`;
+						outputName += interactiveRegion === InteractiveRegionOption.USER ?
+							'_user-shapefile' :
+							`_${interactiveRegion}`;
 						const selectedRegion = climateVariable.getSelectedRegion?.();
 						if (selectedRegion && (selectedRegion as any).name) {
 							outputName += `_${(selectedRegion as any).name}`;

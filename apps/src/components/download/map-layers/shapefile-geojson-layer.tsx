@@ -1,9 +1,8 @@
 import {
 	useEffect,
-	useMemo,
 	useRef,
 } from 'react';
-import { default as L, type PathOptions } from 'leaflet';
+import { default as L } from 'leaflet';
 import { GeoJSON, useMap } from 'react-leaflet';
 
 import type { Feature } from 'geojson';
@@ -12,65 +11,22 @@ import { useShapefile } from '@/hooks/use-shapefile';
 import type { SelectedRegion } from '@/lib/shapefile';
 import { isLayerWithFeature } from '@/types/validations';
 
-/**
- * Possible states a shape on a map can be
- */
-type SelectableRegionState = 'default' | 'hover' | 'selected';
+import {
+	SHAPE_PATH_STYLE_DEFAULT,
+	SHAPE_PATH_STYLE_HOVER,
+	SHAPE_PATH_STYLE_SELECTED,
+	type ShapePathStyleResolverFn,
+	type ShapePathStyleResolverInnerStateMap,
+} from '@/components/map-layers/interactive-layer-styles';
 
-const getStatePathOptions = (
-	state: SelectableRegionState,
-): PathOptions => {
-	/**
-	 * Normal.
-	 *
-	 * Refer to {@link ../../map-layers/selectable-region-layer.tsx} at `tileLayerStyles`
-	 */
-	const normalState: PathOptions = {
-		weight: 1,
-		color: '#999',
-		fillColor: 'transparent',
-		opacity: 0.5,
-		fill: true,
-		fillOpacity: 1
-	};
-
-	/**
-	 * When mouse hover.
-	 *
-	 * Refer to {@link ../../map-layers/selectable-cells-grid-layer.tsx} at `hoverCellStyles`
-	 */
-	const hover: PathOptions = {
-		color: '#444',
-		fill: true,
-		fillColor: '#fff',
-		fillOpacity: 0.2,
-		opacity: 1,
-		weight: 1,
-	};
-
-	/**
-	 * When Selected.
-	 *
-	 * Refer to {@link ../../map-layers/selectable-cells-grid-layer.tsx} at `selectedCellStyles`
-	 */
-	const selected: PathOptions = {
-		color: '#f00', // in other words; red
-		fill: false,
-		opacity: 1,
-		weight: 1,
-	};
-
-	const states = {
-		default: normalState,
-		hover,
-		selected,
-	};
-
-	return typeof state === 'string' && state in states
-		? states[state]
-		: normalState;
+const getStatePathOptions: ShapePathStyleResolverFn = (state) => {
+	const map: ShapePathStyleResolverInnerStateMap = {
+		default: SHAPE_PATH_STYLE_DEFAULT,
+		hover: SHAPE_PATH_STYLE_HOVER,
+		selected: SHAPE_PATH_STYLE_SELECTED,
+	}
+	return map[state] ?? SHAPE_PATH_STYLE_DEFAULT;
 };
-
 
 /**
  * Renders simplified GeoJSON polygons on the Leaflet map when the
@@ -152,12 +108,6 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 		selectedLayerRef.current = regionLayer;
 	}, [selectedRegion, featureCollection]);
 
-	const stateName = 'default';
-	const style = useMemo(
-		() => getStatePathOptions(stateName),
-		[stateName],
-	)
-
 	const click = (e: L.LeafletMouseEvent) => {
 		const layer = e.propagatedFrom as L.Path;
 
@@ -184,6 +134,8 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 	};
 
 	if (!isDisplaying || !featureCollection) return null;
+
+	const style = getStatePathOptions('default');
 
 	return (
 		<GeoJSON

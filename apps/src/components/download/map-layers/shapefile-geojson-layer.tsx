@@ -56,12 +56,6 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 		}
 	}, [featureCollection, map]);
 
-	const stateName = 'default';
-	const style = useMemo(
-		() => getStatePathOptions(stateName),
-		[stateName],
-	)
-
 	const selectedLayerRef = useRef<L.Path | null>(null);
 
 	const click = (e: L.LeafletMouseEvent) => {

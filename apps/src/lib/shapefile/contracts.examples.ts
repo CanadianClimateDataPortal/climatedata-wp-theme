@@ -20,10 +20,10 @@ import type {
 	DisplayableShapes,
 	ExtractedShapefile,
 	FinchShapeParameter,
-	SelectedRegion,
+	SelectedShape,
 	ShapefileInfo,
 	SimplifiedGeometry,
-	ValidatedRegion,
+	ValidatedShapes,
 	ValidatedShapefile,
 } from './contracts';
 import { DEFAULT_AREA_CONSTRAINTS } from './contracts';
@@ -164,17 +164,13 @@ export const EXAMPLE_DISPLAYABLE_SHAPES: DisplayableShapes = {
 // ============================================================================
 
 /**
- * User-selected region derived from the displayable shape.
+ * Lean selection record derived from the displayable shape.
  *
- * Includes formatted area string for UI display.
- *
- * @see {@link SelectedRegion}
+ * @see {@link SelectedShape}
  */
-export const EXAMPLE_SELECTED_REGION: SelectedRegion = {
+export const EXAMPLE_SELECTED_SHAPE: SelectedShape = {
 	id: EXAMPLE_DISPLAYABLE_SHAPE.id,
-	feature: EXAMPLE_DISPLAYABLE_SHAPE.feature,
 	areaKm2: EXAMPLE_DISPLAYABLE_SHAPE.areaKm2,
-	areaFormatted: '5,000 km²',
 };
 
 // ============================================================================
@@ -245,17 +241,14 @@ export const EXAMPLE_AREA_VALIDATION_TOO_LARGE: AreaValidationResult = {
 };
 
 /**
- * Branded validated region — proves area validation passed.
+ * Branded validated shapes — proves area validation passed.
  *
- * Requires `as unknown as` cast because the branded `__areaValidated` symbol
- * cannot be constructed outside the validation function.
- *
- * @see {@link ValidatedRegion}
+ * @see {@link ValidatedShapes}
  */
-export const EXAMPLE_VALIDATED_REGION = {
-	...EXAMPLE_SELECTED_REGION,
-	__areaValidated: Symbol('areaValidated'),
-} as unknown as ValidatedRegion;
+export const EXAMPLE_VALIDATED_SHAPES = Object.assign(
+	[EXAMPLE_DISPLAYABLE_SHAPE],
+	{ __areaValidated: Symbol('areaValidated') },
+) as unknown as ValidatedShapes;
 
 // ============================================================================
 // LAYER 7: FINCH INTEGRATION
@@ -270,5 +263,5 @@ export const EXAMPLE_VALIDATED_REGION = {
  */
 export const EXAMPLE_FINCH_PAYLOAD: FinchShapeParameter = {
 	type: 'FeatureCollection',
-	features: [EXAMPLE_SELECTED_REGION.feature],
+	features: [EXAMPLE_DISPLAYABLE_SHAPE.feature],
 };

@@ -15,18 +15,20 @@ import { assign, fromPromise, setup } from 'xstate';
 
 import type { Feature, Polygon } from 'geojson';
 
+import { computeAreaKm2 } from './compute-area';
+
 import {
 	type Result,
 } from './result';
 import {
 	type AreaConstraints,
 	type AreaValidationResult,
+	type DisplayableShape,
 	type DisplayableShapes,
 	type ExtractedShapefile,
 	type FinchShapeParameter,
-	type SelectedRegion,
 	type SimplifiedGeometry,
-	type ValidatedRegion,
+	type ValidatedShapes,
 	type ValidatedShapefile,
 	DEFAULT_AREA_CONSTRAINTS,
 } from './contracts';
@@ -67,8 +69,8 @@ export type MachineContext = {
 	validatedShapefile: ValidatedShapefile | null;
 	simplifiedGeometry: SimplifiedGeometry | null;
 	displayableShapes: DisplayableShapes | null;
-	selectedRegion: SelectedRegion | null;
-	validatedRegion: ValidatedRegion | null;
+	selectedShapes: Pick<DisplayableShape, 'id' | 'areaKm2'>[];
+	validatedShapes: ValidatedShapes | null;
 	finchPayload: FinchShapeParameter | null;
 	areaValidationResult: AreaValidationResult | null;
 	error: Error | null;
@@ -90,8 +92,8 @@ function initialContext(services: PipelineServices): MachineContext {
 		validatedShapefile: null,
 		simplifiedGeometry: null,
 		displayableShapes: null,
-		selectedRegion: null,
-		validatedRegion: null,
+		selectedShapes: [],
+		validatedShapes: null,
 		finchPayload: null,
 		areaValidationResult: null,
 		error: null,
@@ -107,8 +109,8 @@ function downstreamReset(): Partial<MachineContext> {
 		validatedShapefile: null,
 		simplifiedGeometry: null,
 		displayableShapes: null,
-		selectedRegion: null,
-		validatedRegion: null,
+		selectedShapes: [],
+		validatedShapes: null,
 		finchPayload: null,
 		areaValidationResult: null,
 		error: null,
@@ -121,7 +123,7 @@ function downstreamReset(): Partial<MachineContext> {
 
 export type MachineEvent =
 	| { type: 'FILE_SELECTED'; file: File }
-	| { type: 'SHAPE_CLICKED'; region: SelectedRegion }
+	| { type: 'SHAPE_CLICKED'; shapeId: string }
 	| { type: 'RESET' };
 
 // ============================================================================
@@ -161,7 +163,7 @@ export const shapefileMachine = setup({
 	guards: {
 		isResultOk: (_, params: { result: Result<unknown, Error> }) =>
 			params.result.ok,
-		isAreaValid: ({ context }) => context.validatedRegion !== null,
+		isAreaValid: ({ context }) => context.validatedShapes !== null,
 		hasConversionError: ({ context }) =>
 			context.error !== null && context.displayableShapes === null,
 	},
@@ -184,7 +186,7 @@ export const shapefileMachine = setup({
 			const shapes = geometry.featureCollection.features.map((feature, index) => ({
 				id: `shape-${index}`,
 				feature: feature as Feature<Polygon>,
-				areaKm2: 0, // Area computation deferred to CLIM-1270
+				areaKm2: computeAreaKm2(feature as Feature<Polygon>),
 			}));
 			const bounds = geometry.featureCollection.bbox as
 				| [number, number, number, number]
@@ -201,39 +203,49 @@ export const shapefileMachine = setup({
 		runSelectionValidation: assign(({ context, event }) => {
 			if (event.type !== 'SHAPE_CLICKED') return {};
 
-			const region = event.region;
+			const shapeId = event.shapeId;
+			const shape = context.displayableShapes?.shapes.find(
+				(s) => s.id === shapeId,
+			);
+			if (!shape) return {};
+
+			const selectedShapes: Pick<DisplayableShape, 'id' | 'areaKm2'>[] = [
+				{ id: shape.id, areaKm2: shape.areaKm2 },
+			];
+
 			const areaResult = context.services.validateSelectedArea(
-				region,
-				context.areaConstraints
+				[shape],
+				context.areaConstraints,
 			);
 
 			if (areaResult.ok) {
+				const validatedShapes = areaResult.value;
 				const finchPayload = context.services.prepareFinchPayload(
-					areaResult.value,
+					validatedShapes,
 				);
 				return {
-					selectedRegion: region,
-					validatedRegion: areaResult.value,
+					selectedShapes,
+					validatedShapes,
 					finchPayload,
 					areaValidationResult: {
 						status: 'valid' as const,
-						areaKm2: region.areaKm2,
+						areaKm2: shape.areaKm2,
 						constraints: context.areaConstraints,
 					},
 					error: null,
 				};
 			}
 
-			const isTooSmall = region.areaKm2 < context.areaConstraints.minKm2;
+			const isTooSmall = shape.areaKm2 < context.areaConstraints.minKm2;
 			return {
-				selectedRegion: region,
-				validatedRegion: null,
+				selectedShapes,
+				validatedShapes: null,
 				finchPayload: null,
 				areaValidationResult: {
 					status: isTooSmall
 						? ('too-small' as const)
 						: ('too-large' as const),
-					areaKm2: region.areaKm2,
+					areaKm2: shape.areaKm2,
 					constraints: context.areaConstraints,
 					errorMessageKey: isTooSmall
 						? ('area-too-small' as const)

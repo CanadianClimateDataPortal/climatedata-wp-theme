@@ -17,9 +17,8 @@ import {
 	type DisplayableShapes,
 	type ExtractedShapefile,
 	type FinchShapeParameter,
-	type SelectedRegion,
 	type SimplifiedGeometry,
-	type ValidatedRegion,
+	type ValidatedShapes,
 	type ValidatedShapefile,
 } from './contracts';
 
@@ -93,21 +92,14 @@ const STUB_DISPLAYABLE: DisplayableShapes = {
 	totalCount: 1,
 };
 
-const STUB_REGION: SelectedRegion = {
-	id: 'shape-1',
-	feature: STUB_DISPLAYABLE.shapes[0].feature,
-	areaKm2: 5000,
-	areaFormatted: '5,000 km²',
-};
-
-const STUB_VALIDATED_REGION = {
-	...STUB_REGION,
-	__areaValidated: Symbol('areaValidated'),
-} as unknown as ValidatedRegion;
+const STUB_VALIDATED_SHAPES = Object.assign(
+	[STUB_DISPLAYABLE.shapes[0]],
+	{ __areaValidated: Symbol('areaValidated') },
+) as unknown as ValidatedShapes;
 
 const STUB_FINCH_PAYLOAD: FinchShapeParameter = {
 	type: 'FeatureCollection',
-	features: [STUB_REGION.feature],
+	features: [STUB_DISPLAYABLE.shapes[0].feature],
 };
 
 // ============================================================================
@@ -134,7 +126,7 @@ function createHappyServices(): PipelineServices {
 		}),
 		validateSelectedArea: vi.fn().mockReturnValue({
 			ok: true,
-			value: STUB_VALIDATED_REGION,
+			value: STUB_VALIDATED_SHAPES,
 		}),
 		prepareFinchPayload: vi.fn().mockReturnValue(STUB_FINCH_PAYLOAD),
 	};
@@ -206,7 +198,7 @@ describe('shapefile machine — happy path', () => {
 		// Click a shape — goes through transient 'selected' → 'ready'
 		actor.send({
 			type: 'SHAPE_CLICKED',
-			region: STUB_REGION,
+			shapeId: 'shape-0',
 		});
 
 		const snapshot = actor.getSnapshot();
@@ -220,7 +212,7 @@ describe('shapefile machine — happy path', () => {
 
 		// Context has the final payload
 		expect(snapshot.context.finchPayload).toBe(STUB_FINCH_PAYLOAD);
-		expect(snapshot.context.validatedRegion).toBe(STUB_VALIDATED_REGION);
+		expect(snapshot.context.validatedShapes).toBe(STUB_VALIDATED_SHAPES);
 		expect(snapshot.context.areaValidationResult?.status).toBe('valid');
 
 		actor.stop();

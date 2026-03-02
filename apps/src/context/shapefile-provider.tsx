@@ -6,7 +6,9 @@ import {
 	createAsyncPipelineServices,
 	PipelineServices,
 	shapefileMachine,
-	type ValidatedRegion,
+	type FinchShapeParameter,
+	type PrepareFinchPayload,
+	type ValidatedShapes,
 	type ValidateSelectedArea,
 } from '@/lib/shapefile';
 
@@ -21,14 +23,21 @@ type ShapefileContextValue = {
  * !! TEMPORARY: mock sync services. To be replaced by CLIM-1270 and downstream.
  */
 
-const validateSelectedArea: ValidateSelectedArea = (region) => {
+const validateSelectedArea: ValidateSelectedArea = (shapes) => {
 	// In this mock, we let the region pass validation as is
-	const validated = {
-		...region,
-		__areaValidated: Symbol('areaValidated'),
-	} as unknown as ValidatedRegion;
+	const validated = Object.assign(
+		[...shapes],
+		{ __areaValidated: Symbol('areaValidated') },
+	) as unknown as ValidatedShapes;
 
 	return { ok: true as const, value: validated };
+};
+
+const prepareFinchPayload: PrepareFinchPayload = (shapes) => {
+	return {
+		type: 'FeatureCollection',
+		features: shapes.map((s) => s.feature),
+	} as FinchShapeParameter;
 };
 
 /*

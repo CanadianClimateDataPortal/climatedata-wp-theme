@@ -10,19 +10,17 @@
 
 import { type Result } from './result';
 import {
-	type ExtractedShapefile,
-	type ValidatedShapefile,
-	type SimplifiedGeometry,
-	type SelectedRegion,
 	type AreaConstraints,
-	type ValidatedRegion,
+	type DisplayableShape,
+	type ExtractedShapefile,
 	type FinchShapeParameter,
+	type SimplifiedGeometry,
+	type ValidatedShapefile,
+	type ValidatedShapes,
 } from './contracts';
 import {
 	type ShapefileError,
 	type InvalidGeometryTypeError,
-	type AreaExceedsLimitError,
-	type AreaBelowLimitError,
 	type ProcessingError,
 	type ProjectionError,
 } from './errors';
@@ -66,9 +64,9 @@ export type SimplifyShapefile = (
  * (default: 100 km² to 500,000 km²).
  */
 export type ValidateSelectedArea = (
-	region: SelectedRegion,
+	shapes: DisplayableShape[],
 	constraints: AreaConstraints,
-) => Result<ValidatedRegion, AreaExceedsLimitError | AreaBelowLimitError>;
+) => Result<ValidatedShapes, ShapefileError>;
 
 /**
  * Stage 6: Prepare Finch API payload.
@@ -77,5 +75,5 @@ export type ValidateSelectedArea = (
  * for the Finch API's shape parameter.
  */
 export type PrepareFinchPayload = (
-	region: ValidatedRegion,
+	shapes: ValidatedShapes,
 ) => FinchShapeParameter;

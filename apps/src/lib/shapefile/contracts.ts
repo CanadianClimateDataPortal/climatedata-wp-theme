@@ -193,22 +193,12 @@ export interface DisplayableShapes {
 // ============================================================================
 
 /**
- * User-selected region from shapefile.
+ * Lean selection record for machine context and hook consumers.
  *
- * One polygon selected by clicking on the map. Must pass area
- * validation (between 100 km² and 500,000 km²) before being used
- * for climate data downloads.
+ * Full shape data (including `.feature`) stays in `displayableShapes`.
+ * Consumers that need the feature resolve it there by ID.
  */
-export interface SelectedRegion {
-	/** Unique identifier (from DisplayableShape.id) */
-	id: string;
-	/** GeoJSON Feature of selected polygon */
-	feature: Feature<Polygon>;
-	/** Area in square kilometers */
-	areaKm2: number;
-	/** Human-readable area string (e.g., "1,234.5 km²") */
-	areaFormatted: string;
-}
+export type SelectedShape = Pick<DisplayableShape, 'id' | 'areaKm2'>;
 
 // ============================================================================
 // LAYER 6: AREA VALIDATION
@@ -255,12 +245,12 @@ export interface AreaValidationResult {
 }
 
 /**
- * Branded type proving region passed area validation.
+ * Branded type proving shapes passed area validation.
  *
  * Similar to ValidatedShapefile, this enforces that area
- * validation must occur before using the region.
+ * validation must occur before using the shapes.
  */
-export type ValidatedRegion = SelectedRegion & {
+export type ValidatedShapes = DisplayableShape[] & {
 	readonly __areaValidated: unique symbol;
 };
 
@@ -278,7 +268,7 @@ export type ValidatedRegion = SelectedRegion & {
  */
 export interface FinchShapeParameter {
 	type: 'FeatureCollection';
-	features: [Feature<Polygon>]; // Exactly one feature
+	features: Feature<Polygon>[];
 }
 
 // ============================================================================

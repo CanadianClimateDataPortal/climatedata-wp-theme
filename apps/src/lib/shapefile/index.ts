@@ -1,3 +1,4 @@
+export * from './compute-area';
 export * from './contracts';
 export * from './detect-shp';
 export * from './detect-zip';

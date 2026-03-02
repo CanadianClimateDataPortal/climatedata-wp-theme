@@ -5,10 +5,10 @@ import {
 import { default as L } from 'leaflet';
 import { GeoJSON, useMap } from 'react-leaflet';
 
-import type { Feature } from 'geojson';
+import type { Feature, Polygon } from 'geojson';
 
 import { useShapefile } from '@/hooks/use-shapefile';
-import type { SelectedRegion } from '@/lib/shapefile';
+
 import { isLayerWithFeature } from '@/types/validations';
 
 import {
@@ -44,7 +44,7 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 		simplifiedGeometry,
 		selectShape,
 		displayableShapes,
-		selectedRegion,
+		selectedShapes,
 	} = useShapefile();
 	const map = useMap();
 
@@ -74,7 +74,7 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 		_feature: Feature,
 		layer: L.Layer,
 	) => {
-		if (!isLayerWithFeature<SelectedRegion['feature']>(layer)) return;
+		if (!isLayerWithFeature<Feature<Polygon>>(layer)) return;
 
 		const shape = displayableShapes?.shapes.find(s => s.feature === layer.feature);
 		if (!shape) return;
@@ -90,8 +90,10 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 	useEffect(() => {
 		let regionLayer: L.Path | null = null;
 
-		if (selectedRegion) {
-			regionLayer = layerMapRef.current.get(selectedRegion.id) ?? null;
+		const selectedId = selectedShapes[0]?.id ?? null;
+
+		if (selectedId) {
+			regionLayer = layerMapRef.current.get(selectedId) ?? null;
 
 			if (!regionLayer || regionLayer === selectedLayerRef.current) {
 				return;
@@ -106,12 +108,12 @@ export default function ShapefileGeoJsonLayer(): React.ReactElement | null {
 
 		// Track the selected layer (can be null: when the file changes, no region is selected yet)
 		selectedLayerRef.current = regionLayer;
-	}, [selectedRegion, featureCollection]);
+	}, [selectedShapes, featureCollection]);
 
 	const click = (e: L.LeafletMouseEvent) => {
 		const layer = e.propagatedFrom as L.Path;
 
-		if (!layer || !isLayerWithFeature<SelectedRegion['feature']>(layer)) return;
+		if (!layer || !isLayerWithFeature<Feature<Polygon>>(layer)) return;
 
 		const feature = layer.feature;
 		const shape = displayableShapes?.shapes.find(s => s.feature === feature);

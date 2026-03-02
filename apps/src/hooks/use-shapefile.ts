@@ -5,7 +5,7 @@ import {
 	ShapefileContext,
 	type ShapefileContextValue,
 } from '@/context/shapefile-provider';
-import { ShapefileError } from '@/lib/shapefile';
+import { type FinchShapeParameter, ShapefileError } from '@/lib/shapefile';
 import type {
 	DisplayableShape,
 	DisplayableShapes,
@@ -26,6 +26,7 @@ export type UseShapefileHook = {
 	displayableShapes: DisplayableShapes | null;
 	simplifiedGeometry: SimplifiedGeometry | null;
 	selectedRegion: SelectedRegion | null;
+	finchPayload: FinchShapeParameter | null;
 };
 
 /**
@@ -65,6 +66,7 @@ export function useShapefile(): UseShapefileHook {
 	const isFileValid = hasFile && !isFileInvalid;
 	const isSelectedRegionValid = snapshot.matches('ready');
 	const selectedRegion = snapshot.context.selectedRegion;
+	const finchPayload = snapshot.context.finchPayload;
 
 	const isDisplaying =
 		snapshot.matches('displaying') ||
@@ -117,5 +119,6 @@ export function useShapefile(): UseShapefileHook {
 		displayableShapes,
 		simplifiedGeometry,
 		selectedRegion,
+		finchPayload,
 	};
 }

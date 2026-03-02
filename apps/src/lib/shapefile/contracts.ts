@@ -261,7 +261,6 @@ export type ValidatedShapes = DisplayableShape[] & {
 /**
  * GeoJSON payload for Finch API shape parameter.
  *
- * Requirements from CLIM-1274 (F11, F12, F13):
  * - Must be FeatureCollection with single Feature
  * - Coordinates rounded to 2 decimal places
  * - Replaces lat/lon parameters

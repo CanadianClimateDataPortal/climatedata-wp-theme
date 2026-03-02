@@ -20,7 +20,7 @@ import type { PipelineServices } from './shapefile-machine';
 import { extractShapefileFromZip } from './extract-shapefile';
 import { validateShapefileGeometry } from './validate-geometry';
 import { simplifyShapefile } from './simplify-shapefile';
-import { prepareFinchPayload } from './prepare-finch';
+import { prepareFinchPayload } from './prepare-finch-payload';
 
 export const createAsyncPipelineServices = (): Omit<
 	PipelineServices,

@@ -11,5 +11,4 @@ export * from './services';
 export * from './shapefile-machine';
 export * from './simplify-shapefile';
 export * from './validate-geometry';
-export * from './prepare-finch';
 export * from './validate-selected-area';

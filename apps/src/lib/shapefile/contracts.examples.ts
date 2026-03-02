@@ -260,6 +260,7 @@ export const EXAMPLE_VALIDATED_SHAPES = Object.assign(
  * Coordinates would be rounded to 2 decimal places in production (F13).
  *
  * @see {@link FinchShapeParameter}
+ * @see {@link FINCH_COORDINATE_PRECISION} in contracts.ts
  */
 export const EXAMPLE_FINCH_PAYLOAD: FinchShapeParameter = {
 	type: 'FeatureCollection',

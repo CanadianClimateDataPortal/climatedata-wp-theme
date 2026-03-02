@@ -6,10 +6,7 @@ import {
 	createAsyncPipelineServices,
 	PipelineServices,
 	shapefileMachine,
-	type FinchShapeParameter,
-	type PrepareFinchPayload,
-	type ValidatedShapes,
-	type ValidateSelectedArea,
+	validateSelectedArea,
 } from '@/lib/shapefile';
 
 type ShapefileMachine = typeof shapefileMachine;
@@ -18,31 +15,6 @@ type ShapefileActor = ActorRefFrom<ShapefileMachine>;
 type ShapefileContextValue = {
 	actor: ShapefileActor;
 };
-
-/*
- * !! TEMPORARY: mock sync services. To be replaced by CLIM-1270 and downstream.
- */
-
-const validateSelectedArea: ValidateSelectedArea = (shapes) => {
-	// In this mock, we let the region pass validation as is
-	const validated = Object.assign(
-		[...shapes],
-		{ __areaValidated: Symbol('areaValidated') },
-	) as unknown as ValidatedShapes;
-
-	return { ok: true as const, value: validated };
-};
-
-const prepareFinchPayload: PrepareFinchPayload = (shapes) => {
-	return {
-		type: 'FeatureCollection',
-		features: shapes.map((s) => s.feature),
-	} as FinchShapeParameter;
-};
-
-/*
- * !! END TEMPORARY
- */
 
 const services: PipelineServices = {
 	...createAsyncPipelineServices(),

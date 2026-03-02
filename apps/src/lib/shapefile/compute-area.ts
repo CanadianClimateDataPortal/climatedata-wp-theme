@@ -1,17 +1,20 @@
 /**
- * @file Compute geodesic area of a GeoJSON polygon.
+ * @file Compute geodesic area of a GeoJSON polygon — wrapper.
  *
- * Wraps @turf/area to return area in square kilometers.
+ * Convention: `-impl.ts` pattern
+ *
+ * This wrapper re-exports the computation from the impl module.
  * Keeps the state machine file free of external dependencies.
  *
+ * @see {@link ./compute-area-impl.ts} for the actual logic
  * @see {@link ./shapefile-machine.ts} — consumer (runDisplayConversion)
  */
 
-import area from '@turf/area';
+import { computeAreaKm2Impl } from './compute-area-impl';
 
-import type {
-	Feature,
-	Polygon,
+import {
+	type Feature,
+	type Polygon,
 } from 'geojson';
 
 /**
@@ -28,8 +31,8 @@ import type {
  *
  * @see {@link https://turfjs.org/docs/api/area @turf/area}
  */
-export function computeAreaKm2(
+export const computeAreaKm2 = (
 	feature: Feature<Polygon>,
-): number {
-	return area(feature) / 1_000_000;
-}
+): number => {
+	return computeAreaKm2Impl(feature);
+};

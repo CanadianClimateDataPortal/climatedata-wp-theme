@@ -85,37 +85,35 @@ export type MachineContext = {
 	services: PipelineServices;
 };
 
-function initialContext(services: PipelineServices): MachineContext {
-	return {
-		file: null,
-		extractedShapefile: null,
-		validatedShapefile: null,
-		simplifiedGeometry: null,
-		displayableShapes: null,
-		selectedShapes: [],
-		validatedShapes: null,
-		finchPayload: null,
-		areaValidationResult: null,
-		error: null,
-		areaConstraints: DEFAULT_AREA_CONSTRAINTS,
-		services,
-	};
-}
+const initialContext = (
+	services: PipelineServices,
+): MachineContext => ({
+	file: null,
+	extractedShapefile: null,
+	validatedShapefile: null,
+	simplifiedGeometry: null,
+	displayableShapes: null,
+	selectedShapes: [],
+	validatedShapes: null,
+	finchPayload: null,
+	areaValidationResult: null,
+	error: null,
+	areaConstraints: DEFAULT_AREA_CONSTRAINTS,
+	services,
+});
 
 /** Clear downstream pipeline data, preserving services and constraints. */
-function downstreamReset(): Partial<MachineContext> {
-	return {
-		extractedShapefile: null,
-		validatedShapefile: null,
-		simplifiedGeometry: null,
-		displayableShapes: null,
-		selectedShapes: [],
-		validatedShapes: null,
-		finchPayload: null,
-		areaValidationResult: null,
-		error: null,
-	};
-}
+const downstreamReset = (): Partial<MachineContext> => ({
+	extractedShapefile: null,
+	validatedShapefile: null,
+	simplifiedGeometry: null,
+	displayableShapes: null,
+	selectedShapes: [],
+	validatedShapes: null,
+	finchPayload: null,
+	areaValidationResult: null,
+	error: null,
+});
 
 // ============================================================================
 // EVENTS

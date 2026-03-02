@@ -122,61 +122,6 @@ export class InvalidGeometryTypeError extends ShapefileError {
 }
 
 /**
- * Error: Area exceeds maximum limit.
- *
- * Thrown during area validation (CLIM-1270, U13).
- *
- * @remarks
- * TODO (CLIM-1270): We will not use this error as-is, we do not want to
- * change the contract of errors and this is not the same constructor
- * signature as typical errors. Migrate to standard `(message, options?)`
- * pattern. Use `DEFAULT_AREA_CONSTRAINTS` field names (`minKm2`, `maxKm2`)
- * for consistency with the constraint config.
- */
-export class AreaExceedsLimitError extends AbstractError {
-	constructor(
-		public readonly areaKm2: number,
-		public readonly maxKm2: number,
-		options?: ErrorOptions,
-	) {
-		super(
-			`Region area (${areaKm2.toFixed(1)} km²) exceeds maximum (${maxKm2.toFixed(0)} km²)`,
-			options,
-		);
-		// Explicit name - survives minification
-		this.name = 'AreaExceedsLimitError';
-	}
-}
-
-/**
- * Error: Area below minimum limit.
- *
- * Thrown during area validation (CLIM-1270, U14).
- *
- * @remarks
- * TODO (CLIM-1270): Migrate to standard constructor signature
- * `(message: string, options?: ErrorOptions)` like other ShapefileError
- * subclasses. Current signature uses domain-specific positional args
- * (`areaKm2`, `minKm2`) which diverges from the established pattern.
- * Use `DEFAULT_AREA_CONSTRAINTS` field names (`minKm2`, `maxKm2`)
- * for consistency with the constraint config.
- */
-export class AreaBelowLimitError extends AbstractError {
-	constructor(
-		public readonly areaKm2: number,
-		public readonly minKm2: number,
-		options?: ErrorOptions,
-	) {
-		super(
-			`Region area (${areaKm2.toFixed(1)} km²) is below minimum (${minKm2.toFixed(0)} km²)`,
-			options,
-		);
-		// Explicit name - survives minification
-		this.name = 'AreaBelowLimitError';
-	}
-}
-
-/**
  * Error: Shapefile processing failed.
  *
  * Generic error for transformation failures.

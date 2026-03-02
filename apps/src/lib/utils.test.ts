@@ -327,10 +327,9 @@ describe('toJSONString', () => {
 
 	test('rounds maxDecimals if maxDecimals is not an integer', () => {
 		const list = [-3.2, 10.4896, { number: -0.500001 }];
-		const expected = [-3.2, 10.49, { number: -0.5 }];
 		const result = toJSONString(list, 1.5);
-		const parsed = JSON.parse(result);
-		expect(parsed).toEqual(expected);
+		const resultWhenRounded = toJSONString(list, 2);
+		expect(result).toEqual(resultWhenRounded);
 	});
 
 	describe('invalid inputs', () => {

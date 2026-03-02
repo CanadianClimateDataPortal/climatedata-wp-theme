@@ -282,8 +282,8 @@ const Steps: React.FC = () => {
 						}
 					}
 				} else if (!isUserRegion) {
-					// User custom region (i.e. shapefile): a region is selected,
-					// not points, so we don't include the lat and lon.
+					// We don't include the lat and lon for user custom shapes
+					// (i.e. shapefile)
 
 					if (latList) {
 						inputs.push({ id: 'lat', data: latList });
@@ -297,7 +297,8 @@ const Steps: React.FC = () => {
 				// region as a stringified GeoJSON
 				if (isUserRegion) {
 					if (!finchPayload) {
-						// Should never get here, but just in case to prevent an erroneous request
+						// Should never get here, but just in case to prevent an erroneous request,
+						// and for typing validation
 						console.error('A finchPayload was expected but it is not defined.');
 						dispatch(setRequestStatus('error'));
 						dispatch(setRequestError(__('An unknown error occurred. Please try again.')));

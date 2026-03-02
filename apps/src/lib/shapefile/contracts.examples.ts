@@ -266,3 +266,35 @@ export const EXAMPLE_FINCH_PAYLOAD: FinchShapeParameter = {
 	type: 'FeatureCollection',
 	features: [EXAMPLE_DISPLAYABLE_SHAPE.feature],
 };
+
+/**
+ * Example of a really large polygon — Le Grand Nord du Quebec.
+ * areaKm2 would be ~931k km² — above the default max of 500k km²
+ */
+export const EXAMPLE_GEOMETRY_SHAPE_REALLY_BIG: Omit<DisplayableShape, 'areaKm2'> = {
+	id: 'Le-Grand-Nord-Du-Quebec',
+	feature: {
+		type: 'Feature',
+		properties: {},
+		geometry: {
+			type: 'Polygon',
+			coordinates: [
+				[
+					[-78.09, 60.92],
+					[-78.09, 58.37],
+					[-76.54, 56.36],
+					[-77.19, 55.67],
+					[-78.3, 55.05],
+					[-79.65, 54.68],
+					[-79.04, 53.9],
+					[-79.52, 49.29],
+					[-72.65, 50.76],
+					[-63.59, 55.1],
+					[-64.81, 60.28],
+					[-72.6, 61.94],
+					[-78.09, 60.92],
+				],
+			],
+		},
+	},
+};

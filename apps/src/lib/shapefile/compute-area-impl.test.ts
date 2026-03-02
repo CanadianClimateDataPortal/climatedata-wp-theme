@@ -10,7 +10,10 @@ import { describe, it, expect } from 'vitest';
 import type { Feature, Polygon } from 'geojson';
 
 import { computeAreaKm2Impl } from './compute-area-impl';
-import { EXAMPLE_DISPLAYABLE_SHAPE } from './contracts.examples';
+import {
+	EXAMPLE_DISPLAYABLE_SHAPE,
+	EXAMPLE_GEOMETRY_SHAPE_REALLY_BIG,
+} from './contracts.examples';
 
 describe('computeAreaKm2Impl', () => {
 	describe('valid polygon', () => {
@@ -26,6 +29,14 @@ describe('computeAreaKm2Impl', () => {
 			// Ottawa polygon is ~5000 km² — sanity bounds rule out raw m² (would be ~5e9)
 			expect(result).toBeGreaterThan(100);
 			expect(result).toBeLessThan(50_000);
+		});
+	});
+
+	describe('really large polygon', () => {
+		it('returns area exceeding the max constraint for Le Grand Nord du Quebec', () => {
+			const result = computeAreaKm2Impl(EXAMPLE_GEOMETRY_SHAPE_REALLY_BIG.feature);
+
+			expect(result).toBeGreaterThan(500_000);
 		});
 	});
 

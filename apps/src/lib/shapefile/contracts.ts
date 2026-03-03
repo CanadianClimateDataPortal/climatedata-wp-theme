@@ -284,15 +284,41 @@ export interface FinchShapeParameter {
 // ============================================================================
 
 /**
+ * Coordinate rounding precision for Finch API (requirement F13).
+ */
+export const FINCH_COORDINATE_PRECISION = 2;
+
+/**
+ * Roughly tolerated maximum size of the Finch request (in bytes).
+ *
+ * This number is not used to *guarantee* a request's maximum size (the actual
+ * request could end up a little bit bigger than this in edge cases). But it's
+ * used to calculate what a good value is for the maximum number of positions
+ * allowed.
+ *
+ * Note that the bulk of a Finch request consists of coordinates, so we can
+ * safely consider that the size of the request corresponds to the size of the
+ * list of coordinates (as a JSON encoded string).
+ */
+export const FINCH_APPROX_MAX_REQUEST_SIZE = 4_000_000;
+
+/**
+ * Approximate number of bytes per position in a Finch request when positions
+ * are JSON encoded.
+ * The number 5.4 was determined empirically.
+ */
+const approximateBytesPerPosition = (5.4 + FINCH_COORDINATE_PRECISION) * 2;
+
+/**
  * Default shapes selection constraints (from requirements U13, U14).
+ *
+ * The `maxPositions` is calculated from the desired maximum Finch request size,
+ * and the approximate number of bytes per position in a request.
  */
 export const DEFAULT_SHAPES_CONSTRAINTS: ShapesConstraints = {
 	minKm2: 100,
 	maxKm2: 500_000,
-	maxPositions: 100_000,
+	maxPositions: Math.round(
+		FINCH_APPROX_MAX_REQUEST_SIZE / approximateBytesPerPosition
+	),
 };
-
-/**
- * Coordinate rounding precision for Finch API (requirement F13).
- */
-export const FINCH_COORDINATE_PRECISION = 2;

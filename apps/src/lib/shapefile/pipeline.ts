@@ -60,8 +60,9 @@ export type SimplifyShapefile = (
 /**
  * Stage 5: Validate selected shapes.
  *
- * Validates that the selected region's area falls within the allowed range
- * (default: 100 km² to 500,000 km²).
+ * Validates that the selected shapes' areas fall within the allowed range
+ * (default: 100 km² to 500,000 km²) and that they don't have more than the
+ * maximum number of positions.
  */
 export type ValidateSelectedShapes = (
 	shapes: DisplayableShape[],

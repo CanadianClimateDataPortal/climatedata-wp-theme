@@ -6,6 +6,7 @@ import {
 	parseLatLon,
 	toJSONString,
 	utc,
+	arraySize,
 } from './utils';
 
 describe('findCeilingIndex', () => {
@@ -342,5 +343,35 @@ describe('toJSONString', () => {
 			const fn = () => toJSONString(3.5, -1);
 			expect(fn).toThrow();
 		});
+	});
+});
+
+describe('arraySize', () => {
+	test('returns 0 for an empty array', () => {
+		expect(arraySize([])).toBe(0);
+	});
+
+	test('returns the length of a flat array', () => {
+		expect(arraySize([1, 2, 3])).toBe(3);
+		expect(arraySize(['a', 'b', 'c', 'd'])).toBe(4);
+	});
+
+	test('returns the total number of elements in a nested array', () => {
+		expect(arraySize([1, [2, 3], 4])).toBe(4);
+		expect(arraySize([1, [2, [3, 4]]])).toBe(4);
+		expect(arraySize([[1, 2], [3, 4]])).toBe(4);
+	});
+
+	test('returns 1 for a non-array value', () => {
+		expect(arraySize(5)).toBe(1);
+		expect(arraySize('hello')).toBe(1);
+		expect(arraySize({ a: 1 })).toBe(1);
+		expect(arraySize(null)).toBe(1);
+	});
+
+	test('works with mixed content', () => {
+		const mixed = [1, 'text', [true, false], { key: 'value' }];
+		// 1 (1) + 'text' (1) + [true, false] (2) + {key: 'value'} (1) = 5
+		expect(arraySize(mixed)).toBe(5);
 	});
 });

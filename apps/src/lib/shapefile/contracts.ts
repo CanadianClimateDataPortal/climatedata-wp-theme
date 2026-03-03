@@ -165,7 +165,7 @@ export interface SimplifiedGeometry {
  *
  * Represents a single polygon from the shapefile, extracted from simplified
  * GeoJSON for rendering with Leaflet. Each shape includes its computed
- * area for validation against size constraints.
+ * area and number of positions for validation against size constraints.
  */
 export interface DisplayableShape {
 	/** Unique identifier for this shape */
@@ -174,6 +174,8 @@ export interface DisplayableShape {
 	feature: Feature<Polygon>;
 	/** Area in square kilometers (computed via Turf.js) */
 	areaKm2: number;
+	/** Total number of positions (pairs of coordinates) in the shape */
+	nbPositions: number;
 }
 
 /**
@@ -222,6 +224,13 @@ export interface ShapesConstraints {
 	 * @see {@link DEFAULT_SHAPES_CONSTRAINTS}
 	 */
 	maxKm2: number;
+	/**
+	 * Maximum number of positions (pairs of coordinates) in a shape
+	 * (default: 5,000,000)
+	 * @see {@link DEFAULT_SHAPES_CONSTRAINTS}
+	 * @remarks
+	 */
+	maxPositions: number;
 }
 
 /**
@@ -280,6 +289,7 @@ export interface FinchShapeParameter {
 export const DEFAULT_SHAPES_CONSTRAINTS: ShapesConstraints = {
 	minKm2: 100,
 	maxKm2: 500_000,
+	maxPositions: 100_000,
 };
 
 /**

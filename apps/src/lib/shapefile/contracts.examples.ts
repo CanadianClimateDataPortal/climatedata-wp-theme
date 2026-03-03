@@ -144,6 +144,7 @@ export const EXAMPLE_DISPLAYABLE_SHAPE: DisplayableShape = {
 		properties: {},
 	},
 	areaKm2: 5000,
+	nbPositions: 5,
 };
 
 /**
@@ -199,6 +200,7 @@ export const EXAMPLE_SHAPES_CONSTRAINTS: ShapesConstraints = {
 export const EXAMPLE_SHAPES_CONSTRAINTS_TIGHT: ShapesConstraints = {
 	minKm2: 1000,
 	maxKm2: 10_000,
+	maxPositions: 10,
 };
 
 /**

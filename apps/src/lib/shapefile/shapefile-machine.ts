@@ -16,7 +16,7 @@ import { assign, fromPromise, setup } from 'xstate';
 import type { Feature, Polygon } from 'geojson';
 
 import { computeAreaKm2 } from './compute-area';
-
+import { computeNbPositions } from './compute-nb-positions';
 import {
 	type Result,
 } from './result';
@@ -185,6 +185,7 @@ export const shapefileMachine = setup({
 				id: `shape-${index}`,
 				feature: feature as Feature<Polygon>,
 				areaKm2: computeAreaKm2(feature as Feature<Polygon>),
+				nbPositions: computeNbPositions(feature as Feature<Polygon>),
 			}));
 			const bounds = geometry.featureCollection.bbox as
 				| [number, number, number, number]

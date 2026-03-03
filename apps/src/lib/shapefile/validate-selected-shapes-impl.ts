@@ -58,16 +58,21 @@ export const throwAreaLimitError = (
 };
 
 /**
- * Validate that the total selected area falls within the allowed range.
+ * Validate that the selected shapes respect the constraints.
  *
- * Sums `areaKm2` across all provided shapes, then checks the total
- * against the configured constraints. Brands the array as ValidatedShapes
- * on success, encoding area validity in the type system.
+ * Two validations are performed:
+ * - Sums `areaKm2` across all selected shapes, then checks the total
+ *   against the configured constraints.
+ * - Sums `nbPositions` across all selected shapes, then checks the total
+ *   against the configured maximum.
  *
- * @throws {ShapefileError} when the total area is outside the allowed range
+ * Brands the array as ValidatedShapes on success, encoding area validity in
+ * the type system.
+ *
+ * @throws {ShapefileError} when the constraints are not respected.
  *
  * @param shapes - Array of DisplayableShape objects to validate
- * @param constraints - Min/max area constraints to validate against
+ * @param constraints - Constraints to validate against
  * @returns Branded ValidatedShapes array on success
  */
 export const validateSelectedShapesImpl = (
@@ -81,6 +86,18 @@ export const validateSelectedShapesImpl = (
 
 	if (totalArea < constraints.minKm2 || totalArea > constraints.maxKm2) {
 		throwAreaLimitError(totalArea, constraints);
+	}
+
+	const totalPositions = shapes.reduce(
+		(sum, shape) => sum + shape.nbPositions,
+		0,
+	);
+
+	if (totalPositions > constraints.maxPositions) {
+		throw new ShapefileError(
+			`Shapes contains too many positions (${totalPositions} > ${constraints.maxPositions})`,
+			{ code: 'selection/too-many-positions' },
+		);
 	}
 
 	return shapes as unknown as ValidatedShapes;

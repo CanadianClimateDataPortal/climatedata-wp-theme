@@ -86,6 +86,7 @@ const STUB_DISPLAYABLE: DisplayableShapes = {
 				properties: {},
 			},
 			areaKm2: 5000,
+			nbPositions: 5,
 		},
 	],
 	bounds: [-75, 45, -74, 46],

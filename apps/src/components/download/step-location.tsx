@@ -181,6 +181,7 @@ export default StepLocation;
  */
 export const StepSummaryLocation = (): React.ReactNode | null => {
 	const { climateVariable } = useClimateVariable();
+	const { selectedShapes } = useShapefile();
 
 	if (!climateVariable) return null;
 
@@ -190,8 +191,7 @@ export const StepSummaryLocation = (): React.ReactNode | null => {
 	let selectedCount: number;
 
 	if (isShapefileMode) {
-		// Shapefile supports exactly 1 selected shape
-		selectedCount = 1;
+		selectedCount = selectedShapes.length;
 	} else {
 		selectedCount = isRegion
 			? climateVariable.getSelectedRegion()?.cellCount ?? 0

@@ -47,8 +47,9 @@ import type { Feature, FeatureCollection, Polygon } from 'geojson';
  * Shapes validation result type.
  */
 export const VALUES_SHAPES_VALIDATION_STATUSES = [
-	'too-large',
-	'too-small',
+	'area-too-large',
+	'area-too-small',
+	'too-many-positions',
 	'valid',
 ] as const;
 
@@ -72,6 +73,7 @@ export const VALUES_SUPPORTED_GEOMETRY_TYPES = [
 export const VALUES_SHAPES_VALIDATION_RESULT_ERRORS = [
 	'area-too-large',
 	'area-too-small',
+	'too-many-positions',
 ] as const;
 
 // ============================================================================
@@ -245,8 +247,10 @@ export type ShapesValidationStatus =
 export interface ShapesValidationResult {
 	/** Validation outcome */
 	status: ShapesValidationStatus;
-	/** Selected region area in km² */
+	/** Selected shapes area in km² */
 	areaKm2: number;
+	/** Number of positions in selected shapes */
+	nbPositions: number;
 	/** Applied constraints */
 	constraints: ShapesConstraints;
 	/** Error message key (for i18n) if invalid */

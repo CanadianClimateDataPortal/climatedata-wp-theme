@@ -228,6 +228,7 @@ export const shapefileMachine = setup({
 					shapesValidationResult: {
 						status: 'valid' as const,
 						areaKm2: shape.areaKm2,
+						nbPositions: shape.nbPositions,
 						constraints: context.shapesConstraints,
 					},
 					error: null,
@@ -235,19 +236,25 @@ export const shapefileMachine = setup({
 			}
 
 			const isTooSmall = shape.areaKm2 < context.shapesConstraints.minKm2;
+			const tooManyPositions = shape.nbPositions > context.shapesConstraints.maxPositions;
 			return {
 				selectedShapes,
 				validatedShapes: null,
 				finchPayload: null,
 				shapesValidationResult: {
 					status: isTooSmall
-						? ('too-small' as const)
-						: ('too-large' as const),
+						? ('area-too-small' as const)
+						: tooManyPositions
+							? ('too-many-positions' as const)
+							: ('area-too-large' as const),
 					areaKm2: shape.areaKm2,
+					nbPositions: shape.nbPositions,
 					constraints: context.shapesConstraints,
 					errorMessageKey: isTooSmall
 						? ('area-too-small' as const)
-						: ('area-too-large' as const),
+						: tooManyPositions
+							? ('too-many-positions' as const)
+							: ('area-too-large' as const),
 				},
 				error: shapesResult.error,
 			};

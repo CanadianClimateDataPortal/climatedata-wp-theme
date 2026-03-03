@@ -211,6 +211,7 @@ export const EXAMPLE_SHAPES_CONSTRAINTS_TIGHT: ShapesConstraints = {
 export const EXAMPLE_SHAPES_VALIDATION_VALID: ShapesValidationResult = {
 	status: 'valid',
 	areaKm2: 5000,
+	nbPositions: 5,
 	constraints: DEFAULT_SHAPES_CONSTRAINTS,
 };
 
@@ -222,8 +223,9 @@ export const EXAMPLE_SHAPES_VALIDATION_VALID: ShapesValidationResult = {
  * @see {@link ShapesValidationResult}
  */
 export const EXAMPLE_SHAPES_VALIDATION_AREA_TOO_SMALL: ShapesValidationResult = {
-	status: 'too-small',
+	status: 'area-too-small',
 	areaKm2: 50,
+	nbPositions: 5,
 	constraints: DEFAULT_SHAPES_CONSTRAINTS,
 	errorMessageKey: 'area-too-small',
 };
@@ -236,10 +238,26 @@ export const EXAMPLE_SHAPES_VALIDATION_AREA_TOO_SMALL: ShapesValidationResult = 
  * @see {@link ShapesValidationResult}
  */
 export const EXAMPLE_SHAPES_VALIDATION_AREA_TOO_LARGE: ShapesValidationResult = {
-	status: 'too-large',
+	status: 'area-too-large',
 	areaKm2: 600_000,
+	nbPositions: 5,
 	constraints: DEFAULT_SHAPES_CONSTRAINTS,
 	errorMessageKey: 'area-too-large',
+};
+
+/**
+ * Shapes validation result — too many positions.
+ *
+ * 1 more position than the default maximum.
+ *
+ * @see {@link ShapesValidationResult}
+ */
+export const EXAMPLE_SHAPES_VALIDATION_TOO_MANY_POSITIONS: ShapesValidationResult = {
+	status: 'too-many-positions',
+	areaKm2: 600_000,
+	nbPositions: DEFAULT_SHAPES_CONSTRAINTS.maxPositions + 1,
+	constraints: DEFAULT_SHAPES_CONSTRAINTS,
+	errorMessageKey: 'too-many-positions',
 };
 
 /**

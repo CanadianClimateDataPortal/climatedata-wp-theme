@@ -46,7 +46,7 @@ describe('validateSelectedShapesImpl', () => {
 		expect(result[0]).toBe(EXAMPLE_DISPLAYABLE_SHAPE);
 	});
 
-	it('throws ShapefileError with code area/too-small when area is below minimum', () => {
+	it('throws ShapefileError with code selection/area-too-small when area is below minimum', () => {
 		const shapes = [makeShape(500)]; // 500 < min 1000
 
 		let thrownError: unknown;
@@ -57,10 +57,10 @@ describe('validateSelectedShapesImpl', () => {
 		}
 
 		expect(thrownError).toBeInstanceOf(ShapefileError);
-		expect((thrownError as ShapefileError).code).toBe('area/too-small');
+		expect((thrownError as ShapefileError).code).toBe('selection/area-too-small');
 	});
 
-	it('throws ShapefileError with code area/too-large when area exceeds maximum', () => {
+	it('throws ShapefileError with code selection/area-too-large when area exceeds maximum', () => {
 		const shapes = [makeShape(15_000)]; // 15 000 > max 10 000
 
 		let thrownError: unknown;
@@ -71,7 +71,7 @@ describe('validateSelectedShapesImpl', () => {
 		}
 
 		expect(thrownError).toBeInstanceOf(ShapefileError);
-		expect((thrownError as ShapefileError).code).toBe('area/too-large');
+		expect((thrownError as ShapefileError).code).toBe('selection/area-too-large');
 	});
 
 	it('passes when sum of multiple shapes falls within constraints', () => {
@@ -105,7 +105,7 @@ describe('validateSelectedShapesImpl', () => {
 // ---------------------------------------------------------------------------
 
 describe('throwAreaLimitError', () => {
-	it('throws ShapefileError with code area/too-large when area exceeds max', () => {
+	it('throws ShapefileError with code selection/area-too-large when area exceeds max', () => {
 		let thrownError: unknown;
 		try {
 			throwAreaLimitError(15_000, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
@@ -114,10 +114,10 @@ describe('throwAreaLimitError', () => {
 		}
 
 		expect(thrownError).toBeInstanceOf(ShapefileError);
-		expect((thrownError as ShapefileError).code).toBe('area/too-large');
+		expect((thrownError as ShapefileError).code).toBe('selection/area-too-large');
 	});
 
-	it('throws ShapefileError with code area/too-small when area is below min', () => {
+	it('throws ShapefileError with code selection/area-too-small when area is below min', () => {
 		let thrownError: unknown;
 		try {
 			throwAreaLimitError(500, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
@@ -126,7 +126,7 @@ describe('throwAreaLimitError', () => {
 		}
 
 		expect(thrownError).toBeInstanceOf(ShapefileError);
-		expect((thrownError as ShapefileError).code).toBe('area/too-small');
+		expect((thrownError as ShapefileError).code).toBe('selection/area-too-small');
 	});
 
 	it('includes area value and limit value in the error message', () => {

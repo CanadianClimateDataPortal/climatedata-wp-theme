@@ -57,6 +57,14 @@ function getShapefileErrorMessage(
 						'the "Grid Cells" interactive region.'
 					),
 				);
+			case 'selection/too-many-positions':
+				return new StepErrorMessage(
+					__(
+						'The selected region has too many coordinates (its ' +
+						'polygon has too many edges). Please select a region ' +
+						'with a simpler polygon.'
+					),
+				);
 		}
 	}
 

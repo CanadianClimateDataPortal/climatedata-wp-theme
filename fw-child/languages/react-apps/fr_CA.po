@@ -1469,3 +1469,8 @@ msgid  "The selected region is smaller than our data resolution. Try selecting a
        "\"Grid Cells\" interactive region."
 msgstr "La région sélectionnée est plus petite que la résolution de nos données. Veuillez sélectionner une région "
        "plus grande, ou utilisez l'option « Points de grille » comme région interactive."
+
+msgid  "The selected region has too many coordinates (its polygon has too many edges). Please select a region with a "
+       "simpler polygon."
+msgstr "La région sélectionnée comporte trop de coordonnées (son polygone contient trop de segments). Veuillez "
+       "sélectionner une région avec un polygone plus simple."

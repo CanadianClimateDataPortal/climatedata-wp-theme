@@ -27,7 +27,7 @@ import { prepareFinchPayloadImpl } from './prepare-finch-payload-impl';
  * Synchronous pass-through to the impl module. Returns a FinchShapeParameter
  * directly — no Result wrapping, no error handling needed at this stage.
  *
- * @param shapes - Branded array of shapes that have passed area validation
+ * @param shapes - Branded array of shapes that have passed validation
  * @returns GeoJSON FeatureCollection suitable for the Finch API shape parameter
  *
  * @example

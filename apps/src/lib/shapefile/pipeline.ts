@@ -2,7 +2,7 @@
  * Pipeline function type signatures for shapefile processing.
  *
  * These define the contract for each stage of the pipeline:
- * Extract → Validate → Transform → Display → Select → Validate Area → Finch
+ * Extract → Validate → Transform → Display → Select → Validate Shapes → Finch
  *
  * When the XState machine is implemented, these signatures will be
  * used as invoked services on the machine.
@@ -58,12 +58,12 @@ export type SimplifyShapefile = (
 ) => Promise<Result<SimplifiedGeometry, ProcessingError | ProjectionError>>;
 
 /**
- * Stage 5: Validate selected region area.
+ * Stage 5: Validate selected shapes.
  *
  * Validates that the selected region's area falls within the allowed range
  * (default: 100 km² to 500,000 km²).
  */
-export type ValidateSelectedArea = (
+export type ValidateSelectedShapes = (
 	shapes: DisplayableShape[],
 	constraints: AreaConstraints,
 ) => Result<ValidatedShapes, ShapefileError>;

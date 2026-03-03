@@ -124,7 +124,7 @@ function createHappyServices(): PipelineServices {
 			ok: true,
 			value: STUB_SIMPLIFIED_GEOMETRY,
 		}),
-		validateSelectedArea: vi.fn().mockReturnValue({
+		validateSelectedShapes: vi.fn().mockReturnValue({
 			ok: true,
 			value: STUB_VALIDATED_SHAPES,
 		}),
@@ -183,7 +183,7 @@ describe('shapefile machine — happy path', () => {
 		actor.stop();
 	});
 
-	it('SHAPE_CLICKED with valid area → ready with finchPayload', async () => {
+	it('SHAPE_CLICKED with valid shapes → ready with finchPayload', async () => {
 		const services = createHappyServices();
 		const actor = createActor(shapefileMachine, { input: services });
 		actor.start();
@@ -207,7 +207,7 @@ describe('shapefile machine — happy path', () => {
 		expect(snapshot.value).toBe('ready');
 
 		// Validation + payload services were called
-		expect(services.validateSelectedArea).toHaveBeenCalledOnce();
+		expect(services.validateSelectedShapes).toHaveBeenCalledOnce();
 		expect(services.prepareFinchPayload).toHaveBeenCalledOnce();
 
 		// Context has the final payload

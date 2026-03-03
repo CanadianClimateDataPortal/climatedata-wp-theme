@@ -36,7 +36,7 @@ import {
 	type ExtractShapefileFromZip,
 	type PrepareFinchPayload,
 	type SimplifyShapefile,
-	type ValidateSelectedArea,
+	type ValidateSelectedShapes,
 	type ValidateShapefileGeometry,
 } from './pipeline';
 import {
@@ -55,7 +55,7 @@ export type PipelineServices = {
 	validateShapefileGeometry: ValidateShapefileGeometry;
 	simplifyShapefile: SimplifyShapefile;
 	// Sync (called in actions)
-	validateSelectedArea: ValidateSelectedArea;
+	validateSelectedShapes: ValidateSelectedShapes;
 	prepareFinchPayload: PrepareFinchPayload;
 };
 
@@ -210,7 +210,7 @@ export const shapefileMachine = setup({
 				{ id: shape.id, areaKm2: shape.areaKm2 },
 			];
 
-			const areaResult = context.services.validateSelectedArea(
+			const areaResult = context.services.validateSelectedShapes(
 				[shape],
 				context.areaConstraints,
 			);

@@ -1,19 +1,19 @@
 /**
  * @file
  *
- * Selected-area validation — implementation (reusable outside state machine).
+ * Selected-shapes validation — implementation (reusable outside state machine).
  *
  * Convention: `-impl.ts` pattern
  *
  * This file contains the actual validation logic, separated from the
- * state machine service wrapper (validate-selected-area.ts). It throws
+ * state machine service wrapper (validate-selected-shapes.ts). It throws
  * typed errors on failure instead of returning Result<T, E>, making it
  * usable in any context — not just the XState pipeline.
  *
  * Sums the area of all selected shapes and checks against the configured
  * min/max constraints. Brands the input array as ValidatedShapes on success.
  *
- * @see {@link ./validate-selected-area.ts} for the state machine wrapper
+ * @see {@link ./validate-selected-shapes.ts} for the state machine wrapper
  * @see {@link ./contracts.ts} for AreaConstraints and ValidatedShapes
  */
 
@@ -73,7 +73,7 @@ export const throwAreaLimitError = (
  * @param constraints - Min/max area constraints to validate against
  * @returns Branded ValidatedShapes array on success
  */
-export const validateSelectedAreaImpl = (
+export const validateSelectedShapesImpl = (
 	shapes: DisplayableShape[],
 	constraints: AreaConstraints,
 ): ValidatedShapes => {

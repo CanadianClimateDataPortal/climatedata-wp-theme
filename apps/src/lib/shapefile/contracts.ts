@@ -4,7 +4,7 @@
  * Data shape interfaces for the shapefile processing pipeline.
  *
  * This file defines what data looks like at each stage:
- * Extract → Validate → Transform → Display → Select → Validate Area → Finch
+ * Extract → Validate → Transform → Display → Select → Validate Shapes → Finch
  *
  * For pipeline function signatures, see ./pipeline.ts
  * For Result types, see ./result.ts
@@ -245,9 +245,9 @@ export interface AreaValidationResult {
 }
 
 /**
- * Branded type proving shapes passed area validation.
+ * Branded type proving shapes passed validation.
  *
- * Similar to ValidatedShapefile, this enforces that area
+ * Similar to ValidatedShapefile, this enforces that shapes
  * validation must occur before using the shapes.
  */
 export type ValidatedShapes = DisplayableShape[] & {

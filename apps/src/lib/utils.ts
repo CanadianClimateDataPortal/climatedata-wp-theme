@@ -520,3 +520,23 @@ export function toJSONString(
 		(_, value) => format(value),
 	);
 }
+
+/**
+ * Return the number of elements in an array, recursively.
+ *
+ * @param array
+ *
+ * @example
+ * ```typescript
+ * const myArray = [1, 2, [3, 4, [5, 6]]];
+ * console.log(myArray.length) // 3
+ * console.log(arraySize(myArray)) // 6
+ * ```
+ */
+export function arraySize(array: unknown | unknown[]): number {
+	if (Array.isArray(array)) {
+		return array.reduce((acc, item) => acc + arraySize(item), 0);
+	} else {
+		return 1;
+	}
+}

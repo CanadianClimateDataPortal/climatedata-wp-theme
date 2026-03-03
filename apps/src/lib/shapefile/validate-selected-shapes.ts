@@ -32,15 +32,17 @@ import { validateSelectedShapesImpl } from './validate-selected-shapes-impl';
 /**
  * Validate that the selected shapes are valid.
  *
- * Sums area across all selected shapes and checks against the provided
- * constraints (default: 100 km² to 500,000 km²).
+ * Two validations are performed:
+ * - Sums area across all selected shapes and checks against the provided
+ *   constraints (default: 100 km² to 500,000 km²).
+ * - Sums the number of positions` across all selected shapes and checks against
+ *   the provided maximum.
  *
  * @param shapes - Array of DisplayableShape objects representing the selection
- * @param constraints - Min/max area constraints to validate against
+ * @param constraints - Constraints to validate against
  *
  * @returns Result with branded `ValidatedShapes` on success,
- *   or `ShapefileError` (selection/area-too-large, selection/area-too-small) on
- *   failure,
+ *   or `ShapefileError` on failure,
  *   or `ProcessingError` for unexpected errors
  *
  * @example

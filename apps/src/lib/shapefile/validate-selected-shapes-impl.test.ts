@@ -1,8 +1,8 @@
 /**
- * Tests for validate-selected-area-impl.
+ * Tests for validate-selected-shapes-impl.
  *
- * Covers: validateSelectedShapesImpl (area sum, boundary, multi-shape),
- * throwAreaLimitError (code, message content).
+ * Covers: validateSelectedShapesImpl (area sum, number positions, boundary,
+ * multi-shape), throwAreaLimitError (code, message content).
  */
 
 import { describe, it, expect } from 'vitest';
@@ -22,10 +22,11 @@ import { ShapefileError } from './errors';
 // Helper
 // ---------------------------------------------------------------------------
 
-const makeShape = (areaKm2: number): DisplayableShape => ({
+const makeShape = (areaKm2: number, nbPositions: number): DisplayableShape => ({
 	...EXAMPLE_DISPLAYABLE_SHAPE,
 	id: `test-shape-${areaKm2}`,
 	areaKm2,
+	nbPositions,
 });
 
 // ---------------------------------------------------------------------------
@@ -47,7 +48,7 @@ describe('validateSelectedShapesImpl', () => {
 	});
 
 	it('throws ShapefileError with code selection/area-too-small when area is below minimum', () => {
-		const shapes = [makeShape(500)]; // 500 < min 1000
+		const shapes = [makeShape(500, 5)]; // 500 < min 1000
 
 		let thrownError: unknown;
 		try {
@@ -61,7 +62,7 @@ describe('validateSelectedShapesImpl', () => {
 	});
 
 	it('throws ShapefileError with code selection/area-too-large when area exceeds maximum', () => {
-		const shapes = [makeShape(15_000)]; // 15 000 > max 10 000
+		const shapes = [makeShape(15_000, 5)]; // 15 000 > max 10 000
 
 		let thrownError: unknown;
 		try {
@@ -74,9 +75,24 @@ describe('validateSelectedShapesImpl', () => {
 		expect((thrownError as ShapefileError).code).toBe('selection/area-too-large');
 	});
 
+	it('throws ShapefileError with code selection/too-many-positions when positions exceed maximum', () => {
+		const shapes = [makeShape(5000, 15)]; // 15 > max 10
+
+		let thrownError: unknown;
+		try {
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT);
+		} catch (error) {
+			thrownError = error;
+		}
+
+		expect(thrownError).toBeInstanceOf(ShapefileError);
+		expect((thrownError as ShapefileError).code).toBe('selection/too-many-positions');
+	});
+
 	it('passes when sum of multiple shapes falls within constraints', () => {
-		// 3000 + 3000 = 6000, within [1000, 10 000]
-		const shapes = [makeShape(3000), makeShape(3000)];
+		// areaKm2: 3000 + 3000 = 6000, within [1000, 10 000]
+		// nbPositions: 3 + 4 = 7, lower than 10
+		const shapes = [makeShape(3000, 3), makeShape(3000, 4)];
 
 		expect(() =>
 			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT),
@@ -84,7 +100,7 @@ describe('validateSelectedShapesImpl', () => {
 	});
 
 	it('passes when area is exactly at the minimum boundary', () => {
-		const shapes = [makeShape(1000)]; // exactly 1000 === min
+		const shapes = [makeShape(1000, 5)]; // exactly 1000 === min
 
 		expect(() =>
 			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT),
@@ -92,7 +108,15 @@ describe('validateSelectedShapesImpl', () => {
 	});
 
 	it('passes when area is exactly at the maximum boundary', () => {
-		const shapes = [makeShape(10_000)]; // exactly 10 000 === max
+		const shapes = [makeShape(10_000, 5)]; // exactly 10 000 === max
+
+		expect(() =>
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT),
+		).not.toThrow();
+	});
+
+	it('passes when nbPositions is exactly at the boundary', () => {
+		const shapes = [makeShape(5000, 10)]; // exactly 10 === max
 
 		expect(() =>
 			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT),

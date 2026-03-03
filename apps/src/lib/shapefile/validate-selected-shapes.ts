@@ -1,7 +1,7 @@
 /**
  * @file
  *
- * Selected-area validation — state machine service wrapper.
+ * Selected-shapes validation — state machine service wrapper.
  *
  * Convention: `-impl.ts` pattern
  *
@@ -18,16 +18,16 @@
  * outside the state machine context (e.g., in tests, CLI tools, or
  * other pipelines) without coupling to the Result pattern.
  *
- * @see {@link ./validate-selected-area-impl.ts} for the actual logic
+ * @see {@link ./validate-selected-shapes-impl.ts} for the actual logic
  * @see {@link ./pipeline.ts} for the type signature
  */
 
-import type { ValidateSelectedArea } from './pipeline';
+import type { ValidateSelectedShapes } from './pipeline';
 import {
 	ProcessingError,
 	ShapefileError,
 } from './errors';
-import { validateSelectedAreaImpl } from './validate-selected-area-impl';
+import { validateSelectedShapesImpl } from './validate-selected-shapes-impl';
 
 /**
  * Validate that the selected region's total area is within the allowed range.
@@ -44,7 +44,7 @@ import { validateSelectedAreaImpl } from './validate-selected-area-impl';
  *
  * @example
  * ```typescript
- * const result = validateSelectedArea(shapes, constraints);
+ * const result = validateSelectedShapes(shapes, constraints);
  *
  * if (result.ok) {
  *   // result.value is ValidatedShapes — safe to pass to Finch stage
@@ -55,12 +55,12 @@ import { validateSelectedAreaImpl } from './validate-selected-area-impl';
  *
  * @see {@link ./pipeline.ts} for the type signature
  */
-export const validateSelectedArea: ValidateSelectedArea = (
+export const validateSelectedShapes: ValidateSelectedShapes = (
 	shapes,
 	constraints,
 ) => {
 	try {
-		const value = validateSelectedAreaImpl(shapes, constraints);
+		const value = validateSelectedShapesImpl(shapes, constraints);
 		return { ok: true, value };
 	} catch (err) {
 		if (err instanceof ShapefileError) {

@@ -10,9 +10,6 @@
  * a validated shape collection and returns a FinchShapeParameter directly
  * (no Result wrapper), making it usable in any context.
  *
- * Note: Coordinate truncation is deferred to the Finch integration ticket
- * (CLIM-1274). This implementation extracts features as-is.
- *
  * @see {@link ./prepare-finch-payload.ts} for the state machine wrapper
  * @see {@link ./contracts.ts} for ValidatedShapes and FinchShapeParameter types
  * @see {@link ./pipeline.ts} for the PrepareFinchPayload type signature

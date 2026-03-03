@@ -7,16 +7,16 @@ import {
 } from '@/context/shapefile-provider';
 import { type FinchShapeParameter, ShapefileError } from '@/lib/shapefile';
 import type {
+	AreaValidationResult,
 	DisplayableShape,
 	DisplayableShapes,
-	SelectedRegion,
 	SimplifiedGeometry,
 } from '@/lib/shapefile/contracts';
 
 export type UseShapefileHook = {
 	isProcessingFile: boolean;
 	isFileValid: boolean;
-	isSelectedRegionValid: boolean;
+	isSelectionValid: boolean;
 	file: File | null;
 	errorCode: string | null;
 	reset: () => void;
@@ -25,8 +25,9 @@ export type UseShapefileHook = {
 	isDisplaying: boolean;
 	displayableShapes: DisplayableShapes | null;
 	simplifiedGeometry: SimplifiedGeometry | null;
-	selectedRegion: SelectedRegion | null;
+	selectedShapes: Pick<DisplayableShape, 'id' | 'areaKm2'>[];
 	finchPayload: FinchShapeParameter | null;
+	areaValidationResult: AreaValidationResult | null;
 };
 
 /**
@@ -64,8 +65,8 @@ export function useShapefile(): UseShapefileHook {
 			errorCode.startsWith('validation/') ||
 			errorCode.startsWith('processing/'));
 	const isFileValid = hasFile && !isFileInvalid;
-	const isSelectedRegionValid = snapshot.matches('ready');
-	const selectedRegion = snapshot.context.selectedRegion;
+	const isSelectionValid = snapshot.matches('ready');
+	const selectedShapes = snapshot.context.selectedShapes;
 	const finchPayload = snapshot.context.finchPayload;
 
 	const isDisplaying =
@@ -75,6 +76,7 @@ export function useShapefile(): UseShapefileHook {
 
 	const displayableShapes = snapshot.context.displayableShapes;
 	const simplifiedGeometry = snapshot.context.simplifiedGeometry;
+	const areaValidationResult = snapshot.context.areaValidationResult;
 
 	const reset = () => {
 		send({ type: 'RESET' });
@@ -92,24 +94,14 @@ export function useShapefile(): UseShapefileHook {
 	};
 
 	const selectShape = (shape: DisplayableShape) => {
-		// Guard: already selected? (defense-in-depth — component also guards)
-		if (selectedRegion?.id === shape.id) return;
-
-		// Build SelectedRegion envelope (shared refs, no copy)
-		const region: SelectedRegion = {
-			id: shape.id,
-			feature: shape.feature,
-			areaKm2: shape.areaKm2,
-			areaFormatted: '',
-		};
-
-		send({ type: 'SHAPE_CLICKED', region });
+		if (snapshot.context.selectedShapes.some(s => s.id === shape.id)) return;
+		send({ type: 'SHAPE_CLICKED', shapeId: shape.id });
 	};
 
 	return {
 		isProcessingFile,
 		isFileValid,
-		isSelectedRegionValid,
+		isSelectionValid,
 		file,
 		errorCode,
 		reset,
@@ -118,7 +110,8 @@ export function useShapefile(): UseShapefileHook {
 		isDisplaying,
 		displayableShapes,
 		simplifiedGeometry,
-		selectedRegion,
+		selectedShapes,
 		finchPayload,
+		areaValidationResult,
 	};
 }

@@ -18,7 +18,7 @@ import { useShapefile } from '@/hooks/use-shapefile';
 import 'leaflet/dist/leaflet.css';
 import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 import { StepErrorMessage } from '@/lib/step-error-message';
-import type { SelectedRegion } from '@/lib/shapefile';
+import type { DisplayableShape } from '@/lib/shapefile';
 
 /**
  * Return the step error message to display when in shapefile mode.
@@ -28,7 +28,7 @@ function getShapefileErrorMessage(
 	file: File | null,
 	errorCode: string | null,
 	isFileValid: boolean,
-	selectedRegion: SelectedRegion | null,
+	selectedShapes: Pick<DisplayableShape, 'id' | 'areaKm2'>[],
 ): StepErrorMessage | null {
 	if (!file) {
 		return new StepErrorMessage(__('Please upload a shapefile.'), 'info');
@@ -60,7 +60,7 @@ function getShapefileErrorMessage(
 		}
 	}
 
-	if (selectedRegion === null) {
+	if (selectedShapes.length === 0) {
 		return new StepErrorMessage(
 			__('Please select a region on the map.'),
 			'info',
@@ -82,11 +82,11 @@ const StepLocation = React.forwardRef<
 	const { climateVariable } = useClimateVariable();
 	const {
 		reset: resetShapefile,
-		isSelectedRegionValid: isShapefileSelectedRegionValid,
+		isSelectionValid: isShapefileSelectionValid,
 		file: shapefileFile,
 		errorCode: shapefileErrorCode,
 		isFileValid: isShapefileValid,
-		selectedRegion: selectedShapefileRegion,
+		selectedShapes: selectedShapefileShapes,
 	} = useShapefile();
 	const isShapefileMode = climateVariable?.getInteractiveRegion() === InteractiveRegionOption.USER;
 	const isRegionSelected = Boolean(climateVariable?.getSelectedRegion());
@@ -97,7 +97,7 @@ const StepLocation = React.forwardRef<
 	let isStepValid = true;
 
 	if (isShapefileMode) {
-		isStepValid = isShapefileSelectedRegionValid;
+		isStepValid = isShapefileSelectionValid;
 	} else {
 		isStepValid = selectedPointsCount > 0 || isRegionSelected;
 	}
@@ -121,7 +121,7 @@ const StepLocation = React.forwardRef<
 					shapefileFile,
 					shapefileErrorCode,
 					isShapefileValid,
-					selectedShapefileRegion,
+					selectedShapefileShapes,
 				);
 				if (errorMessage) {
 					errorMessages.push(errorMessage);
@@ -141,7 +141,7 @@ const StepLocation = React.forwardRef<
 		shapefileFile,
 		shapefileErrorCode,
 		isShapefileValid,
-		selectedShapefileRegion,
+		selectedShapefileShapes,
 	]);
 
 	React.useImperativeHandle(ref, () => ({
@@ -181,6 +181,7 @@ export default StepLocation;
  */
 export const StepSummaryLocation = (): React.ReactNode | null => {
 	const { climateVariable } = useClimateVariable();
+	const { selectedShapes } = useShapefile();
 
 	if (!climateVariable) return null;
 
@@ -190,8 +191,7 @@ export const StepSummaryLocation = (): React.ReactNode | null => {
 	let selectedCount: number;
 
 	if (isShapefileMode) {
-		// Shapefile supports exactly 1 selected shape
-		selectedCount = 1;
+		selectedCount = selectedShapes.length;
 	} else {
 		selectedCount = isRegion
 			? climateVariable.getSelectedRegion()?.cellCount ?? 0

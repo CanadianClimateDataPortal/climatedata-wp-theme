@@ -3,11 +3,8 @@ import { ActorRefFrom } from 'xstate';
 import { useActorRef } from '@xstate/react';
 
 import {
-	createAsyncPipelineServices,
-	PipelineServices,
+	createPipelineServices,
 	shapefileMachine,
-	type ValidatedRegion,
-	type ValidateSelectedArea,
 } from '@/lib/shapefile';
 
 type ShapefileMachine = typeof shapefileMachine;
@@ -17,28 +14,7 @@ type ShapefileContextValue = {
 	actor: ShapefileActor;
 };
 
-/*
- * !! TEMPORARY: mock sync services. To be replaced by CLIM-1270 and downstream.
- */
-
-const validateSelectedArea: ValidateSelectedArea = (region) => {
-	// In this mock, we let the region pass validation as is
-	const validated = {
-		...region,
-		__areaValidated: Symbol('areaValidated'),
-	} as unknown as ValidatedRegion;
-
-	return { ok: true as const, value: validated };
-};
-
-/*
- * !! END TEMPORARY
- */
-
-const services: PipelineServices = {
-	...createAsyncPipelineServices(),
-	validateSelectedArea,
-};
+const services = createPipelineServices();
 
 const ShapefileContext = createContext<ShapefileContextValue | null>(null);
 

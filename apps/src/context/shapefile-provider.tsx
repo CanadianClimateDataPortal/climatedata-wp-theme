@@ -3,10 +3,8 @@ import { ActorRefFrom } from 'xstate';
 import { useActorRef } from '@xstate/react';
 
 import {
-	createAsyncPipelineServices,
-	PipelineServices,
+	createPipelineServices,
 	shapefileMachine,
-	validateSelectedArea,
 } from '@/lib/shapefile';
 
 type ShapefileMachine = typeof shapefileMachine;
@@ -16,10 +14,7 @@ type ShapefileContextValue = {
 	actor: ShapefileActor;
 };
 
-const services: PipelineServices = {
-	...createAsyncPipelineServices(),
-	validateSelectedArea,
-};
+const services = createPipelineServices();
 
 const ShapefileContext = createContext<ShapefileContextValue | null>(null);
 

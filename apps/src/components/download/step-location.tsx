@@ -42,14 +42,14 @@ function getShapefileErrorMessage(
 
 	if (errorCode) {
 		switch (errorCode) {
-			case 'area/too-large':
+			case 'selection/area-too-large':
 				return new StepErrorMessage(
 					__(
 						'The selected region is too large. Try selecting a ' +
 						'smaller region.'
 					),
 				);
-			case 'area/too-small':
+			case 'selection/area-too-small':
 				return new StepErrorMessage(
 					__(
 						'The selected region is smaller than our data ' +

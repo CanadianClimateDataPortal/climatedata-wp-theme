@@ -39,7 +39,8 @@ import { validateSelectedShapesImpl } from './validate-selected-shapes-impl';
  * @param constraints - Min/max area constraints to validate against
  *
  * @returns Result with branded `ValidatedShapes` on success,
- *   or `ShapefileError` (area/too-large, area/too-small) on failure,
+ *   or `ShapefileError` (selection/area-too-large, selection/area-too-small) on
+ *   failure,
  *   or `ProcessingError` for unexpected errors
  *
  * @example

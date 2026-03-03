@@ -46,8 +46,8 @@ export const throwAreaLimitError = (
 ): never => {
 	const isOver = areaKm2 > constraints.maxKm2;
 	const code: ShapefileErrorCode = isOver
-		? 'area/too-large'
-		: 'area/too-small';
+		? 'selection/area-too-large'
+		: 'selection/area-too-small';
 	const limit = isOver
 		? constraints.maxKm2
 		: constraints.minKm2;

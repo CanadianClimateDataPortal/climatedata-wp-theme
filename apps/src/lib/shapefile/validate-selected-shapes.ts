@@ -30,7 +30,7 @@ import {
 import { validateSelectedShapesImpl } from './validate-selected-shapes-impl';
 
 /**
- * Validate that the selected region's total area is within the allowed range.
+ * Validate that the selected shapes are valid.
  *
  * Sums area across all selected shapes and checks against the provided
  * constraints (default: 100 km² to 500,000 km²).
@@ -50,7 +50,7 @@ import { validateSelectedShapesImpl } from './validate-selected-shapes-impl';
  * if (result.ok) {
  *   // result.value is ValidatedShapes — safe to pass to Finch stage
  * } else if (result.error instanceof ShapefileError) {
- *   console.error(`Area error [${result.error.code}]: ${result.error.message}`);
+ *   console.error(`Shapes validation error [${result.error.code}]: ${result.error.message}`);
  * }
  * ```
  *

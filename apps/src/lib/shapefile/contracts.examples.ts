@@ -14,8 +14,8 @@
  */
 
 import type {
-	AreaConstraints,
-	AreaValidationResult,
+	ShapesConstraints,
+	ShapesValidationResult,
 	DisplayableShape,
 	DisplayableShapes,
 	ExtractedShapefile,
@@ -26,7 +26,7 @@ import type {
 	ValidatedShapes,
 	ValidatedShapefile,
 } from './contracts';
-import { DEFAULT_AREA_CONSTRAINTS } from './contracts';
+import { DEFAULT_SHAPES_CONSTRAINTS } from './contracts';
 
 // ============================================================================
 // LAYER 1: EXTRACTION
@@ -174,80 +174,80 @@ export const EXAMPLE_SELECTED_SHAPE: SelectedShape = {
 };
 
 // ============================================================================
-// LAYER 6: AREA VALIDATION
+// LAYER 6: SHAPES VALIDATION
 // ============================================================================
 
 /**
- * Default area constraints from requirements U13, U14.
+ * Default shapes constraints from requirements U13, U14.
  *
  * Re-exported from contracts.ts for convenience in tests and stories.
  *
- * @see {@link AreaConstraints}
- * @see {@link DEFAULT_AREA_CONSTRAINTS}
+ * @see {@link ShapesConstraints}
+ * @see {@link DEFAULT_SHAPES_CONSTRAINTS}
  */
-export const EXAMPLE_AREA_CONSTRAINTS: AreaConstraints = {
-	...DEFAULT_AREA_CONSTRAINTS,
+export const EXAMPLE_SHAPES_CONSTRAINTS: ShapesConstraints = {
+	...DEFAULT_SHAPES_CONSTRAINTS,
 };
 
 /**
- * Custom area constraints for testing boundary conditions.
+ * Custom shapes constraints for testing boundary conditions.
  *
  * Tighter range than defaults — useful for triggering too-small / too-large.
  *
- * @see {@link AreaConstraints}
+ * @see {@link ShapesConstraints}
  */
-export const EXAMPLE_AREA_CONSTRAINTS_TIGHT: AreaConstraints = {
+export const EXAMPLE_SHAPES_CONSTRAINTS_TIGHT: ShapesConstraints = {
 	minKm2: 1000,
 	maxKm2: 10_000,
 };
 
 /**
- * Area validation result — valid.
+ * Shapes validation result — valid.
  *
- * @see {@link AreaValidationResult}
+ * @see {@link ShapesValidationResult}
  */
-export const EXAMPLE_AREA_VALIDATION_VALID: AreaValidationResult = {
+export const EXAMPLE_SHAPES_VALIDATION_VALID: ShapesValidationResult = {
 	status: 'valid',
 	areaKm2: 5000,
-	constraints: DEFAULT_AREA_CONSTRAINTS,
+	constraints: DEFAULT_SHAPES_CONSTRAINTS,
 };
 
 /**
- * Area validation result — too small.
+ * Shapes validation result — area too small.
  *
  * Area of 50 km² is below the default minimum of 100 km².
  *
- * @see {@link AreaValidationResult}
+ * @see {@link ShapesValidationResult}
  */
-export const EXAMPLE_AREA_VALIDATION_TOO_SMALL: AreaValidationResult = {
+export const EXAMPLE_SHAPES_VALIDATION_AREA_TOO_SMALL: ShapesValidationResult = {
 	status: 'too-small',
 	areaKm2: 50,
-	constraints: DEFAULT_AREA_CONSTRAINTS,
+	constraints: DEFAULT_SHAPES_CONSTRAINTS,
 	errorMessageKey: 'area-too-small',
 };
 
 /**
- * Area validation result — too large.
+ * Shapes validation result — area too large.
  *
  * Area of 600,000 km² exceeds the default maximum of 500,000 km².
  *
- * @see {@link AreaValidationResult}
+ * @see {@link ShapesValidationResult}
  */
-export const EXAMPLE_AREA_VALIDATION_TOO_LARGE: AreaValidationResult = {
+export const EXAMPLE_SHAPES_VALIDATION_AREA_TOO_LARGE: ShapesValidationResult = {
 	status: 'too-large',
 	areaKm2: 600_000,
-	constraints: DEFAULT_AREA_CONSTRAINTS,
+	constraints: DEFAULT_SHAPES_CONSTRAINTS,
 	errorMessageKey: 'area-too-large',
 };
 
 /**
- * Branded validated shapes — proves area validation passed.
+ * Branded validated shapes — proves shapes validation passed.
  *
  * @see {@link ValidatedShapes}
  */
 export const EXAMPLE_VALIDATED_SHAPES = Object.assign(
 	[EXAMPLE_DISPLAYABLE_SHAPE],
-	{ __areaValidated: Symbol('areaValidated') },
+	{ __shapesValidated: Symbol('shapesValidated') },
 ) as unknown as ValidatedShapes;
 
 // ============================================================================

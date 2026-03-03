@@ -13,7 +13,7 @@ import {
 } from './validate-selected-shapes-impl';
 import {
 	EXAMPLE_DISPLAYABLE_SHAPE,
-	EXAMPLE_AREA_CONSTRAINTS_TIGHT,
+	EXAMPLE_SHAPES_CONSTRAINTS_TIGHT,
 } from './contracts.examples';
 import type { DisplayableShape } from './contracts';
 import { ShapefileError } from './errors';
@@ -35,10 +35,10 @@ const makeShape = (areaKm2: number): DisplayableShape => ({
 describe('validateSelectedShapesImpl', () => {
 	it('returns branded ValidatedShapes for valid shapes', () => {
 		// EXAMPLE_DISPLAYABLE_SHAPE has areaKm2: 5000
-		// EXAMPLE_AREA_CONSTRAINTS_TIGHT: min 1000, max 10 000
+		// EXAMPLE_SHAPES_CONSTRAINTS_TIGHT: min 1000, max 10 000
 		const result = validateSelectedShapesImpl(
 			[EXAMPLE_DISPLAYABLE_SHAPE],
-			EXAMPLE_AREA_CONSTRAINTS_TIGHT,
+			EXAMPLE_SHAPES_CONSTRAINTS_TIGHT,
 		);
 
 		expect(result).toBe(result); // same reference
@@ -51,7 +51,7 @@ describe('validateSelectedShapesImpl', () => {
 
 		let thrownError: unknown;
 		try {
-			validateSelectedShapesImpl(shapes, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT);
 		} catch (error) {
 			thrownError = error;
 		}
@@ -65,7 +65,7 @@ describe('validateSelectedShapesImpl', () => {
 
 		let thrownError: unknown;
 		try {
-			validateSelectedShapesImpl(shapes, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT);
 		} catch (error) {
 			thrownError = error;
 		}
@@ -79,7 +79,7 @@ describe('validateSelectedShapesImpl', () => {
 		const shapes = [makeShape(3000), makeShape(3000)];
 
 		expect(() =>
-			validateSelectedShapesImpl(shapes, EXAMPLE_AREA_CONSTRAINTS_TIGHT),
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT),
 		).not.toThrow();
 	});
 
@@ -87,7 +87,7 @@ describe('validateSelectedShapesImpl', () => {
 		const shapes = [makeShape(1000)]; // exactly 1000 === min
 
 		expect(() =>
-			validateSelectedShapesImpl(shapes, EXAMPLE_AREA_CONSTRAINTS_TIGHT),
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT),
 		).not.toThrow();
 	});
 
@@ -95,7 +95,7 @@ describe('validateSelectedShapesImpl', () => {
 		const shapes = [makeShape(10_000)]; // exactly 10 000 === max
 
 		expect(() =>
-			validateSelectedShapesImpl(shapes, EXAMPLE_AREA_CONSTRAINTS_TIGHT),
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT),
 		).not.toThrow();
 	});
 });
@@ -108,7 +108,7 @@ describe('throwAreaLimitError', () => {
 	it('throws ShapefileError with code selection/area-too-large when area exceeds max', () => {
 		let thrownError: unknown;
 		try {
-			throwAreaLimitError(15_000, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
+			throwAreaLimitError(15_000, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT);
 		} catch (error) {
 			thrownError = error;
 		}
@@ -120,7 +120,7 @@ describe('throwAreaLimitError', () => {
 	it('throws ShapefileError with code selection/area-too-small when area is below min', () => {
 		let thrownError: unknown;
 		try {
-			throwAreaLimitError(500, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
+			throwAreaLimitError(500, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT);
 		} catch (error) {
 			thrownError = error;
 		}
@@ -132,7 +132,7 @@ describe('throwAreaLimitError', () => {
 	it('includes area value and limit value in the error message', () => {
 		let thrownError: unknown;
 		try {
-			throwAreaLimitError(15_000, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
+			throwAreaLimitError(15_000, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT);
 		} catch (error) {
 			thrownError = error;
 		}

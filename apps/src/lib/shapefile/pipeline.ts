@@ -10,7 +10,7 @@
 
 import { type Result } from './result';
 import {
-	type AreaConstraints,
+	type ShapesConstraints,
 	type DisplayableShape,
 	type ExtractedShapefile,
 	type FinchShapeParameter,
@@ -65,7 +65,7 @@ export type SimplifyShapefile = (
  */
 export type ValidateSelectedShapes = (
 	shapes: DisplayableShape[],
-	constraints: AreaConstraints,
+	constraints: ShapesConstraints,
 ) => Result<ValidatedShapes, ShapefileError>;
 
 /**

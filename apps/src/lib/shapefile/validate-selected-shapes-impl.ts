@@ -10,15 +10,12 @@
  * typed errors on failure instead of returning Result<T, E>, making it
  * usable in any context — not just the XState pipeline.
  *
- * Sums the area of all selected shapes and checks against the configured
- * min/max constraints. Brands the input array as ValidatedShapes on success.
- *
  * @see {@link ./validate-selected-shapes.ts} for the state machine wrapper
- * @see {@link ./contracts.ts} for AreaConstraints and ValidatedShapes
+ * @see {@link ./contracts.ts} for ShapesConstraints and ValidatedShapes
  */
 
 import type {
-	AreaConstraints,
+	ShapesConstraints,
 	DisplayableShape,
 	ValidatedShapes,
 } from './contracts';
@@ -41,7 +38,7 @@ import {
  */
 export const throwAreaLimitError = (
 	areaKm2: number,
-	constraints: AreaConstraints,
+	constraints: ShapesConstraints,
 	options?: ErrorOptions,
 ): never => {
 	const isOver = areaKm2 > constraints.maxKm2;
@@ -75,7 +72,7 @@ export const throwAreaLimitError = (
  */
 export const validateSelectedShapesImpl = (
 	shapes: DisplayableShape[],
-	constraints: AreaConstraints,
+	constraints: ShapesConstraints,
 ): ValidatedShapes => {
 	const totalArea = shapes.reduce(
 		(sum, shape) => sum + shape.areaKm2,

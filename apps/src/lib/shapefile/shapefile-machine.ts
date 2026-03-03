@@ -195,7 +195,6 @@ export const shapefileMachine = setup({
 					bounds: bounds ?? [0, 0, 0, 0],
 					totalCount: shapes.length,
 				},
-				error: null,
 			};
 		}),
 		runSelectionValidation: assign(({ context, event }) => {

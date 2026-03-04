@@ -47,8 +47,9 @@ import type { Feature, FeatureCollection, Polygon } from 'geojson';
  * Shapes validation result type.
  */
 export const VALUES_SHAPES_VALIDATION_STATUSES = [
-	'too-large',
-	'too-small',
+	'area-too-large',
+	'area-too-small',
+	'too-many-positions',
 	'valid',
 ] as const;
 
@@ -72,6 +73,7 @@ export const VALUES_SUPPORTED_GEOMETRY_TYPES = [
 export const VALUES_SHAPES_VALIDATION_RESULT_ERRORS = [
 	'area-too-large',
 	'area-too-small',
+	'too-many-positions',
 ] as const;
 
 // ============================================================================
@@ -165,7 +167,7 @@ export interface SimplifiedGeometry {
  *
  * Represents a single polygon from the shapefile, extracted from simplified
  * GeoJSON for rendering with Leaflet. Each shape includes its computed
- * area for validation against size constraints.
+ * area and number of positions for validation against size constraints.
  */
 export interface DisplayableShape {
 	/** Unique identifier for this shape */
@@ -174,6 +176,8 @@ export interface DisplayableShape {
 	feature: Feature<Polygon>;
 	/** Area in square kilometers (computed via Turf.js) */
 	areaKm2: number;
+	/** Total number of positions (pairs of coordinates) in the shape */
+	nbPositions: number;
 }
 
 /**
@@ -222,6 +226,13 @@ export interface ShapesConstraints {
 	 * @see {@link DEFAULT_SHAPES_CONSTRAINTS}
 	 */
 	maxKm2: number;
+	/**
+	 * Maximum number of positions (pairs of coordinates) in a shape
+	 * (default: 5,000,000)
+	 * @see {@link DEFAULT_SHAPES_CONSTRAINTS}
+	 * @remarks
+	 */
+	maxPositions: number;
 }
 
 /**
@@ -236,8 +247,10 @@ export type ShapesValidationStatus =
 export interface ShapesValidationResult {
 	/** Validation outcome */
 	status: ShapesValidationStatus;
-	/** Selected region area in km² */
+	/** Selected shapes area in km² */
 	areaKm2: number;
+	/** Number of positions in selected shapes */
+	nbPositions: number;
 	/** Applied constraints */
 	constraints: ShapesConstraints;
 	/** Error message key (for i18n) if invalid */
@@ -275,14 +288,41 @@ export interface FinchShapeParameter {
 // ============================================================================
 
 /**
+ * Coordinate rounding precision for Finch API (requirement F13).
+ */
+export const FINCH_COORDINATE_PRECISION = 2;
+
+/**
+ * Roughly tolerated maximum size of the Finch request (in bytes).
+ *
+ * This number is not used to *guarantee* a request's maximum size (the actual
+ * request could end up a little bit bigger than this in edge cases). But it's
+ * used to calculate what a good value is for the maximum number of positions
+ * allowed.
+ *
+ * Note that the bulk of a Finch request consists of coordinates, so we can
+ * safely consider that the size of the request corresponds to the size of the
+ * list of coordinates (as a JSON encoded string).
+ */
+export const FINCH_APPROX_MAX_REQUEST_SIZE = 4_000_000;
+
+/**
+ * Approximate number of bytes per position in a Finch request when positions
+ * are JSON encoded.
+ * The number 5.4 was determined empirically.
+ */
+const approximateBytesPerPosition = (5.4 + FINCH_COORDINATE_PRECISION) * 2;
+
+/**
  * Default shapes selection constraints (from requirements U13, U14).
+ *
+ * The `maxPositions` is calculated from the desired maximum Finch request size,
+ * and the approximate number of bytes per position in a request.
  */
 export const DEFAULT_SHAPES_CONSTRAINTS: ShapesConstraints = {
 	minKm2: 100,
 	maxKm2: 500_000,
+	maxPositions: Math.round(
+		FINCH_APPROX_MAX_REQUEST_SIZE / approximateBytesPerPosition
+	),
 };
-
-/**
- * Coordinate rounding precision for Finch API (requirement F13).
- */
-export const FINCH_COORDINATE_PRECISION = 2;

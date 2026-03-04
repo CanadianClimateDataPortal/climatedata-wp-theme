@@ -7,7 +7,7 @@ import {
 } from '@/context/shapefile-provider';
 import { type FinchShapeParameter, ShapefileError } from '@/lib/shapefile';
 import type {
-	AreaValidationResult,
+	ShapesValidationResult,
 	DisplayableShape,
 	DisplayableShapes,
 	SimplifiedGeometry,
@@ -27,7 +27,7 @@ export type UseShapefileHook = {
 	simplifiedGeometry: SimplifiedGeometry | null;
 	selectedShapes: Pick<DisplayableShape, 'id' | 'areaKm2'>[];
 	finchPayload: FinchShapeParameter | null;
-	areaValidationResult: AreaValidationResult | null;
+	shapesValidationResult: ShapesValidationResult | null;
 };
 
 /**
@@ -76,7 +76,7 @@ export function useShapefile(): UseShapefileHook {
 
 	const displayableShapes = snapshot.context.displayableShapes;
 	const simplifiedGeometry = snapshot.context.simplifiedGeometry;
-	const areaValidationResult = snapshot.context.areaValidationResult;
+	const shapesValidationResult = snapshot.context.shapesValidationResult;
 
 	const reset = () => {
 		send({ type: 'RESET' });
@@ -112,6 +112,6 @@ export function useShapefile(): UseShapefileHook {
 		simplifiedGeometry,
 		selectedShapes,
 		finchPayload,
-		areaValidationResult,
+		shapesValidationResult,
 	};
 }

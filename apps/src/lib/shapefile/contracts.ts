@@ -4,7 +4,7 @@
  * Data shape interfaces for the shapefile processing pipeline.
  *
  * This file defines what data looks like at each stage:
- * Extract → Validate → Transform → Display → Select → Validate Area → Finch
+ * Extract → Validate → Transform → Display → Select → Validate Shapes → Finch
  *
  * For pipeline function signatures, see ./pipeline.ts
  * For Result types, see ./result.ts
@@ -44,9 +44,9 @@
 import type { Feature, FeatureCollection, Polygon } from 'geojson';
 
 /**
- * Area validation result type.
+ * Shapes validation result type.
  */
-export const VALUES_AREA_VALIDATION_STATUSES = [
+export const VALUES_SHAPES_VALIDATION_STATUSES = [
 	'too-large',
 	'too-small',
 	'valid',
@@ -67,9 +67,9 @@ export const VALUES_SUPPORTED_GEOMETRY_TYPES = [
 ] as const;
 
 /**
- * Result of area validation.
+ * Result of shapes validation.
  */
-export const VALUES_AREA_VALIDATION_RESULT_ERRORS = [
+export const VALUES_SHAPES_VALIDATION_RESULT_ERRORS = [
 	'area-too-large',
 	'area-too-small',
 ] as const;
@@ -201,57 +201,57 @@ export interface DisplayableShapes {
 export type SelectedShape = Pick<DisplayableShape, 'id' | 'areaKm2'>;
 
 // ============================================================================
-// LAYER 6: AREA VALIDATION
+// LAYER 6: SHAPES VALIDATION
 // ============================================================================
 
 /**
- * Area constraint configuration.
+ * Shapes constraints configuration.
  *
  * From requirements U13, U14.
  */
-export interface AreaConstraints {
+export interface ShapesConstraints {
 	/**
 	 * Minimum area in km²
 	 * (default: 100)
-	 * @see {@link DEFAULT_AREA_CONSTRAINTS}
+	 * @see {@link DEFAULT_SHAPES_CONSTRAINTS}
 	 */
 	minKm2: number;
 	/**
 	 * Maximum area in km²
 	 * (default: 500,000)
-	 * @see {@link DEFAULT_AREA_CONSTRAINTS}
+	 * @see {@link DEFAULT_SHAPES_CONSTRAINTS}
 	 */
 	maxKm2: number;
 }
 
 /**
- * @see {@link VALUES_AREA_VALIDATION_STATUSES}
+ * @see {@link VALUES_SHAPES_VALIDATION_STATUSES}
  */
-export type AreaValidationStatus =
-	(typeof VALUES_AREA_VALIDATION_STATUSES)[number];
+export type ShapesValidationStatus =
+	(typeof VALUES_SHAPES_VALIDATION_STATUSES)[number];
 
 /**
- * Result of area validation.
+ * Result of shapes validation.
  */
-export interface AreaValidationResult {
+export interface ShapesValidationResult {
 	/** Validation outcome */
-	status: AreaValidationStatus;
+	status: ShapesValidationStatus;
 	/** Selected region area in km² */
 	areaKm2: number;
 	/** Applied constraints */
-	constraints: AreaConstraints;
+	constraints: ShapesConstraints;
 	/** Error message key (for i18n) if invalid */
-	errorMessageKey?: (typeof VALUES_AREA_VALIDATION_RESULT_ERRORS)[number];
+	errorMessageKey?: (typeof VALUES_SHAPES_VALIDATION_RESULT_ERRORS)[number];
 }
 
 /**
- * Branded type proving shapes passed area validation.
+ * Branded type proving shapes passed validation.
  *
- * Similar to ValidatedShapefile, this enforces that area
+ * Similar to ValidatedShapefile, this enforces that shapes
  * validation must occur before using the shapes.
  */
 export type ValidatedShapes = DisplayableShape[] & {
-	readonly __areaValidated: unique symbol;
+	readonly __shapesValidated: unique symbol;
 };
 
 // ============================================================================
@@ -275,9 +275,9 @@ export interface FinchShapeParameter {
 // ============================================================================
 
 /**
- * Default area constraints (from requirements U13, U14).
+ * Default shapes selection constraints (from requirements U13, U14).
  */
-export const DEFAULT_AREA_CONSTRAINTS: AreaConstraints = {
+export const DEFAULT_SHAPES_CONSTRAINTS: ShapesConstraints = {
 	minKm2: 100,
 	maxKm2: 500_000,
 };

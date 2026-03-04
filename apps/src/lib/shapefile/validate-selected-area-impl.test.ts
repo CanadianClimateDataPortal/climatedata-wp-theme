@@ -1,19 +1,19 @@
 /**
  * Tests for validate-selected-area-impl.
  *
- * Covers: validateSelectedAreaImpl (area sum, boundary, multi-shape),
+ * Covers: validateSelectedShapesImpl (area sum, boundary, multi-shape),
  * throwAreaLimitError (code, message content).
  */
 
 import { describe, it, expect } from 'vitest';
 
 import {
-	validateSelectedAreaImpl,
+	validateSelectedShapesImpl,
 	throwAreaLimitError,
-} from './validate-selected-area-impl';
+} from './validate-selected-shapes-impl';
 import {
 	EXAMPLE_DISPLAYABLE_SHAPE,
-	EXAMPLE_AREA_CONSTRAINTS_TIGHT,
+	EXAMPLE_SHAPES_CONSTRAINTS_TIGHT,
 } from './contracts.examples';
 import type { DisplayableShape } from './contracts';
 import { ShapefileError } from './errors';
@@ -29,16 +29,16 @@ const makeShape = (areaKm2: number): DisplayableShape => ({
 });
 
 // ---------------------------------------------------------------------------
-// validateSelectedAreaImpl
+// validateSelectedShapesImpl
 // ---------------------------------------------------------------------------
 
-describe('validateSelectedAreaImpl', () => {
-	it('returns branded ValidatedShapes for valid area', () => {
+describe('validateSelectedShapesImpl', () => {
+	it('returns branded ValidatedShapes for valid shapes', () => {
 		// EXAMPLE_DISPLAYABLE_SHAPE has areaKm2: 5000
-		// EXAMPLE_AREA_CONSTRAINTS_TIGHT: min 1000, max 10 000
-		const result = validateSelectedAreaImpl(
+		// EXAMPLE_SHAPES_CONSTRAINTS_TIGHT: min 1000, max 10 000
+		const result = validateSelectedShapesImpl(
 			[EXAMPLE_DISPLAYABLE_SHAPE],
-			EXAMPLE_AREA_CONSTRAINTS_TIGHT,
+			EXAMPLE_SHAPES_CONSTRAINTS_TIGHT,
 		);
 
 		expect(result).toBe(result); // same reference
@@ -46,32 +46,32 @@ describe('validateSelectedAreaImpl', () => {
 		expect(result[0]).toBe(EXAMPLE_DISPLAYABLE_SHAPE);
 	});
 
-	it('throws ShapefileError with code area/too-small when area is below minimum', () => {
+	it('throws ShapefileError with code selection/area-too-small when area is below minimum', () => {
 		const shapes = [makeShape(500)]; // 500 < min 1000
 
 		let thrownError: unknown;
 		try {
-			validateSelectedAreaImpl(shapes, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT);
 		} catch (error) {
 			thrownError = error;
 		}
 
 		expect(thrownError).toBeInstanceOf(ShapefileError);
-		expect((thrownError as ShapefileError).code).toBe('area/too-small');
+		expect((thrownError as ShapefileError).code).toBe('selection/area-too-small');
 	});
 
-	it('throws ShapefileError with code area/too-large when area exceeds maximum', () => {
+	it('throws ShapefileError with code selection/area-too-large when area exceeds maximum', () => {
 		const shapes = [makeShape(15_000)]; // 15 000 > max 10 000
 
 		let thrownError: unknown;
 		try {
-			validateSelectedAreaImpl(shapes, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT);
 		} catch (error) {
 			thrownError = error;
 		}
 
 		expect(thrownError).toBeInstanceOf(ShapefileError);
-		expect((thrownError as ShapefileError).code).toBe('area/too-large');
+		expect((thrownError as ShapefileError).code).toBe('selection/area-too-large');
 	});
 
 	it('passes when sum of multiple shapes falls within constraints', () => {
@@ -79,7 +79,7 @@ describe('validateSelectedAreaImpl', () => {
 		const shapes = [makeShape(3000), makeShape(3000)];
 
 		expect(() =>
-			validateSelectedAreaImpl(shapes, EXAMPLE_AREA_CONSTRAINTS_TIGHT),
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT),
 		).not.toThrow();
 	});
 
@@ -87,7 +87,7 @@ describe('validateSelectedAreaImpl', () => {
 		const shapes = [makeShape(1000)]; // exactly 1000 === min
 
 		expect(() =>
-			validateSelectedAreaImpl(shapes, EXAMPLE_AREA_CONSTRAINTS_TIGHT),
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT),
 		).not.toThrow();
 	});
 
@@ -95,7 +95,7 @@ describe('validateSelectedAreaImpl', () => {
 		const shapes = [makeShape(10_000)]; // exactly 10 000 === max
 
 		expect(() =>
-			validateSelectedAreaImpl(shapes, EXAMPLE_AREA_CONSTRAINTS_TIGHT),
+			validateSelectedShapesImpl(shapes, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT),
 		).not.toThrow();
 	});
 });
@@ -105,34 +105,34 @@ describe('validateSelectedAreaImpl', () => {
 // ---------------------------------------------------------------------------
 
 describe('throwAreaLimitError', () => {
-	it('throws ShapefileError with code area/too-large when area exceeds max', () => {
+	it('throws ShapefileError with code selection/area-too-large when area exceeds max', () => {
 		let thrownError: unknown;
 		try {
-			throwAreaLimitError(15_000, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
+			throwAreaLimitError(15_000, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT);
 		} catch (error) {
 			thrownError = error;
 		}
 
 		expect(thrownError).toBeInstanceOf(ShapefileError);
-		expect((thrownError as ShapefileError).code).toBe('area/too-large');
+		expect((thrownError as ShapefileError).code).toBe('selection/area-too-large');
 	});
 
-	it('throws ShapefileError with code area/too-small when area is below min', () => {
+	it('throws ShapefileError with code selection/area-too-small when area is below min', () => {
 		let thrownError: unknown;
 		try {
-			throwAreaLimitError(500, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
+			throwAreaLimitError(500, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT);
 		} catch (error) {
 			thrownError = error;
 		}
 
 		expect(thrownError).toBeInstanceOf(ShapefileError);
-		expect((thrownError as ShapefileError).code).toBe('area/too-small');
+		expect((thrownError as ShapefileError).code).toBe('selection/area-too-small');
 	});
 
 	it('includes area value and limit value in the error message', () => {
 		let thrownError: unknown;
 		try {
-			throwAreaLimitError(15_000, EXAMPLE_AREA_CONSTRAINTS_TIGHT);
+			throwAreaLimitError(15_000, EXAMPLE_SHAPES_CONSTRAINTS_TIGHT);
 		} catch (error) {
 			thrownError = error;
 		}

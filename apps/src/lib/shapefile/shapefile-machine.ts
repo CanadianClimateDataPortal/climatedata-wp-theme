@@ -21,8 +21,8 @@ import {
 	type Result,
 } from './result';
 import {
-	type AreaConstraints,
-	type AreaValidationResult,
+	type ShapesConstraints,
+	type ShapesValidationResult,
 	type DisplayableShape,
 	type DisplayableShapes,
 	type ExtractedShapefile,
@@ -30,13 +30,13 @@ import {
 	type SimplifiedGeometry,
 	type ValidatedShapes,
 	type ValidatedShapefile,
-	DEFAULT_AREA_CONSTRAINTS,
+	DEFAULT_SHAPES_CONSTRAINTS,
 } from './contracts';
 import {
 	type ExtractShapefileFromZip,
 	type PrepareFinchPayload,
 	type SimplifyShapefile,
-	type ValidateSelectedArea,
+	type ValidateSelectedShapes,
 	type ValidateShapefileGeometry,
 } from './pipeline';
 import {
@@ -55,7 +55,7 @@ export type PipelineServices = {
 	validateShapefileGeometry: ValidateShapefileGeometry;
 	simplifyShapefile: SimplifyShapefile;
 	// Sync (called in actions)
-	validateSelectedArea: ValidateSelectedArea;
+	validateSelectedShapes: ValidateSelectedShapes;
 	prepareFinchPayload: PrepareFinchPayload;
 };
 
@@ -72,9 +72,9 @@ export type MachineContext = {
 	selectedShapes: Pick<DisplayableShape, 'id' | 'areaKm2'>[];
 	validatedShapes: ValidatedShapes | null;
 	finchPayload: FinchShapeParameter | null;
-	areaValidationResult: AreaValidationResult | null;
+	shapesValidationResult: ShapesValidationResult | null;
 	error: Error | null;
-	areaConstraints: AreaConstraints;
+	shapesConstraints: ShapesConstraints;
 	/**
 	 * Injected pipeline functions — async actors and sync actions.
 	 *
@@ -96,9 +96,9 @@ const initialContext = (
 	selectedShapes: [],
 	validatedShapes: null,
 	finchPayload: null,
-	areaValidationResult: null,
+	shapesValidationResult: null,
 	error: null,
-	areaConstraints: DEFAULT_AREA_CONSTRAINTS,
+	shapesConstraints: DEFAULT_SHAPES_CONSTRAINTS,
 	services,
 });
 
@@ -111,7 +111,7 @@ const downstreamReset = (): Partial<MachineContext> => ({
 	selectedShapes: [],
 	validatedShapes: null,
 	finchPayload: null,
-	areaValidationResult: null,
+	shapesValidationResult: null,
 	error: null,
 });
 
@@ -161,7 +161,7 @@ export const shapefileMachine = setup({
 	guards: {
 		isResultOk: (_, params: { result: Result<unknown, Error> }) =>
 			params.result.ok,
-		isAreaValid: ({ context }) => context.validatedShapes !== null,
+		areShapesValid: ({ context }) => context.validatedShapes !== null,
 		hasConversionError: ({ context }) =>
 			context.error !== null && context.displayableShapes === null,
 	},
@@ -210,13 +210,13 @@ export const shapefileMachine = setup({
 				{ id: shape.id, areaKm2: shape.areaKm2 },
 			];
 
-			const areaResult = context.services.validateSelectedArea(
+			const shapesResult = context.services.validateSelectedShapes(
 				[shape],
-				context.areaConstraints,
+				context.shapesConstraints,
 			);
 
-			if (areaResult.ok) {
-				const validatedShapes = areaResult.value;
+			if (shapesResult.ok) {
+				const validatedShapes = shapesResult.value;
 				const finchPayload = context.services.prepareFinchPayload(
 					validatedShapes,
 				);
@@ -224,31 +224,31 @@ export const shapefileMachine = setup({
 					selectedShapes,
 					validatedShapes,
 					finchPayload,
-					areaValidationResult: {
+					shapesValidationResult: {
 						status: 'valid' as const,
 						areaKm2: shape.areaKm2,
-						constraints: context.areaConstraints,
+						constraints: context.shapesConstraints,
 					},
 					error: null,
 				};
 			}
 
-			const isTooSmall = shape.areaKm2 < context.areaConstraints.minKm2;
+			const isTooSmall = shape.areaKm2 < context.shapesConstraints.minKm2;
 			return {
 				selectedShapes,
 				validatedShapes: null,
 				finchPayload: null,
-				areaValidationResult: {
+				shapesValidationResult: {
 					status: isTooSmall
 						? ('too-small' as const)
 						: ('too-large' as const),
 					areaKm2: shape.areaKm2,
-					constraints: context.areaConstraints,
+					constraints: context.shapesConstraints,
 					errorMessageKey: isTooSmall
 						? ('area-too-small' as const)
 						: ('area-too-large' as const),
 				},
-				error: areaResult.error,
+				error: shapesResult.error,
 			};
 		}),
 	},
@@ -390,15 +390,15 @@ export const shapefileMachine = setup({
 		},
 
 		// Transient routing state — never rests here.
-		// Immediately evaluates area validation and routes forward or back.
+		// Immediately evaluates selected shapes validation and routes forward or back.
 		selected: {
 			always: [
 				{
-					guard: 'isAreaValid',
+					guard: 'areShapesValid',
 					target: 'ready',
 				},
 				{
-					// Area invalid — return to displaying with error preserved for UI
+					// Selected shapes invalid — return to displaying with error preserved for UI
 					target: 'displaying',
 				},
 			],

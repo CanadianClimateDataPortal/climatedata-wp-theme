@@ -25,7 +25,7 @@ import type { FinchShapeParameter, ValidatedShapes } from './contracts';
  *
  * Note: Coordinate precision truncation is intentionally omitted here.
  *
- * @param shapes - Branded array of shapes that have passed area validation
+ * @param shapes - Branded array of shapes that have passed validation
  * @returns GeoJSON FeatureCollection suitable for the Finch API shape parameter
  *
  * @example

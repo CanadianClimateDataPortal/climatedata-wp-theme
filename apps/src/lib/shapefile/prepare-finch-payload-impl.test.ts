@@ -42,7 +42,7 @@ describe('prepareFinchPayloadImpl', () => {
 		};
 		const twoShapes = Object.assign(
 			[EXAMPLE_DISPLAYABLE_SHAPE, secondShape],
-			{ __areaValidated: Symbol('areaValidated') },
+			{ __shapesValidated: Symbol('shapesValidated') },
 		) as unknown as ValidatedShapes;
 
 		const result = prepareFinchPayloadImpl(twoShapes);

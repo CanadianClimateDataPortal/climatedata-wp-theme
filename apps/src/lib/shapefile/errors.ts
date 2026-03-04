@@ -12,7 +12,7 @@ import {
  * All possible error codes for shapefile processing.
  *
  * Naming convention: `phase/error-type`
- * - phase: extraction, validation, area, processing
+ * - phase: extraction, validation, selection, processing
  * - error-type: kebab-case description
  */
 export const VALUES_SHAPEFILE_ERROR_CODES = [
@@ -24,9 +24,9 @@ export const VALUES_SHAPEFILE_ERROR_CODES = [
 	'extraction/zip-parse-failed',
 	// Validation phase
 	'validation/invalid-geometry-type',
-	// Area validation phase
-	'area/too-large',
-	'area/too-small',
+	// Selected shapes validation phase
+	'selection/area-too-large',
+	'selection/area-too-small',
 	// Processing phase
 	'processing/failed',
 	'processing/projection-unsupported',

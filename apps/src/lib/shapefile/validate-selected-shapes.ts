@@ -1,7 +1,7 @@
 /**
  * @file
  *
- * Selected-area validation — state machine service wrapper.
+ * Selected-shapes validation — state machine service wrapper.
  *
  * Convention: `-impl.ts` pattern
  *
@@ -18,19 +18,19 @@
  * outside the state machine context (e.g., in tests, CLI tools, or
  * other pipelines) without coupling to the Result pattern.
  *
- * @see {@link ./validate-selected-area-impl.ts} for the actual logic
+ * @see {@link ./validate-selected-shapes-impl.ts} for the actual logic
  * @see {@link ./pipeline.ts} for the type signature
  */
 
-import type { ValidateSelectedArea } from './pipeline';
+import type { ValidateSelectedShapes } from './pipeline';
 import {
 	ProcessingError,
 	ShapefileError,
 } from './errors';
-import { validateSelectedAreaImpl } from './validate-selected-area-impl';
+import { validateSelectedShapesImpl } from './validate-selected-shapes-impl';
 
 /**
- * Validate that the selected region's total area is within the allowed range.
+ * Validate that the selected shapes are valid.
  *
  * Sums area across all selected shapes and checks against the provided
  * constraints (default: 100 km² to 500,000 km²).
@@ -39,28 +39,29 @@ import { validateSelectedAreaImpl } from './validate-selected-area-impl';
  * @param constraints - Min/max area constraints to validate against
  *
  * @returns Result with branded `ValidatedShapes` on success,
- *   or `ShapefileError` (area/too-large, area/too-small) on failure,
+ *   or `ShapefileError` (selection/area-too-large, selection/area-too-small) on
+ *   failure,
  *   or `ProcessingError` for unexpected errors
  *
  * @example
  * ```typescript
- * const result = validateSelectedArea(shapes, constraints);
+ * const result = validateSelectedShapes(shapes, constraints);
  *
  * if (result.ok) {
  *   // result.value is ValidatedShapes — safe to pass to Finch stage
  * } else if (result.error instanceof ShapefileError) {
- *   console.error(`Area error [${result.error.code}]: ${result.error.message}`);
+ *   console.error(`Shapes validation error [${result.error.code}]: ${result.error.message}`);
  * }
  * ```
  *
  * @see {@link ./pipeline.ts} for the type signature
  */
-export const validateSelectedArea: ValidateSelectedArea = (
+export const validateSelectedShapes: ValidateSelectedShapes = (
 	shapes,
 	constraints,
 ) => {
 	try {
-		const value = validateSelectedAreaImpl(shapes, constraints);
+		const value = validateSelectedShapesImpl(shapes, constraints);
 		return { ok: true, value };
 	} catch (err) {
 		if (err instanceof ShapefileError) {

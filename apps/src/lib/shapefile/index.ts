@@ -11,4 +11,4 @@ export * from './services';
 export * from './shapefile-machine';
 export * from './simplify-shapefile';
 export * from './validate-geometry';
-export * from './validate-selected-area';
+export * from './validate-selected-shapes';

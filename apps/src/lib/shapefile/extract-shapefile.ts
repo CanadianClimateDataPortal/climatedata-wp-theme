@@ -9,7 +9,7 @@ import { unzipSync } from 'fflate';
 
 import { detectZip } from './detect-zip';
 import { ShapefileError } from './errors';
-import type { ExtractedShapefile } from './contracts';
+import type { ExtractedShapefile, ShapefilePair, SkippedEntry } from './contracts';
 import type { Result } from './result';
 import type { ExtractShapefileFromZip } from './pipeline';
 
@@ -87,7 +87,7 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 		};
 	}
 
-	// 3. Find .shp entries — pick largest when multiple exist
+	// 3. Find all .shp entries
 	const shpEntries = Object.keys(unzipped).filter(
 		(name) => name.toLowerCase().endsWith('.shp'),
 	);
@@ -101,39 +101,56 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 		};
 	}
 
-	// When a ZIP bundles multiple shapefiles (e.g. government data portals),
-	// pick the largest .shp — it contains the most geometry detail.
-	// Legacy's JSZip async decompression had the same effect accidentally
-	// (largest file resolved last → overwrote earlier ones).
-	const shpName = shpEntries.reduce((largest, current) =>
-		unzipped[current].length > unzipped[largest].length ? current : largest,
-	);
-	const prjName = Object.keys(unzipped).find((name) => {
-		const baseSame =
-			name.toLowerCase().replace(/\.prj$/i, '') ===
-			shpName.toLowerCase().replace(/\.shp$/i, '');
-		return baseSame && name.toLowerCase().endsWith('.prj');
-	});
+	// 4. Match each .shp with its .prj by basename (directory-agnostic)
+	const pairs: ShapefilePair[] = [];
+	const skippedEntries: SkippedEntry[] = [];
+	const decoder = new TextDecoder();
 
-	// .slice() creates a copy with its own ArrayBuffer
-	const shpBuffer = unzipped[shpName].slice().buffer;
+	for (const shpName of shpEntries) {
+		// Strip directory prefix and extension to get basename
+		const basename = shpName
+			.replace(/^.*[\\/]/, '')
+			.replace(/\.shp$/i, '');
 
-	if (!prjName) {
+		const prjName = Object.keys(unzipped).find((name) => {
+			const prjBase = name
+				.replace(/^.*[\\/]/, '')
+				.replace(/\.prj$/i, '');
+			return (
+				name.toLowerCase().endsWith('.prj') &&
+				prjBase.toLowerCase() === basename.toLowerCase()
+			);
+		});
+
+		if (!prjName) {
+			skippedEntries.push({
+				basename,
+				reason: 'No matching .prj file found',
+			});
+			continue;
+		}
+
+		// .slice() creates a copy with its own ArrayBuffer
+		pairs.push({
+			shp: unzipped[shpName].slice().buffer,
+			prj: decoder.decode(unzipped[prjName]),
+			basename,
+		});
+	}
+
+	// 5. Error if no valid pairs remain after filtering orphans
+	if (pairs.length === 0) {
 		return {
 			ok: false,
-			error: new ShapefileError('ZIP does not contain a .prj file', {
-				code: 'extraction/missing-prj',
-			}),
+			error: new ShapefileError(
+				'ZIP contains .shp files but none have a matching .prj file',
+				{ code: 'extraction/missing-prj' },
+			),
 		};
 	}
 
-	const prjContent = new TextDecoder().decode(unzipped[prjName]);
-
-	// 5. Return success
-	const extracted: ExtractedShapefile = {
-		'file.shp': shpBuffer,
-		'file.prj': prjContent,
-	};
+	// 6. Return success
+	const extracted: ExtractedShapefile = { pairs, skippedEntries };
 
 	return { ok: true, value: extracted };
 };

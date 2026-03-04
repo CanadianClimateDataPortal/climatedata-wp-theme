@@ -80,80 +80,84 @@ const processFeature = (feature: Feature): Feature => {
 /**
  * Parse a validated shapefile and produce simplified GeoJSON.
  *
- * Pipeline:
+ * For each .shp/.prj pair:
  * 1. Parse .shp binary + .prj projection string via shpjs (includes proj4 reprojection)
  * 2. Build FeatureCollection via shpjs combine()
  * 3. Filter: keep only Polygon/MultiPolygon features
  * 4. Process each feature through @turf pipeline
- * 5. Return simplified FeatureCollection with feature count
+ *
+ * Then merge all processed features into a single FeatureCollection.
  *
  * @throws {ProjectionError} when received format doesn't match supported shp projection
- * @throws {ProcessingError} when something else unexpected happen
+ * @throws {ProcessingError} when something else unexpected happens
  *
- * @param shapefile - Received files from earlier step {@link ValidateShapefileGeometry} .shp and .prj
+ * @param shapefile - Validated .shp/.prj pairs from earlier pipeline stage
  * @returns SimplifiedGeometry on success
  */
 export const simplifyShapefileImpl = async (
 	shapefile: ValidatedShapefile,
 ): Promise<SimplifiedGeometry> => {
+	const allProcessedFeatures: Feature[] = [];
 
-	// 1. Parse .shp + .prj with shpjs
-	let geometries: Geometry[];
-	try {
-		geometries = parseShp(shapefile['file.shp'], shapefile['file.prj']);
-	} catch (err) {
-		const message = err instanceof Error ? err.message : 'Unknown error';
+	for (const pair of shapefile.pairs) {
+		// 1. Parse .shp + .prj with shpjs
+		let geometries: Geometry[];
+		try {
+			geometries = parseShp(pair.shp, pair.prj);
+		} catch (err) {
+			const message = err instanceof Error ? err.message : 'Unknown error';
 
-		// shpjs uses proj4 internally — projection failures surface here
-		if (message.includes('proj4') || message.includes('projection')) {
-			throw new ProjectionError(
-				shapefile['file.prj'],
+			// shpjs uses proj4 internally — projection failures surface here
+			if (message.includes('proj4') || message.includes('projection')) {
+				throw new ProjectionError(
+					pair.prj,
+					{ cause: err instanceof Error ? err : undefined },
+				);
+			}
+
+			throw new ProcessingError(
+				`Failed to parse ${pair.basename}.shp: ${message}`,
 				{ cause: err instanceof Error ? err : undefined },
 			);
 		}
 
+		// 2. Build FeatureCollection
+		// Second argument is .dbf attributes — undefined because our extraction
+		// only provides .shp + .prj. Features will have empty properties: {}.
+		let featureCollection: FeatureCollection;
+		try {
+			featureCollection = combine([geometries, undefined]);
+		} catch (err) {
+			throw new ProcessingError(
+				`Failed to build feature collection for ${pair.basename}.shp: ${err instanceof Error ? err.message : 'Unknown error'}`,
+				{ cause: err instanceof Error ? err : undefined },
+			);
+		}
+
+		// 3. Filter: keep only polygon features
+		const polygonFeatures = featureCollection.features.filter(
+			(f) => f.geometry && isPolygonGeometry(f.geometry.type),
+		);
+
+		// 4. Process each feature through @turf pipeline
+		const processedFeatures = polygonFeatures.map(processFeature);
+		allProcessedFeatures.push(...processedFeatures);
+	}
+
+	if (allProcessedFeatures.length === 0) {
 		throw new ProcessingError(
-			`Failed to parse shapefile: ${message}`,
-			{ cause: err instanceof Error ? err : undefined },
+			'No polygon features found after parsing all shapefiles',
 		);
 	}
 
-	// 2. Build FeatureCollection
-	// Second argument is .dbf attributes — undefined because our extraction
-	// only provides .shp + .prj. Features will have empty properties: {}.
-	let featureCollection: FeatureCollection;
-	try {
-		featureCollection = combine([geometries, undefined]);
-	} catch (err) {
-		throw new ProcessingError(
-			`Failed to build feature collection: ${err instanceof Error ? err.message : 'Unknown error'}`,
-			{ cause: err instanceof Error ? err : undefined },
-		);
-	}
-
-	// 3. Filter: keep only polygon features
-	const polygonFeatures = featureCollection.features.filter(
-		(f) => f.geometry && isPolygonGeometry(f.geometry.type),
-	);
-
-	if (polygonFeatures.length === 0) {
-		throw new ProcessingError(
-			'No polygon features found after parsing shapefile',
-		);
-	}
-
-	// 4. Process each feature through @turf pipeline
-	// Clean coordinates, truncate float noise, enforce winding order.
-	const processedFeatures = polygonFeatures.map(processFeature);
-
-	// 5. Build final FeatureCollection
+	// 5. Build final merged FeatureCollection
 	const simplified: FeatureCollection = {
 		type: 'FeatureCollection',
-		features: processedFeatures,
+		features: allProcessedFeatures,
 	};
 
 	return {
 		featureCollection: simplified,
-		featureCount: processedFeatures.length,
+		featureCount: allProcessedFeatures.length,
 	};
 };

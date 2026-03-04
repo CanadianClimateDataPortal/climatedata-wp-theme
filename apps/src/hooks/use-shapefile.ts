@@ -12,6 +12,7 @@ import type {
 	DisplayableShapes,
 	SimplifiedGeometry,
 } from '@/lib/shapefile/contracts';
+import type { PipelineWarning } from '@/lib/shapefile/shapefile-machine';
 
 export type UseShapefileHook = {
 	isProcessingFile: boolean;
@@ -19,6 +20,7 @@ export type UseShapefileHook = {
 	isSelectionValid: boolean;
 	file: File | null;
 	errorCode: string | null;
+	warnings: PipelineWarning[];
 	reset: () => void;
 	setFile: (file: File | null) => void;
 	selectShape: (shape: DisplayableShape) => void;
@@ -77,6 +79,7 @@ export function useShapefile(): UseShapefileHook {
 	const displayableShapes = snapshot.context.displayableShapes;
 	const simplifiedGeometry = snapshot.context.simplifiedGeometry;
 	const shapesValidationResult = snapshot.context.shapesValidationResult;
+	const warnings = snapshot.context.warnings;
 
 	const reset = () => {
 		send({ type: 'RESET' });
@@ -104,6 +107,7 @@ export function useShapefile(): UseShapefileHook {
 		isSelectionValid,
 		file,
 		errorCode,
+		warnings,
 		reset,
 		setFile,
 		selectShape,

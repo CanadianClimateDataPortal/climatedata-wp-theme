@@ -33,7 +33,7 @@ import { DEFAULT_SHAPES_CONSTRAINTS } from './contracts';
 // ============================================================================
 
 /**
- * Minimal extracted shapefile — .shp binary + .prj projection string.
+ * Minimal extracted shapefile — single .shp/.prj pair with empty skippedEntries.
  *
  * In production, the ArrayBuffer contains real shapefile binary data.
  * Here we use an 8-byte stub — enough to satisfy the type.
@@ -41,8 +41,14 @@ import { DEFAULT_SHAPES_CONSTRAINTS } from './contracts';
  * @see {@link ExtractedShapefile}
  */
 export const EXAMPLE_EXTRACTED_SHAPEFILE: ExtractedShapefile = {
-	'file.shp': new ArrayBuffer(8),
-	'file.prj': 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
+	pairs: [
+		{
+			shp: new ArrayBuffer(8),
+			prj: 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
+			basename: 'test',
+		},
+	],
+	skippedEntries: [],
 };
 
 // ============================================================================

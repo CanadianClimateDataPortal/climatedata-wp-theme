@@ -81,21 +81,50 @@ export const VALUES_SHAPES_VALIDATION_RESULT_ERRORS = [
 // ============================================================================
 
 /**
+ * A single .shp/.prj pair extracted from a ZIP archive.
+ *
+ * Each pair is independently reprojected by shpjs/proj4 during parsing.
+ * The `basename` preserves the original filename stem for traceability
+ * in warning messages and error diagnostics.
+ */
+export interface ShapefilePair {
+	/** Binary shapefile geometry data */
+	shp: ArrayBuffer;
+	/** Projection definition string (e.g., WGS84 WKT) */
+	prj: string;
+	/** Original filename stem (e.g., "munic_s" from "subdir/munic_s.shp") */
+	basename: string;
+}
+
+/**
+ * An entry that was skipped during extraction.
+ *
+ * Produced when a `.shp` file has no matching `.prj` in the ZIP archive.
+ * Collected as structured data so the UI can surface warnings.
+ */
+export interface SkippedEntry {
+	/** Original filename stem of the orphan .shp */
+	basename: string;
+	/** Human-readable reason for skipping */
+	reason: string;
+}
+
+/**
  * Extracted shapefile data from ZIP archive.
  *
- * Contains the two required files:
- * - .shp: Binary geometry data (ArrayBuffer)
- * - .prj: Projection definition (string)
+ * Contains all valid .shp/.prj pairs found in the archive, plus any
+ * entries that were skipped (e.g., orphan .shp without matching .prj).
  *
- * Other files such as .dbf and .shx are ignored to minimize data exposure.
+ * A ZIP with one .shp and one .prj produces a single-element `pairs`
+ * array — backward compatible with the previous single-pair shape.
  *
- * @see {@link ./extraction.ts} for implementation
+ * @see {@link ./extract-shapefile.ts} for implementation
  */
 export interface ExtractedShapefile {
-	/** Binary shapefile geometry data */
-	'file.shp': ArrayBuffer;
-	/** Projection definition string (e.g., WGS84) */
-	'file.prj': string;
+	/** All valid .shp/.prj pairs found in the archive */
+	pairs: ShapefilePair[];
+	/** Entries skipped during extraction (orphan .shp without .prj) */
+	skippedEntries: SkippedEntry[];
 }
 
 // ============================================================================

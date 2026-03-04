@@ -31,8 +31,14 @@ import {
  * Just enough shape to satisfy the types — no real geometry.
  */
 const STUB_EXTRACTED: ExtractedShapefile = {
-	'file.shp': new ArrayBuffer(8),
-	'file.prj': 'GEOGCS["GCS_WGS_1984"]',
+	pairs: [
+		{
+			shp: new ArrayBuffer(8),
+			prj: 'GEOGCS["GCS_WGS_1984"]',
+			basename: 'test',
+		},
+	],
+	skippedEntries: [],
 };
 
 const STUB_VALIDATED = {

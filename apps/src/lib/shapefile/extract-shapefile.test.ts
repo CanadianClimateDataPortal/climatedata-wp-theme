@@ -46,10 +46,11 @@ describe('extractShapefileFromZip', () => {
 
 			expect(result.ok).toBe(true);
 			if (result.ok) {
-				expect(result.value).toHaveProperty('file.shp');
-				expect(result.value).toHaveProperty('file.prj');
-				expect(result.value['file.shp']).toBeInstanceOf(ArrayBuffer);
-				expect(typeof result.value['file.prj']).toBe('string');
+				expect(result.value.pairs).toHaveLength(1);
+				expect(result.value.pairs[0].shp).toBeInstanceOf(ArrayBuffer);
+				expect(typeof result.value.pairs[0].prj).toBe('string');
+				expect(result.value.pairs[0].basename).toBe('test');
+				expect(result.value.skippedEntries).toHaveLength(0);
 			}
 		});
 
@@ -67,9 +68,8 @@ describe('extractShapefileFromZip', () => {
 
 			expect(result.ok).toBe(true);
 			if (result.ok) {
-				expect(Object.keys(result.value)).toHaveLength(2);
-				expect(result.value).toHaveProperty('file.shp');
-				expect(result.value).toHaveProperty('file.prj');
+				expect(result.value.pairs).toHaveLength(1);
+				expect(result.value.skippedEntries).toHaveLength(0);
 			}
 		});
 

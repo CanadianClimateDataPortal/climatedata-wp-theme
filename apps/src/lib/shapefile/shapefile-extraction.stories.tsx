@@ -302,44 +302,54 @@ const StoryBodyExtraction = () => {
 						<tbody>
 							<tr>
 								<td style={{ padding: '0.25rem', fontWeight: 'bold' }}>
-									file.shp:
+									Pairs:
 								</td>
-								<td>
-									{state.extracted['file.shp'].byteLength.toLocaleString()}{' '}
-									bytes
-								</td>
+								<td>{state.extracted.pairs.length}</td>
 							</tr>
-							<tr>
-								<td style={{ padding: '0.25rem', fontWeight: 'bold' }}>
-									file.prj:
-								</td>
-								<td>
-									{state.extracted['file.prj'].length.toLocaleString()}{' '}
-									characters
-								</td>
-							</tr>
+							{state.extracted.pairs.map((pair) => (
+								<tr key={pair.basename}>
+									<td style={{ padding: '0.25rem', fontWeight: 'bold' }}>
+										{pair.basename}.shp:
+									</td>
+									<td>
+										{pair.shp.byteLength.toLocaleString()} bytes
+									</td>
+								</tr>
+							))}
+							{state.extracted.skippedEntries.length > 0 && (
+								<tr>
+									<td style={{ padding: '0.25rem', fontWeight: 'bold' }}>
+										Skipped:
+									</td>
+									<td>
+										{state.extracted.skippedEntries.map((e) => `${e.basename} (${e.reason})`).join(', ')}
+									</td>
+								</tr>
+							)}
 						</tbody>
 					</table>
-					<details style={{ marginTop: '1rem' }}>
-						<summary style={{ cursor: 'pointer', color: '#666' }}>
-							View .prj content
-						</summary>
-						<pre
-							style={{
-								fontFamily: 'monospace',
-								fontSize: '0.75rem',
-								backgroundColor: '#fff',
-								padding: '0.5rem',
-								borderRadius: '4px',
-								overflow: 'auto',
-								whiteSpace: 'pre-wrap',
-								wordBreak: 'break-all',
-								marginTop: '0.5rem',
-							}}
-						>
-							{state.extracted['file.prj']}
-						</pre>
-					</details>
+					{state.extracted.pairs.map((pair) => (
+						<details key={pair.basename} style={{ marginTop: '1rem' }}>
+							<summary style={{ cursor: 'pointer', color: '#666' }}>
+								View {pair.basename}.prj content
+							</summary>
+							<pre
+								style={{
+									fontFamily: 'monospace',
+									fontSize: '0.75rem',
+									backgroundColor: '#fff',
+									padding: '0.5rem',
+									borderRadius: '4px',
+									overflow: 'auto',
+									whiteSpace: 'pre-wrap',
+									wordBreak: 'break-all',
+									marginTop: '0.5rem',
+								}}
+							>
+								{pair.prj}
+							</pre>
+						</details>
+					))}
 				</section>
 			)}
 
@@ -574,37 +584,41 @@ const PipelineUpload = () => {
 							{snapshot.context.extractedShapefile && (
 								<>
 									<tr>
-										<td className="p-1 font-bold">file.shp:</td>
-										<td>
-											{snapshot.context.extractedShapefile[
-												'file.shp'
-											].byteLength.toLocaleString()}{' '}
-											bytes
-										</td>
+										<td className="p-1 font-bold">Pairs:</td>
+										<td>{snapshot.context.extractedShapefile.pairs.length}</td>
 									</tr>
-									<tr>
-										<td className="p-1 font-bold">file.prj:</td>
-										<td>
-											{snapshot.context.extractedShapefile[
-												'file.prj'
-											].length.toLocaleString()}{' '}
-											characters
-										</td>
-									</tr>
+									{snapshot.context.extractedShapefile.pairs.map((pair) => (
+										<tr key={pair.basename}>
+											<td className="p-1 font-bold">{pair.basename}.shp:</td>
+											<td>
+												{pair.shp.byteLength.toLocaleString()} bytes
+											</td>
+										</tr>
+									))}
+									{snapshot.context.extractedShapefile.skippedEntries.length > 0 && (
+										<tr>
+											<td className="p-1 font-bold">Skipped:</td>
+											<td>
+												{snapshot.context.extractedShapefile.skippedEntries
+													.map((e) => `${e.basename} (${e.reason})`)
+													.join(', ')}
+											</td>
+										</tr>
+									)}
 								</>
 							)}
 						</tbody>
 					</table>
-					{snapshot.context.extractedShapefile && (
-						<details className="mt-4">
+					{snapshot.context.extractedShapefile && snapshot.context.extractedShapefile.pairs.map((pair) => (
+						<details key={pair.basename} className="mt-4">
 							<summary className="cursor-pointer text-gray-500 text-sm">
-								View .prj content
+								View {pair.basename}.prj content
 							</summary>
 							<pre className="font-mono text-xs bg-white p-2 rounded overflow-auto whitespace-pre-wrap break-all mt-2">
-								{snapshot.context.extractedShapefile['file.prj']}
+								{pair.prj}
 							</pre>
 						</details>
-					)}
+					))}
 				</section>
 			)}
 		</div>

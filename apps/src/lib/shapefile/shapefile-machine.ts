@@ -63,6 +63,17 @@ export type PipelineServices = {
 // CONTEXT
 // ============================================================================
 
+/**
+ * Structured warning from pipeline processing.
+ *
+ * Produced during extraction when orphan .shp files are skipped.
+ * Future pipeline stages may add warnings using the same shape.
+ */
+export type PipelineWarning = {
+	code: string;
+	message: string;
+};
+
 export type MachineContext = {
 	file: File | null;
 	extractedShapefile: ExtractedShapefile | null;
@@ -75,6 +86,7 @@ export type MachineContext = {
 	shapesValidationResult: ShapesValidationResult | null;
 	error: Error | null;
 	shapesConstraints: ShapesConstraints;
+	warnings: PipelineWarning[];
 	/**
 	 * Injected pipeline functions — async actors and sync actions.
 	 *
@@ -99,6 +111,7 @@ const initialContext = (
 	shapesValidationResult: null,
 	error: null,
 	shapesConstraints: DEFAULT_SHAPES_CONSTRAINTS,
+	warnings: [],
 	services,
 });
 
@@ -113,6 +126,7 @@ const downstreamReset = (): Partial<MachineContext> => ({
 	finchPayload: null,
 	shapesValidationResult: null,
 	error: null,
+	warnings: [],
 });
 
 // ============================================================================
@@ -292,9 +306,14 @@ export const shapefileMachine = setup({
 						target: 'validating',
 						actions: assign(({ event }) => {
 							const output = event.output;
-							return output.ok
-								? { extractedShapefile: output.value }
-								: {};
+							if (!output.ok) return {};
+							return {
+								extractedShapefile: output.value,
+								warnings: output.value.skippedEntries.map((e) => ({
+									code: 'extraction/orphan-shp-skipped',
+									message: `Skipped ${e.basename}.shp — ${e.reason}`,
+								})),
+							};
 						}),
 					},
 					{

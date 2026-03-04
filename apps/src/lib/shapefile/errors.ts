@@ -28,6 +28,7 @@ export const VALUES_SHAPEFILE_ERROR_CODES = [
 	'selection/area-too-large',
 	'selection/area-too-small',
 	'selection/too-many-positions',
+	'validation/mixed-geometry-types',
 	// Processing phase
 	'processing/failed',
 	'processing/projection-unsupported',

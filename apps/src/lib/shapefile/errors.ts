@@ -22,12 +22,12 @@ export const VALUES_SHAPEFILE_ERROR_CODES = [
 	'extraction/missing-shp',
 	'extraction/missing-prj',
 	'extraction/zip-parse-failed',
-	// Validation phase
-	'validation/invalid-geometry-type',
 	// Selected shapes validation phase
 	'selection/area-too-large',
 	'selection/area-too-small',
 	'selection/too-many-positions',
+	// Validation phase
+	'validation/invalid-geometry-type',
 	'validation/mixed-geometry-types',
 	// Processing phase
 	'processing/failed',

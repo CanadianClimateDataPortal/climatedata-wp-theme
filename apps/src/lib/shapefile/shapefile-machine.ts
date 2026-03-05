@@ -183,7 +183,9 @@ export const shapefileMachine = setup({
 	actions: {
 		resetContext: assign(({ context }) => initialContext(context.services)),
 		assignFile: assign(({ event }) => {
-			if (event.type !== 'FILE_SELECTED') return {};
+			if (event.type !== 'FILE_SELECTED') {
+				return {};
+			}
 			return {
 				...downstreamReset(),
 				file: event.file,
@@ -213,13 +215,17 @@ export const shapefileMachine = setup({
 			};
 		}),
 		runSelectionValidation: assign(({ context, event }) => {
-			if (event.type !== 'SHAPE_CLICKED') return {};
+			if (event.type !== 'SHAPE_CLICKED') {
+				return {};
+			}
 
 			const shapeId = event.shapeId;
 			const shape = context.displayableShapes?.shapes.find(
 				(s) => s.id === shapeId,
 			);
-			if (!shape) return {};
+			if (!shape) {
+				return {};
+			}
 
 			const selectedShapes: Pick<DisplayableShape, 'id' | 'areaKm2'>[] = [
 				{ id: shape.id, areaKm2: shape.areaKm2 },
@@ -306,7 +312,9 @@ export const shapefileMachine = setup({
 						target: 'validating',
 						actions: assign(({ event }) => {
 							const output = event.output;
-							if (!output.ok) return {};
+							if (!output.ok) {
+								return {};
+							}
 							return {
 								extractedShapefile: output.value,
 								warnings: output.value.skippedEntries.map((e) => ({
@@ -342,11 +350,26 @@ export const shapefileMachine = setup({
 							params: ({ event }) => ({ result: event.output }),
 						},
 						target: 'transforming',
-						actions: assign(({ event }) => {
+						actions: assign(({ context, event }) => {
 							const output = event.output;
-							return output.ok
-								? { validatedShapefile: output.value }
-								: {};
+							if (!output.ok) {
+								return {};
+							}
+							const validationWarnings = output.value.skippedEntries
+								.filter((e) => !context.extractedShapefile?.skippedEntries.some(
+									(existing) => existing.basename === e.basename,
+								))
+								.map((e) => ({
+									code: 'validation/non-polygon-skipped',
+									message: `${e.basename}.shp skipped — ${e.reason}`,
+								}));
+							return {
+								validatedShapefile: output.value,
+								warnings: [
+									...context.warnings,
+									...validationWarnings,
+								],
+							};
 						}),
 					},
 					{

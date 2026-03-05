@@ -97,7 +97,9 @@ export function useShapefile(): UseShapefileHook {
 	};
 
 	const selectShape = (shape: DisplayableShape) => {
-		if (snapshot.context.selectedShapes.some(s => s.id === shape.id)) return;
+		if (snapshot.context.selectedShapes.some((s) => s.id === shape.id)) {
+			return;
+		}
 		send({ type: 'SHAPE_CLICKED', shapeId: shape.id });
 	};
 

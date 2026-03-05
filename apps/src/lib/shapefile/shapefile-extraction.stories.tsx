@@ -677,7 +677,9 @@ const ShapefileErrorMessage = () => {
 	const context = useContext(ShapefileContext);
 	const error = useSelector(context!.actor, (s) => s.context.error);
 
-	if (!isFileInvalid || !error) return null;
+	if (!isFileInvalid || !error) {
+		return null;
+	}
 
 	return (
 		<div className="text-xs text-red-600 mt-1">

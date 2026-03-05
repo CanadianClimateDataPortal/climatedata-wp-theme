@@ -43,6 +43,7 @@ import {
 	type ProcessingError,
 	type ProjectionError,
 	type InvalidGeometryTypeError,
+	type ShapefileWarningCode,
 } from './errors';
 
 // ============================================================================
@@ -70,7 +71,8 @@ export type PipelineServices = {
  * Future pipeline stages may add warnings using the same shape.
  */
 export type PipelineWarning = {
-	code: string;
+	basename: string;
+	code: ShapefileWarningCode;
 	message: string;
 };
 
@@ -317,9 +319,10 @@ export const shapefileMachine = setup({
 							}
 							return {
 								extractedShapefile: output.value,
-								warnings: output.value.skippedEntries.map((e) => ({
+								warnings: output.value.skippedEntries.map((e): PipelineWarning => ({
+									basename: e.basename,
 									code: 'extraction/orphan-shp-skipped',
-									message: `Skipped ${e.basename}.shp — ${e.reason}`,
+									message: `${e.basename}.shp skipped — ${e.reason}`,
 								})),
 							};
 						}),
@@ -359,7 +362,8 @@ export const shapefileMachine = setup({
 								.filter((e) => !context.extractedShapefile?.skippedEntries.some(
 									(existing) => existing.basename === e.basename,
 								))
-								.map((e) => ({
+								.map((e): PipelineWarning => ({
+									basename: e.basename,
 									code: 'validation/non-polygon-skipped',
 									message: `${e.basename}.shp skipped — ${e.reason}`,
 								}));

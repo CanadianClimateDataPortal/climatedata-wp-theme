@@ -39,6 +39,26 @@ export const VALUES_SHAPEFILE_ERROR_CODES = [
  */
 export type ShapefileErrorCode = (typeof VALUES_SHAPEFILE_ERROR_CODES)[number];
 
+// ============================================================================
+// WARNING CODES
+// ============================================================================
+
+/**
+ * All possible warning codes for shapefile processing.
+ *
+ * Same naming convention as error codes: `phase/warning-type`.
+ * Warnings are non-fatal — the pipeline continues after producing them.
+ */
+export const VALUES_SHAPEFILE_WARNING_CODES = [
+	'extraction/orphan-shp-skipped',
+	'validation/non-polygon-skipped',
+] as const;
+
+/**
+ * Discriminated union of all shapefile warning codes.
+ */
+export type ShapefileWarningCode = (typeof VALUES_SHAPEFILE_WARNING_CODES)[number];
+
 /**
  * Generic shapefile error with typed error code.
  *

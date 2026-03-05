@@ -22,6 +22,7 @@ import {
 import { useShapefile } from '@/hooks/use-shapefile';
 import { ShapefileGeoJsonLayer } from '@/components/download/map-layers';
 import FileInput from '@/components/ui/file-input';
+import ShapefileWarningsMessage from '@/components/download/ui/shapefile-warnings-message';
 import { MAP_CONFIG } from '@/config/map.config';
 import {
 	DEFAULT_MAX_ZOOM,
@@ -461,8 +462,10 @@ const PipelineUpload = () => {
 		file,
 		isProcessingFile,
 		isFileValid,
+		isDisplaying,
 		setFile,
 		reset,
+		warnings,
 	} = useShapefile();
 
 	const isFileInvalid = file !==null && !isFileValid;
@@ -499,6 +502,7 @@ const PipelineUpload = () => {
 				</button>
 			</div>
 			<ShapefileErrorMessage />
+			<ShapefileWarningsMessage warnings={warnings} />
 
 			{/* Machine state */}
 			<section className="p-4 border border-gray-300 rounded">
@@ -563,7 +567,7 @@ const PipelineUpload = () => {
 			)}
 
 			{/* Success — machine reached displaying */}
-			{machineState === 'displaying' && snapshot.context.simplifiedGeometry && (
+			{isDisplaying && snapshot.context.simplifiedGeometry && (
 				<section className="p-4 border-2 border-green-500 rounded bg-green-50">
 					<h3 className="mt-0 mb-2 text-green-600 font-semibold">
 						Pipeline Complete
@@ -672,7 +676,7 @@ const ShapefileErrorMessage = () => {
 		file,
 		isFileValid,
 	} = useShapefile();
-	const isFileInvalid = file !==null && !isFileValid;
+	const isFileInvalid = file !== null && !isFileValid;
 
 	const context = useContext(ShapefileContext);
 	const error = useSelector(context!.actor, (s) => s.context.error);
@@ -687,6 +691,7 @@ const ShapefileErrorMessage = () => {
 		</div>
 	);
 };
+
 
 // ============================================================================
 // Shared — ShapefileMap (Leaflet map using production ShapefileGeoJsonLayer)

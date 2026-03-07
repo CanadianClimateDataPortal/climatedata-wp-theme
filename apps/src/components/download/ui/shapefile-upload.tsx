@@ -1,13 +1,16 @@
 import React from 'react';
 import { MessageCircleQuestion } from 'lucide-react';
 
-import { __ } from '@/context/locale-provider';
+import { __, _n } from '@/context/locale-provider';
 import Modal from '@/components/ui/modal';
 import { ControlTitle } from '@/components/ui/control-title';
+
+import ShapefileWarningsMessage from '@/components/download/ui/shapefile-warnings-message';
 import { useShapefile } from '@/hooks/use-shapefile';
 import FileInput from '@/components/ui/file-input';
 
 interface ShapefileUploadComponentProps {
+	warnings: ReturnType<typeof useShapefile>['warnings'];
 	file: File | null;
 	isFileValid: boolean;
 	isProcessingFile: boolean;
@@ -32,6 +35,7 @@ export default function ShapefileUpload(): React.ReactElement {
 		file,
 		reset,
 		setFile,
+		warnings,
 	} = useShapefile();
 
 	const onChangeFile = (file: File | null) => {
@@ -54,6 +58,7 @@ export default function ShapefileUpload(): React.ReactElement {
 			onSupportedFilesClick={() => setModalOpened(true)}
 			onChangeFile={onChangeFile}
 			onRemoveFile={reset}
+			warnings={warnings}
 		/>
 	);
 }
@@ -70,6 +75,7 @@ function ShapefileUploadComponent({
 	onSupportedFilesClick,
 	onChangeFile,
 	onRemoveFile,
+	warnings,
 }: ShapefileUploadComponentProps): React.ReactElement {
 	const tooltip = __(
 		'This feature allows you to upload a shapefile of your custom ' +
@@ -122,6 +128,12 @@ function ShapefileUploadComponent({
 							{__('The selected file is not a supported shapefile.')}
 						</div>
 					)}
+					<ShapefileWarningsMessage
+						warnings={warnings}
+						__={__}
+						_n={_n}
+					/>
+
 				</div>
 				<div
 					className="text-sm flex flex-row items-center gap-1 text-neutral-grey-medium sm:mt-2 hover:text-dark-purple cursor-pointer"

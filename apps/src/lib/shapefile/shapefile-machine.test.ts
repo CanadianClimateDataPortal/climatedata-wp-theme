@@ -224,6 +224,36 @@ describe('shapefile machine — happy path', () => {
 
 		actor.stop();
 	});
+	it('warnings from extraction flow to machine context', async () => {
+		const services = createHappyServices();
+		// Override extraction to return skipped entries
+		services.extractShapefileFromZip = vi.fn().mockResolvedValue({
+			ok: true,
+			value: {
+				...STUB_EXTRACTED,
+				skippedEntries: [
+					{ basename: 'orphan', reason: 'No matching .prj file found' },
+				],
+			},
+		});
+
+		const actor = createActor(shapefileMachine, { input: services });
+		actor.start();
+
+		actor.send({
+			type: 'FILE_SELECTED',
+			file: new File([], 'test.zip'),
+		});
+
+		const snapshot = await waitFor(
+			actor,
+			(state) => state.matches('displaying'),
+		);
+
+		expect(snapshot.context.warnings).toHaveLength(1);
+
+		actor.stop();
+	});
 });
 
 // ============================================================================

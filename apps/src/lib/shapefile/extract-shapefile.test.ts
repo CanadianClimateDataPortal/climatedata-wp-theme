@@ -195,4 +195,78 @@ describe('extractShapefileFromZip', () => {
 			}
 		});
 	});
+
+	describe('multi-pair extraction', () => {
+		it('should extract multiple .shp/.prj pairs from ZIP', async () => {
+			const zipData = zipSync({
+				'region_s.shp': new Uint8Array([0x00]),
+				'region_s.prj': strToU8('GEOGCS["WGS 84"]'),
+				'munic_s.shp': new Uint8Array([0x01]),
+				'munic_s.prj': strToU8('GEOGCS["WGS 84"]'),
+			});
+			const file = createMockFile('multi.zip', zipData);
+
+			const result = await extractShapefileFromZip(file);
+
+			expect(result.ok).toBe(true);
+			if (result.ok) {
+				expect(result.value.pairs).toHaveLength(2);
+				expect(result.value.pairs[0].basename).toBe('region_s');
+				expect(result.value.pairs[1].basename).toBe('munic_s');
+				expect(result.value.skippedEntries).toHaveLength(0);
+			}
+		});
+
+		it('should skip orphan .shp without .prj and produce warning', async () => {
+			const zipData = zipSync({
+				'valid.shp': new Uint8Array([0x00]),
+				'valid.prj': strToU8('GEOGCS["WGS 84"]'),
+				'orphan.shp': new Uint8Array([0x01]),
+				// No orphan.prj
+			});
+			const file = createMockFile('partial.zip', zipData);
+
+			const result = await extractShapefileFromZip(file);
+
+			expect(result.ok).toBe(true);
+			if (result.ok) {
+				expect(result.value.pairs).toHaveLength(1);
+				expect(result.value.pairs[0].basename).toBe('valid');
+				expect(result.value.skippedEntries).toHaveLength(1);
+				expect(result.value.skippedEntries[0].basename).toBe('orphan');
+			}
+		});
+
+		it('should error when all .shp files are orphans', async () => {
+			const zipData = zipSync({
+				'orphan1.shp': new Uint8Array([0x00]),
+				'orphan2.shp': new Uint8Array([0x01]),
+				'unrelated.prj': strToU8('GEOGCS["WGS 84"]'),
+			});
+			const file = createMockFile('all-orphans.zip', zipData);
+
+			const result = await extractShapefileFromZip(file);
+
+			expect(result.ok).toBe(false);
+			if (!result.ok) {
+				expect(result.error.code).toBe('extraction/missing-prj');
+			}
+		});
+
+		it('should match .shp/.prj across subdirectories by basename', async () => {
+			const zipData = zipSync({
+				'subdir/region_s.shp': new Uint8Array([0x00]),
+				'subdir/region_s.prj': strToU8('GEOGCS["WGS 84"]'),
+			});
+			const file = createMockFile('nested.zip', zipData);
+
+			const result = await extractShapefileFromZip(file);
+
+			expect(result.ok).toBe(true);
+			if (result.ok) {
+				expect(result.value.pairs).toHaveLength(1);
+				expect(result.value.pairs[0].basename).toBe('region_s');
+			}
+		});
+	});
 });

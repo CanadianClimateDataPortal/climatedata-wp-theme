@@ -8,9 +8,10 @@ import { ControlTitle } from '@/components/ui/control-title';
 import ShapefileWarningsMessage from '@/components/download/ui/shapefile-warnings-message';
 import { useShapefile } from '@/hooks/use-shapefile';
 import FileInput from '@/components/ui/file-input';
+import type { PipelineWarning } from '@/lib/shapefile';
 
 interface ShapefileUploadComponentProps {
-	warnings: ReturnType<typeof useShapefile>['warnings'];
+	warnings: PipelineWarning[];
 	file: File | null;
 	isFileValid: boolean;
 	isProcessingFile: boolean;

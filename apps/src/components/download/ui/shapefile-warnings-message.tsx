@@ -25,7 +25,7 @@ function groupByCode(warnings: PipelineWarning[]): Map<ShapefileWarningCode, str
 	const groups = new Map<ShapefileWarningCode, string[]>();
 	for (const w of warnings) {
 		const list = groups.get(w.code) ?? [];
-		list.push(w.basename);
+		list.push(w.extractedPath);
 		groups.set(w.code, list);
 	}
 	return groups;

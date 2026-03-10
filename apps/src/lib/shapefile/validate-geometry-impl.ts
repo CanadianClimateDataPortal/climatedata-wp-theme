@@ -65,14 +65,14 @@ export const validateShapefileGeometryImpl = async (
 		// 1. Check if it's a valid .shp file
 		if (!header.isShp) {
 			throw new ProcessingError(
-				`Validation Error: ${pair.basename}.shp does not appear to be a .shp file (invalid file code)`,
+				`Validation Error: ${pair.extractedPath}.shp does not appear to be a .shp file (invalid file code)`,
 			);
 		}
 
 		// 2. Check if the file contains any features
 		if (!header.hasFeatures) {
 			throw new ProcessingError(
-				`Validation Error: ${pair.basename}.shp contains no features (file is header-only)`,
+				`Validation Error: ${pair.extractedPath}.shp contains no features (file is header-only)`,
 			);
 		}
 
@@ -82,7 +82,7 @@ export const validateShapefileGeometryImpl = async (
 		} else {
 			lastNonPolygonType = header.shapeTypeName;
 			newSkippedEntries.push({
-				basename: pair.basename,
+				extractedPath: pair.extractedPath,
 				reason: `${header.shapeTypeName} geometry, only Polygon supported`,
 			});
 		}

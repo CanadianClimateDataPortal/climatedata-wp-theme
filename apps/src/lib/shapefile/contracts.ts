@@ -84,7 +84,7 @@ export const VALUES_SHAPES_VALIDATION_RESULT_ERRORS = [
  * A single .shp/.prj pair extracted from a ZIP archive.
  *
  * Each pair is independently reprojected by shpjs/proj4 during parsing.
- * The `basename` preserves the original filename stem for traceability
+ * The `extractedPath` preserves the original zip entry path stem for traceability
  * in warning messages and error diagnostics.
  */
 export interface ShapefilePair {
@@ -92,8 +92,8 @@ export interface ShapefilePair {
 	shp: ArrayBuffer;
 	/** Projection definition string (e.g., WGS84 WKT) */
 	prj: string;
-	/** Original path stem including directory prefix (e.g., "subdir/munic_s" from "subdir/munic_s.shp") */
-	basename: string;
+	/** Zip entry path without extension (e.g., "subdir/munic_s" from "subdir/munic_s.shp") */
+	extractedPath: string;
 }
 
 /**
@@ -103,8 +103,8 @@ export interface ShapefilePair {
  * Collected as structured data so the UI can surface warnings.
  */
 export interface SkippedEntry {
-	/** Original path stem of the orphan .shp (includes directory prefix if present) */
-	basename: string;
+	/** Zip entry path without extension of the orphan .shp */
+	extractedPath: string;
 	/** Human-readable reason for skipping */
 	reason: string;
 }

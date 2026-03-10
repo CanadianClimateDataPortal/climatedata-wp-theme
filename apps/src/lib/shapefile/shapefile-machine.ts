@@ -71,7 +71,7 @@ export type PipelineServices = {
  * Future pipeline stages may add warnings using the same shape.
  */
 export type PipelineWarning = {
-	basename: string;
+	extractedPath: string;
 	code: ShapefileWarningCode;
 	message: string;
 };
@@ -320,9 +320,9 @@ export const shapefileMachine = setup({
 							return {
 								extractedShapefile: output.value,
 								warnings: output.value.skippedEntries.map((e): PipelineWarning => ({
-									basename: e.basename,
+									extractedPath: e.extractedPath,
 									code: 'extraction/orphan-shp-skipped',
-									message: `${e.basename}.shp skipped — ${e.reason}`,
+									message: `${e.extractedPath}.shp skipped — ${e.reason}`,
 								})),
 							};
 						}),
@@ -360,12 +360,12 @@ export const shapefileMachine = setup({
 							}
 							const validationWarnings = output.value.skippedEntries
 								.filter((e) => !context.extractedShapefile?.skippedEntries.some(
-									(existing) => existing.basename === e.basename,
+									(existing) => existing.extractedPath === e.extractedPath,
 								))
 								.map((e): PipelineWarning => ({
-									basename: e.basename,
+									extractedPath: e.extractedPath,
 									code: 'validation/non-polygon-skipped',
-									message: `${e.basename}.shp skipped — ${e.reason}`,
+									message: `${e.extractedPath}.shp skipped — ${e.reason}`,
 								}));
 							return {
 								validatedShapefile: output.value,

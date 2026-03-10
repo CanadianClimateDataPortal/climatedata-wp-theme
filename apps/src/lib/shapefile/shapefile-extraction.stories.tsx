@@ -308,9 +308,9 @@ const StoryBodyExtraction = () => {
 								<td>{state.extracted.pairs.length}</td>
 							</tr>
 							{state.extracted.pairs.map((pair) => (
-								<tr key={pair.basename}>
+								<tr key={pair.extractedPath}>
 									<td style={{ padding: '0.25rem', fontWeight: 'bold' }}>
-										{pair.basename}.shp:
+										{pair.extractedPath}.shp:
 									</td>
 									<td>
 										{pair.shp.byteLength.toLocaleString()} bytes
@@ -323,16 +323,16 @@ const StoryBodyExtraction = () => {
 										Skipped:
 									</td>
 									<td>
-										{state.extracted.skippedEntries.map((e) => `${e.basename} (${e.reason})`).join(', ')}
+										{state.extracted.skippedEntries.map((e) => `${e.extractedPath} (${e.reason})`).join(', ')}
 									</td>
 								</tr>
 							)}
 						</tbody>
 					</table>
 					{state.extracted.pairs.map((pair) => (
-						<details key={pair.basename} style={{ marginTop: '1rem' }}>
+						<details key={pair.extractedPath} style={{ marginTop: '1rem' }}>
 							<summary style={{ cursor: 'pointer', color: '#666' }}>
-								View {pair.basename}.prj content
+								View {pair.extractedPath}.prj content
 							</summary>
 							<pre
 								style={{
@@ -592,8 +592,8 @@ const PipelineUpload = () => {
 										<td>{snapshot.context.extractedShapefile.pairs.length}</td>
 									</tr>
 									{snapshot.context.extractedShapefile.pairs.map((pair) => (
-										<tr key={pair.basename}>
-											<td className="p-1 font-bold">{pair.basename}.shp:</td>
+										<tr key={pair.extractedPath}>
+											<td className="p-1 font-bold">{pair.extractedPath}.shp:</td>
 											<td>
 												{pair.shp.byteLength.toLocaleString()} bytes
 											</td>
@@ -604,7 +604,7 @@ const PipelineUpload = () => {
 											<td className="p-1 font-bold">Skipped:</td>
 											<td>
 												{snapshot.context.extractedShapefile.skippedEntries
-													.map((e) => `${e.basename} (${e.reason})`)
+													.map((e) => `${e.extractedPath} (${e.reason})`)
 													.join(', ')}
 											</td>
 										</tr>
@@ -614,9 +614,9 @@ const PipelineUpload = () => {
 						</tbody>
 					</table>
 					{snapshot.context.extractedShapefile && snapshot.context.extractedShapefile.pairs.map((pair) => (
-						<details key={pair.basename} className="mt-4">
+						<details key={pair.extractedPath} className="mt-4">
 							<summary className="cursor-pointer text-gray-500 text-sm">
-								View {pair.basename}.prj content
+								View {pair.extractedPath}.prj content
 							</summary>
 							<pre className="font-mono text-xs bg-white p-2 rounded overflow-auto whitespace-pre-wrap break-all mt-2">
 								{pair.prj}

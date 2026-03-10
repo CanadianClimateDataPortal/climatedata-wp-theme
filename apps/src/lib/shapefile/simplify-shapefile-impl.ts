@@ -116,7 +116,7 @@ export const simplifyShapefileImpl = async (
 			}
 
 			throw new ProcessingError(
-				`Failed to parse ${pair.basename}.shp: ${message}`,
+				`Failed to parse ${pair.extractedPath}.shp: ${message}`,
 				{ cause: err instanceof Error ? err : undefined },
 			);
 		}
@@ -129,7 +129,7 @@ export const simplifyShapefileImpl = async (
 			featureCollection = combine([geometries, undefined]);
 		} catch (err) {
 			throw new ProcessingError(
-				`Failed to build feature collection for ${pair.basename}.shp: ${err instanceof Error ? err.message : 'Unknown error'}`,
+				`Failed to build feature collection for ${pair.extractedPath}.shp: ${err instanceof Error ? err.message : 'Unknown error'}`,
 				{ cause: err instanceof Error ? err : undefined },
 			);
 		}

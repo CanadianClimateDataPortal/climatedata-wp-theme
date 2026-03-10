@@ -35,7 +35,7 @@ const STUB_EXTRACTED: ExtractedShapefile = {
 		{
 			shp: new ArrayBuffer(8),
 			prj: 'GEOGCS["GCS_WGS_1984"]',
-			basename: 'test',
+			extractedPath: 'test',
 		},
 	],
 	skippedEntries: [],
@@ -232,7 +232,7 @@ describe('shapefile machine — happy path', () => {
 			value: {
 				...STUB_EXTRACTED,
 				skippedEntries: [
-					{ basename: 'orphan', reason: 'No matching .prj file found' },
+					{ extractedPath: 'orphan', reason: 'No matching .prj file found' },
 				],
 			},
 		});

@@ -107,14 +107,14 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 	const decoder = new TextDecoder();
 
 	for (const shpName of shpEntries) {
-		const basename = shpName.replace(/\.shp$/i, '');
+		const extractedPath = shpName.replace(/\.shp$/i, '');
 		const prjName = Object.keys(unzipped).find(
-			(name) => name.toLowerCase() === `${basename}.prj`.toLowerCase(),
+			(name) => name.toLowerCase() === `${extractedPath}.prj`.toLowerCase(),
 		);
 
 		if (!prjName) {
 			skippedEntries.push({
-				basename,
+				extractedPath,
 				reason: 'No matching .prj file found',
 			});
 			continue;
@@ -124,7 +124,7 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 		pairs.push({
 			shp: unzipped[shpName].slice().buffer,
 			prj: decoder.decode(unzipped[prjName]),
-			basename,
+			extractedPath,
 		});
 	}
 

@@ -33,13 +33,13 @@ const buildShpHeader = (shapeType: number, fileLengthWords = 58): ArrayBuffer =>
  * Convenience factory — pre-fills skippedEntries as empty.
  */
 const createExtracted = (
-	pairs: Array<{ basename: string; shapeType: number }>,
+	pairs: Array<{ extractedPath: string; shapeType: number }>,
 	skippedEntries: ExtractedShapefile['skippedEntries'] = [],
 ): ExtractedShapefile => ({
-	pairs: pairs.map(({ basename, shapeType }) => ({
+	pairs: pairs.map(({ extractedPath, shapeType }) => ({
 		shp: buildShpHeader(shapeType),
 		prj: 'GEOGCS["GCS_WGS_1984"]',
-		basename,
+		extractedPath,
 	})),
 	skippedEntries,
 });
@@ -47,8 +47,8 @@ const createExtracted = (
 describe('validateShapefileGeometryImpl', () => {
 	it('should pass all polygon pairs through', async () => {
 		const input = createExtracted([
-			{ basename: 'region_s', shapeType: 5 },
-			{ basename: 'munic_s', shapeType: 5 },
+			{ extractedPath: 'region_s', shapeType: 5 },
+			{ extractedPath: 'munic_s', shapeType: 5 },
 		]);
 
 		const result = await validateShapefileGeometryImpl(input);
@@ -59,23 +59,23 @@ describe('validateShapefileGeometryImpl', () => {
 
 	it('should keep polygon and skip polyline with warning', async () => {
 		const input = createExtracted([
-			{ basename: 'region_s', shapeType: 5 },  // Polygon
-			{ basename: 'region_l', shapeType: 3 },  // Polyline
+			{ extractedPath: 'region_s', shapeType: 5 },  // Polygon
+			{ extractedPath: 'region_l', shapeType: 3 },  // Polyline
 		]);
 
 		const result = await validateShapefileGeometryImpl(input);
 
 		expect(result.pairs).toHaveLength(1);
-		expect(result.pairs[0].basename).toBe('region_s');
+		expect(result.pairs[0].extractedPath).toBe('region_s');
 		expect(result.skippedEntries).toHaveLength(1);
-		expect(result.skippedEntries[0].basename).toBe('region_l');
+		expect(result.skippedEntries[0].extractedPath).toBe('region_l');
 		expect(result.skippedEntries[0].reason).toContain('Polyline');
 	});
 
 	it('should throw InvalidGeometryTypeError when zero polygon pairs remain', async () => {
 		const input = createExtracted([
-			{ basename: 'lines_l', shapeType: 3 },  // Polyline
-			{ basename: 'points', shapeType: 1 },    // Point
+			{ extractedPath: 'lines_l', shapeType: 3 },  // Polyline
+			{ extractedPath: 'points', shapeType: 1 },    // Point
 		]);
 
 		await expect(
@@ -88,7 +88,7 @@ describe('validateShapefileGeometryImpl', () => {
 			pairs: [{
 				shp: new ArrayBuffer(100),  // All zeros — wrong file code
 				prj: 'GEOGCS["GCS_WGS_1984"]',
-				basename: 'bad',
+				extractedPath: 'bad',
 			}],
 			skippedEntries: [],
 		};
@@ -101,11 +101,11 @@ describe('validateShapefileGeometryImpl', () => {
 	it('should accumulate skippedEntries from extraction and validation', async () => {
 		const input = createExtracted(
 			[
-				{ basename: 'region_s', shapeType: 5 },  // Polygon — kept
-				{ basename: 'region_l', shapeType: 3 },  // Polyline — skipped by validation
+				{ extractedPath: 'region_s', shapeType: 5 },  // Polygon — kept
+				{ extractedPath: 'region_l', shapeType: 3 },  // Polyline — skipped by validation
 			],
 			// Pre-existing skipped entry from extraction phase
-			[{ basename: 'orphan', reason: 'No matching .prj file found' }],
+			[{ extractedPath: 'orphan', reason: 'No matching .prj file found' }],
 		);
 
 		const result = await validateShapefileGeometryImpl(input);
@@ -113,7 +113,7 @@ describe('validateShapefileGeometryImpl', () => {
 		expect(result.pairs).toHaveLength(1);
 		// 1 from extraction + 1 from validation = 2
 		expect(result.skippedEntries).toHaveLength(2);
-		expect(result.skippedEntries[0].basename).toBe('orphan');
-		expect(result.skippedEntries[1].basename).toBe('region_l');
+		expect(result.skippedEntries[0].extractedPath).toBe('orphan');
+		expect(result.skippedEntries[1].extractedPath).toBe('region_l');
 	});
 });

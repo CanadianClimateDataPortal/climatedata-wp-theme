@@ -47,7 +47,7 @@ export const EXAMPLE_EXTRACTED_SHAPEFILE: ExtractedShapefile = {
 		{
 			shp: new ArrayBuffer(8),
 			prj: 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
-			basename: 'test',
+			extractedPath: 'test',
 		},
 	],
 	skippedEntries: [],
@@ -132,7 +132,7 @@ export const EXAMPLE_DISPLAYABLE_SHAPE_MONTREAL: DisplayableShape = {
  *
  * Documents the shape of `ExtractedShapefile` when a ZIP contains
  * multiple shapefiles (e.g., Quebec Decoupages Administratifs).
- * Basenames use the `_s` suffix convention from the dataset — `_s` for
+ * Paths use the `_s` suffix convention from the dataset — `_s` for
  * polygon (surface) files, `_l` for polyline (line) files. The suffix
  * is just a naming convention; {@link detectShp} reads the binary header
  * to determine actual geometry type.
@@ -144,12 +144,12 @@ export const EXAMPLE_EXTRACTED_SHAPEFILE_MULTI: ExtractedShapefile = {
 		{
 			shp: new ArrayBuffer(8),
 			prj: 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
-			basename: 'region_s',
+			extractedPath: 'region_s',
 		},
 		{
 			shp: new ArrayBuffer(8),
 			prj: 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
-			basename: 'munic_s',
+			extractedPath: 'munic_s',
 		},
 	],
 	skippedEntries: [],
@@ -171,12 +171,12 @@ export const EXAMPLE_EXTRACTED_SHAPEFILE_WITH_SKIPPED: ExtractedShapefile = {
 		{
 			shp: new ArrayBuffer(8),
 			prj: 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
-			basename: 'region_s',
+			extractedPath: 'region_s',
 		},
 	],
 	skippedEntries: [
 		{
-			basename: 'region_l',
+			extractedPath: 'region_l',
 			reason: 'No matching .prj file found',
 		},
 	],

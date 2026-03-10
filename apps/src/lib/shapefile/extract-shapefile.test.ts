@@ -49,7 +49,7 @@ describe('extractShapefileFromZip', () => {
 				expect(result.value.pairs).toHaveLength(1);
 				expect(result.value.pairs[0].shp).toBeInstanceOf(ArrayBuffer);
 				expect(typeof result.value.pairs[0].prj).toBe('string');
-				expect(result.value.pairs[0].basename).toBe('test');
+				expect(result.value.pairs[0].extractedPath).toBe('test');
 				expect(result.value.skippedEntries).toHaveLength(0);
 			}
 		});
@@ -211,8 +211,8 @@ describe('extractShapefileFromZip', () => {
 			expect(result.ok).toBe(true);
 			if (result.ok) {
 				expect(result.value.pairs).toHaveLength(2);
-				expect(result.value.pairs[0].basename).toBe('region_s');
-				expect(result.value.pairs[1].basename).toBe('munic_s');
+				expect(result.value.pairs[0].extractedPath).toBe('region_s');
+				expect(result.value.pairs[1].extractedPath).toBe('munic_s');
 				expect(result.value.skippedEntries).toHaveLength(0);
 			}
 		});
@@ -231,9 +231,9 @@ describe('extractShapefileFromZip', () => {
 			expect(result.ok).toBe(true);
 			if (result.ok) {
 				expect(result.value.pairs).toHaveLength(1);
-				expect(result.value.pairs[0].basename).toBe('valid');
+				expect(result.value.pairs[0].extractedPath).toBe('valid');
 				expect(result.value.skippedEntries).toHaveLength(1);
-				expect(result.value.skippedEntries[0].basename).toBe('orphan');
+				expect(result.value.skippedEntries[0].extractedPath).toBe('orphan');
 			}
 		});
 
@@ -265,7 +265,7 @@ describe('extractShapefileFromZip', () => {
 			expect(result.ok).toBe(true);
 			if (result.ok) {
 				expect(result.value.pairs).toHaveLength(1);
-				expect(result.value.pairs[0].basename).toBe('subdir/region_s');
+				expect(result.value.pairs[0].extractedPath).toBe('subdir/region_s');
 			}
 		});
 
@@ -283,9 +283,9 @@ describe('extractShapefileFromZip', () => {
 			expect(result.ok).toBe(true);
 			if (result.ok) {
 				expect(result.value.pairs).toHaveLength(1);
-				expect(result.value.pairs[0].basename).toBe('dirA/file');
+				expect(result.value.pairs[0].extractedPath).toBe('dirA/file');
 				expect(result.value.skippedEntries).toHaveLength(1);
-				expect(result.value.skippedEntries[0].basename).toBe('dirB/file');
+				expect(result.value.skippedEntries[0].extractedPath).toBe('dirB/file');
 			}
 		});
 	});

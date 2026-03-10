@@ -1,7 +1,7 @@
 import React from 'react';
 import { MessageCircleQuestion } from 'lucide-react';
 
-import { __, _n } from '@/context/locale-provider';
+import { __ } from '@/context/locale-provider';
 import Modal from '@/components/ui/modal';
 import { ControlTitle } from '@/components/ui/control-title';
 
@@ -128,11 +128,7 @@ function ShapefileUploadComponent({
 							{__('The selected file is not a supported shapefile.')}
 						</div>
 					)}
-					<ShapefileWarningsMessage
-						warnings={warnings}
-						__={__}
-						_n={_n}
-					/>
+					<ShapefileWarningsMessage warnings={warnings} />
 
 				</div>
 				<div

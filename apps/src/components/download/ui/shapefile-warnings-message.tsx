@@ -1,19 +1,12 @@
 import { sprintf } from '@wordpress/i18n';
 
+import { _n } from '@/context/locale-provider';
 import {
 	type ShapefileWarningCode,
 	type PipelineWarning,
 } from '@/lib/shapefile';
 
-type TranslateFn = (text: string) => string;
-type PluralFn = (single: string, plural: string, count: number) => string;
-
-const identity: TranslateFn = (t) => t;
-const identityPlural: PluralFn = (s, p, n) => (n === 1 ? s : p);
-
 export interface ShapefileWarningsMessageProps {
-	__?: TranslateFn;
-	_n?: PluralFn;
 	warnings: PipelineWarning[];
 }
 
@@ -44,12 +37,9 @@ function groupByCode(warnings: PipelineWarning[]): Map<ShapefileWarningCode, str
  * Warnings are independent of errors — a successful pipeline can still
  * have warnings (e.g., non-polygon .shp files skipped, orphan .shp without .prj).
  *
- * i18n functions are optional — when omitted, English strings are used as-is.
- * Pass `__` and `_n` from `@/context/locale-provider` for translated output.
+ * Uses `__` and `_n` from `@/context/locale-provider` for translated output.
  */
 const ShapefileWarningsMessage: React.FC<ShapefileWarningsMessageProps> = ({
-	__ : translate = identity,
-	_n: plural = identityPlural,
 	warnings,
 }) => {
 	if (warnings.length === 0) {
@@ -62,9 +52,9 @@ const ShapefileWarningsMessage: React.FC<ShapefileWarningsMessageProps> = ({
 		<section className="p-4 border-2 border-amber-400 rounded bg-amber-50">
 			<h3 className="mt-0 mb-2 text-amber-700 font-semibold">
 				{sprintf(
-					plural(
-						translate('%d Warning'),
-						translate('%d Warnings'),
+					_n(
+						'%d Warning',
+						'%d Warnings',
 						warnings.length,
 					),
 					warnings.length,
@@ -74,9 +64,9 @@ const ShapefileWarningsMessage: React.FC<ShapefileWarningsMessageProps> = ({
 				const templates = WARNING_MESSAGES[code];
 				const summary = templates
 					? sprintf(
-							plural(
-								translate(templates.one),
-								translate(templates.many),
+							_n(
+								templates.one,
+								templates.many,
 								basenames.length,
 							),
 							basenames.length,

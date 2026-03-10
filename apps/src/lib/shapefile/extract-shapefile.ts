@@ -101,26 +101,16 @@ export const extractShapefileFromZip: ExtractShapefileFromZip = async (
 		};
 	}
 
-	// 4. Match each .shp with its .prj by basename (directory-agnostic)
+	// 4. Match each .shp with its .prj by replacing the extension on the full path
 	const pairs: ShapefilePair[] = [];
 	const skippedEntries: SkippedEntry[] = [];
 	const decoder = new TextDecoder();
 
 	for (const shpName of shpEntries) {
-		// Strip directory prefix and extension to get basename
-		const basename = shpName
-			.replace(/^.*[\\/]/, '')
-			.replace(/\.shp$/i, '');
-
-		const prjName = Object.keys(unzipped).find((name) => {
-			const prjBase = name
-				.replace(/^.*[\\/]/, '')
-				.replace(/\.prj$/i, '');
-			return (
-				name.toLowerCase().endsWith('.prj') &&
-				prjBase.toLowerCase() === basename.toLowerCase()
-			);
-		});
+		const basename = shpName.replace(/\.shp$/i, '');
+		const prjName = Object.keys(unzipped).find(
+			(name) => name.toLowerCase() === `${basename}.prj`.toLowerCase(),
+		);
 
 		if (!prjName) {
 			skippedEntries.push({

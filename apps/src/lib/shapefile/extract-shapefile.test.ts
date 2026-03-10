@@ -253,7 +253,7 @@ describe('extractShapefileFromZip', () => {
 			}
 		});
 
-		it('should match .shp/.prj across subdirectories by basename', async () => {
+		it('should match .shp/.prj in subdirectories by full path', async () => {
 			const zipData = zipSync({
 				'subdir/region_s.shp': new Uint8Array([0x00]),
 				'subdir/region_s.prj': strToU8('GEOGCS["WGS 84"]'),
@@ -265,7 +265,27 @@ describe('extractShapefileFromZip', () => {
 			expect(result.ok).toBe(true);
 			if (result.ok) {
 				expect(result.value.pairs).toHaveLength(1);
-				expect(result.value.pairs[0].basename).toBe('region_s');
+				expect(result.value.pairs[0].basename).toBe('subdir/region_s');
+			}
+		});
+
+		it('should not cross-match files with same name in different directories', async () => {
+			const zipData = zipSync({
+				'dirA/file.shp': new Uint8Array([0x00]),
+				'dirA/file.prj': strToU8('GEOGCS["WGS 84"]'),
+				'dirB/file.shp': new Uint8Array([0x01]),
+				// No dirB/file.prj — orphan
+			});
+			const file = createMockFile('ambiguous.zip', zipData);
+
+			const result = await extractShapefileFromZip(file);
+
+			expect(result.ok).toBe(true);
+			if (result.ok) {
+				expect(result.value.pairs).toHaveLength(1);
+				expect(result.value.pairs[0].basename).toBe('dirA/file');
+				expect(result.value.skippedEntries).toHaveLength(1);
+				expect(result.value.skippedEntries[0].basename).toBe('dirB/file');
 			}
 		});
 	});

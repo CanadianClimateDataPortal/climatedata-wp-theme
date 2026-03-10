@@ -92,7 +92,7 @@ export interface ShapefilePair {
 	shp: ArrayBuffer;
 	/** Projection definition string (e.g., WGS84 WKT) */
 	prj: string;
-	/** Original filename stem (e.g., "munic_s" from "subdir/munic_s.shp") */
+	/** Original path stem including directory prefix (e.g., "subdir/munic_s" from "subdir/munic_s.shp") */
 	basename: string;
 }
 
@@ -103,7 +103,7 @@ export interface ShapefilePair {
  * Collected as structured data so the UI can surface warnings.
  */
 export interface SkippedEntry {
-	/** Original filename stem of the orphan .shp */
+	/** Original path stem of the orphan .shp (includes directory prefix if present) */
 	basename: string;
 	/** Human-readable reason for skipping */
 	reason: string;

@@ -60,16 +60,16 @@ const ShapefileWarningsMessage: React.FC<ShapefileWarningsMessageProps> = ({
 					warnings.length,
 				)}
 			</h3>
-			{[...groups.entries()].map(([code, basenames]) => {
+			{[...groups.entries()].map(([code, extractedPaths]) => {
 				const templates = WARNING_MESSAGES[code];
 				const summary = templates
 					? sprintf(
 							_n(
 								templates.one,
 								templates.many,
-								basenames.length,
+								extractedPaths.length,
 							),
-							basenames.length,
+							extractedPaths.length,
 						)
 					: code;
 
@@ -77,7 +77,7 @@ const ShapefileWarningsMessage: React.FC<ShapefileWarningsMessageProps> = ({
 					<div key={code} className="mb-2 last:mb-0">
 						<p className="text-sm text-amber-800 mb-1">{summary}</p>
 						<ul className="list-disc list-inside text-sm text-amber-800 space-y-0.5 ml-2">
-							{basenames.map((name) => (
+							{extractedPaths.map((name) => (
 								<li key={name}>{name}.shp</li>
 							))}
 						</ul>
@@ -87,5 +87,7 @@ const ShapefileWarningsMessage: React.FC<ShapefileWarningsMessageProps> = ({
 		</section>
 	);
 };
+
+ShapefileWarningsMessage.displayName = 'ShapefileWarningsMessage';
 
 export default ShapefileWarningsMessage;

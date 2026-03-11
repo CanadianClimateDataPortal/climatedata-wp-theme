@@ -114,7 +114,7 @@ function ShapefileUploadComponent({
 			/>
 			<div className="flex flex-col gap-2 sm:flex-row sm:gap-4 sm:items-start">
 				<div className="sm:w-80">
-					<div className="relative">
+					<div className="relative mb-4">
 						<FileInput
 							file={file}
 							isInvalid={isFileInvalid}

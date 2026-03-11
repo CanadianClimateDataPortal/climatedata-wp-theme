@@ -13,6 +13,8 @@
  * @see {@link ./result.ts} — Result<T, E>
  */
 
+import type { Feature, Polygon } from 'geojson';
+
 import type {
 	ShapesConstraints,
 	ShapesValidationResult,
@@ -33,7 +35,7 @@ import { DEFAULT_SHAPES_CONSTRAINTS } from './contracts';
 // ============================================================================
 
 /**
- * Minimal extracted shapefile — .shp binary + .prj projection string.
+ * Minimal extracted shapefile — single .shp/.prj pair with empty skippedEntries.
  *
  * In production, the ArrayBuffer contains real shapefile binary data.
  * Here we use an 8-byte stub — enough to satisfy the type.
@@ -41,8 +43,143 @@ import { DEFAULT_SHAPES_CONSTRAINTS } from './contracts';
  * @see {@link ExtractedShapefile}
  */
 export const EXAMPLE_EXTRACTED_SHAPEFILE: ExtractedShapefile = {
-	'file.shp': new ArrayBuffer(8),
-	'file.prj': 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
+	pairs: [
+		{
+			shp: new ArrayBuffer(8),
+			prj: 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
+			extractedPath: 'test',
+		},
+	],
+	skippedEntries: [],
+};
+
+/**
+ * Ottawa region polygon — 5-vertex bounding box.
+ *
+ * Simple rectangular approximation of the Ottawa–Gatineau area.
+ * Coordinates form a closed ring (first === last point) as required
+ * by the GeoJSON spec. Area is ~5,000 km².
+ *
+ * Referenced by {@link EXAMPLE_SIMPLIFIED_GEOMETRY},
+ * {@link EXAMPLE_DISPLAYABLE_SHAPE}, and other downstream examples.
+ */
+export const EXAMPLE_GEOMETRY_OTTAWA: Feature<Polygon> = {
+	type: 'Feature',
+	geometry: {
+		type: 'Polygon',
+		coordinates: [
+			[
+				[-75.8, 45.2],
+				[-73.5, 45.2],
+				[-73.5, 46.1],
+				[-75.8, 46.1],
+				[-75.8, 45.2],
+			],
+		],
+	},
+	properties: {},
+};
+
+/**
+ * Simplified Montreal region polygon — 11 vertices.
+ *
+ * Derived from `regio_s.shp` in Quebec administrative boundaries
+ * (Decoupages Administratifs). Originally shape #1356 in the file.
+ * Reduced to ~10 points at 2 decimal places for readability.
+ * Used as a second polygon in multi-shp examples.
+ */
+export const EXAMPLE_GEOMETRY_MONTREAL: Feature<Polygon> = {
+	type: 'Feature',
+	geometry: {
+		type: 'Polygon',
+		coordinates: [
+			[
+				[-73.47, 45.70],
+				[-73.60, 45.65],
+				[-73.62, 45.63],
+				[-73.66, 45.58],
+				[-73.67, 45.57],
+				[-73.73, 45.53],
+				[-73.82, 45.52],
+				[-73.89, 45.52],
+				[-73.94, 45.40],
+				[-73.54, 45.43],
+				[-73.47, 45.70],
+			],
+		],
+	},
+	properties: {},
+};
+
+/**
+ * Montreal region as a displayable shape.
+ *
+ * Second shape for multi-shp pipeline examples.
+ * Area is approximate (~300 km²).
+ * ID `shape-1356` reflects original position in `regio_s.shp`.
+ *
+ * @see {@link DisplayableShape}
+ */
+export const EXAMPLE_DISPLAYABLE_SHAPE_MONTREAL: DisplayableShape = {
+	id: 'shape-1356',
+	feature: EXAMPLE_GEOMETRY_MONTREAL,
+	areaKm2: 300,
+	nbPositions: 11,
+};
+
+/**
+ * Multi-pair extraction result — two .shp/.prj pairs, no skipped entries.
+ *
+ * Documents the shape of `ExtractedShapefile` when a ZIP contains
+ * multiple shapefiles (e.g., Quebec Decoupages Administratifs).
+ * Paths use the `_s` suffix convention from the dataset — `_s` for
+ * polygon (surface) files, `_l` for polyline (line) files. The suffix
+ * is just a naming convention; {@link detectShp} reads the binary header
+ * to determine actual geometry type.
+ *
+ * @see {@link ExtractedShapefile}
+ */
+export const EXAMPLE_EXTRACTED_SHAPEFILE_MULTI: ExtractedShapefile = {
+	pairs: [
+		{
+			shp: new ArrayBuffer(8),
+			prj: 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
+			extractedPath: 'region_s',
+		},
+		{
+			shp: new ArrayBuffer(8),
+			prj: 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
+			extractedPath: 'munic_s',
+		},
+	],
+	skippedEntries: [],
+};
+
+/**
+ * Multi-pair extraction with skipped orphan — one valid pair, one orphan .shp.
+ *
+ * Documents the shape when a ZIP has a .shp without a matching .prj.
+ * The orphan is recorded in `skippedEntries`, not silently dropped.
+ * `region_l` uses the `_l` suffix convention (polyline/line), but the
+ * suffix is only a naming hint — {@link detectShp} reads the binary
+ * header to determine actual geometry type.
+ *
+ * @see {@link ExtractedShapefile}
+ */
+export const EXAMPLE_EXTRACTED_SHAPEFILE_WITH_SKIPPED: ExtractedShapefile = {
+	pairs: [
+		{
+			shp: new ArrayBuffer(8),
+			prj: 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]',
+			extractedPath: 'region_s',
+		},
+	],
+	skippedEntries: [
+		{
+			extractedPath: 'region_l',
+			reason: 'No matching .prj file found',
+		},
+	],
 };
 
 // ============================================================================
@@ -84,31 +221,13 @@ export const EXAMPLE_VALIDATED_SHAPEFILE = {
  * Simplified GeoJSON output.
  *
  * Minimal FeatureCollection with one polygon feature.
- * Production data would have real coordinates.
  *
  * @see {@link SimplifiedGeometry}
  */
 export const EXAMPLE_SIMPLIFIED_GEOMETRY: SimplifiedGeometry = {
 	featureCollection: {
 		type: 'FeatureCollection',
-		features: [
-			{
-				type: 'Feature',
-				geometry: {
-					type: 'Polygon',
-					coordinates: [
-						[
-							[-75.8, 45.2],
-							[-73.5, 45.2],
-							[-73.5, 46.1],
-							[-75.8, 46.1],
-							[-75.8, 45.2],
-						],
-					],
-				},
-				properties: {},
-			},
-		],
+		features: [EXAMPLE_GEOMETRY_OTTAWA],
 	},
 	featureCount: 1,
 };
@@ -127,22 +246,7 @@ export const EXAMPLE_SIMPLIFIED_GEOMETRY: SimplifiedGeometry = {
  */
 export const EXAMPLE_DISPLAYABLE_SHAPE: DisplayableShape = {
 	id: 'shape-1',
-	feature: {
-		type: 'Feature',
-		geometry: {
-			type: 'Polygon',
-			coordinates: [
-				[
-					[-75.8, 45.2],
-					[-73.5, 45.2],
-					[-73.5, 46.1],
-					[-75.8, 46.1],
-					[-75.8, 45.2],
-				],
-			],
-		},
-		properties: {},
-	},
+	feature: EXAMPLE_GEOMETRY_OTTAWA,
 	areaKm2: 5000,
 	nbPositions: 5,
 };
@@ -222,13 +326,14 @@ export const EXAMPLE_SHAPES_VALIDATION_VALID: ShapesValidationResult = {
  *
  * @see {@link ShapesValidationResult}
  */
-export const EXAMPLE_SHAPES_VALIDATION_AREA_TOO_SMALL: ShapesValidationResult = {
-	status: 'area-too-small',
-	areaKm2: 50,
-	nbPositions: 5,
-	constraints: DEFAULT_SHAPES_CONSTRAINTS,
-	errorMessageKey: 'area-too-small',
-};
+export const EXAMPLE_SHAPES_VALIDATION_AREA_TOO_SMALL: ShapesValidationResult =
+	{
+		status: 'area-too-small',
+		areaKm2: 50,
+		nbPositions: 5,
+		constraints: DEFAULT_SHAPES_CONSTRAINTS,
+		errorMessageKey: 'area-too-small',
+	};
 
 /**
  * Shapes validation result — area too large.
@@ -237,13 +342,14 @@ export const EXAMPLE_SHAPES_VALIDATION_AREA_TOO_SMALL: ShapesValidationResult = 
  *
  * @see {@link ShapesValidationResult}
  */
-export const EXAMPLE_SHAPES_VALIDATION_AREA_TOO_LARGE: ShapesValidationResult = {
-	status: 'area-too-large',
-	areaKm2: 600_000,
-	nbPositions: 5,
-	constraints: DEFAULT_SHAPES_CONSTRAINTS,
-	errorMessageKey: 'area-too-large',
-};
+export const EXAMPLE_SHAPES_VALIDATION_AREA_TOO_LARGE: ShapesValidationResult =
+	{
+		status: 'area-too-large',
+		areaKm2: 600_000,
+		nbPositions: 5,
+		constraints: DEFAULT_SHAPES_CONSTRAINTS,
+		errorMessageKey: 'area-too-large',
+	};
 
 /**
  * Shapes validation result — too many positions.
@@ -252,13 +358,14 @@ export const EXAMPLE_SHAPES_VALIDATION_AREA_TOO_LARGE: ShapesValidationResult = 
  *
  * @see {@link ShapesValidationResult}
  */
-export const EXAMPLE_SHAPES_VALIDATION_TOO_MANY_POSITIONS: ShapesValidationResult = {
-	status: 'too-many-positions',
-	areaKm2: 600_000,
-	nbPositions: DEFAULT_SHAPES_CONSTRAINTS.maxPositions + 1,
-	constraints: DEFAULT_SHAPES_CONSTRAINTS,
-	errorMessageKey: 'too-many-positions',
-};
+export const EXAMPLE_SHAPES_VALIDATION_TOO_MANY_POSITIONS: ShapesValidationResult =
+	{
+		status: 'too-many-positions',
+		areaKm2: 600_000,
+		nbPositions: DEFAULT_SHAPES_CONSTRAINTS.maxPositions + 1,
+		constraints: DEFAULT_SHAPES_CONSTRAINTS,
+		errorMessageKey: 'too-many-positions',
+	};
 
 /**
  * Branded validated shapes — proves shapes validation passed.

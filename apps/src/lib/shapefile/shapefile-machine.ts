@@ -43,6 +43,7 @@ import {
 	type ProcessingError,
 	type ProjectionError,
 	type InvalidGeometryTypeError,
+	type ShapefileWarningCode,
 } from './errors';
 
 // ============================================================================
@@ -63,6 +64,18 @@ export type PipelineServices = {
 // CONTEXT
 // ============================================================================
 
+/**
+ * Structured warning from pipeline processing.
+ *
+ * Produced during extraction when orphan .shp files are skipped.
+ * Future pipeline stages may add warnings using the same shape.
+ */
+export type PipelineWarning = {
+	extractedPath: string;
+	code: ShapefileWarningCode;
+	message: string;
+};
+
 export type MachineContext = {
 	file: File | null;
 	extractedShapefile: ExtractedShapefile | null;
@@ -75,6 +88,7 @@ export type MachineContext = {
 	shapesValidationResult: ShapesValidationResult | null;
 	error: Error | null;
 	shapesConstraints: ShapesConstraints;
+	warnings: PipelineWarning[];
 	/**
 	 * Injected pipeline functions — async actors and sync actions.
 	 *
@@ -99,6 +113,7 @@ const initialContext = (
 	shapesValidationResult: null,
 	error: null,
 	shapesConstraints: DEFAULT_SHAPES_CONSTRAINTS,
+	warnings: [],
 	services,
 });
 
@@ -113,6 +128,7 @@ const downstreamReset = (): Partial<MachineContext> => ({
 	finchPayload: null,
 	shapesValidationResult: null,
 	error: null,
+	warnings: [],
 });
 
 // ============================================================================
@@ -169,7 +185,9 @@ export const shapefileMachine = setup({
 	actions: {
 		resetContext: assign(({ context }) => initialContext(context.services)),
 		assignFile: assign(({ event }) => {
-			if (event.type !== 'FILE_SELECTED') return {};
+			if (event.type !== 'FILE_SELECTED') {
+				return {};
+			}
 			return {
 				...downstreamReset(),
 				file: event.file,
@@ -199,13 +217,17 @@ export const shapefileMachine = setup({
 			};
 		}),
 		runSelectionValidation: assign(({ context, event }) => {
-			if (event.type !== 'SHAPE_CLICKED') return {};
+			if (event.type !== 'SHAPE_CLICKED') {
+				return {};
+			}
 
 			const shapeId = event.shapeId;
 			const shape = context.displayableShapes?.shapes.find(
 				(s) => s.id === shapeId,
 			);
-			if (!shape) return {};
+			if (!shape) {
+				return {};
+			}
 
 			const selectedShapes: Pick<DisplayableShape, 'id' | 'areaKm2'>[] = [
 				{ id: shape.id, areaKm2: shape.areaKm2 },
@@ -292,9 +314,17 @@ export const shapefileMachine = setup({
 						target: 'validating',
 						actions: assign(({ event }) => {
 							const output = event.output;
-							return output.ok
-								? { extractedShapefile: output.value }
-								: {};
+							if (!output.ok) {
+								return {};
+							}
+							return {
+								extractedShapefile: output.value,
+								warnings: output.value.skippedEntries.map((e): PipelineWarning => ({
+									extractedPath: e.extractedPath,
+									code: 'extraction/orphan-shp-skipped',
+									message: `${e.extractedPath}.shp skipped — ${e.reason}`,
+								})),
+							};
 						}),
 					},
 					{
@@ -323,11 +353,27 @@ export const shapefileMachine = setup({
 							params: ({ event }) => ({ result: event.output }),
 						},
 						target: 'transforming',
-						actions: assign(({ event }) => {
+						actions: assign(({ context, event }) => {
 							const output = event.output;
-							return output.ok
-								? { validatedShapefile: output.value }
-								: {};
+							if (!output.ok) {
+								return {};
+							}
+							const validationWarnings = output.value.skippedEntries
+								.filter((e) => !context.extractedShapefile?.skippedEntries.some(
+									(existing) => existing.extractedPath === e.extractedPath,
+								))
+								.map((e): PipelineWarning => ({
+									extractedPath: e.extractedPath,
+									code: 'validation/non-polygon-skipped',
+									message: `${e.extractedPath}.shp skipped — ${e.reason}`,
+								}));
+							return {
+								validatedShapefile: output.value,
+								warnings: [
+									...context.warnings,
+									...validationWarnings,
+								],
+							};
 						}),
 					},
 					{

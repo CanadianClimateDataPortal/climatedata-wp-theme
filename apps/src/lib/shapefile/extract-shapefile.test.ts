@@ -46,10 +46,11 @@ describe('extractShapefileFromZip', () => {
 
 			expect(result.ok).toBe(true);
 			if (result.ok) {
-				expect(result.value).toHaveProperty('file.shp');
-				expect(result.value).toHaveProperty('file.prj');
-				expect(result.value['file.shp']).toBeInstanceOf(ArrayBuffer);
-				expect(typeof result.value['file.prj']).toBe('string');
+				expect(result.value.pairs).toHaveLength(1);
+				expect(result.value.pairs[0].shp).toBeInstanceOf(ArrayBuffer);
+				expect(typeof result.value.pairs[0].prj).toBe('string');
+				expect(result.value.pairs[0].extractedPath).toBe('test');
+				expect(result.value.skippedEntries).toHaveLength(0);
 			}
 		});
 
@@ -67,9 +68,8 @@ describe('extractShapefileFromZip', () => {
 
 			expect(result.ok).toBe(true);
 			if (result.ok) {
-				expect(Object.keys(result.value)).toHaveLength(2);
-				expect(result.value).toHaveProperty('file.shp');
-				expect(result.value).toHaveProperty('file.prj');
+				expect(result.value.pairs).toHaveLength(1);
+				expect(result.value.skippedEntries).toHaveLength(0);
 			}
 		});
 
@@ -192,6 +192,100 @@ describe('extractShapefileFromZip', () => {
 			if (!result.ok) {
 				// Message should include the first bytes for debugging
 				expect(result.error.message).toMatch(/first bytes.*[0-9a-f]/i);
+			}
+		});
+	});
+
+	describe('multi-pair extraction', () => {
+		it('should extract multiple .shp/.prj pairs from ZIP', async () => {
+			const zipData = zipSync({
+				'region_s.shp': new Uint8Array([0x00]),
+				'region_s.prj': strToU8('GEOGCS["WGS 84"]'),
+				'munic_s.shp': new Uint8Array([0x01]),
+				'munic_s.prj': strToU8('GEOGCS["WGS 84"]'),
+			});
+			const file = createMockFile('multi.zip', zipData);
+
+			const result = await extractShapefileFromZip(file);
+
+			expect(result.ok).toBe(true);
+			if (result.ok) {
+				expect(result.value.pairs).toHaveLength(2);
+				expect(result.value.pairs[0].extractedPath).toBe('region_s');
+				expect(result.value.pairs[1].extractedPath).toBe('munic_s');
+				expect(result.value.skippedEntries).toHaveLength(0);
+			}
+		});
+
+		it('should skip orphan .shp without .prj and produce warning', async () => {
+			const zipData = zipSync({
+				'valid.shp': new Uint8Array([0x00]),
+				'valid.prj': strToU8('GEOGCS["WGS 84"]'),
+				'orphan.shp': new Uint8Array([0x01]),
+				// No orphan.prj
+			});
+			const file = createMockFile('partial.zip', zipData);
+
+			const result = await extractShapefileFromZip(file);
+
+			expect(result.ok).toBe(true);
+			if (result.ok) {
+				expect(result.value.pairs).toHaveLength(1);
+				expect(result.value.pairs[0].extractedPath).toBe('valid');
+				expect(result.value.skippedEntries).toHaveLength(1);
+				expect(result.value.skippedEntries[0].extractedPath).toBe('orphan');
+			}
+		});
+
+		it('should error when all .shp files are orphans', async () => {
+			const zipData = zipSync({
+				'orphan1.shp': new Uint8Array([0x00]),
+				'orphan2.shp': new Uint8Array([0x01]),
+				'unrelated.prj': strToU8('GEOGCS["WGS 84"]'),
+			});
+			const file = createMockFile('all-orphans.zip', zipData);
+
+			const result = await extractShapefileFromZip(file);
+
+			expect(result.ok).toBe(false);
+			if (!result.ok) {
+				expect(result.error.code).toBe('extraction/missing-prj');
+			}
+		});
+
+		it('should match .shp/.prj in subdirectories by full path', async () => {
+			const zipData = zipSync({
+				'subdir/region_s.shp': new Uint8Array([0x00]),
+				'subdir/region_s.prj': strToU8('GEOGCS["WGS 84"]'),
+			});
+			const file = createMockFile('nested.zip', zipData);
+
+			const result = await extractShapefileFromZip(file);
+
+			expect(result.ok).toBe(true);
+			if (result.ok) {
+				expect(result.value.pairs).toHaveLength(1);
+				expect(result.value.pairs[0].extractedPath).toBe('subdir/region_s');
+			}
+		});
+
+		it('should not cross-match files with same name in different directories', async () => {
+			const zipData = zipSync({
+				'dirA/file.shp': new Uint8Array([0x00]),
+				'dirA/file.prj': strToU8('GEOGCS["WGS 84"]'),
+				'dirB/file.shp': new Uint8Array([0x01]),
+				// No dirB/file.prj — orphan
+			});
+			const file = createMockFile('ambiguous.zip', zipData);
+
+			const result = await extractShapefileFromZip(file);
+
+			expect(result.ok).toBe(true);
+			if (result.ok) {
+				expect(result.value.pairs).toHaveLength(1);
+				expect(result.value.pairs[0].extractedPath).toBe('dirA/file');
+				expect(result.value.skippedEntries).toHaveLength(1);
+				expect(result.value.skippedEntries[0].extractedPath).toBe('dirB/file');
 			}
 		});
 	});

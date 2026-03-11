@@ -22,12 +22,13 @@ export const VALUES_SHAPEFILE_ERROR_CODES = [
 	'extraction/missing-shp',
 	'extraction/missing-prj',
 	'extraction/zip-parse-failed',
-	// Validation phase
-	'validation/invalid-geometry-type',
 	// Selected shapes validation phase
 	'selection/area-too-large',
 	'selection/area-too-small',
 	'selection/too-many-positions',
+	// Validation phase
+	'validation/invalid-geometry-type',
+	'validation/mixed-geometry-types',
 	// Processing phase
 	'processing/failed',
 	'processing/projection-unsupported',
@@ -37,6 +38,26 @@ export const VALUES_SHAPEFILE_ERROR_CODES = [
  * Discriminated union of all shapefile error codes.
  */
 export type ShapefileErrorCode = (typeof VALUES_SHAPEFILE_ERROR_CODES)[number];
+
+// ============================================================================
+// WARNING CODES
+// ============================================================================
+
+/**
+ * All possible warning codes for shapefile processing.
+ *
+ * Same naming convention as error codes: `phase/warning-type`.
+ * Warnings are non-fatal — the pipeline continues after producing them.
+ */
+export const VALUES_SHAPEFILE_WARNING_CODES = [
+	'extraction/orphan-shp-skipped',
+	'validation/non-polygon-skipped',
+] as const;
+
+/**
+ * Discriminated union of all shapefile warning codes.
+ */
+export type ShapefileWarningCode = (typeof VALUES_SHAPEFILE_WARNING_CODES)[number];
 
 /**
  * Generic shapefile error with typed error code.

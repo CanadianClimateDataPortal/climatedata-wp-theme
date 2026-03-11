@@ -31,8 +31,14 @@ import {
  * Just enough shape to satisfy the types — no real geometry.
  */
 const STUB_EXTRACTED: ExtractedShapefile = {
-	'file.shp': new ArrayBuffer(8),
-	'file.prj': 'GEOGCS["GCS_WGS_1984"]',
+	pairs: [
+		{
+			shp: new ArrayBuffer(8),
+			prj: 'GEOGCS["GCS_WGS_1984"]',
+			extractedPath: 'test',
+		},
+	],
+	skippedEntries: [],
 };
 
 const STUB_VALIDATED = {
@@ -215,6 +221,36 @@ describe('shapefile machine — happy path', () => {
 		expect(snapshot.context.finchPayload).toBe(STUB_FINCH_PAYLOAD);
 		expect(snapshot.context.validatedShapes).toBe(STUB_VALIDATED_SHAPES);
 		expect(snapshot.context.shapesValidationResult?.status).toBe('valid');
+
+		actor.stop();
+	});
+	it('warnings from extraction flow to machine context', async () => {
+		const services = createHappyServices();
+		// Override extraction to return skipped entries
+		services.extractShapefileFromZip = vi.fn().mockResolvedValue({
+			ok: true,
+			value: {
+				...STUB_EXTRACTED,
+				skippedEntries: [
+					{ extractedPath: 'orphan', reason: 'No matching .prj file found' },
+				],
+			},
+		});
+
+		const actor = createActor(shapefileMachine, { input: services });
+		actor.start();
+
+		actor.send({
+			type: 'FILE_SELECTED',
+			file: new File([], 'test.zip'),
+		});
+
+		const snapshot = await waitFor(
+			actor,
+			(state) => state.matches('displaying'),
+		);
+
+		expect(snapshot.context.warnings).toHaveLength(1);
 
 		actor.stop();
 	});

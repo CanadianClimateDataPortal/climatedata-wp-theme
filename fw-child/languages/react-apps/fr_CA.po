@@ -1474,3 +1474,18 @@ msgid  "The selected region has too many coordinates (its polygon has too many e
        "simpler polygon."
 msgstr "La région sélectionnée comporte trop de coordonnées (son polygone contient trop de segments). Veuillez "
        "sélectionner une région avec un polygone plus simple."
+
+msgid "%d Warning"
+msgid_plural "%d Warnings"
+msgstr[0] "%d avertissement"
+msgstr[1] "%d avertissements"
+
+msgid "%d file was skipped because it has no matching .prj file:"
+msgid_plural "%d files were skipped because they have no matching .prj file:"
+msgstr[0] "%d fichier ignoré — aucun fichier .prj correspondant :"
+msgstr[1] "%d fichiers ignorés — aucun fichier .prj correspondant :"
+
+msgid "Only Polygon geometry is supported. %d file was skipped:"
+msgid_plural "Only Polygon geometry is supported. %d files were skipped:"
+msgstr[0] "Seuls les polygones sont pris en charge. %d fichier ignoré :"
+msgstr[1] "Seuls les polygones sont pris en charge. %d fichiers ignorés :"

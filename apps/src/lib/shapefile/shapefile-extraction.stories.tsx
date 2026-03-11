@@ -465,7 +465,6 @@ const PipelineUpload = () => {
 		isDisplaying,
 		setFile,
 		reset,
-		warnings,
 	} = useShapefile();
 
 	const isFileInvalid = file !==null && !isFileValid;
@@ -501,8 +500,8 @@ const PipelineUpload = () => {
 					Reset
 				</button>
 			</div>
-			<ShapefileErrorMessage />
-			<ShapefileWarningsMessage warnings={warnings} />
+			<ShapefileErrorBlock />
+			<ShapefileWarningsBlock />
 
 			{/* Machine state */}
 			<section className="p-4 border border-gray-300 rounded">
@@ -630,7 +629,7 @@ const PipelineUpload = () => {
 };
 
 // ============================================================================
-// Shared — ShapefileErrorMessage (precise error from machine context)
+// Shared — ShapefileErrorBlock (precise error from machine context)
 //
 // Future work: move to apps/src/components/download/ and replace the
 // generic "The selected file is not a supported shapefile" in
@@ -671,7 +670,7 @@ const getShapefileErrorMessage = (error: Error): string => {
  *
  * Must be rendered inside a ShapefileProvider.
  */
-const ShapefileErrorMessage = () => {
+const ShapefileErrorBlock = () => {
 	const {
 		file,
 		isFileValid,
@@ -691,6 +690,29 @@ const ShapefileErrorMessage = () => {
 		</div>
 	);
 };
+
+/**
+ * Displays all warnings from the shapefile state machine.
+ *
+ * Reads warnings state via ShapefileContext. Renders nothing when no warning.
+ *
+ * Must be rendered inside a ShapefileProvider.
+ */
+const ShapefileWarningsBlock = () => {
+	const {
+		warnings,
+	} = useShapefile();
+
+	if (!warnings || warnings.length === 0) {
+		return null;
+	}
+
+	return (
+		<div className="p-4 border-2 border-amber-400 rounded bg-amber-50">
+			<ShapefileWarningsMessage warnings={warnings} />
+		</div>
+	);
+}
 
 
 // ============================================================================

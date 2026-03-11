@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageCircleQuestion } from 'lucide-react';
+import { MessageCircleQuestion, TriangleAlert } from 'lucide-react';
 
 import { __ } from '@/context/locale-provider';
 import Modal from '@/components/ui/modal';
@@ -9,6 +9,11 @@ import ShapefileWarningsMessage from '@/components/download/ui/shapefile-warning
 import { useShapefile } from '@/hooks/use-shapefile';
 import FileInput from '@/components/ui/file-input';
 import type { PipelineWarning } from '@/lib/shapefile';
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface ShapefileUploadComponentProps {
 	warnings: PipelineWarning[];
@@ -20,6 +25,11 @@ interface ShapefileUploadComponentProps {
 	onSupportedFilesClick: () => void;
 	onChangeFile: (file: File | null) => void;
 	onRemoveFile: () => void;
+}
+
+interface WarningsPopoverProps {
+	warnings: PipelineWarning[];
+	className?: string;
 }
 
 /**
@@ -62,6 +72,32 @@ export default function ShapefileUpload(): React.ReactElement {
 			warnings={warnings}
 		/>
 	);
+}
+
+/**
+ * If there are warnings, display a warning icon with a popover listing the
+ * warnings.
+ */
+function WarningsPopover({
+	warnings,
+	className,
+}: WarningsPopoverProps): React.ReactNode {
+	if (warnings.length === 0) {
+		return null;
+	}
+
+	return (
+		<div className={className}>
+			<Popover>
+				<PopoverTrigger>
+					<TriangleAlert className="text-amber-700" size={16} />
+				</PopoverTrigger>
+				<PopoverContent>
+					<ShapefileWarningsMessage warnings={warnings} />
+				</PopoverContent>
+			</Popover>
+		</div>
+	)
 }
 
 /**
@@ -113,8 +149,8 @@ function ShapefileUploadComponent({
 				tooltip={tooltip}
 			/>
 			<div className="flex flex-col gap-2 sm:flex-row sm:gap-4 sm:items-start">
-				<div className="sm:w-80">
-					<div className="relative mb-4">
+				<div>
+					<div className="relative flex gap-1 items-center">
 						<FileInput
 							file={file}
 							isInvalid={isFileInvalid}
@@ -122,15 +158,15 @@ function ShapefileUploadComponent({
 							isProcessing={isProcessingFile}
 							onChange={onChangeFile}
 							onClear={onRemoveFile}
+							className="sm:w-80"
 						/>
+						<WarningsPopover className="mt-1" warnings={warnings} />
 					</div>
 					{isFileInvalid && (
-						<div className="text-xs text-red-600 mt-1">
+						<div className="text-xs text-red-600 mt-1 sm:w-80">
 							{__('The selected file is not a supported shapefile.')}
 						</div>
 					)}
-					<ShapefileWarningsMessage warnings={warnings} />
-
 				</div>
 				<div
 					className="text-sm flex flex-row items-center gap-1 text-neutral-grey-medium sm:mt-2 hover:text-dark-purple cursor-pointer"

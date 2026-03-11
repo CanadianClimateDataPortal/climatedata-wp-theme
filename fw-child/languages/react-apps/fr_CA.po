@@ -1475,10 +1475,13 @@ msgid  "The selected region has too many coordinates (its polygon has too many e
 msgstr "La région sélectionnée comporte trop de coordonnées (son polygone contient trop de segments). Veuillez "
        "sélectionner une région avec un polygone plus simple."
 
-msgid "%d Warning"
-msgid_plural "%d Warnings"
-msgstr[0] "%d avertissement"
-msgstr[1] "%d avertissements"
+msgid "%d warning was found while processing your shapefile"
+msgid_plural "%d warnings were found while processing your shapefile"
+msgstr[0] "%d avertissement durant le traitement de votre shapefile"
+msgstr[1] "%d avertissements durant le traitement de votre shapefile"
+
+msgid  "Your file is supported and it was correctly processed, but some of its content has not been used:"
+msgstr "Votre fichier est valide et il a correctement été traité, mais une partie de son contenu n'a pas été utilisé :"
 
 msgid "%d file was skipped because it has no matching .prj file:"
 msgid_plural "%d files were skipped because they have no matching .prj file:"

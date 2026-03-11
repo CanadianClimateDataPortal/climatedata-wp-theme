@@ -1,6 +1,6 @@
 import { sprintf } from '@wordpress/i18n';
 
-import { _n } from '@/context/locale-provider';
+import { _n, __ } from '@/context/locale-provider';
 import {
 	type ShapefileWarningCode,
 	type PipelineWarning,
@@ -8,6 +8,7 @@ import {
 
 export interface ShapefileWarningsMessageProps {
 	warnings: PipelineWarning[];
+	className?: string;
 }
 
 const WARNING_MESSAGES: Record<ShapefileWarningCode, { one: string; many: string }> = {
@@ -41,6 +42,7 @@ function groupByCode(warnings: PipelineWarning[]): Map<ShapefileWarningCode, str
  */
 const ShapefileWarningsMessage: React.FC<ShapefileWarningsMessageProps> = ({
 	warnings,
+	className,
 }) => {
 	if (warnings.length === 0) {
 		return null;
@@ -49,42 +51,47 @@ const ShapefileWarningsMessage: React.FC<ShapefileWarningsMessageProps> = ({
 	const groups = groupByCode(warnings);
 
 	return (
-		<section className="p-4 border-2 border-amber-400 rounded bg-amber-50">
+		<div className={className}>
 			<h3 className="mt-0 mb-2 text-amber-700 font-semibold">
 				{sprintf(
 					_n(
-						'%d Warning',
-						'%d Warnings',
+						'%d warning was found while processing your shapefile',
+						'%d warnings were found while processing your shapefile',
 						warnings.length,
 					),
 					warnings.length,
 				)}
 			</h3>
-			{[...groups.entries()].map(([code, extractedPaths]) => {
-				const templates = WARNING_MESSAGES[code];
-				const summary = templates
-					? sprintf(
-							_n(
-								templates.one,
-								templates.many,
+			<p className="mb-2">
+				{__('Your file is supported and it was correctly processed, but some of its content has not been used:')}
+			</p>
+			<ul className="list-disc ml-4">
+				{[...groups.entries()].map(([code, extractedPaths]) => {
+					const templates = WARNING_MESSAGES[code];
+					const summary = templates
+						? sprintf(
+								_n(
+									templates.one,
+									templates.many,
+									extractedPaths.length,
+								),
 								extractedPaths.length,
-							),
-							extractedPaths.length,
-						)
-					: code;
+							)
+						: code;
 
-				return (
-					<div key={code} className="mb-2 last:mb-0">
-						<p className="text-sm text-amber-800 mb-1">{summary}</p>
-						<ul className="list-disc list-inside text-sm text-amber-800 space-y-0.5 ml-2">
-							{extractedPaths.map((name) => (
-								<li key={name}>{name}.shp</li>
-							))}
-						</ul>
-					</div>
-				);
-			})}
-		</section>
+					return (
+						<li key={code} className="mb-2 last:mb-0">
+							<p className="text-sm mb-1">{summary}</p>
+							<ul className="list-disc list-inside text-sm space-y-0.5 ml-2">
+								{extractedPaths.map((name) => (
+									<li key={name}>{name}.shp</li>
+								))}
+							</ul>
+						</li>
+					);
+				})}
+			</ul>
+		</div>
 	);
 };
 

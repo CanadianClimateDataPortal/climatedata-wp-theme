@@ -708,7 +708,7 @@ const ShapefileWarningsBlock = () => {
 	}
 
 	return (
-		<div className="p-4 border-2 border-amber-400 rounded bg-amber-50">
+		<div className="p-4 border-2 border-amber-400 rounded bg-amber-50 text-sm">
 			<ShapefileWarningsMessage warnings={warnings} />
 		</div>
 	);

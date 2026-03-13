@@ -81,8 +81,8 @@ const ShapefileWarningsMessage: React.FC<ShapefileWarningsMessageProps> = ({
 
 					return (
 						<li key={code} className="mb-2 last:mb-0">
-							<p className="text-sm mb-1">{summary}</p>
-							<ul className="list-disc list-inside text-sm space-y-0.5 ml-2">
+							<p className="mb-1">{summary}</p>
+							<ul className="list-disc list-inside space-y-0.5 ml-2">
 								{extractedPaths.map((name) => (
 									<li key={name}>{name}.shp</li>
 								))}

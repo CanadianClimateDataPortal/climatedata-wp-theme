@@ -14,6 +14,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover';
+import { sprintf } from '@wordpress/i18n';
 
 interface ShapefileUploadComponentProps {
 	warnings: PipelineWarning[];
@@ -115,17 +116,22 @@ function ShapefileUploadComponent({
 	warnings,
 }: ShapefileUploadComponentProps): React.ReactElement {
 	const tooltip = __(
-		'This feature allows you to upload a shapefile of your custom ' +
-		'region. Once your shapefile is uploaded, the shapes will appear on ' +
-		'the map. Click the shape of interest to continue.'
+		'This feature allows you to upload a shapefile of your custom region ' +
+		'which must be at least partially within Canada. Once your shapefile ' +
+		'is uploaded, the shapes will appear on the map. Click the shape of ' +
+		'interest to continue. Lower (100 km² – one grid cell) and upper ' +
+		'limits (500,000 km² - approx., the size of the Yukon) exist to ' +
+		'prevent unintended precision and server overload.'
 	);
 
 	const modalContent = __(
-		'All uploads must be a ZIP file containing at least the .shp and ' +
-		'.prj files. The file’s shapes must be closed polygons and be, at ' +
-		'least partially, within Canada (data is available only for land ' +
-		'areas of Canada). Files must use the WGS84 coordinate system, this ' +
-		'is the most common system and the default for most files.'
+		'All uploads must be a ZIP file containing at least .shp and .prj ' +
+		'files. The file’s shapes must be closed polygons and be, at least ' +
+		'partially, within Canada (data is available only for land areas of ' +
+		'Canada; if the shape file contains areas outside of Canada the ' +
+		'returned value is an average of the Canadian area only). Files must ' +
+		'use the WGS84 coordinate system, this is the most common system and ' +
+		'the default for most files.'
 	);
 
 	const hasFile = file != null;
@@ -163,9 +169,16 @@ function ShapefileUploadComponent({
 						<WarningsPopover className="mt-1" warnings={warnings} />
 					</div>
 					{isFileInvalid && (
-						<div className="text-xs text-red-600 mt-1 sm:w-80">
-							{__('The selected file is not a supported shapefile.')}
-						</div>
+						<div
+							className="text-xs text-red-600 mt-1 sm:w-80"
+							dangerouslySetInnerHTML={{ __html: sprintf(
+								__(
+									'The selected file is not a supported shapefile. For tools ' +
+									'to convert a .geojson file to .shp, please consult ' +
+									'<a href="https://mapshaper.org" %s>mapshaper.org</a>.'
+								),
+								'target="_blank" rel="noopener noreferrer" class="underline"',
+							)}} />
 					)}
 				</div>
 				<div

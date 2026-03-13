@@ -46,7 +46,9 @@ function getShapefileErrorMessage(
 				return new StepErrorMessage(
 					__(
 						'The selected region is too large. Try selecting a ' +
-						'smaller region.'
+						'smaller region. A size limit of 500,000 km² ' +
+						'(approx., the size of the Yukon) exists to prevent ' +
+						'server overload.'
 					),
 				);
 			case 'selection/area-too-small':

@@ -925,9 +925,11 @@ const PopupContent = ({
 				/>
 			)}
 
-			<section className="mt-9">
-				<S2DReleaseDate />
-			</section>
+			{isForecast && (
+				<section className="mt-9">
+					<S2DReleaseDate />
+				</section>
+			)}
 		</div>
 	);
 };

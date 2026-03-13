@@ -465,6 +465,18 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			HXmax35: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
 			HXmax40: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
 		},
+		// Until we have a fix for HXMax failing with custom shapefiles (see
+		// CLIM-1350), we disable the "USER" interactive region.
+		// Once fixed, we can remove this whole `interactiveRegionConfig` so
+		// that the default value (which allows shapefile) can be used.
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: InteractiveRegionDisplay.ALWAYS,
+			[InteractiveRegionOption.CENSUS]: InteractiveRegionDisplay.ALWAYS,
+			[InteractiveRegionOption.HEALTH]: InteractiveRegionDisplay.ALWAYS,
+			[InteractiveRegionOption.WATERSHED]: InteractiveRegionDisplay.ALWAYS,
+			// Shapefile disabled:
+			[InteractiveRegionOption.USER]: InteractiveRegionDisplay.NONE,
+		},
 	},
 	/** All CanDCS variables */
 	{

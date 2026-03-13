@@ -86,13 +86,13 @@ export default function FileInput({
 			isInvalid && 'border-red-600',
 			'p-1',
 			hasIcon && 'pr-9',
+			className,
 		)}>
 			<label className={cn(
 				'flex flex-row gap-3 items-center',
 				'w-full h-full',
 				'text-sm',
 				effectiveIsDisabled ? 'cursor-not-allowed' : 'cursor-pointer',
-				className,
 			)}>
 				<div className={cn(
 					'flex flex-col items-center justify-center self-stretch',

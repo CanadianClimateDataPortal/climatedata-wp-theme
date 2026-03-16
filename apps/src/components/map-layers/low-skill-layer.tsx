@@ -21,8 +21,7 @@ const LowSkillLayer = ({
 }: LowSkillLayerProps): React.ReactElement | null => {
 	const { climateVariable } = useClimateVariable();
 	const forecastDisplay = climateVariable?.getForecastDisplay();
-	const isForecast = forecastDisplay === ForecastDisplays.FORECAST
-		|| forecastDisplay === undefined;
+	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 	const { releaseDate } = useS2D();
 	const isLowSkillMasked = !useAppSelector(selectLowSkillVisibility());
 	const {

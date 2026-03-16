@@ -23,8 +23,7 @@ export const MaskLowSkillField = (
 	const forecastDisplay = useAppSelector(
 		(state) => state.climateVariable.data?.forecastDisplay,
 	);
-	const isForecast = forecastDisplay === ForecastDisplays.FORECAST
-		|| forecastDisplay === undefined;
+	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 
 	const onCheckedChange = (checked: boolean) => {
 		dispatch(setLowSkillVisibility({visible: checked}));

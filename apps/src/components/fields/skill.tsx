@@ -44,7 +44,7 @@ export const MaskLowSkillField = (
 		<div className="flex items-center space-x-2">
 			<Checkbox
 				id='mask-low-skill-checkbox'
-				className="text-brand-red"
+				className="text-brand-red disabled:data-[state=checked]:bg-neutral-grey-medium disabled:data-[state=checked]:border-neutral-grey-medium"
 				{...fieldProps}
 			/>
 			<label

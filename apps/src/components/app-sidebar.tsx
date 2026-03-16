@@ -26,6 +26,7 @@ import LinkWithIcon from '@/components/sidebar-footer-links/link-with-icon';
 import LayerOpacities from '@/components/ui/layer-opacities';
 
 import { PostData } from '@/types/types';
+import { ForecastDisplays } from '@/types/climate-variable-interface';
 import { INTERNAL_URLS } from '@/lib/constants';
 import { setDataset } from '@/features/map/map-slice';
 import { useS2D } from '@/hooks/use-s2d';
@@ -40,6 +41,9 @@ export function AppSidebar() {
 		dataset,
 	} = useAppSelector((state) => state.map);
 	const { isS2DVariable } = useS2D();
+	const forecastDisplay =
+		climateVariable?.getForecastDisplay() ?? ForecastDisplays.FORECAST;
+	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 	const [selectedVariable, setSelectedVariable] = useState<PostData | null>(
 		null
 	);
@@ -130,7 +134,7 @@ export function AppSidebar() {
 				</SidebarGroup>
 
 				<SidebarGroup className="gap-0 mt-auto">
-					{isS2DVariable ? (
+					{isS2DVariable && isForecast ? (
 						<S2DReleaseDate />
 					) : null}
 					<RecentLocationsLink />

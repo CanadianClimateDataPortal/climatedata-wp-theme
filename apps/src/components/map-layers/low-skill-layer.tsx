@@ -6,6 +6,7 @@ import { useS2D } from '@/hooks/use-s2d';
 import { useAppSelector } from '@/app/hooks';
 import { selectLowSkillVisibility } from '@/features/map/map-slice';
 import { buildSkillLayerName, buildSkillLayerTime } from '@/lib/s2d';
+import { ForecastDisplays } from '@/types/climate-variable-interface';
 import L from 'leaflet';
 
 interface LowSkillLayerProps {
@@ -19,6 +20,9 @@ const LowSkillLayer = ({
 	pane,
 }: LowSkillLayerProps): React.ReactElement | null => {
 	const { climateVariable } = useClimateVariable();
+	const forecastDisplay = climateVariable?.getForecastDisplay();
+	const isForecast = forecastDisplay === ForecastDisplays.FORECAST
+		|| forecastDisplay === undefined;
 	const { releaseDate } = useS2D();
 	const isLowSkillMasked = !useAppSelector(selectLowSkillVisibility());
 	const {
@@ -49,7 +53,7 @@ const LowSkillLayer = ({
 	// attributes change.
 	return useMemo(
 		() => {
-			if (isLowSkillMasked || !layerName || !timeValue) {
+			if (!isForecast || isLowSkillMasked || !layerName || !timeValue) {
 				return null;
 			}
 
@@ -78,7 +82,7 @@ const LowSkillLayer = ({
 		// above takes care of that). But we still use it as an initial value.
 		//
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[pane, isLowSkillMasked, layerName, timeValue]
+		[pane, isForecast, isLowSkillMasked, layerName, timeValue]
 	);
 };
 

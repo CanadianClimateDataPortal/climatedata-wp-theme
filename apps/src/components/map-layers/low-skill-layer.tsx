@@ -87,10 +87,10 @@ const LowSkillLayer = ({
 		//
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
-			pane,
 			isForecast,
 			isLowSkillMasked,
 			layerName,
+			pane,
 			timeValue,
 		]
 	);

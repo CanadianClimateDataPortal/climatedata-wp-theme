@@ -52,7 +52,12 @@ const LowSkillLayer = ({
 	// attributes change.
 	return useMemo(
 		() => {
-			if (!isForecast || isLowSkillMasked || !layerName || !timeValue) {
+			if (
+			!isForecast
+			|| isLowSkillMasked
+			|| !layerName
+			|| !timeValue
+		) {
 				return null;
 			}
 
@@ -81,7 +86,13 @@ const LowSkillLayer = ({
 		// above takes care of that). But we still use it as an initial value.
 		//
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[pane, isForecast, isLowSkillMasked, layerName, timeValue]
+		[
+			pane,
+			isForecast,
+			isLowSkillMasked,
+			layerName,
+			timeValue,
+		]
 	);
 };
 

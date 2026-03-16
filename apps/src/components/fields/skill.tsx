@@ -8,6 +8,8 @@ import { __ } from '@/context/locale-provider';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import React from 'react';
 
+import { ForecastDisplays } from '@/types/climate-variable-interface';
+
 export interface S2DForecastDisplaySkillFieldCheckboxProps {
 	tooltip?: React.ReactNode;
 }
@@ -18,6 +20,12 @@ export const MaskLowSkillField = (
 	const dispatch = useAppDispatch();
 
 	const checked = useAppSelector(selectLowSkillVisibility());
+	const forecastDisplay = useAppSelector(
+		(state) => state.climateVariable.data?.forecastDisplay,
+	);
+	const isForecast = forecastDisplay === ForecastDisplays.FORECAST
+		|| forecastDisplay === undefined;
+
 	const onCheckedChange = (checked: boolean) => {
 		dispatch(setLowSkillVisibility({visible: checked}));
 	};
@@ -29,6 +37,7 @@ export const MaskLowSkillField = (
 	const fieldProps = {
 		checked,
 		onCheckedChange,
+		disabled: !isForecast,
 		...propsRest,
 	};
 
@@ -41,7 +50,7 @@ export const MaskLowSkillField = (
 			/>
 			<label
 				htmlFor='mask-low-skill-checkbox'
-				className="text-sm font-medium leading-none cursor-pointer"
+				className="text-sm font-medium leading-none cursor-pointer peer-disabled:opacity-50 peer-disabled:cursor-default"
 			>
 				{__('Mask Low Skill')}
 			</label>

@@ -6,8 +6,11 @@ import {
 	PopoverTrigger,
 } from '@/components/ui/popover';
 
+export type PopoverContentSideProp = 'left' | 'right' | 'bottom' | 'top';
+
 export interface TooltipWidgetProps {
 	tooltip: React.ReactNode
+	side?: PopoverContentSideProp
 }
 
 /**
@@ -15,6 +18,7 @@ export interface TooltipWidgetProps {
  */
 export default function TooltipWidget({
 	tooltip,
+	side
 }: TooltipWidgetProps) {
 	return (
 		<>
@@ -22,7 +26,7 @@ export default function TooltipWidget({
 				<PopoverTrigger className="text-dark-purple">
 					<InfoIcon size={16} />
 				</PopoverTrigger>
-				<PopoverContent>
+				<PopoverContent side={side ?? undefined}>
 					{tooltip}
 				</PopoverContent>
 			</Popover>

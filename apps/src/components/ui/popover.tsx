@@ -31,29 +31,33 @@ type PopoverContentSide = NonNullable<
  * Popover content wrapper over `@radix-ui/react-popover`.
  *
  * All Radix PopoverContent props are forwarded via `{...props}`.
- * Positioning-related props available:
  *
- * - `side` (`PopoverContentSide`, default `'bottom'`) —
- *   The preferred side of the anchor to render against when open.
- *   Will be reversed when collisions occur and `avoidCollisions` is enabled.
+ * @remarks
+ * In Radix terminology, "anchor" refers to the trigger — the clickable
+ * element (e.g. `PopoverTrigger`) that opens the popover.
  *
- * - `sideOffset` (`number`, default `4` — Radix default is `0`) —
- *   The distance in pixels from the anchor.
+ * Positioning props forwarded to Radix:
  *
- * - `align` (`'start' | 'center' | 'end'`, default `'center'`) —
- *   The preferred alignment against the anchor.
- *   May change when collisions occur.
+ * - `side` (`'top' | 'right' | 'bottom' | 'left'`, default: `'bottom'`) —
+ *   Which side of the trigger to prefer when open.
+ *   Reverses on collision when `avoidCollisions` is enabled.
  *
- * - `alignOffset` (`number`, default `0`) —
- *   An offset in pixels from the `'start'` or `'end'` alignment options.
+ * - `sideOffset` (`number`, default: `4`) —
+ *   Distance in pixels between the popover and the trigger.
+ *
+ * - `align` (`'start' | 'center' | 'end'`, default: `'center'`) —
+ *   Alignment along the chosen side.
+ *   May shift when collisions occur.
+ *
+ * - `alignOffset` (`number`, default: `0`) —
+ *   Offset in pixels from the `'start'` or `'end'` alignment.
  *
  * - `collisionBoundary` (`Element | Element[] | null`, default: viewport) —
- *   The element(s) used as the collision boundary.
- *   By default this is the viewport.
+ *   DOM node(s) to use as collision boundaries instead of the viewport.
  *
- * - `sticky` (`'partial' | 'always'`, default `'partial'`) —
- *   `'partial'` keeps content visible while the trigger is at least partially in view;
- *   `'always'` keeps content visible regardless of trigger position.
+ * - `sticky` (`'partial' | 'always'`, default: `'partial'`) —
+ *   `'partial'` keeps the popover visible while the trigger is at least
+ *   partially in view; `'always'` keeps it visible regardless of trigger position.
  *
  * @see {@link https://www.radix-ui.com/primitives/docs/components/popover#content Radix UI Popover Content API}
  */

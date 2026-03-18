@@ -3,14 +3,13 @@ import { InfoIcon } from 'lucide-react';
 import {
 	Popover,
 	PopoverContent,
+	type PopoverContentSide,
 	PopoverTrigger,
 } from '@/components/ui/popover';
 
-export type PopoverContentSideProp = 'left' | 'right' | 'bottom' | 'top';
-
 export interface TooltipWidgetProps {
 	tooltip: React.ReactNode
-	side?: PopoverContentSideProp
+	side?: PopoverContentSide
 }
 
 /**

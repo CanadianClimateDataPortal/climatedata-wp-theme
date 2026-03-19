@@ -36,6 +36,9 @@ const LowSkillLayer = ({
 		timeValue = buildSkillLayerTime(climateVariable, releaseDate);
 	}
 
+	const hasLayerData = layerName && timeValue;
+	const shouldHideLayer = !isForecast || isLowSkillMasked;
+
 	// Update the opacity on the *existing* layer if it exists. We do it like
 	// that because we don't want a change in opacity to recreate the layer.
 	// Instead, we want to update the existing layer (else it creates flashing
@@ -52,12 +55,7 @@ const LowSkillLayer = ({
 	// attributes change.
 	return useMemo(
 		() => {
-			if (
-			!isForecast
-			|| isLowSkillMasked
-			|| !layerName
-			|| !timeValue
-		) {
+			if (shouldHideLayer || !hasLayerData) {
 				return null;
 			}
 
@@ -87,10 +85,9 @@ const LowSkillLayer = ({
 		//
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
-			isForecast,
-			isLowSkillMasked,
 			layerName,
 			pane,
+			shouldHideLayer,
 			timeValue,
 		]
 	);

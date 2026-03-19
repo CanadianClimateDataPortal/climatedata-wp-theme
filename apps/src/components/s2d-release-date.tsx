@@ -60,7 +60,7 @@ const S2DReleaseDate = (props: S2DReleaseDateProps) => {
 				{__('Release date:')}&nbsp;
 				{releaseDateElement}
 			</span>
-			{effectiveTooltip && <TooltipWidget tooltip={effectiveTooltip} />}
+			{effectiveTooltip && <TooltipWidget tooltip={effectiveTooltip} side="top" />}
 		</div>
 	);
 };

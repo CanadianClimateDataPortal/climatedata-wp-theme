@@ -4,7 +4,10 @@ import { WMSTileLayer } from 'react-leaflet';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useS2D } from '@/hooks/use-s2d';
 import { useAppSelector } from '@/app/hooks';
-import { selectLowSkillVisibility } from '@/features/map/map-slice';
+import {
+	selectForecastDisplay,
+	selectLowSkillVisibility,
+} from '@/features/map/map-slice';
 import { buildSkillLayerName, buildSkillLayerTime } from '@/lib/s2d';
 import { ForecastDisplays } from '@/types/climate-variable-interface';
 import L from 'leaflet';
@@ -22,7 +25,7 @@ const LowSkillLayer = ({
 	pane,
 }: LowSkillLayerProps): React.ReactElement | null => {
 	const { climateVariable } = useClimateVariable();
-	const forecastDisplay = climateVariable?.getForecastDisplay();
+	const forecastDisplay = useAppSelector(selectForecastDisplay());
 	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 	const { releaseDate } = useS2D();
 	const isLowSkillMasked = !useAppSelector(selectLowSkillVisibility());

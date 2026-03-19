@@ -38,6 +38,11 @@ import {
 	MAP_OPACITY_MIN,
 } from '@/lib/constants';
 import { MapItemsOpacity } from '@/types/types';
+import {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars -- used in {@link} JSDoc
+	type ClimateVariableInterface,
+	ForecastDisplays,
+} from '@/types/climate-variable-interface';
 import { RootState } from '@/app/store';
 
 const defaultTimePeriodEnd = Math.min(
@@ -208,6 +213,20 @@ export const {
 export const selectLowSkillVisibility =
 	() => (state: RootState) =>
 		state.map.isLowSkillVisible;
+
+/**
+ * Selector that returns the current forecast display value.
+ *
+ * Includes the fallback to {@link ForecastDisplays.FORECAST} that
+ * {@link ClimateVariableInterface.getForecastDisplay} also applies, ensuring
+ * consistent behavior before climate variable data is fully loaded.
+ *
+ * Co-located in map-slice (not climate-variable-slice) because its
+ * consumers already import from here alongside {@link selectLowSkillVisibility}.
+ */
+export const selectForecastDisplay =
+	() => (state: RootState) =>
+		state.climateVariable.data?.forecastDisplay ?? ForecastDisplays.FORECAST;
 
 // Export reducer
 export default mapSlice.reducer;

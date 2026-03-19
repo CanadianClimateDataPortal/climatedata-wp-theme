@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
+	selectForecastDisplay,
 	selectLowSkillVisibility,
 	setLowSkillVisibility,
 } from '@/features/map/map-slice';
@@ -23,9 +24,7 @@ export const MaskLowSkillField = (
 	const dispatch = useAppDispatch();
 
 	const checked = useAppSelector(selectLowSkillVisibility());
-	const forecastDisplay = useAppSelector(
-		(state) => state.climateVariable.data?.forecastDisplay,
-	);
+	const forecastDisplay = useAppSelector(selectForecastDisplay());
 	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 
 	const onCheckedChange = (checked: boolean) => {

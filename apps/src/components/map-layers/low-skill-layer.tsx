@@ -15,6 +15,8 @@ interface LowSkillLayerProps {
 
 /**
  * Leaflet layer for the "low skill".
+ *
+ * @see {@link selectLowSkillVisibility} — "skill" is an S2D-specific concept
  */
 const LowSkillLayer = ({
 	pane,

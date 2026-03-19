@@ -201,7 +201,9 @@ export const {
 } = mapSlice.actions;
 
 /**
- * Selector that returns the visibility of the "low skill" layer.
+ * Selector that returns the visibility of the low-skill vector mask overlay.
+ *
+ * @see {@link MapState.isLowSkillVisible}
  */
 export const selectLowSkillVisibility =
 	() => (state: RootState) =>

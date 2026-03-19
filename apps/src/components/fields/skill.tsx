@@ -14,6 +14,9 @@ export interface S2DForecastDisplaySkillFieldCheckboxProps {
 	tooltip?: React.ReactNode;
 }
 
+/**
+ * @see {@link selectLowSkillVisibility} — "skill" is an S2D-specific concept
+ */
 export const MaskLowSkillField = (
 	props: S2DForecastDisplaySkillFieldCheckboxProps,
 ) => {

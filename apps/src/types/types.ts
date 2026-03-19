@@ -216,8 +216,15 @@ export interface MapState {
 	 */
 	messageDisplayStates: {[key: string]: boolean};
 	/**
-	 * True if the "low skill" layer is visible (i.e. true if "mask low skill"
-	 * is checked)
+	 * Whether the low-skill vector mask overlay is visible on the map.
+	 *
+	 * "Mask" here refers to a vector graphics mask — diagonal lines drawn
+	 * over regions where forecast confidence is low. It does NOT mean
+	 * "to hide" (French: masquer). When `true`, the overlay IS displayed.
+	 *
+	 * Only meaningful for S2D variables when Forecast Display = "Forecast".
+	 *
+	 * Controlled by `MaskLowSkillField` in `components/fields/skill.tsx`.
 	 */
 	isLowSkillVisible: boolean;
 	/**

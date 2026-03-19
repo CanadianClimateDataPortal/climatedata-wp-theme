@@ -152,6 +152,10 @@ export function formatPeriodRange(periodRange: PeriodRange): [string, string] {
 /**
  * Create and return the GeoServer layer name for the Skill layer.
  *
+ * "Skill" in meteorology refers to forecast accuracy relative to a baseline
+ * (e.g., climatology). The skill layer is a vector mask overlay showing
+ * diagonal lines over regions where forecast confidence is low.
+ *
  * The name is `CDC:s2d-skill-<VAR>-<F>-<REF-PERIOD>`
  *
  * Where:

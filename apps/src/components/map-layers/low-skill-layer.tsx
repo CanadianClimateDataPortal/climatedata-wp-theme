@@ -6,6 +6,7 @@ import { useS2D } from '@/hooks/use-s2d';
 import { useAppSelector } from '@/app/hooks';
 import { selectLowSkillVisibility } from '@/features/map/map-slice';
 import { buildSkillLayerName, buildSkillLayerTime } from '@/lib/s2d';
+import { ForecastDisplays } from '@/types/climate-variable-interface';
 import L from 'leaflet';
 
 interface LowSkillLayerProps {
@@ -14,13 +15,17 @@ interface LowSkillLayerProps {
 
 /**
  * Leaflet layer for the "low skill".
+ *
+ * @see {@link selectLowSkillVisibility} — "skill" is an S2D-specific concept
  */
 const LowSkillLayer = ({
 	pane,
 }: LowSkillLayerProps): React.ReactElement | null => {
 	const { climateVariable } = useClimateVariable();
+	const forecastDisplay = climateVariable?.getForecastDisplay();
+	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 	const { releaseDate } = useS2D();
-	const isLowSkillMasked = !useAppSelector(selectLowSkillVisibility());
+	const isLowSkillVisible = useAppSelector(selectLowSkillVisibility());
 	const {
 		opacity: { mapData },
 	} = useAppSelector((state) => state.map);
@@ -32,6 +37,9 @@ const LowSkillLayer = ({
 		layerName = buildSkillLayerName(climateVariable, releaseDate);
 		timeValue = buildSkillLayerTime(climateVariable, releaseDate);
 	}
+
+	const hasLayerData = layerName && timeValue;
+	const shouldHideLayer = !isForecast || !isLowSkillVisible;
 
 	// Update the opacity on the *existing* layer if it exists. We do it like
 	// that because we don't want a change in opacity to recreate the layer.
@@ -49,7 +57,7 @@ const LowSkillLayer = ({
 	// attributes change.
 	return useMemo(
 		() => {
-			if (isLowSkillMasked || !layerName || !timeValue) {
+			if (shouldHideLayer || !hasLayerData) {
 				return null;
 			}
 
@@ -78,7 +86,12 @@ const LowSkillLayer = ({
 		// above takes care of that). But we still use it as an initial value.
 		//
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[pane, isLowSkillMasked, layerName, timeValue]
+		[
+			layerName,
+			pane,
+			shouldHideLayer,
+			timeValue,
+		]
 	);
 };
 

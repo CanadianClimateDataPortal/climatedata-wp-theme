@@ -25,7 +25,7 @@ const LowSkillLayer = ({
 	const forecastDisplay = climateVariable?.getForecastDisplay();
 	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 	const { releaseDate } = useS2D();
-	const isLowSkillMasked = !useAppSelector(selectLowSkillVisibility());
+	const isLowSkillVisible = useAppSelector(selectLowSkillVisibility());
 	const {
 		opacity: { mapData },
 	} = useAppSelector((state) => state.map);
@@ -39,7 +39,7 @@ const LowSkillLayer = ({
 	}
 
 	const hasLayerData = layerName && timeValue;
-	const shouldHideLayer = !isForecast || isLowSkillMasked;
+	const shouldHideLayer = !isForecast || !isLowSkillVisible;
 
 	// Update the opacity on the *existing* layer if it exists. We do it like
 	// that because we don't want a change in opacity to recreate the layer.

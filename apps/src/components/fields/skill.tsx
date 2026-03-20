@@ -1,6 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
-	selectForecastDisplay,
 	selectLowSkillVisibility,
 	setLowSkillVisibility,
 } from '@/features/map/map-slice';
@@ -9,6 +8,7 @@ import { __ } from '@/context/locale-provider';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import React from 'react';
 
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { ForecastDisplays } from '@/types/climate-variable-interface';
 
 export interface S2DForecastDisplaySkillFieldCheckboxProps {
@@ -21,10 +21,12 @@ export interface S2DForecastDisplaySkillFieldCheckboxProps {
 export const MaskLowSkillField = (
 	props: S2DForecastDisplaySkillFieldCheckboxProps,
 ) => {
+	const { climateVariable } = useClimateVariable();
+
 	const dispatch = useAppDispatch();
 
 	const checked = useAppSelector(selectLowSkillVisibility());
-	const forecastDisplay = useAppSelector(selectForecastDisplay());
+	const forecastDisplay = climateVariable?.getForecastDisplay();
 	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 
 	const onCheckedChange = (checked: boolean) => {

@@ -216,11 +216,10 @@ export interface MapState {
 	 */
 	messageDisplayStates: {[key: string]: boolean};
 	/**
-	 * Whether the low-skill vector mask overlay is visible on the map.
+	 * Whether low-skill areas are masked on the map.
 	 *
-	 * "Mask" here refers to a vector graphics mask — diagonal lines drawn
-	 * over regions where forecast confidence is low. It does NOT mean
-	 * "to hide" (French: masquer). When `true`, the overlay IS displayed.
+	 * "Mask" is the verb — to visually cover low-confidence forecast areas
+	 * with diagonal lines. When `true`, those areas are masked.
 	 *
 	 * Only meaningful for S2D variables when Forecast Display = "Forecast".
 	 *

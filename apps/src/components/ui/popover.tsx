@@ -18,14 +18,45 @@ import { cn } from '@/lib/utils';
 const Popover = PopoverPrimitive.Root;
 const PopoverTrigger = PopoverPrimitive.Trigger;
 
+/**
+ * Derived from `@radix-ui/react-popover` Content `side` prop.
+ *
+ * `'top' | 'right' | 'bottom' | 'left'` — which side of the trigger to
+ * prefer when open. Reverses on collision when `avoidCollisions` is enabled.
+ *
+ * @see {@link https://www.radix-ui.com/primitives/docs/components/popover#content Radix UI Popover Content API}
+ */
+type PopoverContentSide = NonNullable<
+	React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>['side']
+>;
+
+type PopoverContentProps = React.ComponentPropsWithoutRef<
+	typeof PopoverPrimitive.Content
+>;
+
+/**
+ * Popover content wrapper over `@radix-ui/react-popover`.
+ *
+ * All Radix {@link PopoverContentProps} are forwarded via `{...props}`.
+ *
+ * @see {@link PopoverContentSide} for the `side` prop type
+ * @see {@link https://www.radix-ui.com/primitives/docs/components/popover#content Radix UI Popover Content API}
+ */
 const PopoverContent = forwardRef<
 	React.ElementRef<typeof PopoverPrimitive.Content>,
-	React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ className, align = 'center', sideOffset = 4, ...props }, ref) => (
+	PopoverContentProps
+>(({
+	className,
+	align = 'center',
+	side = 'bottom' satisfies PopoverContentSide,
+	sideOffset = 4,
+	...props
+}, ref) => (
 	<PopoverPrimitive.Portal>
 		<PopoverPrimitive.Content
 			ref={ref}
 			align={align}
+			side={side}
 			sideOffset={sideOffset}
 			className={cn(
 				'popover-content z-50',
@@ -42,4 +73,9 @@ const PopoverContent = forwardRef<
 ));
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-export { Popover, PopoverTrigger, PopoverContent };
+export {
+	Popover,
+	PopoverContent,
+	type PopoverContentSide,
+	PopoverTrigger,
+};

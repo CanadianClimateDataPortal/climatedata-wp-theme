@@ -21,54 +21,42 @@ const PopoverTrigger = PopoverPrimitive.Trigger;
 /**
  * Derived from `@radix-ui/react-popover` Content `side` prop.
  *
+ * `'top' | 'right' | 'bottom' | 'left'` — which side of the trigger to
+ * prefer when open. Reverses on collision when `avoidCollisions` is enabled.
+ *
  * @see {@link https://www.radix-ui.com/primitives/docs/components/popover#content Radix UI Popover Content API}
  */
 type PopoverContentSide = NonNullable<
 	React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>['side']
 >;
 
+type PopoverContentProps = React.ComponentPropsWithoutRef<
+	typeof PopoverPrimitive.Content
+>;
+
 /**
  * Popover content wrapper over `@radix-ui/react-popover`.
  *
- * All Radix PopoverContent props are forwarded via `{...props}`.
+ * All Radix {@link PopoverContentProps} are forwarded via `{...props}`.
  *
- * @remarks
- * In Radix terminology, "anchor" refers to the trigger — the clickable
- * element (e.g. `PopoverTrigger`) that opens the popover.
- *
- * Positioning props forwarded to Radix:
- *
- * - `side` (`'top' | 'right' | 'bottom' | 'left'`, default: `'bottom'`) —
- *   Which side of the trigger to prefer when open.
- *   Reverses on collision when `avoidCollisions` is enabled.
- *
- * - `sideOffset` (`number`, default: `4`) —
- *   Distance in pixels between the popover and the trigger.
- *
- * - `align` (`'start' | 'center' | 'end'`, default: `'center'`) —
- *   Alignment along the chosen side.
- *   May shift when collisions occur.
- *
- * - `alignOffset` (`number`, default: `0`) —
- *   Offset in pixels from the `'start'` or `'end'` alignment.
- *
- * - `collisionBoundary` (`Element | Element[] | null`, default: viewport) —
- *   DOM node(s) to use as collision boundaries instead of the viewport.
- *
- * - `sticky` (`'partial' | 'always'`, default: `'partial'`) —
- *   `'partial'` keeps the popover visible while the trigger is at least
- *   partially in view; `'always'` keeps it visible regardless of trigger position.
- *
+ * @see {@link PopoverContentSide} for the `side` prop type
  * @see {@link https://www.radix-ui.com/primitives/docs/components/popover#content Radix UI Popover Content API}
  */
 const PopoverContent = forwardRef<
 	React.ElementRef<typeof PopoverPrimitive.Content>,
-	React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ className, align = 'center', sideOffset = 4, ...props }, ref) => (
+	PopoverContentProps
+>(({
+	className,
+	align = 'center',
+	side = 'bottom' satisfies PopoverContentSide,
+	sideOffset = 4,
+	...props
+}, ref) => (
 	<PopoverPrimitive.Portal>
 		<PopoverPrimitive.Content
 			ref={ref}
 			align={align}
+			side={side}
 			sideOffset={sideOffset}
 			className={cn(
 				'popover-content z-50',

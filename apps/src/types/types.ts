@@ -216,8 +216,14 @@ export interface MapState {
 	 */
 	messageDisplayStates: {[key: string]: boolean};
 	/**
-	 * True if the "low skill" layer is visible (i.e. true if "mask low skill"
-	 * is checked)
+	 * Whether low-skill areas are masked on the map.
+	 *
+	 * "Mask" is the verb — to visually cover low-confidence forecast areas
+	 * with diagonal lines. When `true`, those areas are masked.
+	 *
+	 * Only meaningful for S2D variables when Forecast Display = "Forecast".
+	 *
+	 * Controlled by `MaskLowSkillField` in `components/fields/skill.tsx`.
 	 */
 	isLowSkillVisible: boolean;
 	/**

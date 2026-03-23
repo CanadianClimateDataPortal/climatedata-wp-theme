@@ -8,16 +8,27 @@ import { __ } from '@/context/locale-provider';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import React from 'react';
 
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { ForecastDisplays } from '@/types/climate-variable-interface';
+
 export interface S2DForecastDisplaySkillFieldCheckboxProps {
 	tooltip?: React.ReactNode;
 }
 
+/**
+ * @see {@link selectLowSkillVisibility} — "skill" is an S2D-specific concept
+ */
 export const MaskLowSkillField = (
 	props: S2DForecastDisplaySkillFieldCheckboxProps,
 ) => {
+	const { climateVariable } = useClimateVariable();
+
 	const dispatch = useAppDispatch();
 
 	const checked = useAppSelector(selectLowSkillVisibility());
+	const forecastDisplay = climateVariable?.getForecastDisplay();
+	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
+
 	const onCheckedChange = (checked: boolean) => {
 		dispatch(setLowSkillVisibility({visible: checked}));
 	};
@@ -29,6 +40,7 @@ export const MaskLowSkillField = (
 	const fieldProps = {
 		checked,
 		onCheckedChange,
+		disabled: !isForecast,
 		...propsRest,
 	};
 
@@ -36,12 +48,12 @@ export const MaskLowSkillField = (
 		<div className="flex items-center space-x-2">
 			<Checkbox
 				id='mask-low-skill-checkbox'
-				className="text-brand-red"
+				className="text-brand-red disabled:data-[state=checked]:bg-neutral-grey-medium disabled:data-[state=checked]:border-neutral-grey-medium"
 				{...fieldProps}
 			/>
 			<label
 				htmlFor='mask-low-skill-checkbox'
-				className="text-sm font-medium leading-none cursor-pointer"
+				className="text-sm font-medium leading-none cursor-pointer peer-disabled:opacity-50 peer-disabled:cursor-default"
 			>
 				{__('Mask Low Skill')}
 			</label>

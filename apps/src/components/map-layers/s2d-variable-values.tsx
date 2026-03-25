@@ -811,11 +811,45 @@ const ProbabilitiesPart = ({
 		}
 	}
 
-	const TitleLine = sprintf(
-		frequency === FrequencyType.MONTHLY
-			? __('Monthly %s probability:')
-			: __('Seasonal %s probability:'),
-		variableName
+	const TitleLine = () => (
+		<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
+			{sprintf(
+				frequency === FrequencyType.MONTHLY
+					? __('Monthly %s probability:')
+					: __('Seasonal %s probability:'),
+				variableName
+			)}
+		</span>
+	);
+
+	const tooltipProbabilityText = [
+		__('The total precipitation has a'), // ALWAYS and ONLY precipitation?
+		...progressBars.map(
+			(i) =>
+				'- ' + /* Should be a list here. But. JSX. */
+				Math.round(i.percent) +
+				'% ' +
+				__('Probability').toLowerCase(/* Jouer aik le yaube */) +
+				' ' +
+				__('of being') +
+				' ' +
+				i.label.toLowerCase()
+		),
+		__('relative to the 1991 to 2020 historical climatology.'),
+		__('The probabilities may not add exactly to 100% due to rounding.'),
+	];
+
+	const ProbabilityHeading = !isLoaded ? (
+		<TitleLine />
+	) : (
+		<>
+			<TitleLine />
+			<TooltipWidget
+				tooltip={tooltipProbabilityText.map((t) => (
+					<p>{t}</p>
+				))}
+			/>
+		</>
 	);
 
 	return (
@@ -824,7 +858,7 @@ const ProbabilitiesPart = ({
 				id="probability-heading"
 				className="mb-3 text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium"
 			>
-				{TitleLine}
+				{ProbabilityHeading}
 			</h3>
 			<div className="border-x border-cold-grey-2 relative">
 				<div className="absolute h-full top-0 border-l border-cold-grey-2 left-1/4"></div>

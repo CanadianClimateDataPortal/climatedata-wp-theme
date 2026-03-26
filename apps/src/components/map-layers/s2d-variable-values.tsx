@@ -22,6 +22,7 @@ import {
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
+import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import StarRating from '@/components/ui/star-rating';
 import ProgressBar, { ProgressBarProps } from '@/components/ui/progress-bar';
@@ -38,6 +39,7 @@ interface PopupContentProps {
 	frequency: S2DFrequencyType;
 	forecastType: ForecastType;
 	forecastDisplay: ForecastDisplay;
+	variableId: string;
 	variableName: string;
 	unit: string;
 }
@@ -46,6 +48,7 @@ interface ProbabilitiesPartProps {
 	locationData: LocationS2DData | null;
 	forecastType: ForecastType;
 	frequency: S2DFrequencyType;
+	variableId: string;
 	variableName: string;
 	unit: string;
 }
@@ -377,6 +380,7 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 			frequency={frequency}
 			forecastType={forecastType}
 			forecastDisplay={forecastDisplay}
+			variableId={variableId}
 			variableName={variableName}
 			unit={unit}
 		/>
@@ -711,6 +715,7 @@ const ProbabilitiesPart = ({
 	locationData,
 	forecastType,
 	frequency,
+	variableId,
 	variableName,
 	unit,
 }: ProbabilitiesPartProps) => {
@@ -811,17 +816,14 @@ const ProbabilitiesPart = ({
 		}
 	}
 
-	// Category names parallel to progressBars, for tooltip content
-	const categoryNames: string[] = forecastType === ForecastTypes.EXPECTED
-		? [
-			__('Above normal'),
-			__('Near normal'),
-			__('Below normal'),
-		]
-		: [
-			__('Unusually high'),
-			__('Unusually low'),
-		];
+	// Category definitions parallel to progressBars, for tooltip content
+	const forecastCategories = buildForecastCategories(forecastType);
+
+	const tooltipOpeningLine = variableId === 's2d_precip_accum'
+		? __('The total precipitation has a:')
+		: variableId === 's2d_air_temp'
+			? __('The mean temperature has a:')
+			: sprintf(__('The %s has a:'), variableName.toLowerCase());
 
 	const TitleLine = () => (
 		<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
@@ -836,14 +838,14 @@ const ProbabilitiesPart = ({
 
 	const tooltipProbabilityContent = isLoaded ? (
 		<div>
-			<p>{sprintf(__('The %s has a:'), variableName.toLowerCase())}</p>
+			<p>{tooltipOpeningLine}</p>
 			<ul>
 				{progressBars.map((bar, idx) => (
 					<li key={idx}>
 						{sprintf(
 							__('%d%% probability of being %s, %s'),
 							Math.round(bar.percent),
-							categoryNames[idx].toLowerCase(),
+							forecastCategories[idx].term.toLowerCase(),
 							bar.label.toLowerCase(),
 						)}
 					</li>
@@ -922,6 +924,7 @@ const PopupContent = ({
 	frequency,
 	forecastType,
 	forecastDisplay,
+	variableId,
 	variableName,
 	unit,
 }: PopupContentProps) => {
@@ -973,6 +976,7 @@ const PopupContent = ({
 					locationData={locationData}
 					forecastType={forecastType}
 					frequency={frequency}
+					variableId={variableId}
 					variableName={variableName}
 					unit={unit}
 				/>

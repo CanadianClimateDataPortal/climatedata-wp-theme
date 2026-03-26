@@ -811,6 +811,18 @@ const ProbabilitiesPart = ({
 		}
 	}
 
+	// Category names parallel to progressBars, for tooltip content
+	const categoryNames: string[] = forecastType === ForecastTypes.EXPECTED
+		? [
+			__('Above normal'),
+			__('Near normal'),
+			__('Below normal'),
+		]
+		: [
+			__('Unusually high'),
+			__('Unusually low'),
+		];
+
 	const TitleLine = () => (
 		<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 			{sprintf(
@@ -822,32 +834,39 @@ const ProbabilitiesPart = ({
 		</span>
 	);
 
-	const tooltipProbabilityText = [
-		__('The total precipitation has a'), // ALWAYS and ONLY precipitation?
-		...progressBars.map(
-			(i) =>
-				'- ' + /* Should be a list here. But. JSX. */
-				Math.round(i.percent) +
-				'% ' +
-				__('Probability').toLowerCase(/* Jouer aik le yaube */) +
-				' ' +
-				__('of being') +
-				' ' +
-				i.label.toLowerCase()
-		),
-		__('relative to the 1991 to 2020 historical climatology.'),
-		__('The probabilities may not add exactly to 100% due to rounding.'),
-	];
+	const tooltipProbabilityContent = isLoaded ? (
+		<div>
+			<p>{sprintf(__('The %s has a:'), variableName.toLowerCase())}</p>
+			<ul>
+				{progressBars.map((bar, idx) => (
+					<li key={idx}>
+						{sprintf(
+							__('%d%% probability of being %s, %s'),
+							Math.round(bar.percent),
+							categoryNames[idx].toLowerCase(),
+							bar.label.toLowerCase(),
+						)}
+					</li>
+				))}
+			</ul>
+			<p className="mt-2">
+				{__('relative to the 1991 to 2020 historical climatology.')}
+			</p>
+			<p className="mt-2">
+				{__('The probabilities may not add exactly to 100% due to rounding.')}
+			</p>
+		</div>
+	) : null;
 
 	const ProbabilityHeading = !isLoaded ? (
 		<TitleLine />
 	) : (
 		<>
 			<TitleLine />
+			{' '}
 			<TooltipWidget
-				tooltip={tooltipProbabilityText.map((t) => (
-					<p>{t}</p>
-				))}
+				side="top"
+				tooltip={tooltipProbabilityContent}
 			/>
 		</>
 	);

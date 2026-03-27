@@ -837,11 +837,11 @@ const ProbabilitiesPart = ({
 	);
 
 	const tooltipProbabilityContent = isLoaded ? (
-		<div>
+		<div className="p-1">
 			<p>{tooltipOpeningLine}</p>
-			<ul>
+			<ul className="mt-2 list-disc list-outside">
 				{progressBars.map((bar, idx) => (
-					<li key={idx}>
+					<li key={idx} className="mt-2 ml-4">
 						{sprintf(
 							__('%d%% probability of being %s, %s'),
 							Math.round(bar.percent),

@@ -868,14 +868,18 @@ const ProbabilitiesPart = ({
 	const ProbabilityHeading = !isLoaded ? (
 		<TitleLine />
 	) : (
-		<>
-			<TitleLine />
-			{' '}
-			<TooltipWidget
-				side="top"
-				tooltip={tooltipProbabilityContent}
-			/>
-		</>
+		<span className="flex items-start gap-1">
+			<span className="shrink">
+				<TitleLine />
+			</span>
+			<span className="shrink-0">
+				<TooltipWidget
+					side="top"
+					tooltip={tooltipProbabilityContent}
+				/>
+			</span>
+
+		</span>
 	);
 
 	return (

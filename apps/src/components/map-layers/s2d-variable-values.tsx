@@ -39,8 +39,6 @@ interface PopupContentProps {
 	frequency: S2DFrequencyType;
 	forecastType: ForecastType;
 	forecastDisplay: ForecastDisplay;
-	variableId: string;
-	variableName: string;
 	unit: string;
 }
 
@@ -48,8 +46,6 @@ interface ProbabilitiesPartProps {
 	locationData: LocationS2DData | null;
 	forecastType: ForecastType;
 	frequency: S2DFrequencyType;
-	variableId: string;
-	variableName: string;
 	unit: string;
 }
 
@@ -299,7 +295,6 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 	const hasDataLoaded = !!(locationData && releaseDate);
 
 	const variableId = climateVariable?.getId() ?? '';
-	const variableName = climateVariable?.getTitle() ?? '';
 	const unit = climateVariable?.getUnit() ?? '';
 	const frequency = (climateVariable?.getFrequency() ??
 		FrequencyType.MONTHLY) as S2DFrequencyType;
@@ -380,8 +375,6 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 			frequency={frequency}
 			forecastType={forecastType}
 			forecastDisplay={forecastDisplay}
-			variableId={variableId}
-			variableName={variableName}
 			unit={unit}
 		/>
 	);
@@ -715,8 +708,6 @@ const ProbabilitiesPart = ({
 	locationData,
 	forecastType,
 	frequency,
-	variableId,
-	variableName,
 	unit,
 }: ProbabilitiesPartProps) => {
 	const { locale } = useLocale();
@@ -819,10 +810,24 @@ const ProbabilitiesPart = ({
 	// Category definitions parallel to progressBars, for tooltip content
 	const forecastCategories = buildForecastCategories(forecastType);
 
+	// A single sprintf template can't produce correct French for both variables:
+	// "Les précipitations totales ont" (plural) vs "La température moyenne a" (singular).
+	// We use getId() over getTitle() because:
+	// - getTitle() comes from WordPress and varies across environments
+	// - getTitle() would need lowercasing/truncation and breaks if titles change
+	// - getId() keys (e.g. 's2d_air_temp') are stable config values, sparse in
+	//   the codebase, and easy to find when a 3rd S2D variable is added.
+	const { climateVariable } = useClimateVariable();
+	const variableId = climateVariable?.getId();
+	const variableName = climateVariable?.getTitle() ?? '';
+
 	const tooltipOpeningLine = variableId === 's2d_precip_accum'
+		// Les précipitations totales ont :
 		? __('The total precipitation has a:')
 		: variableId === 's2d_air_temp'
+			// La température moyenne a :
 			? __('The mean temperature has a:')
+			// Cautious fallback.
 			: sprintf(__('The %s has a:'), variableName.toLowerCase());
 
 	const TitleLine = () => (
@@ -924,8 +929,6 @@ const PopupContent = ({
 	frequency,
 	forecastType,
 	forecastDisplay,
-	variableId,
-	variableName,
 	unit,
 }: PopupContentProps) => {
 	const { locale } = useLocale();
@@ -976,8 +979,6 @@ const PopupContent = ({
 					locationData={locationData}
 					forecastType={forecastType}
 					frequency={frequency}
-					variableId={variableId}
-					variableName={variableName}
 					unit={unit}
 				/>
 			)}

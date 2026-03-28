@@ -1243,6 +1243,21 @@ msgstr "Probabilité saisonnière pour \"%s\":"
 msgid  "Monthly %s probability:"
 msgstr "Probabilité mensuelle pour \"%s\":"
 
+msgid  "The total precipitation has a:"
+msgstr "Les précipitations totales ont :"
+
+msgid  "The mean temperature has a:"
+msgstr "La température moyenne a :"
+
+msgid  "%d%% probability of being %s, %s"
+msgstr "%d %% de probabilité d'être %s, %s"
+
+msgid  "relative to the 1991 to 2020 historical climatology."
+msgstr "par rapport à la climatologie historique de 1991 à 2020."
+
+msgid  "The probabilities may not add exactly to 100% due to rounding."
+msgstr "Les probabilités peuvent ne pas totaliser exactement 100 % en raison de l'arrondi."
+
 msgid  "Historical Median"
 msgstr "Médiane historique"
 

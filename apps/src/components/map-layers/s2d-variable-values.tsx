@@ -807,28 +807,25 @@ const ProbabilitiesPart = ({
 		}
 	}
 
-	// Category definitions parallel to progressBars, for tooltip content
-	const forecastCategories = buildForecastCategories(forecastType);
 
-	// A single sprintf template can't produce correct French for both variables:
-	// "Les précipitations totales ont" (plural) vs "La température moyenne a" (singular).
-	// We use getId() over getTitle() because:
-	// - getTitle() comes from WordPress and varies across environments
-	// - getTitle() would need lowercasing/truncation and breaks if titles change
-	// - getId() keys (e.g. 's2d_air_temp') are stable config values, sparse in
-	//   the codebase, and easy to find when a 3rd S2D variable is added.
+	// We use the variable id instead of the title which is more reliable.
 	const { climateVariable } = useClimateVariable();
 	const variableId = climateVariable?.getId();
 	const variableName = climateVariable?.getTitle() ?? '';
+	// A single sprintf template can't produce correct French for both variables:
+	// "Les précipitations totales ont" (plural) vs "La température moyenne a" (singular).
+	const tooltipOpeningLineVariants = {
+		s2d_precip_accum: __('The total precipitation has a:'),
+		s2d_air_temp: __('The mean temperature has a:'),
+		fallback: sprintf(__('The %s has a:'), variableName.toLowerCase()),
+	};
 
-	const tooltipOpeningLine = variableId === 's2d_precip_accum'
-		// Les précipitations totales ont :
-		? __('The total precipitation has a:')
-		: variableId === 's2d_air_temp'
-			// La température moyenne a :
-			? __('The mean temperature has a:')
-			// Cautious fallback.
-			: sprintf(__('The %s has a:'), variableName.toLowerCase());
+	const tooltipOpeningLine = Reflect.has(
+		tooltipOpeningLineVariants,
+		variableId ?? 'fallback'
+	)
+		? Reflect.get(tooltipOpeningLineVariants, variableId ?? 'fallback')
+		: Reflect.get(tooltipOpeningLineVariants, 'fallback');
 
 	const TitleLine = () => (
 		<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
@@ -840,6 +837,9 @@ const ProbabilitiesPart = ({
 			)}
 		</span>
 	);
+
+	// Category definitions parallel to progressBars, for tooltip content
+	const forecastCategories = buildForecastCategories(forecastType);
 
 	const tooltipProbabilityContent = isLoaded ? (
 		<div className="p-1">
@@ -878,7 +878,6 @@ const ProbabilitiesPart = ({
 					tooltip={tooltipProbabilityContent}
 				/>
 			</span>
-
 		</span>
 	);
 

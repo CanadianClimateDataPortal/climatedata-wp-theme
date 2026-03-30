@@ -6,6 +6,7 @@ import chroma from 'chroma-js';
 import { __ } from '@/context/locale-provider';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import { type DefinitionItem, DefinitionList } from '@/components/ui/definition-list';
+import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
 import { type ColourQuantitiesMap } from '@/types/types';
 import {
 	ForecastTypes,
@@ -61,22 +62,13 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 		__(outcome),
 	);
 
-	const statementRows: DefinitionItem[] = [];
+	const statementRows: DefinitionItem[] = forecastType
+		? buildForecastCategories(forecastType)
+		: [];
+
 	let afterStatementParagraph: string | undefined;
 
 	if (forecastType === ForecastTypes.EXPECTED) {
-		statementRows.push({
-			term: __('Above normal'),
-			details: __('Above the 66th percentile (upper third of historical data)'),
-		});
-		statementRows.push({
-			term: __('Near normal'),
-			details: __('Between the 33rd and 66th percentiles (middle third of historical data)'),
-		});
-		statementRows.push({
-			term: __('Below normal'),
-			details: __('Below the 33rd percentile (lower third of historical data)'),
-		});
 		afterStatementParagraph = sprintf(
 			__(
 			'If the probability is below %s, no single outcome is significantly more likely ' +
@@ -86,14 +78,6 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 			'40%',
 		);
 	} else if (forecastType === ForecastTypes.UNUSUAL) {
-		statementRows.push({
-			term: __('Unusually high'),
-			details: __('Above the 80th percentile (top fifth of historical data)'),
-		});
-		statementRows.push({
-			term: __('Unusually low'),
-			details: __('Below the 20th percentile (bottom fifth of historical data)'),
-		});
 		afterStatementParagraph = sprintf(
 			__(
 			'If the probability is below %s, no single outcome is significantly more likely ' +

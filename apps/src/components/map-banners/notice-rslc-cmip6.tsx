@@ -1,39 +1,24 @@
-import React from 'react';
 import { __ } from '@/context/locale-provider';
 import NoticeBanner from '@/components/ui/notice-banner';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-
-interface NoticeRSLCCMIP6Props extends React.HTMLProps<HTMLDivElement> {
-	displayed?: boolean;
-	onHide?: () => void;
-}
+import { MapBannerProps } from '@/types/types';
 
 /**
- * Notice banner specific to the RSLC CMIP6 issue.
+ * Notice banner saying that the RSLC CMIP6 issue is now fixed.
  *
- * Renders a "notice banner" with a message and modal content specific to the
- * RSLC CMIP6 fix. Can be used in both "Maps" and "Download" apps.
- *
- * @param displayed Display the banner if true. But the banner will display only
- *                  if the selected variable is RSLC and the version is CMIP6.
- * @param onHide Callback called when the user clicks the banner's close button.
- * @param className Classes for the banner container (passed to <WarningBanner>)
+ * Only displayed if the selected variable is RSLC and the version is CMIP6.
  */
 export default function NoticeRSLCCMIP6({
 	displayed,
 	onHide = () => {},
 	className,
-}: NoticeRSLCCMIP6Props) {
+}: MapBannerProps) {
 	const { climateVariable } = useClimateVariable();
 
 	const displayBanner =
-		displayed &&
+		displayed === true &&
 		climateVariable?.getId() === 'sea_level' &&
 		climateVariable?.getVersion() === 'cmip6';
-
-	if (!displayBanner) {
-		return null;
-	}
 
 	const modalContent = (
 		<div>
@@ -55,17 +40,11 @@ export default function NoticeRSLCCMIP6({
 		</div>
 	);
 
-	const handleOnHide = () => {
-		if (onHide) {
-			onHide();
-		}
-	};
-
 	return (
 		<NoticeBanner
 			type="success"
 			display={displayBanner}
-			onHide={handleOnHide}
+			onHide={onHide}
 			bannerContent={__(
 				'Issue addressed: St. Lawrence River in CMIP6 Relative Sea Level Change'
 			)}

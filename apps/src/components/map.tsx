@@ -5,15 +5,13 @@ import 'leaflet.vectorgrid';
 
 // components
 import MapContainer from '@/components/map-container';
-import NoticeRSLCCMIP6 from '@/components/notice-rslc-cmip6';
+import MapBanners from '@/components/map-banners';
 
 // other
 import { cn } from '@/lib/utils';
 import { useMap } from '@/hooks/use-map';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useMapInteractions } from '@/hooks/use-map-interactions';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setMessageDisplay } from '@/features/map/map-slice';
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
@@ -21,12 +19,6 @@ import { setMessageDisplay } from '@/features/map/map-slice';
 export default function Map(): React.ReactElement {
 	const { setMap, setComparisonMap } = useMap();
 	const { climateVariable } = useClimateVariable();
-	const dispatch = useAppDispatch();
-
-	const messageDisplayStates = useAppSelector(state => state.map.messageDisplayStates);
-	const noticeRSLCCMIP6Id = 'warningRSLCCMIP6';
-	const noticeRSLCCMIP6Displayed = messageDisplayStates[noticeRSLCCMIP6Id] ?? true;
-
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const mapRef = useRef<L.Map | null>(null);
 	const comparisonMapRef = useRef<L.Map | null>(null);
@@ -83,10 +75,6 @@ export default function Map(): React.ReactElement {
 		mapRef.current = null;
 	}, []);
 
-	const handleHideRSLCCMIP6Notice = () => {
-		dispatch(setMessageDisplay({message: noticeRSLCCMIP6Id, displayed: false}));
-	}
-
 	return (
 		<div
 			id='wrapper-map'
@@ -97,11 +85,7 @@ export default function Map(): React.ReactElement {
 				showComparisonMap ? 'grid-cols-2' : 'grid-cols-1'
 			)}
 		>
-			<NoticeRSLCCMIP6
-				className="absolute top-48 md:top-40 z-20 w-full px-4"
-				displayed={noticeRSLCCMIP6Displayed}
-				onHide={handleHideRSLCCMIP6Notice}
-			/>
+			<MapBanners className="absolute top-48 md:top-40 z-20 w-full sm:max-w-[calc(100%_-_120px)]" px-4 />
 			<MapContainer
 				onMapReady={handleMapReady}
 				onUnmount={handleUnmount}

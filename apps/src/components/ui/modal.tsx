@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ModalProps } from '@/types/types';
@@ -24,7 +25,7 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {
 		if (!isOpen) return null;
 
-		return (
+		return createPortal(
 			<div
 				className="modal fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
 				onClick={onClose}
@@ -57,7 +58,8 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 					</button>
 					{children}
 				</div>
-			</div>
+			</div>,
+			document.body,
 		);
 	}
 );

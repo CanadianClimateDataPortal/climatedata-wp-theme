@@ -85,7 +85,7 @@ export default function Map(): React.ReactElement {
 				showComparisonMap ? 'grid-cols-2' : 'grid-cols-1'
 			)}
 		>
-			<MapBanners className="absolute top-48 md:top-40 z-20 w-full sm:max-w-[calc(100%_-_120px)]" px-4 />
+			<MapBanners className="absolute top-48 md:top-40 z-20 w-full sm:max-w-[calc(100%_-_120px)] px-4" />
 			<MapContainer
 				onMapReady={handleMapReady}
 				onUnmount={handleUnmount}

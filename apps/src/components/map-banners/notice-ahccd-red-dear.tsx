@@ -7,8 +7,7 @@ import { MapBannerProps } from '@/types/types';
  * Notice banner saying there is an issue with the "Red Deer A" station for the
  * daily AHCCD data.
  *
- * Only displayed if the selected variable is "Daily AHCCD" and the "Red Deer A"
- * station is selected.
+ * Only displayed when the selected dataset is "AHCCD".
  */
 export default function NoticeAHCCDRedDeerA({
 	displayed,
@@ -16,11 +15,9 @@ export default function NoticeAHCCDRedDeerA({
 	className,
 }: MapBannerProps) {
 	const { climateVariable } = useClimateVariable();
-	const selectedStations = climateVariable?.getSelectedPoints() || {};
 	const displayBanner =
 		displayed === true &&
-		climateVariable?.getId() === 'daily_ahccd_temperature_and_precipitation' &&
-		'3025484' in selectedStations; // ID of the Red Deer A station
+		climateVariable?.getDatasetType() === 'ahccd'
 
 	return (
 		<NoticeBanner

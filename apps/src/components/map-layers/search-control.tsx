@@ -15,9 +15,21 @@ import 'leaflet-search';
 import mapPinIcon from '@/assets/map-pin.svg';
 
 import { cn, parseLatLon } from '@/lib/utils';
-import { fetchLocationByCoords } from '@/services/services';
-import { SearchControlLocationItem, SearchControlResponse } from '@/types/types';
-import { LOCATION_SEARCH_ENDPOINT, SEARCH_DEFAULT_ZOOM, SEARCH_PLACEHOLDER } from '@/lib/constants';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import {
+	fetchLocationByCoords,
+	fetchRegionFeatureByCoords,
+} from '@/services/services';
+import type {
+	SearchControlLocationItem,
+	SearchControlResponse,
+} from '@/types/types';
+import { InteractiveRegionOption } from '@/types/climate-variable-interface';
+import {
+	LOCATION_SEARCH_ENDPOINT,
+	SEARCH_DEFAULT_ZOOM,
+	SEARCH_PLACEHOLDER,
+} from '@/lib/constants';
 
 /**
  * Lat/lng object returned by the Search component.
@@ -58,6 +70,7 @@ export default function SearchControl({
 	const [isGeolocationEnabled, setIsGeolocationEnabled] =
 		useState<boolean>(false);
 	const [isTracking, setIsTracking] = useState<boolean>(false);
+	const { climateVariable } = useClimateVariable();
 	const vectorLayer: any = layerRef?.current;
 
 	// we need a unique id for the search control container for cases where multiple maps
@@ -79,7 +92,7 @@ export default function SearchControl({
 	const map = useMap();
 
 	const handleLocationChange = useCallback(
-		(inputLatlng: SearchLatLng) => {
+		async (inputLatlng: SearchLatLng) => {
 			const latlng = convertSearchLatLng(inputLatlng);
 			// clear all existing markers from the map
 			map.eachLayer(layer => {
@@ -92,15 +105,31 @@ export default function SearchControl({
 			// The location will be saved via the click event.
 			// see handleClick() in use-map-interactions.tsx.
 			if (vectorLayer) {
+				const interactiveRegion = climateVariable?.getInteractiveRegion()
+					?? InteractiveRegionOption.GRIDDED_DATA;
+
+				// When a user clicks the map, VectorGrid provides feature
+				// properties from tile data automatically. Search and locate-me
+				// skip that interaction, so we resolve the properties via WFS.
+				const properties = await fetchRegionFeatureByCoords(
+					interactiveRegion,
+					latlng,
+				);
+
 				vectorLayer.fire('click', {
 					latlng: {
 						lat: latlng.lat,
 						lng: latlng.lng,
-					}
-				})
+					},
+					...(properties ? { layer: { properties } } : {}),
+				});
 			}
 		},
-		[map, vectorLayer]
+		[
+			climateVariable,
+			map,
+			vectorLayer,
+		]
 	);
 
 	const toggleGeoLocation = () => {

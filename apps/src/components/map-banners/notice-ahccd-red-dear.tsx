@@ -17,7 +17,7 @@ export default function NoticeAHCCDRedDeerA({
 	const { climateVariable } = useClimateVariable();
 	const displayBanner =
 		displayed === true &&
-		climateVariable?.getDatasetType() === 'ahccd'
+		climateVariable?.getDatasetType() === 'ahccd';
 
 	return (
 		<NoticeBanner

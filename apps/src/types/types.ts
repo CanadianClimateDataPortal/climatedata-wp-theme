@@ -171,6 +171,24 @@ export interface MapCoordinates {
 }
 
 /**
+ * Properties shared by all "map banner" components.
+ *
+ * A "map banner" is a notice (i.e. a banner) shown at the top of the map in
+ * "Maps" and "Download" pages. Each map banner can decide to be shown only
+ * in a specific context.
+ *
+ * @param displayed If false, the banner should not be displayed. If true, the
+ *     component will decide if it should render anything based on the context.
+ * @param onHide Callback called when the user clicks the banner's close button.
+ * @param className Classes for the banner's main div.
+ */
+export interface MapBannerProps {
+	displayed?: boolean;
+	onHide?: () => void;
+	className?: string;
+}
+
+/**
  * Represents the state of a UI overlay component on the map (e.g., legend, location modal).
  * These are UI elements that sit on top of the map and may obscure each other.
  */

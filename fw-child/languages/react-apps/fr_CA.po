@@ -1503,3 +1503,6 @@ msgid "Only Polygon geometry is supported. %d file was skipped:"
 msgid_plural "Only Polygon geometry is supported. %d files were skipped:"
 msgstr[0] "Seuls les polygones sont pris en charge. %d fichier ignoré :"
 msgstr[1] "Seuls les polygones sont pris en charge. %d fichiers ignorés :"
+
+msgid  "White: No clear outcome"
+msgstr "Blanc: Aucun résultat significatif"

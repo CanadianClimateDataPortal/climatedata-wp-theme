@@ -382,6 +382,16 @@ export const MapLegendForecastS2D = (
 							</tr>
 						);
 					})}
+					<tr>
+						<td />
+						<td
+							colSpan={data.rows[0].colors.length}
+							className="text-center text-sm font-normal"
+							style={{ fontSize: headingFontSize }}
+						>
+							{__('White: No clear outcome')}
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>

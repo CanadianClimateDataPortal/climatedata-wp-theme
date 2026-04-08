@@ -453,6 +453,65 @@ export const fetchPostsData = async (
 };
 
 /**
+ * Maps {@link InteractiveRegionOption} values to GeoServer WFS layer names.
+ */
+const REGION_TO_WFS_LAYER: Partial<Record<InteractiveRegionOption, string>> = {
+	[InteractiveRegionOption.CENSUS]: 'CDC:census',
+	[InteractiveRegionOption.HEALTH]: 'CDC:health',
+	[InteractiveRegionOption.WATERSHED]: 'CDC:watershed',
+};
+
+/**
+ * Resolves the interactive region feature (id, gid, labels) that contains the
+ * given coordinates, by querying GeoServer WFS.
+ *
+ * This is only needed for the search and locate-me code paths, where no map
+ * tile interaction occurred. When the user clicks directly on the map,
+ * VectorGrid already provides these properties from the tile data — no
+ * network call is needed.
+ *
+ * Returns `null` when the region type is {@link InteractiveRegionOption.GRIDDED_DATA}
+ * (no feature ID needed), when no matching feature is found, or when the
+ * request is aborted.
+ *
+ * @param regionType - The active interactive region.
+ * @param latlng - Coordinates to resolve.
+ * @param fetchOptions - Any other options to pass to fetch (ex: `signal`).
+ */
+export const fetchRegionFeatureByCoords = async (
+	regionType: InteractiveRegionOption,
+	latlng: Pick<L.LatLng, 'lat' | 'lng'>,
+	fetchOptions?: FetchOptions,
+): Promise<Record<string, unknown> | null> => {
+	const layerName = REGION_TO_WFS_LAYER[regionType];
+	if (!layerName) {
+		return null;
+	}
+
+	type WfsResponse = {
+		features?: { properties?: Record<string, unknown> }[];
+	};
+
+	const data = await fetchJSON<WfsResponse>(
+		`${GEOSERVER_BASE_URL}/geoserver/CDC/ows`,
+		{
+			CQL_FILTER: `CONTAINS(the_geom,POINT(${latlng.lng} ${latlng.lat}))`,
+			maxFeatures: '1',
+			outputFormat: 'application/json',
+			propertyName: 'id,label_en,label_fr',
+			request: 'GetFeature',
+			service: 'WFS',
+			typeName: layerName,
+			version: '1.0.0',
+		},
+		fetchOptions,
+	);
+
+	const properties = data?.features?.[0]?.properties;
+	return properties ?? null;
+};
+
+/**
  * Fetches location data from the API
  *
  * @param latlng Latitude and Longitude of the location
@@ -480,7 +539,7 @@ export const fetchLocationByCoords = async (
  * @param fetchOptions Any other options to pass to fetch (ex: `signal`)
  */
 export const generateChartData = async (options: ChartDataOptions, fetchOptions?: FetchOptions) => {
-	const { 
+	const {
 		interactiveRegion,
 		latlng,
 		featureId,
@@ -489,7 +548,7 @@ export const generateChartData = async (options: ChartDataOptions, fetchOptions?
 		frequency,
 		unitDecimals
 	} = options;
-// 
+//
 	let fetchUrl = '';
 
 	if(interactiveRegion == InteractiveRegionOption.GRIDDED_DATA) {

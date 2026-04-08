@@ -119,6 +119,10 @@ function child_theme_enqueue() {
 
 	// VENDOR
 
+	// JSZip
+
+	wp_register_script ( 'jszip', $child_npm_dir . 'jszip/dist/jszip.min.js', null, null, true );
+
 	// js-cookie
 
 	wp_register_script ( 'js-cookie', 'https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js', NULL, NULL, true );
@@ -210,19 +214,9 @@ function child_theme_enqueue() {
 
 	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'data', 'jquery-ui-slider', 'select2', 'flex-drawer' ), NULL, true );
 
-	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider', 'jquery-ui-datepicker', 'select2', 'flex-drawer' ), NULL, true );
+	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider', 'jquery-ui-datepicker', 'select2', 'flex-drawer', 'jszip' ), NULL, true );
 
 	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'share-widget' ), NULL, true );
-
-	// Scripts for the "custom shapefile upload" logic (in the "download" section).
-
-	wp_register_script ( 'jszip', $child_npm_dir . 'jszip/dist/jszip.min.js', null, null, true );
-	wp_register_script ( 'mapshaper_modules', $child_npm_dir . 'mapshaper/www/modules.js', null, null, true );
-	wp_register_script ( 'mapshaper', $child_npm_dir . 'mapshaper/www/mapshaper.js', array ( 'mapshaper_modules' ), null, true );
-	wp_register_script ( 'topojson', $child_npm_dir . 'topojson/dist/topojson.min.js', null, null, true );
-	wp_register_script ( 'turf', $child_npm_dir . '@turf/turf/turf.min.js', null, null, true );
-
-	wp_register_script ( 'shapefile-upload', $child_js_dir . 'shapefile-upload.js', array ( 'jquery', 'jszip', 'mapshaper', 'topojson', 'turf' ), null, true );
 
 	// localize admin url
 
@@ -264,14 +258,12 @@ function child_theme_enqueue() {
 		case 'carte' :
 			wp_enqueue_script ( 'map-app' );
 			wp_enqueue_script ( 'page-tour' );
-			wp_enqueue_script ( 'shapefile-upload' );
 			break;
 
 		case 'download' :
 		case 'telechargement' :
 			wp_enqueue_script ( 'page-tour' );
 			wp_enqueue_script ( 'download-app' );
-			wp_enqueue_script ( 'shapefile-upload' );
 			break;
 
 		case 'learn' :

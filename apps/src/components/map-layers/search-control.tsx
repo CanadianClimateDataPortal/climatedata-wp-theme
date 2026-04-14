@@ -92,7 +92,7 @@ export default function SearchControl({
 	const map = useMap();
 
 	const handleLocationChange = useCallback(
-		async (inputLatlng: SearchLatLng) => {
+		async (inputLatlng: SearchLatLng, searchProvidedTitle?: string) => {
 			const latlng = convertSearchLatLng(inputLatlng);
 			// clear all existing markers from the map
 			map.eachLayer(layer => {
@@ -121,7 +121,8 @@ export default function SearchControl({
 						lat: latlng.lat,
 						lng: latlng.lng,
 					},
-					...(properties ? { layer: { properties } } : {}),
+					...(searchProvidedTitle ? { searchProvidedTitle } : {}), /* CLIM-1322 "band-aid" #2 */
+					...(properties ? { layer: { properties } } : {}),        /* CLIM-1223            #1 */
 				});
 			}
 		},
@@ -273,8 +274,8 @@ export default function SearchControl({
 			}).on('click', async (e: L.LayerEvent) => {
 				console.log(e);
 			}),
-			moveToLocation: (latlng: SearchLatLng) => {
-				handleLocationChange(latlng);
+			moveToLocation: (latlng: SearchLatLng, title: string) => {
+				handleLocationChange(latlng, title);
 			},
 		});
 

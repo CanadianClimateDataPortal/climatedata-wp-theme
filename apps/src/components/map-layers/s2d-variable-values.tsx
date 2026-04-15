@@ -815,9 +815,9 @@ const ProbabilitiesPart = ({
 	// A single sprintf template can't produce correct French for both variables:
 	// "Les précipitations totales ont" (plural) vs "La température moyenne a" (singular).
 	const tooltipOpeningLineVariants = {
-		s2d_precip_accum: __('The total precipitation has a:'),
-		s2d_air_temp: __('The mean temperature has a:'),
-		fallback: sprintf(__('The %s has a:'), variableName.toLowerCase()),
+		s2d_precip_accum: __('The total precipitation has a'),
+		s2d_air_temp: __('The mean temperature has a'),
+		fallback: sprintf(__('The %s has a'), variableName.toLowerCase()),
 	};
 
 	const tooltipOpeningLine = Reflect.has(
@@ -848,10 +848,10 @@ const ProbabilitiesPart = ({
 				{progressBars.map((bar, idx) => (
 					<li key={idx} className="mt-2 ml-4">
 						{sprintf(
-							__('%d%% probability of being %s, %s'),
+							__('%d%% probability of being %s (%s)'),
 							Math.round(bar.percent),
 							forecastCategories[idx].term.toLowerCase(),
-							bar.label.toLowerCase(),
+							'"' + bar.label.toLowerCase() + '" + PLUSSE DAFFAIRES',
 						)}
 					</li>
 				))}

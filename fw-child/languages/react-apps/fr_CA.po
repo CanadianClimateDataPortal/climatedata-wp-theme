@@ -1243,11 +1243,14 @@ msgstr "Probabilité saisonnière pour \"%s\":"
 msgid  "Monthly %s probability:"
 msgstr "Probabilité mensuelle pour \"%s\":"
 
-msgid  "The total precipitation has a:"
-msgstr "Les précipitations totales ont :"
+msgid  "The total precipitation has a"
+msgstr "La précipitation totale a"
 
-msgid  "The mean temperature has a:"
-msgstr "La température moyenne a :"
+msgid  "The mean temperature has a"
+msgstr "La température moyenne a"
+
+msgid  "The %s has a"
+msgstr "La %s a"
 
 msgid  "%d%% probability of being %s, %s"
 msgstr "%d %% de probabilité d'être %s, %s"

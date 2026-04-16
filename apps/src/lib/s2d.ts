@@ -15,20 +15,8 @@ export type PeriodRange = [Date, Date];
 /**
  * Location-specific S2D forecast data from the API.
  *
- * Example response (temperature, °C):
- * ```json
- * { "cutoff_unusually_low_p20": 5.0, "cutoff_below_normal_p33": 1.8,
- *   "historical_median_p50": 5.6, "cutoff_above_normal_p66": 5.3,
- *   "cutoff_unusually_high_p80": 6.9,
- *   "prob_unusually_low": 4, "prob_below_normal": 37,
- *   "prob_near_normal": 38, "prob_above_normal": 26,
- *   "prob_unusually_high": 5, "skill_level": 2, "skill_CRPSS": 0.12 }
- * ```
- *
  * Cutoffs are raw values in the variable's unit (°C, mm/day).
- * Probabilities are 0–100 percentages. Rendered as:
- * - Bar label (wordy): "Above 5.3 °C", "1.8 to 5.3 °C", "Below 1.8 °C"
- * - Tooltip cutoff (compact): "> 5.3 °C", "1.8 to 5.3 °C", "< 1.8 °C"
+ * Probabilities are 0–100 percentages.
  */
 export interface LocationS2DData {
 	/** 20th percentile cutoff, e.g. `5.0` → "< 5.0 °C" */

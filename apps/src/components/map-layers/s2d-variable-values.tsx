@@ -818,15 +818,14 @@ const ProbabilitiesPart = ({
 	}
 
 
-	// We use the variable id instead of the title which is more reliable.
 	const { climateVariable } = useClimateVariable();
 	const variableId = climateVariable?.getId();
 	const variableName = climateVariable?.getTitle() ?? '';
 	// A single sprintf template can't produce correct French for both variables:
 	// "Les précipitations totales ont" (plural) vs "La température moyenne a" (singular).
 	const tooltipOpeningLineVariants = {
-		s2d_precip_accum: __('The total precipitation has a'),
-		s2d_air_temp: __('The mean temperature has a'),
+		s2d_precip_accum: __('The total precipitation has a') /* from climate-variables.config.ts */,
+		s2d_air_temp: __('The mean temperature has a')        /* from climate-variables.config.ts */,
 		fallback: sprintf(__('The %s has a'), variableName.toLowerCase()),
 	};
 

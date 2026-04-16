@@ -121,7 +121,7 @@ const SKILL_LEVEL_TOOLTIP = [
 	),
 	__(
 		'The skill level at this location is Low (CRPSS value is between ' +
-			'0.00 and 0.05): Past forecasts provided only a small improvement ' +
+			'0.00 and 0.05): The accuracy of past forecasts was a small improvement ' +
 			'over random chance. Use these forecasts with caution and consider ' +
 			'consulting both the forecasts and the historical climatology.'
 	),

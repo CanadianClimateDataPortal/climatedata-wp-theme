@@ -1260,11 +1260,11 @@ msgstr "Le niveau d'habileté à cet endroit est Aucune habileté (valeur CRPSS 
        "prévisions passées n'était pas meilleure que le hasard; il ne faut donc pas les utiliser. La climatologie "
        "historique est un meilleur indicateur que les prévisions et peut être utilisée à la place."
 
-msgid  "The skill level at this location is Low (CRPSS value is between 0.00 and 0.05): Past forecasts provided only a "
-       "small improvement over random chance. Use these forecasts with caution and consider consulting both the forecasts "
+msgid  "The skill level at this location is Low (CRPSS value is between 0.00 and 0.05): The accuracy of past forecasts was "
+       "a small improvement over random chance. Use these forecasts with caution and consider consulting both the forecasts "
        "and the historical climatology."
-msgstr "Le niveau d'habileté à cet endroit est Faible (valeur CRPSS comprise entre 0,00 et 0,05) : les prévisions "
-       "passées n'ont apporté qu'une légère amélioration par rapport au hasard. Utilisez ces prévisions avec prudence et "
+msgstr "Le niveau d'habileté à cet endroit est Faible (valeur CRPSS comprise entre 0,00 et 0,05) : l'exactitude des  "
+       "prévisions passées était légèrement supérieure au hasard. Utilisez ces prévisions avec prudence et "
        "pensez à consulter à la fois les prévisions et la climatologie historique."
 
 msgid  "The skill level at this location is Medium (CRPSS value is between 0.05 and 0.25): The accuracy of past "
@@ -1274,8 +1274,8 @@ msgstr "Le niveau d'habileté à cet endroit est Moyen (valeur CRPSS comprise en
 
 msgid  "The skill level at this location is High (CRPSS value is above 0.25): Past forecasts were mostly accurate. The "
        "forecast is considered trustworthy."
-msgstr "Le niveau d'habileté à cet endroit est Élevé (valeur CRPSS supérieure à 0,25) : l'exactitude des prévisions "
-       "passées est satisfaisante. Les prévisions sont considérées comme fiables."
+msgstr "Le niveau d'habileté à cet endroit est Élevé (valeur CRPSS supérieure à 0,25) : les prévisions passées se sont "
+       "avérées pour la plupart exactes. Les prévisions sont considérées comme fiables."
 
 msgid  "The past performance or “skill” of the prediction system is measured using the continuous ranked probability "
        "skill score (CRPSS). CRPSS measures the accuracy of forecasts produced for the same lead time as the selected "

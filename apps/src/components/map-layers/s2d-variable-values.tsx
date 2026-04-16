@@ -719,9 +719,10 @@ const ProbabilitiesPart = ({
 		{ length: nbProgressBars },
 		() => ({
 			label: '',
+			labelTooltipCutoff: '',
 			percent: 0,
 			fillHexCode: '#fff',
-		})
+		} as ProgressBarProps)
 	);
 
 	if (isLoaded) {
@@ -738,6 +739,7 @@ const ProbabilitiesPart = ({
 						__('Above %s'),
 						formatValue(aboveValue, unit, 1, locale)
 					),
+					labelTooltipCutoff: '> ' + formatValue(aboveValue, unit, 1, locale),
 					percent: abovePercentage,
 					fillHexCode: getProbabilityColour(
 						0,
@@ -749,6 +751,11 @@ const ProbabilitiesPart = ({
 					label: sprintf(
 						__('%s to %s'),
 						// No unit for the first value of the range
+						formatValue(belowValue, '', 1, locale),
+						formatValue(aboveValue, unit, 1, locale)
+					),
+					labelTooltipCutoff: sprintf(
+						__('%s to %s'),
 						formatValue(belowValue, '', 1, locale),
 						formatValue(aboveValue, unit, 1, locale)
 					),
@@ -764,6 +771,7 @@ const ProbabilitiesPart = ({
 						__('Below %s'),
 						formatValue(belowValue, unit, 1, locale)
 					),
+					labelTooltipCutoff: '< ' + formatValue(belowValue, unit, 1, locale),
 					percent: belowPercentage,
 					fillHexCode: getProbabilityColour(
 						2,
@@ -784,6 +792,7 @@ const ProbabilitiesPart = ({
 						__('Higher than %s'),
 						formatValue(higherValue, unit, 1, locale)
 					),
+					labelTooltipCutoff: '> ' + formatValue(higherValue, unit, 1, locale),
 					percent: higherPercentage,
 					fillHexCode: getProbabilityColour(
 						0,
@@ -796,6 +805,7 @@ const ProbabilitiesPart = ({
 						__('Lower than %s'),
 						formatValue(lowerValue, unit, 1, locale)
 					),
+					labelTooltipCutoff: '< ' + formatValue(lowerValue, unit, 1, locale),
 					percent: lowerPercentage,
 					fillHexCode: getProbabilityColour(
 						1,
@@ -851,7 +861,7 @@ const ProbabilitiesPart = ({
 							__('%d%% probability of being %s (%s)'),
 							Math.round(bar.percent),
 							forecastCategories[idx].term.toLowerCase(),
-							'"' + bar.label.toLowerCase() + '" + PLUSSE DAFFAIRES',
+							bar.labelTooltipCutoff,
 						)}
 					</li>
 				))}

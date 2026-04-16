@@ -1252,8 +1252,8 @@ msgstr "La température moyenne a"
 msgid  "The %s has a"
 msgstr "La %s a"
 
-msgid  "%d%% probability of being %s, %s"
-msgstr "%d %% de probabilité d'être %s, %s"
+msgid  "%d%% probability of being %s (%s)"
+msgstr "%d %% de probabilité d'être %s (%s)"
 
 msgid  "relative to the 1991 to 2020 historical climatology."
 msgstr "par rapport à la climatologie historique de 1991 à 2020."

@@ -1521,3 +1521,11 @@ msgid "Only Polygon geometry is supported. %d file was skipped:"
 msgid_plural "Only Polygon geometry is supported. %d files were skipped:"
 msgstr[0] "Seuls les polygones sont pris en charge. %d fichier ignoré :"
 msgstr[1] "Seuls les polygones sont pris en charge. %d fichiers ignorés :"
+
+msgid  "NOTE: The data owner has informed us that there are errors in the daily AHCCD data for Red Deer A (station "
+       "number 3025484). These will be corrected as soon as possible."
+msgstr "REMARQUE: Le propriétaire des données nous a informés de la présence d'erreurs dans les données quotidiennes "
+       "de DCCAH pour Red Deer A (station n° 3025484). Ces erreurs seront corrigées dans les plus brefs délais."
+
+msgid  "White: No clear outcome"
+msgstr "Blanc: Aucun résultat significatif"

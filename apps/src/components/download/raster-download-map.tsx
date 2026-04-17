@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
-	setMessageDisplay,
 	setSelectedStation,
 	setSelectionMode,
 } from '@/features/download/download-slice';
@@ -29,7 +28,7 @@ import {
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
 } from '@/lib/constants';
-import NoticeRSLCCMIP6 from '@/components/notice-rslc-cmip6';
+import MapBanners from '@/components/map-banners';
 import ShapefileUpload from '@/components/download/ui/shapefile-upload';
 import { ShapefileGeoJsonLayer } from '@/components/download/map-layers';
 import { MAP_CONFIG } from '@/config/map.config';
@@ -45,11 +44,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 	const { zoom, center, selectionMode } = useAppSelector(
 		(state) => state.download
 	);
-	const messageDisplayStates = useAppSelector(state => state.download.messageDisplayStates);
 	const dispatch = useAppDispatch();
-
-	const noticeRSLCCMIP6Id = 'noticeRSLCCMIP6';
-	const noticeRSLCCMIP6Displayed = messageDisplayStates[noticeRSLCCMIP6Id] ?? true;
 
 	let stationTypeFilters = climateVariable?.getStationTypeFilter() ?? ['T', 'P', 'B'];
 	// Add B if not included to the default enabled filters.
@@ -160,10 +155,6 @@ export default function RasterDownloadMap(): React.ReactElement {
 	const clearSelection = () => {
 		interactiveLayerRef.current?.clearSelection();
 	};
-
-	const handleHideRSLCCMIP6Notice = () => {
-		dispatch(setMessageDisplay({message: noticeRSLCCMIP6Id, displayed: false}));
-	}
 
 	const renderInteractiveLayer = useCallback(() => {
 		if (isUserCustomInteractiveRegion) {
@@ -296,11 +287,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 			)}
 
 			<div className="h-[560px] font-sans relative">
-				<NoticeRSLCCMIP6
-					className="absolute top-20 z-30 w-full px-4"
-					displayed={noticeRSLCCMIP6Displayed}
-					onHide={handleHideRSLCCMIP6Notice}
-				/>
+				<MapBanners className="absolute top-20 z-30 w-full px-4" />
 
 				<MapContainer
 					attributionControl={false}

@@ -66,17 +66,24 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
     hoveredRef.current = null;
   }, [primaryLayerRef, comparisonLayerRef]); // No dependencies since we're only using refs via .current
 
-  const handleClick = useCallback(async ({ latlng, layer }: { latlng: L.LatLng; layer: { properties: any } }) => {
+  const handleClick = useCallback(async ({ latlng, layer, searchProvidedTitle }: { latlng: L.LatLng; layer: { properties: any }; searchProvidedTitle?: string }) => {
     const featureId = layer && getFeatureId(layer.properties);
 
     const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 
-    const locationByCoords = await fetchLocationByCoords(latlng);
-    const locationId = locationByCoords?.geo_id ?? `${locationByCoords?.lat}|${locationByCoords?.lng}`;
-    let locationTitle = locationByCoords.title;
+    let locationId: string;
+    let locationTitle: string;
+
+    if (searchProvidedTitle && interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
+      locationTitle = searchProvidedTitle;
+      locationId = `${latlng.lat}|${latlng.lng}`;
+    } else {
+      const locationByCoords = await fetchLocationByCoords(latlng);
+      locationId = locationByCoords?.geo_id ?? `${locationByCoords?.lat}|${locationByCoords?.lng}`;
+      locationTitle = locationByCoords.title;
 
 		// For non-gridded data, try to get the title from the layer properties, if available.
-    if (interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA) {
+      if (interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA) {
 			if (layer) {
 				if (locale === 'en') {
 					locationTitle = layer.properties.label_en ?? '';
@@ -84,6 +91,7 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
 					locationTitle = layer.properties.label_fr ?? '';
 				}
 			}
+      }
     }
 
     clearMarkers();

@@ -22,6 +22,7 @@ import {
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
+import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import StarRating from '@/components/ui/star-rating';
 import ProgressBar, { ProgressBarProps } from '@/components/ui/progress-bar';
@@ -38,7 +39,6 @@ interface PopupContentProps {
 	frequency: S2DFrequencyType;
 	forecastType: ForecastType;
 	forecastDisplay: ForecastDisplay;
-	variableName: string;
 	unit: string;
 }
 
@@ -46,7 +46,6 @@ interface ProbabilitiesPartProps {
 	locationData: LocationS2DData | null;
 	forecastType: ForecastType;
 	frequency: S2DFrequencyType;
-	variableName: string;
 	unit: string;
 }
 
@@ -296,7 +295,6 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 	const hasDataLoaded = !!(locationData && releaseDate);
 
 	const variableId = climateVariable?.getId() ?? '';
-	const variableName = climateVariable?.getTitle() ?? '';
 	const unit = climateVariable?.getUnit() ?? '';
 	const frequency = (climateVariable?.getFrequency() ??
 		FrequencyType.MONTHLY) as S2DFrequencyType;
@@ -377,7 +375,6 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 			frequency={frequency}
 			forecastType={forecastType}
 			forecastDisplay={forecastDisplay}
-			variableName={variableName}
 			unit={unit}
 		/>
 	);
@@ -711,7 +708,6 @@ const ProbabilitiesPart = ({
 	locationData,
 	forecastType,
 	frequency,
-	variableName,
 	unit,
 }: ProbabilitiesPartProps) => {
 	const { locale } = useLocale();
@@ -723,9 +719,10 @@ const ProbabilitiesPart = ({
 		{ length: nbProgressBars },
 		() => ({
 			label: '',
+			labelTooltipCutoff: '',
 			percent: 0,
 			fillHexCode: '#fff',
-		})
+		} as ProgressBarProps)
 	);
 
 	if (isLoaded) {
@@ -742,6 +739,7 @@ const ProbabilitiesPart = ({
 						__('Above %s'),
 						formatValue(aboveValue, unit, 1, locale)
 					),
+					labelTooltipCutoff: '> ' + formatValue(aboveValue, unit, 1, locale),
 					percent: abovePercentage,
 					fillHexCode: getProbabilityColour(
 						0,
@@ -753,6 +751,11 @@ const ProbabilitiesPart = ({
 					label: sprintf(
 						__('%s to %s'),
 						// No unit for the first value of the range
+						formatValue(belowValue, '', 1, locale),
+						formatValue(aboveValue, unit, 1, locale)
+					),
+					labelTooltipCutoff: sprintf(
+						__('%s to %s'),
 						formatValue(belowValue, '', 1, locale),
 						formatValue(aboveValue, unit, 1, locale)
 					),
@@ -768,6 +771,7 @@ const ProbabilitiesPart = ({
 						__('Below %s'),
 						formatValue(belowValue, unit, 1, locale)
 					),
+					labelTooltipCutoff: '< ' + formatValue(belowValue, unit, 1, locale),
 					percent: belowPercentage,
 					fillHexCode: getProbabilityColour(
 						2,
@@ -788,6 +792,7 @@ const ProbabilitiesPart = ({
 						__('Higher than %s'),
 						formatValue(higherValue, unit, 1, locale)
 					),
+					labelTooltipCutoff: '> ' + formatValue(higherValue, unit, 1, locale),
 					percent: higherPercentage,
 					fillHexCode: getProbabilityColour(
 						0,
@@ -800,6 +805,7 @@ const ProbabilitiesPart = ({
 						__('Lower than %s'),
 						formatValue(lowerValue, unit, 1, locale)
 					),
+					labelTooltipCutoff: '< ' + formatValue(lowerValue, unit, 1, locale),
 					percent: lowerPercentage,
 					fillHexCode: getProbabilityColour(
 						1,
@@ -811,11 +817,77 @@ const ProbabilitiesPart = ({
 		}
 	}
 
-	const TitleLine = sprintf(
-		frequency === FrequencyType.MONTHLY
-			? __('Monthly %s probability:')
-			: __('Seasonal %s probability:'),
-		variableName
+
+	const { climateVariable } = useClimateVariable();
+	const variableId = climateVariable?.getId();
+	const variableName = climateVariable?.getTitle() ?? '';
+	// A single sprintf template can't produce correct French for both variables:
+	// "Les précipitations totales ont" (plural) vs "La température moyenne a" (singular).
+	const tooltipOpeningLineVariants = {
+		s2d_precip_accum: __('The total precipitation has a') /* from climate-variables.config.ts */,
+		s2d_air_temp: __('The mean temperature has a')        /* from climate-variables.config.ts */,
+		fallback: sprintf(__('The %s has a'), variableName.toLowerCase()),
+	};
+
+	const tooltipOpeningLine = Reflect.has(
+		tooltipOpeningLineVariants,
+		variableId ?? 'fallback'
+	)
+		? Reflect.get(tooltipOpeningLineVariants, variableId ?? 'fallback')
+		: Reflect.get(tooltipOpeningLineVariants, 'fallback');
+
+	const TitleLine = () => (
+		<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
+			{sprintf(
+				frequency === FrequencyType.MONTHLY
+					? __('Monthly %s probability:')
+					: __('Seasonal %s probability:'),
+				variableName
+			)}
+		</span>
+	);
+
+	// Category definitions parallel to progressBars, for tooltip content
+	const forecastCategories = buildForecastCategories(forecastType);
+
+	const tooltipProbabilityContent = isLoaded ? (
+		<div className="p-1">
+			<p>{tooltipOpeningLine}</p>
+			<ul className="mt-2 list-disc list-outside">
+				{progressBars.map((bar, idx) => (
+					<li key={idx} className="mt-2 ml-4">
+						{sprintf(
+							__('%d%% probability of being %s (%s)'),
+							Math.round(bar.percent),
+							forecastCategories[idx].term.toLowerCase(),
+							bar.labelTooltipCutoff,
+						)}
+					</li>
+				))}
+			</ul>
+			<p className="mt-2">
+				{__('relative to the 1991 to 2020 historical climatology.')}
+			</p>
+			<p className="mt-2">
+				{__('The probabilities may not add exactly to 100% due to rounding.')}
+			</p>
+		</div>
+	) : null;
+
+	const ProbabilityHeading = !isLoaded ? (
+		<TitleLine />
+	) : (
+		<span className="flex items-start gap-1">
+			<span className="shrink">
+				<TitleLine />
+			</span>
+			<span className="shrink-0">
+				<TooltipWidget
+					side="top"
+					tooltip={tooltipProbabilityContent}
+				/>
+			</span>
+		</span>
 	);
 
 	return (
@@ -824,7 +896,7 @@ const ProbabilitiesPart = ({
 				id="probability-heading"
 				className="mb-3 text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium"
 			>
-				{TitleLine}
+				{ProbabilityHeading}
 			</h3>
 			<div className="border-x border-cold-grey-2 relative">
 				<div className="absolute h-full top-0 border-l border-cold-grey-2 left-1/4"></div>
@@ -869,7 +941,6 @@ const PopupContent = ({
 	frequency,
 	forecastType,
 	forecastDisplay,
-	variableName,
 	unit,
 }: PopupContentProps) => {
 	const { locale } = useLocale();
@@ -920,7 +991,6 @@ const PopupContent = ({
 					locationData={locationData}
 					forecastType={forecastType}
 					frequency={frequency}
-					variableName={variableName}
 					unit={unit}
 				/>
 			)}

@@ -1639,7 +1639,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	},
 	/** S2D Mean Temperature */
 	{
-		id: 's2d_air_temp',
+		id: 's2d_air_temp' /* used as i18n discriminant, search the code for its usage */,
 		class: 'S2DClimateVariable',
 		unit: 'degC',
 		legendConfigs: {
@@ -1653,7 +1653,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	},
 	/** S2D Total Precipitation */
 	{
-		id: 's2d_precip_accum',
+		id: 's2d_precip_accum' /* used as i18n discriminant, search the code for its usage */,
 		class: 'S2DClimateVariable',
 		unit: 'mm/day',
 		legendConfigs: {

@@ -1263,7 +1263,7 @@ msgstr "Le niveau d'habileté à cet endroit est Aucune habileté (valeur CRPSS 
 msgid  "The skill level at this location is Low (CRPSS value is between 0.00 and 0.05): The accuracy of past forecasts was "
        "a small improvement over random chance. Use these forecasts with caution and consider consulting both the forecasts "
        "and the historical climatology."
-msgstr "Le niveau d'habileté à cet endroit est Faible (valeur CRPSS comprise entre 0,00 et 0,05) : l'exactitude des  "
+msgstr "Le niveau d'habileté à cet endroit est Faible (valeur CRPSS comprise entre 0,00 et 0,05) : l'exactitude des "
        "prévisions passées était légèrement supérieure au hasard. Utilisez ces prévisions avec prudence et "
        "pensez à consulter à la fois les prévisions et la climatologie historique."
 

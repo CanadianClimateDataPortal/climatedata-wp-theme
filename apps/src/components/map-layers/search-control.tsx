@@ -15,6 +15,7 @@ import 'leaflet-search';
 import mapPinIcon from '@/assets/map-pin.svg';
 
 import { cn, parseLatLon } from '@/lib/utils';
+import { dispatchMapClick } from '@/lib/dispatch-map-click';
 import { fetchLocationByCoords } from '@/services/services';
 import { SearchControlLocationItem, SearchControlResponse } from '@/types/types';
 import { LOCATION_SEARCH_ENDPOINT, SEARCH_DEFAULT_ZOOM, SEARCH_PLACEHOLDER } from '@/lib/constants';
@@ -79,7 +80,7 @@ export default function SearchControl({
 	const map = useMap();
 
 	const handleLocationChange = useCallback(
-		(inputLatlng: SearchLatLng) => {
+		async (inputLatlng: SearchLatLng) => {
 			const latlng = convertSearchLatLng(inputLatlng);
 			// clear all existing markers from the map
 			map.eachLayer(layer => {
@@ -88,6 +89,7 @@ export default function SearchControl({
 				}
 			});
 			map.setView(latlng, SEARCH_DEFAULT_ZOOM);
+			await dispatchMapClick(map, latlng);
 		},
 		[
 			//

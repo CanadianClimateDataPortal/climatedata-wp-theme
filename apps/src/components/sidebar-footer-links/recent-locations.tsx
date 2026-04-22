@@ -15,6 +15,7 @@ import { SidebarPanel } from '@/components/ui/sidebar';
 import { useAppSelector } from '@/app/hooks';
 import { MapLocation } from '@/types/types';
 import { SEARCH_DEFAULT_ZOOM } from '@/lib/constants';
+import { dispatchMapClick } from '@/lib/dispatch-map-click';
 import { useMap } from '@/hooks/use-map';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
@@ -59,8 +60,9 @@ const RecentLocationsPanel: React.FC = () => {
 		return null;
 	}
 
-	const moveToLocation = (location: MapLocation) => {
+	const moveToLocation = async (location: MapLocation) => {
 		map.setView(location, SEARCH_DEFAULT_ZOOM);
+		await dispatchMapClick(map, location);
 	};
 
 	return (

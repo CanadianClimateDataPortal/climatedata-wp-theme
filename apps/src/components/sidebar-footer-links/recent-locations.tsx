@@ -18,7 +18,6 @@ import { SEARCH_DEFAULT_ZOOM } from '@/lib/constants';
 import { useMap } from '@/hooks/use-map';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
-import L from 'leaflet';
 
 // link and panel slug
 const slug = 'recent-locations';
@@ -62,24 +61,6 @@ const RecentLocationsPanel: React.FC = () => {
 
 	const moveToLocation = (location: MapLocation) => {
 		map.setView(location, SEARCH_DEFAULT_ZOOM);
-		let vectorLayer: any;
-
-		// Find our vector layer.
-		map.eachLayer(layer => {
-			// @ts-expect-error: suppress leaflet typescript error
-			if (layer instanceof L.VectorGrid) {
-				vectorLayer = layer;
-			}
-		});
-
-		if (vectorLayer) {
-			vectorLayer.fire('click', {
-				latlng: {
-					lat: location.lat,
-					lng: location.lng
-				}
-			})
-		}
 	};
 
 	return (

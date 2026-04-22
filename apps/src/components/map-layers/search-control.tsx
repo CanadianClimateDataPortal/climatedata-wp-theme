@@ -58,7 +58,7 @@ export default function SearchControl({
 	const [isGeolocationEnabled, setIsGeolocationEnabled] =
 		useState<boolean>(false);
 	const [isTracking, setIsTracking] = useState<boolean>(false);
-	const vectorLayer: any = layerRef?.current;
+	void layerRef; // intentionally ignore to suppress typescript error
 
 	// we need a unique id for the search control container for cases where multiple maps
 	// are rendered on the same page -- ie. comparing emission scenarios
@@ -88,19 +88,11 @@ export default function SearchControl({
 				}
 			});
 			map.setView(latlng, SEARCH_DEFAULT_ZOOM);
-
-			// The location will be saved via the click event.
-			// see handleClick() in use-map-interactions.tsx.
-			if (vectorLayer) {
-				vectorLayer.fire('click', {
-					latlng: {
-						lat: latlng.lat,
-						lng: latlng.lng,
-					}
-				})
-			}
 		},
-		[map, vectorLayer]
+		[
+			//
+			map,
+		],
 	);
 
 	const toggleGeoLocation = () => {

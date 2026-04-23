@@ -17,8 +17,15 @@ import mapPinIcon from '@/assets/map-pin.svg';
 import { cn, parseLatLon } from '@/lib/utils';
 import { dispatchMapClick } from '@/lib/dispatch-map-click';
 import { fetchLocationByCoords } from '@/services/services';
-import { SearchControlLocationItem, SearchControlResponse } from '@/types/types';
-import { LOCATION_SEARCH_ENDPOINT, SEARCH_DEFAULT_ZOOM, SEARCH_PLACEHOLDER } from '@/lib/constants';
+import {
+	type SearchControlLocationItem,
+	type SearchControlResponse,
+} from '@/types/types';
+import {
+	LOCATION_SEARCH_ENDPOINT,
+	SEARCH_DEFAULT_ZOOM,
+	SEARCH_PLACEHOLDER,
+} from '@/lib/constants';
 
 /**
  * Lat/lng object returned by the Search component.
@@ -92,7 +99,6 @@ export default function SearchControl({
 			await dispatchMapClick(map, latlng);
 		},
 		[
-			//
 			map,
 		],
 	);
@@ -235,8 +241,6 @@ export default function SearchControl({
 					iconAnchor: [12, 41], // Anchor of the icon
 					popupAnchor: [0, -41], // Popup position relative to the icon
 				}),
-			}).on('click', async (e: L.LayerEvent) => {
-				console.log(e);
 			}),
 			moveToLocation: (latlng: SearchLatLng) => {
 				handleLocationChange(latlng);

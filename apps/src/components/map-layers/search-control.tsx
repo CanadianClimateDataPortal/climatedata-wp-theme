@@ -3,7 +3,7 @@
  * This component allows users to search for locations using the OpenStreetMap Nominatim API and navigate the map to the selected location.
  */
 
-import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 import { __ } from '@/context/locale-provider';
 import { Locate, LocateFixed } from 'lucide-react';
 import { useMap } from 'react-leaflet';
@@ -47,20 +47,25 @@ function convertSearchLatLng(inputLatLng: SearchLatLng): L.LatLng {
 }
 
 /**
+ * Props for the SearchControl component.
+ */
+export interface SearchControlProps {
+	className?: string;
+}
+
+/**
  * SearchControl Component
  * ---------------------------
  * A React component that adds a search control to a Leaflet map using the `leaflet-search` plugin.
  *
- * @returns {ReactElement | null} The rendered component (or null if not used within a map context).
+ * @returns {ReactElement} The rendered component.
  *
  * @example
  * <SearchControl />
  */
-export default function SearchControl({
+const SearchControl = ({
 	className,
-}: {
-	className?: string;
-}): ReactElement | null {
+}: SearchControlProps): ReactElement => {
 	const [isGeolocationEnabled, setIsGeolocationEnabled] =
 		useState<boolean>(false);
 	const [isTracking, setIsTracking] = useState<boolean>(false);
@@ -321,4 +326,6 @@ export default function SearchControl({
 			</div>
 		</div>
 	);
-}
+};
+
+export default SearchControl;

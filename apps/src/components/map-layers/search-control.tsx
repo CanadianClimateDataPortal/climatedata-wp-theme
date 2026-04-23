@@ -58,15 +58,12 @@ function convertSearchLatLng(inputLatLng: SearchLatLng): L.LatLng {
  */
 export default function SearchControl({
 	className,
-	layerRef,
 }: {
 	className?: string;
-	layerRef?: React.MutableRefObject<any>;
 }): ReactElement | null {
 	const [isGeolocationEnabled, setIsGeolocationEnabled] =
 		useState<boolean>(false);
 	const [isTracking, setIsTracking] = useState<boolean>(false);
-	void layerRef; // intentionally ignore to suppress typescript error
 
 	// we need a unique id for the search control container for cases where multiple maps
 	// are rendered on the same page -- ie. comparing emission scenarios

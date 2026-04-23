@@ -245,7 +245,7 @@ export default function MapContainer({
 			<ZoomControl />
 
 			{/* Show search control if not a comparison map. */}
-			{ !isComparisonMap && <SearchControl layerRef={layerRef} /> }
+			{ !isComparisonMap && <SearchControl /> }
 
 			<LocationModal
 				isOpen={canShowModal}

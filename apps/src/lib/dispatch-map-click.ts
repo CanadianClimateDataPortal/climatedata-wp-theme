@@ -9,7 +9,7 @@ import L from 'leaflet';
  * tiles are queried via `gridPane.querySelectorAll('canvas')` and filtered
  * by bounding rect instead.
  *
- * `Promise.race` with a 500 ms timeout guards the case where `setView`
+ * `Promise.race` with a 1,000 ms timeout guards the case where `setView`
  * fires `moveend` synchronously (short pan, no animation) before the
  * listener is attached.
  */
@@ -20,7 +20,7 @@ export const dispatchMapClick = async (
 	void latlng;
 	await Promise.race([
 		new Promise<void>((resolve) => map.once('moveend', () => resolve())),
-		new Promise<void>((resolve) => setTimeout(resolve, 500)),
+		new Promise<void>((resolve) => setTimeout(resolve, 1_000)),
 	]);
 	await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 	const container = map.getContainer();

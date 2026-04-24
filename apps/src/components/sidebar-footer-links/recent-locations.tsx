@@ -15,10 +15,10 @@ import { SidebarPanel } from '@/components/ui/sidebar';
 import { useAppSelector } from '@/app/hooks';
 import { MapLocation } from '@/types/types';
 import { SEARCH_DEFAULT_ZOOM } from '@/lib/constants';
+import { dispatchMapClick } from '@/lib/dispatch-map-click';
 import { useMap } from '@/hooks/use-map';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
-import L from 'leaflet';
 
 // link and panel slug
 const slug = 'recent-locations';
@@ -60,26 +60,9 @@ const RecentLocationsPanel: React.FC = () => {
 		return null;
 	}
 
-	const moveToLocation = (location: MapLocation) => {
+	const moveToLocation = async (location: MapLocation) => {
 		map.setView(location, SEARCH_DEFAULT_ZOOM);
-		let vectorLayer: any;
-
-		// Find our vector layer.
-		map.eachLayer(layer => {
-			// @ts-expect-error: suppress leaflet typescript error
-			if (layer instanceof L.VectorGrid) {
-				vectorLayer = layer;
-			}
-		});
-
-		if (vectorLayer) {
-			vectorLayer.fire('click', {
-				latlng: {
-					lat: location.lat,
-					lng: location.lng
-				}
-			})
-		}
+		await dispatchMapClick(map, location);
 	};
 
 	return (

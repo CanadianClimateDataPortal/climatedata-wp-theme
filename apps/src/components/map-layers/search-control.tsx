@@ -3,7 +3,13 @@
  * This component allows users to search for locations using the OpenStreetMap Nominatim API and navigate the map to the selected location.
  */
 
-import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+	ReactElement,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react';
 import { __ } from '@/context/locale-provider';
 import { Locate, LocateFixed } from 'lucide-react';
 import { useMap } from 'react-leaflet';
@@ -15,16 +21,12 @@ import 'leaflet-search';
 import mapPinIcon from '@/assets/map-pin.svg';
 
 import { cn, parseLatLon } from '@/lib/utils';
-import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { dispatchMapClick } from '@/lib/dispatch-map-click';
+import { fetchLocationByCoords } from '@/services/services';
 import {
-	fetchLocationByCoords,
-	fetchRegionFeatureByCoords,
-} from '@/services/services';
-import type {
-	SearchControlLocationItem,
-	SearchControlResponse,
+	type SearchControlLocationItem,
+	type SearchControlResponse,
 } from '@/types/types';
-import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 import {
 	LOCATION_SEARCH_ENDPOINT,
 	SEARCH_DEFAULT_ZOOM,
@@ -51,27 +53,28 @@ function convertSearchLatLng(inputLatLng: SearchLatLng): L.LatLng {
 }
 
 /**
+ * Props for the SearchControl component.
+ */
+export interface SearchControlProps {
+	className?: string;
+}
+
+/**
  * SearchControl Component
  * ---------------------------
  * A React component that adds a search control to a Leaflet map using the `leaflet-search` plugin.
  *
- * @returns {ReactElement | null} The rendered component (or null if not used within a map context).
+ * @returns {ReactElement} The rendered component.
  *
  * @example
  * <SearchControl />
  */
-export default function SearchControl({
+const SearchControl = ({
 	className,
-	layerRef,
-}: {
-	className?: string;
-	layerRef?: React.MutableRefObject<any>;
-}): ReactElement | null {
+}: SearchControlProps): ReactElement => {
 	const [isGeolocationEnabled, setIsGeolocationEnabled] =
 		useState<boolean>(false);
 	const [isTracking, setIsTracking] = useState<boolean>(false);
-	const { climateVariable } = useClimateVariable();
-	const vectorLayer: any = layerRef?.current;
 
 	// we need a unique id for the search control container for cases where multiple maps
 	// are rendered on the same page -- ie. comparing emission scenarios
@@ -101,35 +104,11 @@ export default function SearchControl({
 				}
 			});
 			map.setView(latlng, SEARCH_DEFAULT_ZOOM);
-
-			// The location will be saved via the click event.
-			// see handleClick() in use-map-interactions.tsx.
-			if (vectorLayer) {
-				const interactiveRegion = climateVariable?.getInteractiveRegion()
-					?? InteractiveRegionOption.GRIDDED_DATA;
-
-				// When a user clicks the map, VectorGrid provides feature
-				// properties from tile data automatically. Search and locate-me
-				// skip that interaction, so we resolve the properties via WFS.
-				const properties = await fetchRegionFeatureByCoords(
-					interactiveRegion,
-					latlng,
-				);
-
-				vectorLayer.fire('click', {
-					latlng: {
-						lat: latlng.lat,
-						lng: latlng.lng,
-					},
-					...(properties ? { layer: { properties } } : {}),
-				});
-			}
+			await dispatchMapClick(map, latlng);
 		},
 		[
-			climateVariable,
 			map,
-			vectorLayer,
-		]
+		],
 	);
 
 	const toggleGeoLocation = () => {
@@ -270,8 +249,6 @@ export default function SearchControl({
 					iconAnchor: [12, 41], // Anchor of the icon
 					popupAnchor: [0, -41], // Popup position relative to the icon
 				}),
-			}).on('click', async (e: L.LayerEvent) => {
-				console.log(e);
 			}),
 			moveToLocation: (latlng: SearchLatLng) => {
 				handleLocationChange(latlng);
@@ -355,4 +332,6 @@ export default function SearchControl({
 			</div>
 		</div>
 	);
-}
+};
+
+export default SearchControl;

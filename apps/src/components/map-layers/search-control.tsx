@@ -3,7 +3,13 @@
  * This component allows users to search for locations using the OpenStreetMap Nominatim API and navigate the map to the selected location.
  */
 
-import { ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+	ReactElement,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react';
 import { __ } from '@/context/locale-provider';
 import { Locate, LocateFixed } from 'lucide-react';
 import { useMap } from 'react-leaflet';

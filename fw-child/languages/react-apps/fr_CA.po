@@ -633,6 +633,9 @@ msgstr "Plusieurs options de seuil sont disponibles pour certaines variables, pa
 msgid "Threshold Values"
 msgstr "Valeurs seuils"
 
+msgid "Threshold"
+msgstr "Seuil"
+
 msgid "Select a time of the year from the options in the dropdown menu."
 msgstr "Sélectionnez une période de l’année parmi les options du menu déroulant."
 

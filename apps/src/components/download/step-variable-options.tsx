@@ -19,6 +19,7 @@ import type {
 	StepResetPayload,
 } from '@/types/download-form-interface';
 import { getForecastTypeName } from '@/lib/s2d';
+import { ThresholdSelect } from '@/components/download/ui/threshold-select';
 
 const validateS2DVariable = (
 	climateVariable: ClimateVariableInterface,
@@ -33,27 +34,38 @@ const validateS2DVariable = (
 const validateRegularVariable = (
 	climateVariable: ClimateVariableInterface,
 ): unknown[] => {
-	const version = climateVariable.getVersion() ?? true;
-	const fields = climateVariable.getAnalysisFields() ?? [];
+	const version = climateVariable.getVersion();
+	const analysisFields = climateVariable.getAnalysisFields() ?? [];
 	const values = climateVariable.getAnalysisFieldValues() ?? {};
+	const thresholdValues = climateVariable.getThresholds() ?? [];
+	const thresholdValue = climateVariable.getThreshold();
+
+	const hasAnalysisFields = analysisFields.length > 0;
+	// We cannot have both analysis fields and a threshold field
+	const hasThresholdField = !hasAnalysisFields && thresholdValues.length > 0;
+
+	const versionIsValid = !!version;
+	const analysisFieldsAreValid = analysisFields
+		.filter(f => f.required !== false)
+		.map(f => {
+			const value = values?.[f.key];
+			// If it's a date field with a format, check both existence and format validity
+			if (f.type === 'input' && f.attributes?.type === 'date' && f.format) {
+				return (
+					value != null &&
+					value !== '' &&
+					dateFormatCheck(f.format).test(value)
+				);
+			}
+			// Otherwise, just check existence
+			return value != null && value !== '';
+		});
+	const thresholdIsValid = !hasThresholdField || thresholdValue != null;
 
 	return [
-		version,
-		...fields
-			.filter(f => f.required !== false)
-			.map(f => {
-				const value = values?.[f.key];
-				// If it's a date field with a format, check both existence and format validity
-				if (f.type === 'input' && f.attributes?.type === 'date' && f.format) {
-					return (
-						value != null &&
-						value !== '' &&
-						dateFormatCheck(f.format).test(value)
-					);
-				}
-				// Otherwise, just check existence
-				return value != null && value !== '';
-			})
+		versionIsValid,
+		...analysisFieldsAreValid,
+		thresholdIsValid,
 	];
 }
 
@@ -121,6 +133,10 @@ const StepVariableOptions = React.forwardRef<
 				payload.analysisFieldValues = {};
 			}
 
+			if (climateVariable.getThreshold() != null) {
+				payload.threshold = null;
+			}
+
 			if (isS2DVariable) {
 				payload.forecastType = null;
 			}
@@ -133,7 +149,10 @@ const StepVariableOptions = React.forwardRef<
 	]);
 
 	// Determine if there are any analysis fields to display.
-	const analysisFields = !!climateVariable?.getAnalysisFields()?.length;
+	const hasAnalysisFields = !!climateVariable?.getAnalysisFields()?.length;
+	// Determine if there are any threshold fields to display. A variable can
+	// have analysis fields or threshold fields, but not both.
+	const hasThreshold = !hasAnalysisFields && !!climateVariable?.getThresholds()?.length;
 	const version = !!climateVariable?.getVersions()?.length;
 
 	return (
@@ -155,10 +174,15 @@ const StepVariableOptions = React.forwardRef<
 								<VersionDownloadFields />
 							</div>
 						)}
-						{analysisFields && (
+						{hasAnalysisFields && (
 							<div className="mb-8">
-							<AnalyzedDownloadFields />
-						</div>
+								<AnalyzedDownloadFields />
+							</div>
+						)}
+						{hasThreshold && (
+							<div className="mb-8">
+								<ThresholdSelect />
+							</div>
 						)}
 					</>
 				)}
@@ -201,6 +225,8 @@ export const StepSummaryVariableOptions = (): React.ReactNode | null => {
 		const version = climateVariable.getVersion?.();
 		const analysisFields = climateVariable.getAnalysisFields?.() ?? [];
 		const analysisFieldValues = climateVariable.getAnalysisFieldValues?.() ?? {};
+		const thresholdValue = climateVariable.getThreshold?.();
+		const thresholdValues = climateVariable.getThresholds?.() ?? [];
 
 		if (climateVariable.getVersions().length > 0) {
 			items.push({
@@ -217,6 +243,16 @@ export const StepSummaryVariableOptions = (): React.ReactNode | null => {
 				}
 			))
 		);
+
+		if (thresholdValue) {
+			const label = thresholdValues.find((t) => t.value === thresholdValue)?.label;
+			if (label) {
+				items.push({
+					term: __('Threshold'),
+					details: label,
+				});
+			}
+		}
 	}
 
 	return (

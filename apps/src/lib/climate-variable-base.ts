@@ -444,6 +444,12 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		}
 
 		const frequencyCode = getFrequencyType(frequency);
+		let frequencyName = frequency;
+
+		if (frequency === FrequencyType.ANNUAL_JUL_JUN) {
+			// Special case: the YS-JUL and YS have the same frequency name (but different codes)
+			frequencyName = FrequencyType.ANNUAL;
+		}
 
 		const valuesArr = [
 			version,
@@ -458,7 +464,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		}
 
 		valuesArr.push(
-			frequency,
+			frequencyName,
 			'30year',
 			this.getDataValue() === 'delta' ? 'delta7100' : ''
 		);

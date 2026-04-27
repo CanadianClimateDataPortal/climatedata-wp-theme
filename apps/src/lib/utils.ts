@@ -68,6 +68,8 @@ export const getFrequencyType = (frequency: string): FrequencyType | undefined =
 
 	if (frequency === 'ann') {
 		frequencyCode = FrequencyType.YS;
+	} else if (frequency === 'annual_jul_jun') {
+		frequencyCode = FrequencyType.YSJUL;
 	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
 		frequencyCode = FrequencyType.MS;
 	} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
@@ -95,6 +97,11 @@ export const getDefaultFrequency = (
 	section: string
 ) => {
 	const hasAnnual = isFrequencyEnabled(config, section, FrequencyType.ANNUAL);
+	const hasAnnualJul = isFrequencyEnabled(
+		config,
+		section,
+		FrequencyType.ANNUAL_JUL_JUN,
+	);
 	const hasMonths = isFrequencyEnabled(
 		config,
 		section,
@@ -110,6 +117,8 @@ export const getDefaultFrequency = (
 
 	if (hasAnnual) {
 		defaultValue = FrequencyType.ANNUAL;
+	} else if (hasAnnualJul) {
+		defaultValue = FrequencyType.ANNUAL_JUL_JUN;
 	} else if (hasMonths) {
 		defaultValue = 'jan';
 	} else if (hasSeasons) {
@@ -227,6 +236,7 @@ export const getFeatureId = (properties: {
 export function getUnitName(unit: string): string {
 	switch (unit) {
 		case 'DoY':
+		case 'DoY-jul':
 			return __('Day');
 		case 'degC':
 			return __('°C');

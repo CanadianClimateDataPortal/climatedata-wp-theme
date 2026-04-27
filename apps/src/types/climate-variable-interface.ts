@@ -78,6 +78,7 @@ export enum FrequencyType {
 	ALL_MONTHS = 'allMonths',
 	DAILY = 'daily',
 	YS = 'ys',
+	YSJUL = 'ysjul',
 	MS = 'ms',
 	QSDEC = 'qsdec',
 }
@@ -95,6 +96,7 @@ export const FrequencyTypes = {
 	DAILY: FrequencyType.DAILY,
 	// Frequency types for API and GeoServer queries.
 	YS: FrequencyType.YS,
+	YSJUL: FrequencyType.YSJUL,
 	MS: FrequencyType.MS,
 	QSDEC: FrequencyType.QSDEC,
 } as const;

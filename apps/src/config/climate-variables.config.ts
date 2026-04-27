@@ -485,6 +485,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "all",
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
@@ -1496,6 +1497,215 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"pr",
 		],
 		stationTypeFilter: ['P'],
+	},
+	/** Total solid precipitation */
+	{
+		id: "total_solid_precipitation",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "sntot",
+		versions: [ "cmip6" ],
+		legendConfigs: {
+			[MapDisplayType.ABSOLUTE]: {
+				addTopPadding: true,
+			},
+			[MapDisplayType.DELTA]: {
+				hideTopLabel: true,
+				decimals: 1,
+			},
+		},
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		unit: "mm",
+		preCalculatedCanDCSConfig: {
+			sntot: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
+	},
+	/** Total liquid precipitation */
+	{
+		id: "total_liquid_precipitation",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "ratot",
+		versions: [ "cmip6" ],
+		legendConfigs: {
+			[MapDisplayType.ABSOLUTE]: {
+				addTopPadding: true,
+			},
+			[MapDisplayType.DELTA]: {
+				hideTopLabel: true,
+				decimals: 1,
+			},
+		},
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		unit: "mm",
+		preCalculatedCanDCSConfig: {
+			ratot: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
+	},
+	/** Snow Days */
+	{
+		id: "snow_days",
+		class: "RasterPrecalculatedClimateVariable",
+		versions: [ "cmip6" ],
+		legendConfigs: {
+			[MapDisplayType.ABSOLUTE]: {
+				addTopPadding: true,
+			},
+			[MapDisplayType.DELTA]: {
+				hideTopLabel: true,
+				decimals: 1,
+			},
+		},
+		thresholds: [
+			{
+				value: "sn2mm",
+				label: ">= 2 mm",
+			},
+			{
+				value: "sn10mm",
+				label: ">= 10 mm",
+			},
+		],
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		unit: "days",
+		preCalculatedCanDCSConfig: {
+			sn2mm: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+			sn10mm: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
+	},
+	/** First snow fall */
+	{
+		id: "first_snow_fall",
+		class: "RasterPrecalculatedClimateVariable",
+		versions: [ "cmip6" ],
+		threshold: "first_snowfall",
+		legendConfigs: {
+			[MapDisplayType.ABSOLUTE]: {
+				addTopPadding: true,
+			},
+			[MapDisplayType.DELTA]: {
+				hideTopLabel: true,
+				decimals: 1,
+			},
+		},
+		frequencyConfig: {
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		unit: "DoY-jul",
+		preCalculatedCanDCSConfig: {
+			first_snowfall: [FrequencyType.YSJUL],
+		},
+	},
+	/** Last snow fall */
+	{
+		id: "last_snow_fall",
+		class: "RasterPrecalculatedClimateVariable",
+		versions: [ "cmip6" ],
+		threshold: "last_snowfall",
+		legendConfigs: {
+			[MapDisplayType.ABSOLUTE]: {
+				addTopPadding: true,
+			},
+			[MapDisplayType.DELTA]: {
+				hideTopLabel: true,
+				decimals: 1,
+			},
+		},
+		frequencyConfig: {
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		unit: "DoY-jul",
+		preCalculatedCanDCSConfig: {
+			last_snowfall: [FrequencyType.YSJUL],
+		},
+	},
+	/** Snowfall season length */
+	{
+		id: "snowfall_season_length",
+		class: "RasterPrecalculatedClimateVariable",
+		versions: [ "cmip6" ],
+		threshold: "snowfall_season_length",
+		legendConfigs: {
+			[MapDisplayType.ABSOLUTE]: {
+				addTopPadding: true,
+			},
+			[MapDisplayType.DELTA]: {
+				hideTopLabel: true,
+				decimals: 1,
+			},
+		},
+		frequencyConfig: {
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		unit: "days",
+		preCalculatedCanDCSConfig: {
+			snowfall_season_length: [FrequencyType.YSJUL],
+		},
+	},
+	/** Maximum 1-Day Total Solid Precipitation */
+	{
+		id: "max_1d_total_solid_precipitation",
+		class: "RasterPrecalculatedClimateVariable",
+		versions: [ "cmip6" ],
+		threshold: "snx1day",
+		legendConfigs: {
+			[MapDisplayType.ABSOLUTE]: {
+				addTopPadding: true,
+			},
+			[MapDisplayType.DELTA]: {
+				hideTopLabel: true,
+				decimals: 1,
+			},
+		},
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		unit: "mm",
+		preCalculatedCanDCSConfig: {
+			snx1day: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
+	},
+	/** Maximum 1-Day Total Liquid Precipitation */
+	{
+		id: "max_1d_total_liquid_precipitation",
+		class: "RasterPrecalculatedClimateVariable",
+		versions: [ "cmip6" ],
+		threshold: "rax1day",
+		legendConfigs: {
+			[MapDisplayType.ABSOLUTE]: {
+				addTopPadding: true,
+			},
+			[MapDisplayType.DELTA]: {
+				hideTopLabel: true,
+				decimals: 1,
+			},
+		},
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		unit: "mm",
+		preCalculatedCanDCSConfig: {
+			rax1day: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
+		},
 	},
 	/** Relative Sea-Level Change */
 	{

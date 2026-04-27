@@ -168,7 +168,8 @@ const MapLegend: React.FC = () => {
 			<MapLegendOpenControl
 				isOpen={isOpen}
 				toggleOpen={() => dispatch(setLegendOpen(!isOpen))}
-				width={100}
+				/* When the unit is a day of the year, we make the legend a little bit larger */
+				width={unit?.startsWith('DoY') && !isDelta ? 120 : 100}
 			>
 				<Suspense fallback={'...'}>
 					<LazyMapLegendCommon

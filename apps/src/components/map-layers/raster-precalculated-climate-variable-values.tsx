@@ -172,8 +172,9 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 	// Value formatter (for delta, for units)
 	const valueFormatter = (value: number, isRangeStart = false, delta: boolean = (climateVariable?.getDataValue() === 'delta')) => {
-		if (unit === 'DoY' && !delta) {
-			return doyFormatter(value, locale);
+		if (unit?.startsWith('DoY') && !delta) {
+			const firstDayIsJuly = (unit === 'DoY-jul');
+			return doyFormatter(value, locale, firstDayIsJuly);
 		}
 
 		return formatValue(value, isRangeStart ? '' : unit, decimals, locale, delta);

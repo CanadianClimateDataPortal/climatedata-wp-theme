@@ -134,8 +134,9 @@ const ClimateDataChart: React.FC<{
 		isRangeStart = isRangeStart === true;
 		let actualUnit = typeof unitOverride == 'string' ? unitOverride : unit;
 
-		if (actualUnit === 'DoY' && !isDelta) {
-			return doyFormatter(value, locale);
+		if (actualUnit?.startsWith('DoY') && !isDelta) {
+			const firstDayIsJuly = actualUnit === 'DoY-jul';
+			return doyFormatter(value, locale, firstDayIsJuly);
 		}
 		
 		if (isRangeStart) {
@@ -728,7 +729,10 @@ const ClimateDataChart: React.FC<{
 										if (item.length > 1) {
 											switch (unit) {
 												case "DoY":
-													item[1] = doyFormatter(Number(item[1]), locale);
+													item[1] = doyFormatter(Number(item[1]), locale, false);
+													break;
+												case "DoY-jul":
+													item[1] = doyFormatter(Number(item[1]), locale, true);
 													break;
 												default:
 													item[1] = Number(item[1]).toFixed(decimals);
@@ -738,7 +742,10 @@ const ClimateDataChart: React.FC<{
 										if (isRange && item.length > 2) {
 											switch (unit) {
 												case "DoY":
-													item[2] = doyFormatter(Number(item[2]), locale);
+													item[2] = doyFormatter(Number(item[2]), locale, false);
+													break;
+												case "DoY-jul":
+													item[2] = doyFormatter(Number(item[2]), locale, true);
 													break;
 												default:
 													item[2] = Number(item[2]).toFixed(decimals);

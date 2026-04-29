@@ -37,12 +37,12 @@ const validateRegularVariable = (
 	const version = climateVariable.getVersion();
 	const analysisFields = climateVariable.getAnalysisFields() ?? [];
 	const values = climateVariable.getAnalysisFieldValues() ?? {};
-	const thresholdValues = climateVariable.getThresholds() ?? [];
-	const thresholdValue = climateVariable.getThreshold();
+	const thresholdPossibleValues = climateVariable.getThresholds() ?? [];
+	const selectedThresholdValue = climateVariable.getThreshold();
 
 	const hasAnalysisFields = analysisFields.length > 0;
 	// We cannot have both analysis fields and a threshold field
-	const hasThresholdField = !hasAnalysisFields && thresholdValues.length > 0;
+	const hasThresholdField = !hasAnalysisFields && thresholdPossibleValues.length > 0;
 
 	const versionIsValid = !!version;
 	const analysisFieldsAreValid = analysisFields
@@ -60,7 +60,7 @@ const validateRegularVariable = (
 			// Otherwise, just check existence
 			return value != null && value !== '';
 		});
-	const thresholdIsValid = !hasThresholdField || thresholdValue != null;
+	const thresholdIsValid = !hasThresholdField || selectedThresholdValue != null;
 
 	return [
 		versionIsValid,
@@ -225,8 +225,12 @@ export const StepSummaryVariableOptions = (): React.ReactNode | null => {
 		const version = climateVariable.getVersion?.();
 		const analysisFields = climateVariable.getAnalysisFields?.() ?? [];
 		const analysisFieldValues = climateVariable.getAnalysisFieldValues?.() ?? {};
-		const thresholdValue = climateVariable.getThreshold?.();
-		const thresholdValues = climateVariable.getThresholds?.() ?? [];
+		const selectedThresholdValue = climateVariable.getThreshold?.();
+		const thresholdPossibleValues = climateVariable.getThresholds?.() ?? [];
+
+		const hasAnalysisFields = analysisFields.length > 0;
+		// We cannot have both analysis fields and a threshold field
+		const hasThresholdField = !hasAnalysisFields && thresholdPossibleValues.length > 0;
 
 		if (climateVariable.getVersions().length > 0) {
 			items.push({
@@ -235,17 +239,19 @@ export const StepSummaryVariableOptions = (): React.ReactNode | null => {
 			});
 		}
 
-		items.push(
-			...analysisFields.map(({ key, label }: { key: string; label: string }) => (
-				{
-					term: __(label),
-					details: analysisFieldValues[key]?.toUpperCase() ?? '-',
-				}
-			))
-		);
+		if (hasAnalysisFields) {
+			items.push(
+				...analysisFields.map(({ key, label }: { key: string; label: string }) => (
+					{
+						term: __(label),
+						details: analysisFieldValues[key]?.toUpperCase() ?? '-',
+					}
+				))
+			);
+		}
 
-		if (thresholdValue) {
-			const label = thresholdValues.find((t) => t.value === thresholdValue)?.label;
+		if (hasThresholdField && selectedThresholdValue != null) {
+			const label = thresholdPossibleValues.find((t) => t.value === selectedThresholdValue)?.label;
 			if (label) {
 				items.push({
 					term: __('Threshold'),

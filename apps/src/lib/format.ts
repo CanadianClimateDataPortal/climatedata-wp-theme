@@ -112,17 +112,45 @@ export const normalizePostData = async (
 		.filter(Boolean);
 };
 
-export const doyFormatter = (value: number, language: string, monthFormat: MonthFormat | undefined = 'long') => {
-	// First day of the year (UTC)
-	const firstDayOfYear = Date.UTC(2019, 0, 1);
+/**
+ * Format a day of the year number to its localized date.
+ *
+ * @example
+ * ```typescript
+ * doyFormatter(1, 'en-US'); // January 1
+ * doyFormatter(1, 'fr-CA', true); // 1 juillet
+ * doyFormatter(100, 'en-CA', false, 'numeric'); // 04-10
+ * ```
+ *
+ * @param value - The day of the year (first day is 1, not 0!).
+ * @param language - The language code to use for formatting.
+ * @param firstDayIsJuly - If true, the first day of the year will be July 1st,
+ *        else it will be January 1st.
+ * @param monthFormat - The format to use for the month. Defaults to "long".
+ *        The values can be the same as for `Date.toLocaleDateString`.
+ */
+export const doyFormatter = (
+	value: number,
+	language: string,
+	firstDayIsJuly: boolean = false,
+	monthFormat: MonthFormat = 'long',
+) => {
+	const firstMonthOfYear = firstDayIsJuly ? 6 : 0;
+	// First day of the year (UTC). We choose 2018 because neither 2018 nor
+	// 2019 are leap years.
+	// Reminder: the month's index is 0-based, but the day's index is 1-based.
+	const firstDayOfYear = Date.UTC(2018, firstMonthOfYear, 1);
+	const boundedValue = Math.max(1, Math.min(value, 365));
 
-	// Convert the day-of-year value to a Date object
-	const date = new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * value);
+	// Convert the day-of-year value (1 = first day of the year) to a Date object
+	const millisecondsDelta = (boundedValue - 1) * 1000 * 60 * 60 * 24;
+	const date = new Date(firstDayOfYear + millisecondsDelta);
 
 	// Format the date according to the given language
 	return date.toLocaleDateString(language, {
 		month: monthFormat,
 		day: 'numeric',
+		timeZone: 'UTC',
 	});
 };
 

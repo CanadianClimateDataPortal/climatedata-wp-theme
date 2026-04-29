@@ -133,7 +133,7 @@ export const doyFormatter = (
 	value: number,
 	language: string,
 	firstDayIsJuly: boolean = false,
-	monthFormat: MonthFormat | undefined = 'long',
+	monthFormat: MonthFormat = 'long',
 ) => {
 	const firstMonthOfYear = firstDayIsJuly ? 6 : 0;
 	// First day of the year (UTC). We choose 2018 because neither 2018 nor

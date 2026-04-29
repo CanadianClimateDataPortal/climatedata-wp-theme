@@ -2,7 +2,7 @@ import { expect, test, describe } from 'vitest'
 import { doyFormatter, MonthFormat } from './format';
 
 describe('doyFormatter', () => {
-    describe('when 0 corresponds to January 1st', () => {
+    describe('when the first day is January 1st', () => {
         test('returns correct first day of the year', () => {
             const output = doyFormatter(1, 'fr-CA');
             expect(output).toEqual('1 janvier');
@@ -58,7 +58,7 @@ describe('doyFormatter', () => {
         });
     });
 
-    describe('when 0 corresponds to July 1st', () => {
+    describe('when first day is July 1st', () => {
         test('returns correct first day of the year', () => {
             const output = doyFormatter(1, 'fr-CA', true);
             expect(output).toEqual('1 juillet');

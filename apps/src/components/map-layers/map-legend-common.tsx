@@ -120,7 +120,7 @@ export const MapLegendCommon = (
 		}
 	}
 
-	if (unit === 'DoY' && isDelta) {
+	if (unit?.startsWith('DoY') && isDelta) {
 		unitName = getUnitName('days');
 	}
 
@@ -155,7 +155,10 @@ export const MapLegendCommon = (
 
 		const width = svgElement.getBoundingClientRect().width;
 		setSvgWidth(width);
-	}, [svgElement]);
+	// `data` added (even if not directly used) to re-calculate the width when
+	// data changes (allowing for dynamic resizing if the parent's width changed
+	// when data changed).
+	}, [svgElement, data]);
 
 	/**
 	 * Update the available height for the SVG element.
@@ -264,8 +267,9 @@ export const MapLegendCommon = (
 							if (customLabel != undefined) {
 								label = __(customLabel);
 							}
-						} else if (unit === 'DoY' && !isDelta) {
-							label = doyFormatter(value, locale, 'short');
+						} else if (unit?.startsWith('DoY') && !isDelta) {
+							const firstDayIsJuly = (unit === 'DoY-jul');
+							label = doyFormatter(value, locale, firstDayIsJuly, 'short');
 						} else {
 							const decimals = legendConfig?.decimals ?? 0;
 							label = formatValue(value, undefined, decimals, locale, isDelta);

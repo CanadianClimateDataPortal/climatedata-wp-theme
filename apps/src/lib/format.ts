@@ -214,6 +214,7 @@ export function formatValue(value: number, unit: string | undefined, decimals: n
 
 		switch (unit) {
 			case 'DoY':
+			case 'DoY-jul':
 				if (relative) {
 					valuePattern = _n(`%s day`, `%s days`, value);
 				}

@@ -379,104 +379,40 @@ function cdc_get_location_by_coords () {
 				$join = "JOIN all_areas_sealevel ON (all_areas.id_code=all_areas_sealevel.id_code)";
 			}
 
-			$ranges = [ 0.05, 0.1, 0.2 ];
-			$preferred_terms = [ 'Community', 'Metropolitan Area' ];
-			$found_community = false;
+			// Single nearest-neighbour lookup, eligibility set harmonised with cdc_location_search()
+			// so search and click return the same name space (CLIM-1322; client clarification 2026-04-17).
+			$range = 0.2;
 
-			// gradually increase the range until we find a community
+			$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
+			, DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance
+			FROM all_areas
+			$join
+			WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . "
+			AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
+			AND gen_term NOT IN ('Administrative Region', 'Province', 'Territory')
+			ORDER BY DISTANCE
+			LIMIT 1");
 
-			foreach ( $ranges as $range ) {
+			if ($main_query->num_rows > 0) {
 
-				if ( $found_community == false ) {
-					$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
-					, DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance
-					FROM all_areas
-					$join
-					WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . "
-					AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
-					AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
-					ORDER BY DISTANCE
-					LIMIT 50");// or die (mysqli_error($GLOBALS['vars']['con']));
+				$result = mysqli_fetch_assoc ( $main_query );
 
-					if ($main_query->num_rows > 0) {
+				$result['coords'] = [ $lat, $lng ];
+				$result['lng'] = $result['lon'];
+				$result['province_short'] = short_province ( $result['province'] );
+				$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
 
-						while ( $row = mysqli_fetch_assoc ( $main_query ) ) {
-
-							if ( in_array ( $row['generic_term'], $preferred_terms ) ) {
-								$result = $row;
-
-								// might be good to know
-								// what range is the community in from the click
-								$result['range'] = $range;
-
-								// send back the original coords
-								$result['coords'] = [ $lat, $lng ];
-
-								// lon -> lng
-								$result['lng'] = $result['lon'];
-
-								// province abbreviation
-								$result['province_short'] = short_province ( $result['province'] );
-
-								// nice name
-								$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
-
-								$found_community = true;
-
-								break;
-							}
-						}
-
-					}
-
-				}
-
-			}
-
-			if ( $found_community == true ) {
-
-				// found a community in range
 				echo json_encode ( $result );
 
 			} else {
 
-				// no preferred results, grab the nearest one
-
-				// range of coordinates to search between
-				$range = 0.1;
-
-				$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
-				, DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance
-				FROM all_areas
-				$join
-				WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . "
-				AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
-				AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
-				ORDER BY DISTANCE
-				LIMIT 1");// or die (mysqli_error($GLOBALS['vars']['con']));
-
-				if ($main_query->num_rows > 0) {
-
-					$result = mysqli_fetch_assoc ( $main_query );
-
-					$result['coords'] = [ $lat, $lng ];
-					$result['lng'] = $result['lon'];
-					$result['province_short'] = short_province ( $result['province'] );
-					$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
-
-					echo json_encode ( $result );
-
-				} else {
-
-					echo json_encode ( array (
-						'lat' => $lat,
-						'lng' => $lng,
-						'coords' => [ $lat, $lng ],
-						'geo_name' => __ ( 'Point', 'cdc' ),
-						'title' => __ ( 'Point', 'cdc' ) . ' (' . number_format ( $lat, 4, '.', '') . ', ' . number_format ( $lng, 4, '.', '') . ')'
-					) );
-
-				}
+				echo json_encode ( array (
+					'lat' => $lat,
+					'lng' => $lng,
+					'coords' => [ $lat, $lng ],
+					'geo_name' => __ ( 'Point', 'cdc' ),
+					'title' => __ ( 'Point', 'cdc' ) . ' (' . number_format ( $lat, 4, '.', '') . ', ' . number_format ( $lng, 4, '.', '') . ')'
+				) );
 
 			}
 

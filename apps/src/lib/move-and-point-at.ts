@@ -1,23 +1,30 @@
 import L from 'leaflet';
 
+import { SEARCH_DEFAULT_ZOOM } from '@/lib/constants';
+
 /**
- * Dispatches a real DOM PointerEvent on the VectorGrid canvas tile at the
- * map container center after the view settles.
+ * Moves the map to a specific lat/lng and triggers the location-selection
+ * cascade at that point.
  *
- * `pointer-events: none` on Leaflet's pane wrapper divs causes
- * `document.elementFromPoint` to return the outermost container — canvas
- * tiles are queried via `gridPane.querySelectorAll('canvas')` and filtered
- * by bounding rect instead.
+ * Used by the search and locate-me flows: the user expressed where they
+ * want to go, this function drives the map there and triggers the same
+ * downstream effects as a manual click would.
+ *
+ * The click-on-canvas dispatch is an implementation detail — VectorGrid's
+ * click handler is what triggers fetchLocationByCoords + popup open, so we
+ * synthesise a real DOM PointerEvent at the typed lat/lng's screen
+ * coordinates.
  *
  * `Promise.race` with a 1,000 ms timeout guards the case where `setView`
  * fires `moveend` synchronously (short pan, no animation) before the
  * listener is attached.
  */
-export const dispatchMapClick = async (
+export const moveAndPointAt = async (
 	map: L.Map,
-	latlng: { lat: number; lng: number },
+	latlng: L.LatLng | { lat: number; lng: number },
+	zoom: number = SEARCH_DEFAULT_ZOOM,
 ): Promise<void> => {
-	void latlng;
+	map.setView(latlng, zoom);
 	await Promise.race([
 		new Promise<void>((resolve) => map.once('moveend', () => resolve())),
 		new Promise<void>((resolve) => setTimeout(resolve, 1_000)),
@@ -25,8 +32,9 @@ export const dispatchMapClick = async (
 	await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 	const container = map.getContainer();
 	const rect = container.getBoundingClientRect();
-	const clientX = rect.left + rect.width / 2;
-	const clientY = rect.top + rect.height / 2;
+	const point = map.latLngToContainerPoint(latlng);
+	const clientX = rect.left + point.x;
+	const clientY = rect.top + point.y;
 	const gridPane = map.getPane('grid') ?? null;
 	if (!gridPane) {
 		return;

@@ -21,7 +21,7 @@ import 'leaflet-search';
 import mapPinIcon from '@/assets/map-pin.svg';
 
 import { cn, parseLatLon } from '@/lib/utils';
-import { dispatchMapClick } from '@/lib/dispatch-map-click';
+import { moveAndPointAt } from '@/lib/move-and-point-at';
 import { fetchLocationByCoords } from '@/services/services';
 import {
 	type SearchControlLocationItem,
@@ -29,7 +29,6 @@ import {
 } from '@/types/types';
 import {
 	LOCATION_SEARCH_ENDPOINT,
-	SEARCH_DEFAULT_ZOOM,
 	SEARCH_PLACEHOLDER,
 } from '@/lib/constants';
 
@@ -103,8 +102,7 @@ const SearchControl = ({
 					map.removeLayer(layer);
 				}
 			});
-			map.setView(latlng, SEARCH_DEFAULT_ZOOM);
-			await dispatchMapClick(map, latlng);
+			await moveAndPointAt(map, latlng);
 		},
 		[
 			map,

@@ -367,7 +367,7 @@ function cdc_get_location_by_coords () {
 				"geo_name",
 				"gen_term" . $term_append . " as generic_term",
 				"location",
-				"province" . $term_append,
+				"province" . $term_append . " as province",
 				"lat",
 				"lon"
 			);

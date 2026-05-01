@@ -389,7 +389,32 @@ function cdc_get_location_by_coords () {
 			$join
 			WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . "
 			AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
-			AND gen_term NOT IN ('Administrative Region', 'Census Division', 'Census Subdivision', 'Province', 'Territory')
+			AND gen_term NOT IN (
+				'Administrative Region',
+				'Administrative Sector',
+				'Census Division',
+				'Census Subdivision',
+				'County',
+				'County Municipality',
+				'County Regional Municipality',
+				'District Municipality',
+				'Improvement District',
+				'Local Government District',
+				'Local Service District',
+				'Local Urban District',
+				'Municipal County',
+				'Municipal District',
+				'Municipality',
+				'Province',
+				'Region',
+				'Regional District',
+				'Regional Municipality',
+				'Restructured County',
+				'Specialized Municipality',
+				'Subdivision',
+				'Territory',
+				'Unorganized Territory'
+			)
 			ORDER BY DISTANCE
 			LIMIT 1");
 

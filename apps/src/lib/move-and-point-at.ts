@@ -39,6 +39,11 @@ export const moveAndPointAt = async (
 	if (!gridPane) {
 		return;
 	}
+	// `pointer-events: none` on Leaflet's pane wrapper divs causes
+	// `document.elementFromPoint` to return the outermost container — the
+	// canvas tiles themselves are not hit-testable through that API. We
+	// enumerate the grid pane's canvases and filter by their bounding rect
+	// to find the one under (clientX, clientY) instead.
 	const canvases = Array.from(gridPane.querySelectorAll('canvas'));
 	const target = canvases.find((canvas) => {
 		const r = canvas.getBoundingClientRect();

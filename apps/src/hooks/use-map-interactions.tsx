@@ -71,6 +71,8 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
 
     const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 
+		console.log('RBx 5a\thandleClick (will call fetchLocationByCoords)\n', latlng);
+
     const locationByCoords = await fetchLocationByCoords(latlng);
     const locationId = locationByCoords?.geo_id ?? `${locationByCoords?.lat}|${locationByCoords?.lng}`;
     let locationTitle = locationByCoords.title;

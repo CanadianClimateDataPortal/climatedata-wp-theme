@@ -128,8 +128,7 @@ export const normalizePostData = async (
  * doyFormatter(100, 'en-CA', false, 'numeric'); // 04-10
  * ```
  *
- * @param value - The day of the year (first day is 1, not 0!). Should be in the
- *        range [-364, 730].
+ * @param value - The day of the year (first day is 1, not 0!).
  * @param language - The language code to use for formatting.
  * @param firstDayIsJuly - If true, the first day of the year will be July 1st,
  *        else it will be January 1st.
@@ -143,13 +142,10 @@ export const doyFormatter = (
 	monthFormat: MonthFormat = 'long',
 ) => {
 	const firstMonthOfYear = firstDayIsJuly ? 6 : 0;
-	// To prevent issues with leap years, we choose a year that has as much
-	// room as possible before the next leap year (based on the direction where
-	// we go).
-	const year = value > 0 ? 2017 : 2019;
-	// First day of the year (UTC).
+	// First day of the year (UTC). We choose 2018 because neither 2017, 2018
+	// nor 2019 are leap years.
 	// Reminder: the month's index is 0-based, but the day's index is 1-based.
-	const firstDayOfYear = Date.UTC(year, firstMonthOfYear, 1);
+	const firstDayOfYear = Date.UTC(2018, firstMonthOfYear, 1);
 
 	// Convert the day-of-year value (1 = first day of the year) to a Date object
 	const millisecondsDelta = (value - 1) % 365 * 1000 * 60 * 60 * 24;

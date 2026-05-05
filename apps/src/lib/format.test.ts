@@ -13,15 +13,24 @@ describe('doyFormatter', () => {
             expect(output).toEqual('31 décembre');
         });
 
-        test.each([0, -20])('returns first day if lower than minimum (%s)', (value) => {
+        test.each([
+            [0, 'December 31'],
+            [-1, 'December 30'],
+            [-42, 'November 19'],
+            [-364, 'January 1'], // Minimum of the recommended range
+        ])('works with value below 1 (%s)', (value, expected) => {
             const output = doyFormatter(value, 'en-CA');
-            expect(output).toEqual('January 1');
+            expect(output).toEqual(expected);
         });
 
-        test.each([366, 890])('returns last day if exceeding (%s)', (value) => {
-            const output = doyFormatter(value, 'en-CA');
-            expect(output).toEqual('December 31');
-        });
+    test.each([
+        [366, 'January 1'],
+        [417, 'February 21'],
+        [730, 'December 31'], // Maximum of the recommended range
+    ])('works with value above 365 (%s)', (value, expected) => {
+        const output = doyFormatter(value, 'en-CA');
+        expect(output).toEqual(expected);
+    });
 
         test("doesn't consider the year to be a leap year", () => {
             // If the year is a leap year, the 60th day would be February 29
@@ -69,15 +78,24 @@ describe('doyFormatter', () => {
             expect(output).toEqual('30 juin');
         });
 
-        test.each([366, 409])('returns last day if exceeding (%s)', (value) => {
+        test.each([
+            [0, 'June 30'],
+            [-1, 'June 29'],
+            [-42, 'May 19'],
+            [-364, 'July 1'], // Minimum of the recommended range
+        ])('works with value below 1 (%s)', (value, expected) => {
             const output = doyFormatter(value, 'en-CA', true);
-            expect(output).toEqual('June 30');
+            expect(output).toEqual(expected);
         });
 
-        test.each([0, -8])('returns first day if lower than minimum (%s)', (value) => {
-            const output = doyFormatter(value, 'en-CA', true);
-            expect(output).toEqual('July 1');
-        });
+        test.each([
+            [366, 'July 1'],
+            [417, 'August 21'],
+            [730, 'June 30'], // Maximum of the recommended range
+        ])('works with value above 365 (%s)', (value, expected) => {
+        const output = doyFormatter(value, 'en-CA', true);
+        expect(output).toEqual(expected);
+    });
 
         test.each([
             ['long', 'September 19'],

@@ -115,14 +115,24 @@ export const normalizePostData = async (
 /**
  * Format a day of the year number to its localized date.
  *
+ * The reference year is not a leap year.
+ *
+ * Negative values and values above 365 are supported, but should be limited to
+ * +/- 1 years outside the range [0, 365] (i.e. [-364, 730]) to prevent
+ * unexpected results do to leap years.
+ *
+ * The first day of the year can be set to be either January 1st or July 1st.
+ *
  * @example
  * ```typescript
  * doyFormatter(1, 'en-US'); // January 1
+ * doyFormatter(-23, 'en-US'); // December 8
  * doyFormatter(1, 'fr-CA', true); // 1 juillet
  * doyFormatter(100, 'en-CA', false, 'numeric'); // 04-10
  * ```
  *
- * @param value - The day of the year (first day is 1, not 0!).
+ * @param value - The day of the year (first day is 1, not 0!). Should be in the
+ *        range [-364, 730].
  * @param language - The language code to use for formatting.
  * @param firstDayIsJuly - If true, the first day of the year will be July 1st,
  *        else it will be January 1st.
@@ -136,14 +146,16 @@ export const doyFormatter = (
 	monthFormat: MonthFormat = 'long',
 ) => {
 	const firstMonthOfYear = firstDayIsJuly ? 6 : 0;
-	// First day of the year (UTC). We choose 2018 because neither 2018 nor
-	// 2019 are leap years.
+	// To prevent issues with leap years, we choose a year that has as much
+	// room as possible before the next leap year (based on the direction where
+	// we go).
+	const year = value > 0 ? 2017 : 2019;
+	// First day of the year (UTC).
 	// Reminder: the month's index is 0-based, but the day's index is 1-based.
-	const firstDayOfYear = Date.UTC(2018, firstMonthOfYear, 1);
-	const boundedValue = Math.max(1, Math.min(value, 365));
+	const firstDayOfYear = Date.UTC(year, firstMonthOfYear, 1);
 
 	// Convert the day-of-year value (1 = first day of the year) to a Date object
-	const millisecondsDelta = (boundedValue - 1) * 1000 * 60 * 60 * 24;
+	const millisecondsDelta = (value - 1) * 1000 * 60 * 60 * 24;
 	const date = new Date(firstDayOfYear + millisecondsDelta);
 
 	// Format the date according to the given language

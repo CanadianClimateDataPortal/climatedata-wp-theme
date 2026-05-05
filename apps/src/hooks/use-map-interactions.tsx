@@ -8,6 +8,7 @@ import { useMapMarker } from '@/hooks/use-map-marker';
 import { useLocale } from '@/hooks/use-locale';
 import { fetchLocationByCoords } from '@/services/services';
 import { getFeatureId } from '@/lib/utils';
+import { consumeIntendedLatlng } from '@/lib/move-and-point-at';
 import { SelectedLocationInfo } from '@/types/types';
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 
@@ -66,7 +67,29 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
     hoveredRef.current = null;
   }, [primaryLayerRef, comparisonLayerRef]); // No dependencies since we're only using refs via .current
 
-  const handleClick = useCallback(async ({ latlng, layer }: { latlng: L.LatLng; layer: { properties: any } }) => {
+  const handleClick = useCallback(async (
+    e: {
+      latlng: L.LatLng;
+      layer: { properties: any };
+      // `target` is the vectorgrid layer the click was bound to. Leaflet
+      // attaches `_map` to layers on `addTo(map)`. Underscored but stable —
+      // we need the map handle here to consume any "intended latlng" the
+      // search/recent-locations flows stashed before the synthetic click.
+      target?: { _map?: L.Map };
+    },
+  ) => {
+    const eventLatlng = e.latlng;
+    const layer = e.layer;
+    const map = e.target?._map ?? null;
+    // Recover the precise caller-supplied latlng if this click originated
+    // from `moveAndPointAt`'s synthetic dispatch — Leaflet rebuilds `latlng`
+    // from rounded container pixels, dropping ~80 m of precision (CLIM-1322).
+    // One-shot read; falls through to the event latlng for real user clicks.
+    const intendedLatlng = map !== null
+      ? consumeIntendedLatlng(map)
+      : null;
+    const latlng = intendedLatlng ?? eventLatlng;
+
     const featureId = layer && getFeatureId(layer.properties);
 
     const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;

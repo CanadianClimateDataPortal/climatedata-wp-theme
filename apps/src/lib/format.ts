@@ -115,11 +115,8 @@ export const normalizePostData = async (
 /**
  * Format a day of the year number to its localized date.
  *
- * The reference year is not a leap year.
- *
- * Negative values and values above 365 are supported, but should be limited to
- * +/- 1 years outside the range [0, 365] (i.e. [-364, 730]) to prevent
- * unexpected results do to leap years.
+ * Zero, negative values, and values above 365 are supported. All calculations
+ * are done on non-leap years.
  *
  * The first day of the year can be set to be either January 1st or July 1st.
  *
@@ -155,7 +152,7 @@ export const doyFormatter = (
 	const firstDayOfYear = Date.UTC(year, firstMonthOfYear, 1);
 
 	// Convert the day-of-year value (1 = first day of the year) to a Date object
-	const millisecondsDelta = (value - 1) * 1000 * 60 * 60 * 24;
+	const millisecondsDelta = (value - 1) % 365 * 1000 * 60 * 60 * 24;
 	const date = new Date(firstDayOfYear + millisecondsDelta);
 
 	// Format the date according to the given language

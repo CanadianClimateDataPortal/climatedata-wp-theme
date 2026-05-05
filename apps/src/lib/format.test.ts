@@ -17,7 +17,7 @@ describe('doyFormatter', () => {
             [0, 'December 31'],
             [-1, 'December 30'],
             [-42, 'November 19'],
-            [-364, 'January 1'], // Minimum of the recommended range
+            [-1708, 'April 27'],  // At least 4 years to ensure no issue with leap years
         ])('works with value below 1 (%s)', (value, expected) => {
             const output = doyFormatter(value, 'en-CA');
             expect(output).toEqual(expected);
@@ -26,7 +26,7 @@ describe('doyFormatter', () => {
     test.each([
         [366, 'January 1'],
         [417, 'February 21'],
-        [730, 'December 31'], // Maximum of the recommended range
+        [1708, 'September 5'], // At least 4 years to ensure no issue with leap years
     ])('works with value above 365 (%s)', (value, expected) => {
         const output = doyFormatter(value, 'en-CA');
         expect(output).toEqual(expected);
@@ -82,7 +82,7 @@ describe('doyFormatter', () => {
             [0, 'June 30'],
             [-1, 'June 29'],
             [-42, 'May 19'],
-            [-364, 'July 1'], // Minimum of the recommended range
+            [-1708, 'October 25'], // At least 4 years to ensure no issue with leap years
         ])('works with value below 1 (%s)', (value, expected) => {
             const output = doyFormatter(value, 'en-CA', true);
             expect(output).toEqual(expected);
@@ -91,7 +91,7 @@ describe('doyFormatter', () => {
         test.each([
             [366, 'July 1'],
             [417, 'August 21'],
-            [730, 'June 30'], // Maximum of the recommended range
+            [1708, 'March 5'], // At least 4 years to ensure no issue with leap years
         ])('works with value above 365 (%s)', (value, expected) => {
         const output = doyFormatter(value, 'en-CA', true);
         expect(output).toEqual(expected);

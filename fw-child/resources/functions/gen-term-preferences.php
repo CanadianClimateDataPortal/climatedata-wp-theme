@@ -14,8 +14,15 @@
  * Anything not listed here falls into the implicit "rest" tier (rank 99)
  * and only wins if no Tier-1/2/3 row exists in the search bounding box.
  *
- * Tier 1: City / Town / Township — primary settlement classes.
- * Tier 2: Village / Municipality / Hamlet variants — named settlements.
+ * Tier 1: City / Town / Metropolitan Area / Community — addressable
+ *         population centers. Metropolitan Area / Community are reinstated
+ *         from the legacy two-pass logic so Halifax / Vancouver / Edmonton-
+ *         class metros (which carry one of those gen_terms in
+ *         geocoder.all_areas rather than 'City') resolve correctly.
+ * Tier 2: Township / Village / Municipality / Hamlet variants — named
+ *         settlements smaller than a City/Town. Townships sit here (not
+ *         Tier 1) so a Geographic Township can't outrank a nearby City
+ *         (the York-vs-Toronto symptom from Atom 10).
  * Tier 3: Borough (Arrondissement) — sub-divisions of cities, returned
  *         when a user is inside one (e.g. Saint-Hubert in Longueuil).
  *
@@ -27,15 +34,31 @@
 
 $gen_term_preference_tiers = [
 	1 => [
+		// Major settlements with addressable population centers.
+		// "City" / "Town" are the dominant Canadian municipal types.
+		// "Metropolitan Area" / "Community" are the original
+		// preferred_terms from the legacy two-pass logic — reinstated
+		// here because Halifax / Vancouver / Edmonton-class metros
+		// often carry one of these two gen_terms in geocoder.all_areas
+		// rather than 'City'/'Town'.
 		'City',
 		'Town',
 		'Separated Town',
+		'Metropolitan Area',
+		'Community',
+	],
+	2 => [
+		// Township-class. In Canadian municipal hierarchies a Township
+		// is roughly equivalent to a Town/Village in size, but a
+		// Geographic Township is a survey-grid artifact and shouldn't
+		// outrank an actual City when both are nearby (e.g. York-Geographic-
+		// Township beating Toronto-City was the symptom that motivated
+		// this re-tiering).
 		'Township',
 		'Township Municipality',
 		'Geographic Township',
 		'United Townships Municipality',
-	],
-	2 => [
+		// Named settlements smaller than City/Town.
 		'Village',
 		'Village Municipality',
 		'Northern Village',
@@ -65,6 +88,7 @@ $gen_term_preference_tiers = [
 		'Townsite',
 	],
 	3 => [
+		// Sub-divisions of cities (Saint-Hubert, Greenfield Park, etc.).
 		'Borough',
 	],
 ];

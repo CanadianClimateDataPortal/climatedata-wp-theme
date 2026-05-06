@@ -33,7 +33,8 @@ export default function Map(): React.ReactElement {
 		handleOver,
 		handleOut,
 		handleClick,
-		handleClearSelectedLocation
+		handleClearSelectedLocation,
+		selectGriddedLocation,
 	} = useMapInteractions({
 		primaryLayerRef,
 		comparisonLayerRef,
@@ -95,6 +96,7 @@ export default function Map(): React.ReactElement {
 				onClick={handleClick}
 				selectedLocation={selectedLocation}
 				clearSelectedLocation={handleClearSelectedLocation}
+				selectGriddedLocation={selectGriddedLocation}
 				layerRef={primaryLayerRef}
 			/>
 			{showComparisonMap && (

@@ -597,7 +597,11 @@ function cdc_location_search() {
 		$response['items'] = array();
 
 		// finish getting rows from the main query — preserve existing
-		// {id, text, term, location, province, lat, lon} response shape.
+		// {id, text, term, location, province, lat, lon} response shape;
+		// `province_short` is additive, derived via the same `short_province()`
+		// helper used by cdc_get_location_by_coords/_by_id so the client can
+		// render the same "geo_name, XX" shape as those endpoints without
+		// duplicating the province-name → 2-letter mapping in JS.
 		while ( $row = mysqli_fetch_row ( $main_query ) ) {
 			$row = array (
 				"id" => $row[0],
@@ -605,6 +609,7 @@ function cdc_location_search() {
 				"term" => $row[2],
 				"location" => $row[3],
 				"province" => $row[4],
+				"province_short" => short_province ( $row[4] ),
 				"lat" => $row[5],
 				"lon" => $row[6]
 			);

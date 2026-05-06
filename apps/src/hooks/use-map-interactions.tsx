@@ -103,6 +103,25 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
     clearMarkers();
   }, [clearMarkers]);
 
+  // Used by the search control's autocomplete branch in GRIDDED_DATA mode:
+  // the autocomplete row already carries a usable display title, so we set
+  // the selected location directly without a reverse-coords lookup.
+  const selectGriddedLocation = useCallback((
+    { latlng, title }: { latlng: L.LatLng; title: string },
+  ) => {
+    clearMarkers();
+    addMarker(latlng, title);
+
+    dispatch(addRecentLocation({
+      id: `${latlng.lat}|${latlng.lng}`,
+      title,
+      lat: latlng.lat,
+      lng: latlng.lng,
+    }));
+
+    setSelectedLocation({ featureId: 0, title, latlng });
+  }, [clearMarkers, addMarker, dispatch]);
+
   // Effect to handle location updates when climate variables change
   useEffect(() => {
     const interactiveRegion = climateVariable?.getInteractiveRegion() ?? null;
@@ -140,5 +159,6 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
     handleOut,
     handleClick,
     handleClearSelectedLocation,
+    selectGriddedLocation,
   };
 }

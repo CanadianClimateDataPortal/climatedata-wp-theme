@@ -14,11 +14,21 @@
  * Anything not listed here falls into the implicit "rest" tier (rank 99)
  * and only wins if no Tier-1/2/3 row exists in the search bounding box.
  *
- * Tier 1: City / Town / Metropolitan Area / Community — addressable
- *         population centers. Metropolitan Area / Community are reinstated
- *         from the legacy two-pass logic so Halifax / Vancouver / Edmonton-
- *         class metros (which carry one of those gen_terms in
- *         geocoder.all_areas rather than 'City') resolve correctly.
+ * Tier 1: City / Town / Separated Town / Metropolitan Area — addressable
+ *         population centers. Metropolitan Area is reinstated from the
+ *         legacy two-pass logic so Halifax-class metros (which carry that
+ *         gen_term in geocoder.all_areas rather than 'City') resolve
+ *         correctly. 'Community' is intentionally NOT in Tier 1: it is
+ *         double-purpose in geocoder.all_areas — it serves both as a
+ *         canonical city name (e.g. Toronto downtown) AND as neighborhood
+ *         names within larger cities (West End in Vancouver, Mount Pleasant,
+ *         Fairfield, …). The neighborhood usage is far more common and
+ *         produces the wrong-name-for-search/locate-me/click pathology
+ *         this ticket is fixing (Atom 11 promoted Community and regressed
+ *         Vancouver to "West End, BC" at 919m beating "Vancouver, BC" City
+ *         at 2.5km — exactly the original Carrington-class bug). Community
+ *         falls to the implicit Tier 99 fallback and only wins when no
+ *         Tier-1/2/3 row exists in the bounding box.
  * Tier 2: Township / Village / Municipality / Hamlet variants — named
  *         settlements smaller than a City/Town. Townships sit here (not
  *         Tier 1) so a Geographic Township can't outrank a nearby City
@@ -36,16 +46,19 @@ $gen_term_preference_tiers = [
 	1 => [
 		// Major settlements with addressable population centers.
 		// "City" / "Town" are the dominant Canadian municipal types.
-		// "Metropolitan Area" / "Community" are the original
-		// preferred_terms from the legacy two-pass logic — reinstated
-		// here because Halifax / Vancouver / Edmonton-class metros
-		// often carry one of these two gen_terms in geocoder.all_areas
-		// rather than 'City'/'Town'.
+		// "Metropolitan Area" reinstated from the legacy two-pass logic
+		// because Halifax-class metros carry that gen_term in
+		// geocoder.all_areas rather than 'City'/'Town'.
+		// "Community" is deliberately excluded here — it is double-
+		// purpose in geocoder.all_areas (canonical city names AND
+		// neighborhood names within larger cities). The neighborhood
+		// usage produces the wrong-name pathology this ticket fixes
+		// (West End-Community at 919m beating Vancouver-City at 2.5km).
+		// Community falls through to the implicit Tier 99 fallback.
 		'City',
 		'Town',
 		'Separated Town',
 		'Metropolitan Area',
-		'Community',
 	],
 	2 => [
 		// Township-class. In Canadian municipal hierarchies a Township

@@ -519,6 +519,12 @@ export interface SearchControlLocationItem {
 	term: string;
 	location: string;
 	province: string;
+	/**
+	 * 2-letter province code derived server-side via short_province().
+	 * @example 'QC', 'NS', 'BC' — pairs with `text` to form the popup
+	 * title shape used by cdc_get_location_by_coords ("Montréal, QC").
+	 */
+	province_short: string;
 	lat: string;
 	lon: string;
 }

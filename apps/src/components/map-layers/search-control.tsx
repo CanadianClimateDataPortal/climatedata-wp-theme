@@ -305,10 +305,16 @@ const SearchControl = ({
 			moveToLocation: (latlng: SearchLatLng, title: string) => {
 				// leaflet-search invokes this with (latlng, title, map);
 				// `title` is the same key formatData() used in formattedData,
-				// so we can recover the original autocomplete row from it.
+				// (the verbose buildLocationTitle output, kept for the
+				// dropdown display), so we can recover the original
+				// autocomplete row from it.
 				const item = formattedItemsRef.current.get(title);
 				if (item) {
-					handleLocationChange(latlng, { item, title });
+					// UC-Search popup title uses the short server-resolved
+					// shape ("Montréal, QC"), matching cdc_get_location_by_coords,
+					// not the verbose dropdown display.
+					const popupTitle = `${item.text}, ${item.province_short}`;
+					handleLocationChange(latlng, { item, title: popupTitle });
 				} else {
 					// No matching row (e.g. raw lat/lon paste branch from
 					// locationNotFound) — fall through to existing behaviour.

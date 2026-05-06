@@ -14,11 +14,25 @@
  * Anything not listed here falls into the implicit "rest" tier (rank 99)
  * and only wins if no Tier-1/2/3 row exists in the search bounding box.
  *
- * Tier 1: City / Town / Separated Town / Metropolitan Area — addressable
- *         population centers. Metropolitan Area is reinstated from the
- *         legacy two-pass logic so Halifax-class metros (which carry that
- *         gen_term in geocoder.all_areas rather than 'City') resolve
- *         correctly. 'Community' is intentionally NOT in Tier 1: it is
+ * Tier 1: City / Town / Separated Town / Metropolitan Area / Municipality —
+ *         addressable population centers. Metropolitan Area is reinstated
+ *         from the legacy two-pass logic so Halifax-class metros (which
+ *         carry that gen_term in geocoder.all_areas rather than 'City')
+ *         resolve correctly. 'Municipality' joins City/Town/Metropolitan
+ *         Area here because in Quebec — and broadly across Canada — Ville
+ *         and Municipalité are equivalent municipal types: both are
+ *         populated places governed by an elected council. Keeping the
+ *         generic 'Municipality' in Tier 2 produced wrong-place behavior
+ *         (clicking near Verchères returned L'Assomption because Tier-1
+ *         Town beat Tier-2 Municipality regardless of distance). The
+ *         specialized municipality variants (Specialized / District /
+ *         Rural / Parish / Resort / Mountain Resort / Township /
+ *         United Townships / Village / Northern Village / Cree Village /
+ *         Naskapi Village Municipality) stay in Tier 2 — they signal
+ *         special-purpose context (parish = legacy religious admin,
+ *         rural = prairie units, resort = tourism zoning) that shouldn't
+ *         outrank a generic Municipality or Town nearby.
+ *         'Community' is intentionally NOT in Tier 1: it is
  *         double-purpose in geocoder.all_areas — it serves both as a
  *         canonical city name (e.g. Toronto downtown) AND as neighborhood
  *         names within larger cities (West End in Vancouver, Mount Pleasant,
@@ -29,10 +43,14 @@
  *         at 2.5km — exactly the original Carrington-class bug). Community
  *         falls to the implicit Tier 99 fallback and only wins when no
  *         Tier-1/2/3 row exists in the bounding box.
- * Tier 2: Township / Village / Municipality / Hamlet variants — named
- *         settlements smaller than a City/Town. Townships sit here (not
- *         Tier 1) so a Geographic Township can't outrank a nearby City
- *         (the York-vs-Toronto symptom from Atom 10).
+ * Tier 2: Township / Village / Hamlet variants and specialized
+ *         Municipality sub-types — named settlements smaller than a
+ *         City/Town, plus special-purpose municipal designations.
+ *         Townships sit here (not Tier 1) so a Geographic Township can't
+ *         outrank a nearby City (the York-vs-Toronto symptom from Atom
+ *         10). Specialized Municipality variants sit here (not Tier 1)
+ *         so a Parish/Rural/Resort Municipality can't outrank a generic
+ *         Municipality or Town nearby.
  * Tier 3: Borough (Arrondissement) — sub-divisions of cities, returned
  *         when a user is inside one (e.g. Saint-Hubert in Longueuil).
  *
@@ -49,6 +67,19 @@ $gen_term_preference_tiers = [
 		// "Metropolitan Area" reinstated from the legacy two-pass logic
 		// because Halifax-class metros carry that gen_term in
 		// geocoder.all_areas rather than 'City'/'Town'.
+		// "Municipality" (the generic, NOT specialized variants) sits
+		// here because in Quebec — Ville and Municipalité — and
+		// broadly across Canada, both are equivalent municipal types:
+		// populated places governed by an elected council. Without
+		// this, Tier-1 Town beat Tier-2 Municipality regardless of
+		// distance (e.g. clicking near Verchères returned L'Assomption).
+		// Specialized variants (Specialized / District / Rural / Parish
+		// / Resort / Mountain Resort / Township / United Townships /
+		// Village / Northern Village / Cree Village / Naskapi Village
+		// Municipality) stay in Tier 2 — they signal special-purpose
+		// context (parish = legacy religious admin, rural = prairie
+		// units, resort = tourism zoning) that shouldn't outrank a
+		// generic Municipality or Town nearby.
 		// "Community" is deliberately excluded here — it is double-
 		// purpose in geocoder.all_areas (canonical city names AND
 		// neighborhood names within larger cities). The neighborhood
@@ -59,6 +90,7 @@ $gen_term_preference_tiers = [
 		'Town',
 		'Separated Town',
 		'Metropolitan Area',
+		'Municipality',
 	],
 	2 => [
 		// Township-class. In Canadian municipal hierarchies a Township
@@ -88,7 +120,6 @@ $gen_term_preference_tiers = [
 		'Naskapi Village Municipality',
 		'First Nation Village',
 		'Former First Nation Village',
-		'Municipality',
 		'Specialized Municipality',
 		'District Municipality',
 		'Rural Municipality',

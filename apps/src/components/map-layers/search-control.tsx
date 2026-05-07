@@ -235,7 +235,7 @@ const SearchControl = ({
 					// Fetch location data
 					const locationByCoords = await fetchLocationByCoords({ lat: latLng.lat, lng: latLng.lon });
 					// Trigger show location.
-					this.showLocation(locationByCoords, locationByCoords.geo_id);
+					this.showLocation(locationByCoords, locationByCoords.title); // T19 — geo_id is the strange string we get
 				}
 				else {
 					// Show error alert.

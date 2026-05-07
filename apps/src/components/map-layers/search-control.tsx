@@ -21,7 +21,7 @@ import 'leaflet-search';
 import mapPinIcon from '@/assets/map-pin.svg';
 
 import { cn, parseLatLon } from '@/lib/utils';
-import { dispatchMapClick } from '@/lib/dispatch-map-click';
+import { moveAndPointAt } from '@/lib/move-and-point-at';
 import { fetchLocationByCoords } from '@/services/services';
 import {
 	type SearchControlLocationItem,
@@ -29,7 +29,6 @@ import {
 } from '@/types/types';
 import {
 	LOCATION_SEARCH_ENDPOINT,
-	SEARCH_DEFAULT_ZOOM,
 	SEARCH_PLACEHOLDER,
 } from '@/lib/constants';
 
@@ -96,15 +95,16 @@ const SearchControl = ({
 
 	const handleLocationChange = useCallback(
 		async (inputLatlng: SearchLatLng) => {
+			console.log('RBx 2a\thandleLocationChange useCallback inputLatlng\n', inputLatlng)
 			const latlng = convertSearchLatLng(inputLatlng);
+			console.log('RBx 3a\thandleLocationChange useCallback convertSearchLatLng(inputLatlng)\n', latlng)
 			// clear all existing markers from the map
 			map.eachLayer(layer => {
 				if (layer instanceof L.Marker) {
 					map.removeLayer(layer);
 				}
 			});
-			map.setView(latlng, SEARCH_DEFAULT_ZOOM);
-			await dispatchMapClick(map, latlng);
+			await moveAndPointAt(map, latlng);
 		},
 		[
 			map,
@@ -191,7 +191,7 @@ const SearchControl = ({
 		// @ts-expect-error: suppress leaflet typescript error
 		const searchControl = new L.Control.Search({
 			url: LOCATION_SEARCH_ENDPOINT,
-			propertyLoc: ['lat', 'lng'],
+			propertyLoc: ['lat', 'lng'], // What this is for? And Where is this used?
 			autoResize: false,
 			collapsed: false,
 			autoCollapse: false,
@@ -205,12 +205,30 @@ const SearchControl = ({
 					SearchControlLocationItem & { loc: number[]; lng: string; }
 				> = {};
 
+				console.log('RBx 0a\tL.Control.Search({ formatData })\n', response?.items );
+
+				/**
+				 * ```js
+				 * response.items = [
+				 *   {
+         *     "id": "EHHUN",
+         *     "text": "Montréal",
+         *     "term": "Ville",
+         *     "location": "Montréal; Montréal",
+         *     "province": "Québec",
+         *     "lat": "45.508822",
+         *     "lon": "-73.554077"
+         *   }
+				 * ]
+				 * ```
+				 */
+
 				response.items.forEach((item: SearchControlLocationItem) => {
 					const title = buildLocationTitle(item);
 					const loc = [parseFloat(item.lat), parseFloat(item.lon)];
 					formattedData[title] = {
 						...item,
-						lng: item.lon,
+						lng: item.lon, // Ah, here
 						loc,
 					};
 				});
@@ -230,12 +248,14 @@ const SearchControl = ({
 				}
 				// Check if the coordinates are valid if the location is empty.
 				const latLng = parseLatLon(this._input.value);
+				console.log('RBx 4a\tL.Control.Search({ locationNotFound }) will call fetchLocationByCoords\n', this._input );
 				// If the coordinates are valid, move to that location.
 				if (latLng && !latLng.isPartial) {
 					// Fetch location data
-					const locationByCoords = await fetchLocationByCoords({ lat: latLng.lat, lng: latLng.lon });
+					// /wp-json/cdc/v2/get_location_by_coords?lat=45.509234158692905&lng=-73.55346679687501
+					const locationByCoords = await fetchLocationByCoords({ lat: latLng.lat, lng: latLng.lon }); //
 					// Trigger show location.
-					this.showLocation(locationByCoords, locationByCoords.geo_id);
+					this.showLocation(locationByCoords, locationByCoords.title);
 				}
 				else {
 					// Show error alert.
@@ -251,6 +271,7 @@ const SearchControl = ({
 				}),
 			}),
 			moveToLocation: (latlng: SearchLatLng) => {
+				console.log('RBx 1a\tmoveToLocation\thandleLocationChange(latlng)\n', latlng);
 				handleLocationChange(latlng);
 			},
 		});

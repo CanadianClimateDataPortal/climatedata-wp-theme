@@ -427,6 +427,8 @@ function cdc_get_location_by_coords () {
 			$lat_r = round ( $lat, 2 );
 			$lng_r = round ( $lng, 2 );
 
+			// Order MUST mirror $types segment-for-segment;
+			// mysqli_stmt_bind_param is positional, no named binds.
 			$bind_values = array_merge (
 				[ $lat, $lng ],
 				$frags['case_values'],
@@ -561,6 +563,8 @@ function cdc_location_search() {
 
 		// Bind order: case_values (s...), excl_values (s...), like_value (s).
 		$types = $frags['case_types'] . $frags['excl_types'] . 's';
+		// Order MUST mirror $types segment-for-segment;
+		// mysqli_stmt_bind_param is positional, no named binds.
 		$bind_values = array_merge (
 			$frags['case_values'],
 			$frags['excl_values'],

@@ -172,17 +172,31 @@ $gen_term_excluded = [
  * Build the SQL fragments needed to apply gen_term preference tiers and
  * hard exclusions in a prepared statement.
  *
- * Given the tiers map, returns:
- *   - case_sql:   "CASE WHEN gen_term IN (?, ?, ...) THEN 1 WHEN ... ELSE 99 END"
- *                 — used in SELECT (aliased as preference_tier) and ORDER BY.
- *   - excl_sql:   "gen_term NOT IN (?, ?, ...)" — used in WHERE.
- *   - case_values: flat array of strings for the CASE WHEN binds, in order.
- *   - excl_values: flat array of strings for the NOT IN binds, in order.
- *   - case_types:  's' repeated for each case_value (for mysqli_stmt_bind_param).
- *   - excl_types:  's' repeated for each excl_value.
- *
  * Both endpoints (cdc_location_search, cdc_get_location_by_coords) call
  * this and stitch the fragments into their own query.
+ *
+ * Worked example with the live data above:
+ *   Input:
+ *     $tiers    = [ 1 => ['City', 'Town', 'Separated Town', 'Metropolitan Area', 'Municipality'],
+ *                   2 => ['Township', 'Township Municipality', ..., 'Townsite'],   // ~30 terms
+ *                   3 => ['Borough'] ]
+ *     $excluded = ['Administrative Region', 'Province', ..., 'Railway Junction']  // ~22 terms
+ *   Output:
+ *     case_sql    = "CASE WHEN gen_term IN (?,?,?,?,?) THEN 1
+ *                         WHEN gen_term IN (?,?,...,?) THEN 2
+ *                         WHEN gen_term IN (?) THEN 3 ELSE 99 END"
+ *     case_values = ['City','Town','Separated Town','Metropolitan Area','Municipality',
+ *                    'Township',...,'Townsite', 'Borough']  // flat, ordered to match ?s
+ *     case_types  = "sssssssss...s"  // one 's' per gen_term placeholder above
+ *     excl_sql    = "gen_term NOT IN (?,?,...,?)"
+ *     excl_values = ['Administrative Region','Province',...,'Railway Junction']
+ *     excl_types  = "sss...s"  // one 's' per excluded gen_term
+ *
+ * Returned as fragments (not a complete SQL string) because the same
+ * fragments embed into two different queries with different surrounding
+ * clauses — bbox + DISTANCE_BETWEEN for cdc_get_location_by_coords, LIKE
+ * for cdc_location_search. The caller composes $types in whatever order
+ * its `?` placeholders appear; mysqli_stmt_bind_param is positional.
  *
  * @param array $tiers     Map of int rank => list of gen_term strings.
  * @param array $excluded  Flat list of gen_term strings to exclude.
@@ -202,6 +216,10 @@ function cdc_build_gen_term_fragments ( array $tiers, array $excluded ) {
 			continue;
 		}
 
+		// Per iteration: emit one "WHEN gen_term IN (?, ?, ...) THEN <rank>"
+		// and append this tier's terms to the flat case_values list. Bind
+		// order in case_values must follow the placeholder order across all
+		// tiers — that's why we append rather than nest.
 		$placeholders = implode ( ', ', array_fill ( 0, count ( $terms ), '?' ) );
 		$case_parts[] = "WHEN gen_term IN ($placeholders) THEN " . intval ( $rank );
 

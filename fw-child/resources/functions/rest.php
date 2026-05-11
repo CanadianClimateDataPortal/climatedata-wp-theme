@@ -341,6 +341,11 @@ function cdc_get_location_by_coords () {
 		( isset ( $_GET['lng'] ) && !empty ( $_GET['lng'] ) )
 	) {
 
+		// Normalize $_GET first so the early-exit "no db" branch can build
+		// its fallback Point response without referencing undefined vars.
+		$lat = floatval ( $_GET['lat'] );
+		$lng = floatval ( $_GET['lng'] );
+
 		if ( locate_template ( 'resources/app/db.php' ) == '' ) {
 
 			echo json_encode ( array (
@@ -355,130 +360,121 @@ function cdc_get_location_by_coords () {
 		} else {
 
 			require_once locate_template ( 'resources/app/db.php' );
+			require_once dirname ( __FILE__ ) . '/gen-term-preferences.php';
 
-			$lat = floatval ( $_GET['lat'] );
-			$lng = floatval ( $_GET['lng'] );
+			$con = $GLOBALS['vars']['con'];
 
 			// add _fr if needed
 			$term_append = ( $GLOBALS['fw']['current_lang_code'] == 'fr' ) ? '_fr' : '';
 
-			$columns = array (
-				"all_areas.id_code as geo_id",
-				"geo_name",
-				"gen_term" . $term_append . " as generic_term",
-				"location",
-				"province" . $term_append,
-				"lat",
-				"lon"
-			);
+			// Bounding-box width (degrees) for the single-pass nearest-place
+			// query. Replaces the previous progressive widening loop
+			// ($ranges = [0.05, 0.1, 0.2]) with a single pass — preference
+			// tiers + hard exclusions (see gen-term-preferences.php) do the
+			// filtering work that the widening loop was approximating.
+			//
+			// 0.5° ≈ ~55 km N-S and 35-40 km E-W at Canadian latitudes —
+			// wide enough to cover sparse-area lookups, narrow enough that
+			// LIMIT 1 + ORDER BY distance still returns the nearest place.
+			// Adjust here if probe results show a regression.
+			$bbox_range = 0.5;
 
-			// $columns = implode ( ",", $columns );
 			$join = "";
 
 			if ( $_GET['sealevel'] == 'true' ) {
 				$join = "JOIN all_areas_sealevel ON (all_areas.id_code=all_areas_sealevel.id_code)";
 			}
 
-			$ranges = [ 0.05, 0.1, 0.2 ];
-			$preferred_terms = [ 'Community', 'Metropolitan Area' ];
-			$found_community = false;
+			$frags = cdc_build_gen_term_fragments (
+				$gen_term_preference_tiers,
+				$gen_term_excluded
+			);
 
-			// gradually increase the range until we find a community
+			// One-action-per-line in the SQL string for legibility — diffs
+			// stay scoped to the line that actually changed.
+			$sql = "SELECT
+				all_areas.id_code as geo_id,
+				geo_name,
+				gen_term" . $term_append . " as generic_term,
+				location,
+				province" . $term_append . " as province,
+				lat,
+				lon,
+				DISTANCE_BETWEEN(?, ?, lat, lon) as distance,
+				" . $frags['case_sql'] . " as preference_tier
+				FROM all_areas
+				$join
+				WHERE lat BETWEEN ? AND ?
+				AND lon BETWEEN ? AND ?
+				AND " . $frags['excl_sql'] . "
+				ORDER BY preference_tier ASC, distance ASC
+				LIMIT 1";
 
-			foreach ( $ranges as $range ) {
+			$stmt = mysqli_prepare ( $con, $sql );
 
-				if ( $found_community == false ) {
-					$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
-					, DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance
-					FROM all_areas
-					$join
-					WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . "
-					AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
-					AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
-					ORDER BY DISTANCE
-					LIMIT 50");// or die (mysqli_error($GLOBALS['vars']['con']));
-
-					if ($main_query->num_rows > 0) {
-
-						while ( $row = mysqli_fetch_assoc ( $main_query ) ) {
-
-							if ( in_array ( $row['generic_term'], $preferred_terms ) ) {
-								$result = $row;
-
-								// might be good to know
-								// what range is the community in from the click
-								$result['range'] = $range;
-
-								// send back the original coords
-								$result['coords'] = [ $lat, $lng ];
-
-								// lon -> lng
-								$result['lng'] = $result['lon'];
-
-								// province abbreviation
-								$result['province_short'] = short_province ( $result['province'] );
-
-								// nice name
-								$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
-
-								$found_community = true;
-
-								break;
-							}
-						}
-
-					}
-
-				}
-
+			if ( $stmt === false ) {
+				die ( mysqli_error ( $con ) );
 			}
 
-			if ( $found_community == true ) {
+			// Bind order matches placeholder order in $sql:
+			//   DISTANCE_BETWEEN(?, ?, ...)         -> lat, lng        (dd)
+			//   CASE WHEN gen_term IN (?, ?, ...)   -> case_values     (s...)
+			//   lat BETWEEN ? AND ?                 -> lat-r, lat+r    (dd)
+			//   lon BETWEEN ? AND ?                 -> lng-r, lng+r    (dd)
+			//   gen_term NOT IN (?, ?, ...)         -> excl_values     (s...)
+			$types = 'dd' . $frags['case_types'] . 'dddd' . $frags['excl_types'];
 
-				// found a community in range
+			$lat_r = round ( $lat, 2 );
+			$lng_r = round ( $lng, 2 );
+
+			// Order MUST mirror $types segment-for-segment;
+			// mysqli_stmt_bind_param is positional, no named binds.
+			$bind_values = array_merge (
+				[ $lat, $lng ],
+				$frags['case_values'],
+				[ $lat_r - $bbox_range, $lat_r + $bbox_range, $lng_r - $bbox_range, $lng_r + $bbox_range ],
+				$frags['excl_values']
+			);
+
+			// mysqli_stmt_bind_param needs values by reference.
+			$bind_refs = [];
+			$bind_refs[] = &$types;
+			foreach ( $bind_values as $k => $v ) {
+				$bind_refs[] = &$bind_values[$k];
+			}
+			call_user_func_array ( 'mysqli_stmt_bind_param', array_merge ( [ $stmt ], $bind_refs ) );
+
+			mysqli_stmt_execute ( $stmt );
+			$main_query = mysqli_stmt_get_result ( $stmt );
+
+			if ( $main_query && $main_query->num_rows > 0 ) {
+
+				$result = mysqli_fetch_assoc ( $main_query );
+
+				$result['lat'] = floatval ( $result['lat'] );
+				$result['lon'] = floatval ( $result['lon'] );
+				$result['lng'] = $result['lon'];
+				// Send back the original click coords (typed) so the
+				// caller can correlate request vs returned place.
+				$result['coords'] = [ $lat, $lng ];
+				$result['province_short'] = short_province ( $result['province'] );
+				$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
+
 				echo json_encode ( $result );
 
 			} else {
 
-				// no preferred results, grab the nearest one
-
-				// range of coordinates to search between
-				$range = 0.1;
-
-				$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
-				, DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance
-				FROM all_areas
-				$join
-				WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . "
-				AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
-				AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
-				ORDER BY DISTANCE
-				LIMIT 1");// or die (mysqli_error($GLOBALS['vars']['con']));
-
-				if ($main_query->num_rows > 0) {
-
-					$result = mysqli_fetch_assoc ( $main_query );
-
-					$result['coords'] = [ $lat, $lng ];
-					$result['lng'] = $result['lon'];
-					$result['province_short'] = short_province ( $result['province'] );
-					$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
-
-					echo json_encode ( $result );
-
-				} else {
-
-					echo json_encode ( array (
-						'lat' => $lat,
-						'lng' => $lng,
-						'coords' => [ $lat, $lng ],
-						'geo_name' => __ ( 'Point', 'cdc' ),
-						'title' => __ ( 'Point', 'cdc' ) . ' (' . number_format ( $lat, 4, '.', '') . ', ' . number_format ( $lng, 4, '.', '') . ')'
-					) );
-
-				}
+				echo json_encode ( array (
+					'lat' => $lat,
+					'lng' => $lng,
+					'coords' => [ $lat, $lng ],
+					'geo_name' => __ ( 'Point', 'cdc' ),
+					'title' => __ ( 'Point', 'cdc' ) . ' (' . number_format ( $lat, 4, '.', '') . ', ' . number_format ( $lng, 4, '.', '') . ')'
+				) );
 
 			}
+
+			mysqli_stmt_close ( $stmt );
 
 		} // if db.php
 
@@ -508,79 +504,95 @@ function cdc_location_search() {
 	} else {
 
 		require_once locate_template ( 'resources/app/db.php' );
+		require_once dirname ( __FILE__ ) . '/gen-term-preferences.php';
 
 		$con = $GLOBALS['vars']['con'];
 
-		$get_sSearch = isset($_GET['q']) ? $_GET['q'] : '';
-		$post_draw = isset($_POST['draw']) ? $_POST['draw'] : '';
+		$get_sSearch = isset ( $_GET['q'] ) ? $_GET['q'] : '';
+		$post_draw = isset ( $_POST['draw'] ) ? $_POST['draw'] : '';
 
-		if (isset ( $GLOBALS['fw']['current_lang_code'] ) ){
+		if ( isset ( $GLOBALS['fw']['current_lang_code'] ) ) {
 			$get_lang = $GLOBALS['fw']['current_lang_code'];
 		} else {
 			$get_lang = 'en';
 		}
 
-		// the columns to be filtered, ordered and returned
-		// must be in the same order as displayed in the table
+		// Backtick → single-quote: existing input normalization, kept
+		// even though the value is now bound (defensive for downstream).
+		$get_sSearch = str_replace ( '`', '\'', $get_sSearch );
 
-		$columns = array (
-			"id_code",
-			"geo_name",
-			"gen_term",
-			"location",
-			"province",
-			"lat",
-			"lon"
-		);
-
-		if ( $get_lang == 'fr' ) {
-			$columns = array (
-				"id_code",
-				"geo_name",
-				"gen_term_fr",
-				"location",
-				"province_fr",
-				"lat",
-				"lon"
-			);
-		}
-
-		$search_columns = [ "geo_name" ];
+		// Column list — _fr suffix when language is French. Gen_term
+		// returned as `term` and geo_name as `text` in the response shape
+		// callers depend on; do not rename here.
+		$gen_term_col = ( $get_lang == 'fr' ) ? 'gen_term_fr' : 'gen_term';
+		$province_col = ( $get_lang == 'fr' ) ? 'province_fr' : 'province';
 
 		$table = "all_areas";
-		$joins = "";
 
-		$get_sSearch = str_replace('`','\'', $get_sSearch);
+		$frags = cdc_build_gen_term_fragments (
+			$gen_term_preference_tiers,
+			$gen_term_excluded
+		);
 
-		// filtering
-		$sql_where = "where gen_term not in ('Administrative Region', 'Province', 'Territory') and geo_name like '%" . mysqli_real_escape_string ( $con,$get_sSearch ) . "%'" ;
+		// Paging if query string is shorter than 5
+		$sql_limit = ( strlen ( $get_sSearch ) < 5 ) ? 'LIMIT 0,10' : '';
 
-		// ordering
-		$sql_order = "order by scale desc";
+		// LIKE bind value — wildcards live in the value, not the SQL.
+		$like_value = '%' . $get_sSearch . '%';
 
-		$sql_limit = "";
+		$sql = "SELECT SQL_CALC_FOUND_ROWS
+			id_code,
+			geo_name,
+			$gen_term_col,
+			location,
+			$province_col,
+			lat,
+			lon,
+			" . $frags['case_sql'] . " as preference_tier
+			FROM {$table}
+			WHERE " . $frags['excl_sql'] . "
+			AND geo_name LIKE ?
+			ORDER BY preference_tier ASC, scale DESC
+			$sql_limit";
 
-		// paging if query string is shorter than 5
-		if ( strlen ( $get_sSearch ) < 5) {
-			$sql_limit = "LIMIT 0,10";
+		$stmt = mysqli_prepare ( $con, $sql );
+
+		if ( $stmt === false ) {
+			die ( mysqli_error ( $con ) );
 		}
 
-		$main_query = mysqli_query($con,"SELECT SQL_CALC_FOUND_ROWS " . implode(", ", $columns) . " FROM {$table} {$joins} {$sql_where} {$sql_order} {$sql_limit}")
-			or die ( mysqli_error ( $con ) );
+		// Bind order: case_values (s...), excl_values (s...), like_value (s).
+		$types = $frags['case_types'] . $frags['excl_types'] . 's';
+		// Order MUST mirror $types segment-for-segment;
+		// mysqli_stmt_bind_param is positional, no named binds.
+		$bind_values = array_merge (
+			$frags['case_values'],
+			$frags['excl_values'],
+			[ $like_value ]
+		);
+
+		$bind_refs = [];
+		$bind_refs[] = &$types;
+		foreach ( $bind_values as $k => $v ) {
+			$bind_refs[] = &$bind_values[$k];
+		}
+		call_user_func_array ( 'mysqli_stmt_bind_param', array_merge ( [ $stmt ], $bind_refs ) );
+
+		mysqli_stmt_execute ( $stmt );
+		$main_query = mysqli_stmt_get_result ( $stmt );
 
 		// send back the number requested
 		$response['draw'] = intval ( $post_draw );
 
 		// get the number of filtered rows
-
-		$filtered_rows_query = mysqli_query ( $con,"SELECT FOUND_ROWS()" )
+		$filtered_rows_query = mysqli_query ( $con, "SELECT FOUND_ROWS()" )
 			or die ( mysqli_error ( $con ) );
 
 		$row = mysqli_fetch_array ( $filtered_rows_query );
 		$response['recordsFiltered'] = $row[0];
 
 		// get the number of rows in total
-		$total_query = mysqli_query ( $con,"SELECT COUNT(*) FROM {$table}" )
+		$total_query = mysqli_query ( $con, "SELECT COUNT(*) FROM {$table}" )
 			or die ( mysqli_error ( $con ) );
 
 		$row = mysqli_fetch_array ( $total_query );
@@ -588,7 +600,12 @@ function cdc_location_search() {
 
 		$response['items'] = array();
 
-		// finish getting rows from the main query
+		// finish getting rows from the main query — preserve existing
+		// {id, text, term, location, province, lat, lon} response shape;
+		// `province_short` is additive, derived via the same `short_province()`
+		// helper used by cdc_get_location_by_coords/_by_id so the client can
+		// render the same "geo_name, XX" shape as those endpoints without
+		// duplicating the province-name → 2-letter mapping in JS.
 		while ( $row = mysqli_fetch_row ( $main_query ) ) {
 			$row = array (
 				"id" => $row[0],
@@ -596,12 +613,15 @@ function cdc_location_search() {
 				"term" => $row[2],
 				"location" => $row[3],
 				"province" => $row[4],
+				"province_short" => short_province ( $row[4] ),
 				"lat" => $row[5],
 				"lon" => $row[6]
 			);
 
 			$response['items'][] = $row;
 		}
+
+		mysqli_stmt_close ( $stmt );
 
 	} // locate db
 

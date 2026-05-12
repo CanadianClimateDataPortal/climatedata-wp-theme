@@ -288,6 +288,28 @@ const SearchControl = ({
 						lng: latLon.lon,
 					}
 					const locationByCoords = await fetchLocationByCoords(latLng);
+
+					// Bypass leaflet-search's showLocation pipeline for GRIDDED mode so the
+					// marker lands at the typed coordinates rather than the synthetic-click
+					// container-center reprojection. Polygon modes (CENSUS/HEALTH/WATERSHED)
+					// fall through to the existing showLocation path because their popup
+					// title comes from layer.properties.label_* and the small drift is
+					// benign at polygon scale.
+					const interactiveRegion = climateVariable?.getInteractiveRegion()
+						?? InteractiveRegionOption.GRIDDED_DATA;
+
+					if (
+						interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
+						&& onSelectGriddedLocation
+					) {
+						map.setView(latLng, SEARCH_DEFAULT_ZOOM);
+						onSelectGriddedLocation({
+							latlng: L.latLng(latLng.lat, latLng.lng),
+							title: locationByCoords.title,
+						});
+						return;
+					}
+
 					const locationAtTypedCoords = {
 						...locationByCoords,
 						lat: latLng.lat,

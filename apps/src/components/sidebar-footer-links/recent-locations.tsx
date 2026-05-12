@@ -62,7 +62,7 @@ const RecentLocationsPanel: React.FC = () => {
 
 	const moveToLocation = async (location: MapLocation) => {
 		map.setView(location, SEARCH_DEFAULT_ZOOM);
-		await dispatchMapClick(map, location);
+		await dispatchMapClick(map);
 	};
 
 	return (

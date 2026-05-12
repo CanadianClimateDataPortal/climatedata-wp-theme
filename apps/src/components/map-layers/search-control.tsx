@@ -131,9 +131,7 @@ const SearchControl = ({
 			const interactiveRegion = climateVariable?.getInteractiveRegion()
 				?? InteractiveRegionOption.GRIDDED_DATA;
 
-			// UC-Search in GRIDDED_DATA: the autocomplete row already has a
-			// usable title — set the selected location directly. Skip the
-			// synthetic-click reverse-lookup path that the other modes need.
+			// The autocomplete row already has a usable title — set the selected location directly.
 			if (
 				autocompleteItem
 				&& interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
@@ -143,12 +141,13 @@ const SearchControl = ({
 					latlng,
 					title: autocompleteItem.title,
 				});
+				// Skip the synthetic-click reverse-lookup path that the other modes need.
 				return;
 			}
 
 			// UC-LocateMe, UC-RawCoordPaste, and all polygon modes:
 			// fall through to existing behaviour from main.
-			await dispatchMapClick(map, latlng);
+			await dispatchMapClick(map);
 		},
 		[
 			climateVariable,

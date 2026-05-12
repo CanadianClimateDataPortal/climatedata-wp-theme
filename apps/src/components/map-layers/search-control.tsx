@@ -280,13 +280,23 @@ const SearchControl = ({
 					return;
 				}
 				// Check if the coordinates are valid if the location is empty.
-				const latLng = parseLatLon(this._input.value);
+				const latLon = parseLatLon(this._input.value);
 				// If the coordinates are valid, move to that location.
-				if (latLng && !latLng.isPartial) {
-					// Fetch location data
-					const locationByCoords = await fetchLocationByCoords({ lat: latLng.lat, lng: latLng.lon });
-					// Trigger show location.
-					this.showLocation(locationByCoords, locationByCoords.title);
+				if (latLon && !latLon.isPartial) {
+					const latLng = {
+						lat: latLon.lat,
+						lng: latLon.lon,
+					}
+					const locationByCoords = await fetchLocationByCoords(latLng);
+					const locationAtTypedCoords = {
+						...locationByCoords,
+						lat: latLng.lat,
+						lng: latLng.lng,
+					};
+					this.showLocation(
+						locationAtTypedCoords,
+						locationByCoords.title,
+					);
 				}
 				else {
 					// Show error alert.

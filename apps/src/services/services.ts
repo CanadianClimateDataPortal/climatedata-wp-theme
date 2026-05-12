@@ -455,6 +455,8 @@ export const fetchPostsData = async (
 /**
  * Fetches location data from the API
  *
+ * Call to WordPress wp-api endpoint `/wp-json/cdc/v2/get_location_by_coords`
+ *
  * @param latlng Latitude and Longitude of the location
  * @param fetchOptions Any other options to pass to fetch (ex: `signal`)
  */

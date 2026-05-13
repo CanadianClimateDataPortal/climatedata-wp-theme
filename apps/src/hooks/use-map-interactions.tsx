@@ -95,17 +95,24 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
       ...latlng,
     }));
 
-    setSelectedLocation({ featureId: featureId ?? 0, title: locationTitle, latlng });
-  }, [clearMarkers, addMarker, dispatch, climateVariable, locale]);
+    setSelectedLocation({
+			featureId: featureId ?? 0,
+			latlng,
+			title: locationTitle,
+		});
+  }, [
+		addMarker,
+		clearMarkers,
+		climateVariable,
+		dispatch,
+		locale,
+	]);
 
-  const handleClearSelectedLocation = useCallback(() => {
-    setSelectedLocation(null);
-    clearMarkers();
-  }, [clearMarkers]);
-
-  // Used by the search control's autocomplete branch in GRIDDED_DATA mode:
-  // the autocomplete row already carries a usable display title, so we set
-  // the selected location directly without a reverse-coords lookup.
+  /**
+	 * Used by the `search-control.tsx`'s autocomplete branch in GRIDDED_DATA mode:
+	 * the autocomplete row already carries a usable display title, so we set
+	 * the selected location directly without a reverse-coords lookup.
+	 */
   const selectGriddedLocation = useCallback((
     { latlng, title }: { latlng: L.LatLng; title: string },
   ) => {
@@ -119,8 +126,21 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
       lng: latlng.lng,
     }));
 
-    setSelectedLocation({ featureId: 0, title, latlng });
-  }, [clearMarkers, addMarker, dispatch]);
+    setSelectedLocation({
+			featureId: 0,
+			latlng,
+			title,
+		});
+  }, [
+		addMarker,
+		clearMarkers,
+		dispatch,
+	]);
+
+  const handleClearSelectedLocation = useCallback(() => {
+    setSelectedLocation(null);
+    clearMarkers();
+  }, [clearMarkers]);
 
   // Effect to handle location updates when climate variables change
   useEffect(() => {

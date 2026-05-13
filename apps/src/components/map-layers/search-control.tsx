@@ -272,6 +272,13 @@ const SearchControl = ({
 				void _; // intentionally ignore to suppress typescript error
 				return `<div>${buildLocationTitle(item)}</div>`;
 			},
+
+			/**
+			 * Search by raw "lat,lon" coordinates or anything else entry point.
+			 *
+			 * The autocomplete-hit path (UC-Search) never reaches here; it lands
+			 * in `moveToLocation` above with a matching row in formattedItemsRef.
+			 */
 			locationNotFound: async function() {
 				// If the list of suggestions is still shown, no error message is shown.
 				// See #86862
@@ -279,21 +286,21 @@ const SearchControl = ({
 					this.showTooltip(this._recordsCache)
 					return;
 				}
-				// Check if the coordinates are valid if the location is empty.
-				const latLon = parseLatLon(this._input.value);
+
+				// parseLatLon is both PARSER and DETECTOR: a non-partial result means
+				// the input was a valid "lat, lon" string.
+				const parsedSearchControlInput = parseLatLon(this._input.value);
 				// If the coordinates are valid, move to that location.
-				if (latLon && !latLon.isPartial) {
-					const latLng = {
-						lat: latLon.lat,
-						lng: latLon.lon,
-					}
+				if (parsedSearchControlInput && !parsedSearchControlInput.isPartial) {
+					const latLng = new L.LatLng(parsedSearchControlInput.lat, parsedSearchControlInput.lon);
 					const locationByCoords = await fetchLocationByCoords(latLng);
 
 					// Bypass leaflet-search's showLocation pipeline for GRIDDED mode so the
-					// marker lands at the typed coordinates rather than the synthetic-click
-					// container-center reprojection. Polygon modes (CENSUS/HEALTH/WATERSHED)
-					// fall through to the existing showLocation path because their popup
-					// title comes from layer.properties.label_* and the small drift is
+					// marker lands at the typed coordinates rather than dispatchMapClick
+					// calculated center (container-center reprojection).
+					// Other `InteractiveRegionOption.` modes (CENSUS/HEALTH/WATERSHED)
+					// fall through because their popup title comes from
+					// `layer.properties.label_*` and the small drift is
 					// benign at polygon scale.
 					const interactiveRegion = climateVariable?.getInteractiveRegion()
 						?? InteractiveRegionOption.GRIDDED_DATA;
@@ -304,19 +311,18 @@ const SearchControl = ({
 					) {
 						map.setView(latLng, SEARCH_DEFAULT_ZOOM);
 						onSelectGriddedLocation({
-							latlng: L.latLng(latLng.lat, latLng.lng),
+							latlng: latLng,
 							title: locationByCoords.title,
 						});
 						return;
 					}
 
-					const locationAtTypedCoords = {
-						...locationByCoords,
-						lat: latLng.lat,
-						lng: latLng.lng,
-					};
 					this.showLocation(
-						locationAtTypedCoords,
+						{
+							...locationByCoords,
+							lat: latLng.lat,
+							lng: latLng.lng,
+						},
 						locationByCoords.title,
 					);
 				}

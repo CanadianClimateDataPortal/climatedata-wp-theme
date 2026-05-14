@@ -8,6 +8,7 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from 'react';
 import { __ } from '@/context/locale-provider';
@@ -20,6 +21,7 @@ import 'leaflet-search/dist/leaflet-search.min.css';
 import 'leaflet-search';
 import mapPinIcon from '@/assets/map-pin.svg';
 
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { cn, parseLatLon } from '@/lib/utils';
 import { dispatchMapClick } from '@/lib/dispatch-map-click';
 import { fetchLocationByCoords } from '@/services/services';
@@ -27,6 +29,7 @@ import {
 	type SearchControlLocationItem,
 	type SearchControlResponse,
 } from '@/types/types';
+import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 import {
 	LOCATION_SEARCH_ENDPOINT,
 	SEARCH_DEFAULT_ZOOM,
@@ -57,6 +60,14 @@ function convertSearchLatLng(inputLatLng: SearchLatLng): L.LatLng {
  */
 export interface SearchControlProps {
 	className?: string;
+	/**
+	 * Set selected location directly from an autocomplete pick when the
+	 * climate variable's interactive region is GRIDDED_DATA. Bypasses the
+	 * synthetic-click + reverse-coords-lookup path.
+	 */
+	onSelectGriddedLocation?: (
+		input: { latlng: L.LatLng; title: string },
+	) => void;
 }
 
 /**
@@ -71,7 +82,16 @@ export interface SearchControlProps {
  */
 const SearchControl = ({
 	className,
+	onSelectGriddedLocation,
 }: SearchControlProps): ReactElement => {
+	const { climateVariable } = useClimateVariable();
+	// Captured at the point formatData() builds entries, keyed by the same
+	// title string leaflet-search later passes back to moveToLocation().
+	// A closure-scoped Map keeps lookup local to the search lifecycle
+	// and avoids any cross-render leakage.
+	const formattedItemsRef = useRef<Map<string, SearchControlLocationItem>>(
+		new Map(),
+	);
 	const [isGeolocationEnabled, setIsGeolocationEnabled] =
 		useState<boolean>(false);
 	const [isTracking, setIsTracking] = useState<boolean>(false);
@@ -95,7 +115,10 @@ const SearchControl = ({
 	const map = useMap();
 
 	const handleLocationChange = useCallback(
-		async (inputLatlng: SearchLatLng) => {
+		async (
+			inputLatlng: SearchLatLng,
+			autocompleteItem?: { item: SearchControlLocationItem; title: string },
+		) => {
 			const latlng = convertSearchLatLng(inputLatlng);
 			// clear all existing markers from the map
 			map.eachLayer(layer => {
@@ -104,10 +127,32 @@ const SearchControl = ({
 				}
 			});
 			map.setView(latlng, SEARCH_DEFAULT_ZOOM);
-			await dispatchMapClick(map, latlng);
+
+			const interactiveRegion = climateVariable?.getInteractiveRegion()
+				?? InteractiveRegionOption.GRIDDED_DATA;
+
+			// The autocomplete row already has a usable title — set the selected location directly.
+			if (
+				autocompleteItem
+				&& interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
+				&& onSelectGriddedLocation
+			) {
+				onSelectGriddedLocation({
+					latlng,
+					title: autocompleteItem.title,
+				});
+				// Skip the synthetic-click reverse-lookup path that the other modes need.
+				return;
+			}
+
+			// UC-LocateMe, UC-RawCoordPaste, and all polygon modes:
+			// fall through to existing behaviour from main.
+			await dispatchMapClick(map);
 		},
 		[
+			climateVariable,
 			map,
+			onSelectGriddedLocation,
 		],
 	);
 
@@ -205,6 +250,11 @@ const SearchControl = ({
 					SearchControlLocationItem & { loc: number[]; lng: string; }
 				> = {};
 
+				// Reset and rebuild the title→item index for the current
+				// suggestion set, so moveToLocation can look the row up by
+				// title without round-tripping through the server.
+				formattedItemsRef.current.clear();
+
 				response.items.forEach((item: SearchControlLocationItem) => {
 					const title = buildLocationTitle(item);
 					const loc = [parseFloat(item.lat), parseFloat(item.lon)];
@@ -213,6 +263,7 @@ const SearchControl = ({
 						lng: item.lon,
 						loc,
 					};
+					formattedItemsRef.current.set(title, item);
 				});
 
 				return formattedData;
@@ -221,6 +272,13 @@ const SearchControl = ({
 				void _; // intentionally ignore to suppress typescript error
 				return `<div>${buildLocationTitle(item)}</div>`;
 			},
+
+			/**
+			 * Search by raw "lat,lon" coordinates or anything else entry point.
+			 *
+			 * The autocomplete-hit path (UC-Search) never reaches here; it lands
+			 * in `moveToLocation` above with a matching row in formattedItemsRef.
+			 */
 			locationNotFound: async function() {
 				// If the list of suggestions is still shown, no error message is shown.
 				// See #86862
@@ -228,14 +286,45 @@ const SearchControl = ({
 					this.showTooltip(this._recordsCache)
 					return;
 				}
-				// Check if the coordinates are valid if the location is empty.
-				const latLng = parseLatLon(this._input.value);
+
+				// parseLatLon is both PARSER and DETECTOR: a non-partial result means
+				// the input was a valid "lat, lon" string.
+				const parsedSearchControlInput = parseLatLon(this._input.value);
 				// If the coordinates are valid, move to that location.
-				if (latLng && !latLng.isPartial) {
-					// Fetch location data
-					const locationByCoords = await fetchLocationByCoords({ lat: latLng.lat, lng: latLng.lon });
-					// Trigger show location.
-					this.showLocation(locationByCoords, locationByCoords.geo_id);
+				if (parsedSearchControlInput && !parsedSearchControlInput.isPartial) {
+					const latLng = new L.LatLng(parsedSearchControlInput.lat, parsedSearchControlInput.lon);
+					const locationByCoords = await fetchLocationByCoords(latLng);
+
+					// Bypass leaflet-search's showLocation pipeline for GRIDDED mode so the
+					// marker lands at the typed coordinates rather than dispatchMapClick
+					// calculated center (container-center reprojection).
+					// Other `InteractiveRegionOption.` modes (CENSUS/HEALTH/WATERSHED)
+					// fall through because their popup title comes from
+					// `layer.properties.label_*` and the small drift is
+					// benign at polygon scale.
+					const interactiveRegion = climateVariable?.getInteractiveRegion()
+						?? InteractiveRegionOption.GRIDDED_DATA;
+
+					if (
+						interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
+						&& onSelectGriddedLocation
+					) {
+						map.setView(latLng, SEARCH_DEFAULT_ZOOM);
+						onSelectGriddedLocation({
+							latlng: latLng,
+							title: locationByCoords.title,
+						});
+						return;
+					}
+
+					this.showLocation(
+						{
+							...locationByCoords,
+							lat: latLng.lat,
+							lng: latLng.lng,
+						},
+						locationByCoords.title,
+					);
 				}
 				else {
 					// Show error alert.
@@ -250,8 +339,24 @@ const SearchControl = ({
 					popupAnchor: [0, -41], // Popup position relative to the icon
 				}),
 			}),
-			moveToLocation: (latlng: SearchLatLng) => {
-				handleLocationChange(latlng);
+			moveToLocation: (latlng: SearchLatLng, title: string) => {
+				// leaflet-search invokes this with (latlng, title, map);
+				// `title` is the same key formatData() used in formattedData,
+				// (the verbose buildLocationTitle output, kept for the
+				// dropdown display), so we can recover the original
+				// autocomplete row from it.
+				const item = formattedItemsRef.current.get(title);
+				if (item) {
+					// UC-Search popup title uses the short server-resolved
+					// shape ("Montréal, QC"), matching cdc_get_location_by_coords,
+					// not the verbose dropdown display.
+					const popupTitle = `${item.text}, ${item.province_short}`;
+					handleLocationChange(latlng, { item, title: popupTitle });
+				} else {
+					// No matching row (e.g. raw lat/lon paste branch from
+					// locationNotFound) — fall through to existing behaviour.
+					handleLocationChange(latlng);
+				}
 			},
 		});
 

@@ -60,6 +60,9 @@ interface MapContainerProps {
 	onClick: (e: { latlng: L.LatLng; layer: { properties: unknown } }) => void;
 	selectedLocation: SelectedLocationInfo | null;
 	clearSelectedLocation: () => void;
+	selectGriddedLocation?: (
+		input: { latlng: L.LatLng; title: string },
+	) => void;
 	// @ts-expect-error: L.VectorGrid is a valid type
 	layerRef?: React.MutableRefObject<L.VectorGrid | null>;
 }
@@ -76,6 +79,7 @@ export default function MapContainer({
 	onClick,
 	selectedLocation,
 	clearSelectedLocation,
+	selectGriddedLocation,
 	layerRef,
 }: MapContainerProps): React.ReactElement {
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
@@ -245,7 +249,11 @@ export default function MapContainer({
 			<ZoomControl />
 
 			{/* Show search control if not a comparison map. */}
-			{ !isComparisonMap && <SearchControl /> }
+			{ !isComparisonMap && (
+				<SearchControl
+					onSelectGriddedLocation={selectGriddedLocation}
+				/>
+			) }
 
 			<LocationModal
 				isOpen={canShowModal}

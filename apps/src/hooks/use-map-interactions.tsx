@@ -95,8 +95,47 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
       ...latlng,
     }));
 
-    setSelectedLocation({ featureId: featureId ?? 0, title: locationTitle, latlng });
-  }, [clearMarkers, addMarker, dispatch, climateVariable, locale]);
+    setSelectedLocation({
+			featureId: featureId ?? 0,
+			latlng,
+			title: locationTitle,
+		});
+  }, [
+		addMarker,
+		clearMarkers,
+		climateVariable,
+		dispatch,
+		locale,
+	]);
+
+  /**
+	 * Used by the `search-control.tsx`'s autocomplete branch in GRIDDED_DATA mode:
+	 * the autocomplete row already carries a usable display title, so we set
+	 * the selected location directly without a reverse-coords lookup.
+	 */
+  const selectGriddedLocation = useCallback((
+    { latlng, title }: { latlng: L.LatLng; title: string },
+  ) => {
+    clearMarkers();
+    addMarker(latlng, title);
+
+    dispatch(addRecentLocation({
+      id: `${latlng.lat}|${latlng.lng}`,
+      title,
+      lat: latlng.lat,
+      lng: latlng.lng,
+    }));
+
+    setSelectedLocation({
+			featureId: 0,
+			latlng,
+			title,
+		});
+  }, [
+		addMarker,
+		clearMarkers,
+		dispatch,
+	]);
 
   const handleClearSelectedLocation = useCallback(() => {
     setSelectedLocation(null);
@@ -140,5 +179,6 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
     handleOut,
     handleClick,
     handleClearSelectedLocation,
+    selectGriddedLocation,
   };
 }

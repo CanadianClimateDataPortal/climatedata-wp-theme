@@ -4,20 +4,13 @@ import L from 'leaflet';
  * Dispatches a real DOM PointerEvent on the VectorGrid canvas tile at the
  * map container center after the view settles.
  *
- * `pointer-events: none` on Leaflet's pane wrapper divs causes
- * `document.elementFromPoint` to return the outermost container — canvas
- * tiles are queried via `gridPane.querySelectorAll('canvas')` and filtered
- * by bounding rect instead.
- *
  * `Promise.race` with a 1,000 ms timeout guards the case where `setView`
  * fires `moveend` synchronously (short pan, no animation) before the
  * listener is attached.
  */
 export const dispatchMapClick = async (
 	map: L.Map,
-	latlng: { lat: number; lng: number },
 ): Promise<void> => {
-	void latlng;
 	await Promise.race([
 		new Promise<void>((resolve) => map.once('moveend', () => resolve())),
 		new Promise<void>((resolve) => setTimeout(resolve, 1_000)),
@@ -31,6 +24,11 @@ export const dispatchMapClick = async (
 	if (!gridPane) {
 		return;
 	}
+	// `pointer-events: none` on Leaflet's pane wrapper divs causes
+	// `document.elementFromPoint` to return the outermost container — the
+	// canvas tiles themselves are not hit-testable through that API. We
+	// enumerate the grid pane's canvases and filter by their bounding rect
+	// to find the one under (clientX, clientY) instead.
 	const canvases = Array.from(gridPane.querySelectorAll('canvas'));
 	const target = canvases.find((canvas) => {
 		const r = canvas.getBoundingClientRect();

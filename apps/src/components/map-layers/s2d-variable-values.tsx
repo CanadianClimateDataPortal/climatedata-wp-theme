@@ -22,7 +22,7 @@ import {
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
-import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
+import { ForecastSummaryContents } from '@/components/map-layers/s2d-location-modal-forecast-summary';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import StarRating from '@/components/ui/star-rating';
 import ProgressBar, { ProgressBarProps } from '@/components/ui/progress-bar';
@@ -819,22 +819,7 @@ const ProbabilitiesPart = ({
 
 
 	const { climateVariable } = useClimateVariable();
-	const variableId = climateVariable?.getId();
 	const variableName = climateVariable?.getTitle() ?? '';
-	// A single sprintf template can't produce correct French for both variables:
-	// "Les précipitations totales ont" (plural) vs "La température moyenne a" (singular).
-	const tooltipOpeningLineVariants = {
-		s2d_precip_accum: __('The total precipitation has a') /* from climate-variables.config.ts */,
-		s2d_air_temp: __('The mean temperature has a')        /* from climate-variables.config.ts */,
-		fallback: sprintf(__('The %s has a'), variableName.toLowerCase()),
-	};
-
-	const tooltipOpeningLine = Reflect.has(
-		tooltipOpeningLineVariants,
-		variableId ?? 'fallback'
-	)
-		? Reflect.get(tooltipOpeningLineVariants, variableId ?? 'fallback')
-		: Reflect.get(tooltipOpeningLineVariants, 'fallback');
 
 	const TitleLine = () => (
 		<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
@@ -847,31 +832,12 @@ const ProbabilitiesPart = ({
 		</span>
 	);
 
-	// Category definitions parallel to progressBars, for tooltip content
-	const forecastCategories = buildForecastCategories(forecastType);
-
 	const tooltipProbabilityContent = isLoaded ? (
-		<div className="p-1">
-			<p>{tooltipOpeningLine}</p>
-			<ul className="mt-2 list-disc list-outside">
-				{progressBars.map((bar, idx) => (
-					<li key={idx} className="mt-2 ml-4">
-						{sprintf(
-							__('%d%% probability of being %s (%s)'),
-							Math.round(bar.percent),
-							forecastCategories[idx].term.toLowerCase(),
-							bar.labelTooltipCutoff,
-						)}
-					</li>
-				))}
-			</ul>
-			<p className="mt-2">
-				{__('relative to the 1991 to 2020 historical climatology.')}
-			</p>
-			<p className="mt-2">
-				{__('The probabilities may not add exactly to 100% due to rounding.')}
-			</p>
-		</div>
+		<ForecastSummaryContents
+			forecastType={forecastType}
+			progressBars={progressBars}
+			locationData={locationData}
+		/>
 	) : null;
 
 	const ProbabilityHeading = !isLoaded ? (

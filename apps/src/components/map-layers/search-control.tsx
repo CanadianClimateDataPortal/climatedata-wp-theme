@@ -95,7 +95,7 @@ const SearchControl = ({
 	const map = useMap();
 
 	const handleLocationChange = useCallback(
-		async (inputLatlng: SearchLatLng) => {
+		async (inputLatlng: SearchLatLng, searchProvidedTitle?: string) => {
 			const latlng = convertSearchLatLng(inputLatlng);
 			// clear all existing markers from the map
 			map.eachLayer(layer => {
@@ -105,6 +105,11 @@ const SearchControl = ({
 			});
 			map.setView(latlng, SEARCH_DEFAULT_ZOOM);
 			await dispatchMapClick(map, latlng);
+
+			// #Illustration
+			// What was done before dispatchMapClick that was done here
+			console.info('earlier iteration had layerRef.current.fire("click", ...) setting searchProvidedTitle', { searchProvidedTitle });
+
 		},
 		[
 			map,
@@ -250,8 +255,8 @@ const SearchControl = ({
 					popupAnchor: [0, -41], // Popup position relative to the icon
 				}),
 			}),
-			moveToLocation: (latlng: SearchLatLng) => {
-				handleLocationChange(latlng);
+			moveToLocation: (latlng: SearchLatLng, searchProvidedTitle: string) => {
+				handleLocationChange(latlng, searchProvidedTitle);
 			},
 		});
 

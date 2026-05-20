@@ -5,6 +5,7 @@ import { __ } from '@/context/locale-provider';
 
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useLocale } from '@/hooks/use-locale';
+import { useCurrentLocationTitle } from '@/hooks/use-current-location';
 
 import S2DReleaseDate from '@/components/s2d-release-date';
 
@@ -106,15 +107,37 @@ const MaybePrefixWhen = ({
 
 MaybePrefixWhen.displayName = 'MaybePrefixWhen';
 
+const LineTitleForecastSummary = (): React.ReactNode => {
+	let outcome: React.ReactNode = null;
+	const currentLocationTitle = useCurrentLocationTitle();
+	if (currentLocationTitle !== null) {
+		outcome = (
+			<p className="mt-2 font-semibold">
+				{sprintf(
+					__('Forecast Summary for %s:'),
+					currentLocationTitle,
+				)}
+			</p>
+		);
+	}
+
+	return outcome;
+};
+
+LineTitleForecastSummary.displayName = 'LineTitleForecastSummary';
+
 type ForecastSummaryContentsProps = ForecastTypeAndProgressBars & {
 	locationData: LocationS2DData;
 };
 
-export const ForecastSummaryContents = ({
-	forecastType,
-	progressBars,
-	locationData,
-}: ForecastSummaryContentsProps): React.ReactNode => {
+export const ForecastSummaryContents = (
+	props: ForecastSummaryContentsProps,
+): React.ReactNode => {
+	const {
+		forecastType,
+		progressBars,
+		locationData,
+	} = props;
 	const { climateVariable } = useClimateVariable();
 	const { locale } = useLocale();
 
@@ -142,12 +165,7 @@ export const ForecastSummaryContents = ({
 
 	return (
 		<div className="p-1">
-			<p className="mt-2 font-semibold">
-				{sprintf(
-					__('Forecast Summary for %s'),
-					'TODO',
-				)}
-			</p>
+			<LineTitleForecastSummary />
 			<p className="mt-2">{progressBarsListFirstLine}</p>
 			<ul className="mt-2 list-disc list-outside">
 				{progressBars.map((bar, idx) => (

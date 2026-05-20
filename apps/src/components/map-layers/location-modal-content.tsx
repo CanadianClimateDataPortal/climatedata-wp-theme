@@ -12,6 +12,11 @@ import appConfig from '@/config/app.config';
 import { getForecastTypeName } from '@/lib/s2d';
 
 interface LocationModalContentProps extends BaseLocationModalContentParams {
+	/**
+	 * Title to display on the surrounding pannel where the LocationModal contents is displayed
+	 *
+	 * @see {@link useCurrentLocationTitle} - An alternative method instead of looking for the LocationModalContent title
+	 */
 	title: string;
 	scenario: string;
 	onDetailsClick: () => void;

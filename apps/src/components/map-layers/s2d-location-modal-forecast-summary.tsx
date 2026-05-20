@@ -17,6 +17,7 @@ import { ForecastTypes, type ForecastType, } from '@/types/climate-variable-inte
 
 import { type LocationS2DData } from '@/lib/s2d';
 import { formatValue } from '@/lib/format';
+import { cn } from '@/lib/utils';
 
 type ForecastTypeAndProgressBars = {
 	forecastType: ForecastType;
@@ -163,6 +164,14 @@ export const ForecastSummaryContents = (
 	// Category definitions parallel to progressBars, for tooltip content
 	const forecastCategories = buildForecastCategories(forecastType);
 
+	const CN_RELEASE_DATE = [
+		'-font-semibold',
+		'-text-dark-purple',
+		'-text-xs',
+		'-tracking-wider',
+		'-uppercase',
+	];
+
 	return (
 		<div className="p-1">
 			<LineTitleForecastSummary />
@@ -202,7 +211,7 @@ export const ForecastSummaryContents = (
 				{__('The probabilities may not add exactly to 100% due to rounding.')}
 			</p>
 			<p className="mt-2">
-				<S2DReleaseDate className="-font-semibold -uppercase" tooltip={false} />
+				<S2DReleaseDate className={cn(CN_RELEASE_DATE)} tooltip={false} />
 			</p>
 			<p className="mt-2">
 				{__('Consider checking back for updated forecasts!')}

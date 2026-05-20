@@ -6,11 +6,15 @@ import { useS2D } from '@/hooks/use-s2d';
 import { useLocale } from '@/hooks/use-locale';
 import { __ } from '@/context/locale-provider';
 
-import TooltipWidget from '@/components/ui/tooltip-widget';
+import {
+	default as TooltipWidget,
+	type TooltipWidgetProps,
+} from '@/components/ui/tooltip-widget';
 
 interface S2DReleaseDateProps {
 	tooltip?: ReactNode | null;
 	className?: string;
+	tooltipSide?: TooltipWidgetProps['side'];
 }
 
 const tooltipReleaseDate = __(
@@ -26,10 +30,13 @@ const tooltipReleaseDate = __(
  *
  * @param tooltip - Optional tooltip override.
  */
-const S2DReleaseDate = (props: S2DReleaseDateProps) => {
+const S2DReleaseDate = (
+	props: S2DReleaseDateProps,
+): React.ReactNode => {
 	const {
 		tooltip,
 		className,
+		tooltipSide = 'top',
 	} = props;
 	const { releaseDate } = useS2D();
 	const { locale } = useLocale();
@@ -54,13 +61,20 @@ const S2DReleaseDate = (props: S2DReleaseDateProps) => {
 		);
 	}
 
+	const TooltipWidgetElement = effectiveTooltip && (
+		<TooltipWidget
+			tooltip={effectiveTooltip}
+			side={tooltipSide}
+		/>
+	);
+
 	return (
 		<div className={cn('flex flex-row flex-nowrap gap-1 my-2 text-xs font-semibold tracking-wider uppercase text-dark-purple', className)}>
 			<span>
 				{__('Release date:')}&nbsp;
 				{releaseDateElement}
 			</span>
-			{effectiveTooltip && <TooltipWidget tooltip={effectiveTooltip} side="top" />}
+			{TooltipWidgetElement}
 		</div>
 	);
 };

@@ -34,7 +34,8 @@ const validateS2DVariable = (
 const validateRegularVariable = (
 	climateVariable: ClimateVariableInterface,
 ): unknown[] => {
-	const version = climateVariable.getVersion();
+	// The selected version or `true` if the variable doesn't have a version concept
+	const version = climateVariable.getVersion() ?? true;
 	const analysisFields = climateVariable.getAnalysisFields() ?? [];
 	const values = climateVariable.getAnalysisFieldValues() ?? {};
 	const thresholdPossibleValues = climateVariable.getThresholds() ?? [];

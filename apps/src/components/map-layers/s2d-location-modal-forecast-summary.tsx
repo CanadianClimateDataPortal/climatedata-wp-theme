@@ -13,7 +13,11 @@ import { buildForecastCategories } from '@/components/map-layers/s2d-build-forec
 
 import { type ProgressBarProps } from '@/components/ui/progress-bar';
 
-import { ForecastTypes, type ForecastType, } from '@/types/climate-variable-interface';
+import {
+	ForecastTypes,
+	S2DFrequencyType,
+	type ForecastType,
+} from '@/types/climate-variable-interface';
 
 import { type LocationS2DData } from '@/lib/s2d';
 import {
@@ -116,7 +120,7 @@ const LineTitleForecastSummary = (): React.ReactNode => {
 	const currentLocationTitle = useCurrentLocationTitle();
 	if (currentLocationTitle !== null) {
 		outcome = (
-			<p className="mt-2 font-semibold">
+			<p className="font-semibold">
 				{sprintf(
 					__('Forecast Summary for %s:'),
 					currentLocationTitle,
@@ -131,7 +135,7 @@ const LineTitleForecastSummary = (): React.ReactNode => {
 LineTitleForecastSummary.displayName = 'LineTitleForecastSummary';
 
 type ForecastSummaryContentsProps = ForecastTypeAndProgressBars & {
-	locationData: LocationS2DData;
+	locationData: LocationS2DData | null;
 };
 
 export const ForecastSummaryContents = (
@@ -188,7 +192,7 @@ export const ForecastSummaryContents = (
 	];
 
 	return (
-		<div className="p-1">
+		<>
 			<LineTitleForecastSummary />
 			<p className="mt-2">{progressBarsListFirstLine}</p>
 			<ul className="mt-2 list-disc list-outside">
@@ -210,7 +214,7 @@ export const ForecastSummaryContents = (
 				forecastType={forecastType}
 				progressBars={progressBars}
 			>
-				{sprintf(
+				{locationData && sprintf(
 					__(
 						'The historical median (%s) from the climatology provides an indication of typical past conditions.'
 					),
@@ -223,15 +227,12 @@ export const ForecastSummaryContents = (
 				)}
 			</MaybePrefixWhen>
 			<p className="mt-2">
-				{__('The probabilities may not add exactly to 100% due to rounding.')}
-			</p>
-			<p className="mt-2">
 				<S2DReleaseDate className={cn(CN_RELEASE_DATE)} tooltip={false} />
 			</p>
 			<p className="mt-2">
 				{__('Consider checking back for updated forecasts!')}
 			</p>
-		</div>
+		</>
 	);
 };
 

@@ -177,7 +177,7 @@ export const ForecastSummaryContents = (
 	const tooltipOpeningLineVariants = {
 		s2d_precip_accum: sprintf(__('The %s total precipitation has a'), formattedPeriodRange) /* from climate-variables.config.ts */,
 		s2d_air_temp: sprintf(__('The %s mean temperature has a'), formattedPeriodRange)        /* from climate-variables.config.ts */,
-		fallback: sprintf(__('The %s %s has a'), variableName.toLowerCase(), formattedPeriodRange),
+		fallback: sprintf(__('The %s %s has a'), variableName.toLowerCase(), formattedPeriodRange), // THIS WON'T WORK UNLESS WE USE POSITIONAL -- TODO Check
 	};
 
 	const progressBarsListFirstLine = Reflect.has(
@@ -270,6 +270,13 @@ export type ForecastSummaryPopoverProps = ForecastSummaryContentsProps & {
 	popoverContentSide?: PopoverContentSide;
 };
 
+/**
+ * @TODO NOTE FOR DISCUSSION:
+ * This should probably be using instead the {@link TooltipWidget} but refactored
+ * using slots (like Vue or native web componets do, using `children` React pattern) and
+ * this be the wrapper with similar interface as {@link ForecastSummaryContentsProps}
+ * wrapping around a modified TooltipWidget
+ */
 export const ForecastSummaryPopover = (
 	props: ForecastSummaryPopoverProps,
 ): React.ReactNode => {

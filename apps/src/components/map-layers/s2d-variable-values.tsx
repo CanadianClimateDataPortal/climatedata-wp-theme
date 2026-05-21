@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { sprintf } from '@wordpress/i18n';
 import L from 'leaflet';
 
@@ -23,6 +23,7 @@ import {
 } from '@/types/climate-variable-interface';
 
 import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
+import { ForecastSummaryPopover } from '@/components/map-layers/s2d-location-modal-forecast-summary';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import StarRating from '@/components/ui/star-rating';
 import ProgressBar, { ProgressBarProps } from '@/components/ui/progress-bar';
@@ -45,6 +46,7 @@ interface PopupContentProps {
 interface ProbabilitiesPartProps {
 	locationData: LocationS2DData | null;
 	forecastType: ForecastType;
+	forecastDisplay: ForecastDisplay;
 	frequency: S2DFrequencyType;
 	unit: string;
 }
@@ -698,14 +700,21 @@ const ClimatologyValuesPart = ({
  * @param unit - The climate variable's unit
  * @constructor
  */
-const ProbabilitiesPart = ({
-	locationData,
-	forecastType,
-	frequency,
-	unit,
-}: ProbabilitiesPartProps) => {
+const ProbabilitiesPart = (
+	props: ProbabilitiesPartProps,
+): React.ReactNode => {
+	const {
+		forecastDisplay,
+		forecastType,
+		frequency,
+		locationData,
+		unit,
+	} = props;
+
 	const { locale } = useLocale();
 	const { colorMap } = useColorMap();
+
+	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 	const nbProgressBars = forecastType === ForecastTypes.EXPECTED ? 3 : 2;
 	const isLoaded = !!(locationData && colorMap);
 	// Initialize the progress bars to the correct number of "empty progress bars"
@@ -914,6 +923,18 @@ const ProbabilitiesPart = ({
 					))}
 				</div>
 			</div>
+
+			{isForecast && (
+				<section className="mt-9 flex items-center justify-between box-border my-2">
+					<S2DReleaseDate className="flex" />
+					<ForecastSummaryPopover
+						forecastType={forecastType}
+						progressBars={progressBars}
+						locationData={locationData}
+					/>
+				</section>
+			)}
+
 		</section>
 	);
 };
@@ -984,16 +1005,12 @@ const PopupContent = ({
 				<ProbabilitiesPart
 					locationData={locationData}
 					forecastType={forecastType}
+					forecastDisplay={forecastDisplay}
 					frequency={frequency}
 					unit={unit}
 				/>
 			)}
 
-			{isForecast && (
-				<section className="mt-9">
-					<S2DReleaseDate />
-				</section>
-			)}
 		</div>
 	);
 };

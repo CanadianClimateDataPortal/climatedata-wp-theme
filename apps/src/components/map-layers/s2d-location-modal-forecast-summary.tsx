@@ -1,5 +1,12 @@
 import React from 'react';
 import { sprintf } from '@wordpress/i18n';
+import { Button } from '@/components/ui/button';
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+	type PopoverContentSide,
+} from '@/components/ui/popover';
 
 import { __ } from '@/context/locale-provider';
 
@@ -237,3 +244,72 @@ export const ForecastSummaryContents = (
 };
 
 ForecastSummaryContents.displayName = 'ForecastSummaryContents';
+
+const CN_BUTTON_EFFECTS = [
+	`bg-brand-blue`,
+	`focus:outline-none`,
+	`focus:ring-brand-blue/90`,
+	`focus:ring`,
+	`focus:bg-brand-blue`,
+	`hover:bg-brand-blue/75`,
+	`rounded-full`,
+	`transition-colors`,
+] as const;
+
+const CN_ROUNDED_BIG_BUTTON_TEXT = [
+	`font-bold`,
+	`hover:text-white`,
+	`text-md`,
+	`text-white`,
+	`tracking-[0.8px]`,
+	`uppercase`,
+] as const;
+
+export type ForecastSummaryPopoverProps = ForecastSummaryContentsProps & {
+	className?: string;
+	popoverContentSide?: PopoverContentSide;
+};
+
+export const ForecastSummaryPopover = (
+	props: ForecastSummaryPopoverProps,
+): React.ReactNode => {
+	const {
+		forecastType,
+		progressBars,
+		locationData,
+		className,
+		popoverContentSide = 'top',
+	} = props;
+
+	return (
+		<>
+			<Popover>
+				<PopoverTrigger asChild>
+					<Button
+						variant="outline"
+						className={cn(
+							'mr-1',
+							CN_BUTTON_EFFECTS,
+							CN_ROUNDED_BIG_BUTTON_TEXT,
+						)}
+					>
+						{__('Forecast Summary')}
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent
+					className={cn('w-auto', className)}
+					side={popoverContentSide ?? undefined}
+					sideOffset={1}
+				>
+					<ForecastSummaryContents
+						forecastType={forecastType}
+						progressBars={progressBars}
+						locationData={locationData}
+					/>
+				</PopoverContent>
+			</Popover>
+		</>
+	);
+};
+
+ForecastSummaryPopover.displayName = 'ForecastSummaryPopover';

@@ -154,15 +154,18 @@ export function findPeriodIndexForDateRange(
  * of the form 'YYYY-MM-DD'.
  *
  * @param periodRange - The period range to transform.
+ * @param dateFormat - The format to use for the date strings.
  * @returns - The date range as an array of two dates in string.
  */
-export function formatPeriodRange(periodRange: PeriodRange): [string, string] {
-	const dateFormat = 'yyyy-MM-dd';
+export const formatPeriodRange = (
+	periodRange: PeriodRange,
+	dateFormat = 'yyyy-MM-dd',
+): [string, string] => {
 	const rangeStart = formatUTCDate(periodRange[0], dateFormat);
 	const rangeEnd = formatUTCDate(periodRange[1], dateFormat);
 
 	return [rangeStart, rangeEnd];
-}
+};
 
 /**
  * Create and return the GeoServer layer name for the Skill layer.

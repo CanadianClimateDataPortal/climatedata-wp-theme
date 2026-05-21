@@ -16,7 +16,10 @@ import { type ProgressBarProps } from '@/components/ui/progress-bar';
 import { ForecastTypes, type ForecastType, } from '@/types/climate-variable-interface';
 
 import { type LocationS2DData } from '@/lib/s2d';
-import { formatValue } from '@/lib/format';
+import {
+	formatValue,
+	formatIntlDate,
+} from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 type ForecastTypeAndProgressBars = {
@@ -145,13 +148,25 @@ export const ForecastSummaryContents = (
 	const variableId = climateVariable?.getId();
 	const variableName = climateVariable?.getTitle() ?? '';
 	const unit = climateVariable?.getUnit() ?? '';
+	const dateRange = climateVariable?.getDateRange() ?? [];
+
+	const periodRange = dateRange.map((i) => formatIntlDate(i, locale, { month: 'short' }));
+
+	let formattedPeriodRange = '';
+	if (periodRange) {
+		if (forecastType === ForecastTypes.EXPECTED) {
+			formattedPeriodRange = sprintf(__('%s to %s'), periodRange[0], periodRange[1]);
+		} else {
+			formattedPeriodRange = periodRange[0];
+		}
+	}
 
 	// A single sprintf template can't produce correct French for both variables:
 	// "Les précipitations totales ont" (plural) vs "La température moyenne a" (singular).
 	const tooltipOpeningLineVariants = {
-		s2d_precip_accum: __('The total precipitation has a') /* from climate-variables.config.ts */,
-		s2d_air_temp: __('The mean temperature has a')        /* from climate-variables.config.ts */,
-		fallback: sprintf(__('The %s has a'), variableName.toLowerCase()),
+		s2d_precip_accum: sprintf(__('The %s total precipitation has a'), formattedPeriodRange) /* from climate-variables.config.ts */,
+		s2d_air_temp: sprintf(__('The %s mean temperature has a'), formattedPeriodRange)        /* from climate-variables.config.ts */,
+		fallback: sprintf(__('The %s %s has a'), variableName.toLowerCase(), formattedPeriodRange),
 	};
 
 	const progressBarsListFirstLine = Reflect.has(

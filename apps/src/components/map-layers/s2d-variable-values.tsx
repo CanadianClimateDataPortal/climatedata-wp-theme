@@ -9,7 +9,7 @@ import { useColorMap } from '@/hooks/use-color-map';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { FetchError, fetchS2DLocationData } from '@/services/services';
 
-import { formatValue } from '@/lib/format';
+import { formatIntlDate, formatValue } from '@/lib/format';
 import { cn, findCeilingIndex, utc } from '@/lib/utils';
 import { getPeriodEnd, LocationS2DData } from '@/lib/s2d';
 import { ColourMap } from '@/types/types';
@@ -154,20 +154,14 @@ const generatePeriodRangeLabel = (
 		return null;
 	}
 
-	const periodStartLabel = Intl.DateTimeFormat(locale, {
-		month: 'long',
-		timeZone: 'UTC',
-	}).format(periodStart);
+	const periodStartLabel = formatIntlDate(periodStart, locale, { month: 'long' });
 
 	if (frequency === FrequencyType.MONTHLY) {
 		return periodStartLabel;
 	}
 
 	const periodEnd = getPeriodEnd(periodStart, frequency);
-	const periodEndLabel = Intl.DateTimeFormat(locale, {
-		month: 'long',
-		timeZone: 'UTC',
-	}).format(periodEnd);
+	const periodEndLabel = formatIntlDate(periodEnd, locale, { month: 'long' });
 
 	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
 };

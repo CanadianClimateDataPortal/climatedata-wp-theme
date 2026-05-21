@@ -23,7 +23,6 @@ import { type ProgressBarProps } from '@/components/ui/progress-bar';
 
 import {
 	ForecastTypes,
-	S2DFrequencyType,
 	type ForecastType,
 } from '@/types/climate-variable-interface';
 

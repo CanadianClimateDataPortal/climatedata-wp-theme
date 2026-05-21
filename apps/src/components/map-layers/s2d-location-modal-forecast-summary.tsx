@@ -1,4 +1,5 @@
 import React from 'react';
+import { BookOpenText } from 'lucide-react';
 import { sprintf } from '@wordpress/i18n';
 import { Button } from '@/components/ui/button';
 import {
@@ -299,8 +300,9 @@ export const ForecastSummaryPopover = (
 							CN_BUTTON_EFFECTS,
 							CN_ROUNDED_BIG_BUTTON_TEXT,
 						)}
+						title={__('Forecast Summary')}
 					>
-						{__('Forecast Summary')}
+						<BookOpenText size={16} />
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent

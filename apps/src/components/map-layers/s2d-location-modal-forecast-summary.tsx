@@ -63,7 +63,6 @@ const OUTCOME_PROBABILITIES_PREAMBLE = new Map<
 	MaybePrefixWhenAllAreLessThan
 >([
 	[
-		// CLIM-1367 requirements: For Expected Conditions, (...) is shown if all probabilities are less than 40%:
 		ForecastTypes.EXPECTED,
 		{
 			threshold: 40,
@@ -73,7 +72,6 @@ const OUTCOME_PROBABILITIES_PREAMBLE = new Map<
 		},
 	],
 	[
-		// CLIM-1367 requirements: For Unusual Conditions, (...) is shown if both probabilities are less than 30%
 		ForecastTypes.UNUSUAL,
 		{
 			threshold: 30,
@@ -95,9 +93,8 @@ const MaybePrefixWhen = ({
 	}
 
 	const childNodes =
-		children && Array.isArray(children) ? children : [children]; // I miss Vue.
+		children && Array.isArray(children) ? children : [children];
 
-	// CLIM-1367 requirements: (...) [shown when] ALL probabilities are less than (...)
 	const allPercent = progressBars.map(({ percent }) => percent);
 	const allAreSmallerThan = allPercent.map(
 		(percent) => Math.floor(percent) < currentCondition.threshold
@@ -107,12 +104,7 @@ const MaybePrefixWhen = ({
 		// In other words; not "all percents smaller than threshold"
 		historicalMedianPreamble = '';
 	} else {
-		if (forecastType === ForecastTypes.EXPECTED) {
-			historicalMedianPreamble = currentCondition.preamble;
-		} else if (forecastType === ForecastTypes.UNUSUAL) {
-			historicalMedianPreamble = currentCondition.preamble;
-		}
-		historicalMedianPreamble += ' ';
+		historicalMedianPreamble = currentCondition.preamble + ' ';
 	}
 
 	return (
@@ -202,6 +194,7 @@ export const ForecastSummaryContents = (
 	const unit = climateVariable?.getUnit() ?? '';
 	const dateRange = climateVariable?.getDateRange() ?? [];
 
+	// [time period] => "mai à juil."
 	const periodRange = dateRange.map((i) => formatIntlDate(i, locale, { month: 'short' }));
 
 	let formattedPeriodRange = '';
@@ -218,7 +211,7 @@ export const ForecastSummaryContents = (
 	const tooltipOpeningLineVariants = {
 		s2d_precip_accum: sprintf(__('The %s total precipitation has a'), formattedPeriodRange) /* from climate-variables.config.ts */,
 		s2d_air_temp: sprintf(__('The %s mean temperature has a'), formattedPeriodRange)        /* from climate-variables.config.ts */,
-		fallback: sprintf(__('The %s %s has a'), variableName.toLowerCase(), formattedPeriodRange), // THIS WON'T WORK UNLESS WE USE POSITIONAL -- TODO Check
+		fallback: sprintf(__('The %s %s has a'), formattedPeriodRange, variableName.toLowerCase()),
 	};
 
 	const progressBarsListFirstLine = Reflect.has(

@@ -26,7 +26,10 @@ import {
 	type ForecastType,
 } from '@/types/climate-variable-interface';
 
-import { type LocationS2DData } from '@/lib/s2d';
+import {
+	extractSkillLevelData,
+	type LocationS2DData,
+} from '@/lib/s2d';
 import {
 	formatValue,
 	formatIntlDate,
@@ -141,6 +144,44 @@ const LineTitleForecastSummary = (): React.ReactNode => {
 
 LineTitleForecastSummary.displayName = 'LineTitleForecastSummary';
 
+type LineSkillLevelProps = {
+	locationData: LocationS2DData | null;
+};
+
+export const LineSkillLevel = (
+	props: LineSkillLevelProps,
+): React.ReactNode => {
+	const {
+		locationData,
+	} = props;
+
+	const {
+		skillLevelLabel,
+		skillLevel,
+	} = extractSkillLevelData(locationData);
+
+	const guidanceText = [
+		/* 0: No skill  */ __('The accuracy of past forecasts was no better than random chance'),
+		/* 1: Low skill */ __('The accuracy of past forecasts was a small improvement over random chance'),
+		/* 2: Medium    */ __('The accuracy of past forecasts was satisfactory'),
+		/* 3: High      */ __('Past forecasts were mostly accurate'),
+	][(typeof skillLevel !== 'number') ? 0 : skillLevel];
+
+	const TEMPLATE = sprintf(
+		__('The skill level is “%s”. %s for this location, time period, and month of release.'),
+		skillLevelLabel,
+		guidanceText,
+	);
+
+	return (
+		<p className="mt-2">
+			{TEMPLATE}
+		</p>
+	);
+};
+
+LineSkillLevel.displayName = 'LineSkillLevel';
+
 type ForecastSummaryContentsProps = ForecastTypeAndProgressBars & {
 	locationData: LocationS2DData | null;
 };
@@ -217,6 +258,7 @@ export const ForecastSummaryContents = (
 			<p className="mt-2">
 				{__('relative to the 1991 to 2020 historical climatology.')}
 			</p>
+			<LineSkillLevel locationData={locationData} />
 			<MaybePrefixWhen
 				forecastType={forecastType}
 				progressBars={progressBars}

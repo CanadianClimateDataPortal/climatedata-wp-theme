@@ -11,7 +11,11 @@ import { FetchError, fetchS2DLocationData } from '@/services/services';
 
 import { formatIntlDate, formatValue } from '@/lib/format';
 import { cn, findCeilingIndex, utc } from '@/lib/utils';
-import { getPeriodEnd, LocationS2DData } from '@/lib/s2d';
+import {
+	extractSkillLevelData,
+	getPeriodEnd,
+	type LocationS2DData,
+} from '@/lib/s2d';
 import { ColourMap } from '@/types/types';
 import {
 	ForecastDisplay,
@@ -95,13 +99,6 @@ const tooltipClimatology = __(
 		'past conditions at this location. The cutoff values provide the ' +
 		'exact values that define the forecast outcomes for this location.'
 );
-
-const SKILL_LEVEL_LABELS = [
-	__('No skill'),
-	__('Low'),
-	__('Medium'),
-	__('High'),
-];
 
 const FREQUENCY_LABEL = {
 	[FrequencyType.MONTHLY]: __('Monthly'),
@@ -402,9 +399,13 @@ const TextLoader = () => {
 const SkillLevelPart = ({ locationData }: SkillLevelPartProps) => {
 	const { locale } = useLocale();
 
-	const skillLevel = locationData?.skill_level;
+	const {
+		skillCRPSS,
+		skillLevel,
+		skillLevelLabel,
+	} = extractSkillLevelData(locationData);
+
 	const hasSkillLevel = skillLevel != null;
-	const skillCRPSS = locationData?.skill_CRPSS;
 	const hasSkillCRPSS = skillCRPSS != null;
 
 	const tooltipSkillLevel = hasSkillLevel ? (
@@ -417,7 +418,7 @@ const SkillLevelPart = ({ locationData }: SkillLevelPartProps) => {
 	const SkillLevelLine =
 		hasSkillCRPSS && hasSkillLevel ? (
 			<>
-				{SKILL_LEVEL_LABELS[skillLevel]}
+				{skillLevelLabel}
 				{' - '}
 				<abbr
 					lang="en"

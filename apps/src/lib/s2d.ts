@@ -269,6 +269,16 @@ export function getForecastTypeName(forecastType: ForecastType): string {
 }
 
 /**
+ * The translated labels for the S2D skill levels, indexed by the skill level value (0–3).
+ */
+export const S2D_SKILL_LEVEL_LABELS = [
+	__('No skill'),
+	__('Low'),
+	__('Medium'),
+	__('High'),
+];
+
+/**
  * Map S2D variable IDs to their corresponding filename components.
  */
 export const S2D_DOWNLOAD_FILENAME_MAP_VARIABLE_ID: Record<string, string> = {
@@ -387,4 +397,27 @@ export const extractS2DDownloadStepFilenameComponents = (
 		forecastType,
 		frequencyType,
 	};
+};
+
+export interface SkillLevelData {
+	skillLevel: number | null;
+	skillCRPSS: number | null;
+	skillLevelLabel: string;
+}
+
+export const extractSkillLevelData = (
+	locationData: LocationS2DData | null,
+): SkillLevelData => {
+	const skillLevel = locationData?.skill_level;
+	const skillCRPSS = locationData?.skill_CRPSS;
+
+	const skillLevelLabel = typeof skillLevel !== 'number' ? null : S2D_SKILL_LEVEL_LABELS[skillLevel];
+
+	const output: SkillLevelData = {
+		skillLevel: skillLevel ?? null,
+		skillCRPSS: skillCRPSS ?? null,
+		skillLevelLabel: skillLevelLabel ?? S2D_SKILL_LEVEL_LABELS[0],
+	};
+
+	return output;
 };

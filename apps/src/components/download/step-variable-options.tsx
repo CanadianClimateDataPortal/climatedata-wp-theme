@@ -34,8 +34,8 @@ const validateS2DVariable = (
 const validateRegularVariable = (
 	climateVariable: ClimateVariableInterface,
 ): unknown[] => {
-	// The selected version or `true` if the variable doesn't have a version concept
-	const version = climateVariable.getVersion() ?? true;
+	const version = climateVariable.getVersion();
+	const hasVersions = climateVariable.getVersions().length > 0;
 	const analysisFields = climateVariable.getAnalysisFields() ?? [];
 	const values = climateVariable.getAnalysisFieldValues() ?? {};
 	const thresholdPossibleValues = climateVariable.getThresholds() ?? [];
@@ -45,7 +45,7 @@ const validateRegularVariable = (
 	// We cannot have both analysis fields and a threshold field
 	const hasThresholdField = !hasAnalysisFields && thresholdPossibleValues.length > 0;
 
-	const versionIsValid = !!version;
+	const versionIsValid = !hasVersions || !!version;
 	const analysisFieldsAreValid = analysisFields
 		.filter(f => f.required !== false)
 		.map(f => {

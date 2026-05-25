@@ -1265,10 +1265,10 @@ msgid  "Monthly %s probability:"
 msgstr "Probabilité mensuelle pour \"%s\":"
 
 msgid  "The total precipitation has a"
-msgstr "Les précipitations totales sont de"
+msgstr "Les précipitations totales ont"
 
 msgid  "The %s total precipitation has a"
-msgstr "Les précipitations totales pour %s sont de"
+msgstr "Les précipitations totales pour %s ont"
 
 msgid  "The mean temperature has a"
 msgstr "La température moyenne a"

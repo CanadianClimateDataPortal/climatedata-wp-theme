@@ -1,4 +1,6 @@
 /**
+ * @file
+ *
  * Redux Slice: Map
  *
  * This slice manages the state needed to render the map with its different layers. For
@@ -22,10 +24,13 @@
  *      )}
  *    </ul>
  *    ...
- *
- * @module locationsSlice
  */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import {
+	createSelector,
+	createSlice,
+	PayloadAction,
+} from '@reduxjs/toolkit';
 
 import { MapState, MapLocation, WMSLegendData, TaxonomyData, PostData, MapCoordinates, TransformedLegendEntry } from '@/types/types';
 import {
@@ -208,6 +213,54 @@ export const {
 export const selectLowSkillVisibility =
 	() => (state: RootState) =>
 		state.map.isLowSkillVisible;
+
+/**
+ * Selector that returns the list of recent locations.
+ *
+ * The "recentLocations" is an array and the currently/most recently selected
+ * is the last item in the array.
+ *
+ * @see {@link MapState.recentLocations}
+ */
+export const selectRecentLocations =
+	(state: RootState) =>
+		state.map.recentLocations;
+
+/**
+ * Pick the last item in recentLocations and return it as the current location.
+ *
+ * @see {@link selectRecentLocations}
+ */
+export const selectCurrentLocation = createSelector(
+	[selectRecentLocations],
+	(list) => {
+		const last = Array.isArray(list) && list.length > 0
+			? list[list.length - 1]
+			: null;
+		return last;
+	},
+);
+
+/**
+ * The current location's title.
+ *
+ * @returns string
+ *
+ * @example 'Lac Rahin, QC' - After having clicked on the map at coord. `59.866883195210214,-72.89428710937501`
+ * @example 'Saint-Anthony-of-Padua, QC' - After having clicked on the map at coord. `45.5111111,-73.5552778`
+ * @example 'Point (83.1597, -72.1143)' - After having clicked on the map at coord. `83.15965662857204,-72.11425781250001`
+ */
+export const selectCurrentLocationTitle = createSelector(
+	[selectCurrentLocation],
+	(current) => {
+		const loc = current
+			&& typeof current.title === 'string'
+			&& current.title.length > 0
+			? current
+			: null;
+		return loc?.title ?? null;
+	},
+);
 
 // Export reducer
 export default mapSlice.reducer;

@@ -5,7 +5,9 @@ import { __ } from '@/context/locale-provider';
 
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useLocale } from '@/hooks/use-locale';
-import { useCurrentLocationTitle } from '@/hooks/use-current-location';
+
+import { useAppSelector } from '@/app/hooks';
+import { selectCurrentLocationTitle } from '@/features/map/map-slice';
 
 import S2DReleaseDate from '@/components/s2d-release-date';
 
@@ -121,7 +123,7 @@ LineHistoricalMedianPrefixedWhen.displayName = 'LineHistoricalMedianPrefixedWhen
 
 const LineTitleForecastSummary = (): React.ReactNode => {
 	let outcome: React.ReactNode = null;
-	const currentLocationTitle = useCurrentLocationTitle();
+	const currentLocationTitle = useAppSelector(selectCurrentLocationTitle);
 	if (currentLocationTitle !== null) {
 		outcome = (
 			<p className="font-semibold">

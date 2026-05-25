@@ -45,9 +45,9 @@ type WithChildren = {
 	children?: React.ReactNode[] | React.ReactNode;
 };
 
-type MaybePrefixWhenProps = ForecastTypeAndProgressBars & WithChildren;
+type LineHistoricalMedianPrefixedWhenProps = ForecastTypeAndProgressBars & WithChildren;
 
-type MaybePrefixWhenAllAreLessThan = {
+type LineHistoricalMedianPrefixedWhenAllAreLessThan = {
 	/**
 	 * Percent number against what to test (a possibility) for "less than"
 	 */
@@ -60,7 +60,7 @@ type MaybePrefixWhenAllAreLessThan = {
 
 const OUTCOME_PROBABILITIES_PREAMBLE = new Map<
 	ForecastType,
-	MaybePrefixWhenAllAreLessThan
+	LineHistoricalMedianPrefixedWhenAllAreLessThan
 >([
 	[
 		ForecastTypes.EXPECTED,
@@ -82,11 +82,16 @@ const OUTCOME_PROBABILITIES_PREAMBLE = new Map<
 	],
 ]);
 
-const MaybePrefixWhen = ({
+/**
+ * When Probabilities are lower than a threshold for the current
+ * data shown, add a warning about the fact that there is no clear
+ * forecast outcome.
+ */
+const LineHistoricalMedianPrefixedWhen = ({
 	forecastType,
 	progressBars,
 	children,
-}: MaybePrefixWhenProps): React.ReactNode => {
+}: LineHistoricalMedianPrefixedWhenProps): React.ReactNode => {
 	const currentCondition = OUTCOME_PROBABILITIES_PREAMBLE.get(forecastType);
 	if (!currentCondition) {
 		return null;
@@ -115,7 +120,7 @@ const MaybePrefixWhen = ({
 	);
 };
 
-MaybePrefixWhen.displayName = 'MaybePrefixWhen';
+LineHistoricalMedianPrefixedWhen.displayName = 'LineHistoricalMedianPrefixedWhen';
 
 const LineTitleForecastSummary = (): React.ReactNode => {
 	let outcome: React.ReactNode = null;
@@ -252,7 +257,7 @@ export const ForecastSummaryContents = (
 				{__('relative to the 1991 to 2020 historical climatology.')}
 			</p>
 			<LineSkillLevel locationData={locationData} />
-			<MaybePrefixWhen
+			<LineHistoricalMedianPrefixedWhen
 				forecastType={forecastType}
 				progressBars={progressBars}
 			>
@@ -267,7 +272,7 @@ export const ForecastSummaryContents = (
 						locale
 					),
 				)}
-			</MaybePrefixWhen>
+			</LineHistoricalMedianPrefixedWhen>
 			<p className="mt-2">
 				<S2DReleaseDate className={cn(CN_RELEASE_DATE)} tooltip={false} />
 			</p>

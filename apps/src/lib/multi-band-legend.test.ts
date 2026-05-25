@@ -191,6 +191,16 @@ describe('multi-band-legend', () => {
 					expect(row.colors).not.toContain('#FFFFFF');
 				});
 			});
+
+			it('transforms floating percentages to integer scale (floor rounding)', () => {
+				const input = createFixture(3);
+				// We add a fraction to each quantity
+				input.quantities = input.quantities.map((quantity, index) => quantity + (index % 10) * 0.1);
+
+				const result = transformColorMapToMultiBandLegend(input);
+
+				expect(result.scale).toEqual([40, 50, 60, 70, 80, 90, 100]);
+			});
 		});
 
 		describe('error cases', () => {

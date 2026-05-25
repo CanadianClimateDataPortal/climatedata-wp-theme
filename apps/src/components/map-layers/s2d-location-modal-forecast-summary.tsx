@@ -1,13 +1,5 @@
 import React from 'react';
-import { BookOpenText } from 'lucide-react';
 import { sprintf } from '@wordpress/i18n';
-import { Button } from '@/components/ui/button';
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-	type PopoverContentSide,
-} from '@/components/ui/popover';
 
 import { __ } from '@/context/locale-provider';
 
@@ -20,6 +12,11 @@ import S2DReleaseDate from '@/components/s2d-release-date';
 import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
 
 import { type ProgressBarProps } from '@/components/ui/progress-bar';
+
+import {
+	ModalSummaryPopover,
+	type ModalSummaryPopoverProps,
+} from '@/components/ui/modal-summary-popover';
 
 import {
 	ForecastTypes,
@@ -285,38 +282,9 @@ export const ForecastSummaryContents = (
 
 ForecastSummaryContents.displayName = 'ForecastSummaryContents';
 
-const CN_BUTTON_EFFECTS = [
-	`bg-brand-blue`,
-	`focus:outline-none`,
-	`focus:ring-brand-blue/90`,
-	`focus:ring`,
-	`focus:bg-brand-blue`,
-	`hover:bg-brand-blue/75`,
-	`rounded-full`,
-	`transition-colors`,
-] as const;
-
-const CN_ROUNDED_BIG_BUTTON_TEXT = [
-	`font-bold`,
-	`hover:text-white`,
-	`text-md`,
-	`text-white`,
-	`tracking-[0.8px]`,
-	`uppercase`,
-] as const;
-
-export type ForecastSummaryPopoverProps = ForecastSummaryContentsProps & {
-	className?: string;
-	popoverContentSide?: PopoverContentSide;
+export type ForecastSummaryPopoverProps = ForecastSummaryContentsProps & ModalSummaryPopoverProps & {
 };
 
-/**
- * @TODO NOTE FOR DISCUSSION:
- * This should probably be using instead the {@link TooltipWidget} but refactored
- * using slots (like Vue or native web componets do, using `children` React pattern) and
- * this be the wrapper with similar interface as {@link ForecastSummaryContentsProps}
- * wrapping around a modified TooltipWidget
- */
 export const ForecastSummaryPopover = (
 	props: ForecastSummaryPopoverProps,
 ): React.ReactNode => {
@@ -324,39 +292,18 @@ export const ForecastSummaryPopover = (
 		forecastType,
 		progressBars,
 		locationData,
-		className,
-		popoverContentSide = 'top',
 	} = props;
 
 	return (
-		<>
-			<Popover>
-				<PopoverTrigger asChild>
-					<Button
-						variant="outline"
-						className={cn(
-							'mr-1',
-							CN_BUTTON_EFFECTS,
-							CN_ROUNDED_BIG_BUTTON_TEXT,
-						)}
-						title={__('Forecast Summary')}
-					>
-						<BookOpenText size={16} />
-					</Button>
-				</PopoverTrigger>
-				<PopoverContent
-					className={cn('w-auto', className)}
-					side={popoverContentSide ?? undefined}
-					sideOffset={1}
-				>
-					<ForecastSummaryContents
-						forecastType={forecastType}
-						progressBars={progressBars}
-						locationData={locationData}
-					/>
-				</PopoverContent>
-			</Popover>
-		</>
+		<ModalSummaryPopover
+			buttonTitle={__('Forecast Summary')}
+		>
+			<ForecastSummaryContents
+				forecastType={forecastType}
+				progressBars={progressBars}
+				locationData={locationData}
+			/>
+		</ModalSummaryPopover>
 	);
 };
 

@@ -200,7 +200,7 @@ export const ForecastSummaryContents = (
 	const dateRange = climateVariable?.getDateRange() ?? [];
 
 	// [time period] => "mai à juil."
-	const periodRange = dateRange.map((i) => formatIntlDate(i, locale, { month: 'short' }));
+	const periodRange = dateRange.map((i) => formatIntlDate(i, locale, { month: 'long' }));
 
 	let formattedPeriodRange = '';
 	if (periodRange) {

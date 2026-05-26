@@ -1,5 +1,4 @@
 import React from 'react';
-import { BookOpenText } from 'lucide-react';
 import { sprintf } from '@wordpress/i18n';
 
 import { __ } from '@/context/locale-provider';
@@ -291,17 +290,21 @@ export type ForecastSummaryPopoverProps = ForecastSummaryContentsProps & ModalSu
 export const ForecastSummaryPopover = (
 	props: ForecastSummaryPopoverProps,
 ): React.ReactNode => {
+	const { locale } = useLocale();
 	const {
 		forecastType,
 		progressBars,
 		locationData,
 	} = props;
 
+	// Handling space at the bottom of the LocationModal where we have releaseDate and the button.
 	// 'Forecast Summary' in French would be 'Résumé des Prévisions'
 	const popoverTriggerButtonTitle = __('Forecast Summary');
+	// In French, "Janvier" becomes "Janv." which takes too much space when ' - ' insted of '-'
+	const dashedWhenInFrench = /^fr/.test(locale) ? '-' : ' ';
 	const popoverTriggerButtonInner = (
 		<>
-			<BookOpenText size={16} />
+			{__('Forecast') + dashedWhenInFrench + __('Summary')}
 		</>
 	);
 	return (

@@ -297,10 +297,11 @@ const validateQuantityFormat = (quantities: number[]): void => {
 export const transformColorMapToMultiBandLegend = (
 	colorMap: ColourQuantitiesMap,
 ): MultiBandLegend => {
-	const {
-		quantities = [],
-		colours = [],
-	} = colorMap;
+	const colours = colorMap.colours;
+	// The GeoServer layer style may contain floating point quantities, but only
+	// integer percentages must be displayed in the legend. So we round
+	// quantities.
+	const quantities = colorMap.quantities.map(Math.floor);
 	// Validate quantity format FIRST (before any string operations)
 	validateQuantityFormat(quantities);
 	// Validate scale consistency across groups

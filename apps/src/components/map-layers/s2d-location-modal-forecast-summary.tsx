@@ -1,4 +1,5 @@
 import React from 'react';
+import { BookOpenText } from 'lucide-react';
 import { sprintf } from '@wordpress/i18n';
 
 import { __ } from '@/context/locale-provider';
@@ -296,9 +297,17 @@ export const ForecastSummaryPopover = (
 		locationData,
 	} = props;
 
+	// 'Forecast Summary' in French would be 'Résumé des Prévisions'
+	const popoverTriggerButtonTitle = __('Forecast Summary');
+	const popoverTriggerButtonInner = (
+		<>
+			<BookOpenText size={16} />
+		</>
+	);
 	return (
 		<ModalSummaryPopover
-			buttonTitle={__('Forecast Summary')}
+			popoverTriggerButtonTitle={popoverTriggerButtonTitle}
+			popoverTriggerButtonInner={popoverTriggerButtonInner}
 		>
 			<ForecastSummaryContents
 				forecastType={forecastType}

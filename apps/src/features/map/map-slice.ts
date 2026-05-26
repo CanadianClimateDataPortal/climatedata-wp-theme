@@ -29,10 +29,19 @@
 import {
 	createSelector,
 	createSlice,
-	PayloadAction,
+	type PayloadAction,
 } from '@reduxjs/toolkit';
 
-import { MapState, MapLocation, WMSLegendData, TaxonomyData, PostData, MapCoordinates, TransformedLegendEntry } from '@/types/types';
+import type {
+	MapCoordinates,
+	MapItemsOpacity,
+	MapLocation,
+	MapState,
+	PostData,
+	TaxonomyData,
+	TransformedLegendEntry,
+	WMSLegendData,
+} from '@/types/types';
 import {
 	SLIDER_DEFAULT_YEAR_VALUE,
 	SLIDER_MAX_YEAR,
@@ -42,7 +51,6 @@ import {
 	CANADA_CENTER,
 	MAP_OPACITY_MIN,
 } from '@/lib/constants';
-import { MapItemsOpacity } from '@/types/types';
 import { RootState } from '@/app/store';
 
 const defaultTimePeriodEnd = Math.min(

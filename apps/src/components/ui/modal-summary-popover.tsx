@@ -1,5 +1,3 @@
-import { BookOpenText } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import {
 	Popover,
@@ -11,10 +9,11 @@ import {
 import { cn } from '@/lib/utils';
 
 export interface ModalSummaryPopoverProps {
-	buttonTitle?: string;
 	children?: React.ReactNode[] | React.ReactNode;
 	popoverContentClassName?: string;
 	popoverContentSide?: PopoverContentSide;
+	popoverTriggerButtonInner: React.ReactNode;
+	popoverTriggerButtonTitle?: string;
 }
 
 const CN_BUTTON_EFFECTS = [
@@ -41,10 +40,11 @@ export const ModalSummaryPopover = (
 	props: ModalSummaryPopoverProps,
 ): React.ReactNode => {
 	const {
-		popoverContentClassName,
-		buttonTitle = '',
-		popoverContentSide = 'top',
 		children,
+		popoverContentClassName,
+		popoverContentSide = 'top',
+		popoverTriggerButtonInner,
+		popoverTriggerButtonTitle = '',
 	} = props;
 
 	return (
@@ -58,9 +58,9 @@ export const ModalSummaryPopover = (
 							CN_BUTTON_EFFECTS,
 							CN_ROUNDED_BIG_BUTTON_TEXT,
 						)}
-						title={buttonTitle !== '' ? buttonTitle : undefined}
+						title={popoverTriggerButtonTitle !== '' ? popoverTriggerButtonTitle : undefined}
 					>
-						<BookOpenText size={16} />
+						{popoverTriggerButtonInner}
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent

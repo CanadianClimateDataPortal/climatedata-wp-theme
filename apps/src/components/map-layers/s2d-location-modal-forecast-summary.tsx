@@ -17,11 +17,11 @@ import { type ProgressBarProps } from '@/components/ui/progress-bar';
 
 import {
 	ModalSummaryPopover,
-	type ModalSummaryPopoverProps,
 } from '@/components/ui/modal-summary-popover';
 
 import {
 	ForecastTypes,
+	S2DFrequencyTypes,
 	type ForecastType,
 } from '@/types/climate-variable-interface';
 
@@ -35,18 +35,19 @@ import {
 } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
-type ForecastTypeAndProgressBars = {
-	forecastType: ForecastType;
+type WithProgressBars = {
 	progressBars: ProgressBarProps[];
 };
 
-type WithChildren = {
-	children?: React.ReactNode[] | React.ReactNode;
+type WithLocationData = {
+	locationData: LocationS2DData | null;
 };
 
-type LineHistoricalMedianPrefixedWhenProps = ForecastTypeAndProgressBars & WithChildren;
+type WithClassName = {
+	className?: string;
+};
 
-type LineHistoricalMedianPrefixedWhenAllAreLessThan = {
+type HistoricalMedianProbabilities = {
 	/**
 	 * Percent number against what to test (a possibility) for "less than"
 	 */
@@ -59,7 +60,7 @@ type LineHistoricalMedianPrefixedWhenAllAreLessThan = {
 
 const OUTCOME_PROBABILITIES_PREAMBLE = new Map<
 	ForecastType,
-	LineHistoricalMedianPrefixedWhenAllAreLessThan
+	HistoricalMedianProbabilities
 >([
 	[
 		ForecastTypes.EXPECTED,
@@ -81,132 +82,159 @@ const OUTCOME_PROBABILITIES_PREAMBLE = new Map<
 	],
 ]);
 
+type LineTheHistoricalMedianProps =
+	WithLocationData &
+	WithProgressBars &
+	WithClassName;
+
 /**
- * When Probabilities are lower than a threshold for the current
- * data shown, add a warning about the fact that there is no clear
- * forecast outcome.
+ * The Historical Median line.
+ *
+ * Display Historical median line with all information about it
+ * and optionnaly a warning when they don't go above a threshold.
+ *
+ * Summary line about "mean temperature", when
+ * none of the probabilities are above 40%, with
+ * an historical median at 2.7°C, shown in French,
+ * the text would be:
+ *
+ * > Comme toutes les probabilités sont inférieures à 40 %,
+ * > il n’y a aucun résultat significatif.
+ * > La médiane historique (2.7 °C) issue de la climatologie
+ * > donne une indication des conditions passées typiques.
  */
-const LineHistoricalMedianPrefixedWhen = ({
-	forecastType,
-	progressBars,
-	children,
-}: LineHistoricalMedianPrefixedWhenProps): React.ReactNode => {
-	const currentCondition = OUTCOME_PROBABILITIES_PREAMBLE.get(forecastType);
-	if (!currentCondition) {
-		return null;
+const LineTheHistoricalMedian = (
+	props: LineTheHistoricalMedianProps,
+): React.ReactNode => {
+	const {
+		className = '',
+		locationData,
+		progressBars,
+	} = props;
+
+	const { climateVariable } = useClimateVariable();
+	const { locale } = useLocale();
+
+	const forecastType =
+		climateVariable?.getForecastType() ?? ForecastTypes.UNUSUAL;
+	const unit = climateVariable?.getUnit() ?? '';
+
+	const parts: string[] = [];
+
+	const currentConditions = OUTCOME_PROBABILITIES_PREAMBLE.get(forecastType);
+	if (currentConditions) {
+		const allPercent = progressBars.map(({ percent }) => percent);
+		const allPercentLessThan = allPercent.map(
+			(percent) => Math.floor(percent) < currentConditions.threshold
+		);
+		if (allPercentLessThan.includes(false)) {
+			// In other words; NOT "all percents smaller than threshold"
+		} else {
+			parts.push(currentConditions.preamble);
+		}
 	}
 
-	const childNodes =
-		children && Array.isArray(children) ? children : [children];
+	if (
+		locationData &&
+		'historical_median_p50' in locationData
+	) {
+		const formatted = formatValue(
+			locationData.historical_median_p50,
+			unit,
+			1,
+			locale
+		);
+		const part = sprintf(
+			__(
+				'The historical median (%s) from the climatology provides an indication of typical past conditions.'
+			),
+			formatted,
+		);
+		parts.push(part);
 
-	const allPercent = progressBars.map(({ percent }) => percent);
-	const allAreSmallerThan = allPercent.map(
-		(percent) => Math.floor(percent) < currentCondition.threshold
-	);
-	let historicalMedianPreamble = '';
-	if (allAreSmallerThan.includes(false)) {
-		// In other words; not "all percents smaller than threshold"
-		historicalMedianPreamble = '';
-	} else {
-		historicalMedianPreamble = currentCondition.preamble + ' ';
+		return (
+			<p className={cn(className)}>
+				{parts.join(' ')}
+			</p>
+		);
 	}
-
-	return (
-		<p className="mt-2">
-			{historicalMedianPreamble}
-			{...childNodes}
-		</p>
-	);
 };
 
-LineHistoricalMedianPrefixedWhen.displayName = 'LineHistoricalMedianPrefixedWhen';
 
-const LineTitleForecastSummary = (): React.ReactNode => {
-	let outcome: React.ReactNode = null;
+/**
+ * The title line.
+ *
+ * "Forecast Summary for [location]"
+ *
+ * Example:
+ * "Résumé des prévisions pour Anderson Island Protected Area, SK:":
+ */
+const LineTitleForecastSummaryFor = (
+): React.ReactNode => {
 	const currentLocationTitle = useAppSelector(selectCurrentLocationTitle);
 	if (currentLocationTitle !== null) {
-		outcome = (
-			<p className="font-semibold">
+		return (
+			<strong className="font-semibold">
 				{sprintf(
 					__('Forecast Summary for %s:'),
 					currentLocationTitle,
 				)}
-			</p>
+			</strong>
 		);
 	}
-
-	return outcome;
 };
 
-LineTitleForecastSummary.displayName = 'LineTitleForecastSummary';
 
-type LineSkillLevelProps = {
-	locationData: LocationS2DData | null;
-};
+type LineTheTimePeriodForVariableHasProps =
+	WithClassName;
 
-export const LineSkillLevel = (
-	props: LineSkillLevelProps,
+/**
+ * The line under the title.
+ *
+ * "The [time period] [variable] has a"
+ *
+ * Example:
+ * "La température moyenne pour mai à juillet a"
+ */
+const LineTheTimePeriodForVariableHas = (
+	props: LineTheTimePeriodForVariableHasProps,
 ): React.ReactNode => {
 	const {
-		locationData,
+		className = '',
 	} = props;
 
-	const {
-		skillLevelLabel,
-		skillLevel,
-	} = extractSkillLevelData(locationData);
-
-	const guidanceText = [
-		/* 0: No skill  */ __('The accuracy of past forecasts was no better than random chance'),
-		/* 1: Low skill */ __('The accuracy of past forecasts was a small improvement over random chance'),
-		/* 2: Medium    */ __('The accuracy of past forecasts was satisfactory'),
-		/* 3: High      */ __('Past forecasts were mostly accurate'),
-	][(typeof skillLevel !== 'number') ? 0 : skillLevel];
-
-	const TEMPLATE = sprintf(
-		__('The skill level is “%s”. %s for this location, time period, and month of release.'),
-		skillLevelLabel,
-		guidanceText,
-	);
-
-	return (
-		<p className="mt-2">
-			{TEMPLATE}
-		</p>
-	);
-};
-
-LineSkillLevel.displayName = 'LineSkillLevel';
-
-type ForecastSummaryContentsProps = ForecastTypeAndProgressBars & {
-	locationData: LocationS2DData | null;
-};
-
-export const ForecastSummaryContents = (
-	props: ForecastSummaryContentsProps,
-): React.ReactNode => {
-	const {
-		forecastType,
-		progressBars,
-		locationData,
-	} = props;
 	const { climateVariable } = useClimateVariable();
 	const { locale } = useLocale();
 
+	const frequencyType =
+		climateVariable?.getFrequency() ?? S2DFrequencyTypes.SEASONAL;
 	const variableId = climateVariable?.getId();
 	const variableName = climateVariable?.getTitle() ?? '';
-	const unit = climateVariable?.getUnit() ?? '';
 	const dateRange = climateVariable?.getDateRange() ?? [];
 
-	// [time period] => "mai à juil."
-	const periodRange = dateRange.map((i) => formatIntlDate(i, locale, { month: 'long' }));
+	// [time period] => "mai à juillet"
+	const timePeriodTuple = dateRange.map((i) =>
+		formatIntlDate(i, locale, { month: 'long' })
+	);
 
 	let formattedPeriodRange = '';
-	if (periodRange) {
-		if (forecastType === ForecastTypes.EXPECTED) {
-			formattedPeriodRange = sprintf(__('%s to %s'), periodRange[0], periodRange[1]);
+
+	if (timePeriodTuple) {
+		if (frequencyType === S2DFrequencyTypes.SEASONAL) {
+			formattedPeriodRange = sprintf(
+				__('%s to %s'),
+				timePeriodTuple[0],
+				timePeriodTuple[1],
+			);
 		} else {
-			formattedPeriodRange = periodRange[0];
+			formattedPeriodRange = timePeriodTuple[0];
+		}
+		if (
+			timePeriodTuple.length === 2 &&
+			timePeriodTuple[0] === timePeriodTuple[1]
+		) {
+			// Fail-Safe when we have two times the same month, so we don't display 'may to may'.
+			formattedPeriodRange = timePeriodTuple[0];
 		}
 	}
 
@@ -225,22 +253,81 @@ export const ForecastSummaryContents = (
 		? Reflect.get(tooltipOpeningLineVariants, variableId ?? 'fallback')
 		: Reflect.get(tooltipOpeningLineVariants, 'fallback');
 
+	return (
+		<p className={cn(className)}>
+			{progressBarsListFirstLine}
+		</p>
+	);
+};
+
+
+type LineTheSkillLevelForThisLocationProps =
+	WithLocationData &
+	WithClassName;
+
+export const LineTheSkillLevelForThisLocation = (
+	props: LineTheSkillLevelForThisLocationProps,
+): React.ReactNode => {
+	const {
+		className = '',
+		locationData,
+	} = props;
+
+	if (!locationData) {
+		return null;
+	}
+
+	const {
+		skillLevelLabel,
+		skillLevel,
+	} = extractSkillLevelData(locationData);
+
+	const guidanceText = [
+		/* 0: No skill  */ __('The accuracy of past forecasts was no better than random chance'),
+		/* 1: Low skill */ __('The accuracy of past forecasts was a small improvement over random chance'),
+		/* 2: Medium    */ __('The accuracy of past forecasts was satisfactory'),
+		/* 3: High      */ __('Past forecasts were mostly accurate'),
+	][(typeof skillLevel !== 'number') ? 0 : skillLevel];
+
+	const TEMPLATE = sprintf(
+		__(
+			'The skill level is “%s”. %s for this location, time period, and month of release.'
+		),
+		skillLevelLabel,
+		guidanceText,
+	);
+
+	return (
+		<p className={cn(className)}>
+			{TEMPLATE}
+		</p>
+	);
+};
+
+
+type LineListForecastCategoriesProps =
+	WithProgressBars &
+	WithClassName;
+
+const LineListForecastCategories = (
+	props: LineListForecastCategoriesProps,
+): React.ReactNode => {
+	const {
+		className = '',
+		progressBars,
+	} = props;
+
+	const { climateVariable } = useClimateVariable();
+
+	const forecastType =
+		climateVariable?.getForecastType() ?? ForecastTypes.UNUSUAL;
+
 	// Category definitions parallel to progressBars, for tooltip content
 	const forecastCategories = buildForecastCategories(forecastType);
 
-	const CN_RELEASE_DATE = [
-		'-font-semibold',
-		'-text-dark-purple',
-		'-text-xs',
-		'-tracking-wider',
-		'-uppercase',
-	];
-
 	return (
 		<>
-			<LineTitleForecastSummary />
-			<p className="mt-2">{progressBarsListFirstLine}</p>
-			<ul className="mt-2 list-disc list-outside">
+			<ul className={cn('mt-2 list-disc list-outside', className)}>
 				{progressBars.map((bar, idx) => (
 					<li key={idx} className="mt-2 ml-4">
 						{sprintf(
@@ -252,28 +339,61 @@ export const ForecastSummaryContents = (
 					</li>
 				))}
 			</ul>
-			<p className="mt-2">
+			<p>
 				{__('relative to the 1991 to 2020 historical climatology.')}
 			</p>
-			<LineSkillLevel locationData={locationData} />
-			<LineHistoricalMedianPrefixedWhen
-				forecastType={forecastType}
+		</>
+	);
+};
+
+
+type ForecastSummaryContentsProps =
+	WithProgressBars &
+	WithLocationData;
+
+const ForecastSummaryContents = (
+	props: ForecastSummaryContentsProps,
+): React.ReactNode => {
+	const {
+		progressBars,
+		locationData,
+	} = props;
+
+	// To make S2D Release Date look like the rest of the text
+	// we have to negate all className from the S2DReleaseDate
+	// component.
+	const CN_RELEASE_DATE = [
+		'-font-semibold',
+		'-text-dark-purple',
+		'-text-xs',
+		'-tracking-wider',
+		'-uppercase',
+	];
+
+	return (
+		<>
+			<LineTitleForecastSummaryFor />
+			<LineTheTimePeriodForVariableHas
+				className="mt-2"
+			/>
+			<LineListForecastCategories
+				className="mt-2"
 				progressBars={progressBars}
-			>
-				{locationData && sprintf(
-					__(
-						'The historical median (%s) from the climatology provides an indication of typical past conditions.'
-					),
-					formatValue(
-						locationData.historical_median_p50,
-						unit,
-						1,
-						locale
-					),
-				)}
-			</LineHistoricalMedianPrefixedWhen>
+			/>
+			<LineTheSkillLevelForThisLocation
+				className="mt-2"
+				locationData={locationData}
+			/>
+			<LineTheHistoricalMedian
+				className="mt-2"
+				locationData={locationData}
+				progressBars={progressBars}
+			/>
 			<p className="mt-2">
-				<S2DReleaseDate className={cn(CN_RELEASE_DATE)} tooltip={false} />
+				<S2DReleaseDate
+					className={cn(CN_RELEASE_DATE)}
+					tooltip={false}
+				/>
 			</p>
 			<p className="mt-2">
 				{__('Consider checking back for updated forecasts!')}
@@ -282,20 +402,20 @@ export const ForecastSummaryContents = (
 	);
 };
 
-ForecastSummaryContents.displayName = 'ForecastSummaryContents';
 
-export type ForecastSummaryPopoverProps = ForecastSummaryContentsProps & ModalSummaryPopoverProps & {
-};
+type ForecastSummaryPopoverProps =
+	WithLocationData &
+	WithProgressBars;
 
 export const ForecastSummaryPopover = (
 	props: ForecastSummaryPopoverProps,
 ): React.ReactNode => {
-	const { locale } = useLocale();
 	const {
-		forecastType,
 		progressBars,
 		locationData,
 	} = props;
+
+	const { locale } = useLocale();
 
 	// Handling space at the bottom of the LocationModal where we have releaseDate and the button.
 	// 'Forecast Summary' in French would be 'Résumé des Prévisions'
@@ -313,7 +433,6 @@ export const ForecastSummaryPopover = (
 			popoverTriggerButtonInner={popoverTriggerButtonInner}
 		>
 			<ForecastSummaryContents
-				forecastType={forecastType}
 				progressBars={progressBars}
 				locationData={locationData}
 			/>
@@ -321,4 +440,5 @@ export const ForecastSummaryPopover = (
 	);
 };
 
-ForecastSummaryPopover.displayName = 'ForecastSummaryPopover';
+export default ForecastSummaryPopover;
+

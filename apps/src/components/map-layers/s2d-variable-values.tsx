@@ -27,7 +27,7 @@ import {
 } from '@/types/climate-variable-interface';
 
 import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
-import { ForecastSummaryPopover } from '@/components/map-layers/s2d-location-modal-forecast-summary';
+import ForecastSummaryPopover from '@/components/map-layers/s2d-location-modal-forecast-summary';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import StarRating from '@/components/ui/star-rating';
 import ProgressBar, { ProgressBarProps } from '@/components/ui/progress-bar';
@@ -929,7 +929,6 @@ const ProbabilitiesPart = (
 				<section className="mt-9 flex items-center justify-between box-border my-2">
 					<S2DReleaseDate className="flex" />
 					<ForecastSummaryPopover
-						forecastType={forecastType}
 						progressBars={progressBars}
 						locationData={locationData}
 					/>

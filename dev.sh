@@ -42,6 +42,7 @@ function _show_help {
   echo ""
   echo "  Other:"
   echo "    download-docker-assets <URL>   Download the required Docker assets from the given URL."
+  echo "    compile-react-apps-translation Run translation files compilation for the React maps and download apps in apps/ folder"
 }
 
 # Switch to the real directory of the script, so it still works when used from
@@ -205,6 +206,31 @@ function nginx {
 
 function task-runner-shell {
   _docker_compose exec -it task-runner bash
+}
+
+function compile-react-apps-translation {
+  # open 'docs/translate-the-site.md'
+  # open 'https://github.com/CanadianClimateDataPortal/climatedata-wp-theme/blob/main/docs/translate-the-site.md#react-apps-translation'
+  # ./dev.sh portal-shell
+  # cd /var/www/html/assets/themes/fw-child
+  # wp i18n make-mo languages/react-apps/fr_CA.po
+  (
+    set -e
+
+    echo "Compiling React apps/ translation that currently are maintained from ./fw-child/languages/react-apps/:"
+    _docker_compose exec -w /var/www/html/assets/themes/fw-child portal bash -c '
+      wp i18n make-mo languages/react-apps/fr_CA.po
+    '
+    echo ''
+    echo "To do the same manually:"
+    echo '  ./dev.sh portal-shell'
+    echo '  cd /var/www/html/assets/themes/fw-child'
+    echo '  wp i18n make-mo languages/react-apps/fr_CA.po'
+    echo ''
+    echo 'To read the docs:'
+    echo "  open 'docs/translate-the-site.md'"
+    echo ''
+  )
 }
 
 ####

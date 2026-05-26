@@ -415,16 +415,15 @@ export const ForecastSummaryPopover = (
 		locationData,
 	} = props;
 
-	const { locale } = useLocale();
-
-	// Handling space at the bottom of the LocationModal where we have releaseDate and the button.
 	// 'Forecast Summary' in French would be 'Résumé des Prévisions'
 	const popoverTriggerButtonTitle = __('Forecast Summary');
-	// In French, "Janvier" becomes "Janv." which takes too much space when ' - ' insted of '-'
-	const dashedWhenInFrench = /^fr/.test(locale) ? '-' : ' ';
+	// The button text, when is the same as 'Forecast Summary' when
+	// in french, the Release Date contents may wrap text in a wrong
+	// way so we have to keep this button small.
+	// We could alternatively use BookOpenText from 'lucide-react'
 	const popoverTriggerButtonInner = (
 		<>
-			{__('Forecast') + dashedWhenInFrench + __('Summary')}
+			{__('Summary')}
 		</>
 	);
 	return (

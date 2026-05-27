@@ -172,16 +172,18 @@ const LineTheHistoricalMedian = (
 const LineTitleForecastSummaryFor = (
 ): React.ReactNode => {
 	const currentLocationTitle = useAppSelector(selectCurrentLocationTitle);
+	let formattedTitle = __('Forecast Summary') + ':';
 	if (currentLocationTitle !== null) {
-		return (
-			<strong className="font-semibold">
-				{sprintf(
-					__('Forecast Summary for %s:'),
-					currentLocationTitle,
-				)}
-			</strong>
+		formattedTitle = sprintf(
+			__('Forecast Summary for %s:'),
+			currentLocationTitle,
 		);
 	}
+	return (
+		<strong className="font-semibold">
+			{formattedTitle}
+		</strong>
+	);
 };
 
 

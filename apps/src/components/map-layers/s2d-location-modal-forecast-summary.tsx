@@ -409,7 +409,7 @@ type S2DLocationModalForecastSummaryProps =
 	WithLocationData &
 	WithProgressBars;
 
-export const S2DLocationModalForecastSummary = ( // Renamed from ForecastSummaryPopover
+export const S2DLocationModalForecastSummary = (
 	props: S2DLocationModalForecastSummaryProps,
 ): React.ReactNode => {
 	const {

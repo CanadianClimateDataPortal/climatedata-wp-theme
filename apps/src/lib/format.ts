@@ -199,7 +199,7 @@ export const buttonVariants = cva(
 
 /**
  * Return a formatted and translated string of a value followed by a unit.
- * 
+ *
  * This function doesn't format "Day of Year" units (ex: formatting a day number `187` to the string
  * "July 7"). For this, use `doyFormatter()`.
  *
@@ -270,33 +270,33 @@ const DEFAULT_DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
 /**
  * Format a date into a localized string using Intl.DateTimeFormat, with error handling.
  *
- * @param maybeDate - Date or string
+ * @param dateLike - Date or string
  * @param locale - Locale to use for formatting
  * @param options - Intl.DateTimeFormatOptions for formatting the dates
  *
  * @returns A formatted date string, e.g. "2025-10-15"
  */
 export const formatIntlDate = (
-	maybeDate: Date | string,
+	dateLike: Date | string,
 	locale: Locale | string,
 	options?: Intl.DateTimeFormatOptions,
 ): string => {
 	let dateObj: Date;
 	let outcome: string | null = null;
 
-	if (typeof maybeDate === 'string') {
-		const maybe = utc(maybeDate);
+	if (typeof dateLike === 'string') {
+		const maybe = utc(dateLike);
 		if (maybe) {
 			dateObj = maybe;
 		} else {
 			console.error(
 				'Invalid date string provided to formatIntlDate:',
-				maybeDate
+				dateLike
 			);
-			return maybeDate;
+			return dateLike;
 		}
 	} else {
-		dateObj = maybeDate;
+		dateObj = dateLike;
 	}
 
 	try {

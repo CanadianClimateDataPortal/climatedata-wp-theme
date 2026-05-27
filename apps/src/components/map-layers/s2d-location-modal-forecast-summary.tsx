@@ -23,15 +23,16 @@ import {
 	ForecastTypes,
 	S2DFrequencyTypes,
 	type ForecastType,
+	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
 import {
 	extractSkillLevelData,
+	generatePeriodRangeLabel,
 	type LocationS2DData,
 } from '@/lib/s2d';
 import {
 	formatValue,
-	formatIntlDate,
 } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
@@ -208,36 +209,23 @@ const LineTheTimePeriodForVariableHas = (
 	const { climateVariable } = useClimateVariable();
 	const { locale } = useLocale();
 
-	const frequencyType =
-		climateVariable?.getFrequency() ?? S2DFrequencyTypes.SEASONAL;
+	const frequency = (climateVariable?.getFrequency() ??
+		S2DFrequencyTypes.MONTHLY) as S2DFrequencyType;
 	const variableId = climateVariable?.getId();
 	const variableName = climateVariable?.getTitle() ?? '';
-	const dateRange = climateVariable?.getDateRange() ?? [];
 
-	// [time period] => "mai à juillet"
-	const timePeriodTuple = dateRange.map((i) =>
-		formatIntlDate(i, locale, { month: 'long' })
-	);
+	const dateRange = climateVariable?.getDateRange();
+	// Same logic around dateRangeStart in S2DVariableValues
+	const dateRangeStart = dateRange ? dateRange[0] : null;
 
 	let formattedPeriodRange = '';
 
-	if (timePeriodTuple) {
-		if (frequencyType === S2DFrequencyTypes.SEASONAL) {
-			formattedPeriodRange = sprintf(
-				__('%s to %s'),
-				timePeriodTuple[0],
-				timePeriodTuple[1],
-			);
-		} else {
-			formattedPeriodRange = timePeriodTuple[0];
-		}
-		if (
-			timePeriodTuple.length === 2 &&
-			timePeriodTuple[0] === timePeriodTuple[1]
-		) {
-			// Fail-Safe when we have two times the same month, so we don't display 'may to may'.
-			formattedPeriodRange = timePeriodTuple[0];
-		}
+	if (dateRangeStart !== null) {
+		// Same logic around DateRangeLine in S2DVariableValues
+		const DateRangeLine = dateRangeStart
+			? generatePeriodRangeLabel(dateRangeStart, frequency, locale)
+			: null;
+		formattedPeriodRange = DateRangeLine !== null ? DateRangeLine : '';
 	}
 
 	// A single sprintf template can't produce correct French for both variables:

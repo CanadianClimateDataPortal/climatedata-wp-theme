@@ -1,3 +1,4 @@
+import { sprintf } from '@wordpress/i18n';
 import { S2D_NB_PERIODS } from '@/lib/constants';
 import {
 	ClimateVariableInterface,
@@ -8,6 +9,7 @@ import {
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 import { formatUTCDate, utc } from '@/lib/utils';
+import { formatIntlDate } from '@/lib/format';
 import { __ } from '@/context/locale-provider';
 
 export type PeriodRange = [Date, Date];
@@ -420,4 +422,34 @@ export const extractSkillLevelData = (
 	};
 
 	return output;
+};
+
+/**
+ * Generate a period range label for a given date range and frequency.
+ *
+ * @param dateRangeStart - Start date of the period. Example: 2025-08-01
+ * @param frequency - Frequency type
+ * @param locale - Locale to use for formatting
+ */
+export const generatePeriodRangeLabel = (
+	dateRangeStart: string,
+	frequency: S2DFrequencyType,
+	locale: string
+): string | null => {
+	const periodStart = utc(dateRangeStart);
+
+	if (!periodStart) {
+		return null;
+	}
+
+	const periodStartLabel = formatIntlDate(periodStart, locale, { month: 'long' });
+
+	if (frequency === FrequencyType.MONTHLY) {
+		return periodStartLabel;
+	}
+
+	const periodEnd = getPeriodEnd(periodStart, frequency);
+	const periodEndLabel = formatIntlDate(periodEnd, locale, { month: 'long' });
+
+	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
 };

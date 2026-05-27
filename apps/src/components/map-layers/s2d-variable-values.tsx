@@ -9,11 +9,11 @@ import { useColorMap } from '@/hooks/use-color-map';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { FetchError, fetchS2DLocationData } from '@/services/services';
 
-import { formatIntlDate, formatValue } from '@/lib/format';
+import { formatValue } from '@/lib/format';
 import { cn, findCeilingIndex, utc } from '@/lib/utils';
 import {
 	extractSkillLevelData,
-	getPeriodEnd,
+	generatePeriodRangeLabel,
 	type LocationS2DData,
 } from '@/lib/s2d';
 import { ColourMap } from '@/types/types';
@@ -135,36 +135,6 @@ const SKILL_LEVEL_TOOLTIP = [
 			'considered trustworthy.'
 	),
 ];
-
-/**
- * Generate a period range label for a given date range and frequency.
- *
- * @param dateRangeStart - Start date of the period. Example: 2025-08-01
- * @param frequency - Frequency type
- * @param locale - Locale to use for formatting
- */
-const generatePeriodRangeLabel = (
-	dateRangeStart: string,
-	frequency: S2DFrequencyType,
-	locale: string
-): string | null => {
-	const periodStart = utc(dateRangeStart);
-
-	if (!periodStart) {
-		return null;
-	}
-
-	const periodStartLabel = formatIntlDate(periodStart, locale, { month: 'long' });
-
-	if (frequency === FrequencyType.MONTHLY) {
-		return periodStartLabel;
-	}
-
-	const periodEnd = getPeriodEnd(periodStart, frequency);
-	const periodEndLabel = formatIntlDate(periodEnd, locale, { month: 'long' });
-
-	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
-};
 
 /**
  * Return true if two numbers are in the same thousand.

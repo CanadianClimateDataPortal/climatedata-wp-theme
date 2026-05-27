@@ -356,7 +356,7 @@ const ForecastSummaryContents = (
 		'-font-semibold',
 		'-text-dark-purple',
 		'-text-xs',
-		'-tracking-wider',
+		'tracking-normal',
 		'-uppercase',
 	];
 

@@ -67,6 +67,7 @@ const initialState: MapState = {
 	frequency: 'ann',
 	timePeriodEnd: [defaultTimePeriodEnd], // needs an array because of the slider component that uses it
 	recentLocations: [],
+	selectedLocation: null,
 	pane: 'raster',
 	mapColor: 'default',
 	opacity: {
@@ -146,6 +147,17 @@ const mapSlice = createSlice({
 		clearRecentLocations(state) {
 			state.recentLocations = [];
 		},
+		/**
+		 * Set the single, currently-selected map location (or clear it with null).
+		 *
+		 * This is intentionally separate from `addRecentLocation`: that one is an
+		 * append-only history with id-based dedup, so re-clicking an existing
+		 * location is a no-op and `recentLocations[last]` cannot be relied upon
+		 * as "the current selection." Use `selectedLocation` for that.
+		 */
+		setSelectedLocation(state, action: PayloadAction<MapLocation | null>) {
+			state.selectedLocation = action.payload;
+		},
 		setMapColor(state, action: PayloadAction<string>) {
 			state.mapColor = action.payload;
 		},
@@ -201,6 +213,7 @@ export const {
 	addRecentLocation,
 	deleteLocation,
 	clearRecentLocations,
+	setSelectedLocation,
 	setMapColor,
 	setLegendData,
 	setTransformedLegendEntry,
@@ -235,19 +248,17 @@ export const selectRecentLocations =
 		state.map.recentLocations;
 
 /**
- * Pick the last item in recentLocations and return it as the current location.
+ * The single, currently-selected map location.
  *
- * @see {@link selectRecentLocations}
+ * Reads {@link MapState.selectedLocation} directly. Do NOT derive this from
+ * `recentLocations[last]` — that history is dedup-on-id append-only, so the
+ * last appended entry is not the current selection when an existing location
+ * is re-clicked. {@link MapState.selectedLocation} is the source of truth.
+ *
+ * @see {@link MapState.selectedLocation}
  */
-export const selectCurrentLocation = createSelector(
-	[selectRecentLocations],
-	(list) => {
-		const last = Array.isArray(list) && list.length > 0
-			? list[list.length - 1]
-			: null;
-		return last;
-	},
-);
+export const selectCurrentLocation = (state: RootState) =>
+	state.map.selectedLocation;
 
 /**
  * The current location's title.

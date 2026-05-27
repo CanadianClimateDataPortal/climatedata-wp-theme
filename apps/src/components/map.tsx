@@ -40,6 +40,8 @@ export default function Map(): React.ReactElement {
 		comparisonLayerRef,
 	});
 
+	console.log('RBx\tmap.tsx', { selectedLocation });
+
 	const syncMaps = useCallback(() => {
 		if (mapRef.current && comparisonMapRef.current) {
 			// @ts-expect-error: suppress leaflet typescript errors

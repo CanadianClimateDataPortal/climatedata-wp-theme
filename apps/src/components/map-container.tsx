@@ -85,6 +85,8 @@ export default function MapContainer({
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
 	const [selectedStation, setSelectedStation] = useState<Station | null>(null);
 
+	console.log('RBx\tMapContainer');
+
 	const {
 		opacity: { labels: labelsOpacity },
 		mapCoordinates
@@ -130,7 +132,12 @@ export default function MapContainer({
 
 	// Handle click on details button of a location (to open the chart panel)
 	const handleDetailsClick = useCallback(async () => {
+		console.log('RBx\tMapContainer in useCallback named handleDetailsClick 0');
+
 		if (selectedLocation) {
+
+			console.log('RBx\tMapContainer in useCallback named handleDetailsClick', { selectedLocation });
+
 			const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 			const { title, latlng, featureId } = selectedLocation;
 			const frequencyConfig = climateVariable?.getFrequencyConfig();
@@ -194,6 +201,8 @@ export default function MapContainer({
 	useEffect(() => {
 		if (selectedLocation && canShowModal) {
 			const { title, latlng, featureId } = selectedLocation;
+
+			console.log('RBx\tMapContainer in useEffect selectedLocation', selectedLocation);
 
 			setLocationModalContent(
 				<LocationModalContent

@@ -77,8 +77,6 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 		);
 	}
 
-	console.log('RBx\t<LocationModalContent title />', { title });
-
 	return (
 		<div className="min-h-0 overflow-y-auto">
 			<h2 className="mb-1 text-2xl font-semibold leading-7 text-cdc-black">

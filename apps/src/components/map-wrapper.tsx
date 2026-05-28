@@ -13,7 +13,6 @@ const MapWrapper = () => {
 		const postId = climateVariable?.getPostId();
 		if (typeof postId !== 'number') return;
 		fetchMapInfoData(postId).then((mapInfo) => {
-			console.log('RBx\tMapWrapper', { mapInfo })
 			if (mapInfo) {
 				setMapInfo(mapInfo);
 			}

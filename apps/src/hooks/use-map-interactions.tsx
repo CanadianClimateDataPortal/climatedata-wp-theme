@@ -29,9 +29,6 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
   const selectedInteractiveRegion = useRef<InteractiveRegionOption | null>(climateVariable?.getInteractiveRegion() || null);
 	const variableId = climateVariable?.getId();
 
-
-	console.log('RBx\tuseMapInteractions', { selectedLocation });
-
   const handleOver = useCallback((
     e: { latlng: L.LatLng; layer: { properties: any } },
     getFeatureColor: (featureId: number) => string
@@ -94,8 +91,6 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
 
     clearMarkers();
     addMarker(latlng, locationTitle);
-
-		console.log('RBx\tuseMapInteractions in useCallback named handleClick before addRecentLocation', locationTitle);
 
     const recentLocationPayload = {
       id: locationId,
@@ -174,8 +169,6 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
       handleClearSelectedLocation();
       return;
     }
-
-		console.log('RBx\tuseMapInteractions useEffect', { selectedLocation });
 
     // If we have a selected location and variable changed, update the data
     if (selectedLocation) {

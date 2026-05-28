@@ -333,7 +333,7 @@ const LineListForecastCategories = (
 					</li>
 				))}
 			</ul>
-			<p>
+			<p className="mt-2">
 				{__('relative to the 1991 to 2020 historical climatology.')}
 			</p>
 		</>

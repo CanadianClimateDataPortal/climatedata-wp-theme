@@ -1,3 +1,4 @@
+import { sprintf } from '@wordpress/i18n';
 import { S2D_NB_PERIODS } from '@/lib/constants';
 import {
 	ClimateVariableInterface,
@@ -8,6 +9,7 @@ import {
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 import { formatUTCDate, utc } from '@/lib/utils';
+import { formatIntlDate } from '@/lib/format';
 import { __ } from '@/context/locale-provider';
 
 export type PeriodRange = [Date, Date];
@@ -154,15 +156,18 @@ export function findPeriodIndexForDateRange(
  * of the form 'YYYY-MM-DD'.
  *
  * @param periodRange - The period range to transform.
+ * @param dateFormat - The format to use for the date strings.
  * @returns - The date range as an array of two dates in string.
  */
-export function formatPeriodRange(periodRange: PeriodRange): [string, string] {
-	const dateFormat = 'yyyy-MM-dd';
+export const formatPeriodRange = (
+	periodRange: PeriodRange,
+	dateFormat = 'yyyy-MM-dd',
+): [string, string] => {
 	const rangeStart = formatUTCDate(periodRange[0], dateFormat);
 	const rangeEnd = formatUTCDate(periodRange[1], dateFormat);
 
 	return [rangeStart, rangeEnd];
-}
+};
 
 /**
  * Create and return the GeoServer layer name for the Skill layer.
@@ -264,6 +269,16 @@ export function getForecastTypeName(forecastType: ForecastType): string {
 
 	return nameMap[forecastType] ?? (forecastType as string);
 }
+
+/**
+ * The translated labels for the S2D skill levels, indexed by the skill level value (0–3).
+ */
+export const S2D_SKILL_LEVEL_LABELS = [
+	__('No skill'),
+	__('Low'),
+	__('Medium'),
+	__('High'),
+];
 
 /**
  * Map S2D variable IDs to their corresponding filename components.
@@ -384,4 +399,57 @@ export const extractS2DDownloadStepFilenameComponents = (
 		forecastType,
 		frequencyType,
 	};
+};
+
+export interface SkillLevelData {
+	skillLevel: number | null;
+	skillCRPSS: number | null;
+	skillLevelLabel: string;
+}
+
+export const extractSkillLevelData = (
+	locationData: LocationS2DData | null,
+): SkillLevelData => {
+	const skillLevel = locationData?.skill_level;
+	const skillCRPSS = locationData?.skill_CRPSS;
+
+	const skillLevelLabel = typeof skillLevel !== 'number' ? null : S2D_SKILL_LEVEL_LABELS[skillLevel];
+
+	const output: SkillLevelData = {
+		skillLevel: skillLevel ?? null,
+		skillCRPSS: skillCRPSS ?? null,
+		skillLevelLabel: skillLevelLabel ?? S2D_SKILL_LEVEL_LABELS[0],
+	};
+
+	return output;
+};
+
+/**
+ * Generate a period range label for a given date range and frequency.
+ *
+ * @param dateRangeStart - Start date of the period. Example: 2025-08-01
+ * @param frequency - Frequency type
+ * @param locale - Locale to use for formatting
+ */
+export const generatePeriodRangeLabel = (
+	dateRangeStart: string,
+	frequency: S2DFrequencyType,
+	locale: string
+): string | null => {
+	const periodStart = utc(dateRangeStart);
+
+	if (!periodStart) {
+		return null;
+	}
+
+	const periodStartLabel = formatIntlDate(periodStart, locale, { month: 'long' });
+
+	if (frequency === FrequencyType.MONTHLY) {
+		return periodStartLabel;
+	}
+
+	const periodEnd = getPeriodEnd(periodStart, frequency);
+	const periodEndLabel = formatIntlDate(periodEnd, locale, { month: 'long' });
+
+	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
 };

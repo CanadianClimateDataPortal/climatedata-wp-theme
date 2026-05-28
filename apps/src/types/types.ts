@@ -214,6 +214,16 @@ export interface MapState {
 	frequency: string;
 	timePeriodEnd: number[]; // using an array because the slider that uses it expects an array
 	recentLocations: MapLocation[];
+	/**
+	 * The location currently selected on the map (single value, mirrors the
+	 * Leaflet-driven local `selectedLocation` in `useMapInteractions`).
+	 *
+	 * Distinct from {@link MapState.recentLocations}, which is an append-only
+	 * history with id-based dedup. Use this field as the source of truth for
+	 * "what is selected right now" — `recentLocations[last]` is NOT reliable
+	 * because re-clicking an existing location is a no-op in `addRecentLocation`.
+	 */
+	selectedLocation: MapLocation | null;
 	variable: ApiPostData | string;
 	dataset?: TaxonomyData;
 	decade: string;

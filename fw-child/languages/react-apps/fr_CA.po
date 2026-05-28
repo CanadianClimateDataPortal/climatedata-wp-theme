@@ -1240,6 +1240,24 @@ msgstr "L'étendue près de la normale est définie à l'aide de la climatologie
        "l'étendue « près de la normale » est définie à partir du tiers central, ce qui donne une étendue correspondant aux "
        "conditions typiques observées dans le passé."
 
+msgid  "Forecast Summary"
+msgstr "Résumé des prévisions"
+
+msgid  "Forecast Summary for %s:"
+msgstr "Résumé des prévisions pour %s:"
+
+msgid  "Consider checking back for updated forecasts!"
+msgstr "Pensez à revenir pour consulter les prévisions mises à jour!"
+
+msgid  "The historical median (%s) from the climatology provides an indication of typical past conditions."
+msgstr "La médiane historique (%s) issue de la climatologie donne une indication des conditions passées typiques."
+
+msgid  "As all probabilities are lower than 40%, there is no clear forecast outcome."
+msgstr "Comme toutes les probabilités sont inférieures à 40 %, il n'y a aucun résultat significatif."
+
+msgid  "As both probabilities are lower than 30%, there is no clear forecast outcome."
+msgstr "Comme les deux probabilités sont inférieures à 30 %, il n'y a aucun résultat significatif."
+
 msgid  "Seasonal %s probability:"
 msgstr "Probabilité saisonnière pour \"%s\":"
 
@@ -1247,13 +1265,22 @@ msgid  "Monthly %s probability:"
 msgstr "Probabilité mensuelle pour \"%s\":"
 
 msgid  "The total precipitation has a"
-msgstr "La précipitation totale a"
+msgstr "Les précipitations totales ont"
+
+msgid  "The %s total precipitation has a"
+msgstr "Les précipitations totales pour %s ont"
 
 msgid  "The mean temperature has a"
 msgstr "La température moyenne a"
 
+msgid  "The %s mean temperature has a"
+msgstr "La température moyenne pour %s a"
+
 msgid  "The %s has a"
 msgstr "La %s a"
+
+msgid  "The %s %s has a"
+msgstr "La %s pour %s a"
 
 msgid  "%d%% probability of being %s (%s)"
 msgstr "%d %% de probabilité d'être %s (%s)"
@@ -1305,6 +1332,21 @@ msgstr "Les performances passées ou « habileté » du système de prévision s
        "l’indice continu de probabilité ordonnée (CRPSS). Le CRPSS mesure l'exactitude des prévisions produites pour le "
        "même délai de prévision que la prévision sélectionnée et pour le même mois, la même saison ou la même période "
        "décennale entre 1991 et 2020."
+
+msgid  "The skill level is “%s”. %s for this location, time period, and month of release."
+msgstr "Le niveau d’habilité est « %s ». %s  pour cet endroit, cette période et ce mois de sortie."
+
+msgid  "The accuracy of past forecasts was no better than random chance"
+msgstr "L'exactitude des prévisions passées n'était pas meilleure que le hasard"
+
+msgid  "The accuracy of past forecasts was a small improvement over random chance"
+msgstr "L'exactitude des prévisions passées était légèrement supérieure au hasard"
+
+msgid  "The accuracy of past forecasts was satisfactory"
+msgstr "L'exactitude des prévisions passées était satisfaisante"
+
+msgid  "Past forecasts were mostly accurate"
+msgstr "Les prévisions passées se sont avérées pour la plupart exactes"
 
 msgid "Probability"
 msgstr "Probabilité"
@@ -1389,7 +1431,7 @@ msgid "Near normal"
 msgstr "Près de la normale"
 
 msgid "Below normal"
-msgstr "Sous la normale"
+msgstr "En dessous de la normale"
 
 msgid "Between the 33rd and 66th percentiles (middle third of historical data)"
 msgstr "Entre le 33e et le 66e centile (tiers central des données historiques)"

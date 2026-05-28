@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { sprintf } from '@wordpress/i18n';
 import L from 'leaflet';
 
@@ -11,7 +11,11 @@ import { FetchError, fetchS2DLocationData } from '@/services/services';
 
 import { formatValue } from '@/lib/format';
 import { cn, findCeilingIndex, utc } from '@/lib/utils';
-import { getPeriodEnd, LocationS2DData } from '@/lib/s2d';
+import {
+	extractSkillLevelData,
+	generatePeriodRangeLabel,
+	type LocationS2DData,
+} from '@/lib/s2d';
 import { ColourMap } from '@/types/types';
 import {
 	ForecastDisplay,
@@ -23,6 +27,8 @@ import {
 } from '@/types/climate-variable-interface';
 
 import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
+import S2DLocationModalForecastSummary from '@/components/map-layers/s2d-location-modal-forecast-summary';
+
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import StarRating from '@/components/ui/star-rating';
 import ProgressBar, { ProgressBarProps } from '@/components/ui/progress-bar';
@@ -45,6 +51,7 @@ interface PopupContentProps {
 interface ProbabilitiesPartProps {
 	locationData: LocationS2DData | null;
 	forecastType: ForecastType;
+	forecastDisplay: ForecastDisplay;
 	frequency: S2DFrequencyType;
 	unit: string;
 }
@@ -94,13 +101,6 @@ const tooltipClimatology = __(
 		'exact values that define the forecast outcomes for this location.'
 );
 
-const SKILL_LEVEL_LABELS = [
-	__('No skill'),
-	__('Low'),
-	__('Medium'),
-	__('High'),
-];
-
 const FREQUENCY_LABEL = {
 	[FrequencyType.MONTHLY]: __('Monthly'),
 	[FrequencyType.SEASONAL]: __('Seasonal'),
@@ -135,42 +135,6 @@ const SKILL_LEVEL_TOOLTIP = [
 			'considered trustworthy.'
 	),
 ];
-
-/**
- * Generate a period range label for a given date range and frequency.
- *
- * @param dateRangeStart - Start date of the period. Example: 2025-08-01
- * @param frequency - Frequency type
- * @param locale - Locale to use for formatting
- */
-const generatePeriodRangeLabel = (
-	dateRangeStart: string,
-	frequency: S2DFrequencyType,
-	locale: string
-): string | null => {
-	const periodStart = utc(dateRangeStart);
-
-	if (!periodStart) {
-		return null;
-	}
-
-	const periodStartLabel = Intl.DateTimeFormat(locale, {
-		month: 'long',
-		timeZone: 'UTC',
-	}).format(periodStart);
-
-	if (frequency === FrequencyType.MONTHLY) {
-		return periodStartLabel;
-	}
-
-	const periodEnd = getPeriodEnd(periodStart, frequency);
-	const periodEndLabel = Intl.DateTimeFormat(locale, {
-		month: 'long',
-		timeZone: 'UTC',
-	}).format(periodEnd);
-
-	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
-};
 
 /**
  * Return true if two numbers are in the same thousand.
@@ -406,9 +370,13 @@ const TextLoader = () => {
 const SkillLevelPart = ({ locationData }: SkillLevelPartProps) => {
 	const { locale } = useLocale();
 
-	const skillLevel = locationData?.skill_level;
+	const {
+		skillCRPSS,
+		skillLevel,
+		skillLevelLabel,
+	} = extractSkillLevelData(locationData);
+
 	const hasSkillLevel = skillLevel != null;
-	const skillCRPSS = locationData?.skill_CRPSS;
 	const hasSkillCRPSS = skillCRPSS != null;
 
 	const tooltipSkillLevel = hasSkillLevel ? (
@@ -421,7 +389,7 @@ const SkillLevelPart = ({ locationData }: SkillLevelPartProps) => {
 	const SkillLevelLine =
 		hasSkillCRPSS && hasSkillLevel ? (
 			<>
-				{SKILL_LEVEL_LABELS[skillLevel]}
+				{skillLevelLabel}
 				{' - '}
 				<abbr
 					lang="en"
@@ -704,14 +672,21 @@ const ClimatologyValuesPart = ({
  * @param unit - The climate variable's unit
  * @constructor
  */
-const ProbabilitiesPart = ({
-	locationData,
-	forecastType,
-	frequency,
-	unit,
-}: ProbabilitiesPartProps) => {
+const ProbabilitiesPart = (
+	props: ProbabilitiesPartProps,
+): React.ReactNode => {
+	const {
+		forecastDisplay,
+		forecastType,
+		frequency,
+		locationData,
+		unit,
+	} = props;
+
 	const { locale } = useLocale();
 	const { colorMap } = useColorMap();
+
+	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 	const nbProgressBars = forecastType === ForecastTypes.EXPECTED ? 3 : 2;
 	const isLoaded = !!(locationData && colorMap);
 	// Initialize the progress bars to the correct number of "empty progress bars"
@@ -920,6 +895,17 @@ const ProbabilitiesPart = ({
 					))}
 				</div>
 			</div>
+
+			{isForecast && (
+				<section className="mt-9 flex items-center justify-between box-border my-2">
+					<S2DReleaseDate className="flex" />
+					<S2DLocationModalForecastSummary
+						progressBars={progressBars}
+						locationData={locationData}
+					/>
+				</section>
+			)}
+
 		</section>
 	);
 };
@@ -990,16 +976,12 @@ const PopupContent = ({
 				<ProbabilitiesPart
 					locationData={locationData}
 					forecastType={forecastType}
+					forecastDisplay={forecastDisplay}
 					frequency={frequency}
 					unit={unit}
 				/>
 			)}
 
-			{isForecast && (
-				<section className="mt-9">
-					<S2DReleaseDate />
-				</section>
-			)}
 		</div>
 	);
 };

@@ -2,7 +2,10 @@ import { useCallback, useRef, useState, useEffect } from 'react';
 import L from 'leaflet';
 
 import { useAppDispatch } from '@/app/hooks';
-import { addRecentLocation } from '@/features/map/map-slice';
+import {
+  addRecentLocation,
+  setSelectedLocation as dispatchSetSelectedLocation,
+} from '@/features/map/map-slice';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useMapMarker } from '@/hooks/use-map-marker';
 import { useLocale } from '@/hooks/use-locale';
@@ -89,11 +92,15 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
     clearMarkers();
     addMarker(latlng, locationTitle);
 
-    dispatch(addRecentLocation({
+    const recentLocationPayload = {
       id: locationId,
       title: locationTitle,
-      ...latlng,
-    }));
+      lat: latlng.lat,
+      lng: latlng.lng,
+    };
+
+    dispatch(addRecentLocation(recentLocationPayload));
+    dispatch(dispatchSetSelectedLocation(recentLocationPayload));
 
     setSelectedLocation({
 			featureId: featureId ?? 0,
@@ -119,12 +126,15 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
     clearMarkers();
     addMarker(latlng, title);
 
-    dispatch(addRecentLocation({
+    const recentLocationPayload = {
       id: `${latlng.lat}|${latlng.lng}`,
       title,
       lat: latlng.lat,
       lng: latlng.lng,
-    }));
+    };
+
+    dispatch(addRecentLocation(recentLocationPayload));
+    dispatch(dispatchSetSelectedLocation(recentLocationPayload));
 
     setSelectedLocation({
 			featureId: 0,
@@ -139,8 +149,12 @@ export function useMapInteractions({ primaryLayerRef, comparisonLayerRef }: UseM
 
   const handleClearSelectedLocation = useCallback(() => {
     setSelectedLocation(null);
+    dispatch(dispatchSetSelectedLocation(null));
     clearMarkers();
-  }, [clearMarkers]);
+  }, [
+		clearMarkers,
+		dispatch,
+	]);
 
   // Effect to handle location updates when climate variables change
   useEffect(() => {

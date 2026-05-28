@@ -1,4 +1,6 @@
 /**
+ * @file
+ *
  * Redux Slice: Map
  *
  * This slice manages the state needed to render the map with its different layers. For
@@ -22,12 +24,24 @@
  *      )}
  *    </ul>
  *    ...
- *
- * @module locationsSlice
  */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { MapState, MapLocation, WMSLegendData, TaxonomyData, PostData, MapCoordinates, TransformedLegendEntry } from '@/types/types';
+import {
+	createSelector,
+	createSlice,
+	type PayloadAction,
+} from '@reduxjs/toolkit';
+
+import type {
+	MapCoordinates,
+	MapItemsOpacity,
+	MapLocation,
+	MapState,
+	PostData,
+	TaxonomyData,
+	TransformedLegendEntry,
+	WMSLegendData,
+} from '@/types/types';
 import {
 	SLIDER_DEFAULT_YEAR_VALUE,
 	SLIDER_MAX_YEAR,
@@ -37,7 +51,6 @@ import {
 	CANADA_CENTER,
 	MAP_OPACITY_MIN,
 } from '@/lib/constants';
-import { MapItemsOpacity } from '@/types/types';
 import { RootState } from '@/app/store';
 
 const defaultTimePeriodEnd = Math.min(
@@ -54,6 +67,7 @@ const initialState: MapState = {
 	frequency: 'ann',
 	timePeriodEnd: [defaultTimePeriodEnd], // needs an array because of the slider component that uses it
 	recentLocations: [],
+	selectedLocation: null,
 	pane: 'raster',
 	mapColor: 'default',
 	opacity: {
@@ -133,6 +147,17 @@ const mapSlice = createSlice({
 		clearRecentLocations(state) {
 			state.recentLocations = [];
 		},
+		/**
+		 * Set the single, currently-selected map location (or clear it with null).
+		 *
+		 * This is intentionally separate from `addRecentLocation`: that one is an
+		 * append-only history with id-based dedup, so re-clicking an existing
+		 * location is a no-op and `recentLocations[last]` cannot be relied upon
+		 * as "the current selection." Use `selectedLocation` for that.
+		 */
+		setSelectedLocation(state, action: PayloadAction<MapLocation | null>) {
+			state.selectedLocation = action.payload;
+		},
 		setMapColor(state, action: PayloadAction<string>) {
 			state.mapColor = action.payload;
 		},
@@ -188,6 +213,7 @@ export const {
 	addRecentLocation,
 	deleteLocation,
 	clearRecentLocations,
+	setSelectedLocation,
 	setMapColor,
 	setLegendData,
 	setTransformedLegendEntry,
@@ -208,6 +234,40 @@ export const {
 export const selectLowSkillVisibility =
 	() => (state: RootState) =>
 		state.map.isLowSkillVisible;
+
+/**
+ * The single, currently-selected map location.
+ *
+ * Reads {@link MapState.selectedLocation} directly. Do NOT derive this from
+ * `recentLocations[last]` — that history is dedup-on-id append-only, so the
+ * last appended entry is not the current selection when an existing location
+ * is re-clicked. {@link MapState.selectedLocation} is the source of truth.
+ *
+ * @see {@link MapState.selectedLocation}
+ */
+export const selectSelectedLocation = (state: RootState) =>
+	state.map.selectedLocation;
+
+/**
+ * The current location's title.
+ *
+ * @returns string
+ *
+ * @example 'Lac Rahin, QC' - After having clicked on the map at coord. `59.866883195210214,-72.89428710937501`
+ * @example 'Saint-Anthony-of-Padua, QC' - After having clicked on the map at coord. `45.5111111,-73.5552778`
+ * @example 'Point (83.1597, -72.1143)' - After having clicked on the map at coord. `83.15965662857204,-72.11425781250001`
+ */
+export const selectSelectedLocationTitle = createSelector(
+	[selectSelectedLocation],
+	(current) => {
+		const loc = current
+			&& typeof current.title === 'string'
+			&& current.title.length > 0
+			? current
+			: null;
+		return loc?.title ?? null;
+	},
+);
 
 // Export reducer
 export default mapSlice.reducer;

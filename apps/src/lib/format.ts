@@ -1,8 +1,15 @@
 import { cva } from 'class-variance-authority';
-import { ApiPostData, MultilingualField, PostData, TermItem } from '@/types/types';
+import {
+	ApiPostData,
+	MultilingualField,
+	PostData,
+	TermItem,
+	Locale,
+} from '@/types/types';
 import React from 'react';
 import { __, _n } from '@/context/locale-provider';
 import { sprintf } from '@wordpress/i18n';
+import { formatUTCDate, utc } from '@/lib/utils';
 
 export type MonthFormat = "long" | "numeric" | "2-digit" | "short" | "narrow";
 
@@ -192,7 +199,7 @@ export const buttonVariants = cva(
 
 /**
  * Return a formatted and translated string of a value followed by a unit.
- * 
+ *
  * This function doesn't format "Day of Year" units (ex: formatting a day number `187` to the string
  * "July 7"). For this, use `doyFormatter()`.
  *
@@ -253,3 +260,55 @@ export function formatValue(value: number, unit: string | undefined, decimals: n
 
 	return sprintf(valuePattern, formatter.format(value));
 }
+
+const DEFAULT_DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
+	year: 'numeric',
+	month: '2-digit',
+	day: '2-digit',
+} as const;
+
+/**
+ * Format a date into a localized string using Intl.DateTimeFormat, with error handling.
+ *
+ * @param dateLike - Date or string
+ * @param locale - Locale to use for formatting
+ * @param options - Intl.DateTimeFormatOptions for formatting the dates
+ *
+ * @returns A formatted date string, e.g. "2025-10-15"
+ */
+export const formatIntlDate = (
+	dateLike: Date | string,
+	locale: Locale | string,
+	options?: Intl.DateTimeFormatOptions,
+): string => {
+	let dateObj: Date;
+	let outcome: string | null = null;
+
+	if (typeof dateLike === 'string') {
+		const maybe = utc(dateLike);
+		if (maybe) {
+			dateObj = maybe;
+		} else {
+			console.error(
+				'Invalid date string provided to formatIntlDate:',
+				dateLike
+			);
+			return dateLike;
+		}
+	} else {
+		dateObj = dateLike;
+	}
+
+	try {
+		const formatter = Intl.DateTimeFormat(locale, {
+			timeZone: 'UTC',
+			...(options || DEFAULT_DATE_FORMAT_OPTIONS),
+		});
+		outcome = formatter.format(dateObj);
+	} catch (err) {
+		console.error('Error formatting date with Intl.DateTimeFormat:', err);
+		outcome = formatUTCDate(dateObj, 'yyyy-MM-dd');
+	}
+
+	return outcome;
+};

@@ -409,17 +409,10 @@ export const S2DLocationModalForecastSummary = (
 		locationData,
 	} = props;
 
-	// 'Forecast Summary' in French would be 'Résumé des Prévisions'
 	const popoverTriggerButtonTitle = __('Forecast Summary');
-	// The button text, when is the same as 'Forecast Summary' when
-	// in french, the Release Date contents may wrap text in a wrong
-	// way so we have to keep this button small.
-	// We could alternatively use BookOpenText from 'lucide-react'
-	const popoverTriggerButtonInner = (
-		<>
-			{__('Summary')}
-		</>
-	);
+	// If we used the same as `popoverTriggerButtonTitle` we'd see
+	// S2DReleaseDate's date wrapped into this button on long-month dates.
+	const popoverTriggerButtonInner = __('Summary');
 	return (
 		<ModalSummaryPopover
 			popoverTriggerButtonTitle={popoverTriggerButtonTitle}

@@ -48,26 +48,29 @@ type WithClassName = {
 	className?: string;
 };
 
-type HistoricalMedianProbabilities = {
+/**
+ * Guard rule: when every probability bar falls below {@link threshold},
+ * the forecast is inconclusive — prepend {@link caveatText} to the summary.
+ */
+type NoClearOutcomeNotice = {
 	/**
-	 * Percent number against what to test (a possibility) for "less than"
+	 * Strict `<` on the raw float (no rounding). Different semantics
+	 * (rounded, tolerance, etc.) → new sibling field, not inline transform.
 	 */
 	threshold: number;
-	/**
-	 * Text to display if "all probabilities" are "less than"
-	 */
-	preamble: string;
+	/** Sentence prepended to the summary when the outcome is inconclusive. */
+	caveatText: string;
 };
 
-const OUTCOME_PROBABILITIES_PREAMBLE = new Map<
+const INCONCLUSIVE_OUTCOME_RULES = new Map<
 	ForecastType,
-	HistoricalMedianProbabilities
+	NoClearOutcomeNotice
 >([
 	[
 		ForecastTypes.EXPECTED,
 		{
 			threshold: 40,
-			preamble: __(
+			caveatText: __(
 				'As all probabilities are lower than 40%, there is no clear forecast outcome.'
 			),
 		},
@@ -76,7 +79,7 @@ const OUTCOME_PROBABILITIES_PREAMBLE = new Map<
 		ForecastTypes.UNUSUAL,
 		{
 			threshold: 30,
-			preamble: __(
+			caveatText: __(
 				'As both probabilities are lower than 30%, there is no clear forecast outcome.'
 			),
 		},
@@ -91,8 +94,8 @@ type LineTheHistoricalMedianProps =
 /**
  * The Historical Median line.
  *
- * Display Historical median line with all information about it
- * and optionnaly a warning when they don't go above a threshold.
+ * Renders the historical-median paragraph; prepends `caveatText` from
+ * {@link NoClearOutcomeNotice} when `forecastHasNoClearOutcome`.
  *
  * Summary line about "mean temperature", when
  * none of the probabilities are above 40%, with
@@ -122,16 +125,17 @@ const LineTheHistoricalMedian = (
 
 	const parts: string[] = [];
 
-	const currentConditions = OUTCOME_PROBABILITIES_PREAMBLE.get(forecastType);
-	if (currentConditions) {
+	const rule = INCONCLUSIVE_OUTCOME_RULES.get(forecastType);
+	if (rule) {
 		const allPercent = progressBars.map(({ percent }) => percent);
-		const allPercentLessThan = allPercent.map(
-			(percent) => Math.floor(percent) < currentConditions.threshold
+		const eachPercentLessThan = allPercent.map(
+			(percent) => percent < rule.threshold
 		);
-		if (allPercentLessThan.includes(false)) {
-			// In other words; NOT "all percents smaller than threshold"
-		} else {
-			parts.push(currentConditions.preamble);
+		const forecastHasNoClearOutcome = eachPercentLessThan.every(
+			(isLessThan) => isLessThan === true
+		);
+		if (forecastHasNoClearOutcome) {
+			parts.push(rule.caveatText);
 		}
 	}
 

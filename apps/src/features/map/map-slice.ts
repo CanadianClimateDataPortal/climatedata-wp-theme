@@ -236,18 +236,6 @@ export const selectLowSkillVisibility =
 		state.map.isLowSkillVisible;
 
 /**
- * Selector that returns the list of recent locations.
- *
- * The "recentLocations" is an array and the currently/most recently selected
- * is the last item in the array.
- *
- * @see {@link MapState.recentLocations}
- */
-export const selectRecentLocations =
-	(state: RootState) =>
-		state.map.recentLocations;
-
-/**
  * The single, currently-selected map location.
  *
  * Reads {@link MapState.selectedLocation} directly. Do NOT derive this from
@@ -257,7 +245,7 @@ export const selectRecentLocations =
  *
  * @see {@link MapState.selectedLocation}
  */
-export const selectCurrentLocation = (state: RootState) =>
+export const selectSelectedLocation = (state: RootState) =>
 	state.map.selectedLocation;
 
 /**
@@ -269,8 +257,8 @@ export const selectCurrentLocation = (state: RootState) =>
  * @example 'Saint-Anthony-of-Padua, QC' - After having clicked on the map at coord. `45.5111111,-73.5552778`
  * @example 'Point (83.1597, -72.1143)' - After having clicked on the map at coord. `83.15965662857204,-72.11425781250001`
  */
-export const selectCurrentLocationTitle = createSelector(
-	[selectCurrentLocation],
+export const selectSelectedLocationTitle = createSelector(
+	[selectSelectedLocation],
 	(current) => {
 		const loc = current
 			&& typeof current.title === 'string'

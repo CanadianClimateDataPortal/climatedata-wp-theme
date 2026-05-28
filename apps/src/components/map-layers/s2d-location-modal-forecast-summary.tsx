@@ -7,7 +7,7 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useLocale } from '@/hooks/use-locale';
 
 import { useAppSelector } from '@/app/hooks';
-import { selectCurrentLocationTitle } from '@/features/map/map-slice';
+import { selectSelectedLocationTitle } from '@/features/map/map-slice';
 
 import S2DReleaseDate from '@/components/s2d-release-date';
 
@@ -176,7 +176,7 @@ const LineTheHistoricalMedian = (
  */
 const LineTitleForecastSummaryFor = (
 ): React.ReactNode => {
-	const currentLocationTitle = useAppSelector(selectCurrentLocationTitle);
+	const currentLocationTitle = useAppSelector(selectSelectedLocationTitle);
 	let formattedTitle = __('Forecast Summary') + ':';
 	if (currentLocationTitle !== null) {
 		formattedTitle = sprintf(

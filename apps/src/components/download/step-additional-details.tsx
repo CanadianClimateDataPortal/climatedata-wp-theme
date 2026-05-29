@@ -511,11 +511,12 @@ const StepAdditionalDetails = React.forwardRef<
 						/>
 						{showSSP3Warning
 							&& <div className="text-neutral-grey-medium text-sm mt-3">
-									{__(`* If SSP3-7.0 is selected above, either alone or with
-									any of the other emissions scenarios, then only 24 models are
-									included in the analysis for all selected scenarios. To use
-									the 26 models available for all emissions scenarios except
-									SSP3-7.0, do not include SSP3-7.0 in your selection above.`)}
+									{__(
+										'* If SSP3-7.0 is selected above, either alone or with any of the other ' +
+										'emissions scenarios, then only 24 models are included in the analysis for ' +
+										'all selected scenarios. To use the 26 models available for all emissions ' +
+										'scenarios except SSP3-7.0, do not include SSP3-7.0 in your selection above.'
+									)}
 								</div>
 						}
 					</div>

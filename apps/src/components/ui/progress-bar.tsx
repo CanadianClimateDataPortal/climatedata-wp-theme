@@ -3,29 +3,12 @@ import { __ } from '@/context/locale-provider';
 import { sprintf } from '@wordpress/i18n';
 import { cn } from '@/lib/utils';
 import { bestContrastingColor } from '@/lib/colors';
-
-export type HexColor = `#${string}`;
-
-export interface ProgressBarProps {
-	/**
-	 * Text to use on top of the progress bar.
-	 */
-	label: string;
-	/**
-	 * Compact cutoff form for the TooltipWidget text,
-	 * e.g. "> 3.5 °C", "1.8 to 3.5 °C", "< 1.0 mm/day".
-	 */
-	labelTooltipCutoff: string;
-	/**
-	 * The width as a percent the bar with background color
-	 * (using fillColor) will take up. A number between 0 and 100.
-	 */
-	percent: number;
-	/**
-	 * Color code to use for the bar
-	 */
-	fillHexCode: HexColor;
-}
+import {
+	type ProgressBarProps,
+} from '@/types/progress-bar';
+import {
+	normalizeProbabilitiesBarChartPercent,
+} from '@/lib/s2d';
 
 /**
  * Progress Bar to illustrate a percent value.
@@ -38,7 +21,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 	percent,
 	fillHexCode,
 }) => {
-	const roundedPercent = Math.round(percent);
+	const roundedPercent = normalizeProbabilitiesBarChartPercent({percent});
 	const screenReaderOnly = sprintf(__('Horizontal bar at %s%% filled'), roundedPercent);
 	const textLightColor = 'text-white';
 	const textDarkColor = 'text-black';

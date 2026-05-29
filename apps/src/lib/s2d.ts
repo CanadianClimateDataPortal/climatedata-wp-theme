@@ -8,6 +8,9 @@ import {
 	FrequencyTypes,
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
+import type {
+	ProgressBarProps,
+} from '@/types/progress-bar';
 import { formatUTCDate, utc } from '@/lib/utils';
 import { formatIntlDate } from '@/lib/format';
 import { __ } from '@/context/locale-provider';
@@ -452,4 +455,17 @@ export const generatePeriodRangeLabel = (
 	const periodEndLabel = formatIntlDate(periodEnd, locale, { month: 'long' });
 
 	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
+};
+
+/**
+ * The way we represent the percent value and cutoff whether its value is one of the probabilities defined by the cutoffs.
+ * The method of trimming decimal values to determine if the value is part of the cutoff.
+ *
+ * @see {@link LocationS2DData} for the cutoffs and probabilities values.
+ * @see {@link getProbabilityColour} for how the normalized percent value is used to determine the colour of the probability bar.
+ */
+export const normalizeProbabilitiesBarChartPercent = (
+	input: Pick<ProgressBarProps, 'percent'>,
+): number => {
+	return Math.round(input.percent);
 };

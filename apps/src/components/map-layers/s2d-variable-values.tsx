@@ -31,7 +31,10 @@ import { buildForecastCategories } from '@/components/map-layers/s2d-build-forec
 import S2DLocationModalForecastSummary from '@/components/map-layers/s2d-location-modal-forecast-summary';
 
 import ProgressBar from '@/components/ui/progress-bar';
-import type { ProgressBarProps } from '@/types/progress-bar';
+import type {
+	HexColor,
+	ProgressBarProps,
+} from '@/types/progress-bar';
 
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import StarRating from '@/components/ui/star-rating';
@@ -186,9 +189,9 @@ export const getProbabilityColour = (
 	outcome: number,
 	percentage: number,
 	colorMap: ColourMap
-): `#${string}` => {
-	const colours = colorMap.colours as `#${string}`[];
-	const defaultColor = '#909090';
+): HexColor => {
+	const colours = colorMap.colours as HexColor[];
+	const defaultColor: HexColor = '#909090';
 	let percentageForQuery = normalizeProbabilitiesBarChartPercent({ percent: percentage });
 
 	/**

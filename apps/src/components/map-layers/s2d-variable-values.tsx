@@ -14,6 +14,7 @@ import { cn, findCeilingIndex, utc } from '@/lib/utils';
 import {
 	extractSkillLevelData,
 	generatePeriodRangeLabel,
+	normalizeProbabilitiesBarChartPercent,
 	type LocationS2DData,
 } from '@/lib/s2d';
 import { ColourMap } from '@/types/types';
@@ -29,9 +30,11 @@ import {
 import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
 import S2DLocationModalForecastSummary from '@/components/map-layers/s2d-location-modal-forecast-summary';
 
+import ProgressBar from '@/components/ui/progress-bar';
+import type { ProgressBarProps } from '@/types/progress-bar';
+
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import StarRating from '@/components/ui/star-rating';
-import ProgressBar, { ProgressBarProps } from '@/components/ui/progress-bar';
 import S2DReleaseDate from '@/components/s2d-release-date';
 import { Spinner } from '@/components/ui/spinner';
 
@@ -186,7 +189,7 @@ export const getProbabilityColour = (
 ): `#${string}` => {
 	const colours = colorMap.colours as `#${string}`[];
 	const defaultColor = '#909090';
-	let percentageForQuery = Math.round(percentage);
+	let percentageForQuery = normalizeProbabilitiesBarChartPercent({ percent: percentage });
 
 	/**
 	 * For values falling exactly on the limit between two colors, we always
@@ -833,7 +836,7 @@ const ProbabilitiesPart = (
 					<li key={idx} className="mt-2 ml-4">
 						{sprintf(
 							__('%d%% probability of being %s (%s)'),
-							Math.round(bar.percent),
+							normalizeProbabilitiesBarChartPercent(bar),
 							forecastCategories[idx].term.toLowerCase(),
 							bar.labelTooltipCutoff,
 						)}

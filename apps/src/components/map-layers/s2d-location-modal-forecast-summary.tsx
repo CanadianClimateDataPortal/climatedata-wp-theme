@@ -13,7 +13,7 @@ import S2DReleaseDate from '@/components/s2d-release-date';
 
 import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
 
-import { type ProgressBarProps } from '@/components/ui/progress-bar';
+import { type ProgressBarProps } from '@/types/progress-bar';
 
 import {
 	ModalSummaryPopover,
@@ -29,6 +29,7 @@ import {
 import {
 	extractSkillLevelData,
 	generatePeriodRangeLabel,
+	normalizeProbabilitiesBarChartPercent,
 	type LocationS2DData,
 } from '@/lib/s2d';
 import {
@@ -129,7 +130,7 @@ const LineTheHistoricalMedian = (
 	if (rule) {
 		const allPercent = progressBars.map(({ percent }) => percent);
 		const eachPercentLessThan = allPercent.map(
-			(percent) => percent < rule.threshold
+			(percent) => normalizeProbabilitiesBarChartPercent({ percent }) < rule.threshold
 		);
 		const forecastHasNoClearOutcome = eachPercentLessThan.every(
 			(isLessThan) => isLessThan === true

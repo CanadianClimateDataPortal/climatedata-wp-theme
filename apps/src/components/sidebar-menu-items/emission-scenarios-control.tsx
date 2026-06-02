@@ -49,11 +49,12 @@ const EmissionScenariosControl: React.FC = () => {
 	return (
 		<SidebarMenuItem>
 			<div className="flex flex-col gap-4">
+				!
 				<Dropdown
 					key={climateVariable?.getId()}
-					label={__('Emissions Scenarios')}
+					label={__('Emissions Scenarios') + ' TESTING FOR CLIM-1096: This is from map side'}
 					tooltip={<EmissionScenariosTooltip />}
-					placeholder={__('Select an option')}
+					placeholder={__('Select an option') + ' TESTING FOR CLIM-1096: This is from map side'}
 					options={scenarioOptions.filter(
 						(option) => option.value !== climateVariable?.getScenarioCompareTo()
 					) ?? []}

@@ -477,6 +477,8 @@ export interface ClimateVariableInterface {
 
 	getScenario(): string | null;
 
+	getDefaultScenario(): string | null;
+
 	getValidScenarioForVersion(version: string): string | null;
 
 	getScenarioCompare(): boolean;

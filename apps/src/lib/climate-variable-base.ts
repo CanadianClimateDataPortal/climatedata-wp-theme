@@ -32,6 +32,76 @@ import { getDefaultFrequency, getFrequencyType, utc } from '@/lib/utils';
 import { MapDisplayType, WMSParams } from '@/types/types';
 
 /**
+ * Preferred default emissions scenario per model version (CLIM-1096).
+ *
+ * The product requirement is that the map should default to SSP2-4.5 (cmip6)
+ * or RCP4.5 (cmip5) whenever that scenario is applicable to the current
+ * variable, rather than blindly picking the first scenario in the list.
+ *
+ * Data-driven descriptor (private source of truth): keyed by the version
+ * string returned by {@link ClimateVariableBase.getVersion}. A version with no
+ * entry here has no preferred scenario and falls back to the first available
+ * scenario. A `Map` lets us look a version up with `.get()` and get
+ * `string | undefined` natively — no key-narrowing cast needed.
+ *
+ * @see {@link ClimateVariableBase.getDefaultScenario}
+ */
+const DEFAULT_SCENARIO_BY_VERSION = new Map<string, string>([
+	['cmip5', 'rcp45'],
+	['cmip6', 'ssp245'],
+]);
+
+/**
+ * Percentile suffix used by precalculated variables whose scenarios encode a
+ * percentile (e.g. sea level, which exposes `rcp45-p50` rather than a bare
+ * `rcp45`). Customer-confirmed median percentile for the default scenario.
+ *
+ * @see {@link ClimateVariableBase.getDefaultScenario}
+ */
+const DEFAULT_SCENARIO_PERCENTILE_SUFFIX = '-p50';
+
+/**
+ * Resolve the default scenario for a given version from a list of scenarios,
+ * applying the CLIM-1096 preference cascade. Single implementation shared by
+ * {@link ClimateVariableBase.getDefaultScenario} and
+ * {@link ClimateVariableBase.getValidScenarioForVersion} so the lazy read and
+ * the eager version-change reset never diverge.
+ *
+ * Cascade (always SSP2-4.5/RCP4.5 when available; never force an inapplicable
+ * choice):
+ * 1. No scenarios → `null` (null-safe for S2D/ahccd variables).
+ * 2. No preferred scenario for this version → fall through to step 5.
+ * 3. Preferred scenario is offered → return it (e.g. `rcp45`, `ssp245`).
+ * 4. Preferred median percentile is offered → return it (e.g. `rcp45-p50`).
+ * 5. Graceful fallback → first available scenario, or `null`.
+ *
+ * @param version - The model version the scenarios belong to, or `null`.
+ * @param scenarios - The scenarios available for that version.
+ *
+ * @returns The preferred default scenario, or `null` when none applies.
+ */
+const resolveDefaultScenario = (
+	version: string | null,
+	scenarios: string[],
+): string | null => {
+	if (scenarios.length === 0) {
+		return null;
+	}
+	const preferred = version ? DEFAULT_SCENARIO_BY_VERSION.get(version) : undefined;
+	if (preferred === undefined) {
+		return scenarios[0] ?? null;
+	}
+	if (scenarios.includes(preferred)) {
+		return preferred;
+	}
+	const preferredPercentile = `${preferred}${DEFAULT_SCENARIO_PERCENTILE_SUFFIX}`;
+	if (scenarios.includes(preferredPercentile)) {
+		return preferredPercentile;
+	}
+	return scenarios[0] ?? null;
+};
+
+/**
  * A base class representing a climate variable and its configuration. This class provides methods
  * to retrieve different aspects of the climate variable configuration, such as versions, thresholds,
  * scenarios, and visualization properties.
@@ -102,19 +172,42 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getScenario(): string | null {
 		// Check if the current scenario actually belongs to the current version.
-		// If not, return the first scenario that belongs to the current version.
+		// An explicit, valid selection (e.g. `?scen=` in the URL) always wins.
 		const currentScenario = this._config.scenario;
 		if (currentScenario && this.getScenarios().includes(currentScenario)) {
 			return currentScenario;
 		}
-		return this.getScenarios()[0] || null;
+		// Otherwise default to the preferred scenario (CLIM-1096), not blindly
+		// the first one in the list.
+		return this.getDefaultScenario();
+	}
+
+	/**
+	 * Resolve the default scenario to display when none is explicitly selected.
+	 *
+	 * Implements the CLIM-1096 preference: the map should default to SSP2-4.5
+	 * (cmip6) or RCP4.5 (cmip5) whenever that scenario is applicable, and never
+	 * force an inapplicable choice. Delegates the cascade to
+	 * {@link resolveDefaultScenario}, which both this method and
+	 * {@link ClimateVariableBase.getValidScenarioForVersion} share so the lazy
+	 * read and the eager version-change reset agree.
+	 *
+	 * @returns The preferred default scenario for the current version, or
+	 *   `null` when the variable exposes no scenarios (e.g. S2D, AHCCD).
+	 */
+	getDefaultScenario(): string | null {
+		const version = this.getVersion();
+		const scenarios = this.getScenarios();
+		return resolveDefaultScenario(version, scenarios);
 	}
 
 	getValidScenarioForVersion(version: string): string | null {
-		// Get scenarios for the specified version
+		// Get scenarios for the specified version, then apply the same
+		// CLIM-1096 preference cascade as getDefaultScenario so the eager
+		// version-change reset and the lazy read never diverge.
 		const scenariosConfig = this.getScenariosConfig() ?? {};
 		const scenarios = scenariosConfig[version] ?? [];
-		return scenarios[0] || null;
+		return resolveDefaultScenario(version, scenarios);
 	}
 
 	getScenarioCompare(): boolean {

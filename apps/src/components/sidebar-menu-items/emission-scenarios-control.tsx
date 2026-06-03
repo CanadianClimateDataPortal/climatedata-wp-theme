@@ -46,42 +46,18 @@ const EmissionScenariosControl: React.FC = () => {
 		dispatch(clearTransformedLegendEntry());
 	}
 
-	// These need better naming than this
-	const scenarioOptionsValueCompareToPredicate /* and proper typing */ = (option) => {
-		const outcome = option.value !== climateVariable?.getScenarioCompareTo();
-		return outcome;
-	};
-	// Pretty much one of these 3
-	let DEFAULT_CHOICE_WE_WANT = '';
-	DEFAULT_CHOICE_WE_WANT = 'ssp245';     // <?dataset=216&var=wet_days&ver=cmip6&scen=ssp245>
-	DEFAULT_CHOICE_WE_WANT = 'rcp45';      // <?dataset=216&var=wet_days&ver=cmip5&scen=rcp45>
-	DEFAULT_CHOICE_WE_WANT = 'rcp45-p50';  // <?dataset=219&var=sea_level&ver=cmip5&scen=rcp85-p50&th=slr>
-	const scenarioOptionsValueContainsWhatWeWantPredicate = (options: Record<'value' | 'label', string>): void | string => {
-		if (
-			// This will clearly need more than only this, or that exact pattern!
-			options && options?.value == DEFAULT_CHOICE_WE_WANT
-		) {
-			return DEFAULT_CHOICE_WE_WANT;
-		}
-	};
-	const dropdownThingOptions = scenarioOptions.filter(scenarioOptionsValueCompareToPredicate) ?? [];
-	let dropdownThingValue = climateVariable?.getScenario() ?? undefined;
-	const testing = dropdownThingOptions.find(scenarioOptionsValueContainsWhatWeWantPredicate);
-	if (testing !== undefined && testing.value) {
-		dropdownThingValue = testing.value;
-	}
-	console.log('RBx', { dropdownThingValue, scenarioOptions, scenarioOptions2: dropdownThingOptions, testing });
-
 	return (
 		<SidebarMenuItem>
 			<div className="flex flex-col gap-4">
 				<Dropdown
 					key={climateVariable?.getId()}
-					label={__('Emissions Scenarios') + ' TESTING FOR CLIM-1096: This is from map side'}
+					label={__('Emissions Scenarios')}
 					tooltip={<EmissionScenariosTooltip />}
-					placeholder={__('Select an option') + ' TESTING FOR CLIM-1096: This is from map side'}
-					options={dropdownThingOptions}
-					value={dropdownThingValue}
+					placeholder={__('Select an option')}
+					options={scenarioOptions.filter(
+						(option) => option.value !== climateVariable?.getScenarioCompareTo()
+					) ?? []}
+					value={climateVariable?.getScenario() ?? undefined}
 					onChange={setScenario}
 				/>
 

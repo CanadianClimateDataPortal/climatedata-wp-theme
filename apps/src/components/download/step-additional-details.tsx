@@ -500,7 +500,7 @@ const StepAdditionalDetails = React.forwardRef<
 					<div className="mb-8 max-w-md">
 						<CheckboxFactory
 							name="emission-scenarios"
-							title={__('Emissions Scenarios') + ' TESTING FOR CLIM-1096: This is from download side'}
+							title={__('Emissions Scenarios')}
 							tooltip={<EmissionScenariosTooltip />}
 							orientation="horizontal"
 							className="max-w-md"

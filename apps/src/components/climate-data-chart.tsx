@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Highcharts, {
 	numberFormat,
 	Options,
@@ -29,7 +29,18 @@ import { getChartDataOptions, getSeriesObject } from '@/config/chart-config';
 import { AveragingType } from "@/types/climate-variable-interface";
 import { trackGraphExport } from '@/lib/google-analytics';
 
-type TabValue = 'annual-values' | '30-year-averages' | '30-year-changes';
+/*
+ * Possible types of value aggregation on the chart. The value aggregation
+ * impacts only the value (i.e. popup) shown when hovering the graph, it doesn't
+ * impact the graph itself.
+ *
+ * - 'individual-values': The value of each individual point is shown.
+ * - 'period-averages': The average of the values of the period is shown (ex:
+ *     average over a 30-year period).
+ * - 'period-changes': The _difference_ between the period average (like
+ *     'period-averages') and a reference period.
+ */
+type TabValue = 'individual-values' | 'period-averages' | 'period-changes';
 
 interface Tab {
 	value: TabValue;
@@ -81,6 +92,59 @@ function addClimateZonePlotBands(options: Options) {
 }
 
 /**
+ * Return the aggregation tabs to be displayed.
+ *
+ * @param climateVariableId - The ID of the displayed variable.
+ * @param averagingOptions - The available averaging options for the variable.
+ */
+function getGraphTabs(climateVariableId: string, averagingOptions: AveragingType[]): Tab[] {
+	const isAllYearsAveragingEnabled = averagingOptions.includes(AveragingType.ALL_YEARS);
+	const isThirtyYearAveragingEnabled = averagingOptions.includes(AveragingType.THIRTY_YEARS);
+
+	const all_tabs: Tab[] = [
+		{
+			value: 'individual-values',
+			label: __('Annual values'),
+			enabled: isAllYearsAveragingEnabled,
+		},
+		{
+			value: 'period-averages',
+			label: __('30-year averages'),
+			enabled: isThirtyYearAveragingEnabled,
+		},
+		{
+			value: 'period-changes',
+			label: __('30-year changes'),
+			enabled: isThirtyYearAveragingEnabled,
+		},
+	];
+
+	if (climateVariableId === 'msc_climate_normals') {
+		return [all_tabs[0]];
+	}
+
+
+	return all_tabs;
+}
+
+/**
+ * Return which of the aggregation tab must be selected by default.
+ *
+ * @param tabs - The tabs available.
+ */
+function getDefaultActiveTab(tabs: Tab[]): TabValue {
+	// By default, we prioritize 'period-averages', if enabled.
+	const preferredDefaultTab = tabs.find((tab) => tab.value === 'period-averages');
+
+	if (preferredDefaultTab && preferredDefaultTab.enabled) {
+		return preferredDefaultTab.value;
+	}
+
+	// Else, we return the first enabled tab, or 'individual-values' as fallback.
+	return tabs.find((tab) => tab.enabled)?.value ?? 'individual-values';
+}
+
+/**
  * Component to render a chart using Highcharts with climate data.
  */
 const ClimateDataChart: React.FC<{
@@ -105,14 +169,28 @@ const ClimateDataChart: React.FC<{
 	const climateVariableId = climateVariable?.getId();
 	const version = climateVariable?.getVersion();
 	const unit = climateVariable?.getUnit();
+	const averagingOptions = climateVariable?.getAveragingOptions() ?? [];
 	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	// If the navigator shown below the graph is displayed
+	const enableChartNavigator = climateVariableId !== 'msc_climate_normals';
 
-	const [enableTabs, setEnableTabs] = useState(true);
-	const [activeTab, setActiveTab] = useState<TabValue>('annual-values');
+	// Aggregation tabs to display
+	const tabs: Tab[] = useMemo(() => {
+		if (climateVariableId == null) {
+			return [];
+		}
+
+		return getGraphTabs(climateVariableId, averagingOptions);
+	}, [climateVariableId, averagingOptions]);
+
+	// If we show the aggregation tabs
+	const enableTabs = tabs.length > 1;
+
+	// The currently selected tab.
+	const [activeTab, setActiveTab] = useState<TabValue>(() => getDefaultActiveTab(tabs));
 	const [activeSeries, setActiveSeries] = useState<string[]>([]);
 	const [activeChartTooltip, setActiveChartTooltip] = useState<Highcharts.TooltipOptions>({});
 	const [activeChartPlotOptions, setActiveChartPlotOptions] = useState<Highcharts.PlotOptions>({});
-	const [enableChartNavigator, setEnableChartNavigator] = useState(true);
 
 	// Subtitle displayed info
 	const datasetLabel = getLocalized(dataset) ?? '';
@@ -244,7 +322,7 @@ const ClimateDataChart: React.FC<{
 	// Chart tooltips
 	const chartTooltips = useMemo(() =>
 		() => ({
-			'annual-values': {
+			'individual-values': {
 				crosshairs: true,
 				shared: true,
 				split: false,
@@ -272,13 +350,13 @@ const ClimateDataChart: React.FC<{
 						}).join('') || '';
 				}
 			},
-			'30-year-averages': {
+			'period-averages': {
 				followPointer: true,
 				formatter: function (this: Point) {
 					return tooltip30yFormatter(this.x, '30y_', false, activeSeries);
 				},
 			},
-			'30-year-changes': {
+			'period-changes': {
 				followPointer: true,
 				formatter: function (this: Point) {
 					return tooltip30yFormatter(this.x, 'delta7100_', true, activeSeries);
@@ -291,7 +369,7 @@ const ClimateDataChart: React.FC<{
 	// Chart plot options
 	const chartPlotOptions = useMemo<() => Record<TabValue, Highcharts.PlotOptions>>(() =>
 		() => ({
-			'annual-values': {
+			'individual-values': {
 				series: {
 					states: {
 						hover: {
@@ -303,7 +381,7 @@ const ClimateDataChart: React.FC<{
 					},
 				},
 			},
-			'30-year-averages': {
+			'period-averages': {
 				series: {
 					states: {
 						hover: {
@@ -315,7 +393,7 @@ const ClimateDataChart: React.FC<{
 					},
 				},
 			},
-			'30-year-changes': {
+			'period-changes': {
 				series: {
 					states: {
 						hover: {
@@ -331,6 +409,20 @@ const ClimateDataChart: React.FC<{
 		[]
 	);
 
+	// When the list of tabs changes, validate that the active tab is still
+	// enabled, else change it to the default tab.
+	useEffect(() => {
+		setActiveTab((currentActiveTab) => {
+			const currentTab = tabs.find((tab) => tab.value === currentActiveTab);
+
+			if (currentTab?.enabled) {
+				return currentActiveTab;
+			}
+
+			return getDefaultActiveTab(tabs);
+		});
+	}, [tabs]);
+
 	// Update plot bands when the active tab changes
 	useEffect(() => {
 		// Chart reference
@@ -340,7 +432,7 @@ const ClimateDataChart: React.FC<{
 		chart.xAxis[0].removePlotBand('30y-plot-band',);
 		chart.xAxis[0].removePlotBand('delta-plot-band');
 
-		if(activeTab === '30-year-changes') {
+		if(activeTab === 'period-changes') {
 			// Add plot band for 30y changes
 			chart.xAxis[0].addPlotBand({
 				from: Date.UTC(1971, 0, 1),
@@ -374,13 +466,6 @@ const ClimateDataChart: React.FC<{
 		);
 	}, [activeTab, activeSeries, seriesObject]);
 
-	// Initialize enableTabs state based on the climate variable
-	useEffect(() => {
-		setEnableTabs(climateVariableId !== 'msc_climate_normals');
-		setEnableChartNavigator(climateVariableId !== 'msc_climate_normals');
-	}
-	, [climateVariableId]);
-
 	// initialize activeSeries state with all leys  from the first tab
 	useEffect(() => {
 		setActiveSeries(seriesObject.map((s) => s.custom?.key) || []);
@@ -405,31 +490,6 @@ const ClimateDataChart: React.FC<{
 			__(versionLabel),
 		].filter(Boolean).join('-'));
 	};
-
-	// Tabs configuration
-	const isThirtyYearAveragingEnabled = useCallback(() => {
-		const averagingOptions = climateVariable?.getAveragingOptions() ?? [];
-		return averagingOptions.length > 0 && averagingOptions.includes(AveragingType.THIRTY_YEARS);
-	}, [climateVariable]);
-
-	// Tabs configuration
-	const tabs: Tab[] = useMemo(() => [
-		{
-			value: 'annual-values',
-			label: __('Annual values'),
-			enabled: true,
-		},
-		{
-			value: '30-year-averages',
-			label: __('30-year averages'),
-			enabled: isThirtyYearAveragingEnabled(),
-		},
-		{
-			value: '30-year-changes',
-			label: __('30-year changes'),
-			enabled: isThirtyYearAveragingEnabled(),
-		},
-	], [isThirtyYearAveragingEnabled, __]);
 
 	// Chart options
 	const chartOptions = useMemo<Options>(() => {
@@ -586,7 +646,7 @@ const ClimateDataChart: React.FC<{
 						opacity: 0.6,
 						states: {
 							hover: {
-								enabled: activeTab === 'annual-values',
+								enabled: activeTab === 'individual-values',
 								lineWidth: 0,
 								opacity: 0,
 							},
@@ -756,7 +816,7 @@ const ClimateDataChart: React.FC<{
 								}
 							}
 
-							if(activeTab === 'annual-values') {
+							if(activeTab === 'individual-values') {
 								chart.downloadCSV();
 							} else {
 								const prefixes: string[] = ['30y_', 'delta7100_'];

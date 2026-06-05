@@ -445,7 +445,7 @@ const ClimateDataChart: React.FC<{
 
 	// adds visible property to each series
 	const filteredSeries = useMemo<SeriesOptionsType[]>(() => {
-		return (
+		const series = (
 			seriesObject.map((s) => {
 				const baseSeries = {
 					...s,
@@ -464,6 +464,8 @@ const ClimateDataChart: React.FC<{
 				}
 			}) || []
 		);
+
+		return series.filter((s) => (s.data?.length ?? 0) > 0);
 	}, [activeTab, activeSeries, seriesObject]);
 
 	// initialize activeSeries state with all leys  from the first tab

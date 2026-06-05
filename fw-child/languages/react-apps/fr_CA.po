@@ -1602,3 +1602,12 @@ msgstr "1 sur 30"
 
 msgid "1-in-50"
 msgstr "1 sur 50"
+
+msgid "30-year values"
+msgstr "Valeurs sur 30 ans"
+
+msgid "Return Periods"
+msgstr "Niveaux de retour"
+
+msgid "Return Period"
+msgstr "Niveau de retour"

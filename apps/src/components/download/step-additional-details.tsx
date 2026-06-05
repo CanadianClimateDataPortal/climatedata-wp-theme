@@ -279,6 +279,7 @@ const StepAdditionalDetails = React.forwardRef<
 	const frequency = climateVariable?.getFrequency() as FrequencyType;
 	const selectedPeriods = climateVariable?.getSelectedPeriods();
 	const { isS2DVariable, releaseDate } = useS2D();
+	const isReturnPeriod = climateVariable?.getClass() === 'ReturnPeriodClimateVariable';
 
 	let availablePeriods: ReturnType<typeof getPeriods> = [];
 	if (isS2DVariable && frequency && releaseDate) {
@@ -386,7 +387,7 @@ const StepAdditionalDetails = React.forwardRef<
 		},
 		{
 			value: AveragingType.THIRTY_YEARS,
-			label: __('30-year averages'),
+			label: __(isReturnPeriod ? '30-year values' : '30-year averages'),
 		},
 	].filter((option) =>
 		!isS2DVariable && climateVariable?.getAveragingOptions()?.includes(option.value)

@@ -113,6 +113,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		this._config = config;
 	}
 
+	getConfig(): ClimateVariableConfigInterface {
+		return this._config;
+	}
+
 	getClass(): string {
 		return this._config.class ?? '';
 	}

@@ -1710,17 +1710,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** 1-in-X-Year Annual Maximum Temperature (Return Level) */
 	{
 		id: "return_level_max_temp",
-		class: "RasterPrecalculatedClimateVariable",
-		versions: [ "cmip6" ],
-		legendConfigs: {
-			[MapDisplayType.ABSOLUTE]: {
-				addTopPadding: true,
-			},
-			[MapDisplayType.DELTA]: {
-				hideTopLabel: true,
-				decimals: 1,
-			},
-		},
+		class: "ReturnPeriodClimateVariable",
 		thresholds: [
 			{
 				value: "rl5tasmax",
@@ -1747,9 +1737,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "1-in-50",
 			},
 		],
-		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-		},
 		unit: "degC",
 		preCalculatedCanDCSConfig: {
 			rl5tasmax: [FrequencyType.YS],
@@ -1763,17 +1750,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** 1-in-X-Year Annual Minimum Temperature (Return Level) */
 	{
 		id: "return_level_min_temp",
-		class: "RasterPrecalculatedClimateVariable",
-		versions: [ "cmip6" ],
-		legendConfigs: {
-			[MapDisplayType.ABSOLUTE]: {
-				addTopPadding: true,
-			},
-			[MapDisplayType.DELTA]: {
-				hideTopLabel: true,
-				decimals: 1,
-			},
-		},
+		class: "ReturnPeriodClimateVariable",
 		thresholds: [
 			{
 				value: "rl5tasmin",
@@ -1800,9 +1777,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "1-in-50",
 			},
 		],
-		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-		},
 		unit: "degC",
 		preCalculatedCanDCSConfig: {
 			rl5tasmin: [FrequencyType.YS],
@@ -1816,17 +1790,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** 1-in-X-Year Annual Maximum 1-Day Precipitation (Return Level) */
 	{
 		id: "return_level_precipitation",
-		class: "RasterPrecalculatedClimateVariable",
-		versions: [ "cmip6" ],
-		legendConfigs: {
-			[MapDisplayType.ABSOLUTE]: {
-				addTopPadding: true,
-			},
-			[MapDisplayType.DELTA]: {
-				hideTopLabel: true,
-				decimals: 1,
-			},
-		},
+		class: "ReturnPeriodClimateVariable",
 		thresholds: [
 			{
 				value: "rl5pr",
@@ -1853,9 +1817,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "1-in-50",
 			},
 		],
-		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-		},
 		unit: "mm",
 		preCalculatedCanDCSConfig: {
 			rl5pr: [FrequencyType.YS],

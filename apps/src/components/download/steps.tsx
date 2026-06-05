@@ -389,6 +389,12 @@ const Steps: React.FC = () => {
 							}
 						}
 					}
+					/**
+					 * outputName might look like, we have to escape paths:
+					 * - "tx_tn_days_above_health_North Shore/Coast Garibaldi Health Service Delivery Area"
+					 */
+					outputName = outputName
+												.replace(/[/\\]/g, '_');
 					console.log('RBx 4', outputName);
 					inputs.push({ id: 'output_name', data: outputName });
 				}

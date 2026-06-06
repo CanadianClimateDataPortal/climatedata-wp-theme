@@ -234,9 +234,6 @@ const Steps: React.FC = () => {
 				let latList = '';
 				let lonList = '';
 
-
-				console.log('RBx 0', { interactiveRegion, isUserRegion, selectedPoints });
-
 				if (
 					interactiveRegion &&
 					interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA &&
@@ -257,9 +254,6 @@ const Steps: React.FC = () => {
 						dispatch(setRequestError('Failed to fetch region grid points'));
 						return;
 					}
-
-					console.log('RBx 1', { regionId, url });
-
 				} else if (selectedPoints && Object.keys(selectedPoints).length > 0) {
 					latList = Object.values(selectedPoints).map((c) => c.lat).join(',');
 					lonList = Object.values(selectedPoints).map((c) => c.lng).join(',');
@@ -270,9 +264,6 @@ const Steps: React.FC = () => {
 
 				if (isDailyRequest) {
 					const selectedRegion = climateVariable.getSelectedRegion();
-
-					console.log('RBx 2 isDailyRequest', selectedRegion);
-
 					if (selectedRegion) {
 						const bounds = selectedRegion.bounds as [
 							[number, number],
@@ -290,8 +281,6 @@ const Steps: React.FC = () => {
 							inputs.push({ id: 'lon0', data: lonList });
 						}
 					}
-
-					console.log('RBx 3', { inputs, isUserRegion });
 				} else if (!isUserRegion) {
 					// We don't include the lat and lon for user custom shapes
 					// (i.e. shapefile)
@@ -392,10 +381,10 @@ const Steps: React.FC = () => {
 					/**
 					 * outputName might look like, we have to escape paths:
 					 * - "tx_tn_days_above_health_North Shore/Coast Garibaldi Health Service Delivery Area"
+					 * - "tx_days_above_health_Tłı̨chǫ Community Services Agen"
 					 */
 					outputName = outputName
 												.replace(/[/\\]/g, '_');
-					console.log('RBx 4', outputName);
 					inputs.push({ id: 'output_name', data: outputName });
 				}
 
@@ -437,8 +426,6 @@ const Steps: React.FC = () => {
 				if (isDailyRequest) {
 					inputs.push({ id: 'variable', data: climateVariable.getFinch?.() || '' });
 				}
-
-				console.log('RBx 5 END', inputs);
 
 				const request_data: { [key: string]: any; } = {};
 				request_data['inputs'] = inputs;

@@ -378,6 +378,14 @@ const Steps: React.FC = () => {
 							}
 						}
 					}
+					/**
+					 * output_name might contain a slash that then gets taken as a directory separator that we have to escape:
+					 * - "tx_tn_days_above_health_North Shore/Coast Garibaldi Health Service Delivery Area"
+					 * Names like the following has been tested to not cause issues:
+					 * - "tx_days_above_health_Tłı̨chǫ Community Services Agen"
+					 */
+					outputName = outputName
+												.replace(/[/\\]/g, '_');
 					inputs.push({ id: 'output_name', data: outputName });
 				}
 

@@ -24,7 +24,7 @@ const tooltipForecastDisplay = __(
 
 const tooltipForecastDisplayLowSkill = __(
 	'Forecasts at locations with no or low skill should be used with caution, or the climatology should be consulted instead. ' +
-		'Click the box to apply cross-hatching over locations with no skill or low skill.'
+		'Click the box to apply hatching over locations with no skill or low skill.'
 );
 
 const tooltipFrequencies = __(

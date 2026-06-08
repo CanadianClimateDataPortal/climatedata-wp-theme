@@ -1607,7 +1607,7 @@ msgid "30-year values"
 msgstr "Valeurs sur 30 ans"
 
 msgid "Return Periods"
-msgstr "Niveaux de retour"
+msgstr "Périodes de retour"
 
 msgid "Return Period"
-msgstr "Niveau de retour"
+msgstr "Période de retour"

@@ -34,13 +34,19 @@ import { trackGraphExport } from '@/lib/google-analytics';
  * impacts only the value (i.e. popup) shown when hovering the graph, it doesn't
  * impact the graph itself.
  *
- * - 'individual-values': The value of each individual point is shown.
- * - 'period-averages': The average of the values of the period is shown (ex:
+ * - INDIVIDUAL_VALUES: The value of each individual point is shown.
+ * - PERIOD_AVERAGES: The average of the values of the period is shown (ex:
  *     average over a 30-year period).
- * - 'period-changes': The _difference_ between the period average (like
- *     'period-averages') and a reference period.
+ * - PERIOD_CHANGES: The _difference_ between the period average (like
+ *     PERIOD_AVERAGES) and a reference period.
  */
-type TabValue = 'individual-values' | 'period-averages' | 'period-changes';
+const TAB_VALUES = {
+	INDIVIDUAL_VALUES: 'individual-values',
+	PERIOD_AVERAGES:   'period-averages',
+	PERIOD_CHANGES:    'period-changes',
+} as const;
+
+type TabValue = typeof TAB_VALUES[keyof typeof TAB_VALUES];
 
 interface Tab {
 	value: TabValue;
@@ -103,17 +109,17 @@ function getGraphTabs(climateVariable: ClimateVariableInterface): Tab[] {
 
 	const allTabs: Tab[] = [
 		{
-			value: 'individual-values',
+			value: TAB_VALUES.INDIVIDUAL_VALUES,
 			label: __('Annual values'),
 			enabled: isAllYearsAveragingEnabled,
 		},
 		{
-			value: 'period-averages',
+			value: TAB_VALUES.PERIOD_AVERAGES,
 			label: __('30-year averages'),
 			enabled: isThirtyYearAveragingEnabled,
 		},
 		{
-			value: 'period-changes',
+			value: TAB_VALUES.PERIOD_CHANGES,
 			label: __('30-year changes'),
 			enabled: isThirtyYearAveragingEnabled,
 		},
@@ -121,7 +127,7 @@ function getGraphTabs(climateVariable: ClimateVariableInterface): Tab[] {
 
 	if (climateVariable.getId() === 'msc_climate_normals') {
 		// We use `filter` because we want to return an array of tabs.
-		return allTabs.filter((tab) => tab.value === 'individual-values');
+		return allTabs.filter((tab) => tab.value === TAB_VALUES.INDIVIDUAL_VALUES);
 	}
 
 	return allTabs;
@@ -133,15 +139,15 @@ function getGraphTabs(climateVariable: ClimateVariableInterface): Tab[] {
  * @param tabs - The tabs available.
  */
 function getDefaultActiveTab(tabs: Tab[]): TabValue {
-	// By default, we prioritize 'period-averages', if enabled.
-	const preferredDefaultTab = tabs.find((tab) => tab.value === 'period-averages');
+	// By default, we prioritize PERIOD_AVERAGES, if enabled.
+	const preferredDefaultTab = tabs.find((tab) => tab.value === TAB_VALUES.PERIOD_AVERAGES);
 
 	if (preferredDefaultTab && preferredDefaultTab.enabled) {
 		return preferredDefaultTab.value;
 	}
 
-	// Else, we return the first enabled tab, or 'individual-values' as fallback.
-	return tabs.find((tab) => tab.enabled)?.value ?? 'individual-values';
+	// Else, we return the first enabled tab, or INDIVIDUAL_VALUES as fallback.
+	return tabs.find((tab) => tab.enabled)?.value ?? TAB_VALUES.INDIVIDUAL_VALUES;
 }
 
 /**
@@ -321,7 +327,7 @@ const ClimateDataChart: React.FC<{
 	// Chart tooltips
 	const chartTooltips = useMemo(() =>
 		() => ({
-			'individual-values': {
+			[TAB_VALUES.INDIVIDUAL_VALUES]: {
 				crosshairs: true,
 				shared: true,
 				split: false,
@@ -349,13 +355,13 @@ const ClimateDataChart: React.FC<{
 						}).join('') || '';
 				}
 			},
-			'period-averages': {
+			[TAB_VALUES.PERIOD_AVERAGES]: {
 				followPointer: true,
 				formatter: function (this: Point) {
 					return tooltipPeriodFormatter(this.x, '30y_', false, activeSeries);
 				},
 			},
-			'period-changes': {
+			[TAB_VALUES.PERIOD_CHANGES]: {
 				followPointer: true,
 				formatter: function (this: Point) {
 					return tooltipPeriodFormatter(this.x, 'delta7100_', true, activeSeries);
@@ -368,7 +374,7 @@ const ClimateDataChart: React.FC<{
 	// Chart plot options
 	const chartPlotOptions = useMemo<() => Record<TabValue, Highcharts.PlotOptions>>(() =>
 		() => ({
-			'individual-values': {
+			[TAB_VALUES.INDIVIDUAL_VALUES]: {
 				series: {
 					states: {
 						hover: {
@@ -380,7 +386,7 @@ const ClimateDataChart: React.FC<{
 					},
 				},
 			},
-			'period-averages': {
+			[TAB_VALUES.PERIOD_AVERAGES]: {
 				series: {
 					states: {
 						hover: {
@@ -392,7 +398,7 @@ const ClimateDataChart: React.FC<{
 					},
 				},
 			},
-			'period-changes': {
+			[TAB_VALUES.PERIOD_CHANGES]: {
 				series: {
 					states: {
 						hover: {
@@ -431,7 +437,7 @@ const ClimateDataChart: React.FC<{
 		chart.xAxis[0].removePlotBand('period-plot-band',);
 		chart.xAxis[0].removePlotBand('delta-plot-band');
 
-		if(activeTab === 'period-changes') {
+		if(activeTab === TAB_VALUES.PERIOD_CHANGES) {
 			// Add plot band for reference period changes
 			chart.xAxis[0].addPlotBand({
 				from: Date.UTC(1971, 0, 1),
@@ -649,7 +655,7 @@ const ClimateDataChart: React.FC<{
 						opacity: 0.6,
 						states: {
 							hover: {
-								enabled: activeTab === 'individual-values',
+								enabled: activeTab === TAB_VALUES.INDIVIDUAL_VALUES,
 								lineWidth: 0,
 								opacity: 0,
 							},
@@ -819,7 +825,7 @@ const ClimateDataChart: React.FC<{
 								}
 							}
 
-							if(activeTab === 'individual-values') {
+							if(activeTab === TAB_VALUES.INDIVIDUAL_VALUES) {
 								chart.downloadCSV();
 							} else {
 								const prefixes: string[] = ['30y_', 'delta7100_'];

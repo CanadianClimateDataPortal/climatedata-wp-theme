@@ -26,7 +26,7 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import appConfig from '@/config/app.config';
 import { doyFormatter, formatValue } from '@/lib/format';
 import { getChartDataOptions, getSeriesObject } from '@/config/chart-config';
-import { AveragingType } from "@/types/climate-variable-interface";
+import { AveragingType, ClimateVariableInterface } from '@/types/climate-variable-interface';
 import { trackGraphExport } from '@/lib/google-analytics';
 
 /*
@@ -94,14 +94,14 @@ function addClimateZonePlotBands(options: Options) {
 /**
  * Return the aggregation tabs to be displayed.
  *
- * @param climateVariableId - The ID of the displayed variable.
- * @param averagingOptions - The available averaging options for the variable.
+ * @param climateVariable - The displayed climate variable.
  */
-function getGraphTabs(climateVariableId: string, averagingOptions: AveragingType[]): Tab[] {
+function getGraphTabs(climateVariable: ClimateVariableInterface): Tab[] {
+	const averagingOptions = climateVariable.getAveragingOptions();
 	const isAllYearsAveragingEnabled = averagingOptions.includes(AveragingType.ALL_YEARS);
 	const isThirtyYearAveragingEnabled = averagingOptions.includes(AveragingType.THIRTY_YEARS);
 
-	const all_tabs: Tab[] = [
+	const allTabs: Tab[] = [
 		{
 			value: 'individual-values',
 			label: __('Annual values'),
@@ -119,12 +119,12 @@ function getGraphTabs(climateVariableId: string, averagingOptions: AveragingType
 		},
 	];
 
-	if (climateVariableId === 'msc_climate_normals') {
-		return [all_tabs[0]];
+	if (climateVariable.getId() === 'msc_climate_normals') {
+		// We use `filter` because we want to return an array of tabs.
+		return allTabs.filter((tab) => tab.value === 'individual-values');
 	}
 
-
-	return all_tabs;
+	return allTabs;
 }
 
 /**
@@ -169,19 +169,18 @@ const ClimateDataChart: React.FC<{
 	const climateVariableId = climateVariable?.getId();
 	const version = climateVariable?.getVersion();
 	const unit = climateVariable?.getUnit();
-	const averagingOptions = climateVariable?.getAveragingOptions() ?? [];
 	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 	// If the navigator shown below the graph is displayed
 	const enableChartNavigator = climateVariableId !== 'msc_climate_normals';
 
 	// Aggregation tabs to display
 	const tabs: Tab[] = useMemo(() => {
-		if (climateVariableId == null) {
+		if (climateVariable == null) {
 			return [];
 		}
 
-		return getGraphTabs(climateVariableId, averagingOptions);
-	}, [climateVariableId, averagingOptions]);
+		return getGraphTabs(climateVariable);
+	}, [climateVariable]);
 
 	// If we show the aggregation tabs
 	const enableTabs = tabs.length > 1;
@@ -235,7 +234,7 @@ const ClimateDataChart: React.FC<{
 	// Get the label for the current threshold, or null if not found.
 	const thresholdLabel = getLabelByValue(threshold);
 
-	// Tooltip: find closest timestamp for 30-years options
+	// Tooltip: find closest timestamp for period options
 	const findClosetTimestamp = (timestamp: number, data: Record<string, number[]> | undefined) => {
 		if (!data) return null;
 		const sortedKeys = Object.keys(data)
@@ -254,15 +253,15 @@ const ClimateDataChart: React.FC<{
 		[data, version, climateVariableId, chartDataOptions]
 	);
 
-	// Tooltip formatter for 30-years averages and changes
-	const tooltip30yFormatter = (x: number, prefix: string, isDelta: boolean, currentActiveSeries: string[]) => {
+	// Tooltip formatter for period averages and changes
+	const tooltipPeriodFormatter = (x: number, prefix: string, isDelta: boolean, currentActiveSeries: string[]) => {
 		// Chart reference
 		const chart = chartRef.current?.chart;
 		if (!chart) {
 			return false;
 		}
 		// Remove previous plot band
-		chart.xAxis[0].removePlotBand('30y-plot-band',);
+		chart.xAxis[0].removePlotBand('period-plot-band');
 
 		// Get current range
 		const currentTimestamp = x;
@@ -281,11 +280,11 @@ const ClimateDataChart: React.FC<{
 		const startYear = new Date(timestampKey).getUTCFullYear();
 		const endYear = startYear + 29;
 
-		// Add plot band on 30-years range
+		// Add plot band on period range
 		chart.xAxis[0].addPlotBand({
 			from: Date.UTC(startYear, 0, 1),
 			to: Date.UTC(startYear + 29, 11, 31),
-			id: '30y-plot-band',
+			id: 'period-plot-band',
 			color: 'rgba(51,63,80,0.1)',
 		});
 
@@ -294,7 +293,7 @@ const ClimateDataChart: React.FC<{
 		if(prefix === "delta7100_") tooltip += ` (${__('Change from ')} 1971-2000)`;
 		tooltip += `</b><br/>`;
 
-		// Iterate on 30y data
+		// Iterate on period data
 		Object.keys(data)
 			.filter((key) => key.startsWith(prefix))
 			.forEach((key) => {
@@ -353,13 +352,13 @@ const ClimateDataChart: React.FC<{
 			'period-averages': {
 				followPointer: true,
 				formatter: function (this: Point) {
-					return tooltip30yFormatter(this.x, '30y_', false, activeSeries);
+					return tooltipPeriodFormatter(this.x, '30y_', false, activeSeries);
 				},
 			},
 			'period-changes': {
 				followPointer: true,
 				formatter: function (this: Point) {
-					return tooltip30yFormatter(this.x, 'delta7100_', true, activeSeries);
+					return tooltipPeriodFormatter(this.x, 'delta7100_', true, activeSeries);
 				},
 			},
 		}),
@@ -429,11 +428,11 @@ const ClimateDataChart: React.FC<{
 		const chart = chartRef.current?.chart;
 		if (!chart) return;
 		// Remove previous plot bands when we change tab
-		chart.xAxis[0].removePlotBand('30y-plot-band',);
+		chart.xAxis[0].removePlotBand('period-plot-band',);
 		chart.xAxis[0].removePlotBand('delta-plot-band');
 
 		if(activeTab === 'period-changes') {
-			// Add plot band for 30y changes
+			// Add plot band for reference period changes
 			chart.xAxis[0].addPlotBand({
 				from: Date.UTC(1971, 0, 1),
 				to: Date.UTC(2000, 11, 31),

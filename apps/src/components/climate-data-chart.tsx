@@ -465,6 +465,8 @@ const ClimateDataChart: React.FC<{
 			}) || []
 		);
 
+		// Remove series without any data (else they would be shown in the
+		// legend but not in the chart).
 		return series.filter((s) => (s.data?.length ?? 0) > 0);
 	}, [activeTab, activeSeries, seriesObject]);
 

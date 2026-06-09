@@ -1707,6 +1707,126 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			rax1day: [FrequencyType.YS, FrequencyType.MS, FrequencyType.QSDEC],
 		},
 	},
+	/** 1-in-X-Year Annual Maximum Temperature (Return Level) */
+	{
+		id: "return_level_max_temp",
+		class: "ReturnPeriodClimateVariable",
+		thresholds: [
+			{
+				value: "rl5tasmax",
+				label: "1-in-5",
+			},
+			{
+				value: "rl10tasmax",
+				label: "1-in-10",
+			},
+			{
+				value: "rl20tasmax",
+				label: "1-in-20",
+			},
+			{
+				value: "rl25tasmax",
+				label: "1-in-25",
+			},
+			{
+				value: "rl30tasmax",
+				label: "1-in-30",
+			},
+			{
+				value: "rl50tasmax",
+				label: "1-in-50",
+			},
+		],
+		unit: "degC",
+		preCalculatedCanDCSConfig: {
+			rl5tasmax: [FrequencyType.YS],
+			rl10tasmax: [FrequencyType.YS],
+			rl20tasmax: [FrequencyType.YS],
+			rl25tasmax: [FrequencyType.YS],
+			rl30tasmax: [FrequencyType.YS],
+			rl50tasmax: [FrequencyType.YS],
+		},
+	},
+	/** 1-in-X-Year Annual Minimum Temperature (Return Level) */
+	{
+		id: "return_level_min_temp",
+		class: "ReturnPeriodClimateVariable",
+		thresholds: [
+			{
+				value: "rl5tasmin",
+				label: "1-in-5",
+			},
+			{
+				value: "rl10tasmin",
+				label: "1-in-10",
+			},
+			{
+				value: "rl20tasmin",
+				label: "1-in-20",
+			},
+			{
+				value: "rl25tasmin",
+				label: "1-in-25",
+			},
+			{
+				value: "rl30tasmin",
+				label: "1-in-30",
+			},
+			{
+				value: "rl50tasmin",
+				label: "1-in-50",
+			},
+		],
+		unit: "degC",
+		preCalculatedCanDCSConfig: {
+			rl5tasmin: [FrequencyType.YS],
+			rl10tasmin: [FrequencyType.YS],
+			rl20tasmin: [FrequencyType.YS],
+			rl25tasmin: [FrequencyType.YS],
+			rl30tasmin: [FrequencyType.YS],
+			rl50tasmin: [FrequencyType.YS],
+		},
+	},
+	/** 1-in-X-Year Annual Maximum 1-Day Precipitation (Return Level) */
+	{
+		id: "return_level_precipitation",
+		class: "ReturnPeriodClimateVariable",
+		thresholds: [
+			{
+				value: "rl5pr",
+				label: "1-in-5",
+			},
+			{
+				value: "rl10pr",
+				label: "1-in-10",
+			},
+			{
+				value: "rl20pr",
+				label: "1-in-20",
+			},
+			{
+				value: "rl25pr",
+				label: "1-in-25",
+			},
+			{
+				value: "rl30pr",
+				label: "1-in-30",
+			},
+			{
+				value: "rl50pr",
+				label: "1-in-50",
+			},
+		],
+		unit: "mm",
+		preCalculatedCanDCSConfig: {
+			rl5pr: [FrequencyType.YS],
+			rl10pr: [FrequencyType.YS],
+			rl20pr: [FrequencyType.YS],
+			rl25pr: [FrequencyType.YS],
+			rl30pr: [FrequencyType.YS],
+			rl50pr: [FrequencyType.YS],
+		},
+	},
 	/** Relative Sea-Level Change */
 	{
 		id: "sea_level",

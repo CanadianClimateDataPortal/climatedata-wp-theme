@@ -12,6 +12,9 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 const ThresholdSelect: React.FC = () => {
 	const { climateVariable, setThreshold } = useClimateVariable();
+	const isReturnPeriod = climateVariable?.getClass() === 'ReturnPeriodClimateVariable';
+	let options = climateVariable?.getThresholds() ?? [];
+	options = options.map((option) => ({ label: __(option.label), value: option.value }));
 
 	const Tooltip = () => (
 		<div>
@@ -27,9 +30,9 @@ const ThresholdSelect: React.FC = () => {
 		<Dropdown
 			className="sm:w-64"
 			placeholder={__('Select an option')}
-			options={climateVariable?.getThresholds() ?? []}
-			label={__('Threshold Values')}
-			tooltip={<Tooltip />}
+			options={options}
+			label={__(isReturnPeriod ? 'Return Periods' : 'Threshold Values')}
+			tooltip={isReturnPeriod ? null : <Tooltip />}
 			value={climateVariable?.getThreshold() ?? undefined}
 			onChange={setThreshold}
 		/>

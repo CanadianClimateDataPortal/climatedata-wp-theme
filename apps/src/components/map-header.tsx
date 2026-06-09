@@ -144,7 +144,7 @@ const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 			{variableTitle && (
 				<Button
 					variant="ghost"
-					className="breadcrumb-button text-md text-cdc-black hover:text-dark-purple hover:bg-transparent p-0 h-auto"
+					className="breadcrumb-button text-md text-cdc-black hover:text-dark-purple hover:bg-transparent p-0 h-auto whitespace-normal"
 					onClick={onClick}
 					aria-label={__('View details')}
 				>

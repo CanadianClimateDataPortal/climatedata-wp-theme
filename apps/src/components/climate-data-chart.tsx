@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Highcharts, {
+	Chart,
 	numberFormat,
 	Options,
 	Point,
@@ -98,6 +99,44 @@ function addClimateZonePlotBands(options: Options) {
 }
 
 /**
+ * Add an extra padding to the X-axis.
+ *
+ * This method should be called after the chart has rendered, to be able to
+ * retrieve the current maximum values of the axis.
+ *
+ * @param chart - The chart to extend
+ * @param extraStart - Additional padding to add at the beginning of the axe
+ * @param extraEnd - Additional padding to add at the end of the axe
+ */
+function extendChartXAxis(
+	chart: Chart,
+	extraStart: number|undefined,
+	extraEnd: number|undefined,
+) {
+	const xAxis = chart.xAxis[0];
+
+	if (!xAxis) {
+		return;
+	}
+
+	// By default, we reset the extremes
+	let newMin: number|undefined = undefined;
+	let newMax: number|undefined = undefined;
+
+	const { dataMin, dataMax } = xAxis.getExtremes();
+
+	if (extraStart) {
+		newMin = dataMin - extraStart;
+	}
+
+	if (extraEnd) {
+		newMax = dataMax + extraEnd;
+	}
+
+	xAxis.setExtremes(newMin, newMax);
+}
+
+/**
  * Return the aggregation tabs to be displayed.
  *
  * @param climateVariable - The displayed climate variable.
@@ -106,6 +145,7 @@ function getGraphTabs(climateVariable: ClimateVariableInterface): Tab[] {
 	const averagingOptions = climateVariable.getAveragingOptions();
 	const isAllYearsAveragingEnabled = averagingOptions.includes(AveragingType.ALL_YEARS);
 	const isThirtyYearAveragingEnabled = averagingOptions.includes(AveragingType.THIRTY_YEARS);
+	const isReturnPeriod = climateVariable.getClass() === 'ReturnPeriodClimateVariable';
 
 	const allTabs: Tab[] = [
 		{
@@ -115,7 +155,7 @@ function getGraphTabs(climateVariable: ClimateVariableInterface): Tab[] {
 		},
 		{
 			value: TAB_VALUES.PERIOD_AVERAGES,
-			label: __('30-year averages'),
+			label: __(isReturnPeriod ? '30-year values' : '30-year averages'),
 			enabled: isThirtyYearAveragingEnabled,
 		},
 		{
@@ -128,6 +168,11 @@ function getGraphTabs(climateVariable: ClimateVariableInterface): Tab[] {
 	if (climateVariable.getId() === 'msc_climate_normals') {
 		// We use `filter` because we want to return an array of tabs.
 		return allTabs.filter((tab) => tab.value === TAB_VALUES.INDIVIDUAL_VALUES);
+	}
+
+	if (isReturnPeriod) {
+		// We filter out the 'individual-values' tab for Return Period.
+		return allTabs.filter((tab) => tab.value !== TAB_VALUES.INDIVIDUAL_VALUES);
 	}
 
 	return allTabs;
@@ -149,6 +194,8 @@ function getDefaultActiveTab(tabs: Tab[]): TabValue {
 	// Else, we return the first enabled tab, or INDIVIDUAL_VALUES as fallback.
 	return tabs.find((tab) => tab.enabled)?.value ?? TAB_VALUES.INDIVIDUAL_VALUES;
 }
+
+const FIFTEEN_YEARS = 15 * 365 * 24 * 60 * 60 * 1000;
 
 /**
  * Component to render a chart using Highcharts with climate data.
@@ -178,6 +225,7 @@ const ClimateDataChart: React.FC<{
 	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 	// If the navigator shown below the graph is displayed
 	const enableChartNavigator = climateVariableId !== 'msc_climate_normals';
+	const isReturnPeriod = climateVariable?.getClass() === 'ReturnPeriodClimateVariable';
 
 	// Aggregation tabs to display
 	const tabs: Tab[] = useMemo(() => {
@@ -283,13 +331,18 @@ const ClimateDataChart: React.FC<{
 		}
 
 		// Displayed period
-		const startYear = new Date(timestampKey).getUTCFullYear();
+		let startYear = new Date(timestampKey).getUTCFullYear();
+
+		if (isReturnPeriod) {
+			startYear -= 15;
+		}
+
 		const endYear = startYear + 29;
 
 		// Add plot band on period range
 		chart.xAxis[0].addPlotBand({
 			from: Date.UTC(startYear, 0, 1),
-			to: Date.UTC(startYear + 29, 11, 31),
+			to: Date.UTC(endYear, 11, 31),
 			id: 'period-plot-band',
 			color: 'rgba(51,63,80,0.1)',
 		});
@@ -705,6 +758,26 @@ const ClimateDataChart: React.FC<{
 
 		return options;
 	}, [climateVariable, climateVariableId, locale, title, filteredSeries, activeChartTooltip, activeChartPlotOptions]);
+
+	/*
+	 * For the Return Period variable, we extend the X-axis to allow the
+	 * period's gray block to be fully shown at extremities.
+	 */
+	useEffect(() => {
+		const chart = chartRef.current?.chart;
+
+		if (!chart || !isReturnPeriod || !activeTab.startsWith('period')) {
+			return;
+		}
+
+		// Timeout of 0 to allow the HighChart component to render before
+		// extending the X-axis.
+		const timeoutId = window.setTimeout(() => {
+			extendChartXAxis(chart, FIFTEEN_YEARS, FIFTEEN_YEARS);
+		}, 0);
+
+		return () => window.clearTimeout(timeoutId);
+	}, [chartOptions, isReturnPeriod, activeTab]);
 
 	// Export CSV from data
 	const exportCsvFromData = (data: Record<string, Record<string, number[]>>): string => {

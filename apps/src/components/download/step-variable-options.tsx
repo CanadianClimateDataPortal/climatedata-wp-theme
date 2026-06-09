@@ -201,6 +201,7 @@ export const StepSummaryVariableOptions = (): React.ReactNode | null => {
 	const { climateVariable } = useClimateVariable();
 	const { isS2DVariable } = useS2D();
 	const items: DefinitionItem[] = [];
+	const isReturnPeriod = climateVariable?.getClass() === 'ReturnPeriodClimateVariable';
 
 	if (!climateVariable) {
 		return null;
@@ -255,8 +256,8 @@ export const StepSummaryVariableOptions = (): React.ReactNode | null => {
 			const label = thresholdPossibleValues.find((t) => t.value === selectedThresholdValue)?.label;
 			if (label) {
 				items.push({
-					term: __('Threshold'),
-					details: label,
+					term: __(isReturnPeriod ? 'Return Period' : 'Threshold'),
+					details: __(label),
 				});
 			}
 		}

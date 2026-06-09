@@ -1584,3 +1584,30 @@ msgstr "REMARQUE: Le propriétaire des données nous a informés de la présence
 
 msgid  "White: No clear outcome"
 msgstr "Blanc: Aucun résultat significatif"
+
+msgid "1-in-5"
+msgstr "1 sur 5"
+
+msgid "1-in-10"
+msgstr "1 sur 10"
+
+msgid "1-in-20"
+msgstr "1 sur 20"
+
+msgid "1-in-25"
+msgstr "1 sur 25"
+
+msgid "1-in-30"
+msgstr "1 sur 30"
+
+msgid "1-in-50"
+msgstr "1 sur 50"
+
+msgid "30-year values"
+msgstr "Valeurs sur 30 ans"
+
+msgid "Return Periods"
+msgstr "Périodes de retour"
+
+msgid "Return Period"
+msgstr "Période de retour"

@@ -30,6 +30,7 @@ import StationDataClimateVariable from "@/lib/station-data-climate-variable";
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { formatUTCDate } from '@/lib/utils';
+import ReturnPeriodClimateVariable from '@/lib/return-period-climate-variable';
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
@@ -84,6 +85,7 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 	StationClimateVariable: StationClimateVariable,
 	StationDataClimateVariable: StationDataClimateVariable,
 	S2DClimateVariable: S2DClimateVariable,
+	ReturnPeriodClimateVariable: ReturnPeriodClimateVariable,
 };
 
 /**

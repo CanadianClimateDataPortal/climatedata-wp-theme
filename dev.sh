@@ -209,11 +209,6 @@ function task-runner-shell {
 }
 
 function compile-react-apps-translation {
-  # open 'docs/translate-the-site.md'
-  # open 'https://github.com/CanadianClimateDataPortal/climatedata-wp-theme/blob/main/docs/translate-the-site.md#react-apps-translation'
-  # ./dev.sh portal-shell
-  # cd /var/www/html/assets/themes/fw-child
-  # wp i18n make-mo languages/react-apps/fr_CA.po
   (
     set -e
 

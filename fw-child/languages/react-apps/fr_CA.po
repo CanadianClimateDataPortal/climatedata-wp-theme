@@ -1163,7 +1163,7 @@ msgstr "Masquer les prévisions de faible habileté"
 
 # Tooltip: Mask Low Skill
 msgid "Forecasts at locations with no or low skill should be used with caution, or the climatology should be consulted instead. "
-  "Click the box to apply cross-hatching over locations with no skill or low skill."
+  "Click the box to apply hatching over locations with no skill or low skill."
 msgstr "Les prévisions pour les endroits où l’habileté est nulle ou faible doivent être utilisées avec prudence, "
   "ou il est préférable de consulter la climatologie. Cliquez sur la case pour appliquer des hachures sur les endroits où "
   "l’habileté est nulle ou faible."

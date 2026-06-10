@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { __ } from '@/context/locale-provider';
 
@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setDataset } from '@/features/download/download-slice';
 import { fetchTaxonomyData } from '@/services/services';
 import { TaxonomyData } from '@/types/types';
-import { StepComponentProps, StepComponentRef } from '@/types/download-form-interface';
+import { StepComponent } from '@/types/download-form-interface';
 
 // This has to be done better
 export type PayloadShapeDataset = {
@@ -39,10 +39,7 @@ export type PayloadShapeDataset = {
  *
  * Dataset step
  */
-const StepDataset = React.forwardRef<
-	StepComponentRef,
-	StepComponentProps
->(({ onChangeValidity }, ref) => {
+const StepDataset: StepComponent = ({ onChangeValidity }) => {
 	const [options, setOptions] = useState<TaxonomyData[]>([]);
 
 	const { locale } = useLocale();
@@ -56,14 +53,6 @@ const StepDataset = React.forwardRef<
 	useEffect(() => {
 		onChangeValidity(Boolean(dataset))
 	}, [dataset, onChangeValidity]);
-
-	React.useImperativeHandle(ref, () => ({
-		getResetPayload: () => {
-			return {
-				dataset: null
-			};
-		}
-	}), []);
 
 	useEffect(() => {
 		fetchTaxonomyData('datasets', 'download').then((data) => {
@@ -116,7 +105,9 @@ const StepDataset = React.forwardRef<
 			</div>
 		</StepContainer>
 	);
-});
+};
+// Explicit string literal — step-summary.tsx branches on these names, and a
+// derived function name would not survive minification.
 StepDataset.displayName = 'StepDataset';
 
 export default StepDataset;

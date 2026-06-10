@@ -9,7 +9,7 @@ import {
 	StepContainerDescription,
 } from '@/components/download/step-container';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { StepComponentProps, StepComponentRef } from "@/types/download-form-interface";
+import { StepComponent } from "@/types/download-form-interface";
 import RasterDownloadMap from '@/components/download/raster-download-map';
 import { useShapefile } from '@/hooks/use-shapefile';
 
@@ -83,13 +83,12 @@ function getShapefileErrorMessage(
  *
  * Location step, allows the user to make a selection on the map and choose what type of region to select
  */
-const StepLocation = React.forwardRef<
-	StepComponentRef,
-	StepComponentProps
->(({ onChangeValidity, onChangeErrorMessages }, ref) => {
+const StepLocation: StepComponent = ({
+	onChangeValidity,
+	onChangeErrorMessages,
+}) => {
 	const { climateVariable } = useClimateVariable();
 	const {
-		reset: resetShapefile,
 		isSelectionValid: isShapefileSelectionValid,
 		file: shapefileFile,
 		errorCode: shapefileErrorCode,
@@ -151,21 +150,6 @@ const StepLocation = React.forwardRef<
 		selectedShapefileShapes,
 	]);
 
-	React.useImperativeHandle(ref, () => ({
-		reset: () => {
-			// Reset the shapefile state. The selection-mode reset now fires
-			// from the provider's resetStepsAfter, mount-independent.
-			resetShapefile();
-		},
-		getResetPayload: () => {
-			return {
-				selectedPoints: {},
-				selectedRegion: null,
-				interactiveRegion: null,
-			};
-		},
-	}), [resetShapefile]);
-
 	return (
 		<StepContainer title={__('Select a location or area')}>
 			<StepContainerDescription>
@@ -176,7 +160,9 @@ const StepLocation = React.forwardRef<
 			<RasterDownloadMap />
 		</StepContainer>
 	);
-});
+};
+// Explicit string literal — step-summary.tsx branches on these names, and a
+// derived function name would not survive minification.
 StepLocation.displayName = 'StepLocation';
 
 export default StepLocation;

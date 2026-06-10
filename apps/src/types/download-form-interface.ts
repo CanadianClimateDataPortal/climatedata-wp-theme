@@ -9,17 +9,6 @@ export interface StepResetPayload {
 }
 
 /**
- * Interface for step components that need to validate their state
- * and provide reset functionality when navigating backwards
- */
-export interface StepComponentRef {
-	/** Returns the data that should be reset when navigating backwards */
-	getResetPayload?: () => StepResetPayload;
-	/** Execute any other operations to reset the step. */
-	reset?: () => void;
-}
-
-/**
  * Type for a member of the "inputs" fields in a Finch request.
  */
 export type FinchRequestInput = {
@@ -37,6 +26,4 @@ export type StepComponentProps = {
 	onChangeErrorMessages: (messages: StepErrorMessage[]) => void;
 };
 
-export type StepComponent = React.ForwardRefExoticComponent<
-	React.PropsWithoutRef<StepComponentProps> & React.RefAttributes<StepComponentRef>
->;
+export type StepComponent = React.FC<StepComponentProps>;

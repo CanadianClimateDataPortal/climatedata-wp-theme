@@ -5,11 +5,11 @@ import type { ClimateVariableConfigInterface } from '@/types/climate-variable-in
  *
  * @remarks
  * Mirrors the positional order of the `STEPS` tuple in
- * {@link ../../components/download/config.ts}. The wizard registers step refs
- * with 1-based keys (see `registerStepRef` in `download-provider.tsx`), so the
- * derivation logic here is keyed on the same 1-based ordinals rather than the
- * 0-based array indexes. There is intentionally NO `Step` enum in the codebase;
- * these are the shared literal constants used in its place.
+ * {@link ../../components/download/config.ts}. The wizard tracks `currentStep`
+ * 1-based (`download-provider.tsx`), so the derivation logic here is keyed on
+ * the same 1-based ordinals rather than the 0-based array indexes. There is
+ * intentionally NO `Step` enum in the codebase; these are the shared literal
+ * constants used in its place.
  */
 export const DOWNLOAD_STEPS = {
 	additionalDetails: 5,

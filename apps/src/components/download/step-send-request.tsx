@@ -17,7 +17,7 @@ import {
 	setRequestError,
 	setSubscribe,
 } from '@/features/download/download-slice';
-import { StepComponentProps, StepComponentRef } from '@/types/download-form-interface';
+import { StepComponent } from '@/types/download-form-interface';
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
 
@@ -76,13 +76,10 @@ Captcha.displayName = 'Captcha';
  *
  * Send download request step
  */
-const StepSendRequest = React.forwardRef<
-	StepComponentRef,
-	StepComponentProps
->(({ onChangeValidity }, ref) => {
+const StepSendRequest: StepComponent = ({ onChangeValidity }) => {
 	const captchaValue = useAppSelector((state) => state.download.captchaValue) || '';
 	const [captchaRefresh, setCaptchaRefresh] = useState(Math.random());
-	const {climateVariable, setFileFormat, resetFileFormat, setDecimalPlace} = useClimateVariable();
+	const {climateVariable, setFileFormat, setDecimalPlace} = useClimateVariable();
 
 	const { email, subscribe, requestStatus, requestError } = useAppSelector(
 		(state) => state.download
@@ -119,15 +116,6 @@ const StepSendRequest = React.forwardRef<
 		}
 		onChangeValidity(isValid())
 	}, [climateVariable, downloadType, email, onChangeValidity]);
-
-	React.useImperativeHandle(ref, () => ({
-		reset: () => {
-			// The request-state and captcha resets now fire from the
-			// provider's resetStepsAfter, mount-independent.
-			resetFileFormat();
-		},
-	}), [resetFileFormat]);
-
 
 	const formatOptions = [
 		{ value: FileFormatType.CSV, label: 'CSV' },
@@ -277,7 +265,9 @@ const StepSendRequest = React.forwardRef<
 			{requestStatus === 'error' && <div className="text-red-600 text-sm mt-2">{requestError}</div>}
 		</StepContainer>
 	);
-});
+};
+// Explicit string literal — step-summary.tsx branches on these names, and a
+// derived function name would not survive minification.
 StepSendRequest.displayName = 'StepSendRequest';
 
 /**

@@ -39,7 +39,13 @@
  * });
  */
 
-import React, { createContext, useState, useCallback, useRef, useEffect } from 'react';
+import React, {
+	createContext,
+	useState,
+	useCallback,
+	useRef,
+	useEffect,
+} from 'react';
 import { useDownloadUrlSync } from '@/hooks/use-download-url-sync';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { TaxonomyData } from '@/types/types';
@@ -48,6 +54,7 @@ import { updateClimateVariable } from '@/store/climate-variable-slice';
 import { setCurrentStep } from '@/features/download/download-slice';
 import { STEPS } from '@/components/download/config';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { buildResetPayloadForStepsAfter } from '@/lib/download';
 
 interface DownloadContextValue {
 	steps: typeof STEPS;
@@ -71,7 +78,9 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	// Start at step 2 if URL has variable parameter
 	const params = new URLSearchParams(window.location.search);
 	const hasVariable = params.has('var');
-	const [currentStep, setCurrentStepLocal] = useState<number>(hasVariable ? 2 : 1);
+	const [currentStep, setCurrentStepLocal] = useState<number>(
+		hasVariable ? 2 : 1
+	);
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
 
@@ -95,15 +104,27 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 				return [...STEPS];
 			}
 
-			if (climateVariable?.getClass() === 'StationClimateVariable' || climateVariable?.getClass() === 'StationDataClimateVariable') {
+			if (
+				climateVariable?.getClass() === 'StationClimateVariable' ||
+				climateVariable?.getClass() === 'StationDataClimateVariable'
+			) {
 				// skip step 3 (variable options) if it's a station variable
 				const skipIndexes = [2];
 				// skip step 5 (additional details) if it's a station variable (but not station variable)
-				if(climateVariable?.getId() !== 'station_data') skipIndexes.push(4);
+				if (climateVariable?.getId() !== 'station_data')
+					skipIndexes.push(4);
 				// skip step 6 (send request) when there's no file format to chose (for "Future Building Design Value Summaries" and "Short-duration Rainfall IDF Data")
-				if(climateVariable?.getId() === 'future_building_design_value_summaries' || climateVariable?.getId() === 'short_duration_rainfall_idf_data') skipIndexes.push(5);
+				if (
+					climateVariable?.getId() ===
+						'future_building_design_value_summaries' ||
+					climateVariable?.getId() ===
+						'short_duration_rainfall_idf_data'
+				)
+					skipIndexes.push(5);
 
-				return STEPS.filter((_, index) => !skipIndexes.includes(index)) as unknown as typeof STEPS;
+				return STEPS.filter(
+					(_, index) => !skipIndexes.includes(index)
+				) as unknown as typeof STEPS;
 			}
 			return [...STEPS];
 		});
@@ -116,13 +137,16 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	 * @param step - The step number (1-based)
 	 * @param ref - The step component's ref, or null to unregister
 	 */
-	const registerStepRef = useCallback((step: number, ref: StepComponentRef | null) => {
-		if (ref) {
-			stepRefs.current.set(step, ref);
-		} else {
-			stepRefs.current.delete(step);
-		}
-	}, []);
+	const registerStepRef = useCallback(
+		(step: number, ref: StepComponentRef | null) => {
+			if (ref) {
+				stepRefs.current.set(step, ref);
+			} else {
+				stepRefs.current.delete(step);
+			}
+		},
+		[]
+	);
 
 	/**
 	 * Resets data for all steps after the target step.
@@ -137,42 +161,47 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	 *
 	 * @param targetStep - The step number being navigated to
 	 */
-	const resetStepsAfter = useCallback((targetStep: number) => {
-		const stepsToReset = Array.from(stepRefs.current.entries())
-			.filter(([step]) => step > targetStep)
-			.sort(([stepA], [stepB]) => stepA - stepB);
+	const resetStepsAfter = useCallback(
+		(targetStep: number) => {
+			const stepsToReset = Array.from(stepRefs.current.entries())
+				.filter(([step]) => step > targetStep)
+				.sort(([stepA], [stepB]) => stepA - stepB);
 
-		stepsToReset.forEach(([_, ref]) => {
-			if (ref.reset) {
-				ref.reset();
+			stepsToReset.forEach(([_, ref]) => {
+				if (ref.reset) {
+					ref.reset();
+				}
+			});
+
+			// Derive the combined reset payload from the climate variable itself,
+			// independent of which step components are currently mounted.
+			const resetPayload = buildResetPayloadForStepsAfter(
+				climateVariable,
+				targetStep
+			);
+
+			if (Object.keys(resetPayload).length > 0) {
+				dispatch(updateClimateVariable(resetPayload));
 			}
-		});
-
-		// For other steps, collect and apply reset payloads
-		const resetPayload = stepsToReset.reduce((payload, [_, ref]) => {
-			if (ref.getResetPayload) {
-				return {
-					...payload,
-					...ref.getResetPayload()
-				};
-			}
-			return payload;
-		}, {});
-
-		if (Object.keys(resetPayload).length > 0) {
-			dispatch(updateClimateVariable(resetPayload));
-		}
-	}, [dispatch]);
+		},
+		[climateVariable, dispatch]
+	);
 
 	/**
 	 * Remove from the steps ref all steps after a specific step number.
 	 */
-	const removeStepsAfter = useCallback((targetStep: number) => {
-		const stepsToRemove = Array.from(stepRefs.current.keys())
-			.filter((step) => step > targetStep);
+	const removeStepsAfter = useCallback(
+		(targetStep: number) => {
+			const stepsToRemove = Array.from(stepRefs.current.keys()).filter(
+				(step) => step > targetStep
+			);
 
-		stepsToRemove.map((step) => { registerStepRef(step, null); });
-	}, [registerStepRef]);
+			stepsToRemove.map((step) => {
+				registerStepRef(step, null);
+			});
+		},
+		[registerStepRef]
+	);
 
 	/**
 	 * Navigates to the next step in the form.
@@ -188,15 +217,18 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	 *
 	 * @param step - The target step number (1-based)
 	 */
-	const goToStep = useCallback((step: number) => {
-		if (step < currentStep) {
-			setCurrentStepLocal(step);
-			resetStepsAfter(step);
-			removeStepsAfter(step);
-		} else {
-			setCurrentStepLocal(step);
-		}
-	}, [currentStep, resetStepsAfter]);
+	const goToStep = useCallback(
+		(step: number) => {
+			if (step < currentStep) {
+				setCurrentStepLocal(step);
+				resetStepsAfter(step);
+				removeStepsAfter(step);
+			} else {
+				setCurrentStepLocal(step);
+			}
+		},
+		[currentStep, resetStepsAfter]
+	);
 
 	const values: DownloadContextValue = {
 		steps,

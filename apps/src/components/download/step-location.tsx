@@ -10,8 +10,6 @@ import {
 } from '@/components/download/step-container';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { StepComponentProps, StepComponentRef } from "@/types/download-form-interface";
-import { useAppDispatch } from '@/app/hooks';
-import { setSelectionMode } from '@/features/download/download-slice';
 import RasterDownloadMap from '@/components/download/raster-download-map';
 import { useShapefile } from '@/hooks/use-shapefile';
 
@@ -102,7 +100,6 @@ const StepLocation = React.forwardRef<
 	const isRegionSelected = Boolean(climateVariable?.getSelectedRegion());
 	const selectedPointsCount = climateVariable?.getSelectedPointsCount() ?? 0;
 
-	const dispatch = useAppDispatch();
 
 	let isStepValid = true;
 
@@ -156,9 +153,8 @@ const StepLocation = React.forwardRef<
 
 	React.useImperativeHandle(ref, () => ({
 		reset: () => {
-			// Reset the selection mode
-			dispatch(setSelectionMode('cells'));
-			// Reset the shapefile state
+			// Reset the shapefile state. The selection-mode reset now fires
+			// from the provider's resetStepsAfter, mount-independent.
 			resetShapefile();
 		},
 		getResetPayload: () => {
@@ -168,7 +164,7 @@ const StepLocation = React.forwardRef<
 				interactiveRegion: null,
 			};
 		},
-	}), [dispatch, resetShapefile]);
+	}), [resetShapefile]);
 
 	return (
 		<StepContainer title={__('Select a location or area')}>

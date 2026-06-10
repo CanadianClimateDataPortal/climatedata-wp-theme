@@ -50,11 +50,23 @@ import { useDownloadUrlSync } from '@/hooks/use-download-url-sync';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { TaxonomyData } from '@/types/types';
 import { StepComponentRef } from '@/types/download-form-interface';
-import { updateClimateVariable } from '@/store/climate-variable-slice';
-import { setCurrentStep } from '@/features/download/download-slice';
+import {
+	setClimateVariable,
+	updateClimateVariable,
+} from '@/store/climate-variable-slice';
+import {
+	resetRequestState,
+	setCaptchaValue,
+	setCurrentStep,
+	setSelectionMode,
+} from '@/features/download/download-slice';
 import { STEPS } from '@/components/download/config';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { buildResetPayloadForStepsAfter } from '@/lib/download';
+import {
+	buildResetPayloadForStepsAfter,
+	determineStepApplicable,
+	DOWNLOAD_STEPS,
+} from '@/lib/download';
 
 interface DownloadContextValue {
 	steps: typeof STEPS;
@@ -172,6 +184,33 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 					ref.reset();
 				}
 			});
+
+			// Fire the Redux-only step reset side-effects independent of which
+			// step components are currently mounted. Gated EXACTLY like the
+			// payload derivation (step > targetStep AND the step is applicable
+			// for this variable) so a skipped step contributes nothing — the
+			// same behaviour as a skipped step never registering a ref.
+			const isVariableStepReset =
+				DOWNLOAD_STEPS.variable > targetStep &&
+				determineStepApplicable(climateVariable, DOWNLOAD_STEPS.variable);
+			if (isVariableStepReset) {
+				dispatch(setClimateVariable(null));
+			}
+
+			const isLocationStepReset =
+				DOWNLOAD_STEPS.location > targetStep &&
+				determineStepApplicable(climateVariable, DOWNLOAD_STEPS.location);
+			if (isLocationStepReset) {
+				dispatch(setSelectionMode('cells'));
+			}
+
+			const isSendRequestStepReset =
+				DOWNLOAD_STEPS.sendRequest > targetStep &&
+				determineStepApplicable(climateVariable, DOWNLOAD_STEPS.sendRequest);
+			if (isSendRequestStepReset) {
+				dispatch(resetRequestState());
+				dispatch(setCaptchaValue(''));
+			}
 
 			// Derive the combined reset payload from the climate variable itself,
 			// independent of which step components are currently mounted.

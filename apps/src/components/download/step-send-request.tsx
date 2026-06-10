@@ -12,7 +12,6 @@ import { DownloadType, FileFormatType } from "@/types/climate-variable-interface
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
-	resetRequestState,
 	setCaptchaValue,
 	setEmail,
 	setRequestError,
@@ -123,11 +122,11 @@ const StepSendRequest = React.forwardRef<
 
 	React.useImperativeHandle(ref, () => ({
 		reset: () => {
+			// The request-state and captcha resets now fire from the
+			// provider's resetStepsAfter, mount-independent.
 			resetFileFormat();
-			dispatch(resetRequestState());
-			dispatch(setCaptchaValue(''));
 		},
-	}), [dispatch, resetFileFormat]);
+	}), [resetFileFormat]);
 
 
 	const formatOptions = [

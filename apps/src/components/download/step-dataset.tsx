@@ -16,24 +16,6 @@ import { fetchTaxonomyData } from '@/services/services';
 import { TaxonomyData } from '@/types/types';
 import { StepComponent } from '@/types/download-form-interface';
 
-// This has to be done better
-export type PayloadShapeDataset = {
-	/**
-	 * @example
-	 * ```
-	 * {
-   *   "term_id": 215,
-   *   "title": {
-   *     "en": "Adjusted and Homogenized Canadian Climate Data (AHCCD)",
-   *     "fr": "Données climatologiques canadiennes ajustées et homogénéisées (DCCAH)"
-   *   },
-   *   "dataset_type": "ahccd"
-   * }
-	 * ```
-	 */
-	dataset: TaxonomyData | null;
-};
-
 /**
  * Step 1.
  *
@@ -44,6 +26,19 @@ const StepDataset: StepComponent = ({ onChangeValidity }) => {
 
 	const { locale } = useLocale();
 
+	/**
+	 * @example
+	 * ```
+	 * {
+	 *   "term_id": 215,
+	 *   "title": {
+	 *     "en": "Adjusted and Homogenized Canadian Climate Data (AHCCD)",
+	 *     "fr": "Données climatologiques canadiennes ajustées et homogénéisées (DCCAH)"
+	 *   },
+	 *   "dataset_type": "ahccd"
+	 * }
+	 * ```
+	 */
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
 
@@ -51,12 +46,11 @@ const StepDataset: StepComponent = ({ onChangeValidity }) => {
 	 * Step validation
 	 */
 	useEffect(() => {
-		onChangeValidity(Boolean(dataset))
+		onChangeValidity(Boolean(dataset));
 	}, [dataset, onChangeValidity]);
 
 	useEffect(() => {
 		fetchTaxonomyData('datasets', 'download').then((data) => {
-			console.log('RBx StepDataset useEffect', data);
 			setOptions(data);
 		});
 	}, []);

@@ -1,8 +1,12 @@
 import type { ClimateVariableInterface } from '@/types/climate-variable-interface';
-import type { StepResetPayload } from '@/types/download-form-interface';
+
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { determineStepApplicable } from './determine-applicable-steps';
-import { DOWNLOAD_STEPS, type ResetPayload } from './types';
+import {
+	DOWNLOAD_STEPS,
+	type ResetPayload,
+	type StepResetAccumulator,
+} from './types';
 
 /**
  * Build the reset-payload contribution for step 3 (Variable Options).
@@ -15,8 +19,8 @@ import { DOWNLOAD_STEPS, type ResetPayload } from './types';
  */
 function buildVariableOptionsPayload(
 	climateVariable: ClimateVariableInterface
-): StepResetPayload {
-	const payload: StepResetPayload = {};
+): StepResetAccumulator {
+	const payload: StepResetAccumulator = {};
 
 	if (climateVariable.getVersions()?.length) {
 		payload.version = null;
@@ -53,7 +57,7 @@ function buildVariableOptionsPayload(
  * `components/download/step-location.tsx`. The values are unconditional: step 4
  * is never skipped, so it always contributes these three fields.
  */
-function buildLocationPayload(): StepResetPayload {
+function buildLocationPayload(): StepResetAccumulator {
 	return {
 		interactiveRegion: null,
 		selectedPoints: {},
@@ -73,8 +77,8 @@ function buildLocationPayload(): StepResetPayload {
  */
 function buildAdditionalDetailsPayload(
 	climateVariable: ClimateVariableInterface
-): StepResetPayload {
-	const payload: StepResetPayload = {};
+): StepResetAccumulator {
+	const payload: StepResetAccumulator = {};
 
 	if (climateVariable instanceof S2DClimateVariable) {
 		payload.selectedPeriods = [];
@@ -112,7 +116,7 @@ function buildAdditionalDetailsPayload(
  */
 const STEP_PAYLOAD_BUILDERS: ReadonlyMap<
 	number,
-	(climateVariable: ClimateVariableInterface) => StepResetPayload
+	(climateVariable: ClimateVariableInterface) => StepResetAccumulator
 > = new Map([
 	[DOWNLOAD_STEPS.variableOptions, buildVariableOptionsPayload],
 	[DOWNLOAD_STEPS.location, () => buildLocationPayload()],
@@ -176,7 +180,7 @@ export function buildResetPayloadForStepsAfter(
 		(stepA, stepB) => stepA - stepB
 	);
 
-	const payload: StepResetPayload = {};
+	const payload: StepResetAccumulator = {};
 
 	for (const step of orderedSteps) {
 		const isAfterTarget = step > targetStep;

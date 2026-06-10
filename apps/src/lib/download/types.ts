@@ -34,3 +34,18 @@ export const DOWNLOAD_STEPS = {
  * behavior byte-identical with the former mounted-ref derivation.
  */
 export type ResetPayload = Partial<ClimateVariableConfigInterface>;
+
+/**
+ * Internal accumulator for assembling a step's reset contribution.
+ *
+ * @remarks
+ * Deliberately loose: a few legacy reset values do not satisfy the strict
+ * config field types (e.g. `interactiveRegion: null` where the field is
+ * `InteractiveRegionOption | undefined`) and are reproduced verbatim to keep
+ * behavior identical with the former mounted-ref derivation. Tightening these
+ * to the strict field types is a follow-up that requires loosening the
+ * corresponding {@link ClimateVariableConfigInterface} fields to accept the
+ * reset sentinels. Not exported from the barrel — internal to this namespace.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type StepResetAccumulator = { [key: string]: any };

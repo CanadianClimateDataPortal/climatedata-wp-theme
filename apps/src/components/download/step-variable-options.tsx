@@ -13,11 +13,7 @@ import { useS2D } from '@/hooks/use-s2d';
 import { dateFormatCheck } from '@/lib/utils';
 
 import { ClimateVariableInterface, ForecastTypes } from '@/types/climate-variable-interface';
-import type {
-	StepComponentProps,
-	StepComponentRef,
-	StepResetPayload,
-} from '@/types/download-form-interface';
+import type { StepComponent } from '@/types/download-form-interface';
 import { getForecastTypeName } from '@/lib/s2d';
 import { ThresholdSelect } from '@/components/download/ui/threshold-select';
 
@@ -84,10 +80,7 @@ const tooltipForecastType = __(
  *
  * Variable options step
  */
-const StepVariableOptions = React.forwardRef<
-	StepComponentRef,
-	StepComponentProps
->(({ onChangeValidity }, ref) => {
+const StepVariableOptions: StepComponent = ({ onChangeValidity }) => {
 	const { climateVariable } = useClimateVariable();
 	const { isS2DVariable } = useS2D();
 
@@ -111,43 +104,6 @@ const StepVariableOptions = React.forwardRef<
 		}
 		onChangeValidity(isValid())
 	}, [climateVariable, isS2DVariable, onChangeValidity]);
-
-	React.useImperativeHandle(ref, () => ({
-		getResetPayload: () => {
-			if (!climateVariable) return {};
-
-			const payload: StepResetPayload = {};
-
-			if (climateVariable.getVersions()?.length) {
-				payload.version = null;
-			}
-
-			if (climateVariable.getFrequencyConfig()) {
-				payload.frequency = null;
-			}
-
-			if (climateVariable.getAveragingOptions()?.length) {
-				payload.averagingType = null;
-			}
-
-			if (climateVariable.getAnalysisFields()?.length) {
-				payload.analysisFieldValues = {};
-			}
-
-			if (climateVariable.getThreshold() != null) {
-				payload.threshold = null;
-			}
-
-			if (isS2DVariable) {
-				payload.forecastType = null;
-			}
-
-			return payload;
-		},
-	}), [
-		climateVariable,
-		isS2DVariable,
-	]);
 
 	// Determine if there are any analysis fields to display.
 	const hasAnalysisFields = !!climateVariable?.getAnalysisFields()?.length;
@@ -190,9 +146,10 @@ const StepVariableOptions = React.forwardRef<
 			</div>
 		</StepContainer>
 	);
-});
+};
+// Explicit string literal — step-summary.tsx branches on these names, and a
+// derived function name would not survive minification.
 StepVariableOptions.displayName = 'StepVariableOptions';
-
 
 /**
  * Extracts and formats summary data for the Variable Options step.

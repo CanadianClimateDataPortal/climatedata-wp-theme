@@ -1714,27 +1714,27 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		thresholds: [
 			{
 				value: "rl5tasmax",
-				label: "1-in-5",
+				label: "1-in-5 year",
 			},
 			{
 				value: "rl10tasmax",
-				label: "1-in-10",
+				label: "1-in-10 year",
 			},
 			{
 				value: "rl20tasmax",
-				label: "1-in-20",
+				label: "1-in-20 year",
 			},
 			{
 				value: "rl25tasmax",
-				label: "1-in-25",
+				label: "1-in-25 year",
 			},
 			{
 				value: "rl30tasmax",
-				label: "1-in-30",
+				label: "1-in-30 year",
 			},
 			{
 				value: "rl50tasmax",
-				label: "1-in-50",
+				label: "1-in-50 year",
 			},
 		],
 		unit: "degC",
@@ -1754,27 +1754,27 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		thresholds: [
 			{
 				value: "rl5tasmin",
-				label: "1-in-5",
+				label: "1-in-5 year",
 			},
 			{
 				value: "rl10tasmin",
-				label: "1-in-10",
+				label: "1-in-10 year",
 			},
 			{
 				value: "rl20tasmin",
-				label: "1-in-20",
+				label: "1-in-20 year",
 			},
 			{
 				value: "rl25tasmin",
-				label: "1-in-25",
+				label: "1-in-25 year",
 			},
 			{
 				value: "rl30tasmin",
-				label: "1-in-30",
+				label: "1-in-30 year",
 			},
 			{
 				value: "rl50tasmin",
-				label: "1-in-50",
+				label: "1-in-50 year",
 			},
 		],
 		unit: "degC",
@@ -1794,27 +1794,27 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		thresholds: [
 			{
 				value: "rl5pr",
-				label: "1-in-5",
+				label: "1-in-5 year",
 			},
 			{
 				value: "rl10pr",
-				label: "1-in-10",
+				label: "1-in-10 year",
 			},
 			{
 				value: "rl20pr",
-				label: "1-in-20",
+				label: "1-in-20 year",
 			},
 			{
 				value: "rl25pr",
-				label: "1-in-25",
+				label: "1-in-25 year",
 			},
 			{
 				value: "rl30pr",
-				label: "1-in-30",
+				label: "1-in-30 year",
 			},
 			{
 				value: "rl50pr",
-				label: "1-in-50",
+				label: "1-in-50 year",
 			},
 		],
 		unit: "mm",

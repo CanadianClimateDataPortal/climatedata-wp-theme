@@ -154,7 +154,9 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				else if(frequency == 'winter') month = 11;
 			}
 
-			const timestamp = Date.UTC(decadeValue, month, 1, 0, 0, 0);
+			const isReturnPeriod = climateVariable?.getClass() === 'ReturnPeriodClimateVariable';
+			const lookupYear = isReturnPeriod ? decadeValue + 15 : decadeValue;
+			const timestamp = Date.UTC(lookupYear, month, 1, 0, 0, 0);
 
 			if(
 				chartsData[deltaValueKey] !== undefined

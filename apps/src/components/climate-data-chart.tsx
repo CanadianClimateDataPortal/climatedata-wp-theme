@@ -26,7 +26,11 @@ import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import appConfig from '@/config/app.config';
 import { doyFormatter, formatValue } from '@/lib/format';
-import { getChartDataOptions, getSeriesObject } from '@/config/chart-config';
+import {
+	getChartDataOptions,
+	getSeriesObject,
+	type SeriesOptions,
+} from '@/config/chart-config';
 import { AveragingType, ClimateVariableInterface } from '@/types/climate-variable-interface';
 import { trackGraphExport } from '@/lib/google-analytics';
 
@@ -195,6 +199,51 @@ function getDefaultActiveTab(tabs: Tab[]): TabValue {
 	return tabs.find((tab) => tab.enabled)?.value ?? TAB_VALUES.INDIVIDUAL_VALUES;
 }
 
+/**
+ * Return all the unique x values of a list of series.
+ *
+ * Only visible series are considered.
+ *
+ * @param allSeries - The list of series to consider.
+ * @returns The list of unique x values.
+ */
+function getSeriesXValues(allSeries: Series[]): number[] {
+	let xValues: number[] = [];
+
+	allSeries.forEach((series) => {
+		// For type checking: we expect the `options` to contain `data`, even
+		// if some specific types of series (which we don't use) don't contain
+		// `data` in their `options`.
+		const options = series.options as (Highcharts.SeriesOptionsType & { data?: number | number[] });
+		const rawData = options.data ?? [];
+
+		if (series.visible && Array.isArray(rawData)) {
+			rawData.forEach((point) => {
+				let xVal: number | null = null;
+
+				if (Array.isArray(point)) {
+					xVal = point[0];
+				}
+				else if (typeof point === 'number') {
+					xVal = point;
+				}
+
+				if (typeof xVal === 'number' && !isNaN(xVal)) {
+					xValues.push(xVal);
+				}
+			});
+		}
+	});
+
+	xValues = xValues.filter((value, index, self) => {
+		return self.indexOf(value) === index;
+	});
+
+	xValues.sort((a, b) => a - b);
+
+	return xValues;
+}
+
 const FIFTEEN_YEARS = 15 * 365 * 24 * 60 * 60 * 1000;
 
 /**
@@ -220,12 +269,15 @@ const ClimateDataChart: React.FC<{
 	const variableList = useAppSelector((state) => state.map.variableList);
 	const chartRef = useRef<HighchartsReact.RefObject>(null);
 	const climateVariableId = climateVariable?.getId();
+	const climateVariableClass = climateVariable?.getClass();
 	const version = climateVariable?.getVersion();
 	const unit = climateVariable?.getUnit();
 	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	const isReturnPeriod = climateVariableClass === 'ReturnPeriodClimateVariable';
 	// If the navigator shown below the graph is displayed
-	const enableChartNavigator = climateVariableId !== 'msc_climate_normals';
-	const isReturnPeriod = climateVariable?.getClass() === 'ReturnPeriodClimateVariable';
+	const enableChartNavigator = !isReturnPeriod && climateVariableId !== 'msc_climate_normals';
+	// If true, the X axis ticks will be shown only where we have data points
+	const limitXTicksToData = isReturnPeriod;
 
 	// Aggregation tabs to display
 	const tabs: Tab[] = useMemo(() => {
@@ -302,9 +354,9 @@ const ClimateDataChart: React.FC<{
 	const chartDataOptions = useMemo(() => getChartDataOptions(__), [__]);
 
 	// Get series object
-	const seriesObject = useMemo<(SeriesLineOptions | SeriesArearangeOptions | SeriesColumnOptions)[]>(() =>
-		getSeriesObject(data, version, climateVariableId, chartDataOptions),
-		[data, version, climateVariableId, chartDataOptions]
+	const seriesObject = useMemo<SeriesOptions[]>(() =>
+		getSeriesObject(data, version, climateVariableId, climateVariableClass, chartDataOptions),
+		[data, version, climateVariableId, climateVariableClass, chartDataOptions]
 	);
 
 	// Tooltip formatter for period averages and changes
@@ -528,6 +580,50 @@ const ClimateDataChart: React.FC<{
 		return series.filter((s) => (s.data?.length ?? 0) > 0);
 	}, [activeTab, activeSeries, seriesObject]);
 
+	/**
+	 * Callback that can be used in Highcharts options to specify the positions
+	 * of the x axis ticks.
+	 *
+	 * If `limitXTicksToData` is true, the returned positions are only the
+	 * x values where we have data points.
+	 *
+	 * Else, we return undefined to let Highcharts choose the default positions.
+	 */
+	const tickPositioner = useMemo<Highcharts.AxisTickPositionerCallbackFunction|undefined>(() => {
+		if (!limitXTicksToData) {
+			return undefined;
+		}
+
+		return function() {
+			const self = this as Highcharts.Axis;
+			const positions = getSeriesXValues(self.chart.series);
+			return positions.length > 0 ? positions : [];
+		}
+	}, [limitXTicksToData]);
+
+	/**
+	 * Callback that can be used in Highcharts options to specify the text
+	 * of the x axis labels.
+	 *
+	 * If `isReturnPeriod` is true, the returned text is the return period
+	 * of the data point.
+	 *
+	 * Else, we return undefined to let Highcharts choose the default text.
+	 */
+	const xLabelFormatter = useMemo<Highcharts.AxisLabelsFormatterCallbackFunction|undefined>(() => {
+		if (!isReturnPeriod) {
+			return undefined;
+		}
+
+		return function() {
+			const valueDate = new Date(this.value);
+			const startYear = valueDate.getUTCFullYear() - 15;
+			const endYear = startYear + 29;
+
+			return `${startYear}&nbsp;-<br>${endYear}`;
+		}
+	}, [isReturnPeriod]);
+
 	// initialize activeSeries state with all leys  from the first tab
 	useEffect(() => {
 		setActiveSeries(seriesObject.map((s) => s.custom?.key) || []);
@@ -646,6 +742,10 @@ const ClimateDataChart: React.FC<{
 				type: 'datetime',
 				minPadding: 0,
 				maxPadding: 0,
+				tickPositioner: tickPositioner,
+				labels: {
+					formatter: xLabelFormatter,
+				}
 			},
 			yAxis: climateVariableId === 'msc_climate_normals' ? [
 				{
@@ -698,9 +798,13 @@ const ClimateDataChart: React.FC<{
 				},
 			},
 			series: filteredSeries.map(series => {
-				const baseSeries = {
-					...series,
-					marker: {
+				const baseSeries = {...series};
+
+				// Unless the series already has a `marker`, we define it a
+				// default one. This marker is shown only on hover when in the
+				// "individual values" tab.
+				if ((baseSeries as SeriesLineOptions).marker == null) {
+					(baseSeries as SeriesLineOptions).marker = {
 						enabled: false,
 						symbol: 'circle',
 						radius: 6,
@@ -713,8 +817,8 @@ const ClimateDataChart: React.FC<{
 								opacity: 0,
 							},
 						},
-					},
-				};
+					} as Highcharts.PointMarkerOptionsObject & { opacity?: number };
+				}
 
 				if (climateVariableId === 'msc_climate_normals') {
 					// Assign yAxis based on series type
@@ -917,7 +1021,9 @@ const ClimateDataChart: React.FC<{
 										acc[newKey] = Object.fromEntries(
 											Object.entries(dataCopy[key] ?? {}).map(([timestamp, value]) => {
 												const year = new Date(Number(timestamp)).getUTCFullYear();
-												return [`${year} - ${year + 29}`, value as number[]];
+												const startYear = isReturnPeriod ? year - 15 : year;
+												const endYear = startYear + 29;
+												return [`${startYear} - ${endYear}`, value as number[]];
 											})
 										);
 										return acc;

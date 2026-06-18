@@ -1,4 +1,9 @@
-import { SeriesLineOptions, SeriesArearangeOptions, SeriesColumnOptions } from 'highcharts';
+import {
+	SeriesLineOptions,
+	SeriesArearangeOptions,
+	SeriesColumnOptions,
+	SeriesBoxplotOptions,
+} from 'highcharts';
 import { ClimateDataProps } from '@/types/types.ts';
 
 // Helper to sort an array of tuples by the first element (x-value / timestamp).
@@ -19,6 +24,13 @@ export type ChartDataOption = {
 export type ChartDataOptions = {
 	[key: string]: ChartDataOption;
 };
+
+export type SeriesOptions = (
+	SeriesLineOptions |
+	SeriesArearangeOptions |
+	SeriesColumnOptions |
+	SeriesBoxplotOptions
+);
 
 export const getChartDataOptions = (
 	__: (key: string) => string
@@ -150,12 +162,102 @@ export const getChartDataOptions = (
 	},
 });
 
+/**
+ * Create a series where data is shown as vertical range bars.
+ *
+ * Data are shown as vertical bars showing the range and the median. No line
+ * connects the data.
+ */
+function createBarSeries(
+	data: ClimateDataProps,
+	chartDataOptions: ChartDataOptions
+): SeriesOptions[] {
+
+	const series: SeriesOptions[] = [];
+
+	Object.keys(chartDataOptions).forEach((key) => {
+		const hasData = data[key]?.length
+
+		if (!hasData) {
+			return;
+		}
+
+		const isMedian = key.endsWith('_median');
+		const isRange = key.endsWith('_range');
+		const baseKey = isMedian ? key.substring(0, key.length - '_median'.length) : key;
+
+		const isMedianWithRange = isMedian && Object.hasOwn(chartDataOptions, `${baseKey}_range`);
+
+		if (isMedianWithRange) {
+			const medianByTs = Object.fromEntries(
+				(sortByTimestamp(data[key]) as number[][]).map(([ts, v]) => [ts, v])
+			);
+			const boxData = (sortByTimestamp(data[`${baseKey}_range`]) as number[][]).map(
+				([ts, low, high]) => [ts, low, medianByTs[ts], medianByTs[ts], medianByTs[ts], high]
+			);
+			series.push(
+				{
+					custom: {key: `${baseKey}_median`},
+					name: chartDataOptions[`${baseKey}_median`].name,
+					type: 'boxplot',
+					data: boxData,
+					color: chartDataOptions[`${baseKey}_median`].color,
+					lineWidth: 2,
+					showInNavigator: true,
+					visible: true,
+					whiskerLength: 10,
+					// Change the default "boxplot" legend symbol to a line.
+					legendSymbol: 'lineMarker',
+				} as SeriesBoxplotOptions,
+
+				// Even though the "range" is already included in the boxplot
+				// above, we still add an *invisible* series for the range.
+				// This allows other features of the graph to work (e.g. the
+				// values in the tooltip).
+				{
+					custom: { key: `${baseKey}_range` },
+					name: chartDataOptions[`${baseKey}_range`].name,
+					type: chartDataOptions[`${baseKey}_range`].type,
+					data: sortByTimestamp(data[`${baseKey}_range`]),
+					fillOpacity: 0,
+					lineWidth: 0,
+					linkedTo: ':previous',
+					visible: true,
+				} as SeriesArearangeOptions,
+			)
+		} else if (!isRange) {
+			// Other type of series (ex: historical observations), hidden by
+			// default.
+			series.push(
+				{
+					custom: { key },
+					name: chartDataOptions[key].name,
+					type: chartDataOptions[key].type,
+					data: sortByTimestamp(data[key]),
+					color: chartDataOptions[key].color,
+					lineWidth: 0,
+					marker: {
+						enabled: true,
+						symbol: 'diamond',
+						radius: 4,
+					},
+					visible: false,
+				} as SeriesLineOptions,
+			);
+		}
+
+	});
+
+	return series;
+}
+
 export const getSeriesObject = (
 	data: ClimateDataProps,
 	version: string | undefined | null,
 	climateVariableId: string | undefined,
+	climateVariableClass: string | undefined,
 	chartDataOptions: ChartDataOptions
-): (SeriesLineOptions | SeriesArearangeOptions | SeriesColumnOptions)[] => {
+): SeriesOptions[] => {
 	if (climateVariableId === 'allowance') {
 		return [
 			{
@@ -432,6 +534,8 @@ export const getSeriesObject = (
 				lineWidth: 2,
 			} as SeriesColumnOptions,
 		]
+	} else if (climateVariableClass === 'ReturnPeriodClimateVariable') {
+		return createBarSeries(data, chartDataOptions);
 	} else {
 		// Other variables series (for CMIP5 then CMIP6)
 		switch (version) {

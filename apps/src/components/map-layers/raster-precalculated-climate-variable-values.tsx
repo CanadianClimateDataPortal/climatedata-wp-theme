@@ -58,6 +58,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		const variable = climateVariable?.getThreshold() ?? '';
 		const { lat, lng } = latlng;
 		const decadeValue = parseInt(dateRange[0]) - (parseInt(dateRange[0]) % 10) + 1;
+		const isReturnPeriod = climateVariable?.getClass() === 'ReturnPeriodClimateVariable';
 
 		const fetchData = async () => {
 			if (!decadeValue && !variableId) return;
@@ -154,7 +155,6 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				else if(frequency == 'winter') month = 11;
 			}
 
-			const isReturnPeriod = climateVariable?.getClass() === 'ReturnPeriodClimateVariable';
 			const lookupYear = isReturnPeriod ? decadeValue + 15 : decadeValue;
 			const timestamp = Date.UTC(lookupYear, month, 1, 0, 0, 0);
 

@@ -936,29 +936,42 @@ const ClimateDataChart: React.FC<{
 		return csvString;
 	};
 
+	const getExportChartOptions = () => {
+		const baseOptions: Highcharts.ChartOptions = {
+			backgroundColor: '#ffffff'
+		};
+
+		if (isReturnPeriod) {
+			return {
+				...baseOptions,
+				width: 1000, // Increased width for better automatic label spacing
+			};
+		}
+
+		return baseOptions;
+	};
+
 	// Export method
 	const handleExport = (format: string) => {
 		const chart = chartRef.current?.chart;
 		if (!chart) return;
 
 		try {
+			const exportChartOptions = getExportChartOptions();
+
 			switch (format) {
 				case 'pdf':
 					chart.exportChartLocal({
 						type: 'application/pdf',
 					}, {
-						chart: {
-							backgroundColor: '#ffffff'
-						}
+						chart: exportChartOptions
 					});
 					break;
 				case 'png':
 					chart.exportChartLocal({
 						type: 'image/png',
 					}, {
-						chart: {
-							backgroundColor: '#ffffff'
-						}
+						chart: exportChartOptions
 					});
 					break;
 					case 'csv':

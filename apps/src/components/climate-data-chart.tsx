@@ -321,7 +321,7 @@ const ClimateDataChart: React.FC<{
 			const firstDayIsJuly = actualUnit === 'DoY-jul';
 			return doyFormatter(value, locale, firstDayIsJuly);
 		}
-		
+
 		if (isRangeStart) {
 			actualUnit = '';
 		}
@@ -383,24 +383,31 @@ const ClimateDataChart: React.FC<{
 		}
 
 		// Displayed period
-		let startYear = new Date(timestampKey).getUTCFullYear();
+		let tooltipStartYear = new Date(timestampKey).getUTCFullYear();
+		let plotBandStartYear = tooltipStartYear;
+		let tooltipYearLength = 29;
+		let plotBandYearLength = 29;
 
 		if (isReturnPeriod) {
-			startYear -= 15;
+			// Return period uses smaller plotband, with data offsetted by 15 years, since it uses a different chart type
+			tooltipStartYear -= 15;
+			plotBandStartYear -= 5;
+			plotBandYearLength = 9;
 		}
 
-		const endYear = startYear + 29;
+		const tooltipEndYear = tooltipStartYear + tooltipYearLength;
+		const plotBandEndYear = plotBandStartYear + plotBandYearLength;
 
 		// Add plot band on period range
 		chart.xAxis[0].addPlotBand({
-			from: Date.UTC(startYear, 0, 1),
-			to: Date.UTC(endYear, 11, 31),
+			from: Date.UTC(plotBandStartYear, 0, 1),
+			to: Date.UTC(plotBandEndYear, 11, 31),
 			id: 'period-plot-band',
 			color: 'rgba(51,63,80,0.1)',
 		});
 
 		// Tooltip content
-		let tooltip = `<b>${startYear} - ${endYear}`;
+		let tooltip = `<b>${tooltipStartYear} - ${tooltipEndYear}`;
 		if(prefix === "delta7100_") tooltip += ` (${__('Change from ')} 1971-2000)`;
 		tooltip += `</b><br/>`;
 
@@ -544,9 +551,18 @@ const ClimateDataChart: React.FC<{
 
 		if(activeTab === TAB_VALUES.PERIOD_CHANGES) {
 			// Add plot band for reference period changes
+			let plotbandStartYear = 1971;
+			let plotbandEndYear = 2000;
+
+			if (isReturnPeriod) {
+				// Return period uses smaller plotband, with data offsetted by 15 years, since it uses a different chart type
+				plotbandStartYear = 1981;
+				plotbandEndYear = 1990;
+			}
+
 			chart.xAxis[0].addPlotBand({
-				from: Date.UTC(1971, 0, 1),
-				to: Date.UTC(2000, 11, 31),
+				from: Date.UTC(plotbandStartYear, 0, 1),
+				to: Date.UTC(plotbandEndYear, 11, 31),
 				color: 'rgba(51,63,80,0.05)',
 				id: 'delta-plot-band',
 			});
@@ -1185,8 +1201,8 @@ const ClimateDataChart: React.FC<{
 								'Canadian Centre for Climate Services</a> and the ' +
 								'<a href="https://climate.weather.gc.ca/climate_normals/index_e.html" %s>' +
 								'Government of Canada Historical Climate Data</a> websites.'
-							), 
-							'target="_blank" rel="noopener noreferrer" class="text-dark-purple"', 
+							),
+							'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
 							'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
 						)
 				}}

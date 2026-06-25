@@ -103,44 +103,6 @@ function addClimateZonePlotBands(options: Options) {
 }
 
 /**
- * Add an extra padding to the X-axis.
- *
- * This method should be called after the chart has rendered, to be able to
- * retrieve the current maximum values of the axis.
- *
- * @param chart - The chart to extend
- * @param extraStart - Additional padding to add at the beginning of the axe
- * @param extraEnd - Additional padding to add at the end of the axe
- */
-function extendChartXAxis(
-	chart: Chart,
-	extraStart: number|undefined,
-	extraEnd: number|undefined,
-) {
-	const xAxis = chart.xAxis[0];
-
-	if (!xAxis) {
-		return;
-	}
-
-	// By default, we reset the extremes
-	let newMin: number|undefined = undefined;
-	let newMax: number|undefined = undefined;
-
-	const { dataMin, dataMax } = xAxis.getExtremes();
-
-	if (extraStart) {
-		newMin = dataMin - extraStart;
-	}
-
-	if (extraEnd) {
-		newMax = dataMax + extraEnd;
-	}
-
-	xAxis.setExtremes(newMin, newMax);
-}
-
-/**
  * Return the aggregation tabs to be displayed.
  *
  * @param climateVariable - The displayed climate variable.
@@ -244,7 +206,7 @@ function getSeriesXValues(allSeries: Series[]): number[] {
 	return xValues;
 }
 
-const FIFTEEN_YEARS = 15 * 365 * 24 * 60 * 60 * 1000;
+const RETURN_PERIOD_PLOTBAND_YEAR_LENGTH = 9;
 
 /**
  * Component to render a chart using Highcharts with climate data.
@@ -321,7 +283,7 @@ const ClimateDataChart: React.FC<{
 			const firstDayIsJuly = actualUnit === 'DoY-jul';
 			return doyFormatter(value, locale, firstDayIsJuly);
 		}
-		
+
 		if (isRangeStart) {
 			actualUnit = '';
 		}
@@ -383,24 +345,30 @@ const ClimateDataChart: React.FC<{
 		}
 
 		// Displayed period
-		let startYear = new Date(timestampKey).getUTCFullYear();
+		const tooltipStartYear = new Date(timestampKey).getUTCFullYear();
+		let plotBandStartYear = tooltipStartYear;
+		const tooltipYearLength = 29;
+		let plotBandYearLength = 29;
 
 		if (isReturnPeriod) {
-			startYear -= 15;
+			// Return period uses a different plotband centered on the data point, adapted to its specific chart type
+			plotBandYearLength = RETURN_PERIOD_PLOTBAND_YEAR_LENGTH;
+			plotBandStartYear -= Math.ceil(plotBandYearLength / 2);
 		}
 
-		const endYear = startYear + 29;
+		const tooltipEndYear = tooltipStartYear + tooltipYearLength;
+		const plotBandEndYear = plotBandStartYear + plotBandYearLength;
 
 		// Add plot band on period range
 		chart.xAxis[0].addPlotBand({
-			from: Date.UTC(startYear, 0, 1),
-			to: Date.UTC(endYear, 11, 31),
+			from: Date.UTC(plotBandStartYear, 0, 1),
+			to: Date.UTC(plotBandEndYear, 11, 31),
 			id: 'period-plot-band',
 			color: 'rgba(51,63,80,0.1)',
 		});
 
 		// Tooltip content
-		let tooltip = `<b>${startYear} - ${endYear}`;
+		let tooltip = `<b>${tooltipStartYear} - ${tooltipEndYear}`;
 		if(prefix === "delta7100_") tooltip += ` (${__('Change from ')} 1971-2000)`;
 		tooltip += `</b><br/>`;
 
@@ -544,14 +512,23 @@ const ClimateDataChart: React.FC<{
 
 		if(activeTab === TAB_VALUES.PERIOD_CHANGES) {
 			// Add plot band for reference period changes
+			let plotbandStartYear = 1971;
+			let plotbandEndYear = 2000;
+
+			if (isReturnPeriod) {
+				// Return period uses a different plotband centered on the data point, adapted to its specific chart type
+				plotbandStartYear -= Math.ceil(RETURN_PERIOD_PLOTBAND_YEAR_LENGTH / 2);
+				plotbandEndYear = plotbandStartYear + RETURN_PERIOD_PLOTBAND_YEAR_LENGTH;
+			}
+
 			chart.xAxis[0].addPlotBand({
-				from: Date.UTC(1971, 0, 1),
-				to: Date.UTC(2000, 11, 31),
+				from: Date.UTC(plotbandStartYear, 0, 1),
+				to: Date.UTC(plotbandEndYear, 11, 31),
 				color: 'rgba(51,63,80,0.05)',
 				id: 'delta-plot-band',
 			});
 		}
-	}, [activeTab]);
+	}, [activeTab, isReturnPeriod]);
 
 	// adds visible property to each series
 	const filteredSeries = useMemo<SeriesOptionsType[]>(() => {
@@ -617,7 +594,7 @@ const ClimateDataChart: React.FC<{
 
 		return function() {
 			const valueDate = new Date(this.value);
-			const startYear = valueDate.getUTCFullYear() - 15;
+			const startYear = valueDate.getUTCFullYear();
 			const endYear = startYear + 29;
 
 			return `${startYear}&nbsp;-<br>${endYear}`;
@@ -863,26 +840,6 @@ const ClimateDataChart: React.FC<{
 		return options;
 	}, [climateVariable, climateVariableId, locale, title, filteredSeries, activeChartTooltip, activeChartPlotOptions]);
 
-	/*
-	 * For the Return Period variable, we extend the X-axis to allow the
-	 * period's gray block to be fully shown at extremities.
-	 */
-	useEffect(() => {
-		const chart = chartRef.current?.chart;
-
-		if (!chart || !isReturnPeriod || !activeTab.startsWith('period')) {
-			return;
-		}
-
-		// Timeout of 0 to allow the HighChart component to render before
-		// extending the X-axis.
-		const timeoutId = window.setTimeout(() => {
-			extendChartXAxis(chart, FIFTEEN_YEARS, FIFTEEN_YEARS);
-		}, 0);
-
-		return () => window.clearTimeout(timeoutId);
-	}, [chartOptions, isReturnPeriod, activeTab]);
-
 	// Export CSV from data
 	const exportCsvFromData = (data: Record<string, Record<string, number[]>>): string => {
 		// Get all ranges
@@ -1034,9 +991,7 @@ const ClimateDataChart: React.FC<{
 										acc[newKey] = Object.fromEntries(
 											Object.entries(dataCopy[key] ?? {}).map(([timestamp, value]) => {
 												const year = new Date(Number(timestamp)).getUTCFullYear();
-												const startYear = isReturnPeriod ? year - 15 : year;
-												const endYear = startYear + 29;
-												return [`${startYear} - ${endYear}`, value as number[]];
+												return [`${year} - ${year + 29}`, value as number[]];
 											})
 										);
 										return acc;
@@ -1185,8 +1140,8 @@ const ClimateDataChart: React.FC<{
 								'Canadian Centre for Climate Services</a> and the ' +
 								'<a href="https://climate.weather.gc.ca/climate_normals/index_e.html" %s>' +
 								'Government of Canada Historical Climate Data</a> websites.'
-							), 
-							'target="_blank" rel="noopener noreferrer" class="text-dark-purple"', 
+							),
+							'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
 							'target="_blank" rel="noopener noreferrer" class="text-dark-purple"',
 						)
 				}}

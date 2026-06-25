@@ -244,7 +244,7 @@ function getSeriesXValues(allSeries: Series[]): number[] {
 	return xValues;
 }
 
-const FIFTEEN_YEARS = 15 * 365 * 24 * 60 * 60 * 1000;
+const RETURN_PERIOD_PLOTBAND_YEAR_LENGTH = 9;
 
 /**
  * Component to render a chart using Highcharts with climate data.
@@ -389,10 +389,9 @@ const ClimateDataChart: React.FC<{
 		let plotBandYearLength = 29;
 
 		if (isReturnPeriod) {
-			// Return period uses smaller plotband, with data offsetted by 15 years, since it uses a different chart type
-			tooltipStartYear -= 15;
-			plotBandStartYear -= 5;
-			plotBandYearLength = 9;
+			// Return period uses a different plotband centered on the data point, adapted to its specific chart type
+			plotBandYearLength = RETURN_PERIOD_PLOTBAND_YEAR_LENGTH;
+			plotBandStartYear -= Math.ceil(plotBandYearLength / 2);
 		}
 
 		const tooltipEndYear = tooltipStartYear + tooltipYearLength;
@@ -555,9 +554,9 @@ const ClimateDataChart: React.FC<{
 			let plotbandEndYear = 2000;
 
 			if (isReturnPeriod) {
-				// Return period uses smaller plotband, with data offsetted by 15 years, since it uses a different chart type
-				plotbandStartYear = 1981;
-				plotbandEndYear = 1990;
+				// Return period uses a different plotband centered on the data point, adapted to its specific chart type
+				plotbandStartYear -= Math.ceil(RETURN_PERIOD_PLOTBAND_YEAR_LENGTH / 2);
+				plotbandEndYear = plotbandStartYear + RETURN_PERIOD_PLOTBAND_YEAR_LENGTH;
 			}
 
 			chart.xAxis[0].addPlotBand({
@@ -633,7 +632,7 @@ const ClimateDataChart: React.FC<{
 
 		return function() {
 			const valueDate = new Date(this.value);
-			const startYear = valueDate.getUTCFullYear() - 15;
+			const startYear = valueDate.getUTCFullYear();
 			const endYear = startYear + 29;
 
 			return `${startYear}&nbsp;-<br>${endYear}`;
@@ -879,26 +878,6 @@ const ClimateDataChart: React.FC<{
 		return options;
 	}, [climateVariable, climateVariableId, locale, title, filteredSeries, activeChartTooltip, activeChartPlotOptions]);
 
-	/*
-	 * For the Return Period variable, we extend the X-axis to allow the
-	 * period's gray block to be fully shown at extremities.
-	 */
-	useEffect(() => {
-		const chart = chartRef.current?.chart;
-
-		if (!chart || !isReturnPeriod || !activeTab.startsWith('period')) {
-			return;
-		}
-
-		// Timeout of 0 to allow the HighChart component to render before
-		// extending the X-axis.
-		const timeoutId = window.setTimeout(() => {
-			extendChartXAxis(chart, FIFTEEN_YEARS, FIFTEEN_YEARS);
-		}, 0);
-
-		return () => window.clearTimeout(timeoutId);
-	}, [chartOptions, isReturnPeriod, activeTab]);
-
 	// Export CSV from data
 	const exportCsvFromData = (data: Record<string, Record<string, number[]>>): string => {
 		// Get all ranges
@@ -1050,9 +1029,7 @@ const ClimateDataChart: React.FC<{
 										acc[newKey] = Object.fromEntries(
 											Object.entries(dataCopy[key] ?? {}).map(([timestamp, value]) => {
 												const year = new Date(Number(timestamp)).getUTCFullYear();
-												const startYear = isReturnPeriod ? year - 15 : year;
-												const endYear = startYear + 29;
-												return [`${startYear} - ${endYear}`, value as number[]];
+												return [`${year} - ${year + 29}`, value as number[]];
 											})
 										);
 										return acc;

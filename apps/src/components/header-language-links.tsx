@@ -20,8 +20,10 @@ const HeaderLanguageLinks = (
 	 */
 	const currentLangCode = document.documentElement.lang ?? 'en';
 
+	const alternateLangCode = currentLangCode === 'fr' ? 'en' : 'fr';
+
 	// What to change on the link about the langauge we're currently on.
-	const cnListForLangCodeWhen = (subjectLangCode: string): string[] => {
+	const getClassNamesForLangCode = (subjectLangCode: string): string[] => {
 		return currentLangCode === subjectLangCode
 			? ['underline', 'text-zinc-500']
 			: [];
@@ -39,7 +41,7 @@ const HeaderLanguageLinks = (
 				<li
 					className={cn(
 						'hover:text-brand-red',
-						cnListForLangCodeWhen('en')
+						getClassNamesForLangCode('en')
 					)}
 				>
 					<a href="https://www.ClimateData.ca/">en</a>
@@ -47,7 +49,7 @@ const HeaderLanguageLinks = (
 				<li
 					className={cn(
 						'hover:text-brand-red',
-						cnListForLangCodeWhen('fr')
+						getClassNamesForLangCode('fr')
 					)}
 				>
 					<a href="https://www.DonneesClimatiques.ca/">fr</a>

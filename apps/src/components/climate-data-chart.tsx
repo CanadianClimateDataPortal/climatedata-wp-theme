@@ -103,44 +103,6 @@ function addClimateZonePlotBands(options: Options) {
 }
 
 /**
- * Add an extra padding to the X-axis.
- *
- * This method should be called after the chart has rendered, to be able to
- * retrieve the current maximum values of the axis.
- *
- * @param chart - The chart to extend
- * @param extraStart - Additional padding to add at the beginning of the axe
- * @param extraEnd - Additional padding to add at the end of the axe
- */
-function extendChartXAxis(
-	chart: Chart,
-	extraStart: number|undefined,
-	extraEnd: number|undefined,
-) {
-	const xAxis = chart.xAxis[0];
-
-	if (!xAxis) {
-		return;
-	}
-
-	// By default, we reset the extremes
-	let newMin: number|undefined = undefined;
-	let newMax: number|undefined = undefined;
-
-	const { dataMin, dataMax } = xAxis.getExtremes();
-
-	if (extraStart) {
-		newMin = dataMin - extraStart;
-	}
-
-	if (extraEnd) {
-		newMax = dataMax + extraEnd;
-	}
-
-	xAxis.setExtremes(newMin, newMax);
-}
-
-/**
  * Return the aggregation tabs to be displayed.
  *
  * @param climateVariable - The displayed climate variable.
@@ -383,9 +345,9 @@ const ClimateDataChart: React.FC<{
 		}
 
 		// Displayed period
-		let tooltipStartYear = new Date(timestampKey).getUTCFullYear();
+		const tooltipStartYear = new Date(timestampKey).getUTCFullYear();
 		let plotBandStartYear = tooltipStartYear;
-		let tooltipYearLength = 29;
+		const tooltipYearLength = 29;
 		let plotBandYearLength = 29;
 
 		if (isReturnPeriod) {
@@ -566,7 +528,7 @@ const ClimateDataChart: React.FC<{
 				id: 'delta-plot-band',
 			});
 		}
-	}, [activeTab]);
+	}, [activeTab, isReturnPeriod]);
 
 	// adds visible property to each series
 	const filteredSeries = useMemo<SeriesOptionsType[]>(() => {

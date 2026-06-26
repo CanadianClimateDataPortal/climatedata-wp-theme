@@ -28,13 +28,10 @@ import React, {
 	useState,
 	useCallback,
 	useEffect,
-	useRef,
 } from 'react';
 import { useDownloadUrlSync } from '@/hooks/use-download-url-sync';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import type { RootState } from '@/app/store';
-import type { ClimateVariableInterface } from '@/types/climate-variable-interface';
-import type { TaxonomyData } from '@/types/types';
+import { TaxonomyData } from '@/types/types';
 import { useShapefile } from '@/hooks/use-shapefile';
 import {
 	setClimateVariable,
@@ -52,7 +49,6 @@ import {
 	buildResetPayloadForStepsAfter,
 	determineStepApplicable,
 	DOWNLOAD_STEPS,
-	resolvePopstateStep,
 } from '@/lib/download';
 
 interface DownloadContextValue {
@@ -63,87 +59,7 @@ interface DownloadContextValue {
 	dataset: TaxonomyData | null;
 }
 
-interface DownloadHistoryState {
-	step: number;
-}
-
-interface DownloadPopstateContext {
-	climateVariable: ClimateVariableInterface | null;
-	currentStep: number;
-	setCurrentStepLocal: React.Dispatch<React.SetStateAction<number>>;
-	stepCount: number;
-}
-
 const DownloadContext = createContext<DownloadContextValue | null>(null);
-
-const selectDownloadDataset = (state: RootState): TaxonomyData | null =>
-	state.download.dataset;
-
-function getInitialDownloadStep(): number {
-	const params = new URLSearchParams(window.location.search);
-	const hasVariable = params.has('var');
-	return hasVariable ? 2 : 1;
-}
-
-function replaceDownloadHistoryStep(step: number): void {
-	const historyState = { step } satisfies DownloadHistoryState;
-	// Download browser history state is `{ step: N }`.
-	window.history.replaceState(historyState, '');
-}
-
-function pushDownloadHistoryStep(step: number): void {
-	const historyState = { step } satisfies DownloadHistoryState;
-	// Download browser history state is `{ step: N }`.
-	window.history.pushState(historyState, '');
-}
-
-function advanceDownloadStepWithHistory(
-	contextRef: React.RefObject<DownloadPopstateContext | null>
-): void {
-	const context = contextRef.current;
-	if (context === null) {
-		return;
-	}
-
-	const nextStep = context.currentStep + 1;
-	context.currentStep = nextStep;
-	pushDownloadHistoryStep(nextStep);
-	context.setCurrentStepLocal(nextStep);
-}
-
-function createDownloadPopstateHandler(
-	contextRef: React.RefObject<DownloadPopstateContext | null>
-): (event: PopStateEvent) => void {
-	/**
-	 * Apply browser Back/Forward as a non-destructive local step change.
-	 *
-	 * @remarks
-	 * Popstate must bypass the destructive Edit-pencil path
-	 * ({@link resetStepsAfter} via `goToStep`) so Back/Forward preserves later
-	 * step selections for Forward re-entry. The pure resolver reads the
-	 * `{ step: N }` history state defensively and performs T7's structural
-	 * guard before this handler mirrors the normal local state path.
-	 */
-	return function handleDownloadPopstate(event: PopStateEvent): void {
-		const context = contextRef.current;
-		if (context === null) {
-			return;
-		}
-
-		const resolvedStep = resolvePopstateStep({
-			climateVariable: context.climateVariable,
-			currentStep: context.currentStep,
-			historyState: event.state,
-			stepCount: context.stepCount,
-		});
-		if (resolvedStep === null) {
-			return;
-		}
-
-		context.currentStep = resolvedStep;
-		context.setCurrentStepLocal(resolvedStep);
-	};
-}
 
 export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
@@ -154,39 +70,18 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	useDownloadUrlSync();
 
 	const [steps, setSteps] = useState<typeof STEPS>([...STEPS]);
-	const initialStepRef = useRef<number>(getInitialDownloadStep());
+	// Start at step 2 if URL has variable parameter
+	const params = new URLSearchParams(window.location.search);
+	const hasVariable = params.has('var');
 	const [currentStep, setCurrentStepLocal] = useState<number>(
-		initialStepRef.current
+		hasVariable ? 2 : 1
 	);
-	const popstateContextRef = useRef<DownloadPopstateContext | null>(null);
-	const dataset = useAppSelector(selectDownloadDataset);
+	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
-
-	popstateContextRef.current = {
-		climateVariable,
-		currentStep,
-		setCurrentStepLocal,
-		stepCount: steps.length,
-	};
 
 	useEffect(() => {
 		dispatch(setCurrentStep(currentStep));
 	}, [currentStep, dispatch]);
-
-	useEffect(() => {
-		replaceDownloadHistoryStep(initialStepRef.current);
-	}, []);
-
-	useEffect(() => {
-		// Register once and read live values from a ref so queued browser
-		// `popstate` events are not exposed to add/remove listener churn.
-		const handlePopstate = createDownloadPopstateHandler(popstateContextRef);
-		window.addEventListener('popstate', handlePopstate);
-
-		return () => {
-			window.removeEventListener('popstate', handlePopstate);
-		};
-	}, []);
 
 	/**
 	 * Update steps when the climate variable class or id change.
@@ -289,9 +184,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	 * Navigates to the next step in the form.
 	 */
 	const goToNextStep = useCallback(
-		() => {
-			advanceDownloadStepWithHistory(popstateContextRef);
-		},
+		() => setCurrentStepLocal((prev) => prev + 1),
 		[]
 	);
 

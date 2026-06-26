@@ -1738,6 +1738,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			},
 		],
 		unit: "degC",
+		unitDecimalPlaces: 1,
 		preCalculatedCanDCSConfig: {
 			rl5tasmax: [FrequencyType.YS],
 			rl10tasmax: [FrequencyType.YS],
@@ -1778,6 +1779,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			},
 		],
 		unit: "degC",
+		unitDecimalPlaces: 1,
 		preCalculatedCanDCSConfig: {
 			rl5tasmin: [FrequencyType.YS],
 			rl10tasmin: [FrequencyType.YS],

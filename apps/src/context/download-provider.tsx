@@ -52,6 +52,7 @@ import {
 	buildResetPayloadForStepsAfter,
 	determineStepApplicable,
 	DOWNLOAD_STEPS,
+	reconcileHistoryOnMutation,
 	resolvePopstateStep,
 } from '@/lib/download';
 
@@ -72,6 +73,14 @@ interface DownloadPopstateContext {
 	currentStep: number;
 	setCurrentStepLocal: React.Dispatch<React.SetStateAction<number>>;
 	stepCount: number;
+	// T13 push-on-mutation guards (D6). `deferredPushStep` holds the step to
+	// truncate-push once an Edit-jump's programmatic `history.go` settles (the
+	// `go` fires its own popstate); the handler consumes it instead of moving the
+	// UI. `mutationGuardArmed` is set on a genuine Back/Forward so the first
+	// step-state mutation afterwards reconciles the stale forward tail exactly
+	// once (the once-guard), then disarms until the next Back/Forward.
+	deferredPushStep: number | null;
+	mutationGuardArmed: boolean;
 }
 
 const DownloadContext = createContext<DownloadContextValue | null>(null);
@@ -97,6 +106,32 @@ function pushDownloadHistoryStep(step: number): void {
 	window.history.pushState(historyState, '');
 }
 
+/**
+ * Read the wizard step currently tagged on `window.history.state`.
+ *
+ * @remarks
+ * Returns `null` when the live history state is foreign or untagged (e.g. the
+ * URL-sync hook's empty-object write before the mount tag lands), so the
+ * reconciliation decision treats it as "already positioned" (push only).
+ */
+function readCurrentHistoryStep(): number | null {
+	const historyState = window.history.state;
+	const isObjectState =
+		typeof historyState === 'object' &&
+		historyState !== null &&
+		!Array.isArray(historyState);
+	if (!isObjectState) {
+		return null;
+	}
+
+	const maybeStep = (historyState as { step?: unknown }).step;
+	if (typeof maybeStep !== 'number' || !Number.isFinite(maybeStep)) {
+		return null;
+	}
+
+	return maybeStep;
+}
+
 function advanceDownloadStepWithHistory(
 	contextRef: React.RefObject<DownloadPopstateContext | null>
 ): void {
@@ -109,6 +144,49 @@ function advanceDownloadStepWithHistory(
 	context.currentStep = nextStep;
 	pushDownloadHistoryStep(nextStep);
 	context.setCurrentStepLocal(nextStep);
+}
+
+/**
+ * Reconcile the browser-history stack after a step-state mutation that
+ * invalidates the forward tail (CLIM-1410 T13, design D6 push-on-mutation).
+ *
+ * @remarks
+ * Delegates the decision to the pure {@link reconcileHistoryOnMutation}, then
+ * applies it imperatively:
+ *
+ * - When the plan carries a `go` delta (downward Edit-jump from the stack top),
+ *   stash the truncating push on `deferredPushStep` and walk the stack with
+ *   `history.go(delta)`. The resulting programmatic popstate is consumed by
+ *   {@link createDownloadPopstateHandler}, which performs the deferred push —
+ *   sequencing the truncation AFTER the position settles (`history.go` resolves
+ *   on a later task).
+ * - When the plan has no `go` (mutate-after-Back, floor, or foreign state), push
+ *   immediately; the push truncates the live forward tail by construction.
+ *
+ * @param contextRef - Live popstate context ref (read at call time).
+ * @param targetStep - The wizard step the UI is settling on.
+ */
+function reconcileDownloadHistoryForMutation(
+	contextRef: React.RefObject<DownloadPopstateContext | null>,
+	targetStep: number
+): void {
+	const context = contextRef.current;
+	if (context === null) {
+		return;
+	}
+
+	const plan = reconcileHistoryOnMutation({
+		currentHistoryStep: readCurrentHistoryStep(),
+		targetStep,
+	});
+
+	if (plan.go !== null) {
+		context.deferredPushStep = plan.push;
+		window.history.go(plan.go);
+		return;
+	}
+
+	pushDownloadHistoryStep(plan.push);
 }
 
 function createDownloadPopstateHandler(
@@ -130,6 +208,18 @@ function createDownloadPopstateHandler(
 			return;
 		}
 
+		// An Edit-jump reconciliation walks the stack with `history.go(delta)` to
+		// reposition onto the target's existing entry before truncating. That
+		// `go` fires its own popstate; consume it here — perform the deferred
+		// truncating push instead of moving the UI (the UI is already on the
+		// target via `goToStep`). See {@link reconcileHistoryOnMutation}.
+		if (context.deferredPushStep !== null) {
+			const pushStep = context.deferredPushStep;
+			context.deferredPushStep = null;
+			pushDownloadHistoryStep(pushStep);
+			return;
+		}
+
 		const resolvedStep = resolvePopstateStep({
 			climateVariable: context.climateVariable,
 			currentStep: context.currentStep,
@@ -140,6 +230,10 @@ function createDownloadPopstateHandler(
 			return;
 		}
 
+		// A genuine Back/Forward landed: arm the once-guard so the first
+		// step-state mutation afterwards reconciles the now-stale forward tail
+		// (D6 mutate-after-Back site).
+		context.mutationGuardArmed = true;
 		context.currentStep = resolvedStep;
 		context.setCurrentStepLocal(resolvedStep);
 	};
@@ -162,11 +256,17 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	const dataset = useAppSelector(selectDownloadDataset);
 	const dispatch = useAppDispatch();
 
+	// Preserve the imperative T13 guards across renders — they track browser
+	// traversal state, not render-derived state, so they must survive the
+	// per-render rebuild of the render-derived fields below.
+	const previousContext = popstateContextRef.current;
 	popstateContextRef.current = {
 		climateVariable,
 		currentStep,
 		setCurrentStepLocal,
 		stepCount: steps.length,
+		deferredPushStep: previousContext?.deferredPushStep ?? null,
+		mutationGuardArmed: previousContext?.mutationGuardArmed ?? false,
 	};
 
 	useEffect(() => {
@@ -187,6 +287,31 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 			window.removeEventListener('popstate', handlePopstate);
 		};
 	}, []);
+
+	/**
+	 * T13 mutate-after-Back trigger site (D6 push-on-mutation).
+	 *
+	 * The `climateVariable` instance changes on every step-state mutation (any
+	 * download setter dispatches `updateClimateVariable`, which the
+	 * climate-variable provider memo recomputes from). That dispatch is the
+	 * mutation signal — no DOM-event heuristics, no snapshot diffing.
+	 *
+	 * Reconcile only when the once-guard is armed: a genuine browser Back/Forward
+	 * landed (popstate set `mutationGuardArmed`), leaving a now-stale forward
+	 * tail. The first mutation afterwards truncates it via a plain push; the
+	 * guard disarms so repeated keystrokes on the same step don't push duplicate
+	 * entries. Forward-flow mutations (reached via Next) are never armed, so they
+	 * are left untouched — their `goToNextStep` push already owns the top.
+	 */
+	useEffect(() => {
+		const context = popstateContextRef.current;
+		if (context === null || !context.mutationGuardArmed) {
+			return;
+		}
+
+		context.mutationGuardArmed = false;
+		reconcileDownloadHistoryForMutation(popstateContextRef, context.currentStep);
+	}, [climateVariable]);
 
 	/**
 	 * Update steps when the climate variable class or id change.
@@ -306,6 +431,18 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 			if (step < currentStep) {
 				setCurrentStepLocal(step);
 				resetStepsAfter(step);
+				// T13 Edit-pencil trigger site (D6): the destructive Edit jump left
+				// the browser history untouched, so its forward tail was stale
+				// (Back would move the UI FORWARD). Reconcile by walking back to
+				// the target's entry and truncating. Keep the mutate-after-Back
+				// guard disarmed — the reset's own `updateClimateVariable` dispatch
+				// must NOT be mistaken for a post-Back field mutation.
+				const context = popstateContextRef.current;
+				if (context !== null) {
+					context.currentStep = step;
+					context.mutationGuardArmed = false;
+				}
+				reconcileDownloadHistoryForMutation(popstateContextRef, step);
 			} else {
 				setCurrentStepLocal(step);
 			}

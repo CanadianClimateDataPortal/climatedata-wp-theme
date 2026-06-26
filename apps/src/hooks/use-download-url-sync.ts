@@ -62,9 +62,10 @@ export const useDownloadUrlSync = () => {
 			addParamsToUrl(params);
 
 			// Update URL without navigation.
-			// Preserve any existing `history.state` instead of replacing it
-			// with `{}` — this sync should only swap the URL, never discard
-			// history state another part of the app may rely on.
+			// Preserve the existing history state (the Download wizard's
+			// `{ step: N }` tag written by the provider for CLIM-1410
+			// Back/Forward navigation) — passing `{}` here would clobber it,
+			// leaving `popstate` with no step to read.
 			const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
 			const preservedHistoryState = window.history.state;
 			window.history.replaceState(preservedHistoryState, '', newUrl);

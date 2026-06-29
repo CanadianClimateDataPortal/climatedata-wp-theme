@@ -1,7 +1,7 @@
-import React, { useContext, useMemo, useState, useEffect } from 'react';
+import { useContext, useMemo, useState, useEffect } from 'react';
 import { __ } from '@/context/locale-provider';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { selectSearchQuery, setClimateVariable } from '@/store/climate-variable-slice';
+import { useAppSelector } from '@/app/hooks';
+import { selectSearchQuery } from '@/store/climate-variable-slice';
 import { PostData } from '@/types/types';
 
 import {
@@ -14,7 +14,7 @@ import VariableFilterCount from '@/components/sidebar-menu-items/variables';
 import { VariableSearchFilter } from '@/components/variable-search-filter';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { StepComponentProps, StepComponentRef } from '@/types/download-form-interface';
+import { StepComponent } from '@/types/download-form-interface';
 import SectionContext from "@/context/section-provider";
 import useFilteredVariables from '@/hooks/use-filtered-variables';
 
@@ -23,15 +23,11 @@ import useFilteredVariables from '@/hooks/use-filtered-variables';
  *
  * Variable step
  */
-const StepVariable = React.forwardRef<
-    StepComponentRef,
-    StepComponentProps
->(({ onChangeValidity }, ref) => {
+const StepVariable: StepComponent = ({ onChangeValidity }) => {
     const { climateVariable, selectClimateVariable } = useClimateVariable();
     const [varType, setVarType] = useState<string>('');
     const [sector, setSector] = useState<string>('');
     const section = useContext(SectionContext);
-    const dispatch = useAppDispatch();
     const { dataset } = useAppSelector((state) => state.download);
     const { variableList } = useAppSelector((state) => state.map);
     const searchQuery = useAppSelector(selectSearchQuery);
@@ -42,16 +38,6 @@ const StepVariable = React.forwardRef<
     useEffect(() => {
         onChangeValidity(Boolean(climateVariable?.getId()))
     }, [climateVariable, onChangeValidity]);
-
-    React.useImperativeHandle(
-        ref,
-        () => ({
-            reset: () => {
-                dispatch(setClimateVariable(null));
-            },
-        }),
-        [dispatch]
-    );
 
     const filterValues = useMemo(
         () => ({
@@ -150,8 +136,9 @@ const StepVariable = React.forwardRef<
             </div>
         </StepContainer>
     );
-});
-
+};
+// Explicit string literal — step-summary.tsx branches on these names, and a
+// derived function name would not survive minification.
 StepVariable.displayName = 'StepVariable';
 
 export default StepVariable;

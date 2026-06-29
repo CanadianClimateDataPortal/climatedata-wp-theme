@@ -17,7 +17,6 @@ import { FINCH_FREQUENCY_NAMES, GEOSERVER_BASE_URL } from '@/lib/constants';
 import {
 	FinchRequestInput,
 	StepComponent,
-	StepComponentRef,
 } from '@/types/download-form-interface';
 import {
 	ClimateVariableInterface,
@@ -122,7 +121,7 @@ const Steps: React.FC = () => {
 	const [stepErrorMessages, setStepErrorMessages] = useState<StepErrorMessage[]>([]);
 
 	const dispatch = useAppDispatch();
-	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
+	const { steps, goToNextStep, currentStep } = useDownload();
 	const { climateVariable } = useClimateVariable();
 	const { finchPayload } = useShapefile();
 
@@ -614,15 +613,6 @@ const Steps: React.FC = () => {
 			<StepNavigation totalSteps={steps.length} />
 			<div className="mb-8">
 				<Step
-					// Register the step's ref to enable communication between the step component
-					// and the download context. This allows the step to validate itself and
-					// notify the parent when its state changes.
-					ref={(ref: StepComponentRef | null) => {
-						if (ref) {
-							// Store the ref in the download context to access it from other components
-							registerStepRef(currentStep, ref);
-						}
-					}}
 					onChangeValidity={setIsStepValid}
 					onChangeErrorMessages={updateErrorMessages}
 				/>

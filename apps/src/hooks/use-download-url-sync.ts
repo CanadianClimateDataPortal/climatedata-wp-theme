@@ -61,9 +61,13 @@ export const useDownloadUrlSync = () => {
 
 			addParamsToUrl(params);
 
-			// Update URL without navigation
+			// Update URL without navigation.
+			// Preserve any existing `history.state` instead of replacing it
+			// with `{}` — this sync should only swap the URL, never discard
+			// history state another part of the app may rely on.
 			const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
-			window.history.replaceState({}, '', newUrl);
+			const preservedHistoryState = window.history.state;
+			window.history.replaceState(preservedHistoryState, '', newUrl);
 
 			updateTimeoutRef.current = null;
 		}, 200);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { __ } from '@/context/locale-provider';
 
@@ -14,21 +14,34 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setDataset } from '@/features/download/download-slice';
 import { fetchTaxonomyData } from '@/services/services';
 import { TaxonomyData } from '@/types/types';
-import { StepComponentProps, StepComponentRef } from '@/types/download-form-interface';
+import { StepComponent } from '@/types/download-form-interface';
 
 /**
  * Step 1.
  *
  * Dataset step
  */
-const StepDataset = React.forwardRef<
-	StepComponentRef,
-	StepComponentProps
->(({ onChangeValidity }, ref) => {
+const StepDataset: StepComponent = (props): React.ReactElement => {
+	const {
+		onChangeValidity,
+	} = props;
 	const [options, setOptions] = useState<TaxonomyData[]>([]);
 
 	const { locale } = useLocale();
 
+	/**
+	 * @example
+	 * ```
+	 * {
+	 *   "term_id": 215,
+	 *   "title": {
+	 *     "en": "Adjusted and Homogenized Canadian Climate Data (AHCCD)",
+	 *     "fr": "Données climatologiques canadiennes ajustées et homogénéisées (DCCAH)"
+	 *   },
+	 *   "dataset_type": "ahccd"
+	 * }
+	 * ```
+	 */
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
 
@@ -36,16 +49,8 @@ const StepDataset = React.forwardRef<
 	 * Step validation
 	 */
 	useEffect(() => {
-		onChangeValidity(Boolean(dataset))
+		onChangeValidity(Boolean(dataset));
 	}, [dataset, onChangeValidity]);
-
-	React.useImperativeHandle(ref, () => ({
-		getResetPayload: () => {
-			return {
-				dataset: null
-			};
-		}
-	}), []);
 
 	useEffect(() => {
 		fetchTaxonomyData('datasets', 'download').then((data) => {
@@ -97,7 +102,8 @@ const StepDataset = React.forwardRef<
 			</div>
 		</StepContainer>
 	);
-});
-StepDataset.displayName = 'StepDataset';
+};
+
+StepDataset.displayName = 'StepDataset'; // Explicit string literal, or this name would be lost in production.
 
 export default StepDataset;

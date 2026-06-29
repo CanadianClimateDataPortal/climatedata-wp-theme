@@ -165,7 +165,7 @@ function MissingDataTooltip(): React.ReactElement {
 	);
 }
 
-const PeriodsSelector = (props: PeriodsSelectorProps) => {
+const PeriodsSelector = (props: PeriodsSelectorProps): React.ReactElement => {
 	const {
 		availablePeriods,
 		selectedPeriods,
@@ -249,12 +249,18 @@ const PeriodsSelector = (props: PeriodsSelectorProps) => {
 	);
 }
 
+PeriodsSelector.displayName = 'PeriodsSelector'; // Explicit string literal, or this name would be lost in production.
+
+
 /**
  * Step 5.
  *
  * Additional details step will allow the user to customize the download request
  */
-const StepAdditionalDetails: StepComponent = ({ onChangeValidity }) => {
+const StepAdditionalDetails: StepComponent = (props): React.ReactElement => {
+	const {
+		onChangeValidity,
+	} = props;
 	const { locale } = useLocale();
 	const {
 		climateVariable,
@@ -589,9 +595,8 @@ const StepAdditionalDetails: StepComponent = ({ onChangeValidity }) => {
 		</StepContainer>
 	);
 };
-// Explicit string literal — step-summary.tsx branches on these names, and a
-// derived function name would not survive minification.
-StepAdditionalDetails.displayName = 'StepAdditionalDetails';
+
+StepAdditionalDetails.displayName = 'StepAdditionalDetails'; // Explicit string literal, or this name would be lost in production.
 
 /**
  * Extracts and formats summary data for the Additional Details step.

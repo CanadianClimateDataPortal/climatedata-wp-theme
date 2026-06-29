@@ -83,10 +83,11 @@ function getShapefileErrorMessage(
  *
  * Location step, allows the user to make a selection on the map and choose what type of region to select
  */
-const StepLocation: StepComponent = ({
-	onChangeValidity,
-	onChangeErrorMessages,
-}) => {
+const StepLocation: StepComponent = (props): React.ReactElement => {
+	const {
+		onChangeValidity,
+		onChangeErrorMessages,
+	} = props
 	const { climateVariable } = useClimateVariable();
 	const {
 		isSelectionValid: isShapefileSelectionValid,
@@ -161,9 +162,8 @@ const StepLocation: StepComponent = ({
 		</StepContainer>
 	);
 };
-// Explicit string literal — step-summary.tsx branches on these names, and a
-// derived function name would not survive minification.
-StepLocation.displayName = 'StepLocation';
+
+StepLocation.displayName = 'StepLocation'; // Explicit string literal, or this name would be lost in production.
 
 export default StepLocation;
 

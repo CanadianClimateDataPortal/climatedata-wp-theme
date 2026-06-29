@@ -21,7 +21,10 @@ import { StepComponent } from '@/types/download-form-interface';
  *
  * Dataset step
  */
-const StepDataset: StepComponent = ({ onChangeValidity }) => {
+const StepDataset: StepComponent = (props): React.ReactElement => {
+	const {
+		onChangeValidity,
+	} = props;
 	const [options, setOptions] = useState<TaxonomyData[]>([]);
 
 	const { locale } = useLocale();
@@ -100,8 +103,7 @@ const StepDataset: StepComponent = ({ onChangeValidity }) => {
 		</StepContainer>
 	);
 };
-// Explicit string literal — step-summary.tsx branches on these names, and a
-// derived function name would not survive minification.
-StepDataset.displayName = 'StepDataset';
+
+StepDataset.displayName = 'StepDataset'; // Explicit string literal, or this name would be lost in production.
 
 export default StepDataset;

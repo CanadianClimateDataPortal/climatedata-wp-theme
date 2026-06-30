@@ -9,20 +9,9 @@ interface HeaderLanguageLinksProps {
 }
 
 interface ListItemElementProps {
-	locale: Locale;
+	subjectLangCode: Locale;
+	subjectAppPathname: string;
 }
-
-const URL_ORDERED_SET = new Set([
-	'/maps/;en',
-	'/cartes/;fr',
-	'/download/;en',
-	'/telechargement/;fr',
-]);
-
-const createHashMapForApp = (pathName: string) =>
-	[...URL_ORDERED_SET]
-		.filter((i) => i.split(';')[0] === pathName)
-		.map((i) => [i.split(';')[1], i.split(';')[0]]);
 
 const URL_HASHMAP_BASEURL = new Map<Locale, string>([
 	['fr', 'https://www.DonneesClimatiques.ca'],
@@ -39,6 +28,20 @@ const URL_HASHMAP_PATHS_DOWNLOAD = new Map<Locale, string>([
 	['en', '/download/'],
 ]);
 
+const getPathnameFor = (locale: string, appName: string): string => {
+	let out = '';
+	let attempt;
+	if (/^(download|telechargement)$/.test(appName)) {
+		attempt = URL_HASHMAP_PATHS_DOWNLOAD.get(locale as Locale);
+	} else if (/^(maps|cartes)$/.test(appName)) {
+		attempt = URL_HASHMAP_PATHS_MAPS.get(locale as Locale);
+	}
+	if (typeof attempt === 'string') {
+		out = attempt;
+	}
+	return out;
+};
+
 const HeaderLanguageLinks = (
 	props: HeaderLanguageLinksProps
 ): React.ReactNode => {
@@ -46,14 +49,18 @@ const HeaderLanguageLinks = (
 
 	const { locale } = useLocale();
 
-	/**
-	 * IDEA: since we can know the current language.
-	 *
-	 * We could make the lange we're not on more visible than the one we're on already.
-	 */
-	const currentLangCode = document.documentElement.lang ?? 'en';
-
+	const currentLangCode = document.documentElement.lang ?? locale;
 	const alternateLangCode = currentLangCode === 'fr' ? 'en' : 'fr';
+
+	const currentUrl = (() => {
+		// Missing: useUrlSync (`apps/src/hooks/use-url-sync.ts`, `apps/src/hooks/use-download-url-sync.ts`)
+		return new URL(window.location.href);
+	})();
+
+	const currentAppPathname = (() => {
+		const current = currentUrl.pathname.replace(/\//g, '');
+		return current;
+	})();
 
 	// What to change on the link about the langauge we're currently on.
 	const getClassNamesForLangCode = (subjectLangCode: string): string[] => {
@@ -62,46 +69,29 @@ const HeaderLanguageLinks = (
 			: [];
 	};
 
-	const currentAppPathname = (() => {
-		const url = new URL(window.location.href);
-		const current = url.pathname.replace('/', '');
-		return current;
-	})();
-
 	const ListItemElement = (props: ListItemElementProps): React.ReactElement => {
-		const { locale } = props;
-		const alternateLangCode = locale === 'fr' ? 'en' : 'fr';
-		const href = URL_HASHMAP_BASEURL.get(locale) as string;
-		// if (currentAppPathname === '/') const pathName = URL_HASHMAP_BASEURL;
-		console.log(`<ListItemElement locale="${locale}">`, { locale, currentLangCode, alternateLangCode });
+		const { subjectLangCode, subjectAppPathname } = props;
+		const baseUrl = URL_HASHMAP_BASEURL.get(subjectLangCode) as string;
+		const pathname = getPathnameFor(subjectLangCode, subjectAppPathname);
+		const href = new URL(baseUrl + pathname + currentUrl.search);
 
 		return (
 			<>
 				<li
 					className={cn(
 						'hover:text-brand-red',
-						getClassNamesForLangCode(locale)
+						getClassNamesForLangCode(subjectLangCode)
 					)}
 				>
-					{locale !== alternateLangCode ? (
-						<span>{alternateLangCode}</span>
+					{subjectLangCode === currentLangCode ? (
+						<span>{subjectLangCode}</span>
 					) : (
-						<a href={href + '?yo=dog'}>{alternateLangCode}</a>
+						<a href={String(href)}>{subjectLangCode}</a>
 					)}
 				</li>
 			</>
 		);
 	};
-
-	const whatever = createHashMapForApp(currentAppPathname);
-
-	console.log('HeaderLanguageLinks', {
-		currentLangCode,
-		locale,
-		alternateLangCode,
-		currentAppPathname,
-		whatever,
-	});
 
 	return (
 		<>
@@ -112,17 +102,10 @@ const HeaderLanguageLinks = (
 				)}
 				data-lang-code={currentLangCode}
 			>
-				<ListItemElement locale={locale} />
-				<li
-					className={cn('hover:text-brand-red', getClassNamesForLangCode('en'))}
-				>
-					<a href="https://www.ClimateData.ca/">en</a>
-				</li>
-				<li
-					className={cn('hover:text-brand-red', getClassNamesForLangCode('fr'))}
-				>
-					<a href="https://www.DonneesClimatiques.ca/">fr</a>
-				</li>
+				<ListItemElement
+					subjectLangCode={alternateLangCode}
+					subjectAppPathname={currentAppPathname}
+				/>
 			</ul>
 		</>
 	);

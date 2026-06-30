@@ -1,6 +1,8 @@
 import { LogOut } from 'lucide-react';
+
 import { __ } from '@/context/locale-provider';
 import Logo from '@/assets/logo.svg';
+import HeaderLanguageLinks from '@/components/header-language-links';
 
 export default function Header(): JSX.Element {
 	return (
@@ -13,12 +15,15 @@ export default function Header(): JSX.Element {
 					</h2>
 				</a>
 			</div>
-			<a href="/" className="hidden lg:flex gap-x-2 px-4 py-2">
-				<span className="underline text-sm">
-					{__('Go back to the main website')}
-				</span>
-				<LogOut />
-			</a>
+			<div className="gap-x-2 px-4 py-2 flex items-center divide-x">
+				<a href="/" className="flex gap-2">
+					<span className="underline text-sm">
+						{__('Go back to the main website')}
+					</span>
+					<LogOut />
+				</a>
+				<HeaderLanguageLinks className="pl-4" />
+			</div>
 		</header>
 	);
 }

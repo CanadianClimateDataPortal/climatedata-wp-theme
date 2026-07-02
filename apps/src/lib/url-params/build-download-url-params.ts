@@ -31,8 +31,9 @@ export interface DownloadUrlParamsInput {
  *
  * Past step 1, the selected dataset (and, once chosen, the variable) are added.
  * On step 1 both are removed — the Download page only ever carries `dataset`
- * and `var`, so a step-1 switch lands on the dataset-choice step (accepted, see
- * ticket DI2).
+ * and `var` (never the wizard step). A consequence: switching language reloads
+ * the app onto the dataset/variable step, not the exact step the user was on —
+ * that step loss is accepted. ([[LLM-Context-ClimateData-Ticket-CLIM-1409]], DI2.)
  *
  * @param params - URL parameters to mutate (existing unrelated params are kept).
  * @param input - Download slice values to serialize.

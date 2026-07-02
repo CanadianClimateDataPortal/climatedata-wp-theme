@@ -32,9 +32,10 @@ const LOCALES: Locale[] = [
  * other locale renders as a real `<a href>` to the equivalent page on the
  * other-language site (origin swap + path translation + current query). The
  * query is derived from Redux state via `selectMapUrlSearch` /
- * `selectDownloadUrlSearch` — NOT `window.location.search`, which lags
- * url-sync's debounced write (ticket CI-16) — so the `href` stays current even
- * for a middle/Ctrl-click "open in new tab".
+ * `selectDownloadUrlSearch`, not `window.location.search` — url-sync writes the
+ * URL on a debounced `replaceState` with no re-render, so the URL lags the live
+ * state — so the `href` stays current even for a middle/Ctrl-click "open in new
+ * tab". ([[LLM-Context-ClimateData-Ticket-CLIM-1409]], CI-16.)
  */
 const HeaderLanguageLinks = (
 	props: HeaderLanguageLinksProps

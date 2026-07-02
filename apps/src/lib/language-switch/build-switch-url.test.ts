@@ -11,7 +11,7 @@ import {
 	resolveAlternatePath,
 } from '@/lib/language-switch';
 
-describe('resolveAlternateOrigin (D1b origin transform)', () => {
+describe('resolveAlternateOrigin (bidirectional host → counterpart lookup)', () => {
 	test.each([
 		['dev-en.climatedata.ca', 'https:', 'https://dev-fr.climatedata.ca'],
 		['dev-fr.climatedata.ca', 'https:', 'https://dev-en.climatedata.ca'],
@@ -36,7 +36,7 @@ describe('resolveAlternateOrigin (D1b origin transform)', () => {
 	});
 });
 
-describe('prod apex pair (DI3)', () => {
+describe('prod apex pair — bare-apex cross-origin, hardcoded', () => {
 	test('is the bare-apex cross-origin pair, NO www. prefix', () => {
 		expect(PROD_APEX_HOST_EN).toBe('climatedata.ca');
 		expect(PROD_APEX_HOST_FR).toBe('donneesclimatiques.ca');
@@ -94,7 +94,7 @@ describe('buildSwitchUrl (origin + path + query carry)', () => {
 		expect(url).toBe('https://dev-en.climatedata.ca/maps/');
 	});
 
-	test('a query set after mount is carried (guards CI-16 staleness)', () => {
+	test('a query set after mount is carried (guards against a stale URL query)', () => {
 		// The header derives `search` from Redux state, so a param changed after
 		// mount is present here even though the URL bar may lag the debounce.
 		const url = buildSwitchUrl({

@@ -33,9 +33,12 @@ export const { initializeUrlSync, setUrlParamsLoaded } = urlSyncSlice.actions;
 
 /**
  * The Map URL query string the app would currently write, derived from Redux
- * state (NOT from `window.location.search`, which lags url-sync's debounced
- * `replaceState` — see ticket CI-16). Memoized on the driving slices, so the
- * language switcher re-renders and rebuilds its `href` when they change.
+ * state — NOT from `window.location.search`. url-sync writes the URL with a
+ * debounced `history.replaceState` that triggers no re-render, so a value read
+ * from the URL at render time lags the live state (and is empty before the
+ * first write). Reading state keeps this current. Memoized on the driving
+ * slices, so the language switcher re-renders and rebuilds its `href` when they
+ * change. ([[LLM-Context-ClimateData-Ticket-CLIM-1409]], CI-16.)
  *
  * Reuses `buildMapUrlParams` — the same serializer the Map url-sync hook writes
  * with — so the switch destination can never drift from what url-sync produces.

@@ -6,6 +6,7 @@ import { ClimateVariables } from '@/config/climate-variables.config';
 import { ClimateVariableConfigInterface } from '@/types/climate-variable-interface';
 import { fetchTaxonomyData, fetchPostsData } from '@/services/services';
 import { initializeDownloadUrlSync, setDownloadUrlParamsLoaded, resetDownloadUrlSync } from '@/features/download/download-url-sync-slice';
+import { buildDownloadUrlParams, URL_PARAMS } from '@/lib/url-params';
 import { normalizePostData } from '@/lib/format';
 
 /**
@@ -25,26 +26,20 @@ export const useDownloadUrlSync = () => {
 		state.download.currentStep !== undefined ? state.download.currentStep : 1
 	);
 
-	// Helper function to add parameters to URL
+	// Serialize download state to URL params using the shared builder (the same
+	// one the language switcher reads through `selectDownloadUrlSearch`), then
+	// keep the step-1 reset side effect here in the hook.
 	const addParamsToUrl = (
 		params: URLSearchParams
 	) => {
-		// Only include parameters if we're past step 1
-		if (currentStep > 1) {
-			if (dataset && dataset.term_id) {
-				params.set('dataset', dataset.term_id.toString());
-				
-				// Only include variable if we're at step 2 or beyond and have a selected variable
-				if (currentStep > 1 && climateVariableData?.id) {
-					params.set('var', climateVariableData.id);
-				}
-			}
-		} else {
-			// Clear params when on step 1
-			params.delete('var');
-			params.delete('dataset');
-			
-			// Also reset the URL sync state when going back to step 1
+		buildDownloadUrlParams(params, {
+			currentStep,
+			datasetTermId: dataset?.term_id,
+			climateVariableId: climateVariableData?.id,
+		});
+
+		// Also reset the URL sync state when going back to step 1
+		if (currentStep <= 1) {
 			dispatch(resetDownloadUrlSync());
 		}
 	};
@@ -86,8 +81,8 @@ export const useDownloadUrlSync = () => {
 		// Process URL parameters
 		(async () => {
 			try {
-				const datasetParam = params.get('dataset');
-				const variableParam = params.get('var');
+				const datasetParam = params.get(URL_PARAMS.DATASET);
+				const variableParam = params.get(URL_PARAMS.VARIABLE_ID);
 
 				if (datasetParam) {
 					const datasets = await fetchTaxonomyData('datasets', 'download');

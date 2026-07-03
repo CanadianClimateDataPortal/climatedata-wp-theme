@@ -52,7 +52,15 @@ export const useDownloadUrlSync = () => {
 		}
 
 		updateTimeoutRef.current = window.setTimeout(() => {
-			const params = new URLSearchParams(window.location.search);
+			// Build the query FRESH (empty base), NOT seeded from
+			// `window.location.search`, so this writer emits exactly what the
+			// `selectDownloadUrlSearch` selector builds — byte-identical, both
+			// pure. The Download URL owns only `dataset`/`var` (gated by the
+			// wizard step) and nothing reads any other param back, so starting
+			// empty simply drops any foreign param (e.g. `utm_*`) — the same
+			// behaviour as the Map writer, which replaces the whole query with a
+			// freshly built `buildMapUrlParams` result. (Same-Intent-Same-Pattern.)
+			const params = new URLSearchParams();
 
 			addParamsToUrl(params);
 

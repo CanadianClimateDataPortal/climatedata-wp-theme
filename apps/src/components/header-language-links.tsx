@@ -1,7 +1,4 @@
-import {
-	type ReactNode,
-	useContext,
-} from 'react';
+import { useContext } from 'react';
 
 import { useAppSelector } from '@/app/hooks';
 import SectionContext from '@/context/section-provider';
@@ -26,6 +23,21 @@ const LOCALES: Locale[] = [
 ];
 
 /**
+ * Language endonyms — each language named in its own language (`en` → English,
+ * `fr` → Français). Used as the accessible name (`aria-label`) for each switcher
+ * item so a screen reader announces "English" / "Français" instead of the bare
+ * two-letter code that shows visually.
+ *
+ * Deliberately NOT run through the `__`/translation helper: an endonym is
+ * locale-invariant (French is "Français" whether the UI is English or French),
+ * so translating it would be incorrect, not merely unnecessary.
+ */
+const LOCALE_ENDONYMS: Record<Locale, string> = {
+	en: 'English',
+	fr: 'Français',
+};
+
+/**
  * Bilingual `EN | FR` switcher for the Map and Download SPA headers.
  *
  * The current locale (from `useLocale()`) renders as an inert `<span>`; the
@@ -39,7 +51,7 @@ const LOCALES: Locale[] = [
  */
 const HeaderLanguageLinks = (
 	props: HeaderLanguageLinksProps
-): ReactNode => {
+): JSX.Element => {
 	const { className } = props;
 
 	const { locale } = useLocale();
@@ -71,11 +83,18 @@ const HeaderLanguageLinks = (
 						)}
 					>
 						{isCurrent ? (
-							<span lang={subjectLocale}>{subjectLocale}</span>
+							<span
+								lang={subjectLocale}
+								aria-current="true"
+								aria-label={LOCALE_ENDONYMS[subjectLocale]}
+							>
+								{subjectLocale}
+							</span>
 						) : (
 							<a
 								lang={subjectLocale}
 								hrefLang={subjectLocale}
+								aria-label={LOCALE_ENDONYMS[subjectLocale]}
 								href={buildSwitchUrl({
 									hostname: window.location.hostname,
 									protocol: window.location.protocol,

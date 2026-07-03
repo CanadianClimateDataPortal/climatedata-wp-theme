@@ -1,7 +1,7 @@
 import {
 	createSelector,
 	createSlice,
-	PayloadAction,
+	type PayloadAction,
 } from '@reduxjs/toolkit';
 import type { RootState } from '@/app/store';
 import { buildMapUrlParams } from '@/lib/url-params';

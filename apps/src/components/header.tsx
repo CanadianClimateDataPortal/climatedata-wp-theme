@@ -1,10 +1,12 @@
+import React from 'react';
 import { LogOut } from 'lucide-react';
 
 import { __ } from '@/context/locale-provider';
+
 import Logo from '@/assets/logo.svg';
 import HeaderLanguageLinks from '@/components/header-language-links';
 
-export default function Header(): JSX.Element {
+const AppHeader = (): React.ReactNode => {
 	return (
 		<header id="header" className="flex items-center justify-between px-4 py-1.5">
 			<div className="flex items-center">
@@ -26,4 +28,8 @@ export default function Header(): JSX.Element {
 			</div>
 		</header>
 	);
-}
+};
+
+AppHeader.displayName = 'AppHeader'; // Explicit string literal, or this name would be lost in production.
+
+export default AppHeader;

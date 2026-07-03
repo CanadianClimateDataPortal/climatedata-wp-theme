@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 
 import { useAppSelector } from '@/app/hooks';
 import SectionContext from '@/context/section-provider';
@@ -51,7 +51,7 @@ const LOCALE_ENDONYMS: Record<Locale, string> = {
  */
 const HeaderLanguageLinks = (
 	props: HeaderLanguageLinksProps
-): JSX.Element => {
+): React.ReactNode => {
 	const { className } = props;
 
 	const { locale } = useLocale();
@@ -113,6 +113,6 @@ const HeaderLanguageLinks = (
 	);
 };
 
-HeaderLanguageLinks.displayName = 'HeaderLanguageLinks';
+HeaderLanguageLinks.displayName = 'HeaderLanguageLinks'; // Explicit string literal, or this name would be lost in production.
 
 export default HeaderLanguageLinks;

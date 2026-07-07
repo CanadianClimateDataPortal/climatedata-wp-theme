@@ -49,6 +49,7 @@ import {
 	buildResetPayloadForStepsAfter,
 	determineStepApplicable,
 	DOWNLOAD_STEPS,
+	resolveFullStepOrdinal,
 } from '@/lib/download';
 
 interface DownloadContextValue {
@@ -192,18 +193,33 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	 * Navigates to a specific step in the form.
 	 * If navigating backwards, triggers data reset for all subsequent steps.
 	 *
-	 * @param step - The target step number (1-based)
+	 * `step` is a 1-based position within the variable-FILTERED `steps` list
+	 * (the step-summary edit pencils emit `goToStep(index + 1)` over that list),
+	 * which is what `currentStep` and rendering use. `resetStepsAfter`, however,
+	 * gates on FULL-space `DOWNLOAD_STEPS` ordinals, and the two spaces diverge
+	 * whenever a variable skips steps (e.g. a station variable): the filtered
+	 * position of a step is lower than its full ordinal. Passing the filtered
+	 * position straight into the reset gate makes it reset the very step being
+	 * navigated to. So the filtered position is translated to its full ordinal
+	 * before the reset, while `setCurrentStepLocal` keeps the filtered value.
+	 *
+	 * @param step - The target step, 1-based within the filtered `steps` list.
 	 */
 	const goToStep = useCallback(
 		(step: number) => {
 			if (step < currentStep) {
 				setCurrentStepLocal(step);
-				resetStepsAfter(step);
+				const fullStepOrdinal = resolveFullStepOrdinal(
+					STEPS,
+					steps,
+					step
+				);
+				resetStepsAfter(fullStepOrdinal);
 			} else {
 				setCurrentStepLocal(step);
 			}
 		},
-		[currentStep, resetStepsAfter]
+		[currentStep, resetStepsAfter, steps]
 	);
 
 	const values: DownloadContextValue = {

@@ -85,42 +85,20 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	}, [currentStep, dispatch]);
 
 	/**
-	 * Update steps when the climate variable class or id change.
-	 * - skip step 3 (variable options) if it's a station variable
-	 * - skip step 5 (additional details) if it's a station variable (but not station variable)
-	 * - skip step 6 (send request) when there's no file format to choose (for "Future Building Design Value Summaries" and "Short-duration Rainfall IDF Data")
+	 * Recompute the visible steps whenever the climate variable changes.
+	 *
+	 * Which steps apply for a given variable is decided in one place —
+	 * {@link determineStepApplicable} (keyed by 1-based {@link DOWNLOAD_STEPS}
+	 * ordinal) — so this effect just keeps the steps it marks applicable. The
+	 * `index + 1` is the only 0-based (array) to 1-based (ordinal) bridge.
 	 */
 	useEffect(() => {
-		setSteps(() => {
-			// If no climate variable is selected yet (like when first loading), use all steps
-			if (!climateVariable) {
-				return [...STEPS];
-			}
-
-			if (
-				climateVariable?.getClass() === 'StationClimateVariable' ||
-				climateVariable?.getClass() === 'StationDataClimateVariable'
-			) {
-				// skip step 3 (variable options) if it's a station variable
-				const skipIndexes = [2];
-				// skip step 5 (additional details) if it's a station variable (but not station variable)
-				if (climateVariable?.getId() !== 'station_data')
-					skipIndexes.push(4);
-				// skip step 6 (send request) when there's no file format to chose (for "Future Building Design Value Summaries" and "Short-duration Rainfall IDF Data")
-				if (
-					climateVariable?.getId() ===
-						'future_building_design_value_summaries' ||
-					climateVariable?.getId() ===
-						'short_duration_rainfall_idf_data'
-				)
-					skipIndexes.push(5);
-
-				return STEPS.filter(
-					(_, index) => !skipIndexes.includes(index)
-				) as unknown as typeof STEPS;
-			}
-			return [...STEPS];
-		});
+		setSteps(
+			() =>
+				STEPS.filter((_, index) =>
+					determineStepApplicable(climateVariable, index + 1)
+				) as unknown as typeof STEPS
+		);
 	}, [climateVariable]);
 
 	/**
@@ -190,20 +168,15 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	);
 
 	/**
-	 * Navigates to a specific step in the form.
-	 * If navigating backwards, triggers data reset for all subsequent steps.
+	 * Navigate to a specific step; going backwards also resets the steps after it.
 	 *
-	 * `step` is a 1-based position within the variable-FILTERED `steps` list
-	 * (the step-summary edit pencils emit `goToStep(index + 1)` over that list),
-	 * which is what `currentStep` and rendering use. `resetStepsAfter`, however,
-	 * gates on FULL-space `DOWNLOAD_STEPS` ordinals, and the two spaces diverge
-	 * whenever a variable skips steps (e.g. a station variable): the filtered
-	 * position of a step is lower than its full ordinal. Passing the filtered
-	 * position straight into the reset gate makes it reset the very step being
-	 * navigated to. So the filtered position is translated to its full ordinal
-	 * before the reset, while `setCurrentStepLocal` keeps the filtered value.
+	 * `step` counts positions in the variable-filtered `steps` list (what
+	 * `currentStep` and rendering use); `resetStepsAfter` counts full
+	 * `DOWNLOAD_STEPS` ordinals. The two differ once a variable skips steps, so
+	 * {@link resolveFullStepOrdinal} converts before the reset — otherwise the reset
+	 * would wipe the very step being navigated to.
 	 *
-	 * @param step - The target step, 1-based within the filtered `steps` list.
+	 * @param step - Target step, 1-based within the filtered `steps` list.
 	 */
 	const goToStep = useCallback(
 		(step: number) => {

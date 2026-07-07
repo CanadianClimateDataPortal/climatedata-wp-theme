@@ -111,7 +111,7 @@ function buildAdditionalDetailsPayload(
  *
  * @remarks
  * Only steps that actually contribute a payload appear here:
- * - step 1 (Dataset) is intentionally absent (see LI1 below);
+ * - step 1 (Dataset) is intentionally absent (see the step-1 exclusion note below);
  * - step 2 (Variable), step 6 (Send Request) and step 7 (Result) only ever
  *   ran side-effecting `reset()` and never returned a payload.
  */
@@ -148,7 +148,7 @@ const STEP_PAYLOAD_BUILDERS: ReadonlyMap<
  * that logic; per-field getter gating alone would wrongly inject step 5's
  * unconditional `dateRange` for station variables.
  *
- * LI1 exclusion: the legacy step-1 (Dataset) handle returned `dataset: null`,
+ * Step-1 exclusion: the legacy step-1 (Dataset) handle returned `dataset: null`,
  * but `dataset` lives in the download slice, not the climate-variable config —
  * dispatching it through `updateClimateVariable` was a latent no-op, harmless
  * only because step 1 is never a reset target. It is deliberately NOT emitted

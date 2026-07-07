@@ -9,7 +9,7 @@ import {
 } from './types';
 
 /**
- * Build the reset-payload contribution for step 3 (Variable Options).
+ * Build the reset-payload contribution for step 3 ({@link DOWNLOAD_STEPS.variableOptions}).
  *
  * @remarks
  * Resets the Variable Options fields the variable exposes — version, frequency,
@@ -51,7 +51,7 @@ function buildVariableOptionsPayload(
 }
 
 /**
- * Build the reset-payload contribution for step 4 (Location).
+ * Build the reset-payload contribution for step 4 ({@link DOWNLOAD_STEPS.location}).
  *
  * @remarks
  * Resets the three Location fields collected by step 4
@@ -67,7 +67,7 @@ function buildLocationPayload(): StepResetAccumulator {
 }
 
 /**
- * Build the reset-payload contribution for step 5 (Additional Details).
+ * Build the reset-payload contribution for step 5 ({@link DOWNLOAD_STEPS.additionalDetails}).
  *
  * @remarks
  * Resets the Additional Details fields collected by step 5
@@ -111,8 +111,8 @@ function buildAdditionalDetailsPayload(
  *
  * @remarks
  * Only steps that actually contribute a payload appear here:
- * - step 1 (Dataset) is intentionally absent (see the step-1 exclusion note below);
- * - step 2 (Variable), step 6 (Send Request) and step 7 (Result) only ever
+ * - step 1 ({@link DOWNLOAD_STEPS.dataset}) is intentionally absent (see the step-1 exclusion note below);
+ * - step 2 ({@link DOWNLOAD_STEPS.variable}), step 6 ({@link DOWNLOAD_STEPS.sendRequest}) and step 7 ({@link DOWNLOAD_STEPS.result}) only ever
  *   ran side-effecting `reset()` and never returned a payload.
  */
 const STEP_PAYLOAD_BUILDERS: ReadonlyMap<
@@ -148,7 +148,7 @@ const STEP_PAYLOAD_BUILDERS: ReadonlyMap<
  * that logic; per-field getter gating alone would wrongly inject step 5's
  * unconditional `dateRange` for station variables.
  *
- * Step-1 exclusion: the legacy step-1 (Dataset) handle returned `dataset: null`,
+ * Step-1 exclusion: the legacy step-1 ({@link DOWNLOAD_STEPS.dataset}) handle returned `dataset: null`,
  * but `dataset` lives in the download slice, not the climate-variable config —
  * dispatching it through `updateClimateVariable` was a latent no-op, harmless
  * only because step 1 is never a reset target. It is deliberately NOT emitted

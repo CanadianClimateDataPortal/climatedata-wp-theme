@@ -75,7 +75,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	const params = new URLSearchParams(window.location.search);
 	const hasVariable = params.has('var');
 	const [currentStep, setCurrentStepLocal] = useState<number>(
-		hasVariable ? 2 : 1
+		hasVariable ? DOWNLOAD_STEPS.variable : DOWNLOAD_STEPS.dataset,
 	);
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();

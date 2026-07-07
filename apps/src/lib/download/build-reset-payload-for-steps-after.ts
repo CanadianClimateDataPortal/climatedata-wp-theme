@@ -12,10 +12,11 @@ import {
  * Build the reset-payload contribution for step 3 (Variable Options).
  *
  * @remarks
- * Mirrors the `getResetPayload` imperative handle in
- * `components/download/step-variable-options.tsx` field-for-field. The
- * `forecastType` field is gated on the S2D predicate (the same
- * `instanceof S2DClimateVariable` check `useS2D` exposes as `isS2DVariable`).
+ * Resets the Variable Options fields the variable exposes — version, frequency,
+ * averaging type, analysis fields and threshold — mirroring what step 3
+ * (`components/download/step-variable-options.tsx`) collects. The `forecastType`
+ * field is gated on the S2D predicate (the same `instanceof S2DClimateVariable`
+ * check `useS2D` exposes as `isS2DVariable`).
  */
 function buildVariableOptionsPayload(
 	climateVariable: ClimateVariableInterface
@@ -53,8 +54,8 @@ function buildVariableOptionsPayload(
  * Build the reset-payload contribution for step 4 (Location).
  *
  * @remarks
- * Mirrors the `getResetPayload` imperative handle in
- * `components/download/step-location.tsx`. The values are unconditional: step 4
+ * Resets the three Location fields collected by step 4
+ * (`components/download/step-location.tsx`). The values are unconditional: step 4
  * is never skipped, so it always contributes these three fields.
  */
 function buildLocationPayload(): StepResetAccumulator {
@@ -69,8 +70,8 @@ function buildLocationPayload(): StepResetAccumulator {
  * Build the reset-payload contribution for step 5 (Additional Details).
  *
  * @remarks
- * Mirrors the `getResetPayload` imperative handle in
- * `components/download/step-additional-details.tsx`. Note `dateRange` is
+ * Resets the Additional Details fields collected by step 5
+ * (`components/download/step-additional-details.tsx`). Note `dateRange` is
  * UNCONDITIONAL within the step — the only thing that prevents a station
  * variable from resetting `dateRange` is the step being skipped entirely, which
  * {@link determineStepApplicable} models upstream.
@@ -136,10 +137,9 @@ const STEP_PAYLOAD_BUILDERS: ReadonlyMap<
  * `averagingType` appear in both step 3 and step 5) the later step wins —
  * exactly matching the legacy ascending `reduce` merge order.
  *
- * Shape-table provenance: the per-step field sets and their gating come from
- * the verified Path A plan, cross-checked against the three step components
- * (`step-variable-options.tsx`, `step-location.tsx`,
- * `step-additional-details.tsx`). The S2D gate uses
+ * Shape-table provenance: the per-step field sets and their gating were verified
+ * field-for-field against the three step components (`step-variable-options.tsx`,
+ * `step-location.tsx`, `step-additional-details.tsx`). The S2D gate uses
  * `instanceof S2DClimateVariable`, the same predicate `useS2D` exposes.
  *
  * Skip semantics: a step that is skipped for the given variable contributes

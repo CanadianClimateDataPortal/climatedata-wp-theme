@@ -12,13 +12,13 @@ import type { ClimateVariableConfigInterface } from '@/types/climate-variable-in
  * constants used in its place.
  */
 export const DOWNLOAD_STEPS = {
-	additionalDetails: 5,
 	dataset: 1,
-	location: 4,
-	result: 7,
-	sendRequest: 6,
 	variable: 2,
 	variableOptions: 3,
+	location: 4,
+	additionalDetails: 5,
+	sendRequest: 6,
+	result: 7,
 } as const;
 
 /**

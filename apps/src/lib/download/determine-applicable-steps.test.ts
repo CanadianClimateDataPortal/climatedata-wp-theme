@@ -68,29 +68,3 @@ describe('createResolveStepApplicable — lookup mechanics (synthetic fixtures)'
 		expect(resolve(climateVariable, 2)).toBe(true);
 	});
 });
-
-// Minimal real-constants smoke: determineStepApplicable is
-// createResolveStepApplicable bound to the real constants, so this only pins the
-// two load-bearing behaviours. Full mechanics are covered above.
-// TRIM ME if judged redundant with the synthetic suite.
-describe('determineStepApplicable — real-constants smoke', () => {
-	test('station_data keeps Additional Details', () => {
-		const climateVariable = createMockClimateVariable({
-			class: 'StationClimateVariable',
-			id: 'station_data',
-		});
-		expect(
-			determineStepApplicable(climateVariable, DOWNLOAD_STEPS.additionalDetails),
-		).toBe(true);
-	});
-
-	test('a no-file-format dataset also skips Send Request', () => {
-		const climateVariable = createMockClimateVariable({
-			class: 'StationClimateVariable',
-			id: 'future_building_design_value_summaries',
-		});
-		expect(
-			determineStepApplicable(climateVariable, DOWNLOAD_STEPS.sendRequest),
-		).toBe(false);
-	});
-});

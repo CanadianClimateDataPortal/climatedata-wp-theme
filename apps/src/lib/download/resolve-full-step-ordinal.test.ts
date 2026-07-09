@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'vitest';
 import { resolveFullStepOrdinal } from './resolve-full-step-ordinal';
+import { DOWNLOAD_STEPS } from './types';
 
 /**
- * The full, unfiltered wizard step order, mirroring the `STEPS` tuple in
+ * The full, unfiltered wizard step order, mirroring the {@link STEPS} tuple in
  * `components/download/config.ts`. Plain strings stand in for the React step
  * components; the helper only relies on reference equality, which string
  * literal interning satisfies here.
@@ -60,7 +61,9 @@ describe('resolveFullStepOrdinal', () => {
 		] as const;
 
 		test('Location at filtered position 3 resolves to full ordinal 4', () => {
-			expect(resolveFullStepOrdinal(FULL_STEPS, filtered, 3)).toBe(4);
+			expect(resolveFullStepOrdinal(FULL_STEPS, filtered, 3)).toBe(
+				DOWNLOAD_STEPS.location
+			);
 		});
 
 		test.each([
@@ -95,11 +98,15 @@ describe('resolveFullStepOrdinal', () => {
 		] as const;
 
 		test('Send Request at filtered position 5 resolves to full ordinal 6', () => {
-			expect(resolveFullStepOrdinal(FULL_STEPS, filtered, 5)).toBe(6);
+			expect(resolveFullStepOrdinal(FULL_STEPS, filtered, 5)).toBe(
+				DOWNLOAD_STEPS.sendRequest
+			);
 		});
 
 		test('positions before the skip are unchanged', () => {
-			expect(resolveFullStepOrdinal(FULL_STEPS, filtered, 4)).toBe(4);
+			expect(resolveFullStepOrdinal(FULL_STEPS, filtered, 4)).toBe(
+				DOWNLOAD_STEPS.location
+			);
 		});
 	});
 
@@ -119,7 +126,9 @@ describe('resolveFullStepOrdinal', () => {
 
 		test('resolved ordinal equals the target ordinal (4), not the filtered position (3)', () => {
 			const resolved = resolveFullStepOrdinal(FULL_STEPS, filtered, 3);
-			expect(resolved).toBe(4);
+			expect(resolved).toBe(DOWNLOAD_STEPS.location);
+			// 3 is the filtered position Location sat at — deliberately NOT a
+			// full DOWNLOAD_STEPS ordinal, so it stays a raw number here.
 			expect(resolved).not.toBe(3);
 			expect(FULL_STEPS[resolved - 1]).toBe('location');
 		});

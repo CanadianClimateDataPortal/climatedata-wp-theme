@@ -6,7 +6,7 @@
  * The Download wizard keeps step numbers in two different 1-based index spaces
  * that only coincide when no steps are skipped:
  *
- * - The FULL space is the fixed `STEPS` tuple in
+ * - The FULL space is the fixed {@link STEPS} tuple in
  *   {@link ../../components/download/config.ts} (always 7 entries). The reset
  *   gating in `context/download-provider.tsx` — and the ordinal constants in
  *   {@link ./types.ts} — are expressed in this space, so ordinal 4 always means

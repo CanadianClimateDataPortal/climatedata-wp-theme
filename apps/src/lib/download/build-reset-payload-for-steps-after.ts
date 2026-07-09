@@ -12,6 +12,9 @@ import {
  * Build the reset-payload contribution for step 3 ({@link DOWNLOAD_STEPS.variableOptions}).
  *
  * @remarks
+ * This field set must track what the {@link StepVariableOptions} component
+ * collects — the two ends of the same step must stay in sync.
+ *
  * Resets the Variable Options fields, each only when the variable exposes it.
  * `forecastType` is S2D-only, gated on `instanceof S2DClimateVariable`.
  */
@@ -51,6 +54,8 @@ function buildVariableOptionsPayload(
  * Build the reset-payload contribution for step 4 ({@link DOWNLOAD_STEPS.location}).
  *
  * @remarks
+ * This field set must track what the {@link StepLocation} component collects.
+ *
  * The three Location fields are unconditional: step 4 is never skipped, so it
  * always contributes them.
  */
@@ -66,6 +71,9 @@ function buildLocationPayload(): StepResetAccumulator {
  * Build the reset-payload contribution for step 5 ({@link DOWNLOAD_STEPS.additionalDetails}).
  *
  * @remarks
+ * This field set must track what the {@link StepAdditionalDetails} component
+ * collects.
+ *
  * `dateRange` is UNCONDITIONAL within the step — the only thing that prevents a
  * station variable from resetting it is the step being skipped entirely, which
  * {@link determineStepApplicable} models upstream.
@@ -126,7 +134,8 @@ const STEP_PAYLOAD_BUILDERS: ReadonlyMap<
  * @remarks
  * Walks the applicable steps in ascending ordinal order and shallow-merges each
  * step's contribution, so for keys shared between steps (`frequency` and
- * `averagingType` appear in both step 3 and step 5) the later step wins.
+ * `averagingType`, the latter of type {@link AveragingType}, appear in both
+ * step 3 and step 5) the later step wins.
  *
  * Skip semantics: a step that is skipped for the given variable contributes
  * nothing. {@link determineStepApplicable} is the single source of that logic;

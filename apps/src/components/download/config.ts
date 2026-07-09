@@ -6,6 +6,11 @@ import StepAdditionalDetails from './step-additional-details';
 import StepSendRequest from './step-send-request';
 import StepResult from './step-result';
 
+/**
+ * @remark
+ * Instead of looking back at the JSDoc comment of each item and
+ * hard-coding the step numbers elsewhere, let's use {@link STEPS_ORDINALS}.
+ */
 export const STEPS = [
     StepDataset,
     StepVariable,

@@ -25,6 +25,7 @@ import {
 	FileFormatType,
 	InteractiveRegionOption,
 	StationDownloadUrlsProps,
+	StationVariableIds,
 } from '@/types/climate-variable-interface';
 import { useLocale } from "@/hooks/use-locale";
 import { useS2D } from '@/hooks/use-s2d';
@@ -546,6 +547,8 @@ const Steps: React.FC = () => {
 
 				} else {
 					// For station variables
+					// i.e. Non-region interactive mode: each selected station/point is
+					// downloaded individually.
 					const selectedPoints = climateVariable.getSelectedPoints?.() ?? {};
 					const fileFormat = climateVariable.getFileFormat?.() ?? null;
 					const stationIds = Object.keys(selectedPoints);
@@ -553,20 +556,20 @@ const Steps: React.FC = () => {
 					dispatch(setRequestStatus('loading'));
 
 					switch (climateVariable.getId()) {
-						case 'msc_climate_normals':
-						case 'daily_ahccd_temperature_and_precipitation':
+						case StationVariableIds.MSC_CLIMATE_NORMALS:
+						case StationVariableIds.DAILY_AHCCD_TEMPERATURE_AND_PRECIPITATION:
 							stationDownloadUrlsProps.stationIds = stationIds;
 							stationDownloadUrlsProps.fileFormat = fileFormat;
 							break;
-						case 'future_building_design_value_summaries': {
+						case StationVariableIds.FUTURE_BUILDING_DESIGN_VALUE_SUMMARIES: {
 							stationDownloadUrlsProps.filename = selectedStation?.filename;
 							stationDownloadUrlsProps.locale = locale;
 							break;
 						}
-						case 'short_duration_rainfall_idf_data':
+						case StationVariableIds.SHORT_DURATION_RAINFALL_IDF_DATA:
 							stationDownloadUrlsProps.stationId = stationIds[0];
 							break;
-						case 'station_data': {
+						case StationVariableIds.STATION_DATA: {
 							stationDownloadUrlsProps.stationIds = stationIds;
 							stationDownloadUrlsProps.fileFormat = fileFormat;
 							const dateRange = climateVariable.getDateRange?.();

@@ -40,7 +40,7 @@ function createStationVariable(id: string): ClimateVariableInterface {
 }
 
 /**
- * The full set of 1-based wizard ordinals, mirroring the `STEPS` tuple in
+ * The full set of 1-based wizard ordinals, mirroring the {@link STEPS} tuple in
  * `components/download/config.ts`.
  */
 const ALL_STEP_ORDINALS = [

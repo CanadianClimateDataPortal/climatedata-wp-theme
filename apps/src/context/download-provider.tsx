@@ -2,26 +2,27 @@
  * Download Provider and Context
  *
  * This provider manages the multi-step form state and behavior for the download application.
+ *
  * It handles:
  * - Step navigation (forward and backward)
- * - Data reset when navigating backwards
+ * - Data reset when returning to a past choice
  *
  * Data Reset Logic:
- * When navigating backwards (e.g., from step 5 to step 2), `resetStepsAfter`
- * resets every step after the target step, independent of which step
- * components are currently mounted:
- * 1. The combined reset payload is derived from the climate-variable instance
- *    by {@link buildResetPayloadForStepsAfter} and dispatched as one
- *    `updateClimateVariable`.
+ * When returning to a past choice backwards (e.g., from step 5 to step 2),
+ * using the pencil icon with{@see resetStepsAfter}
+ *
+ * 1. The combined reset payload is derived from the `climateVariable` instance
+ *    with {@link buildResetPayloadForStepsAfter} and dispatched as one
+ *    {@link updateClimateVariable}.
  * 2. The cross-slice side-effects (variable selection, selection mode,
- *    request state, captcha, shapefile state, file format) are fired here,
+ *    request state, shapefile state, file format) are fired here,
  *    each gated on the step being after the target AND applicable for the
  *    current variable ({@link determineStepApplicable}), reproducing the
  *    skip semantics of the step list.
  *
- * Step components receive only `StepComponentProps` (`onChangeValidity`,
- * `onChangeErrorMessages`); they expose no imperative reset handles — reset is
- * derived here from the climate-variable instance.
+ * Step components receive only {@link StepComponentProps} (`onChangeValidity`,
+ * `onChangeErrorMessages`); Which is how we "reset" based on the current
+ * internal state of the `climateVariable` instance.
  */
 
 import React, {

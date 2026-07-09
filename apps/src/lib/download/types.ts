@@ -4,7 +4,7 @@ import type { ClimateVariableConfigInterface } from '@/types/climate-variable-in
  * Ordinal (1-based) step numbers for the Download wizard.
  *
  * @remarks
- * Mirrors the positional order of the `STEPS` tuple in
+ * Mirrors the positional order of the {@link STEPS} tuple in
  * {@link ../../components/download/config.ts}. The wizard tracks `currentStep`
  * 1-based (`download-provider.tsx`), so the derivation logic here is keyed on
  * the same 1-based ordinals rather than the 0-based array indexes. There is
@@ -30,7 +30,9 @@ export const DOWNLOAD_STEPS = {
  * shallow-merged into `state.data` by the `updateClimateVariable` reducer. Some
  * reset sentinels are intentionally looser than the strict field types (e.g.
  * `interactiveRegion: null` where the field is `InteractiveRegionOption |
- * undefined`), reproduced verbatim to preserve the exact prior reset behaviour.
+ * undefined`): these are the exact values `updateClimateVariable` shallow-merges
+ * to clear a step, so they stay as-is until the matching
+ * {@link ClimateVariableConfigInterface} fields are loosened in lockstep.
  */
 export type ResetPayload = Partial<ClimateVariableConfigInterface>;
 
@@ -40,11 +42,11 @@ export type ResetPayload = Partial<ClimateVariableConfigInterface>;
  * @remarks
  * Deliberately loose: a few reset sentinels do not satisfy the strict config
  * field types (e.g. `interactiveRegion: null` where the field is
- * `InteractiveRegionOption | undefined`) and are reproduced verbatim to keep
- * behaviour identical with the prior derivation. Tightening them to the strict
- * field types is a follow-up that requires loosening the corresponding
- * {@link ClimateVariableConfigInterface} fields to accept the reset sentinels.
- * Not exported from the barrel — internal to this namespace.
+ * `InteractiveRegionOption | undefined`). They are the exact values
+ * `updateClimateVariable` shallow-merges to clear a step; tightening them to the
+ * strict field types is a follow-up that must loosen the corresponding
+ * {@link ClimateVariableConfigInterface} fields in lockstep to accept the reset
+ * sentinels. Not exported from the barrel — internal to this namespace.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type StepResetAccumulator = { [key: string]: any };

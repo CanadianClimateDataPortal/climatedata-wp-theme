@@ -130,6 +130,22 @@ export const ForecastDisplays = {
 
 export type ForecastDisplay = typeof ForecastDisplays[keyof typeof ForecastDisplays];
 
+/**
+ * "Station Variable" climateVariableId.
+ *
+ * Climate-variable ids whose variables, the download app, where we can select only
+ * one selected station at a time (the non-region interactive download mode).
+ */
+export const StationVariableIds = {
+	DAILY_AHCCD_TEMPERATURE_AND_PRECIPITATION: 'daily_ahccd_temperature_and_precipitation',
+	FUTURE_BUILDING_DESIGN_VALUE_SUMMARIES: 'future_building_design_value_summaries',
+	MSC_CLIMATE_NORMALS: 'msc_climate_normals',
+	SHORT_DURATION_RAINFALL_IDF_DATA: 'short_duration_rainfall_idf_data',
+	STATION_DATA: 'station_data',
+} as const;
+
+export type StationVariableId = typeof StationVariableIds[keyof typeof StationVariableIds];
+
 export type FrequencyConfig = {
 	[K in FrequencyType]?: FrequencyDisplayModeOption;
 }

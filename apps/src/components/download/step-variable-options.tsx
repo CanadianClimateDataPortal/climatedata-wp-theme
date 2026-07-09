@@ -147,9 +147,8 @@ const StepVariableOptions: StepComponent = ({ onChangeValidity }) => {
 		</StepContainer>
 	);
 };
-// Explicit string literal — step-summary.tsx branches on these names, and a
-// derived function name would not survive minification.
-StepVariableOptions.displayName = 'StepVariableOptions';
+
+StepVariableOptions.displayName = 'StepVariableOptions'; // Explicit string literal, or this name would be lost in production.
 
 /**
  * Extracts and formats summary data for the Variable Options step.
@@ -228,6 +227,8 @@ export const StepSummaryVariableOptions = (): React.ReactNode | null => {
 			variant="ul"
 		/>
 	);
-}
+};
+
+StepSummaryVariableOptions.displayName = 'StepSummaryVariableOptions'; // Explicit string literal, or this name would be lost in production.
 
 export default StepVariableOptions;

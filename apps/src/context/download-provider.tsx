@@ -156,7 +156,12 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 				dispatch(updateClimateVariable(resetPayload));
 			}
 		},
-		[climateVariable, dispatch, resetFileFormat, resetShapefile]
+		[
+			climateVariable,
+			dispatch,
+			resetFileFormat,
+			resetShapefile,
+		]
 	);
 
 	/**

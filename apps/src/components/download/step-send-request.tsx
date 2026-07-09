@@ -79,7 +79,11 @@ Captcha.displayName = 'Captcha';
 const StepSendRequest: StepComponent = ({ onChangeValidity }) => {
 	const captchaValue = useAppSelector((state) => state.download.captchaValue) || '';
 	const [captchaRefresh, setCaptchaRefresh] = useState(Math.random());
-	const {climateVariable, setFileFormat, setDecimalPlace} = useClimateVariable();
+	const {
+		climateVariable,
+		setDecimalPlace,
+		setFileFormat,
+	} = useClimateVariable();
 
 	const { email, subscribe, requestStatus, requestError } = useAppSelector(
 		(state) => state.download
@@ -266,9 +270,8 @@ const StepSendRequest: StepComponent = ({ onChangeValidity }) => {
 		</StepContainer>
 	);
 };
-// Explicit string literal — step-summary.tsx branches on these names, and a
-// derived function name would not survive minification.
-StepSendRequest.displayName = 'StepSendRequest';
+
+StepSendRequest.displayName = 'StepSendRequest'; // Explicit string literal, or this name would be lost in production.
 
 /**
  * Extracts and formats summary data for the Send Request step (file parameters).

@@ -1,4 +1,9 @@
-import { useContext, useMemo, useState, useEffect } from 'react';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react';
 import { __ } from '@/context/locale-provider';
 import { useAppSelector } from '@/app/hooks';
 import { selectSearchQuery } from '@/store/climate-variable-slice';
@@ -137,8 +142,7 @@ const StepVariable: StepComponent = ({ onChangeValidity }) => {
         </StepContainer>
     );
 };
-// Explicit string literal — step-summary.tsx branches on these names, and a
-// derived function name would not survive minification.
-StepVariable.displayName = 'StepVariable';
+
+StepVariable.displayName = 'StepVariable'; // Explicit string literal, or this name would be lost in production.
 
 export default StepVariable;

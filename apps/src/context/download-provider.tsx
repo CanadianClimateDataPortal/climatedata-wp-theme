@@ -57,7 +57,7 @@ interface DownloadContextValue {
 	steps: typeof STEPS;
 	currentStep: number;
 	goToNextStep: () => void;
-	goToStep: (step: number) => void;
+	goToStep: (targetStepViewNumber: number) => void;
 	dataset: TaxonomyData | null;
 }
 
@@ -173,26 +173,27 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	/**
 	 * Navigate to a specific step; going backwards also resets the steps after it.
 	 *
-	 * `step` counts positions in the visible `steps` list (what
+	 * `targetStepViewNumber` counts step views in the visible `steps` list (what
 	 * `currentStep` and rendering use); `resetStepsAfter` counts full
-	 * `DOWNLOAD_STEPS` ordinals. The two differ once a variable skips steps, so
+	 * `DOWNLOAD_STEPS` ordinals. The two differ once a variable hides steps, so
 	 * {@link resolveFullStepOrdinal} converts before the reset — otherwise the reset
 	 * would wipe the very step being navigated to.
 	 *
-	 * @param step - Target step, 1-based within the visible `steps` list.
+	 * @param targetStepViewNumber - The destination step view, 1-based within the
+	 *   visible `steps` list.
 	 */
 	const goToStep = useCallback(
-		(step: number) => {
-			if (step < currentStep) {
-				setCurrentStepLocal(step);
+		(targetStepViewNumber: number) => {
+			if (targetStepViewNumber < currentStep) {
+				setCurrentStepLocal(targetStepViewNumber);
 				const fullStepOrdinal = resolveFullStepOrdinal(
 					STEPS,
 					steps,
-					step
+					targetStepViewNumber
 				);
 				resetStepsAfter(fullStepOrdinal);
 			} else {
-				setCurrentStepLocal(step);
+				setCurrentStepLocal(targetStepViewNumber);
 			}
 		},
 		[currentStep, resetStepsAfter, steps]

@@ -2,10 +2,8 @@ import { describe, expect, test } from 'vitest';
 import type { ClimateVariableInterface } from '@/types/climate-variable-interface';
 import {
 	createResolveStepApplicable,
-	determineStepApplicable,
 	type StationStepPolicy,
 } from './determine-applicable-steps';
-import { DOWNLOAD_STEPS } from './types';
 
 /**
  * Create a mock climate variable exposing only the two getters the lookup reads.

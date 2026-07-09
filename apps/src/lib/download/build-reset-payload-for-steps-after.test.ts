@@ -3,6 +3,7 @@ import ClimateVariableBase from '@/lib/climate-variable-base';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import type { ClimateVariableInterface } from '@/types/climate-variable-interface';
 import { buildResetPayloadForStepsAfter } from './build-reset-payload-for-steps-after';
+import { DOWNLOAD_STEPS } from './types';
 
 /**
  * Build a non-station "regular" variable with every per-field gate ON.
@@ -123,7 +124,7 @@ describe('buildResetPayloadForStepsAfter', () => {
 	describe('happy path — regular (non-station) variable', () => {
 		test('targetStep 1 resets every later step (steps 3, 4 and 5)', () => {
 			const climateVariable = createRegularVariableAllGatesOn();
-			const payload = buildResetPayloadForStepsAfter(climateVariable, 1);
+			const payload = buildResetPayloadForStepsAfter(climateVariable, DOWNLOAD_STEPS.dataset);
 
 			expect(payload).toEqual({
 				analysisFieldValues: {},
@@ -140,16 +141,16 @@ describe('buildResetPayloadForStepsAfter', () => {
 			});
 		});
 
-		test('does NOT include a step-1 dataset field (LI1 exclusion)', () => {
+		test('does NOT include a step-1 dataset field', () => {
 			const climateVariable = createRegularVariableAllGatesOn();
-			const payload = buildResetPayloadForStepsAfter(climateVariable, 1);
+			const payload = buildResetPayloadForStepsAfter(climateVariable, DOWNLOAD_STEPS.dataset);
 
 			expect(payload).not.toHaveProperty('dataset');
 		});
 
 		test('with every gate off, only unconditional fields remain', () => {
 			const climateVariable = createRegularVariableAllGatesOff();
-			const payload = buildResetPayloadForStepsAfter(climateVariable, 1);
+			const payload = buildResetPayloadForStepsAfter(climateVariable, DOWNLOAD_STEPS.dataset);
 
 			expect(payload).toEqual({
 				dateRange: ['2040', '2070'],
@@ -163,7 +164,7 @@ describe('buildResetPayloadForStepsAfter', () => {
 	describe('S2D variable', () => {
 		test('includes forecastType (step 3) and selectedPeriods (step 5)', () => {
 			const climateVariable = createS2DVariableAllGatesOn();
-			const payload = buildResetPayloadForStepsAfter(climateVariable, 1);
+			const payload = buildResetPayloadForStepsAfter(climateVariable, DOWNLOAD_STEPS.dataset);
 
 			expect(payload).toHaveProperty('forecastType', null);
 			expect(payload).toHaveProperty('selectedPeriods', []);
@@ -173,7 +174,7 @@ describe('buildResetPayloadForStepsAfter', () => {
 	describe('station variable skip semantics', () => {
 		test('non-station_data station variable at targetStep 1 yields no step-3 nor step-5 fields', () => {
 			const climateVariable = createStationVariableAllGatesOn();
-			const payload = buildResetPayloadForStepsAfter(climateVariable, 1);
+			const payload = buildResetPayloadForStepsAfter(climateVariable, DOWNLOAD_STEPS.dataset);
 
 			// Step 5's dateRange is unconditional within the step; it must NOT
 			// appear because the whole step is skipped for this variable.
@@ -195,7 +196,7 @@ describe('buildResetPayloadForStepsAfter', () => {
 
 		test('station_data id makes step 5 applicable again (dateRange returns)', () => {
 			const climateVariable = createStationDataVariableAllGatesOn();
-			const payload = buildResetPayloadForStepsAfter(climateVariable, 1);
+			const payload = buildResetPayloadForStepsAfter(climateVariable, DOWNLOAD_STEPS.dataset);
 
 			// Step 3 is still skipped for any station variable.
 			expect(payload).not.toHaveProperty('version');
@@ -207,7 +208,7 @@ describe('buildResetPayloadForStepsAfter', () => {
 
 	describe('null variable', () => {
 		test('returns an empty payload', () => {
-			const payload = buildResetPayloadForStepsAfter(null, 1);
+			const payload = buildResetPayloadForStepsAfter(null, DOWNLOAD_STEPS.dataset);
 			expect(payload).toEqual({});
 		});
 	});
@@ -215,7 +216,7 @@ describe('buildResetPayloadForStepsAfter', () => {
 	describe('per-targetStep key sets (regular variable, all gates on)', () => {
 		test.each([
 			[
-				1,
+				DOWNLOAD_STEPS.dataset,
 				[
 					'analysisFieldValues',
 					'analyzeScenarios',
@@ -231,7 +232,7 @@ describe('buildResetPayloadForStepsAfter', () => {
 				],
 			],
 			[
-				2,
+				DOWNLOAD_STEPS.variable,
 				[
 					'analysisFieldValues',
 					'analyzeScenarios',
@@ -247,7 +248,7 @@ describe('buildResetPayloadForStepsAfter', () => {
 				],
 			],
 			[
-				3,
+				DOWNLOAD_STEPS.variableOptions,
 				[
 					'analyzeScenarios',
 					'averagingType',
@@ -260,7 +261,7 @@ describe('buildResetPayloadForStepsAfter', () => {
 				],
 			],
 			[
-				4,
+				DOWNLOAD_STEPS.location,
 				[
 					'analyzeScenarios',
 					'averagingType',
@@ -269,8 +270,8 @@ describe('buildResetPayloadForStepsAfter', () => {
 					'percentiles',
 				],
 			],
-			[5, []],
-			[6, []],
+			[DOWNLOAD_STEPS.additionalDetails, []],
+			[DOWNLOAD_STEPS.sendRequest, []],
 		])(
 			'targetStep %i yields the expected key set',
 			(targetStep, expectedKeys) => {
@@ -293,7 +294,7 @@ describe('buildResetPayloadForStepsAfter', () => {
 			const defaultDateRange = ['2011', '2040'];
 			climateVariable.getDefaultDateRange = () => defaultDateRange;
 
-			const payload = buildResetPayloadForStepsAfter(climateVariable, 1);
+			const payload = buildResetPayloadForStepsAfter(climateVariable, DOWNLOAD_STEPS.dataset);
 
 			expect(payload.dateRange).toBe(defaultDateRange);
 		});
@@ -309,15 +310,15 @@ describe('buildResetPayloadForStepsAfter', () => {
 			// frequency/averagingType through the same getters, so the values are
 			// identical regardless of winner. Assert presence and that the keys
 			// survive when ONLY step 5 is reachable.
-			const payloadFromStep4 = buildResetPayloadForStepsAfter(
+			const payloadFromLocationStep = buildResetPayloadForStepsAfter(
 				climateVariable,
-				4
+				DOWNLOAD_STEPS.location
 			);
 
-			// At targetStep 4, only step 5 contributes — frequency/averagingType
-			// here can ONLY have come from step 5.
-			expect(payloadFromStep4).toHaveProperty('frequency', null);
-			expect(payloadFromStep4).toHaveProperty('averagingType', null);
+			// At targetStep 4 (Location), only step 5 contributes —
+			// frequency/averagingType here can ONLY have come from step 5.
+			expect(payloadFromLocationStep).toHaveProperty('frequency', null);
+			expect(payloadFromLocationStep).toHaveProperty('averagingType', null);
 		});
 	});
 });
@@ -325,7 +326,7 @@ describe('buildResetPayloadForStepsAfter', () => {
 describe('determineStepApplicable via payload presence', () => {
 	test('station variable skips step 3 and step 5 (non station_data)', () => {
 		const climateVariable = createStationVariableAllGatesOn();
-		const payload = buildResetPayloadForStepsAfter(climateVariable, 2);
+		const payload = buildResetPayloadForStepsAfter(climateVariable, DOWNLOAD_STEPS.variable);
 		expect(Object.keys(payload).sort()).toEqual(
 			['interactiveRegion', 'selectedPoints', 'selectedRegion'].sort()
 		);

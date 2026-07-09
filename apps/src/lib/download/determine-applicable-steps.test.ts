@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import type { ClimateVariableInterface } from '@/types/climate-variable-interface';
 import { determineStepApplicable } from './determine-applicable-steps';
+import { DOWNLOAD_STEPS } from './types';
 
 /**
  * Build a minimal climate-variable stand-in exposing only the two methods the
@@ -42,7 +43,15 @@ function createStationVariable(id: string): ClimateVariableInterface {
  * The full set of 1-based wizard ordinals, mirroring the `STEPS` tuple in
  * `components/download/config.ts`.
  */
-const ALL_STEP_ORDINALS = [1, 2, 3, 4, 5, 6, 7] as const;
+const ALL_STEP_ORDINALS = [
+	DOWNLOAD_STEPS.dataset,
+	DOWNLOAD_STEPS.variable,
+	DOWNLOAD_STEPS.variableOptions,
+	DOWNLOAD_STEPS.location,
+	DOWNLOAD_STEPS.additionalDetails,
+	DOWNLOAD_STEPS.sendRequest,
+	DOWNLOAD_STEPS.result,
+] as const;
 
 /**
  * The rendered-step set the provider computes: every ordinal the predicate
@@ -60,26 +69,49 @@ function applicableOrdinals(
 describe('determineStepApplicable', () => {
 	describe('the rendered-step set matches the truth table', () => {
 		test('null variable — none selected yet — every step applies', () => {
-			expect(applicableOrdinals(null)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+			expect(applicableOrdinals(null)).toEqual([
+				DOWNLOAD_STEPS.dataset,
+				DOWNLOAD_STEPS.variable,
+				DOWNLOAD_STEPS.variableOptions,
+				DOWNLOAD_STEPS.location,
+				DOWNLOAD_STEPS.additionalDetails,
+				DOWNLOAD_STEPS.sendRequest,
+				DOWNLOAD_STEPS.result,
+			]);
 		});
 
 		test('non-station variable — every step applies', () => {
 			expect(applicableOrdinals(createNonStationVariable())).toEqual([
-				1, 2, 3, 4, 5, 6, 7,
+				DOWNLOAD_STEPS.dataset,
+				DOWNLOAD_STEPS.variable,
+				DOWNLOAD_STEPS.variableOptions,
+				DOWNLOAD_STEPS.location,
+				DOWNLOAD_STEPS.additionalDetails,
+				DOWNLOAD_STEPS.sendRequest,
+				DOWNLOAD_STEPS.result,
 			]);
 		});
 
 		test('station "station_data" — skips step 3 only', () => {
 			const climateVariable = createStationVariable('station_data');
 			expect(applicableOrdinals(climateVariable)).toEqual([
-				1, 2, 4, 5, 6, 7,
+				DOWNLOAD_STEPS.dataset,
+				DOWNLOAD_STEPS.variable,
+				DOWNLOAD_STEPS.location,
+				DOWNLOAD_STEPS.additionalDetails,
+				DOWNLOAD_STEPS.sendRequest,
+				DOWNLOAD_STEPS.result,
 			]);
 		});
 
 		test('station "ahccd" — skips steps 3 and 5', () => {
 			const climateVariable = createStationVariable('ahccd');
 			expect(applicableOrdinals(climateVariable)).toEqual([
-				1, 2, 4, 6, 7,
+				DOWNLOAD_STEPS.dataset,
+				DOWNLOAD_STEPS.variable,
+				DOWNLOAD_STEPS.location,
+				DOWNLOAD_STEPS.sendRequest,
+				DOWNLOAD_STEPS.result,
 			]);
 		});
 
@@ -87,14 +119,24 @@ describe('determineStepApplicable', () => {
 			const climateVariable = createStationVariable(
 				'future_building_design_value_summaries'
 			);
-			expect(applicableOrdinals(climateVariable)).toEqual([1, 2, 4, 7]);
+			expect(applicableOrdinals(climateVariable)).toEqual([
+				DOWNLOAD_STEPS.dataset,
+				DOWNLOAD_STEPS.variable,
+				DOWNLOAD_STEPS.location,
+				DOWNLOAD_STEPS.result,
+			]);
 		});
 
 		test('station "short_duration_rainfall_idf_data" — skips steps 3, 5 and 6', () => {
 			const climateVariable = createStationVariable(
 				'short_duration_rainfall_idf_data'
 			);
-			expect(applicableOrdinals(climateVariable)).toEqual([1, 2, 4, 7]);
+			expect(applicableOrdinals(climateVariable)).toEqual([
+				DOWNLOAD_STEPS.dataset,
+				DOWNLOAD_STEPS.variable,
+				DOWNLOAD_STEPS.location,
+				DOWNLOAD_STEPS.result,
+			]);
 		});
 	});
 
@@ -107,7 +149,11 @@ describe('determineStepApplicable', () => {
 			(className) => {
 				const climateVariable = createVariableMock(className, 'ahccd');
 				expect(applicableOrdinals(climateVariable)).toEqual([
-					1, 2, 4, 6, 7,
+					DOWNLOAD_STEPS.dataset,
+					DOWNLOAD_STEPS.variable,
+					DOWNLOAD_STEPS.location,
+					DOWNLOAD_STEPS.sendRequest,
+					DOWNLOAD_STEPS.result,
 				]);
 			}
 		);

@@ -12,11 +12,8 @@ import {
  * Build the reset-payload contribution for step 3 ({@link DOWNLOAD_STEPS.variableOptions}).
  *
  * @remarks
- * Resets the Variable Options fields the variable exposes — version, frequency,
- * averaging type, analysis fields and threshold — mirroring what step 3
- * (`components/download/step-variable-options.tsx`) collects. The `forecastType`
- * field is gated on the S2D predicate (the same `instanceof S2DClimateVariable`
- * check `useS2D` exposes as `isS2DVariable`).
+ * Resets the Variable Options fields, each only when the variable exposes it.
+ * `forecastType` is S2D-only, gated on `instanceof S2DClimateVariable`.
  */
 function buildVariableOptionsPayload(
 	climateVariable: ClimateVariableInterface
@@ -54,9 +51,8 @@ function buildVariableOptionsPayload(
  * Build the reset-payload contribution for step 4 ({@link DOWNLOAD_STEPS.location}).
  *
  * @remarks
- * Resets the three Location fields collected by step 4
- * (`components/download/step-location.tsx`). The values are unconditional: step 4
- * is never skipped, so it always contributes these three fields.
+ * The three Location fields are unconditional: step 4 is never skipped, so it
+ * always contributes them.
  */
 function buildLocationPayload(): StepResetAccumulator {
 	return {
@@ -70,10 +66,8 @@ function buildLocationPayload(): StepResetAccumulator {
  * Build the reset-payload contribution for step 5 ({@link DOWNLOAD_STEPS.additionalDetails}).
  *
  * @remarks
- * Resets the Additional Details fields collected by step 5
- * (`components/download/step-additional-details.tsx`). Note `dateRange` is
- * UNCONDITIONAL within the step — the only thing that prevents a station
- * variable from resetting `dateRange` is the step being skipped entirely, which
+ * `dateRange` is UNCONDITIONAL within the step — the only thing that prevents a
+ * station variable from resetting it is the step being skipped entirely, which
  * {@link determineStepApplicable} models upstream.
  */
 function buildAdditionalDetailsPayload(
@@ -110,10 +104,10 @@ function buildAdditionalDetailsPayload(
  * Per-step reset-payload builders, keyed by 1-based ordinal step number.
  *
  * @remarks
- * Only steps that actually contribute a payload appear here:
- * - step 1 ({@link DOWNLOAD_STEPS.dataset}) is intentionally absent (see the step-1 exclusion note below);
- * - step 2 ({@link DOWNLOAD_STEPS.variable}), step 6 ({@link DOWNLOAD_STEPS.sendRequest}) and step 7 ({@link DOWNLOAD_STEPS.result}) only ever
- *   ran side-effecting `reset()` and never returned a payload.
+ * Only steps 3–5 contribute reset fields. Step 1
+ * ({@link DOWNLOAD_STEPS.dataset}) is intentionally absent — see the step-1
+ * exclusion note on {@link buildResetPayloadForStepsAfter}. Steps 2, 6 and 7
+ * carry no resettable climate-variable fields.
  */
 const STEP_PAYLOAD_BUILDERS: ReadonlyMap<
 	number,
@@ -130,29 +124,18 @@ const STEP_PAYLOAD_BUILDERS: ReadonlyMap<
  * mounted.
  *
  * @remarks
- * This is the mount-independent replacement for the former `reduce` over
- * mounted step refs in `resetStepsAfter` (`context/download-provider.tsx`). It
- * walks the applicable steps in ascending ordinal order and shallow-merges each
+ * Walks the applicable steps in ascending ordinal order and shallow-merges each
  * step's contribution, so for keys shared between steps (`frequency` and
- * `averagingType` appear in both step 3 and step 5) the later step wins —
- * exactly matching the legacy ascending `reduce` merge order.
- *
- * Shape-table provenance: the per-step field sets and their gating were verified
- * field-for-field against the three step components (`step-variable-options.tsx`,
- * `step-location.tsx`, `step-additional-details.tsx`). The S2D gate uses
- * `instanceof S2DClimateVariable`, the same predicate `useS2D` exposes.
+ * `averagingType` appear in both step 3 and step 5) the later step wins.
  *
  * Skip semantics: a step that is skipped for the given variable contributes
- * nothing, reproducing the mounted-ref behaviour where a skipped step never
- * registered a ref. {@link determineStepApplicable} is the single source of
- * that logic; per-field getter gating alone would wrongly inject step 5's
- * unconditional `dateRange` for station variables.
+ * nothing. {@link determineStepApplicable} is the single source of that logic;
+ * per-field getter gating alone would wrongly inject step 5's unconditional
+ * `dateRange` for station variables.
  *
- * Step-1 exclusion: the legacy step-1 ({@link DOWNLOAD_STEPS.dataset}) handle returned `dataset: null`,
- * but `dataset` lives in the download slice, not the climate-variable config —
- * dispatching it through `updateClimateVariable` was a latent no-op, harmless
- * only because step 1 is never a reset target. It is deliberately NOT emitted
- * here.
+ * Step-1 exclusion: `dataset` ({@link DOWNLOAD_STEPS.dataset}) lives in the
+ * download slice, not the climate-variable config, so merging it through
+ * `updateClimateVariable` would be a no-op. It is deliberately NOT emitted here.
  *
  * @param climateVariable - The climate-variable instance, or `null` when none
  *   is selected (yields `{}`).

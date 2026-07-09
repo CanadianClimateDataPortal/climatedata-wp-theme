@@ -20,7 +20,8 @@
  *    skip semantics of the step list.
  *
  * Step components receive only `StepComponentProps` (`onChangeValidity`,
- * `onChangeErrorMessages`); they no longer expose imperative reset handles.
+ * `onChangeErrorMessages`); they expose no imperative reset handles — reset is
+ * derived here from the climate-variable instance.
  */
 
 import React, {
@@ -116,11 +117,10 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	const resetStepsAfter = useCallback(
 		(targetStep: number) => {
 			// Fire the step reset side-effects independent of which step
-			// components are currently mounted. Gated EXACTLY like the
-			// payload derivation (step > targetStep AND the step is applicable
-			// for this variable) so a skipped step contributes nothing — the
-			// same behaviour as the former per-step imperative handles, which
-			// a skipped step never registered.
+			// components are mounted.
+			// Gated in the same way as the payload derivation
+			// (step > targetStep AND the step is applicable for this variable)
+			// so a skipped step contributes nothing.
 			const isVariableStepReset =
 				DOWNLOAD_STEPS.variable > targetStep &&
 				determineStepApplicable(climateVariable, DOWNLOAD_STEPS.variable);
@@ -145,8 +145,6 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 				dispatch(setCaptchaValue(''));
 			}
 
-			// Derive the combined reset payload from the climate variable itself,
-			// independent of which step components are currently mounted.
 			const resetPayload = buildResetPayloadForStepsAfter(
 				climateVariable,
 				targetStep

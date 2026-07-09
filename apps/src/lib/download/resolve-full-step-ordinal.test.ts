@@ -47,10 +47,10 @@ describe('resolveFullStepOrdinal', () => {
 		// The AHCCD case: a station variable (not station_data) skips Variable
 		// Options and Additional Details, leaving:
 		//   [dataset, variable, location, sendRequest, result]
-		// Location is filtered position 3 but full ordinal 4. Passing the
-		// filtered position 3 straight into the full-space reset gate was the
-		// regression (4 > 3 wiped the Location being edited); the full ordinal 4
-		// restores the boundary (4 > 4 preserves it).
+		// Location is filtered position 3 but full ordinal 4. The full-space
+		// reset gate must see ordinal 4, not the filtered position 3: with 4 the
+		// boundary holds (4 > 4 preserves Location); with 3 it would wipe the
+		// Location being navigated to (4 > 3).
 		const filtered = [
 			'dataset',
 			'variable',

@@ -1,4 +1,6 @@
-import type { ClimateVariableInterface } from '@/types/climate-variable-interface';
+import {
+	type ClimateVariableInterface,
+} from '@/types/climate-variable-interface';
 import { DOWNLOAD_STEPS } from './types';
 
 /**
@@ -31,14 +33,16 @@ const SEND_REQUEST_SKIP_IDS = new Set<string>([
  * skipped) for the supplied climate variable.
  *
  * @remarks
- * Pure and mount-independent. Single source of the wizard's step-skipping logic
- * and the load-bearing piece of the reset-payload derivation: a skipped step
- * must contribute NOTHING to the reset payload. Per-field getter gating alone
- * does NOT achieve that — step 5's `dateRange` is unconditional, so a station
+ * Pure and outside of component logic so we can reliably write and
+ * manage which steps to "skip" when returning on a past choice using
+ * the pencil icon.
+ * Functionally, a skipped step must contribute NOTHING to the reset payload.
+ * Per-field getter checks alone does NOT achieve that.
+ *  — step 5's `dateRange` is unconditional, so a station
  * variable (step 5 skipped) must not contribute a `dateRange` reset. Modelling
  * applicability explicitly preserves that.
  *
- * Skip rules (station variables only — all steps apply to non-station
+ * Skip rules ("station variables" only — all steps apply to non-station
  * variables, and to the `null` variable):
  * - step 3 (Variable Options) is skipped;
  * - step 5 (Additional Details) is skipped unless the id is `station_data`;

@@ -7,9 +7,9 @@ import StepSendRequest from './step-send-request';
 import StepResult from './step-result';
 
 /**
- * @remark
+ * @remarks
  * Instead of looking back at the JSDoc comment of each item and
- * hard-coding the step numbers elsewhere, let's use {@link STEPS_ORDINALS}.
+ * hard-coding the step numbers elsewhere, let's use {@link DOWNLOAD_STEPS}.
  */
 export const STEPS = [
     StepDataset,

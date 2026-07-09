@@ -1,5 +1,6 @@
 import {
 	type ClimateVariableInterface,
+	StationVariableIds,
 } from '@/types/climate-variable-interface';
 import { DOWNLOAD_STEPS } from './types';
 
@@ -16,37 +17,118 @@ const STATION_VARIABLE_CLASSES = new Set<string>([
 ]);
 
 /**
- * Climate-variable ids for which step 6 (Send Request) is skipped because there
- * is no file format to choose.
- *
- * @remarks
- * These are the "Future Building Design Value Summaries" and "Short-duration
- * Rainfall IDF Data" datasets.
+ * A station-variable skip policy. `byId` maps a known station id → the set of
+ * {@link DOWNLOAD_STEPS} ordinals that id removes; `default` is the open-set
+ * safety net applied to a station-class variable whose id is not in `byId`.
+ * Exported so the lookup can be exercised with hypothetical policies in tests.
  */
-const SEND_REQUEST_SKIP_IDS = new Set<string>([
-	'future_building_design_value_summaries',
-	'short_duration_rainfall_idf_data',
-]);
+export type StationStepPolicy = {
+	byId: ReadonlyMap<string, ReadonlySet<number>>;
+	default: ReadonlySet<number>;
+};
 
 /**
- * Determine whether a given Download wizard step is applicable (i.e. is NOT
- * skipped) for the supplied climate variable.
+ * The real station-variable skip policy.
  *
  * @remarks
- * Pure and outside of component logic so we can reliably write and
- * manage which steps to "skip" when returning on a past choice using
- * the pencil icon.
- * Functionally, a skipped step must contribute NOTHING to the reset payload.
- * Per-field getter checks alone does NOT achieve that.
- *  — step 5's `dateRange` is unconditional, so a station
- * variable (step 5 skipped) must not contribute a `dateRange` reset. Modelling
- * applicability explicitly preserves that.
+ * `byId` rows differ deliberately: `station_data` keeps Additional Details (only
+ * Variable Options is skipped), while the building-design and IDF datasets also
+ * skip Send Request — they have no file format to choose. `default` is the
+ * open-set safety net: membership is by class, so a station-class variable whose
+ * id has not been added to `byId` yet still skips Variable Options and
+ * Additional Details.
+ */
+const STATION_STEP_POLICY: StationStepPolicy = {
+	byId: new Map([
+		[
+			StationVariableIds.MSC_CLIMATE_NORMALS,
+			new Set([
+				DOWNLOAD_STEPS.variableOptions,
+				DOWNLOAD_STEPS.additionalDetails,
+			]),
+		],
+		[
+			StationVariableIds.DAILY_AHCCD_TEMPERATURE_AND_PRECIPITATION,
+			new Set([
+				DOWNLOAD_STEPS.variableOptions,
+				DOWNLOAD_STEPS.additionalDetails,
+			]),
+		],
+		[
+			StationVariableIds.STATION_DATA,
+			new Set([
+				DOWNLOAD_STEPS.variableOptions,
+			]),
+		],
+		[
+			StationVariableIds.FUTURE_BUILDING_DESIGN_VALUE_SUMMARIES,
+			new Set([
+				DOWNLOAD_STEPS.variableOptions,
+				DOWNLOAD_STEPS.additionalDetails,
+				DOWNLOAD_STEPS.sendRequest,
+			]),
+		],
+		[
+			StationVariableIds.SHORT_DURATION_RAINFALL_IDF_DATA,
+			new Set([
+				DOWNLOAD_STEPS.variableOptions,
+				DOWNLOAD_STEPS.additionalDetails,
+				DOWNLOAD_STEPS.sendRequest,
+			]),
+		],
+	]),
+	default: new Set([
+		DOWNLOAD_STEPS.variableOptions,
+		DOWNLOAD_STEPS.additionalDetails,
+	]),
+};
+
+/**
+ * Build a step-applicability resolver bound to a policy and station-class set —
+ * a factory (a function that returns a function) so tests can build a resolver
+ * from hypothetical policies, class names and skeleton variables.
+ */
+export const createResolveStepApplicable = (
+	policy: StationStepPolicy,
+	stationClasses: ReadonlySet<string>,
+) => (
+	climateVariable: ClimateVariableInterface | null,
+	step: number,
+): boolean => {
+	if (!climateVariable) {
+		return true;
+	}
+
+	if (!stationClasses.has(climateVariable.getClass())) {
+		return true;
+	}
+
+	const skippedSteps =
+		policy.byId.get(climateVariable.getId()) ?? policy.default;
+
+	return !skippedSteps.has(step);
+};
+
+/**
+ * Whether a given Download wizard step is applicable (i.e. NOT skipped) for the
+ * supplied climate variable.
  *
- * Skip rules ("station variables" only — all steps apply to non-station
- * variables, and to the `null` variable):
- * - step 3 (Variable Options) is skipped;
- * - step 5 (Additional Details) is skipped unless the id is `station_data`;
- * - step 6 (Send Request) is skipped for the two no-file-format ids.
+ * The public entry point: {@link createResolveStepApplicable} bound to the real
+ * constants.
+ *
+ * @remarks
+ * This file is THE place for "station variable" step semantics. Membership is
+ * by CLASS ({@link STATION_VARIABLE_CLASSES}) — an open set, so a station-class
+ * variable whose id is not (yet) in {@link STATION_STEP_POLICY}'s `byId` still
+ * gets its `default` treatment. Non-station variables and the `null` variable
+ * keep every step.
+ *
+ * Pure and outside component logic so the same skip decision drives both the
+ * rendered step list and the reset payload. A skipped step must contribute
+ * NOTHING to the reset payload; per-field getter checks alone do NOT achieve
+ * that — step 5's `dateRange` is unconditional, so a station variable with step
+ * 5 skipped must not reset `dateRange`. Modelling applicability explicitly
+ * preserves that.
  *
  * @param climateVariable - The climate-variable instance, or `null` when none
  *   is selected yet (every step is applicable).
@@ -54,34 +136,7 @@ const SEND_REQUEST_SKIP_IDS = new Set<string>([
  * @returns `true` when the step is rendered for this variable, `false` when it
  *   is skipped.
  */
-export function determineStepApplicable(
-	climateVariable: ClimateVariableInterface | null,
-	step: number
-): boolean {
-	if (!climateVariable) {
-		return true;
-	}
-
-	const isStationVariable = STATION_VARIABLE_CLASSES.has(
-		climateVariable.getClass()
-	);
-	if (!isStationVariable) {
-		return true;
-	}
-
-	const variableId = climateVariable.getId();
-
-	if (step === DOWNLOAD_STEPS.variableOptions) {
-		return false;
-	}
-
-	if (step === DOWNLOAD_STEPS.additionalDetails) {
-		return variableId === 'station_data';
-	}
-
-	if (step === DOWNLOAD_STEPS.sendRequest) {
-		return !SEND_REQUEST_SKIP_IDS.has(variableId);
-	}
-
-	return true;
-}
+export const determineStepApplicable = createResolveStepApplicable(
+	STATION_STEP_POLICY,
+	STATION_VARIABLE_CLASSES,
+);

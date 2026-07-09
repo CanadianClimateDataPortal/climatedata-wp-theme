@@ -46,11 +46,11 @@
  *   unreachable because the filtered list is always a subsequence of the full
  *   list by reference.
  */
-export function resolveFullStepOrdinal<T>(
+export const resolveFullStepOrdinal = <T>(
 	fullSteps: readonly T[],
 	filteredSteps: readonly T[],
-	filteredPosition: number
-): number {
+	filteredPosition: number,
+): number => {
 	const filteredIndex = filteredPosition - 1;
 	const step = filteredSteps[filteredIndex];
 	const fullIndex = fullSteps.indexOf(step);
@@ -60,4 +60,4 @@ export function resolveFullStepOrdinal<T>(
 	}
 
 	return fullIndex + 1;
-}
+};

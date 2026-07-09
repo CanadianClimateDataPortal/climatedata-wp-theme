@@ -18,9 +18,9 @@ import {
  * Resets the Variable Options fields, each only when the variable exposes it.
  * `forecastType` is S2D-only, gated on `instanceof S2DClimateVariable`.
  */
-function buildVariableOptionsPayload(
-	climateVariable: ClimateVariableInterface
-): StepResetAccumulator {
+const buildVariableOptionsPayload = (
+	climateVariable: ClimateVariableInterface,
+): StepResetAccumulator => {
 	const payload: StepResetAccumulator = {};
 
 	if (climateVariable.getVersions()?.length) {
@@ -48,7 +48,7 @@ function buildVariableOptionsPayload(
 	}
 
 	return payload;
-}
+};
 
 /**
  * Build the reset-payload contribution for step 4 ({@link DOWNLOAD_STEPS.location}).
@@ -59,13 +59,13 @@ function buildVariableOptionsPayload(
  * The three Location fields are unconditional: step 4 is never skipped, so it
  * always contributes them.
  */
-function buildLocationPayload(): StepResetAccumulator {
+const buildLocationPayload = (): StepResetAccumulator => {
 	return {
 		interactiveRegion: null,
 		selectedPoints: {},
 		selectedRegion: null,
 	};
-}
+};
 
 /**
  * Build the reset-payload contribution for step 5 ({@link DOWNLOAD_STEPS.additionalDetails}).
@@ -78,9 +78,9 @@ function buildLocationPayload(): StepResetAccumulator {
  * station variable from resetting it is the step being skipped entirely, which
  * {@link determineStepApplicable} models upstream.
  */
-function buildAdditionalDetailsPayload(
-	climateVariable: ClimateVariableInterface
-): StepResetAccumulator {
+const buildAdditionalDetailsPayload = (
+	climateVariable: ClimateVariableInterface,
+): StepResetAccumulator => {
 	const payload: StepResetAccumulator = {};
 
 	if (climateVariable instanceof S2DClimateVariable) {
@@ -106,7 +106,17 @@ function buildAdditionalDetailsPayload(
 	}
 
 	return payload;
-}
+};
+
+/**
+ * The shape of a per-step reset-payload builder map: 1-based step ordinal → a
+ * function producing that step's reset fragment. Exported so tests can build a
+ * worker from hypothetical builders.
+ */
+export type StepPayloadBuilders = ReadonlyMap<
+	number,
+	(climateVariable: ClimateVariableInterface) => StepResetAccumulator
+>;
 
 /**
  * Per-step reset-payload builders, keyed by 1-based ordinal step number.
@@ -117,14 +127,54 @@ function buildAdditionalDetailsPayload(
  * exclusion note on {@link buildResetPayloadForStepsAfter}. Steps 2, 6 and 7
  * carry no resettable climate-variable fields.
  */
-const STEP_PAYLOAD_BUILDERS: ReadonlyMap<
-	number,
-	(climateVariable: ClimateVariableInterface) => StepResetAccumulator
-> = new Map([
+const STEP_PAYLOAD_BUILDERS: StepPayloadBuilders = new Map([
 	[DOWNLOAD_STEPS.variableOptions, buildVariableOptionsPayload],
 	[DOWNLOAD_STEPS.location, () => buildLocationPayload()],
 	[DOWNLOAD_STEPS.additionalDetails, buildAdditionalDetailsPayload],
 ]);
+
+/**
+ * Build a reset-payload worker bound to a set of per-step builders and a step
+ * applicability predicate — a factory so tests can exercise the walk/merge
+ * mechanics with synthetic builders and predicates.
+ */
+export const createBuildResetPayloadForStepsAfter = (
+	stepPayloadBuilders: StepPayloadBuilders,
+	isStepApplicable: (
+		climateVariable: ClimateVariableInterface | null,
+		step: number,
+	) => boolean,
+) => (
+	climateVariable: ClimateVariableInterface | null,
+	targetStep: number,
+): ResetPayload => {
+	if (!climateVariable) {
+		return {};
+	}
+
+	const orderedSteps = Array.from(stepPayloadBuilders.keys()).sort(
+		(stepA, stepB) => stepA - stepB,
+	);
+
+	const payload: StepResetAccumulator = {};
+
+	for (const step of orderedSteps) {
+		const isAfterTarget = step > targetStep;
+		if (!isAfterTarget) {
+			continue;
+		}
+
+		if (!isStepApplicable(climateVariable, step)) {
+			continue;
+		}
+
+		const buildStepPayload = stepPayloadBuilders.get(step)!;
+		const stepPayload = buildStepPayload(climateVariable);
+		Object.assign(payload, stepPayload);
+	}
+
+	return payload as ResetPayload;
+};
 
 /**
  * Derive the combined reset payload for every Download wizard step AFTER a
@@ -160,35 +210,7 @@ const STEP_PAYLOAD_BUILDERS: ReadonlyMap<
  * @see {@link determineStepApplicable}
  * @see {@link DOWNLOAD_STEPS}
  */
-export function buildResetPayloadForStepsAfter(
-	climateVariable: ClimateVariableInterface | null,
-	targetStep: number
-): ResetPayload {
-	if (!climateVariable) {
-		return {};
-	}
-
-	const orderedSteps = Array.from(STEP_PAYLOAD_BUILDERS.keys()).sort(
-		(stepA, stepB) => stepA - stepB
-	);
-
-	const payload: StepResetAccumulator = {};
-
-	for (const step of orderedSteps) {
-		const isAfterTarget = step > targetStep;
-		if (!isAfterTarget) {
-			continue;
-		}
-
-		const isApplicable = determineStepApplicable(climateVariable, step);
-		if (!isApplicable) {
-			continue;
-		}
-
-		const buildStepPayload = STEP_PAYLOAD_BUILDERS.get(step)!;
-		const stepPayload = buildStepPayload(climateVariable);
-		Object.assign(payload, stepPayload);
-	}
-
-	return payload as ResetPayload;
-}
+export const buildResetPayloadForStepsAfter = createBuildResetPayloadForStepsAfter(
+	STEP_PAYLOAD_BUILDERS,
+	determineStepApplicable,
+);

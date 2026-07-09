@@ -9,16 +9,15 @@
  *
  * Data Reset Logic:
  * When returning to a past choice backwards (e.g., from step 5 to step 2),
- * using the pencil icon with{@see resetStepsAfter}
+ * using the pencil icon, `resetStepsAfter` runs:
  *
  * 1. The combined reset payload is derived from the `climateVariable` instance
  *    with {@link buildResetPayloadForStepsAfter} and dispatched as one
  *    {@link updateClimateVariable}.
- * 2. The cross-slice side-effects (variable selection, selection mode,
- *    request state, shapefile state, file format) are fired here,
- *    each gated on the step being after the target AND applicable for the
- *    current variable ({@link determineStepApplicable}), reproducing the
- *    skip semantics of the step list.
+ * 2. The cross-slice side-effects that reset the state later steps depend on
+ *    are fired here, each gated on the step being after the target AND
+ *    applicable for the current variable ({@link determineStepApplicable}),
+ *    reproducing the skip semantics of the step list.
  *
  * Step components receive only {@link StepComponentProps} (`onChangeValidity`,
  * `onChangeErrorMessages`); Which is how we "reset" based on the current

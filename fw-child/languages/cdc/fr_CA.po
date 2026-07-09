@@ -807,11 +807,11 @@ msgstr "Construction / Bâtiments"
 
 #: template/feedback.php:148
 msgid "Education / Training"
-msgstr "Education / Formation"
+msgstr "Éducation / Formation"
 
 #: template/feedback.php:149
 msgid "Energy"
-msgstr "Energie"
+msgstr "Énergie"
 
 #: template/feedback.php:150
 msgid "Finance / Insurance"

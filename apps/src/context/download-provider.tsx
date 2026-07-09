@@ -173,13 +173,13 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	/**
 	 * Navigate to a specific step; going backwards also resets the steps after it.
 	 *
-	 * `step` counts positions in the variable-filtered `steps` list (what
+	 * `step` counts positions in the visible `steps` list (what
 	 * `currentStep` and rendering use); `resetStepsAfter` counts full
 	 * `DOWNLOAD_STEPS` ordinals. The two differ once a variable skips steps, so
 	 * {@link resolveFullStepOrdinal} converts before the reset — otherwise the reset
 	 * would wipe the very step being navigated to.
 	 *
-	 * @param step - Target step, 1-based within the filtered `steps` list.
+	 * @param step - Target step, 1-based within the visible `steps` list.
 	 */
 	const goToStep = useCallback(
 		(step: number) => {

@@ -9,11 +9,8 @@ import {
 } from './build-reset-payload-for-steps-after';
 import type { StepResetAccumulator } from './types';
 
-// Mechanics: the walk/merge worker exercised with SYNTHETIC builders and a
-// synthetic applicability predicate. No real climate variables and no real step
-// ordinals — the step numbers here are arbitrary builder keys.
 describe('createBuildResetPayloadForStepsAfter — walk/merge mechanics (synthetic)', () => {
-	const variable = {} as ClimateVariableInterface;
+	const climateVariable = {} as ClimateVariableInterface;
 	const applicableAlways = (): boolean => true;
 
 	const buildersByStep: StepPayloadBuilders = new Map([
@@ -27,7 +24,7 @@ describe('createBuildResetPayloadForStepsAfter — walk/merge mechanics (synthet
 			buildersByStep,
 			applicableAlways,
 		);
-		expect(build(variable, 4)).toEqual({ fromStep6: true });
+		expect(build(climateVariable, 4)).toEqual({ fromStep6: true });
 	});
 
 	test('ascending merge: a later step wins on a shared key', () => {
@@ -39,7 +36,7 @@ describe('createBuildResetPayloadForStepsAfter — walk/merge mechanics (synthet
 			sharedKey,
 			applicableAlways,
 		);
-		expect(build(variable, 0)).toEqual({ shared: 'late' });
+		expect(build(climateVariable, 0)).toEqual({ shared: 'late' });
 	});
 
 	test('a step the predicate rejects contributes nothing', () => {
@@ -51,7 +48,7 @@ describe('createBuildResetPayloadForStepsAfter — walk/merge mechanics (synthet
 			buildersByStep,
 			onlyStep6,
 		);
-		expect(build(variable, 0)).toEqual({ fromStep6: true });
+		expect(build(climateVariable, 0)).toEqual({ fromStep6: true });
 	});
 
 	test('no applicable steps → empty payload', () => {
@@ -59,7 +56,7 @@ describe('createBuildResetPayloadForStepsAfter — walk/merge mechanics (synthet
 			buildersByStep,
 			(): boolean => false,
 		);
-		expect(build(variable, 0)).toEqual({});
+		expect(build(climateVariable, 0)).toEqual({});
 	});
 
 	test('null variable → empty payload', () => {
@@ -72,69 +69,91 @@ describe('createBuildResetPayloadForStepsAfter — walk/merge mechanics (synthet
 });
 
 /**
- * Mock full {@link STEP_PAYLOAD_BUILDERS} in isolation.
+ * Create a mock climate variable — a real instance (so `instanceof` gates hold)
+ * with every per-field gate getter ON, so the real {@link STEP_PAYLOAD_BUILDERS}
+ * all contribute in the smoke tests below.
  */
-const withGatesOn = <T extends ClimateVariableInterface>(variable: T): T => {
-	variable.getVersions = () => ['v1'];
-	variable.getFrequencyConfig = () => ({}) as never;
-	variable.getAveragingOptions = () => ['allYears'] as never;
-	variable.getAnalysisFields = () => [{} as never];
-	variable.getThreshold = () => 'someThreshold';
-	variable.getScenarios = () => ['ssp245'];
-	variable.getPercentileOptions = () => ['p50'];
-	variable.getDefaultDateRange = () => ['2040', '2070'];
-	return variable;
+const createMockClimateVariable = ({
+	class: className,
+	id,
+}: {
+	class: string;
+	id: string;
+}): ClimateVariableInterface => {
+	const climateVariable =
+		className === 'S2DClimateVariable'
+			? new S2DClimateVariable({ class: className, id })
+			: new ClimateVariableBase({ class: className, id });
+	climateVariable.getVersions = () => ['v1'];
+	climateVariable.getFrequencyConfig = () => ({}) as never;
+	climateVariable.getAveragingOptions = () => ['allYears'] as never;
+	climateVariable.getAnalysisFields = () => [{} as never];
+	climateVariable.getThreshold = () => 'someThreshold';
+	climateVariable.getScenarios = () => ['ssp245'];
+	climateVariable.getPercentileOptions = () => ['p50'];
+	climateVariable.getDefaultDateRange = () => ['2040', '2070'];
+	return climateVariable;
 };
-
-const regularVariable = (): ClimateVariableInterface =>
-	withGatesOn(
-		new ClimateVariableBase({ class: 'ClimateVariableBase', id: 'regular' }),
-	);
 
 describe('buildResetPayloadForStepsAfter — real-constants smoke', () => {
 	test('S2D forecastType (step 3) is gated by instanceof S2DClimateVariable', () => {
-		const s2d = withGatesOn(
-			new S2DClimateVariable({ class: 'S2DClimateVariable', id: 's2d_test' }),
-		);
-		expect(buildResetPayloadForStepsAfter(s2d, 1)).toHaveProperty(
+		const climateVariable = createMockClimateVariable({
+			class: 'S2DClimateVariable',
+			id: 's2d_test',
+		});
+		expect(buildResetPayloadForStepsAfter(climateVariable, 1)).toHaveProperty(
 			'forecastType',
 			null,
 		);
 		expect(
-			buildResetPayloadForStepsAfter(regularVariable(), 1),
+			buildResetPayloadForStepsAfter(
+				createMockClimateVariable({
+					class: 'ClimateVariableBase',
+					id: 'regular',
+				}),
+				1,
+			),
 		).not.toHaveProperty('forecastType');
 	});
 
 	test('station_data keeps Additional Details (dateRange); a generic station variable does not', () => {
-		const stationData = withGatesOn(
-			new ClimateVariableBase({
-				class: 'StationClimateVariable',
-				id: 'station_data',
-			}),
-		);
-		expect(buildResetPayloadForStepsAfter(stationData, 1)).toHaveProperty(
+		const climateVariable = createMockClimateVariable({
+			class: 'StationClimateVariable',
+			id: 'station_data',
+		});
+		expect(buildResetPayloadForStepsAfter(climateVariable, 1)).toHaveProperty(
 			'dateRange',
 		);
-
-		const genericStation = withGatesOn(
-			new ClimateVariableBase({ class: 'StationClimateVariable', id: 'ahccd' }),
-		);
 		expect(
-			buildResetPayloadForStepsAfter(genericStation, 1),
+			buildResetPayloadForStepsAfter(
+				createMockClimateVariable({
+					class: 'StationClimateVariable',
+					id: 'ahccd',
+				}),
+				1,
+			),
 		).not.toHaveProperty('dateRange');
 	});
 
 	test('shared keys merge with the later step winning (frequency/averagingType from step 5)', () => {
+		const climateVariable = createMockClimateVariable({
+			class: 'ClimateVariableBase',
+			id: 'regular',
+		});
 		// Target step 4 leaves only step 5 reachable, so these keys come from it.
-		expect(buildResetPayloadForStepsAfter(regularVariable(), 4)).toMatchObject({
+		expect(buildResetPayloadForStepsAfter(climateVariable, 4)).toMatchObject({
 			averagingType: null,
 			frequency: null,
 		});
 	});
 
 	test('step 1 (dataset) is never emitted', () => {
+		const climateVariable = createMockClimateVariable({
+			class: 'ClimateVariableBase',
+			id: 'regular',
+		});
 		expect(
-			buildResetPayloadForStepsAfter(regularVariable(), 1),
+			buildResetPayloadForStepsAfter(climateVariable, 1),
 		).not.toHaveProperty('dataset');
 	});
 });

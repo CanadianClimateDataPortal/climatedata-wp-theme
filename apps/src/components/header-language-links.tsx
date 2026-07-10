@@ -47,7 +47,7 @@ const LOCALE_ENDONYMS: Record<Locale, string> = {
  * `selectDownloadUrlSearch`, not `window.location.search` — url-sync writes the
  * URL on a debounced `replaceState` with no re-render, so the URL lags the live
  * state — so the `href` stays current even for a middle/Ctrl-click "open in new
- * tab". ([[LLM-Context-ClimateData-Ticket-CLIM-1409]], CI-16.)
+ * tab".
  */
 const HeaderLanguageLinks = (
 	props: HeaderLanguageLinksProps

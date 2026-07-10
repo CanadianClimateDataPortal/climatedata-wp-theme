@@ -44,6 +44,14 @@ export const useDownloadUrlSync = () => {
 		}
 	};
 
+	// Debounced write of the Download state into the URL bar.
+	//
+	// No DOM event drives this — the trigger is Redux state changing
+	// (dataset / variable / step). The selectors above subscribe the hook
+	// to the store; every change re-creates this callback with fresh
+	// values, re-runs the consuming effect, and reschedules the pending
+	// timer — so the delayed write always sees the latest state, and a
+	// burst of changes collapses into one `history.replaceState`.
 	const updateUrlWithDebounce = useCallback(() => {
 		if (typeof window === 'undefined' || !isInitialized) return;
 
@@ -52,13 +60,14 @@ export const useDownloadUrlSync = () => {
 		}
 
 		updateTimeoutRef.current = window.setTimeout(() => {
-			// Build the query FRESH (empty base), NOT seeded from
-			// `window.location.search`, so this writer emits exactly what the
-			// `selectDownloadUrlSearch` selector builds.
-			// The Download URL owns only `dataset`/`var` and nothing reads any
-			// other param back, so starting empty simply drops any foreign param (e.g. `utm_*`) — the same
-			// behaviour as the Map writer, which replaces the whole query with a
-			// freshly built `buildMapUrlParams` result. (Same-Intent-Same-Pattern.)
+			// The query is built FRESH from state (empty URLSearchParams), never
+			// seeded from `window.location.search`: Redux state is the single
+			// source of truth and the URL bar is write-only output. Seeding from
+			// the live URL would re-import params this app does not own (e.g.
+			// `utm_*`) and let this writer drift from `selectDownloadUrlSearch`,
+			// which the language switcher uses to build the same query for its
+			// `href`. Fresh build keeps writer and selector byte-identical — the
+			// same pattern as the Map writer.
 			const params = new URLSearchParams();
 
 			addParamsToUrl(params);

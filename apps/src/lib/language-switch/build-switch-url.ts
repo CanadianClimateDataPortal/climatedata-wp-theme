@@ -1,7 +1,7 @@
 import type { Locale } from '@/types/types';
 import {
-	resolveAlternateOrigin,
-} from './resolve-alternate-origin';
+	resolveOriginForLocale,
+} from './resolve-origin-for-locale';
 import {
 	resolveAlternatePath,
 	type SwitchSection,
@@ -28,20 +28,28 @@ export interface BuildSwitchUrlInput {
 }
 
 /**
- * Build the equivalent other-language URL: origin swap + path translation +
- * verbatim query carry.
+ * Build the URL of the requested section in the requested locale: locale-
+ * addressed origin + path translation + query carry.
  *
- * Pure and free of `window` — origin and protocol are passed in — so it is
+ * The origin is resolved FOR `input.targetLocale` (not an unconditional
+ * swap to the other language), so passing the current page's own locale
+ * returns that same page's URL instead of a host/path language mismatch.
+ *
+ * Pure and free of `window` — hostname and protocol are passed in — so it is
  * exhaustively unit-testable. This is the sole place the switch destination is
  * assembled; the component stays thin.
  *
- * @param input - Origin/protocol, target section + locale, and the query.
- * @returns The absolute destination URL.
+ * @param input - Hostname/protocol, target section + locale, and the query.
+ * @returns The absolute destination URL in the requested locale.
  */
 export const buildSwitchUrl = (
 	input: BuildSwitchUrlInput,
 ): string => {
-	const origin = resolveAlternateOrigin(input.hostname, input.protocol);
+	const origin = resolveOriginForLocale(
+		input.hostname,
+		input.protocol,
+		input.targetLocale,
+	);
 	const path = resolveAlternatePath(input.section, input.targetLocale);
 
 	const url = new URL(path, origin);

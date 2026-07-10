@@ -1739,14 +1739,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		unit: "degC",
 		unitDecimalPlaces: 1,
-		preCalculatedCanDCSConfig: {
-			rl5tasmax: [FrequencyType.YS],
-			rl10tasmax: [FrequencyType.YS],
-			rl20tasmax: [FrequencyType.YS],
-			rl25tasmax: [FrequencyType.YS],
-			rl30tasmax: [FrequencyType.YS],
-			rl50tasmax: [FrequencyType.YS],
-		},
 	},
 	/** 1-in-X-Year Annual Minimum Temperature (Return Level) */
 	{
@@ -1780,14 +1772,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		unit: "degC",
 		unitDecimalPlaces: 1,
-		preCalculatedCanDCSConfig: {
-			rl5tasmin: [FrequencyType.YS],
-			rl10tasmin: [FrequencyType.YS],
-			rl20tasmin: [FrequencyType.YS],
-			rl25tasmin: [FrequencyType.YS],
-			rl30tasmin: [FrequencyType.YS],
-			rl50tasmin: [FrequencyType.YS],
-		},
 	},
 	/** 1-in-X-Year Annual Maximum 1-Day Precipitation (Return Level) */
 	{
@@ -1820,14 +1804,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			},
 		],
 		unit: "mm",
-		preCalculatedCanDCSConfig: {
-			rl5pr: [FrequencyType.YS],
-			rl10pr: [FrequencyType.YS],
-			rl20pr: [FrequencyType.YS],
-			rl25pr: [FrequencyType.YS],
-			rl30pr: [FrequencyType.YS],
-			rl50pr: [FrequencyType.YS],
-		},
 	},
 	/** Relative Sea-Level Change */
 	{

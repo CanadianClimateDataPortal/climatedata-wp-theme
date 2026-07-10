@@ -17,7 +17,6 @@ import { FINCH_FREQUENCY_NAMES, GEOSERVER_BASE_URL } from '@/lib/constants';
 import {
 	FinchRequestInput,
 	StepComponent,
-	StepComponentRef,
 } from '@/types/download-form-interface';
 import {
 	ClimateVariableInterface,
@@ -26,6 +25,7 @@ import {
 	FileFormatType,
 	InteractiveRegionOption,
 	StationDownloadUrlsProps,
+	StationVariableIds,
 } from '@/types/climate-variable-interface';
 import { useLocale } from "@/hooks/use-locale";
 import { useS2D } from '@/hooks/use-s2d';
@@ -122,7 +122,7 @@ const Steps: React.FC = () => {
 	const [stepErrorMessages, setStepErrorMessages] = useState<StepErrorMessage[]>([]);
 
 	const dispatch = useAppDispatch();
-	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
+	const { steps, goToNextStep, currentStep } = useDownload();
 	const { climateVariable } = useClimateVariable();
 	const { finchPayload } = useShapefile();
 
@@ -547,6 +547,8 @@ const Steps: React.FC = () => {
 
 				} else {
 					// For station variables
+					// i.e. Non-region interactive mode: each selected station/point is
+					// downloaded individually.
 					const selectedPoints = climateVariable.getSelectedPoints?.() ?? {};
 					const fileFormat = climateVariable.getFileFormat?.() ?? null;
 					const stationIds = Object.keys(selectedPoints);
@@ -554,20 +556,20 @@ const Steps: React.FC = () => {
 					dispatch(setRequestStatus('loading'));
 
 					switch (climateVariable.getId()) {
-						case 'msc_climate_normals':
-						case 'daily_ahccd_temperature_and_precipitation':
+						case StationVariableIds.MSC_CLIMATE_NORMALS:
+						case StationVariableIds.DAILY_AHCCD_TEMPERATURE_AND_PRECIPITATION:
 							stationDownloadUrlsProps.stationIds = stationIds;
 							stationDownloadUrlsProps.fileFormat = fileFormat;
 							break;
-						case 'future_building_design_value_summaries': {
+						case StationVariableIds.FUTURE_BUILDING_DESIGN_VALUE_SUMMARIES: {
 							stationDownloadUrlsProps.filename = selectedStation?.filename;
 							stationDownloadUrlsProps.locale = locale;
 							break;
 						}
-						case 'short_duration_rainfall_idf_data':
+						case StationVariableIds.SHORT_DURATION_RAINFALL_IDF_DATA:
 							stationDownloadUrlsProps.stationId = stationIds[0];
 							break;
-						case 'station_data': {
+						case StationVariableIds.STATION_DATA: {
 							stationDownloadUrlsProps.stationIds = stationIds;
 							stationDownloadUrlsProps.fileFormat = fileFormat;
 							const dateRange = climateVariable.getDateRange?.();
@@ -614,15 +616,6 @@ const Steps: React.FC = () => {
 			<StepNavigation totalSteps={steps.length} />
 			<div className="mb-8">
 				<Step
-					// Register the step's ref to enable communication between the step component
-					// and the download context. This allows the step to validate itself and
-					// notify the parent when its state changes.
-					ref={(ref: StepComponentRef | null) => {
-						if (ref) {
-							// Store the ref in the download context to access it from other components
-							registerStepRef(currentStep, ref);
-						}
-					}}
 					onChangeValidity={setIsStepValid}
 					onChangeErrorMessages={updateErrorMessages}
 				/>

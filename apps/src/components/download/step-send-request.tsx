@@ -12,13 +12,12 @@ import { DownloadType, FileFormatType } from "@/types/climate-variable-interface
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
-	resetRequestState,
 	setCaptchaValue,
 	setEmail,
 	setRequestError,
 	setSubscribe,
 } from '@/features/download/download-slice';
-import { StepComponentProps, StepComponentRef } from '@/types/download-form-interface';
+import { StepComponent } from '@/types/download-form-interface';
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
 
@@ -77,13 +76,14 @@ Captcha.displayName = 'Captcha';
  *
  * Send download request step
  */
-const StepSendRequest = React.forwardRef<
-	StepComponentRef,
-	StepComponentProps
->(({ onChangeValidity }, ref) => {
+const StepSendRequest: StepComponent = ({ onChangeValidity }) => {
 	const captchaValue = useAppSelector((state) => state.download.captchaValue) || '';
 	const [captchaRefresh, setCaptchaRefresh] = useState(Math.random());
-	const {climateVariable, setFileFormat, resetFileFormat, setDecimalPlace} = useClimateVariable();
+	const {
+		climateVariable,
+		setDecimalPlace,
+		setFileFormat,
+	} = useClimateVariable();
 
 	const { email, subscribe, requestStatus, requestError } = useAppSelector(
 		(state) => state.download
@@ -120,15 +120,6 @@ const StepSendRequest = React.forwardRef<
 		}
 		onChangeValidity(isValid())
 	}, [climateVariable, downloadType, email, onChangeValidity]);
-
-	React.useImperativeHandle(ref, () => ({
-		reset: () => {
-			resetFileFormat();
-			dispatch(resetRequestState());
-			dispatch(setCaptchaValue(''));
-		},
-	}), [dispatch, resetFileFormat]);
-
 
 	const formatOptions = [
 		{ value: FileFormatType.CSV, label: 'CSV' },
@@ -278,8 +269,9 @@ const StepSendRequest = React.forwardRef<
 			{requestStatus === 'error' && <div className="text-red-600 text-sm mt-2">{requestError}</div>}
 		</StepContainer>
 	);
-});
-StepSendRequest.displayName = 'StepSendRequest';
+};
+
+StepSendRequest.displayName = 'StepSendRequest'; // Explicit string literal, or this name would be lost in production.
 
 /**
  * Extracts and formats summary data for the Send Request step (file parameters).

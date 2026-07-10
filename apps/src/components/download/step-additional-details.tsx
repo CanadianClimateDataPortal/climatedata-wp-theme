@@ -15,11 +15,7 @@ import {
 	DownloadType,
 	FrequencyType,
 } from '@/types/climate-variable-interface';
-import {
-	StepComponentProps,
-	StepComponentRef,
-	StepResetPayload,
-} from "@/types/download-form-interface";
+import { StepComponent } from "@/types/download-form-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
 import { YearRange } from "@/components/year-range";
@@ -169,7 +165,7 @@ function MissingDataTooltip(): React.ReactElement {
 	);
 }
 
-const PeriodsSelector = (props: PeriodsSelectorProps) => {
+const PeriodsSelector = (props: PeriodsSelectorProps): React.ReactElement => {
 	const {
 		availablePeriods,
 		selectedPeriods,
@@ -253,15 +249,18 @@ const PeriodsSelector = (props: PeriodsSelectorProps) => {
 	);
 }
 
+PeriodsSelector.displayName = 'PeriodsSelector'; // Explicit string literal, or this name would be lost in production.
+
+
 /**
  * Step 5.
  *
  * Additional details step will allow the user to customize the download request
  */
-const StepAdditionalDetails = React.forwardRef<
-	StepComponentRef,
-	StepComponentProps
->(({ onChangeValidity }, ref) => {
+const StepAdditionalDetails: StepComponent = (props): React.ReactElement => {
+	const {
+		onChangeValidity,
+	} = props;
 	const { locale } = useLocale();
 	const {
 		climateVariable,
@@ -344,41 +343,6 @@ const StepAdditionalDetails = React.forwardRef<
 		}
 		onChangeValidity(isValid())
 	}, [climateVariable, isS2DVariable, onChangeValidity]);
-
-	React.useImperativeHandle(ref, () => ({
-		getResetPayload: () => {
-			if (!climateVariable) return {};
-
-			const payload: StepResetPayload = {};
-
-			if (isS2DVariable) {
-				payload.selectedPeriods = [];
-			}
-
-			if (climateVariable.getFrequencyConfig()) {
-				payload.frequency = null;
-			}
-
-			if (climateVariable.getAveragingOptions()?.length) {
-				payload.averagingType = null;
-			}
-
-			payload.dateRange = climateVariable.getDefaultDateRange();
-
-			if (climateVariable.getScenarios()?.length) {
-				payload.analyzeScenarios = [];
-			}
-
-			if (climateVariable.getPercentileOptions()?.length) {
-				payload.percentiles = [];
-			}
-
-			return payload;
-		},
-	}), [
-		climateVariable,
-		isS2DVariable,
-	]);
 
 	const averagingOptions = [
 		{
@@ -631,9 +595,9 @@ const StepAdditionalDetails = React.forwardRef<
 			}
 		</StepContainer>
 	);
-});
+};
 
-StepAdditionalDetails.displayName = 'StepAdditionalDetails';
+StepAdditionalDetails.displayName = 'StepAdditionalDetails'; // Explicit string literal, or this name would be lost in production.
 
 /**
  * Extracts and formats summary data for the Additional Details step.

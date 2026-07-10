@@ -1,13 +1,13 @@
 import type { ClimateVariableConfigInterface } from '@/types/climate-variable-interface';
 
 /**
- * Ordinal (1-based) step numbers for the Download wizard.
+ * 1-based step numbers in the full flow for the Download wizard.
  *
  * @remarks
  * Mirrors the positional order of the {@link STEPS} tuple in
  * {@link ../../components/download/config.ts}. The wizard tracks `currentStep`
  * 1-based (`download-provider.tsx`), so the derivation logic here is keyed on
- * the same 1-based ordinals rather than the 0-based array indexes. There is
+ * the same 1-based full-flow step numbers rather than the 0-based array indexes. There is
  * intentionally NO `Step` enum in the codebase; these are the shared literal
  * constants used in its place.
  */

@@ -50,7 +50,7 @@ import {
 	buildResetPayloadForStepsAfter,
 	determineStepApplicable,
 	DOWNLOAD_STEPS,
-	resolveFullStepOrdinal,
+	resolveStepNumberInFullFlow,
 } from '@/lib/download';
 
 interface DownloadContextValue {
@@ -85,14 +85,6 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 		dispatch(setCurrentStep(currentStep));
 	}, [currentStep, dispatch]);
 
-	/**
-	 * Recompute the visible steps whenever the climate variable changes.
-	 *
-	 * Which steps apply for a given variable is decided in one place —
-	 * {@link determineStepApplicable} (keyed by 1-based {@link DOWNLOAD_STEPS}
-	 * ordinal) — so this effect just keeps the steps it marks applicable. The
-	 * `index + 1` is the only 0-based (array) to 1-based (ordinal) bridge.
-	 */
 	useEffect(() => {
 		setSteps(
 			() =>
@@ -111,25 +103,22 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	 * components are currently mounted — in two halves: the cross-slice
 	 * side-effects fired here, and one combined `updateClimateVariable` payload
 	 * derived by {@link buildResetPayloadForStepsAfter}.
-	 *
-	 * @param targetStep - The step number being navigated to
 	 */
 	const resetStepsAfter = useCallback(
-		(targetStep: number) => {
-			// Fire the step reset side-effects independent of which step
-			// components are mounted.
-			// Gated in the same way as the payload derivation
-			// (step > targetStep AND the step is applicable for this variable)
-			// so a skipped step contributes nothing.
+		(
+			/** The step number in the full flow being navigated to */
+			targetStepNumberInFullFlow: number,
+		) => {
+			// Fire the step reset side-effects independent of which step components are mounted.
 			const isVariableStepReset =
-				DOWNLOAD_STEPS.variable > targetStep &&
+				DOWNLOAD_STEPS.variable > targetStepNumberInFullFlow &&
 				determineStepApplicable(climateVariable, DOWNLOAD_STEPS.variable);
 			if (isVariableStepReset) {
 				dispatch(setClimateVariable(null));
 			}
 
 			const isLocationStepReset =
-				DOWNLOAD_STEPS.location > targetStep &&
+				DOWNLOAD_STEPS.location > targetStepNumberInFullFlow &&
 				determineStepApplicable(climateVariable, DOWNLOAD_STEPS.location);
 			if (isLocationStepReset) {
 				dispatch(setSelectionMode('cells'));
@@ -137,7 +126,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 			}
 
 			const isSendRequestStepReset =
-				DOWNLOAD_STEPS.sendRequest > targetStep &&
+				DOWNLOAD_STEPS.sendRequest > targetStepNumberInFullFlow &&
 				determineStepApplicable(climateVariable, DOWNLOAD_STEPS.sendRequest);
 			if (isSendRequestStepReset) {
 				resetFileFormat();
@@ -147,7 +136,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 
 			const resetPayload = buildResetPayloadForStepsAfter(
 				climateVariable,
-				targetStep
+				targetStepNumberInFullFlow
 			);
 
 			if (Object.keys(resetPayload).length > 0) {
@@ -171,32 +160,38 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	);
 
 	/**
-	 * Navigate to a specific step; going backwards also resets the steps after it.
+	 * Navigate to a specific step; going "back" also resets the steps after it.
 	 *
-	 * `targetStepViewNumber` counts step views in the visible `steps` list (what
-	 * `currentStep` and rendering use); `resetStepsAfter` counts full
-	 * `DOWNLOAD_STEPS` ordinals. The two differ once a variable hides steps, so
-	 * {@link resolveFullStepOrdinal} converts before the reset — otherwise the reset
-	 * would wipe the very step being navigated to.
+	 * `targetStepViewNumber` counts step views in the visible step views list
+	 * `resetStepsAfter` counts full `DOWNLOAD_STEPS` step numbers.
 	 *
-	 * @param targetStepViewNumber - The destination step view, 1-based within the
-	 *   visible `steps` list.
+	 * The two differ once a variable hides steps, so {@link resolveStepNumberInFullFlow}
+	 * converts before the reset — otherwise the reset would wipe the very step being
+	 * navigated to.
 	 */
 	const goToStep = useCallback(
-		(targetStepViewNumber: number) => {
+		(
+			/** counts step views in the visible step views list */
+			targetStepViewNumber: number,
+		) => {
 			if (targetStepViewNumber < currentStep) {
 				setCurrentStepLocal(targetStepViewNumber);
-				const fullStepOrdinal = resolveFullStepOrdinal(
+				const stepNumberInFullFlow = resolveStepNumberInFullFlow(
 					STEPS,
 					steps,
 					targetStepViewNumber
 				);
-				resetStepsAfter(fullStepOrdinal);
+				/** counts full `DOWNLOAD_STEPS` step numbers */
+				resetStepsAfter(stepNumberInFullFlow);
 			} else {
 				setCurrentStepLocal(targetStepViewNumber);
 			}
 		},
-		[currentStep, resetStepsAfter, steps]
+		[
+			currentStep,
+			resetStepsAfter,
+			steps,
+		]
 	);
 
 	const values: DownloadContextValue = {

@@ -7,7 +7,7 @@ import {
 	createBuildResetPayloadForStepsAfter,
 	type StepPayloadBuilders,
 } from './build-reset-payload-for-steps-after';
-import type { StepResetAccumulator } from './types';
+import { DOWNLOAD_STEPS, type StepResetAccumulator } from './types';
 
 describe('createBuildResetPayloadForStepsAfter — walk/merge mechanics (synthetic)', () => {
 	const climateVariable = {} as ClimateVariableInterface;
@@ -28,12 +28,12 @@ describe('createBuildResetPayloadForStepsAfter — walk/merge mechanics (synthet
 	});
 
 	test('ascending merge: a later step wins on a shared key', () => {
-		const sharedKey: StepPayloadBuilders = new Map([
+		const buildersWithSharedKey: StepPayloadBuilders = new Map([
 			[2, (): StepResetAccumulator => ({ shared: 'early' })],
 			[4, (): StepResetAccumulator => ({ shared: 'late' })],
 		]);
 		const build = createBuildResetPayloadForStepsAfter(
-			sharedKey,
+			buildersWithSharedKey,
 			applicableAlways,
 		);
 		expect(build(climateVariable, 0)).toEqual({ shared: 'late' });
@@ -101,18 +101,20 @@ describe('buildResetPayloadForStepsAfter — real-constants smoke', () => {
 			class: 'S2DClimateVariable',
 			id: 's2d_test',
 		});
-		expect(buildResetPayloadForStepsAfter(climateVariable, 1)).toHaveProperty(
-			'forecastType',
-			null,
-		);
+		expect(
+			buildResetPayloadForStepsAfter(
+				climateVariable,
+				DOWNLOAD_STEPS.dataset /* 1 */,
+			)
+		).toHaveProperty('forecastType', null);
 		expect(
 			buildResetPayloadForStepsAfter(
 				createMockClimateVariable({
 					class: 'ClimateVariableBase',
 					id: 'regular',
 				}),
-				1,
-			),
+				DOWNLOAD_STEPS.dataset /* 1 */,
+			)
 		).not.toHaveProperty('forecastType');
 	});
 
@@ -121,17 +123,20 @@ describe('buildResetPayloadForStepsAfter — real-constants smoke', () => {
 			class: 'StationClimateVariable',
 			id: 'station_data',
 		});
-		expect(buildResetPayloadForStepsAfter(climateVariable, 1)).toHaveProperty(
-			'dateRange',
-		);
+		expect(
+			buildResetPayloadForStepsAfter(
+				climateVariable,
+				DOWNLOAD_STEPS.dataset /* 1 */,
+			)
+		).toHaveProperty('dateRange');
 		expect(
 			buildResetPayloadForStepsAfter(
 				createMockClimateVariable({
 					class: 'StationClimateVariable',
 					id: 'ahccd',
 				}),
-				1,
-			),
+				DOWNLOAD_STEPS.dataset /* 1 */,
+			)
 		).not.toHaveProperty('dateRange');
 	});
 
@@ -141,7 +146,12 @@ describe('buildResetPayloadForStepsAfter — real-constants smoke', () => {
 			id: 'regular',
 		});
 		// Target step 4 leaves only step 5 reachable, so these keys come from it.
-		expect(buildResetPayloadForStepsAfter(climateVariable, 4)).toMatchObject({
+		expect(
+			buildResetPayloadForStepsAfter(
+				climateVariable,
+				DOWNLOAD_STEPS.location /* 4 */,
+			)
+		).toMatchObject({
 			averagingType: null,
 			frequency: null,
 		});
@@ -153,7 +163,10 @@ describe('buildResetPayloadForStepsAfter — real-constants smoke', () => {
 			id: 'regular',
 		});
 		expect(
-			buildResetPayloadForStepsAfter(climateVariable, 1),
+			buildResetPayloadForStepsAfter(
+				climateVariable,
+				DOWNLOAD_STEPS.dataset /* 1 */,
+			)
 		).not.toHaveProperty('dataset');
 	});
 });

@@ -18,7 +18,7 @@ const STATION_VARIABLE_CLASSES = new Set<string>([
 
 /**
  * A station-variable skip policy. `byId` maps a known station id → the set of
- * {@link DOWNLOAD_STEPS} ordinals that id removes; `default` is the open-set
+ * {@link DOWNLOAD_STEPS} full-flow numbers that id removes; `default` is the open-set
  * safety net applied to a station-class variable whose id is not in `byId`.
  * Exported so the lookup can be exercised with hypothetical policies in tests.
  */
@@ -132,7 +132,7 @@ export const createResolveStepApplicable = (
  *
  * @param climateVariable - The climate-variable instance, or `null` when none
  *   is selected yet (every step is applicable).
- * @param step - The 1-based ordinal step number (see {@link DOWNLOAD_STEPS}).
+ * @param step - The 1-based step number in the full flow (see {@link DOWNLOAD_STEPS}).
  * @returns `true` when the step is rendered for this variable, `false` when it
  *   is skipped.
  */

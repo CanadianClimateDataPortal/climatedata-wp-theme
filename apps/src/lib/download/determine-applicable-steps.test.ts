@@ -22,7 +22,7 @@ const createMockClimateVariable = ({
 
 // Synthetic fixtures — deliberately unrelated to the real dataset roster, so
 // these tests exercise the lookup MECHANICS, not memorised dataset behaviour.
-// The step numbers are arbitrary set members, not real ordinals.
+// The step numbers are arbitrary set members, not real full-flow step numbers.
 const STATION_CLASSES: ReadonlySet<string> = new Set(['StationLike']);
 const POLICY: StationStepPolicy = {
 	byId: new Map([['known_id', new Set([2, 4])]]),

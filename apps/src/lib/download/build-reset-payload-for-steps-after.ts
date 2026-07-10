@@ -109,9 +109,9 @@ const buildAdditionalDetailsPayload = (
 };
 
 /**
- * The shape of a per-step reset-payload builder map: 1-based step ordinal → a
- * function producing that step's reset fragment. Exported so tests can build a
- * worker from hypothetical builders.
+ * The shape of a per-step reset-payload builder map:
+ * 1-based step number in the full flow → a function producing that step's reset fragment.
+ * Exported so tests can build a worker from hypothetical builders.
  */
 export type StepPayloadBuilders = ReadonlyMap<
 	number,
@@ -119,13 +119,13 @@ export type StepPayloadBuilders = ReadonlyMap<
 >;
 
 /**
- * Per-step reset-payload builders, keyed by 1-based ordinal step number.
+ * Per-step reset-payload builders, keyed by 1-based full-flow step number.
  *
  * @remarks
- * Only steps 3–5 contribute reset fields. Step 1
- * ({@link DOWNLOAD_STEPS.dataset}) is intentionally absent — see the step-1
- * exclusion note on {@link buildResetPayloadForStepsAfter}. Steps 2, 6 and 7
- * carry no resettable climate-variable fields.
+ * Only steps 3–5 contribute reset fields.
+ * Step 1 ({@link DOWNLOAD_STEPS.dataset}) is intentionally absent — see the step-1
+ * exclusion note on {@link buildResetPayloadForStepsAfter}.
+ * Steps 2, 6 and 7 carry no resettable climate-variable fields.
  */
 const STEP_PAYLOAD_BUILDERS: StepPayloadBuilders = new Map([
 	[DOWNLOAD_STEPS.variableOptions, buildVariableOptionsPayload],
@@ -182,7 +182,7 @@ export const createBuildResetPayloadForStepsAfter = (
  * mounted.
  *
  * @remarks
- * Walks the applicable steps in ascending ordinal order and shallow-merges each
+ * Walks the applicable steps in ascending step-number order and shallow-merges each
  * step's contribution, so for keys shared between steps (`frequency` and
  * `averagingType`, the latter of type {@link AveragingType}, appear in both
  * step 3 and step 5) the later step wins.

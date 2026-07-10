@@ -1,6 +1,6 @@
 /**
- * Translate a step view's number in the VISIBLE step list into its ordinal in
- * the FULL step list.
+ * Translate a step view's number in the VISIBLE step list into its number in the
+ * FULL step list.
  *
  * @remarks
  * The Download wizard keeps step numbers in two different 1-based index spaces
@@ -8,9 +8,9 @@
  *
  * - The FULL space is the fixed {@link STEPS} tuple in
  *   {@link ../../components/download/config.ts} (always 7 entries). The reset
- *   gating in `context/download-provider.tsx` — and the ordinal constants in
- *   {@link ./types.ts} — are expressed in this space, so ordinal 4 always means
- *   "Location" regardless of the selected variable.
+ *   gating in `context/download-provider.tsx` — and the step-number constants in
+ *   {@link ./types.ts} — are expressed in this space, so step number 4 in the
+ *   full flow always means "Location" regardless of the selected variable.
  * - The VISIBLE space is the `steps` state the provider derives by hiding the
  *   steps that do not apply to the current variable (station variables hide
  *   Variable Options and Additional Details, and two ids also hide Send
@@ -19,20 +19,21 @@
  *   this shorter list.
  *
  * For a variable with no hidden steps the two spaces are identical, so a step
- * view's visible number needs no translation. For a station variable they
- * diverge: e.g. with the visible list `[Dataset, Variable, Location, Send
- * Request, Result]`, Location sits at step view number 3 but full ordinal 4.
- * Feeding that visible number straight into the full-space reset gates makes
- * them reset the very step being navigated to (`4 > 3` is true, so Location gets
- * wiped). Converting to the full ordinal first restores the intended boundary
+ * view's visible number needs no translation.
+ *
+ * For a station variable they diverge: e.g. with the visible list
+ * `[Dataset, Variable, Location, Send Request, Result]`, Location sits at the
+ * 3rd step view, but is displayed at 4th in the full flow. Feeding that visible
+ * number straight into the full-space reset gates makes them reset the very
+ * step being navigated to (`4 > 3` is true, so Location gets wiped).
+ *
+ * Converting to the full-flow step number first restores the intended boundary
  * (`4 > 4` is false, so Location is preserved).
  *
  * The provider's `steps` list is `STEPS.filter(...)`, so each visible entry is
  * the SAME object reference as its counterpart in the full tuple. That is why
- * the ordinal can be recovered with a reference-equality `indexOf` rather than a
- * value comparison. The helper stays generic and takes both arrays as arguments
- * so it depends on neither the config nor the provider (respecting the
- * lib -> components layering).
+ * the full-flow step number can be recovered with a reference-equality `indexOf`
+ * rather than a value comparison.
  *
  * @typeParam T - The element type shared by both lists (the wizard passes React
  *   step-component references).
@@ -41,13 +42,13 @@
  *   inapplicable steps; every entry must be a reference into `fullSteps`.
  * @param stepViewNumber - The step view's 1-based number in the visible flow
  *   (its slot within `visibleSteps`).
- * @returns The 1-based ordinal of that step within `fullSteps`. Falls back to
- *   `stepViewNumber` unchanged when the referenced step is absent from
- *   `fullSteps` (e.g. an out-of-range number); in the wizard this branch is
- *   unreachable because the visible list is always a subsequence of the full
- *   list by reference.
+ * @returns The step view's 1-based number in the full flow (its position within
+ *   `fullSteps`). Falls back to `stepViewNumber` unchanged when the referenced
+ *   step is absent from `fullSteps` (e.g. an out-of-range number); in the wizard
+ *   this branch is unreachable because the visible list is always a subsequence
+ *   of the full list by reference.
  */
-export const resolveFullStepOrdinal = <T>(
+export const resolveStepNumberInFullFlow = <T>(
 	fullSteps: readonly T[],
 	visibleSteps: readonly T[],
 	stepViewNumber: number,

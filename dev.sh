@@ -42,7 +42,8 @@ function _show_help {
   echo ""
   echo "  Other:"
   echo "    download-docker-assets <URL>   Download the required Docker assets from the given URL."
-  echo "    compile-react-apps-translation Run translation files compilation for the React maps and download apps in apps/ folder"
+  echo "    compile-main-site-translation Run translation files compilation for the main site pages."
+  echo "    compile-react-apps-translation Run translation files compilation for the React maps and download apps in apps/ folder."
 }
 
 # Switch to the real directory of the script, so it still works when used from
@@ -62,7 +63,7 @@ function _docker_compose {
 function _check_for_required_build_assets {
   local required_dirs=("dockerfiles/mounts/wp-plugins" "dockerfiles/mounts/ssl")
   local error_found=false
-  
+
   for dir in "${required_dirs[@]}"; do
     if [[ ! -d "$dir" ]]; then
       error_found=true
@@ -72,12 +73,12 @@ function _check_for_required_build_assets {
       break
     fi
   done
-  
+
   if [[ "$error_found" == true ]]; then
     echo    "[WARNING] Some assets are required to build the Portal image, but they cannot be found. To download those assets, cancel this process and run:"
     echo    "            ./dev.sh download-docker-assets <URL>"
     read -p "          Do you want to cancel this process? [Y/n]? " -n 1 -r
-    
+
     if [[ ! $REPLY =~ ^[Nn]$ ]]; then
       echo "Cancelled."
       exit 1
@@ -206,6 +207,26 @@ function nginx {
 
 function task-runner-shell {
   _docker_compose exec -it task-runner bash
+}
+
+function compile-main-site-translation {
+  (
+    set -e
+
+    echo "Compiling the main site translations that are currently maintained from ./fw-child/languages/cdc/:"
+    _docker_compose exec -w /var/www/html/assets/themes/fw-child portal bash -c '
+      wp i18n make-mo languages/cdc/fr_CA.po
+    '
+    echo ''
+    echo "To do the same manually:"
+    echo '  ./dev.sh portal-shell'
+    echo '  cd /var/www/html/assets/themes/fw-child'
+    echo '  wp i18n make-mo languages/cdc/fr_CA.po'
+    echo ''
+    echo 'To read the docs:'
+    echo "  open 'docs/translate-the-site.md'"
+    echo ''
+  )
 }
 
 function compile-react-apps-translation {

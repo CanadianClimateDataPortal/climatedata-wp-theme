@@ -24,8 +24,8 @@ export const PROD_APEX_HOST_FR = 'donneesclimatiques.ca';
 const HOST_COUNTERPART = new Map<string, string>([
 	['dev-en.climatedata.ca', 'dev-fr.climatedata.ca'],
 	['dev-fr.climatedata.ca', 'dev-en.climatedata.ca'],
-	['uat-en.climatedata.ca', 'uat-fr.climatedata.ca'],
-	['uat-fr.climatedata.ca', 'uat-en.climatedata.ca'],
+	['uat.' + PROD_APEX_HOST_EN, 'uat.' + PROD_APEX_HOST_FR],
+	['uat.' + PROD_APEX_HOST_FR, 'uat.' + PROD_APEX_HOST_EN],
 	[PROD_APEX_HOST_EN, PROD_APEX_HOST_FR],
 	[PROD_APEX_HOST_FR, PROD_APEX_HOST_EN],
 ]);

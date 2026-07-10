@@ -15,8 +15,8 @@ describe('resolveAlternateOrigin (bidirectional host → counterpart lookup)', (
 	test.each([
 		['dev-en.climatedata.ca', 'https:', 'https://dev-fr.climatedata.ca'],
 		['dev-fr.climatedata.ca', 'https:', 'https://dev-en.climatedata.ca'],
-		['uat-en.climatedata.ca', 'https:', 'https://uat-fr.climatedata.ca'],
-		['uat-fr.climatedata.ca', 'https:', 'https://uat-en.climatedata.ca'],
+		['uat.donneesclimatiques.ca', 'https:', 'https://uat.climatedata.ca'],
+		['uat.climatedata.ca', 'https:', 'https://uat.donneesclimatiques.ca'],
 		['climatedata.ca', 'https:', 'https://donneesclimatiques.ca'],
 		['donneesclimatiques.ca', 'https:', 'https://climatedata.ca'],
 	])('swaps %s → %s', (hostname, protocol, expected) => {

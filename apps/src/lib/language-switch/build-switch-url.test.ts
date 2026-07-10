@@ -98,6 +98,25 @@ describe('buildSwitchUrl (origin + path + query carry)', () => {
 		expect(url).toBe('https://dev-en.climatedata.ca/maps/');
 	});
 
+	test('same-locale-as-host is a degenerate call: origin still swaps, so host and path languages mismatch', () => {
+		// buildSwitchUrl has NO notion of the current page's locale — it only
+		// takes `targetLocale`. resolveAlternateOrigin unconditionally swaps the
+		// host to its counterpart, while the path is built from `targetLocale`.
+		// So passing targetLocale === the current host's language yields the
+		// counterpart (FR) host carrying the same-language (EN) path — a mismatch.
+		// The switcher is only ever rendered to move to the OTHER language, so it
+		// never calls this with the current locale; this pins the raw behavior
+		// rather than a production scenario.
+		const url = buildSwitchUrl({
+			hostname: 'dev-en.climatedata.ca',
+			protocol: 'https:',
+			section: 'map',
+			targetLocale: 'en',
+			search: '',
+		});
+		expect(url).toBe('https://dev-fr.climatedata.ca/maps/');
+	});
+
 	test('a query set after mount is carried (guards against a stale URL query)', () => {
 		// The header derives `search` from Redux state, so a param changed after
 		// mount is present here even though the URL bar may lag the debounce.

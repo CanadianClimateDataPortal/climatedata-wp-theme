@@ -22,7 +22,7 @@ export const useDownloadUrlSync = () => {
 	const isInitialized = useAppSelector((state) => state.downloadUrlSync.isInitialized);
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
-	const currentStep = useAppSelector((state) => 
+	const currentStep = useAppSelector((state) =>
 		state.download.currentStep !== undefined ? state.download.currentStep : 1
 	);
 
@@ -54,10 +54,9 @@ export const useDownloadUrlSync = () => {
 		updateTimeoutRef.current = window.setTimeout(() => {
 			// Build the query FRESH (empty base), NOT seeded from
 			// `window.location.search`, so this writer emits exactly what the
-			// `selectDownloadUrlSearch` selector builds — byte-identical, both
-			// pure. The Download URL owns only `dataset`/`var` (gated by the
-			// wizard step) and nothing reads any other param back, so starting
-			// empty simply drops any foreign param (e.g. `utm_*`) — the same
+			// `selectDownloadUrlSearch` selector builds.
+			// The Download URL owns only `dataset`/`var` and nothing reads any
+			// other param back, so starting empty simply drops any foreign param (e.g. `utm_*`) — the same
 			// behaviour as the Map writer, which replaces the whole query with a
 			// freshly built `buildMapUrlParams` result. (Same-Intent-Same-Pattern.)
 			const params = new URLSearchParams();

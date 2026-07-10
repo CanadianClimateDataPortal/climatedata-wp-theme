@@ -3,7 +3,6 @@ import { describe, expect, test } from 'vitest';
 import { selectDownloadUrlSearch } from '@/features/download/download-url-sync-slice';
 import { buildDownloadUrlParams } from './build-download-url-params';
 import {
-	downloadScenarioPastStepWithVariable,
 	downloadUrlScenarios,
 	makeDownloadRootState,
 } from './build-download-url-params.examples';

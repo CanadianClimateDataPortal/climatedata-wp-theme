@@ -17,14 +17,18 @@ const AppHeader = (): React.ReactNode => {
 					</h2>
 				</a>
 			</div>
-			<div className="gap-x-2 px-4 py-2 flex items-center divide-x">
+			<div className="gap-x-4 px-4 py-2 flex items-center">
 				<a href="/" className="flex gap-2">
 					<span className="underline text-sm">
 						{__('Go back to the main website')}
 					</span>
 					<LogOut />
 				</a>
-				<HeaderLanguageLinks className="pl-4" />
+				<span
+					aria-hidden="true"
+					className="hidden lg:block w-px h-5 bg-zinc-300"
+				/>
+				<HeaderLanguageLinks />
 			</div>
 		</header>
 	);

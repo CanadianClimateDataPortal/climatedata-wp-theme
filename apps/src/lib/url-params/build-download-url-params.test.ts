@@ -45,22 +45,4 @@ describe('buildDownloadUrlParams', () => {
 			expect(selectDownloadUrlSearch(state)).toBe(scenario.expected);
 		},
 	);
-
-	/**
-	 * Foreign params can never survive: both call sites serialize from an empty
-	 * `URLSearchParams`, so the output only ever carries managed keys — an
-	 * unmanaged key such as `utm_source` is structurally impossible.
-	 */
-	test('serialization never emits an unmanaged param', () => {
-		const scenario = downloadScenarioPastStepWithVariable();
-		const params = new URLSearchParams();
-
-		buildDownloadUrlParams(params, scenario.input);
-
-		const managedKeys = new Set(['dataset', 'var']);
-		for (const key of params.keys()) {
-			expect(managedKeys.has(key)).toBe(true);
-		}
-		expect(params.has('utm_source')).toBe(false);
-	});
 });

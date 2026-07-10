@@ -14,12 +14,6 @@ export const PROD_APEX_HOST_FR = 'donneesclimatiques.ca';
 
 /**
  * Explicit bidirectional host → counterpart-host lookup.
- *
- * Every known host maps to its other-language equivalent. Dev and UAT keep a
- * shared apex and only flip the `en`/`fr` token; production crosses to the
- * other registrable domain ({@link PROD_APEX_HOST_EN} ↔ {@link PROD_APEX_HOST_FR}).
- * Explicit over a token-swapping regex: dead-obvious and exhaustively testable,
- * one place for the truth. ([[LLM-Context-ClimateData-Ticket-CLIM-1409]], decision D1b.)
  */
 const HOST_COUNTERPART = new Map<string, string>([
 	['dev-en.climatedata.ca', 'dev-fr.climatedata.ca'],

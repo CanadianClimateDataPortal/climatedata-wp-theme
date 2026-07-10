@@ -66,7 +66,7 @@ const HeaderLanguageLinks = (
 	return (
 		<ul
 			className={cn(
-				'text-xs font-semibold tracking-wider uppercase text-cdc-black flex gap-2',
+				'text-xs font-semibold tracking-wider uppercase text-cdc-black hidden lg:flex gap-2',
 				className
 			)}
 			data-lang-code={locale}

@@ -26,6 +26,10 @@ const HOST_COUNTERPART = new Map<string, string>([
 	['dev-fr.climatedata.ca', 'dev-en.climatedata.ca'],
 	['uat.' + PROD_APEX_HOST_EN, 'uat.' + PROD_APEX_HOST_FR],
 	['uat.' + PROD_APEX_HOST_FR, 'uat.' + PROD_APEX_HOST_EN],
+	['qa.' + PROD_APEX_HOST_EN, 'qa.' + PROD_APEX_HOST_FR],
+	['qa.' + PROD_APEX_HOST_FR, 'qa.' + PROD_APEX_HOST_EN],
+	['preprod.' + PROD_APEX_HOST_EN, 'preprod.' + PROD_APEX_HOST_FR],
+	['preprod.' + PROD_APEX_HOST_FR, 'preprod.' + PROD_APEX_HOST_EN],
 	[PROD_APEX_HOST_EN, PROD_APEX_HOST_FR],
 	[PROD_APEX_HOST_FR, PROD_APEX_HOST_EN],
 ]);

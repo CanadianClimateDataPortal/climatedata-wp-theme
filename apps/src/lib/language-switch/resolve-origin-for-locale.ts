@@ -9,7 +9,6 @@ import type { Locale } from '@/types/types';
  * apex server-side (a 301 before the app loads), so the SPA only ever runs on
  * the bare host and the switch target must match it. Centralized so there is a
  * single place to correct if the hosts ever change, and it is unit-tested.
- * ([[LLM-Context-ClimateData-Ticket-CLIM-1409]], CI-9 / DI3.)
  */
 export const PROD_APEX_HOST_EN = 'climatedata.ca';
 export const PROD_APEX_HOST_FR = 'donneesclimatiques.ca';
@@ -22,7 +21,7 @@ export const PROD_APEX_HOST_FR = 'donneesclimatiques.ca';
  * side resolves to the sibling host for any requested locale — and to itself
  * when the requested locale matches the current side. This locale annotation is
  * what lets the resolver address a host BY locale instead of blindly swapping
- * to a counterpart (the seam that produced host/path language mismatches).
+ * to a counterpart.
  */
 const HOST_PAIRS: ReadonlyArray<Record<Locale, string>> = [
 	{

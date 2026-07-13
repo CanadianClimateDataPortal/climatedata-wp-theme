@@ -34,6 +34,8 @@ When you add or modify a string in the PHP files, you need to update the
 > Note that this step is not required if you didn't add a new, or removed, a
 > new string to translate (skip to "Compiling translations").
 
+Either run the `./dev.sh i18n-update-main-site` command, or run the manual commands below :
+
 1. Start the development environment.
 2. Once the `portal` container is running, open a terminal on it:
    ```shell
@@ -49,6 +51,8 @@ When you add or modify a string in the PHP files, you need to update the
 
 From an updated `.pot` file, you can then update the translation files for the
 French language.
+
+Either run the `./dev.sh i18n-generate-main-site` command, or run the manual commands below :
 
 1. Start the development environment.
 2. Once the `portal` container is running, open a terminal on it:
@@ -67,6 +71,8 @@ Then do your translations in the `languages/cdc/fr_CA.po` file.
 
 Once the translations are done, you then compile the `.po` file into a `.mo`
 file.
+
+Either run the `./dev.sh i18n-compile-main-site` command, or run the manual commands below :
 
 1. Start the development environment.
 2. Once the `portal` container is running, start a Bash terminal on it.
@@ -104,6 +110,8 @@ the English value is good for French, you can leave the `msgstr` field empty.
 Note that the same translation file is used for both the map and download apps.
 
 ### Compiling translations
+
+Either run the `./dev.sh i18n-compile-react-apps` command, or run the manual commands below :
 
 1. Start the development environment.
 2. Once the `portal` container is running, start a Bash terminal on it.

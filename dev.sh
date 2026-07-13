@@ -40,10 +40,14 @@ function _show_help {
   echo "  Task runner:"
   echo "    task-runner-shell       Start a shell on the 'Task runner' container."
   echo ""
+  echo "  Translation:"
+  echo "    i18n-update-main-site    Update the .pot translation file for the main site pages."
+  echo "    i18n-generate-main-site  Generate the .po translation file for the main site pages."
+  echo "    i18n-compile-main-site   Run translation files compilation for the main site pages."
+  echo "    i18n-compile-react-apps  Run translation files compilation for the React maps and download apps in apps/ folder."
+  echo ""
   echo "  Other:"
   echo "    download-docker-assets <URL>   Download the required Docker assets from the given URL."
-  echo "    compile-main-site-translation Run translation files compilation for the main site pages."
-  echo "    compile-react-apps-translation Run translation files compilation for the React maps and download apps in apps/ folder."
 }
 
 # Switch to the real directory of the script, so it still works when used from
@@ -209,43 +213,35 @@ function task-runner-shell {
   _docker_compose exec -it task-runner bash
 }
 
-function compile-main-site-translation {
+function i18n-update-main-site {
   (
-    set -e
-
-    echo "Compiling the main site translations that are currently maintained from ./fw-child/languages/cdc/:"
     _docker_compose exec -w /var/www/html/assets/themes/fw-child portal bash -c '
-      wp i18n make-mo languages/cdc/fr_CA.po
+      wp i18n make-pot --skip-js . languages/cdc/cdc.pot --domain=cdc
     '
-    echo ''
-    echo "To do the same manually:"
-    echo '  ./dev.sh portal-shell'
-    echo '  cd /var/www/html/assets/themes/fw-child'
-    echo '  wp i18n make-mo languages/cdc/fr_CA.po'
-    echo ''
-    echo 'To read the docs:'
-    echo "  open 'docs/translate-the-site.md'"
-    echo ''
   )
 }
 
-function compile-react-apps-translation {
+function i18n-generate-main-site {
   (
-    set -e
+    _docker_compose exec -w /var/www/html/assets/themes/fw-child portal bash -c '
+      wp i18n update-po languages/cdc/cdc.pot
+    '
+  )
+}
 
-    echo "Compiling React apps/ translation that currently are maintained from ./fw-child/languages/react-apps/:"
+function i18n-compile-main-site {
+  (
+    _docker_compose exec -w /var/www/html/assets/themes/fw-child portal bash -c '
+      wp i18n make-mo languages/cdc/fr_CA.po
+    '
+  )
+}
+
+function i18n-compile-react-apps {
+  (
     _docker_compose exec -w /var/www/html/assets/themes/fw-child portal bash -c '
       wp i18n make-mo languages/react-apps/fr_CA.po
     '
-    echo ''
-    echo "To do the same manually:"
-    echo '  ./dev.sh portal-shell'
-    echo '  cd /var/www/html/assets/themes/fw-child'
-    echo '  wp i18n make-mo languages/react-apps/fr_CA.po'
-    echo ''
-    echo 'To read the docs:'
-    echo "  open 'docs/translate-the-site.md'"
-    echo ''
   )
 }
 

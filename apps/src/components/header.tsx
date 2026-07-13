@@ -5,10 +5,29 @@ import { __ } from '@/context/locale-provider';
 
 import Logo from '@/assets/logo.svg';
 
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import HeaderLanguageLinks from '@/components/header-language-links';
 
-const AppHeader = (): React.ReactNode => {
+interface AppHeaderProps {
+	/**
+	 * Optional trailing slot, rendered at the mobile-only end of the header
+	 * (`lg:hidden`).
+	 *
+	 * This is a caller-supplied slot rather than a hardcoded child because the
+	 * header is shared by BOTH the Map and Download apps — anything mounted here
+	 * runs in both trees. The Map app passes its `<SidebarTrigger />`, which calls
+	 * `useSidebar()` and so requires the Map-only `SidebarProvider` context; the
+	 * Download app wraps no such provider and passes nothing. Keeping it a slot
+	 * means a provider-dependent component is only ever mounted by the tree that
+	 * owns its provider, so it can never crash the provider-less Download tree.
+	 */
+	trailing?: React.ReactNode;
+}
+
+const AppHeader = (
+	props: AppHeaderProps
+): React.ReactNode => {
+	const { trailing } = props;
+
 	return (
 		<header id="header" className="flex items-center justify-between px-4 py-1.5">
 			<div className="flex items-center grow">
@@ -36,9 +55,9 @@ const AppHeader = (): React.ReactNode => {
 					<HeaderLanguageLinks />
 				</span>
 			</div>
-			<div className="lg:hidden">
-				<SidebarTrigger className="[&_svg]:size-6" />
-			</div>
+			{trailing ? (
+				<div className="lg:hidden">{trailing}</div>
+			) : null}
 		</header>
 	);
 };

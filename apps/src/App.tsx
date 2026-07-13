@@ -23,7 +23,7 @@ function App() {
 					<SidebarProvider>
 						<AppSidebar />
 						<main className="flex flex-col h-screen">
-							<Header />
+							<Header trailing={<SidebarTrigger className="[&_svg]:size-6" />} />
 							<MapWrapper />
 						</main>
 					</SidebarProvider>

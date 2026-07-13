@@ -66,7 +66,7 @@ const HeaderLanguageLinks = (
 	return (
 		<ul
 			className={cn(
-				'text-xs font-semibold tracking-wider uppercase text-cdc-black flex lg:gap-2',
+				'text-xs font-semibold tracking-wider uppercase text-cdc-black flex gap-2',
 				className
 			)}
 			data-lang-code={locale}
@@ -87,7 +87,6 @@ const HeaderLanguageLinks = (
 								lang={subjectLocale}
 								aria-current="true"
 								aria-label={LOCALE_ENDONYMS[subjectLocale]}
-								className="hidden lg:inline"
 							>
 								{subjectLocale}
 							</span>

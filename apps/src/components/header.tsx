@@ -38,10 +38,10 @@ const AppHeader = (
 					</h2>
 				</a>
 			</div>
-			<div className="lg:gap-x-4 lg:px-4 gap-x-2 px-2 py-2 flex items-center">
+			<div className="hidden lg:flex gap-x-4 px-4 py-2 items-center">
 				<span>
-					<a href="/" className="flex lg:gap-2">
-						<span className="underline text-xs lg:text-sm text-right pe-2 font-light leading-tight">
+					<a href="/" className="flex gap-2">
+						<span className="underline text-sm text-right pe-2 font-light leading-tight">
 							{__('Go back to the main website')}
 						</span>
 						<LogOut />

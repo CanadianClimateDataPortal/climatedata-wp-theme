@@ -86,6 +86,7 @@ const HeaderLanguageLinks = (
 							<span
 								lang={subjectLocale}
 								aria-current="true"
+								className="hidden lg:inline"
 								aria-label={LOCALE_ENDONYMS[subjectLocale]}
 							>
 								{subjectLocale}

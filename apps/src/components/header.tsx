@@ -38,9 +38,9 @@ const AppHeader = (
 					</h2>
 				</a>
 			</div>
-			<div className="hidden lg:flex gap-x-4 px-4 py-2 items-center">
+			<div className="gap-x-4 px-4 py-2 items-center flex">
 				<span>
-					<a href="/" className="flex gap-2">
+					<a href="/" className="hidden lg:flex gap-2">
 						<span className="underline text-sm text-right pe-2 font-light leading-tight">
 							{__('Go back to the main website')}
 						</span>
@@ -51,9 +51,7 @@ const AppHeader = (
 					aria-hidden="true"
 					className="w-px h-5 bg-zinc-300"
 				/>
-				<span>
-					<HeaderLanguageLinks />
-				</span>
+				<HeaderLanguageLinks />
 			</div>
 			{trailing ? (
 				<div className="lg:hidden">{trailing}</div>

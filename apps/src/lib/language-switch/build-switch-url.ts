@@ -35,10 +35,6 @@ export interface BuildSwitchUrlInput {
  * swap to the other language), so passing the current page's own locale
  * returns that same page's URL instead of a host/path language mismatch.
  *
- * Pure and free of `window` — hostname and protocol are passed in — so it is
- * exhaustively unit-testable. This is the sole place the switch destination is
- * assembled; the component stays thin.
- *
  * @param input - Hostname/protocol, target section + locale, and the query.
  * @returns The absolute destination URL in the requested locale.
  */

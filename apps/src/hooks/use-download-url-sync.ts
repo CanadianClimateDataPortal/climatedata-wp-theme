@@ -47,8 +47,8 @@ export const useDownloadUrlSync = () => {
 	// Debounced write of the Download state into the URL bar.
 	//
 	// No DOM event drives this — the trigger is Redux state changing
-	// (dataset / variable / step). The selectors above subscribe the hook
-	// to the store; every change re-creates this callback with fresh
+	// The selectors above subscribe the hook to the store;
+	// every change re-creates this callback with fresh
 	// values, re-runs the consuming effect, and reschedules the pending
 	// timer — so the delayed write always sees the latest state, and a
 	// burst of changes collapses into one `history.replaceState`.
@@ -59,15 +59,12 @@ export const useDownloadUrlSync = () => {
 			window.clearTimeout(updateTimeoutRef.current);
 		}
 
+		// The "debouncing"
 		updateTimeoutRef.current = window.setTimeout(() => {
 			// The query is built FRESH from state (empty URLSearchParams), never
 			// seeded from `window.location.search`: Redux state is the single
-			// source of truth and the URL bar is write-only output. Seeding from
-			// the live URL would re-import params this app does not own (e.g.
-			// `utm_*`) and let this writer drift from `selectDownloadUrlSearch`,
-			// which the language switcher uses to build the same query for its
-			// `href`. Fresh build keeps writer and selector byte-identical — the
-			// same pattern as the Map writer.
+			// source of truth and the URL bar is write-only output.
+			// Fresh build keeps writer and selector the same.
 			const params = new URLSearchParams();
 
 			addParamsToUrl(params);
@@ -169,7 +166,7 @@ export const useDownloadUrlSync = () => {
 	useEffect(() => {
 		return () => {
 			if (updateTimeoutRef.current !== null) {
-				window.clearTimeout(updateTimeoutRef.current);
+				window.clearTimeout(updateTimeoutRef.current); // Debouncer self-cleanup
 			}
 		};
 	}, []);

@@ -49,7 +49,7 @@ const AppHeader = (
 				</span>
 				<span
 					aria-hidden="true"
-					className="w-px h-5 bg-zinc-300"
+					className="w-px h-5 bg-zinc-300 hidden lg:inline"
 				/>
 				<HeaderLanguageLinks />
 			</div>

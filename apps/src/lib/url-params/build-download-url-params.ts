@@ -33,7 +33,7 @@ export interface DownloadUrlParamsInput {
  * On step 1 both are removed — the Download page only ever carries `dataset`
  * and `var` (never the wizard step). A consequence: switching language reloads
  * the app onto the dataset/variable step, not the exact step the user was on —
- * that step loss is accepted. ([[LLM-Context-ClimateData-Ticket-CLIM-1409]], DI2.)
+ * that step loss is accepted.
  *
  * @param params - URL parameters to mutate (existing unrelated params are kept).
  * @param input - Download slice values to serialize.

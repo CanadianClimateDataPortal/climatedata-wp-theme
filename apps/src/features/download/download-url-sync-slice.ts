@@ -40,18 +40,9 @@ export const {
 } = downloadUrlSyncSlice.actions;
 
 /**
- * The Download URL query string the app would currently write, derived from
- * Redux state — NOT from `window.location.search`. url-sync writes the URL with
- * a debounced `history.replaceState` that triggers no re-render, so a value
- * read from the URL at render time lags the live state. Reading state keeps
- * this current. Memoized on the driving slices, so the language switcher
- * re-renders and rebuilds its `href` when the step, dataset, or variable
- * changes. ([[LLM-Context-ClimateData-Ticket-CLIM-1409]], CI-16.)
+ * URL query string the app would currently write, derived from Redux state.
  *
- * Reuses `buildDownloadUrlParams` — the same serializer the Download url-sync
- * hook writes with — so the switch destination can never drift.
- *
- * @returns The query without a leading `?` (`dataset`/`var`, or `''` on step 1).
+ * @see {@link selectMapUrlSearch} for the Map URL equivalent and explanation.
  */
 export const selectDownloadUrlSearch = createSelector(
 	[

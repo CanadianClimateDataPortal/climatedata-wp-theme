@@ -691,11 +691,11 @@ msgstr "Nouveau-Brunswick"
 
 #: template/feedback.php:79
 msgid "Newfoundland and Labrador"
-msgstr "Terre-Neuve et Labrador"
+msgstr "Terre-Neuve-et-Labrador"
 
 #: template/feedback.php:80
 msgid "Northwest Territories"
-msgstr "Territoires du nord-ouest"
+msgstr "Territoires du Nord-Ouest"
 
 #: template/feedback.php:81
 msgid "Nova Scotia"
@@ -711,7 +711,7 @@ msgstr ""
 
 #: template/feedback.php:84
 msgid "Prince Edward Island"
-msgstr "Île du Prince-Édouard"
+msgstr "Île-du-Prince-Édouard"
 
 #: template/feedback.php:85
 msgid "Québec"
@@ -807,11 +807,11 @@ msgstr "Construction / Bâtiments"
 
 #: template/feedback.php:148
 msgid "Education / Training"
-msgstr "Education / Formation"
+msgstr "Éducation / Formation"
 
 #: template/feedback.php:149
 msgid "Energy"
-msgstr "Energie"
+msgstr "Énergie"
 
 #: template/feedback.php:150
 msgid "Finance / Insurance"

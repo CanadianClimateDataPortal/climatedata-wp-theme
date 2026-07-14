@@ -34,17 +34,10 @@ When you add or modify a string in the PHP files, you need to update the
 > Note that this step is not required if you didn't add a new, or removed, a
 > new string to translate (skip to "Compiling translations").
 
-Either run the `./dev.sh i18n-update-main-site` command, or run the manual commands below :
-
 1. Start the development environment.
-2. Once the `portal` container is running, open a terminal on it:
+2. Once the `portal` container is running, run:
    ```shell
-   ./dev.sh portal-shell
-   ```
-3. From this terminal, execute the following commands:
-   ```shell
-   cd /var/www/html/assets/themes/fw-child
-   wp i18n make-pot --skip-js . languages/cdc/cdc.pot --domain=cdc
+   ./dev.sh i18n-update-main-site
    ```
 
 ### Generate the translation files (.mo and .po)
@@ -52,17 +45,10 @@ Either run the `./dev.sh i18n-update-main-site` command, or run the manual comma
 From an updated `.pot` file, you can then update the translation files for the
 French language.
 
-Either run the `./dev.sh i18n-generate-main-site` command, or run the manual commands below :
-
 1. Start the development environment.
-2. Once the `portal` container is running, open a terminal on it:
+2. Once the `portal` container is running, run:
    ```shell
-   ./dev.sh portal-shell
-   ```
-3. From this terminal, execute the following commands:
-   ```shell
-   cd /var/www/html/assets/themes/fw-child
-   wp i18n update-po languages/cdc/cdc.pot
+   ./dev.sh i18n-generate-main-site
    ```
 
 Then do your translations in the `languages/cdc/fr_CA.po` file.
@@ -72,14 +58,10 @@ Then do your translations in the `languages/cdc/fr_CA.po` file.
 Once the translations are done, you then compile the `.po` file into a `.mo`
 file.
 
-Either run the `./dev.sh i18n-compile-main-site` command, or run the manual commands below :
-
 1. Start the development environment.
-2. Once the `portal` container is running, start a Bash terminal on it.
-3. From this terminal, execute the following commands:
+2. Once the `portal` container is running, run:
    ```shell
-   cd /var/www/html/assets/themes/fw-child
-   wp i18n make-mo languages/cdc/fr_CA.po
+   ./dev.sh i18n-compile-main-site
    ```
 
 New translations should now be available on the site.
@@ -111,14 +93,10 @@ Note that the same translation file is used for both the map and download apps.
 
 ### Compiling translations
 
-Either run the `./dev.sh i18n-compile-react-apps` command, or run the manual commands below :
-
 1. Start the development environment.
-2. Once the `portal` container is running, start a Bash terminal on it.
-3. From this terminal, execute the following commands:
+2. Once the `portal` container is running, run:
    ```shell
-   cd /var/www/html/assets/themes/fw-child
-   wp i18n make-mo languages/react-apps/fr_CA.po
+   ./dev.sh i18n-compile-react-apps
    ```
 
 New translations should now be available on the site.

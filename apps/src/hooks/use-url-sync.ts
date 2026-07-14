@@ -23,41 +23,13 @@ import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-s
 import { normalizePostData } from '@/lib/format';
 import { store } from '@/app/store';
 import { CANADA_CENTER, DEFAULT_ZOOM } from '@/lib/constants';
+import { URL_PARAMS, buildMapUrlParams } from '@/lib/url-params';
 import { MapItemsOpacity } from '@/types/types';
 import {
 	AssertionError,
 	assertIsForecastDisplay,
 	assertIsForecastType,
 } from '@/types/assertions';
-
-/**
- * Name of URL parameters.
- */
-const URL_PARAMS = {
-	VARIABLE_ID: 'var',
-	VERSION: 'ver',
-	THRESHOLD: 'th',
-	FREQUENCY: 'freq',
-	SCENARIO: 'scen',
-	DO_COMPARE: 'cmp',
-	COMPARE_TO: 'cmpTo',
-	INTERACTIVE_REGION: 'region',
-	DATA_VALUE: 'dataVal',
-	COLOUR_SCHEME: 'clr',
-	COLOUR_TYPE: 'clrType',
-	AVERAGING_TYPE: 'avg',
-	DATE_RANGE: 'dateRange',
-	FORECAST_TYPE: 'fcastType',
-	FORECAST_DISPLAY: 'fcastDisp',
-	LOW_SKILL_MASKED: 'maskLowSkill',
-	DATASET: 'dataset',
-	DATA_OPACITY: 'dataOpacity',
-	LABEL_OPACITY: 'labelOpacity',
-	PERIOD: 'period',
-	LATITUDE: 'lat',
-	LONGITUDE: 'lng',
-	ZOOM_LEVEL: 'zoom',
-} as const;
 
 /**
  * Synchronizes state with URL params from climate variable state
@@ -82,119 +54,6 @@ export const useUrlSync = () => {
 
 	// Climate variable state
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
-
-	/**
-	 * Save a climate variable configuration in a URL parameter list.
-	 *
-	 * No existing parameters are removed. If a value is equal to a default
-	 * value, no parameter is added.
-	 *
-	 * @param params - URL parameters to augment.
-	 * @param climateData - Configuration to save into the parameters.
-	 * @param defaultConfig - Default values of the configuration.
-	 */
-	const addClimateVariableParamsToUrl = (
-		params: URLSearchParams,
-		climateData: ClimateVariableConfigInterface,
-		defaultConfig: ClimateVariableConfigInterface | null
-	) => {
-		// Always include variable ID
-		if (climateData.id) {
-			params.set(URL_PARAMS.VARIABLE_ID, climateData.id);
-		}
-
-		// Only add threshold if the variable supports thresholds AND has a value
-		if (climateData.threshold && 
-			(defaultConfig?.thresholds || defaultConfig?.threshold)) {
-			params.set(URL_PARAMS.THRESHOLD, climateData.threshold.toString());
-		}
-
-		if (climateData.scenario) {
-			params.set(URL_PARAMS.SCENARIO, climateData.scenario);
-		}
-		
-		// Only include scenario comparison parameters if enabled
-		if (climateData.scenarioCompare === true) {
-			params.set(URL_PARAMS.DO_COMPARE, '1');
-			
-			if (climateData.scenarioCompareTo) {
-				params.set(URL_PARAMS.COMPARE_TO, climateData.scenarioCompareTo);
-			}
-		}
-
-		// Add date range
-		if (climateData.dateRange && 
-			climateData.dateRange.length > 0) {
-			const defaultDateRange = defaultConfig?.dateRange;
-			const currentDateRangeStr = climateData.dateRange.join(',');
-			const defaultDateRangeStr = defaultDateRange?.join(',');
-			
-			if (currentDateRangeStr !== defaultDateRangeStr) {
-				params.set(URL_PARAMS.DATE_RANGE, currentDateRangeStr);
-			}
-		}
-
-		// List of configurations that are simply saved as is in the params if
-		// their value is different from their default value
-		const simpleConfigurations: [keyof ClimateVariableConfigInterface, string][] = [
-			['forecastType', URL_PARAMS.FORECAST_TYPE],
-			['forecastDisplay', URL_PARAMS.FORECAST_DISPLAY],
-			['interactiveRegion', URL_PARAMS.INTERACTIVE_REGION],
-			['dataValue', URL_PARAMS.DATA_VALUE],
-			['colourScheme', URL_PARAMS.COLOUR_SCHEME],
-			['colourType', URL_PARAMS.COLOUR_TYPE],
-			['averagingType', URL_PARAMS.AVERAGING_TYPE],
-			['version', URL_PARAMS.VERSION],
-			['frequency', URL_PARAMS.FREQUENCY],
-		];
-
-		for (const [configKey, urlParam] of simpleConfigurations) {
-			const defaultValue = defaultConfig?.[configKey];
-			const currentValue = climateData[configKey];
-			if (currentValue != undefined && currentValue !== defaultValue) {
-				params.set(urlParam, currentValue.toString());
-			}
-		}
-	};
-
-	/**
-	 * Save in a URL parameter list elements of the Map store.
-	 *
-	 * No existing parameters are removed.
-	 *
-	 * @param params - URL parameters to augment.
-	 */
-	const addMapOnlyParamsToUrl = (
-		params: URLSearchParams
-	) => {
-		// Dataset 
-		if (dataset && dataset.term_id) {
-			params.set(URL_PARAMS.DATASET, dataset.term_id.toString());
-		}
-		
-		// Opacity
-		if (opacity) {
-			if (opacity.mapData !== undefined) {
-				const urlOpacityValue = Math.round(opacity.mapData * 100);
-				params.set(URL_PARAMS.DATA_OPACITY, urlOpacityValue.toString());
-			}
-			
-			if (opacity.labels !== undefined) {
-				const urlOpacityValue = Math.round(opacity.labels * 100);
-				params.set(URL_PARAMS.LABEL_OPACITY, urlOpacityValue.toString());
-			}
-		}
-		
-		if (mapCoordinates) {
-			params.set(URL_PARAMS.LATITUDE, mapCoordinates.lat.toFixed(5));
-			params.set(URL_PARAMS.LONGITUDE, mapCoordinates.lng.toFixed(5));
-			params.set(URL_PARAMS.ZOOM_LEVEL, mapCoordinates.zoom.toString());
-		}
-
-		if (lowSkillVisibility === false) {
-			params.set(URL_PARAMS.LOW_SKILL_MASKED, '0');
-		}
-	};
 
 	/**
 	 * Return if a list of parameters is different from the current URL's
@@ -240,16 +99,16 @@ export const useUrlSync = () => {
 		}
 
 		updateTimeoutRef.current = window.setTimeout(() => {
-			const params = new URLSearchParams();
-
-			// Always add climate variable parameters if a variable is selected
-			const defaultConfig = climateVariableData.id
-				? ClimateVariables.find(config => config.id === climateVariableData.id) || null
-				: null;
-			addClimateVariableParamsToUrl(params, climateVariableData, defaultConfig);
-
-			// Add map-only parameters
-			addMapOnlyParamsToUrl(params);
+			// Serialize the current state to URL params using the shared builder
+			// (the same one the language switcher reads through
+			// `selectMapUrlSearch`) so both stay in lock-step.
+			const params = buildMapUrlParams({
+				climateVariable: climateVariableData,
+				dataset,
+				opacity,
+				mapCoordinates,
+				isLowSkillVisible: lowSkillVisibility,
+			});
 
 			// Only update URL if parameters have changed significantly
 			if (haveParamsChanged(params)) {

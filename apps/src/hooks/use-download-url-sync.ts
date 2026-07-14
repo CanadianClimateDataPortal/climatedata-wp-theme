@@ -6,6 +6,7 @@ import { ClimateVariables } from '@/config/climate-variables.config';
 import { ClimateVariableConfigInterface } from '@/types/climate-variable-interface';
 import { fetchTaxonomyData, fetchPostsData } from '@/services/services';
 import { initializeDownloadUrlSync, setDownloadUrlParamsLoaded, resetDownloadUrlSync } from '@/features/download/download-url-sync-slice';
+import { buildDownloadUrlParams, URL_PARAMS } from '@/lib/url-params';
 import { normalizePostData } from '@/lib/format';
 
 /**
@@ -21,34 +22,36 @@ export const useDownloadUrlSync = () => {
 	const isInitialized = useAppSelector((state) => state.downloadUrlSync.isInitialized);
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
-	const currentStep = useAppSelector((state) => 
+	const currentStep = useAppSelector((state) =>
 		state.download.currentStep !== undefined ? state.download.currentStep : 1
 	);
 
-	// Helper function to add parameters to URL
+	// Serialize download state to URL params using the shared builder (the same
+	// one the language switcher reads through `selectDownloadUrlSearch`), then
+	// keep the step-1 reset side effect here in the hook.
 	const addParamsToUrl = (
 		params: URLSearchParams
 	) => {
-		// Only include parameters if we're past step 1
-		if (currentStep > 1) {
-			if (dataset && dataset.term_id) {
-				params.set('dataset', dataset.term_id.toString());
-				
-				// Only include variable if we're at step 2 or beyond and have a selected variable
-				if (currentStep > 1 && climateVariableData?.id) {
-					params.set('var', climateVariableData.id);
-				}
-			}
-		} else {
-			// Clear params when on step 1
-			params.delete('var');
-			params.delete('dataset');
-			
-			// Also reset the URL sync state when going back to step 1
+		buildDownloadUrlParams(params, {
+			currentStep,
+			datasetTermId: dataset?.term_id,
+			climateVariableId: climateVariableData?.id,
+		});
+
+		// Also reset the URL sync state when going back to step 1
+		if (currentStep <= 1) {
 			dispatch(resetDownloadUrlSync());
 		}
 	};
 
+	// Debounced write of the Download state into the URL bar.
+	//
+	// No DOM event drives this — the trigger is Redux state changing
+	// The selectors above subscribe the hook to the store;
+	// every change re-creates this callback with fresh
+	// values, re-runs the consuming effect, and reschedules the pending
+	// timer — so the delayed write always sees the latest state, and a
+	// burst of changes collapses into one `history.replaceState`.
 	const updateUrlWithDebounce = useCallback(() => {
 		if (typeof window === 'undefined' || !isInitialized) return;
 
@@ -56,8 +59,13 @@ export const useDownloadUrlSync = () => {
 			window.clearTimeout(updateTimeoutRef.current);
 		}
 
+		// The "debouncing"
 		updateTimeoutRef.current = window.setTimeout(() => {
-			const params = new URLSearchParams(window.location.search);
+			// The query is built FRESH from state (empty URLSearchParams), never
+			// seeded from `window.location.search`: Redux state is the single
+			// source of truth and the URL bar is write-only output.
+			// Fresh build keeps writer and selector the same.
+			const params = new URLSearchParams();
 
 			addParamsToUrl(params);
 
@@ -90,8 +98,8 @@ export const useDownloadUrlSync = () => {
 		// Process URL parameters
 		(async () => {
 			try {
-				const datasetParam = params.get('dataset');
-				const variableParam = params.get('var');
+				const datasetParam = params.get(URL_PARAMS.DATASET);
+				const variableParam = params.get(URL_PARAMS.VARIABLE_ID);
 
 				if (datasetParam) {
 					const datasets = await fetchTaxonomyData('datasets', 'download');
@@ -162,7 +170,7 @@ export const useDownloadUrlSync = () => {
 	useEffect(() => {
 		return () => {
 			if (updateTimeoutRef.current !== null) {
-				window.clearTimeout(updateTimeoutRef.current);
+				window.clearTimeout(updateTimeoutRef.current); // Debouncer self-cleanup
 			}
 		};
 	}, []);

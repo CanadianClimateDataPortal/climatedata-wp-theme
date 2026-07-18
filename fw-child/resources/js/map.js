@@ -1,6 +1,7 @@
 // map functions
 
 (function ($) {
+  console.log('yo')
   function map_app(item, options) {
     // options
 
@@ -4221,5 +4222,6 @@
     $('#map-breadcrumb').remove();
     $('.tooltip').remove();
     $('#map-objects').addClass('to-raster');
+    console.log('Yo2')
   };
 })(jQuery);

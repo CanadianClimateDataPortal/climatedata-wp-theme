@@ -58,6 +58,19 @@ $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
     <?php include ( locate_template ( 'template/google-tags-head.php' ) ); ?>
 
 	<?php
+	// Effect worth knowing: fw-child/resources/js/map.js never loads on this
+	// page, so the $.fn.prepare_raster it defines is not present here either.
+	// The React app assigns its own $.fn.prepare_raster for the external
+	// screenshot contract -- on this page that assignment is the only one, with
+	// nothing to collide with or override.
+	//
+	// Why it cannot load: this template calls no wp_head()/wp_footer(), and
+	// WordPress fires wp_enqueue_scripts from inside wp_head() -- so nothing the
+	// theme enqueues reaches this page, including jQuery and the 'map-app'
+	// handle that carries map.js. (That isolation is the point; see the docblock
+	// above. Anything normally hooked to wp_head must be called directly, as
+	// add_favicon() is on the next line.)
+
 	// Add favicon.
 	add_favicon();
 

@@ -190,6 +190,24 @@ export const encodeURL = (url: string, salt: string) => {
  * class to the map container to render the map in a cleaner, full-screen layout.
  *
  * Note: This function does not revert changes. A full page reload is required to restore the original UI.
+ *
+ * @remarks
+ * Nothing inside `apps/` calls this — the caller is outside the bundle.
+ * `download-map-modal.tsx` assigns it to `window.$.fn.prepare_raster` while the
+ * modal is mounted; the server-side screenshot service (`climatedata-api`,
+ * `climatedata_api/raster.py`) then loads this page in a headless browser and
+ * evaluates `$.fn.prepare_raster()` to strip the interactive UI before capturing
+ * the "Save map as image" PNG. That is the entire call path.
+ *
+ * The name is a trap: `fw-child/resources/js/map.js` defines its own
+ * `$.fn.prepare_raster` for the legacy jQuery Explore Maps page, and a grep for
+ * the name finds that one first. It does not apply here, and does not need
+ * checking — `fw-child/apps/app-map.php` calls no `wp_head()`/`wp_footer()`, and
+ * WordPress fires `wp_enqueue_scripts` from inside `wp_head()`, so nothing the
+ * theme enqueues reaches this page, jQuery and `map.js` included. The assignment
+ * made by the modal is the only definition present.
+ *
+ * This is live production behaviour, not scaffolding.
  */
 export function prepareRaster(): void {
 	// Simulate a click on the legend toggle button
@@ -198,7 +216,14 @@ export function prepareRaster(): void {
 		legendToggle.click();
 	}
 	// Remove elements that should not appear in the screenshot
-	['map-sidebar', 'header', 'sidebar-toggle', 'header-map', 'map-search-control', 'map-zoom-control'].forEach(id => {
+	[
+		'map-sidebar',
+		'header',
+		'sidebar-toggle',
+		'header-map',
+		'map-search-control',
+		'map-zoom-control',
+	].forEach(id => {
 		const el = document.getElementById(id);
 		if (el) {
 			el.remove();

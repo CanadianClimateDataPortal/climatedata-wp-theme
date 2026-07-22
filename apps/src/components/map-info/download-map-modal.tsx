@@ -9,7 +9,8 @@ import { __, LocaleContext } from '@/context/locale-provider';
 import { Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { encodeURL, prepareRaster } from '@/lib/utils';
-import { useAppSelector } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { setRasterMode } from '@/features/map/map-slice';
 
 // components
 import Modal from '@/components/ui/modal';
@@ -46,6 +47,7 @@ const DownloadMapModal: React.FC<{
 	const currentLocale = localeContext?.locale || 'en';
 
 	// Get dataset and variable information for download URL
+	const dispatch = useAppDispatch();
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
 
@@ -59,8 +61,31 @@ const DownloadMapModal: React.FC<{
 		window.$ = window.$ || {};
 		window.$.fn = window.$.fn || {};
 
-		// Assign your function to $.fn.prepare_raster
-		window.$.fn.prepare_raster = prepareRaster;
+		/**
+		 * The single entry point the server-side screenshot service uses to tell
+		 * this page it is about to be photographed.
+		 *
+		 * It is a closure rather than a bare reference to `prepareRaster` because
+		 * entering raster mode is now two things, in this order:
+		 *
+		 * 1. Flip the app into raster mode, so React re-renders the page as the
+		 *    exported image — export-only furniture in, interactive affordances
+		 *    out. This is a *set*, never a toggle, so it is safe if raster mode is
+		 *    already on (a developer previewing with `?raster=1`, for instance).
+		 * 2. Run `prepareRaster`, the existing imperative pass that strips chrome
+		 *    the React tree does not own and forces the map to re-lay out.
+		 *
+		 * The service calls this and then waits before capturing, so the React
+		 * re-render queued by step 1 has settled well before the screenshot.
+		 *
+		 * Keeping the `$.fn.prepare_raster` name is what makes this a zero-change
+		 * addition on the service's side — it still evaluates the same expression
+		 * it always has. The name is a fake-jQuery shim; this app has no jQuery.
+		 */
+		window.$.fn.prepare_raster = () => {
+			dispatch(setRasterMode(true));
+			prepareRaster();
+		};
 
 		return () => {
 			// Clean up if needed
@@ -68,7 +93,7 @@ const DownloadMapModal: React.FC<{
 				delete window.$.fn.prepare_raster;
 			}
 		};
-	}, []);
+	}, [dispatch]);
 
 	/**
 	 * Handles the click event for the "Download" link.

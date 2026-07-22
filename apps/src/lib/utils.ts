@@ -183,11 +183,16 @@ export const encodeURL = (url: string, salt: string) => {
 };
 
 /**
- * Modify the DOM to prepare the "Explore Maps" page for a screenshot.
+ * Modify the DOM of this app's map page to prepare it for a screenshot.
  *
  * This function is designed to be executed by an external script (e.g. via Selenium)
- * before taking a screenshot. It removes certain UI elements and applies a specific
- * class to the map container to render the map in a cleaner, full-screen layout.
+ * before taking a screenshot. It clicks the legend toggle, removes the surrounding
+ * chrome (sidebar, headers, sidebar toggle, search and zoom controls) along with any
+ * tooltips, then dispatches a `resize` event so the map re-lays out at the new size.
+ *
+ * It does not add the `to-raster` class the screenshot service waits for: that class
+ * marks which element gets captured, and this app renders it statically on
+ * `#wrapper-map` in `apps/src/components/map.tsx`, so it is already in place.
  *
  * Note: This function does not revert changes. A full page reload is required to restore the original UI.
  *

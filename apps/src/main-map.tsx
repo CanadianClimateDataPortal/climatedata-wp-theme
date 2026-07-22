@@ -1,14 +1,18 @@
-// Looking for `window.$.fn.prepare_raster`? It is assigned in
-// `apps/src/components/map-info/download-map-modal.tsx`, and nothing inside
-// `apps/` ever calls it — which is why it looks dead from in here.
+// Looking for `window.$.fn.prepare_raster`?
+// It is assigned in `apps/src/lib/utils.ts`
+//
+// Anything outside `apps/` relating to `prepare_raster` and Map Image Download
+// that uses the same name is effectively not used.
 //
 // The caller is outside this app. The server-side screenshot service
-// (`climatedata-api`, `climatedata_api/raster.py`) loads this page in a
+// (<https://github.com/CanadianClimateDataPortal/climatedata-api>,
+// file: `climatedata_api/raster.py`) loads this page in a
 // headless browser, evaluates `$.fn.prepare_raster()` to strip interactive
 // UI, then captures the "Save map as image" PNG.
 //
-// `fw-child/resources/js/map.js` also defines `$.fn.prepare_raster`; that
-// file does not load on this page.
+// Code unused, time lost following dead-end:
+// `fw-child/resources/js/map.js` also defines `$.fn.prepare_raster`;
+// is the legacy implementation that will eventually be deleted.
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

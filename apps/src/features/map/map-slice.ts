@@ -202,10 +202,15 @@ const mapSlice = createSlice({
 		 * Deliberately a SET and never a toggle, shaped after `setLegendOpen`. Two
 		 * independent entry points can fire in the same page load (the server's
 		 * `prepare_raster()` hook and the `?raster=1` boot read), and a toggle
-		 * would let the second one undo the first. That exact failure already cost
-		 * this feature once: the export used to flip the legend open with a blind
-		 * `click()` on the toggle button, which closed an already-open legend right
-		 * before the screenshot.
+		 * would let the second one undo the first.
+		 *
+		 * That failure mode is not hypothetical, and it is still live elsewhere in
+		 * this feature: `prepareRaster` (`lib/utils.ts`) opens the legend by
+		 * calling `.click()` on the `#legend-toggle` button, which flips whatever
+		 * state it finds rather than setting one. The legend defaults to open on a
+		 * wide container, and the export runs at 2560px, so that blind click
+		 * *closes* the legend immediately before the screenshot. Making this setter
+		 * a set does not fix that — it avoids repeating the same mistake here.
 		 *
 		 * @see {@link MapState.isRasterMode} for what the flag means and who sets it.
 		 */
@@ -241,8 +246,8 @@ export const {
 	setMessageDisplay,
 	setLowSkillVisibility,
 	setLegendOpen,
-	setLocationModalOpen,
 	setRasterMode,
+	setLocationModalOpen,
 } = mapSlice.actions;
 
 /**

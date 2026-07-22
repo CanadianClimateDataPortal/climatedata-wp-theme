@@ -262,9 +262,15 @@ export interface MapState {
 	 * browser loads the Map page, calls the `window.$.fn.prepare_raster()` hook
 	 * this app installs, waits for the element carrying the `to-raster` class, and
 	 * screenshots just that element. Raster mode is how the page knows it is being
-	 * photographed, so it can render the export's own furniture (composed title,
-	 * grid resolution, an always-expanded legend) and drop affordances that mean
-	 * nothing on a still image.
+	 * photographed.
+	 *
+	 * **Nothing reads this flag yet beyond the `data-raster` attribute in
+	 * `App.tsx`.** It is the enabling primitive, landed first so the rest is
+	 * verifiable in an ordinary browser. The intent it exists to serve — rendering
+	 * the export's own furniture (a composed title, a grid-resolution pill, an
+	 * always-expanded legend) and dropping affordances that mean nothing on a
+	 * still image — is not implemented here. Do not read the list above as a
+	 * description of current behaviour.
 	 *
 	 * Two entry points set it, and both are plain sets rather than toggles so
 	 * either or both may fire in the same page load:

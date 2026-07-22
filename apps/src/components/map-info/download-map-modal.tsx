@@ -66,17 +66,25 @@ const DownloadMapModal: React.FC<{
 		 * this page it is about to be photographed.
 		 *
 		 * It is a closure rather than a bare reference to `prepareRaster` because
-		 * entering raster mode is now two things, in this order:
+		 * entering raster mode is now two things:
 		 *
-		 * 1. Flip the app into raster mode, so React re-renders the page as the
-		 *    exported image — export-only furniture in, interactive affordances
-		 *    out. This is a *set*, never a toggle, so it is safe if raster mode is
-		 *    already on (a developer previewing with `?raster=1`, for instance).
+		 * 1. Flip the app into raster mode, so React can render the page as the
+		 *    exported image. This is a *set*, never a toggle, so it is safe if
+		 *    raster mode is already on (a developer previewing with `?raster=1`).
 		 * 2. Run `prepareRaster`, the existing imperative pass that strips chrome
-		 *    the React tree does not own and forces the map to re-lay out.
+		 *    and fires a `resize` so the map re-lays out.
 		 *
-		 * The service calls this and then waits before capturing, so the React
-		 * re-render queued by step 1 has settled well before the screenshot.
+		 * **The two are NOT sequential, despite reading that way.** `dispatch` only
+		 * schedules a re-render; React commits it after this function has already
+		 * returned. So `prepareRaster` — including its `resize` — runs first, and
+		 * the raster-mode commit lands afterwards. Today that is harmless, because
+		 * nothing renders differently under the flag yet. It stops being harmless
+		 * as soon as something does: see the ordering note on the `data-raster`
+		 * carrier in `App.tsx`, which has to be resolved then, not here.
+		 *
+		 * How long the service waits after this returns is defined by the
+		 * screenshot service, which lives in another repository. Do not assume a
+		 * settle window from this side.
 		 *
 		 * Keeping the `$.fn.prepare_raster` name is what makes this a zero-change
 		 * addition on the service's side — it still evaluates the same expression

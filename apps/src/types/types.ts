@@ -255,6 +255,31 @@ export interface MapState {
 	 */
 	isLowSkillVisible: boolean;
 	/**
+	 * Whether the app is rendering for the downloadable map image ("raster mode")
+	 * rather than for a person using the page.
+	 *
+	 * The downloadable image is produced OUTSIDE this app: a server-side headless
+	 * browser loads the Map page, calls the `window.$.fn.prepare_raster()` hook
+	 * this app installs, waits for the element carrying the `to-raster` class, and
+	 * screenshots just that element. Raster mode is how the page knows it is being
+	 * photographed, so it can render the export's own furniture (composed title,
+	 * grid resolution, an always-expanded legend) and drop affordances that mean
+	 * nothing on a still image.
+	 *
+	 * Two entry points set it, and both are plain sets rather than toggles so
+	 * either or both may fire in the same page load:
+	 * - the `prepare_raster` hook, assigned in
+	 *   `components/map-info/download-map-modal.tsx` — the real export;
+	 * - a `?raster=1` query parameter read once at boot by `useRasterMode`
+	 *   (`hooks/use-raster-mode.ts`) — a developer-only preview, refused on the
+	 *   production hosts, which exists because this app cannot be viewed outside
+	 *   the WordPress stack.
+	 *
+	 * Deliberately NOT registered as a URL-sync parameter: see
+	 * `readRasterPreviewRequest` in `lib/raster-mode`.
+	 */
+	isRasterMode: boolean;
+	/**
 	 * Represents the state of the map legend overlay.
 	 * The graphical legend that explains the map's color coding.
 	 */

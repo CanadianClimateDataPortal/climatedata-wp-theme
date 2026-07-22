@@ -85,6 +85,7 @@ const initialState: MapState = {
 	},
 	messageDisplayStates: {},
 	isLowSkillVisible: true,
+	isRasterMode: false,  // Normal page render until an export entry point says otherwise
 	legend: {
 		isOpen: false,  // Legend starts collapsed
 	},
@@ -194,6 +195,23 @@ const mapSlice = createSlice({
 		setLegendOpen(state, action: PayloadAction<boolean>) {
 			state.legend.isOpen = action.payload;
 		},
+		/**
+		 * Enter or leave raster mode — rendering for the downloadable map image
+		 * rather than for a person using the page.
+		 *
+		 * Deliberately a SET and never a toggle, shaped after `setLegendOpen`. Two
+		 * independent entry points can fire in the same page load (the server's
+		 * `prepare_raster()` hook and the `?raster=1` boot read), and a toggle
+		 * would let the second one undo the first. That exact failure already cost
+		 * this feature once: the export used to flip the legend open with a blind
+		 * `click()` on the toggle button, which closed an already-open legend right
+		 * before the screenshot.
+		 *
+		 * @see {@link MapState.isRasterMode} for what the flag means and who sets it.
+		 */
+		setRasterMode(state, action: PayloadAction<boolean>) {
+			state.isRasterMode = action.payload;
+		},
 		setLocationModalOpen(state, action: PayloadAction<boolean>) {
 			state.locationModal.isOpen = action.payload;
 		},
@@ -224,6 +242,7 @@ export const {
 	setLowSkillVisibility,
 	setLegendOpen,
 	setLocationModalOpen,
+	setRasterMode,
 } = mapSlice.actions;
 
 /**
@@ -247,6 +266,18 @@ export const selectLowSkillVisibility =
  */
 export const selectSelectedLocation = (state: RootState) =>
 	state.map.selectedLocation;
+
+/**
+ * Whether the app is rendering for the downloadable map image rather than for a
+ * person using the page.
+ *
+ * Raw read, no derivation. Consumers use it to render export-only furniture and
+ * to drop interactive affordances that mean nothing on a still image.
+ *
+ * @see {@link MapState.isRasterMode}
+ */
+export const selectIsRasterMode = (state: RootState) =>
+	state.map.isRasterMode;
 
 /**
  * The current location's title.

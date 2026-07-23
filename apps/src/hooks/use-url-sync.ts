@@ -95,10 +95,10 @@ export const useUrlSync = () => {
 		if (!climateVariableData) return; // Only update URL if a variable is selected
 
 		if (updateTimeoutRef.current !== null) {
-			window.clearTimeout(updateTimeoutRef.current);
+			window.clearTimeout(updateTimeoutRef.current); // Writer A: Two Debounced Writers Share One Timer And Cancel Each Other
 		}
 
-		updateTimeoutRef.current = window.setTimeout(() => {
+		updateTimeoutRef.current = window.setTimeout(() => { // Writer A: Two Debounced Writers...
 			// Serialize the current state to URL params using the shared builder
 			// (the same one the language switcher reads through
 			// `selectMapUrlSearch`) so both stay in lock-step.
@@ -119,7 +119,7 @@ export const useUrlSync = () => {
 				}
 			}
 
-			updateTimeoutRef.current = null;
+			updateTimeoutRef.current = null; // Writer A: Two Debounced Writers...
 		}, 300);
 	}, [
 		climateVariableData,
@@ -576,12 +576,13 @@ export const useUrlSync = () => {
 		
 		if (mapCoordinates && typeof window !== 'undefined') {
 			if (updateTimeoutRef.current !== null) {
-				window.clearTimeout(updateTimeoutRef.current);
+				window.clearTimeout(updateTimeoutRef.current); // Writer B: Two Debounced Writers Share One Timer And Cancel Each Other
 			}
 			
-			updateTimeoutRef.current = window.setTimeout(() => {
-				const params = new URLSearchParams(window.location.search);
 				
+			updateTimeoutRef.current = window.setTimeout(() => { // Writer B: Two Debounced Writers...
+				const params = new URLSearchParams(window.location.search); // Writer B: Two Debounced Writers...
+
 				params.set(URL_PARAMS.LATITUDE, mapCoordinates.lat.toFixed(5));
 				params.set(URL_PARAMS.LONGITUDE, mapCoordinates.lng.toFixed(5));
 				params.set(URL_PARAMS.ZOOM_LEVEL, mapCoordinates.zoom.toString());
@@ -605,7 +606,7 @@ export const useUrlSync = () => {
 					}
 				}
 				
-				updateTimeoutRef.current = null;
+				updateTimeoutRef.current = null; // Writer B: Two Debounced Writers...
 			}, 400); // Longer debounce for map movements
 		}
 	}, [mapCoordinates, isInitialized]);
@@ -614,7 +615,7 @@ export const useUrlSync = () => {
 	useEffect(() => {
 		return () => {
 			if (updateTimeoutRef.current !== null) {
-				window.clearTimeout(updateTimeoutRef.current);
+				window.clearTimeout(updateTimeoutRef.current); // Writer B: Two Debounced Writers...
 			}
 		};
 	}, []);

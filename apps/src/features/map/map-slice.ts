@@ -199,10 +199,10 @@ const mapSlice = createSlice({
 		 * Enter or leave raster mode — rendering for the downloadable map image
 		 * rather than for a person using the page.
 		 *
-		 * Deliberately a SET and never a toggle, shaped after `setLegendOpen`. Two
-		 * independent entry points can fire in the same page load (the server's
-		 * `prepare_raster()` hook and the `?raster=1` boot read), and a toggle
-		 * would let the second one undo the first.
+		 * Deliberately a SET and never a toggle, shaped after `setLegendOpen`.
+		 * Raster mode is entered via the server-side `prepare_raster()` closure
+		 * (`components/map-info/download-map-modal.tsx`), and a set rather than a
+		 * toggle keeps a repeated entry idempotent instead of self-cancelling.
 		 *
 		 * That failure mode is not hypothetical, and it is still live elsewhere in
 		 * this feature: `prepareRaster` (`lib/utils.ts`) opens the legend by

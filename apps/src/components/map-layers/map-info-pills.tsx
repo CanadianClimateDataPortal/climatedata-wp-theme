@@ -7,11 +7,15 @@ import { cn } from '@/lib/utils';
 /**
  * MapInfoPills
  * ------------
- * Always-on informational pills overlaid on the map:
+ * Export-only informational pills overlaid on the map (gated by the `data-raster`
+ * flag — present in the DOM but shown only in raster/export mode, hidden in the
+ * live app):
  *  - Title pill (top-centre): climate variable title joined with the dataset version.
  *  - Grid pill (bottom-left): grid resolution note.
  *
  * Mirrors the scenario ("SSP") pill chrome in map-container.tsx — same intent, same pattern.
+ * The `group-data-[raster=true]/sidebar-wrapper:block` variant reveals each pill only when
+ * an ancestor `SidebarProvider` carries `data-raster="true"` (set in App.tsx during export).
  */
 const MapInfoPills = (): React.ReactElement => {
 	const { climateVariable } = useClimateVariable();
@@ -29,18 +33,20 @@ const MapInfoPills = (): React.ReactElement => {
 
 	return (
 		<>
-			{/* Title pill — top-centre */}
+			{/* Title pill — top-centre (export-only) */}
 			<div className={cn(
 				'absolute top-6 left-1/2 transform -translate-x-1/2 z-20',
+				'hidden group-data-[raster=true]/sidebar-wrapper:block',
 				'text-sm text-zinc-900 font-normal leading-5',
 				'bg-neutral-grey-light border border-cold-grey-4 shadow-md rounded-xl px-3.5 py-1.5',
 			)}>
 				{titleContent}
 			</div>
 
-			{/* Grid resolution pill — bottom-left */}
+			{/* Grid resolution pill — bottom-left (export-only) */}
 			<div className={cn(
 				'absolute bottom-6 left-6 z-20',
+				'hidden group-data-[raster=true]/sidebar-wrapper:block',
 				'text-sm text-zinc-900 font-normal leading-5',
 				'bg-neutral-grey-light border border-cold-grey-4 shadow-md rounded-xl px-3.5 py-1.5',
 			)}>

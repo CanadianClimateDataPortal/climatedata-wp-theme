@@ -36,10 +36,9 @@ describe('map slice — raster mode', () => {
 		expect(next.isRasterMode).toBe(false);
 	});
 
-	// This is the property that matters. The two entry points (the server's
-	// `prepare_raster()` hook and the `?raster=1` boot read) can both fire in the
-	// same page load, and the old export path failed precisely because it
-	// *toggled* rather than *set* — a second trigger undid the first. Applying
+	// This is the property that matters. Raster mode is entered via the server's
+	// `prepare_raster()` closure, and the old export path failed precisely because
+	// it *toggled* rather than *set* — a repeated trigger undid the first. Applying
 	// the same value twice must be indistinguishable from applying it once.
 	test('is a set, not a toggle — applying true twice stays true', () => {
 		let state = mapReducer(initialMapState, setRasterMode(true));

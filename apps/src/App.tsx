@@ -10,16 +10,11 @@ import { ClimateVariableProvider } from "@/context/climate-variable-provider";
 import { useAppSelector } from '@/app/hooks';
 import { selectIsRasterMode } from '@/features/map/map-slice';
 import { useLeaflet } from '@/hooks/use-leaflet';
-import { useRasterMode } from '@/hooks/use-raster-mode';
 import { useUrlSync } from '@/hooks/use-url-sync';
 
 import '@/App.css';
 
 function App() {
-	// Ahead of `useUrlSync`: this consumes `?raster=1` once on mount, before URL
-	// sync's debounced writers can rewrite the query string. Effects run in call
-	// order, so the ordering here is the guarantee.
-	useRasterMode();
 	useUrlSync();
 	useLeaflet();
 

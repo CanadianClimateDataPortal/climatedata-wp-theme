@@ -272,17 +272,9 @@ export interface MapState {
 	 * still image — is not implemented here. Do not read the list above as a
 	 * description of current behaviour.
 	 *
-	 * Two entry points set it, and both are plain sets rather than toggles so
-	 * either or both may fire in the same page load:
-	 * - the `prepare_raster` hook, assigned in
-	 *   `components/map-info/download-map-modal.tsx` — the real export;
-	 * - a `?raster=1` query parameter read once at boot by `useRasterMode`
-	 *   (`hooks/use-raster-mode.ts`) — a developer-only preview, refused on the
-	 *   production hosts, which exists because this app cannot be viewed outside
-	 *   the WordPress stack.
-	 *
-	 * Deliberately NOT registered as a URL-sync parameter: see
-	 * `readRasterPreviewRequest` in `lib/raster-mode`.
+	 * It is set by the `prepare_raster` hook, assigned in
+	 * `components/map-info/download-map-modal.tsx` (the real export) — a plain
+	 * set rather than a toggle.
 	 */
 	isRasterMode: boolean;
 	/**

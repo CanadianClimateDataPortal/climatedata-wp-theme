@@ -24,6 +24,7 @@ import SearchControl from '@/components/map-layers/search-control';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
 import InteractiveStationsLayer from '@/components/map-layers/interactive-stations-layer';
 import LocationModal from '@/components/map-layers/location-modal';
+import MapInfoPills from '@/components/map-layers/map-info-pills';
 import LocationInfoPanel from '@/components/map-info/location-info-panel';
 
 import { useAppSelector } from '@/app/hooks';
@@ -326,6 +327,8 @@ export default function MapContainer({
 					{scenarioLabel}
 				</div>
 			)}
+
+			<MapInfoPills />
 		</LMapContainer>
 	);
 }

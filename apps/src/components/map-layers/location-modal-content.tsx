@@ -104,6 +104,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 				<p
 					className="text-right"
 					data-part="location-modal-content-see-details"
+					data-raster="false"
 				>
 					<a
 						href="#"

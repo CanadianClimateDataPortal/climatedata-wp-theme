@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import L from 'leaflet';
 import { cn } from '@/lib/utils';
+import { __ } from '@/context/locale-provider';
 
 interface LocationModalProps {
 	isOpen: boolean;
@@ -66,8 +67,9 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 					className={cn(
 						'absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none'
 					)}
+					data-raster="false"
 					onClick={onClose}
-					aria-label="Close Modal"
+					aria-label={__('Close Modal')}
 				>
 					<X className="h-4 w-4" />
 				</button>

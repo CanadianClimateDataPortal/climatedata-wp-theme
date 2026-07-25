@@ -93,7 +93,10 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 			}) }
 
 			{!isS2DVariable && (
-				<p className="text-right">
+				<p
+					className="text-right"
+					data-raster="false"
+				>
 					<a
 						href="#"
 						aria-label={__('Go to details section')}

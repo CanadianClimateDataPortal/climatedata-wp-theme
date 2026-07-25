@@ -237,6 +237,8 @@ export function prepareRaster(): void {
 
 	// Remove all tooltip elements
 	document.querySelectorAll('.tooltip').forEach(el => el.remove());
+	// Remove all data-raster="false" elements
+	document.querySelectorAll('[data-raster="false"]').forEach(el => el.remove());
 
 	// Resize the window to force a layout update.
 	window.dispatchEvent(new Event('resize'));

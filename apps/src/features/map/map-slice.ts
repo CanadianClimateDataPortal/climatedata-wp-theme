@@ -204,13 +204,13 @@ const mapSlice = createSlice({
 		 * (`components/map-info/download-map-modal.tsx`), and a set rather than a
 		 * toggle keeps a repeated entry idempotent instead of self-cancelling.
 		 *
-		 * That failure mode is not hypothetical, and it is still live elsewhere in
-		 * this feature: `prepareRaster` (`lib/utils.ts`) opens the legend by
-		 * calling `.click()` on the `#legend-toggle` button, which flips whatever
-		 * state it finds rather than setting one. The legend defaults to open on a
-		 * wide container, and the export runs at 2560px, so that blind click
-		 * *closes* the legend immediately before the screenshot. Making this setter
-		 * a set does not fix that — it avoids repeating the same mistake here.
+		 * That failure mode is not hypothetical. `prepareRaster` (`lib/utils.ts`)
+		 * used to open the legend by calling `.click()` on the `#legend-toggle`
+		 * button, which flips whatever state it finds rather than setting one. The
+		 * legend defaults to open on a wide container, and the export runs at
+		 * 2560px, so that blind click *closed* the legend immediately before the
+		 * screenshot. It has since been replaced by a `setLegendOpen(true)` on the
+		 * same export path — the same reason this setter is a set.
 		 *
 		 * @see {@link MapState.isRasterMode} for what the flag means and who sets it.
 		 */

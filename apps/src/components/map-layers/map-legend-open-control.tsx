@@ -62,7 +62,6 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 						'relative flex flex-col overflow-hidden overflow-y-auto' /* positioning and overflow */,
 						'items-end gap-1' /* alignment */,
 						'bg-white border rounded-md border-cold-grey-3' /* visual */,
-						/* TODO: Figure out why this closes when $.fn.prepare_raster()  */
 					)}
 				>
 					{children}

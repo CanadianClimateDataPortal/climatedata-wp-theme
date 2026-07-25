@@ -69,8 +69,17 @@ const MapLegend: React.FC = () => {
 
 	/**
 	 * Open legend by default when the map container has space for legend.
-	 * Legend max width is 430px (MapLegendOpenControl.MAX_LEGEND_WIDTH)
+	 * Legend max width is 430px (MapLegendOpenControl.maxLegendWidth)
 	 * Only check on the initial mount, no resize handling needed.
+	 *
+	 * This runs once per mount, and `MapLegend` is mounted conditionally (see
+	 * `map-container.tsx`), so it can still fire *after* the map-image export has
+	 * forced the legend open. That is safe rather than lucky: the export renders in
+	 * a window far wider than the threshold below, so `shouldBeOpen` is `true` there
+	 * and this dispatch re-sets the value the export already asked for. Narrow the
+	 * export viewport, or raise the threshold, and that stops holding — this effect
+	 * would then have to skip its dispatch while an export is in progress.
+	 * (CLIM-1454 R3.)
 	 */
 	useEffect(() => {
 		if (!map) {
@@ -79,7 +88,7 @@ const MapLegend: React.FC = () => {
 		const container = map.getContainer();
 		const { width } = container.getBoundingClientRect();
 		const shouldBeOpen = width >= MapLegendOpenControl.maxLegendWidth * 1.5;
-		dispatch(setLegendOpen(shouldBeOpen)); // Also this
+		dispatch(setLegendOpen(shouldBeOpen));
 	}, [map, dispatch]);
 
 	/**

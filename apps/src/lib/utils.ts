@@ -186,9 +186,17 @@ export const encodeURL = (url: string, salt: string) => {
  * Modify the DOM of this app's map page to prepare it for a screenshot.
  *
  * This function is designed to be executed by an external script (e.g. via Selenium)
- * before taking a screenshot. It clicks the legend toggle, removes the surrounding
- * chrome (sidebar, headers, sidebar toggle, search and zoom controls) along with any
- * tooltips, then dispatches a `resize` event so the map re-lays out at the new size.
+ * before taking a screenshot. It removes the surrounding chrome (sidebar, headers,
+ * sidebar toggle, search and zoom controls) along with any tooltips, then dispatches
+ * a `resize` event so the map re-lays out at the new size.
+ *
+ * Opening the legend is deliberately *not* done here — the caller dispatches
+ * `setLegendOpen(true)` instead, because Redux owns that state. This function used
+ * to click the `#legend-toggle` button, which flips whatever state it finds rather
+ * than setting one. The legend auto-opens once the map container is wide enough and
+ * the screenshot runs far above that width, so the click reliably *closed* an
+ * already-open legend a moment before the capture. A set cannot misfire that way;
+ * do not reintroduce the click. (CLIM-1454 R3.)
  *
  * It does not add the `to-raster` class the screenshot service waits for: that class
  * marks which element gets captured, and this app renders it statically on
@@ -215,11 +223,6 @@ export const encodeURL = (url: string, salt: string) => {
  * This is live production behaviour, not scaffolding.
  */
 export function prepareRaster(): void {
-	// Simulate a click on the legend toggle button
-	const legendToggle = document.getElementById('legend-toggle');
-	if (legendToggle instanceof HTMLElement) {
-		legendToggle.click();
-	}
 	// Remove elements that should not appear in the screenshot
 	[
 		'map-sidebar',

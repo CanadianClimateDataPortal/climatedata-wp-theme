@@ -10,7 +10,7 @@ import { Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { encodeURL, prepareRaster } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setRasterMode } from '@/features/map/map-slice';
+import { setRasterMode, setLegendOpen } from '@/features/map/map-slice';
 
 // components
 import Modal from '@/components/ui/modal';
@@ -91,6 +91,7 @@ const DownloadMapModal: React.FC<{
 		 * it always has. The name is a fake-jQuery shim; this app has no jQuery.
 		 */
 		window.$.fn.prepare_raster = () => {
+			dispatch(setLegendOpen(true));
 			dispatch(setRasterMode(true));
 			prepareRaster();
 		};

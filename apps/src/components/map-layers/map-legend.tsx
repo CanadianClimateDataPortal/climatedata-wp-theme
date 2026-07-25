@@ -79,7 +79,7 @@ const MapLegend: React.FC = () => {
 		const container = map.getContainer();
 		const { width } = container.getBoundingClientRect();
 		const shouldBeOpen = width >= MapLegendOpenControl.maxLegendWidth * 1.5;
-		dispatch(setLegendOpen(shouldBeOpen));
+		dispatch(setLegendOpen(shouldBeOpen)); // Also this
 	}, [map, dispatch]);
 
 	/**

@@ -223,6 +223,34 @@ export const encodeURL = (url: string, salt: string) => {
  * This is live production behaviour, not scaffolding.
  */
 export function prepareRaster(): void {
+	// Flag raster mode on the root element, so the export's CSS can reach every
+	// node on the page.
+	//
+	// `App.tsx` sets this same attribute on a div inside the React tree, and that
+	// one drives the export-only content React renders. It cannot also be the
+	// *hiding* flag, for two reasons.
+	//
+	// Reach: modals render through a portal into `document.body`
+	// (`components/ui/modal.tsx`), so they are not DOM descendants of that div and
+	// no rule anchored on it can match them. They still have to be hidable,
+	// because the screenshot is a rectangle taken at the map wrapper's bounding
+	// box — anything painting over that rectangle is in the image, whatever its
+	// position in the tree.
+	//
+	// Timing: the React attribute lands on a commit, which is asynchronous. This
+	// function runs synchronously right after the dispatch that asks for it, so
+	// that attribute is not on the page yet at this point. `<html>` sits above
+	// React's mount, so setting it here applies immediately and reconciliation
+	// cannot revert it — which is also precisely why the same imperative move on a
+	// node React owns would *not* be safe.
+	//
+	// Two carriers is deliberate, not an oversight: the React-committed flag
+	// reveals React-rendered content, this one hides anything anywhere.
+	//
+	// Deliberately never unset — see this function's docblock on not reverting.
+	// (CLIM-1454 R5.)
+	document.documentElement.setAttribute('data-raster', 'true');
+
 	// Remove elements that should not appear in the screenshot
 	[
 		'map-sidebar',

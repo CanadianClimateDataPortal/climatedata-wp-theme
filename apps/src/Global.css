@@ -303,6 +303,22 @@
  * service waits for that element to be *visible*, so hiding an ancestor does not
  * trim the image — it expires the wait and the export fails outright.
  *
+ * Why this hides rather than deletes. An earlier version of this feature removed
+ * every marked element from the DOM instead, and that is worse in two ways.
+ *
+ * The legend renders into a React root of its own — `map-legend.tsx` calls
+ * `createRoot` on a container Leaflet made — and one of the markers lives inside
+ * it. Detaching a node behind React's back leaves that root reconciling against a
+ * tree that moved under it, and a failure during commit takes down the whole
+ * root, not just the one element. The symptom is not a chevron that stays
+ * visible; it is the entire legend disappearing. Any React-owned node carries
+ * that risk, so the rule has to be one that never mutates the tree.
+ *
+ * And the export's final act is a synthetic `resize`, which makes Leaflet
+ * re-measure. Mutating the tree and then forcing a re-measure is where rendering
+ * hiccups come from. Hiding is a style recalculation React stays consistent with;
+ * removing is a tree mutation it never learns about.
+ *
  * (CLIM-1454 R5.)
  */
 [data-raster='true'] [data-raster='false'] {

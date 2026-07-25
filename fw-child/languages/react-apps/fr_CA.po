@@ -298,6 +298,9 @@ msgstr "ltr"
 msgid "Close panel"
 msgstr "Fermer"
 
+msgid "Close Modal"
+msgstr "Fermer"
+
 msgid "Filter variables"
 msgstr "Filtrer les variables"
 

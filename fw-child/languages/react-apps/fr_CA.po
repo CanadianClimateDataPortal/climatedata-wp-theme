@@ -349,6 +349,9 @@ msgstr "sur"
 msgid "variables"
 msgstr "variables"
 
+msgid "Grid="
+msgstr "Grille="
+
 msgid "Grid Cells"
 msgstr "Points de grille"
 

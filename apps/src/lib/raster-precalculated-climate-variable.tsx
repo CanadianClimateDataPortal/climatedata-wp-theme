@@ -120,9 +120,9 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		} else {
 			// Fallback based on the version.
 			if (this.getVersion() === "cmip6") {
-				return "canadagrid-m6";
+				return 'canadagrid-m6';
 			} else {
-				return "canadagrid";
+				return 'canadagrid';
 			}
 		}
 	}

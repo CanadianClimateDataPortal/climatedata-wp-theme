@@ -12,6 +12,7 @@ import { useLocale } from '@/hooks/use-locale';
 import { setCenter, setZoom } from '@/features/download/download-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, GEOSERVER_BASE_URL } from '@/lib/constants';
+import { GRID_RESOLUTIONS_VALUES } from '@/lib/grid-resolution';
 
 /**
  * Component that allows to select a rectangle on the map and calculate the number of cells selected.
@@ -32,14 +33,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 	const { locale } = useLocale();
 
 	const gridResolutions = useMemo<Record<string, number>>(
-			() => ({
-			canadagrid: 0.08333333333333333,
-			'canadagrid-m6': 0.08333333333333333,
-			canadagrid1deg: 1,
-			slrgrid: 0.1,
-			'slrgrid-cmip6': 0.1,
-			era5landgrid: 0.1,
-		}),
+		() => ({...GRID_RESOLUTIONS_VALUES }),
 		[]
 	);
 

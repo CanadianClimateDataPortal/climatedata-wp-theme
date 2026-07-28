@@ -16,7 +16,8 @@ import { useMapInteractions } from '@/hooks/use-map-interactions';
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
-export default function Map(): React.ReactElement {
+const MapRoot = (
+): React.ReactElement => {
 	const { setMap, setComparisonMap } = useMap();
 	const { climateVariable } = useClimateVariable();
 	const wrapperRef = useRef<HTMLDivElement>(null);
@@ -83,7 +84,7 @@ export default function Map(): React.ReactElement {
 			className={cn(
 				'map-wrapper to-raster',
 				'grid gap-4 h-full z-30',
-				showComparisonMap ? 'grid-cols-2' : 'grid-cols-1'
+				showComparisonMap ? 'grid-cols-2 map-comparison' : 'grid-cols-1'
 			)}
 		>
 			<MapBanners className="absolute top-48 md:top-40 z-20 w-full sm:max-w-[calc(100%_-_120px)] px-4" />
@@ -98,6 +99,7 @@ export default function Map(): React.ReactElement {
 				clearSelectedLocation={handleClearSelectedLocation}
 				selectGriddedLocation={selectGriddedLocation}
 				layerRef={primaryLayerRef}
+				className={showComparisonMap ? 'map-comparison-left' : undefined}
 			/>
 			{showComparisonMap && (
 				<MapContainer
@@ -110,8 +112,13 @@ export default function Map(): React.ReactElement {
 					selectedLocation={selectedLocation}
 					clearSelectedLocation={handleClearSelectedLocation}
 					layerRef={comparisonLayerRef}
+					className={showComparisonMap ? 'map-comparison-right' : undefined}
 				/>
 			)}
 		</div>
 	);
 }
+
+MapRoot.displayName = 'MapRoot';
+
+export default MapRoot;

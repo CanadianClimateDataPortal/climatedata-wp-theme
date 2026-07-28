@@ -39,6 +39,7 @@ const MapInfoPills = (): React.ReactElement => {
 				'hidden group-data-[raster=true]/sidebar-wrapper:block',
 				'text-sm text-zinc-900 font-normal leading-5',
 				'bg-neutral-grey-light border border-cold-grey-4 shadow-md rounded-xl px-3.5 py-1.5',
+				'raster-addition-pill-title',
 			)}>
 				{titleContent}
 			</div>
@@ -49,6 +50,7 @@ const MapInfoPills = (): React.ReactElement => {
 				'hidden group-data-[raster=true]/sidebar-wrapper:block',
 				'text-sm text-zinc-900 font-normal leading-5',
 				'bg-neutral-grey-light border border-cold-grey-4 shadow-md rounded-xl px-3.5 py-1.5',
+				'raster-addition-pill-resolution',
 			)}>
 				{__('Grid=') + ' ' + hardcodedString}
 			</div>

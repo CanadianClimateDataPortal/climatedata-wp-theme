@@ -29,8 +29,8 @@ import type { MapLegendCommon, MapLegendCommonProps } from '@/components/map-lay
 const LazyMapLegendForecastS2D = lazy<MapLegendForecastS2D>(() => import('@/components/map-layers/map-legend-forecast-s2d'));
 const LazyMapLegendCommon = lazy<React.MemoExoticComponent<MapLegendCommon>>(() => import('@/components/map-layers/map-legend-common'));
 
-
-const MapLegend: React.FC = () => {
+const MapLegend = (
+): React.ReactElement | null => {
 	const dispatch = useAppDispatch();
 	const isOpen = useAppSelector((state) => state.map.legend.isOpen);
 

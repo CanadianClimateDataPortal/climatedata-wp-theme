@@ -80,10 +80,13 @@ export interface SearchControlProps {
  * @example
  * <SearchControl />
  */
-const SearchControl = ({
-	className,
-	onSelectGriddedLocation,
-}: SearchControlProps): ReactElement => {
+const SearchControl = (
+	props: SearchControlProps,
+): ReactElement => {
+	const {
+		className,
+		onSelectGriddedLocation,
+	} = props;
 	const { climateVariable } = useClimateVariable();
 	// Captured at the point formatData() builds entries, keyed by the same
 	// title string leaflet-search later passes back to moveToLocation().
@@ -98,16 +101,17 @@ const SearchControl = ({
 
 	// we need a unique id for the search control container for cases where multiple maps
 	// are rendered on the same page -- ie. comparing emission scenarios
-	const searchControlId = useMemo(() => {
-		let id = nanoid(); // Generate a normal nanoid
-
-		// Make sure it starts with an alphabetic character
-		if (!/^[a-zA-Z]/.test(id)) {
-			id = 'a' + id.substring(1);
-		}
-
-		return id;
+	// When comparing emissions scenarios (URL Search Query `?cmp=1&cmpTo=`)
+	const uniqueId = useMemo(() => {
+		const suffix = nanoid(5);
+		return 'search-control-' + suffix;
 	}, []);
+
+	// CSS className of this component's outermost element
+	const classNameForOutermostElement = cn(
+		'search-control absolute top-24 left-6 z-40 flex items-center space-x-1',
+		className,
+	);
 
 	// defining default placeholder here so that it can be translated
 	const textPlaceholder = __(SEARCH_PLACEHOLDER) || '';
@@ -242,7 +246,7 @@ const SearchControl = ({
 			autoCollapse: false,
 			autoType: false,
 			minLength: 2,
-			container: searchControlId,
+			container: uniqueId,
 			textPlaceholder,
 			formatData: (response: SearchControlResponse) => {
 				const formattedData: Record<
@@ -363,7 +367,7 @@ const SearchControl = ({
 		map.addControl(searchControl);
 
 		// manually trigger search when the input changes.. this fixes the issue where deleting characters doesn't trigger a search
-		const searchInput = document.querySelector(`#${searchControlId} input`);
+		const searchInput = document.querySelector(`#${uniqueId} input`);
 		searchInput?.addEventListener('input', (event) => {
 			let value = (event.target as HTMLInputElement).value;
 			// Remove a single leading space, if present
@@ -402,18 +406,21 @@ const SearchControl = ({
 			map.removeControl(searchControl);
 			window.removeEventListener('resize', updateInputSize);
 		};
-	}, [map, handleLocationChange, searchControlId, textPlaceholder]);
+	}, [
+		map,
+		handleLocationChange,
+		uniqueId,
+		textPlaceholder,
+	]);
 
 	return (
 		<div
-			className={cn(
-				'search-control absolute top-24 left-6 z-40 flex items-center space-x-1',
-				className
-			)}
-			id='map-search-control'
+			className={classNameForOutermostElement}
+			data-raster="false"
+			id={uniqueId + '-parent'}
 		>
 			<div
-				id={searchControlId}
+				id={uniqueId}
 				className="border border-gray-300 shadow-md inline-block [&_input]:leading-5 [&_input]:placeholder:text-neutral-grey-medium"
 			/>
 			<div
@@ -438,5 +445,7 @@ const SearchControl = ({
 		</div>
 	);
 };
+
+SearchControl.displayName = 'SearchControl'; // Explicit string literal, or this name would be lost in production.
 
 export default SearchControl;

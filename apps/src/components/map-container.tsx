@@ -66,23 +66,28 @@ interface MapContainerProps {
 	) => void;
 	// @ts-expect-error: L.VectorGrid is a valid type
 	layerRef?: React.MutableRefObject<L.VectorGrid | null>;
+	className?: string;
 }
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
-export default function MapContainer({
-	onMapReady,
-	onUnmount,
-	isComparisonMap = false,
-	onOver,
-	onOut,
-	onClick,
-	selectedLocation,
-	clearSelectedLocation,
-	selectGriddedLocation,
-	layerRef,
-}: MapContainerProps): React.ReactElement {
+const MapContainer = (
+	props: MapContainerProps,
+): React.ReactElement => {
+	const {
+		onMapReady,
+		onUnmount,
+		isComparisonMap = false,
+		onOver,
+		onOut,
+		onClick,
+		selectedLocation,
+		clearSelectedLocation,
+		selectGriddedLocation,
+		layerRef,
+	} = props;
+
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
 	const [selectedStation, setSelectedStation] = useState<Station | null>(null);
 
@@ -105,8 +110,16 @@ export default function MapContainer({
 
 	const scenarioLabel = appConfig.scenarios.find(item => item.value === scenario)?.label ?? scenario;
 
-	// CSS classes to position the location modal
-	const locationModalClassName = cn(
+	const classNameForOutermostElement = [
+		'h-full',
+		'w-full',
+		'z-10',
+	];
+	if (typeof props.className == 'string') {
+		classNameForOutermostElement.push(props.className);
+	}
+
+	const classNameForLocationModal = cn(
 		'absolute z-50',
 		'max-w-md w-full',
 		'top-1/2 -translate-y-1/2',
@@ -230,7 +243,7 @@ export default function MapContainer({
 			minZoom={DEFAULT_MIN_ZOOM}
 			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}
-			className="z-10 h-full w-full"
+			className={classNameForOutermostElement.join(' ')}
 			bounds={CANADA_BOUNDS}
 		>
 			<MapEvents
@@ -238,7 +251,9 @@ export default function MapContainer({
 				onUnmount={onUnmount}
 			/>
 			{climateVariable?.getInteractiveMode() === 'region' && (
-				<MapLegend />
+				!isComparisonMap && (
+					<MapLegend />
+				)
 			)}
 
 			{/* Use the unified CustomPanesLayer with 'standard' mode */}
@@ -247,19 +262,20 @@ export default function MapContainer({
 			{/* Use the unified VariableLayer */}
 			<VariableLayer isComparisonMap={isComparisonMap} />
 
-			<ZoomControl />
-
 			{/* Show search control if not a comparison map. */}
 			{ !isComparisonMap && (
-				<SearchControl
-					onSelectGriddedLocation={selectGriddedLocation}
-				/>
+				<>
+					<ZoomControl />
+					<SearchControl
+						onSelectGriddedLocation={selectGriddedLocation}
+					/>
+				</>
 			) }
 
 			<LocationModal
 				isOpen={canShowModal}
 				onClose={handleLocationModalClose}
-				className={locationModalClassName}
+				className={classNameForLocationModal}
 			>
 				{locationModalContent}
 			</LocationModal>
@@ -331,4 +347,8 @@ export default function MapContainer({
 			<MapInfoPills />
 		</LMapContainer>
 	);
-}
+};
+
+MapContainer.displayName = 'MapContainer'; // Explicit string literal, or this name would be lost in production.
+
+export default MapContainer;

@@ -263,8 +263,6 @@ export function prepareRaster(): void {
 		'header',
 		'sidebar-toggle',
 		'header-map',
-		'map-search-control',
-		'map-zoom-control',
 	].forEach(id => {
 		const el = document.getElementById(id);
 		if (el) {

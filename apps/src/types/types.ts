@@ -614,16 +614,6 @@ export interface ControlTitleProps
 	tooltip?: React.ReactNode;
 }
 
-/**
- * Represents the properties of the ZoomControl component.
- */
-export interface ZoomControlProps {
-	className?: string;
-	wrapperClass?: string;
-	onZoomIn: () => void;
-	onZoomOut: () => void;
-}
-
 export interface ClimateDataProps {
 	observations?: number[][];
 	modeled_historical_median?: number[][];

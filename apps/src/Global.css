@@ -281,6 +281,10 @@
 }
 
 /**
+ * When exporting as image what we see on the map.
+ * Things that are useless when they no longer are interactive elements
+ * within a web browser.
+ *
  * Two-sided convention for the downloadable map image, which the server
  * produces by loading this page and screenshotting it.
  *
@@ -321,8 +325,10 @@
  *
  * (CLIM-1454 R5.)
  */
-[data-raster='true'] [data-raster='false'] {
-	display: none;
+[data-raster='true'] [data-raster='false'],
+[data-raster='true'] .map-wrapper.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-resolution,
+[data-raster='true'] .map-wrapper.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-title {
+	display: none !important;
 }
 
 /* Custom scrollbar styles for variables panel */

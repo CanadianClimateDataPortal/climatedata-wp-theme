@@ -25,6 +25,8 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {
 		if (!isOpen) return null;
 
+		console.log('Modal', { isOpen });
+
 		return createPortal(
 			<div
 				className="modal fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
@@ -42,6 +44,7 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 						e.stopPropagation()
 					} // Prevent closing modal when clicking inside
 					role="dialog"
+					data-foo="bar"
 					aria-modal="true"
 					aria-labelledby="modal-title" // Links to the title for accessibility
 					aria-describedby="modal-description" // Links to the description for accessibility

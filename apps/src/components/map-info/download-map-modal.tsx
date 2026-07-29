@@ -24,7 +24,6 @@ import {
 
 import { INTERNAL_URLS } from '@/lib/constants';
 
-
 // Extend the global Window interface to allow simulation of jQuery-style API.
 // This is used to expose a `prepare_raster` function on `$.fn`
 declare global {
@@ -124,7 +123,32 @@ const DownloadMapModal: React.FC<{
 		}
 
 		setIsGenerating(true);
-		window.open(api_url, '_blank');
+		/**
+		 * We need to pass more data, e.g. {@see exampleMoreData}
+		 * Either we use:
+		 * - `window.open` and pass messages between realms
+		 * - HTTP POST and handle attachment
+		 *
+		 * ```http
+		 * POST /raster?url=0000000000000000000-base64encodedUrl-000000000000000000000000
+		 * content-Type: application/json
+		 *
+		 * {"locationPopupHtml": [], "markerLatLon": [] }
+		 *
+		 *
+		 * HTTP/1.1 200 OK
+		 * Content-Type: application/pdf
+		 * Content-Disposition: attachment; filename="report.pdf"
+		 * Content-Length: 1048576
+		 *
+		 * [Binary PDF Data Goes Here]
+		 * ```
+		 */
+		// Currently.... it is only window.open
+		const otherWindowRealm = window.open(api_url, '_blank'); // TODO: Figure out how to control this otherWindowRealm and emulate a <form method="POST" /> submit.
+		window.otherWindowRealm = otherWindowRealm;
+
+
 		setIsGenerating(false);
 	};
 
@@ -138,6 +162,13 @@ const DownloadMapModal: React.FC<{
 
 		return `${downloadBaseUrl}?dataset=${encodeURIComponent(dataset.term_id.toString())}&var=${encodeURIComponent(climateVariableData.id)}`;
 	}, [dataset, climateVariableData, currentLocale]);
+
+	const downloadMapModal = {
+		getDownloadUrl,
+		handleDownloadClick,
+	};
+	window.downloadMapModal = downloadMapModal;
+	console.log('downloadMapModal', downloadMapModal);
 
 	const buttonText = useMemo(() => {
 		if (isGenerating) {

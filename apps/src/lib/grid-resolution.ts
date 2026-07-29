@@ -1,38 +1,40 @@
 /**
  * Grid Resolution.
  *
- * WORK IN PROGRESS -- This is a starting point to adjust and improve what we already have and use what was written in the session folder.
+ * Grid resolution is **declared, not computed**. The scientists define the grid for each
+ * data source; this module only maps a declared grid identity to the label they wrote for
+ * it. Nothing here derives a cell size from a variable, a latitude or a bounding box.
  *
- * Grid resolution is **declared, not computed**.
- * The scientists define the grid for each data source; the app displays what they declared.
+ * **The meaningful null**
  *
- * This supersedes FI4's framing, which argues resolution must be derived per-variable and
- * per-latitude. `grid-resolution.ts` (590 lines, in the session folder) was an attempt at
- * derivation — it is not too heavy for the job, it solves a problem that turned out not
- * to be the problem.
+ * `ClimateVariableBase.getGridType()` returns `this._config.gridType ?? null`, and that
+ * `null` carries information: "this variable's config declares no grid type." It is not a
+ * missing value to paper over. Four map layers currently do paper over it, each inventing
+ * a declaration the model never made:
+ * - `interactive-regions-layer.tsx` and `selectable-rectangle-grid-layer.tsx` (twice),
+ *   with `?? 'canadagrid'`,
+ * - `selectable-cells-grid-layer.tsx`, with `?? GridTypes.CANADAGRID`.
  *
- * **Where we are at**
+ * Those four build GeoServer tile URLs and are out of scope for this module. When they are
+ * fixed, the pattern to copy is `RasterPrecalculatedClimateVariable.getGridType()`: it
+ * defaults **inside the class**, where the knowledge lives — config first, then a
+ * version-based fallback. `S2dClimateVariable` and `SeaLevelClimateVariable` already
+ * declare properly too.
  *
- * `climateVariable?.getGridType()` is unreliable, and the reason is specific:
- * - `climate-variable-base.ts:301` returns `this._config.gridType ?? null`. That `null` is
- *   meaningful — "this variable's config declares no grid type."
- * - Four call sites destroy it with `?? 'canadagrid'`: `interactive-regions-layer.tsx:57`,
- *   `selectable-cells-grid-layer.tsx:29`, `selectable-rectangle-grid-layer.tsx:41` and `:65`.
- *   Each invents a declaration the model never made, and downstream cannot tell it from a real
- *   one — which is why callers re-derive with `getInteractiveRegion()` and class-name tests.
- * - Three subclasses already declare properly: `s2d-climate-variable.ts:98`,
- *   `sea-level-climate-variable.tsx:7`, `raster-precalculated-climate-variable.tsx:117`.
- *   The last one is the pattern to copy — it defaults **inside the class**, where the knowledge
- *   lives, commented "Prioritize getting value from config."
+ * This module never applies such a fallback. A grid type that is undeclared, or declared
+ * but carrying no label here, resolves to `null` and the caller displays nothing.
  *
- * Station identification: prefer `StationVariableIds` (`types/climate-variable-interface.ts:139`)
- * or the `STATION_VARIABLE_CLASSES` set (`lib/download/determine-applicable-steps.ts:14`) over the
- * `/^Station/` regex currently in `lib/grid-types.ts:108`. Two registries already exist — one by
- * id, one by class. Adding a third mechanism is a Same-Intent-Same-Pattern divergence.
+ * **Station identification**
+ *
+ * Station data is measured at points, so there is no grid resolution to state for it.
+ * Membership is decided by id against the {@link StationVariableIds} registry — see
+ * `isStationClimateVariable` below. That registry is the single declared authority for the
+ * question; also testing the class name or the interactive mode would be a second
+ * mechanism answering it, invisible to a future refactor of the first.
  */
 
 import {
-	InteractiveRegionOption,
+	StationVariableIds,
 	type ClimateVariableInterface,
 } from '@/types/climate-variable-interface';
 
@@ -127,6 +129,37 @@ export const GRID_RESOLUTIONS_LABELS = {
 	[GridTypes.ALLOWANCEGRID]: GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS,
 } as const satisfies Record<GridType, string>;
 
+/**
+ * Grid identities this module knows, as a membership set.
+ *
+ * @remarks
+ * Kept private, and derived from {@link GridTypes} so that object stays the single
+ * declaration. Ask through {@link isGridType} rather than reading the set.
+ */
+const GRID_TYPE_VALUES = new Set<string>(Object.values(GridTypes));
+
+/**
+ * Climate-variable ids that identify station data.
+ *
+ * @remarks
+ * Kept private, and derived from {@link StationVariableIds} so that registry stays the
+ * single declaration. Ask through {@link isStationClimateVariable}.
+ */
+const STATION_VARIABLE_IDS = new Set<string>(Object.values(StationVariableIds));
+
+/**
+ * Whether a value is a grid identity this module carries a resolution label for.
+ *
+ * @remarks
+ * `ClimateVariableInterface.getGridType()` is typed `string | null`, so its result must be
+ * narrowed rather than cast: a grid name the labels table has no entry for is as
+ * unusable as no name at all, and casting would hide that.
+ */
+export const isGridType = (
+	value: unknown,
+): value is GridType =>
+	typeof value === 'string' && GRID_TYPE_VALUES.has(value);
+
 export const isClimateVariable = (
 	climateVariable: ClimateVariableInterface | null,
 ): climateVariable is ClimateVariableInterface =>
@@ -137,42 +170,40 @@ export const isStationClimateVariable = (
 	climateVariable: ClimateVariableInterface | null,
 ): boolean =>
 	isClimateVariable(climateVariable) &&
-	climateVariable.getInteractiveMode() === 'station' &&
-	/^Station/.test(climateVariable.getClass());
+	STATION_VARIABLE_IDS.has(climateVariable.getId());
 
 export const getGridTypeLabel = (gridType?: GridType | null): string => {
-	console.log('getGridTypeLabel 2', { gridType });
 	if (gridType === undefined || gridType === null) {
 		return '';
-	} else if (!Object.prototype.hasOwnProperty.call(GRID_RESOLUTIONS_LABELS, gridType)) {
+	} else if (
+		!Object.prototype.hasOwnProperty.call(GRID_RESOLUTIONS_LABELS, gridType)
+	) {
 		return '';
 	}
 	return GRID_RESOLUTIONS_LABELS[gridType];
 };
 
-export const getGridTypeFor = (climateVariable: ClimateVariableInterface | null): GridType | null => {
-	let outcome: GridType | null = null;
-	const gridType = climateVariable?.getGridType() as GridType;
-	const climateVariableId = climateVariable?.getId() ?? null;
-	const climateVariableClass = climateVariable?.getClass() ?? null;
-	const interactiveMode = climateVariable?.getInteractiveMode() ?? null;
-	const interactiveRegion = climateVariable?.getInteractiveRegion() ?? null;
-
-	if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
-		outcome = gridType;
-	} else if (isStationClimateVariable(climateVariable)) {
-		// Station data is not gridded, so we return null.
-		outcome = null;
+/**
+ * The grid identity to display for a climate variable, or `null` when there is none to
+ * show.
+ *
+ * @remarks
+ * Two unrelated situations yield `null`, and neither is an error:
+ * - the variable is station data, which is measured at points and has no grid;
+ * - the variable declares no grid type, or one this module carries no label for.
+ *
+ * Display is otherwise not conditioned on how the map is being browsed. The sizes are
+ * declared per data source, so a variable shown by region still has the grid its data was
+ * produced on, and still states it.
+ */
+export const getGridTypeFor = (
+	climateVariable: ClimateVariableInterface | null,
+): GridType | null => {
+	if (isStationClimateVariable(climateVariable)) {
+		return null;
 	}
 
-	console.log('getGridTypeFor', {
-		outcome,
-		gridType,
-		climateVariableId,
-		climateVariableClass,
-		interactiveMode,
-		interactiveRegion,
-	});
+	const declaredGridType = climateVariable?.getGridType() ?? null;
 
-	return outcome;
+	return isGridType(declaredGridType) ? declaredGridType : null;
 };

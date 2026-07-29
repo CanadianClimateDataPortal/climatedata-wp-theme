@@ -1,3 +1,12 @@
+import L from 'leaflet';
+
+import {
+	createExampleLocationPopupHtml,
+	EXAMPLE_PREPARE_RASTER_POST_PAYLOAD,
+} from '@/lib/prepare-raster.examples';
+
+
+
 /**
  * Make an image out of the current map view and prepare it for download.
  *
@@ -11,6 +20,8 @@ export interface PrepareRasterPostHttpPayload {
 	locationPopupHtml: [string, string?];
 	markerLatLon: [number, number];
 }
+
+
 
 /**
  * This function is called JUST before sending as a POST request to the server-side screenshot service
@@ -41,6 +52,8 @@ export const getLocationModalInnerHTML = (): null | [string, string?] => {
 
 	return outcome as [string, string?];
 };
+
+
 
 /**
  * This function is called from a Selenium (server-side screenshot service) (`climatedata-api`, `climatedata_api/raster.py`) in a headless browser to prepare the map page for a screenshot. It removes interactive UI elements and tooltips, and dispatches a `resize` event so the map re-lays out at the new size.
@@ -87,51 +100,125 @@ export const getLocationModalInnerHTML = (): null | [string, string?] => {
  *
  * This is live production behaviour, not scaffolding.
  */
-export function prepareRaster(payload?: PrepareRasterPostHttpPayload): void {
-	// Flag raster mode on the root element, so the export's CSS can reach every
-	// node on the page.
-	//
-	// `App.tsx` sets this same attribute on a div inside the React tree, and that
-	// one drives the export-only content React renders. It cannot also be the
-	// *hiding* flag, for two reasons.
-	//
-	// Reach: modals render through a portal into `document.body`
-	// (`components/ui/modal.tsx`), so they are not DOM descendants of that div and
-	// no rule anchored on it can match them. They still have to be hidable,
-	// because the screenshot is a rectangle taken at the map wrapper's bounding
-	// box — anything painting over that rectangle is in the image, whatever its
-	// position in the tree.
-	//
-	// Timing: the React attribute lands on a commit, which is asynchronous. This
-	// function runs synchronously right after the dispatch that asks for it, so
-	// that attribute is not on the page yet at this point. `<html>` sits above
-	// React's mount, so setting it here applies immediately and reconciliation
-	// cannot revert it — which is also precisely why the same imperative move on a
-	// node React owns would *not* be safe.
-	//
-	// Two carriers is deliberate, not an oversight: the React-committed flag
-	// reveals React-rendered content, this one hides anything anywhere.
-	//
-	// Deliberately never unset — see this function's docblock on not reverting.
-	// (CLIM-1454 R5.)
-	document.documentElement.setAttribute('data-raster', 'true');
-
-	// Remove elements that should not appear in the screenshot
-	[
-		'map-sidebar',
-		'header',
-		'sidebar-toggle',
-		'header-map',
-	].forEach(id => {
-		const el = document.getElementById(id);
-		if (el) {
-			el.remove();
-		}
+export const prepareRaster = async (payload?: PrepareRasterPostHttpPayload): Promise<void> => {
+	console.log('0 prepareRaster: payload', payload);
+	await new Promise(resolve => {
+		console.log('0a prepareRaster: Promise 0');
+		// This is a no-op, but it is here to illustrate the async nature of this function.
+		resolve(null);
 	});
 
-	// Remove all tooltip elements
-	document.querySelectorAll('.tooltip').forEach(el => el.remove());
+	let marker: ReturnType<typeof L.marker> | null = null;
 
-	// Resize the window to force a layout update.
-	window.dispatchEvent(new Event('resize'));
+	await new Promise(resolve => {
+		console.log('1 prepareRaster: Promise 0');
+		const {
+			// locationPopupHtml,
+			markerLatLon,
+		} = payload || {};
+		const [
+			markerLat,
+			markerLon,
+		] = markerLatLon || [0, 0];
+
+		if (markerLat > 0 && markerLon > 0) {
+			const latlng = new L.LatLng(markerLat, markerLon);
+			marker = L.marker(latlng);
+		}
+		resolve(null);
+	});
+
+	console.log('2 prepareRaster: marker', marker);
+
+	await new Promise(resolve => {
+		console.log('3 prepareRaster: Promise 1');
+		document.documentElement.setAttribute('data-raster', 'true');
+
+		// Remove elements that should not appear in the screenshot
+		// Which basically makes the map take up all the available space by removing the surrounding elements.
+		[
+			'map-sidebar',
+			'header',
+			'sidebar-toggle',
+			'header-map',
+		].forEach(id => {
+			const el = document.getElementById(id);
+			if (el) {
+				el.remove();
+			}
+		});
+
+		// Remove all tooltip elements
+		document.querySelectorAll('.tooltip').forEach(el => el.remove());
+
+		// Resize the window to force a layout update.
+		window.dispatchEvent(new Event('resize'));
+
+		resolve(null);
+	});
+
+	console.log('3 prepareRaster: done');
 }
+
+// TEMPORARY UTILITIES UNTIL i FIGURE OUT
+
+const createMarkerLatLon = (): PrepareRasterPostHttpPayload['markerLatLon'] => {
+	const url = new URL(window.location.href);
+	const lat = parseFloat(url.searchParams.get('lat') || '0');
+	const lon = parseFloat(url.searchParams.get('lon') || '0');
+
+	return [lat, lon] as [number, number];
+}
+
+const INTERNAL_URLS_TEMPORARY = 'https://dataclimatedata.crim.ca/raster'
+
+const getCurrentLocationEscaped = (): string => {
+	const enc = btoa(window.location.href);
+	return `${INTERNAL_URLS_TEMPORARY}?url=${enc}`;
+}
+
+export const createFetchRequestInitOptions = (payload: PrepareRasterPostHttpPayload) => {
+	const fetchOptions: RequestInit = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(payload),
+	};
+	return fetchOptions;
+};
+
+export const createPrepareRasterPostHttpPayload = (latLon?: [number, number]): PrepareRasterPostHttpPayload => {
+	const locationPopupHtml = getLocationModalInnerHTML() || EXAMPLE_PREPARE_RASTER_POST_PAYLOAD.locationPopupHtml;
+	const markerLatLon = latLon ||createMarkerLatLon();
+
+	return {
+		locationPopupHtml,
+		markerLatLon,
+	};
+}
+
+const prepareRaster2 = {
+	createExampleLocationPopupHtml,
+	createFetchRequestInitOptions,
+	createMarkerLatLon,
+	createPrepareRasterPostHttpPayload,
+	EXAMPLE_PREPARE_RASTER_POST_PAYLOAD,
+	getCurrentLocationEscaped,
+	getLocationModalInnerHTML,
+	INTERNAL_URLS_TEMPORARY,
+	prepareRaster,
+};
+
+console.log('prepareRaster', prepareRaster2);
+window.prepareRaster = prepareRaster2;
+
+/*
+var attempt = fetch('https://dataclimatedata.crim.ca/raster?url=aHR0cHM6Ly91YXQuY2xpbWF0ZWRhdGEuY2EvbWFwcy8%2FdmFyPWFsbG93YW5jZSZ0aD1hbGxvd2FuY2UmZGF0YXNldD0yMTkmZGF0YU9wYWNpdHk9MTAwJmxhYmVsT3BhY2l0eT0xMDAmbGF0PTU2Ljk1MDk3JmxuZz0tNzUuNDU0MTAmem9vbT03fDExNTUwNzI0ODQ%3D',
+    { method: "POST",
+	  headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({locationPopupHtml: ["Allo"],
+         markerLatLon: [56.94797, -75.45410]})
+})
+*/
+

@@ -7,6 +7,7 @@ import {
 	S2DFrequencyTypes,
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
+import { GridTypes } from '@/lib/grid-resolution';
 
 import mapPinIcon from '@/assets/map-pin.svg';
 
@@ -112,7 +113,7 @@ export const DATASETS: Record<
 			},
 		],
 		layer_prefix: '',
-		grid: 'canadagrid',
+		grid: GridTypes.CANADAGRID,
 		model_lists: [
 			{ name: 'pcic12', label: 'PCIC12 (Ensemble)' },
 			{ name: '24models', label: 'All models' },
@@ -146,7 +147,7 @@ export const DATASETS: Record<
 			},
 		],
 		layer_prefix: 'cmip6-',
-		grid: 'canadagrid',
+		grid: GridTypes.CANADAGRID,
 		model_lists: [{ name: '26models', label: 'All models' }],
 	},
 };

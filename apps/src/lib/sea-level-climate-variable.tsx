@@ -2,10 +2,11 @@ import MarineClimateVariable from '@/lib/marine-climate-variable';
 import { ColourType, DateRangeConfig, LocationModalContentParams } from '@/types/climate-variable-interface';
 import MedianOnlyVariableValues from '@/components/map-layers/median-only-variable-values';
 import { WMSParams } from '@/types/types';
+import { GridTypes } from '@/lib/grid-resolution';
 
 class SeaLevelClimateVariable extends MarineClimateVariable {
 	getGridType(): string | null {
-		return (this.getVersion() === "cmip6") ? "slrgrid-cmip6" : "slrgrid";
+		return (this.getVersion() === "cmip6") ? GridTypes.SLRGRID_CMIP6 : GridTypes.SLRGRID;
 	}
 
 	getDateRangeConfig(): DateRangeConfig | null {

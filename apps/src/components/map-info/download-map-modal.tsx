@@ -8,9 +8,10 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { __, LocaleContext } from '@/context/locale-provider';
 import { Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { encodeURL, prepareRaster } from '@/lib/utils';
+import { encodeURL } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setRasterMode, setLegendOpen } from '@/features/map/map-slice';
+import { type PrepareRasterPostHttpPayload, prepareRaster } from '@/lib/prepare-raster';
 
 // components
 import Modal from '@/components/ui/modal';
@@ -30,7 +31,7 @@ declare global {
 	interface Window {
 		$?: {
 			fn?: {
-				prepare_raster?: () => void;
+				prepare_raster?: (payload?: PrepareRasterPostHttpPayload) => void;
 			};
 		};
 		URL_ENCODER_SALT: string;
@@ -90,10 +91,10 @@ const DownloadMapModal: React.FC<{
 		 * addition on the service's side — it still evaluates the same expression
 		 * it always has. The name is a fake-jQuery shim; this app has no jQuery.
 		 */
-		window.$.fn.prepare_raster = () => {
+		window.$.fn.prepare_raster = (payload?: PrepareRasterPostHttpPayload) => {
 			dispatch(setLegendOpen(true));
 			dispatch(setRasterMode(true));
-			prepareRaster();
+			prepareRaster(payload);
 		};
 
 		return () => {

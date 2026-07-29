@@ -1,4 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, {
+	useEffect,
+	useMemo,
+	useRef,
+} from 'react';
+import { nanoid } from 'nanoid';
 import { X } from 'lucide-react';
 import L from 'leaflet';
 import { cn } from '@/lib/utils';
@@ -20,6 +25,11 @@ interface LocationModalProps {
 const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {
 		const internalRef = useRef<HTMLDivElement>(null);
+
+		const uniqueId = useMemo(() => {
+			const suffix = nanoid(5);
+			return 'location-modal-' + suffix;
+		}, []);
 
 		// Prevent Leaflet from capturing mouse events, to allow the user
 		// to scroll inside the modal, and select the text
@@ -44,6 +54,7 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 			className
 		);
 
+
 		return (
 			<div
 				ref={(node) => {
@@ -61,6 +72,7 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 				aria-modal="true"
 				aria-labelledby="modal-title" // Links to the title for accessibility
 				aria-describedby="modal-description" // Links to the description for accessibility
+				id={uniqueId}
 				{...props}
 			>
 				<button

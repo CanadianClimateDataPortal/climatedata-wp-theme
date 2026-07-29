@@ -12,7 +12,10 @@ import { useLocale } from '@/hooks/use-locale';
 import { setCenter, setZoom } from '@/features/download/download-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, GEOSERVER_BASE_URL } from '@/lib/constants';
-import { GRID_RESOLUTIONS_VALUES } from '@/lib/grid-resolution';
+import {
+	GRID_RESOLUTIONS_VALUES,
+	GridTypes,
+} from '@/lib/grid-resolution';
 
 /**
  * Component that allows to select a rectangle on the map and calculate the number of cells selected.
@@ -38,7 +41,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 	);
 
 	// Grid configuration for visual reference
-	const gridName = climateVariable?.getGridType() ?? 'canadagrid';
+	const gridName = climateVariable?.getGridType() ?? GridTypes.CANADAGRID;
 	const tileLayerUrl = `${GEOSERVER_BASE_URL}/geoserver/gwc/service/tms/1.0.0/CDC:${gridName}@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf`;
 
 	const tileLayerStyles = useMemo(
@@ -62,7 +65,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 
 	const getSelectedShapeData = useCallback(
 		(layer: L.Layer) => {
-			const varGrid = climateVariable?.getGridType() ?? 'canadagrid';
+			const varGrid = climateVariable?.getGridType() ?? GridTypes.CANADAGRID;
 			const geojson = (layer as L.Polygon).toGeoJSON() as GeoJSON.Feature;
 
 			// these coordinates are an array of linear rings.. the first element at

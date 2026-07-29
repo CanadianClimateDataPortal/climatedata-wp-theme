@@ -22,6 +22,7 @@ import {
 	normalizeForApiFrequencyName,
 	normalizeForApiVariableId,
 } from '@/lib/s2d';
+import { GridTypes } from '@/lib/grid-resolution';
 
 /**
  * Payload descriptor for S2D (Seasonal To Decadal) data download requests.
@@ -96,7 +97,7 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 	}
 
 	getGridType(): string | null {
-		return 'canadagrid';
+		return GridTypes.CANADAGRID;
 	}
 
 	hasDelta(): boolean | undefined {

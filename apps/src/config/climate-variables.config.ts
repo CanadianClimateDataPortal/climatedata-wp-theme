@@ -10,6 +10,7 @@ import {
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
 import { MapDisplayType } from '@/types/types';
+import { GridTypes } from '@/lib/grid-resolution';
 
 export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Test variable */
@@ -54,7 +55,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.NONE,
 		},
 		frequency: "ann",
-		gridType: "canadagrid",
+		gridType: GridTypes.CANADAGRID,
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS
@@ -404,7 +405,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		finch: "hxmax_days_above",
 		versions: [ "cmip6" ],
-		gridType: "era5landgrid",
+		gridType: GridTypes.ERA5LANDGRID,
 		scenarios: {
 			cmip6: [
 				"ssp126",
@@ -613,7 +614,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		hasDelta: false,
 		enableColourOptions: false,
-		gridType: "canadagrid1deg",
+		gridType: GridTypes.CANADAGRID_1DEG,
 	},
 	/** Standardized precipitation evapotranspiration index (3-months) */
 	{
@@ -640,7 +641,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		hasDelta: false,
 		enableColourOptions: false,
-		gridType: "canadagrid1deg",
+		gridType: GridTypes.CANADAGRID_1DEG,
 	},
 	/** Total Precipitation */
 	{
@@ -1885,7 +1886,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			interval: 10
 		},
 		unit: "cm",
-		gridType: "allowancegrid",
+		gridType: GridTypes.ALLOWANCEGRID,
 		downloadType: DownloadType.PRECALCULATED,
 	},
 	/** MSC Climate Normals 1981-2010 */

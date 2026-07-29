@@ -23,6 +23,7 @@ import {
 	type PostDownloadToBlobObjectURLPayload,
 	postDownloadToBlobObjectURL,
 } from '@/services/download';
+import { GridTypes } from '@/lib/grid-resolution';
 
 interface DownloadPayloadProps extends PostDownloadToBlobObjectURLPayload {
 	dataset_name: string | null;
@@ -120,9 +121,9 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		} else {
 			// Fallback based on the version.
 			if (this.getVersion() === "cmip6") {
-				return 'canadagrid-m6';
+				return GridTypes.CANADAGRID_M6;
 			} else {
-				return 'canadagrid';
+				return GridTypes.CANADAGRID;
 			}
 		}
 	}

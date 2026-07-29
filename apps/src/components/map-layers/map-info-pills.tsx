@@ -38,8 +38,6 @@ const MapInfoPills = (
 
 	const gridResolutionLabel = getGridTypeLabel(gridTypeOf);
 
-	console.log('MapInfoPills', { gridType: gridTypeOf,  gridResolutionLabel })
-
 	return (
 		<>
 			{/* Title pill — top-centre (export-only) */}

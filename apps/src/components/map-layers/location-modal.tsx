@@ -6,6 +6,7 @@ import React, {
 import { nanoid } from 'nanoid';
 import { X } from 'lucide-react';
 import L from 'leaflet';
+import { LOCATION_MODAL_BASE_CLASS_NAMES } from '@/lib/location-modal-class-names';
 import { cn } from '@/lib/utils';
 import { __ } from '@/context/locale-provider';
 
@@ -45,11 +46,7 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 
 		// classNames for the top-level element of this component.
 		const topElementClassNames = cn(
-			'location-modal',
-			'font-sans',
-			'bg-white rounded-lg shadow-lg',
-			'flex flex-col',
-			'gap-6 p-6',
+			...LOCATION_MODAL_BASE_CLASS_NAMES,
 			// External overrides from className prop
 			className
 		);

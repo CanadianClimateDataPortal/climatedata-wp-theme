@@ -42,6 +42,7 @@ import {
 	GEOSERVER_BASE_URL,
 	SIDEBAR_WIDTH,
 } from '@/lib/constants';
+import { LOCATION_MODAL_POSITION_CLASS_NAMES } from '@/lib/location-modal-class-names';
 import { LocationModalContent } from '@/components/map-layers/location-modal-content';
 import { SelectedLocationInfo, Station } from '@/types/types';
 import { InteractiveRegionOption } from '@/types/climate-variable-interface';
@@ -119,18 +120,7 @@ const MapContainer = (
 		classNameForOutermostElement.push(props.className);
 	}
 
-	const classNameForLocationModal = cn(
-		'absolute z-50',
-		'max-w-md w-full',
-		'top-1/2 -translate-y-1/2',
-		'left-1/2 -translate-x-1/2',
-		'max-h-[calc(100%-10rem)]',
-		// Medium screens and up: position from top left
-		'md:z-30',
-		'md:top-[10rem] md:translate-y-0',
-		'md:left-16 md:translate-x-0',
-		'md:max-h-[calc(100%-12rem)]',
-	);
+	const classNameForLocationModal = cn(...LOCATION_MODAL_POSITION_CLASS_NAMES);
 
 	const handleLocationModalOpen = (content: React.ReactNode) => {
 		setLocationModalContent(content);

@@ -17,6 +17,7 @@ import {
 	createPrepareRasterPostHttpPayload,
 	prepareRaster,
 	type PrepareRasterPostHttpPayload,
+	type Prepare_Raster,
 } from '@/lib/prepare-raster';
 import { useMap } from '@/hooks/use-map';
 import { useMapMarker } from '@/hooks/use-map-marker';
@@ -38,7 +39,7 @@ declare global {
 	interface Window {
 		$?: {
 			fn?: {
-				prepare_raster?: (payload?: PrepareRasterPostHttpPayload) => void;
+				prepare_raster?: Prepare_Raster;
 			};
 		};
 		URL_ENCODER_SALT: string;
@@ -108,13 +109,24 @@ const DownloadMapModal: React.FC<{
 		 * addition on the service's side — it still evaluates the same expression
 		 * it always has. The name is a fake-jQuery shim; this app has no jQuery.
 		 */
-		window.$.fn.prepare_raster = (payload?: PrepareRasterPostHttpPayload) => {
+		const prepare_raster: Prepare_Raster = (
+			locationPopupHtml,
+			markerLatLon,
+		) => {
 			flushSync(() => {
 				dispatch(setLegendOpen(true));
 				dispatch(setRasterMode(true));
 			});
+			let payload = undefined;
+			if (locationPopupHtml && markerLatLon) {
+				payload = {
+				 	locationPopupHtml,
+					markerLatLon,
+				}
+			}
 			prepareRaster(payload, { map, comparisonMap, addMarker, clearMarkers });
-		};
+		}
+		window.$.fn.prepare_raster = prepare_raster;
 
 		return () => {
 			// Clean up if needed
@@ -157,9 +169,11 @@ const DownloadMapModal: React.FC<{
 			? [selectedLocation.lat, selectedLocation.lng]
 			: null;
 		const payload = createPrepareRasterPostHttpPayload(markerLatLon);
+		const fetchInit = createFetchRequestInitOptions(payload);
 
+		window.PrepareRasterPostHttpPayload = payload; // DEBUG SYMBOL to capture and try in browser devtools
 		try {
-			const response = await fetch(api_url, createFetchRequestInitOptions(payload));
+			const response = await fetch(api_url, fetchInit);
 			if (!response.ok) {
 				throw new Error(`Map image request failed with status ${response.status}`);
 			}

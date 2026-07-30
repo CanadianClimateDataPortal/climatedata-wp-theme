@@ -1,23 +1,11 @@
 import L from 'leaflet';
 
 import { useMapMarker } from '@/hooks/use-map-marker';
+import { dispatchMapClick } from '@/lib/dispatch-map-click';
 
 // To avoid circular dependency, and having to update elsewhere when/if these types change.
 type AddMarker = ReturnType<typeof useMapMarker>['addMarker'];
 type ClearMarkers = ReturnType<typeof useMapMarker>['clearMarkers'];
-
-/**
- * Make an image out of the current map view and prepare it for download.
- *
- * Formerly known as `$.fn.prepare_raster` outside of `apps/`.
- */
-export interface PrepareRasterPostHttpPayload {
-	/**
-	 * The innerHTML of all LocationModal element(s)
-	 */
-	locationPopupHtml: [string, string?];
-	markerLatLon: [number, number];
-}
 
 /**
  * The map handles `prepareRaster` needs to replay a popup and marker that
@@ -47,7 +35,40 @@ export interface PrepareRasterMapHandles {
 	clearMarkers: ClearMarkers;
 }
 
+/**
+ * Make an image out of the current map view and prepare it for download.
+ *
+ * Formerly known as `$.fn.prepare_raster` outside of `apps/`.
+ */
+export interface PrepareRasterPostHttpPayload {
+	/**
+	 * The innerHTML of all LocationModal element(s)
+	 */
+	locationPopupHtml: [string, string?];
+	/**
+	 * The clicked location, read by the caller from {@link selectSelectedLocation}
+	 * or `null` when nothing is selected.
+	 *
+	 * Comes from Redux rather than the URL because the URL only carries the viewport centre,
+	 * not the clicked point.
+	 */
+	markerLatLon: [number, number];
+}
 
+/**
+ * The function we attach to `window.$.fn.prepare_raster` that is called by the server-side
+ * screenshot service (`climatedata-api`, `climatedata_api/raster.py`) in a headless browser
+ * to prepare the map page for a screenshot.
+ */
+export type Prepare_Raster = (
+	locationPopupHtml?: PrepareRasterPostHttpPayload['locationPopupHtml'],
+	markerLatLon?: PrepareRasterPostHttpPayload['markerLatLon'],
+) => void;
+
+export type PrepareRaster = (
+	payload?: PrepareRasterPostHttpPayload,
+	handles?: PrepareRasterMapHandles,
+) => Promise<void>;
 
 /**
  * This function is called JUST before sending as a POST request to the server-side screenshot service
@@ -63,13 +84,7 @@ export const getLocationModalInnerHTML = (): null | [string, string?] => {
 		return null;
 	}
 
-	const [left, right] = [...locationModal].map((child) => {
-		const foo = child.innerHTML;
-		// TODO: Document Fragment
-		// [...child.querySelectorAll('[data-raster]')].map(i => { i.remove(); return i; })
-		// do things in HTML here, or not.
-		return foo;
-	});
+	const [left, right] = [...locationModal].map((child) => child.innerHTML);
 
 	const outcome = [left];
 	if (right) {
@@ -129,22 +144,50 @@ export const getLocationModalInnerHTML = (): null | [string, string?] => {
  *
  * This is live production behaviour, not scaffolding.
  */
-export const prepareRaster = async (
-	payload?: PrepareRasterPostHttpPayload,
-	handles?: PrepareRasterMapHandles,
+export const prepareRaster: PrepareRaster = async (
+	payload,
+	handles,
 ): Promise<void> => {
-	await new Promise(resolve => {
-		// This is a no-op, but it is here to illustrate the async nature of this function.
-		resolve(null);
-	});
+	// Making sure the map has finished moving and loading what it has to load.
+	await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+	if (handles) {
+		const map = handles?.map as L.Map;
+		await dispatchMapClick(map);
+		await Promise.race([
+			new Promise<void>((resolve) => map.once('moveend', () => resolve())),
+			new Promise<void>((resolve) => setTimeout(resolve, 1_000)),
+		]);
+		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+	}
 
 	await new Promise(resolve => {
 		const { locationPopupHtml, markerLatLon } = payload || {};
 
-		// Re-create the popup(s) the sending browser had open. Index 0 is the
-		// left/main pane, index 1 (present only in compare mode) is the
-		// right/compare pane — the same indexing `getLocationModalInnerHTML`
-		// captures them in.
+		// `Number.isFinite` rather than `> 0`: every Canadian longitude is
+		// negative, so a `> 0` check silently dropped every real marker. The
+		// `[NaN, NaN]` fallback (rather than `[0, 0]`) keeps a missing
+		// `markerLatLon` from being read as a real position at 0,0.
+		const [markerLat, markerLon] = markerLatLon || [NaN, NaN];
+		if (Number.isFinite(markerLat) && Number.isFinite(markerLon)) {
+			// Placing the marker directly, instead of dispatching
+			// `setSelectedLocation`, is deliberate: that dispatch mounts the
+			// real `LocationModal` and fires its location-lookup fetch
+			// chain, which would fight the popup HTML just injected above.
+			handles?.clearMarkers();
+			handles?.addMarker(new L.LatLng(markerLat, markerLon), '');
+		}
+
+		const containers = document.querySelectorAll('[id^="location-modal-"]');
+		(locationPopupHtml || []).forEach((innerHtml, index) => {
+			const container = containers[index];
+			if (container && innerHtml) {
+				container.innerHTML = innerHtml;
+			}
+		});
+
+		/*
+		// Re-create the popup(s) the sending browser had open.
 		const containers = [handles?.map?.getContainer(), handles?.comparisonMap?.getContainer()];
 		(locationPopupHtml || []).forEach((innerHtml, index) => {
 			const container = containers[index];
@@ -160,23 +203,10 @@ export const prepareRaster = async (
 			// either one's classes change.
 			container.insertAdjacentHTML(
 				'beforeend',
-				`<div class="location-modal font-sans bg-white rounded-lg shadow-lg flex flex-col gap-6 p-6 absolute z-50 max-w-md w-full top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 max-h-[calc(100%-10rem)] md:z-30 md:top-[10rem] md:translate-y-0 md:left-16 md:translate-x-0 md:max-h-[calc(100%-12rem)]">${innerHtml}</div>`,
+				`<div class="location-modal font-sans bg-white rounded-lg shadow-lg flex flex-col gap-6 p-6 absolute z-50 max-w-md w-full top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 max-h-[calc(100%-10rem)] md:z-30 md:top-[10rem] md:translate-y-0 md:lef  t-16 md:translate-x-0 md:max-h-[calc(100%-12rem)]">${innerHtml}</div>`,
 			);
 		});
-
-		// `Number.isFinite` rather than `> 0`: every Canadian longitude is
-		// negative, so a `> 0` check silently dropped every real marker. The
-		// `[NaN, NaN]` fallback (rather than `[0, 0]`) keeps a missing
-		// `markerLatLon` from being read as a real position at 0,0.
-		const [markerLat, markerLon] = markerLatLon || [NaN, NaN];
-		if (Number.isFinite(markerLat) && Number.isFinite(markerLon)) {
-			// Placing the marker directly, instead of dispatching
-			// `setSelectedLocation`, is deliberate: that dispatch mounts the
-			// real `LocationModal` and fires its location-lookup fetch
-			// chain, which would fight the popup HTML just injected above.
-			handles?.clearMarkers();
-			handles?.addMarker(new L.LatLng(markerLat, markerLon), '');
-		}
+		*/
 
 		resolve(null);
 	});

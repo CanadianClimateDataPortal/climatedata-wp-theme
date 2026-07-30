@@ -202,21 +202,11 @@ export const prepareRaster: PrepareRaster = async (
 	});
 
 	await new Promise(resolve => {
-		document.documentElement.setAttribute('data-raster', 'true');
-
 		// Remove elements that should not appear in the screenshot
 		// Which basically makes the map take up all the available space by removing the surrounding elements.
-		[
-			'map-sidebar',
-			'header',
-			'sidebar-toggle',
-			'header-map',
-		].forEach(id => {
-			const el = document.getElementById(id);
-			if (el) {
-				el.remove();
-			}
-		});
+		document.querySelectorAll('[data-raster="false"]').forEach(el => el.remove());
+
+		document.documentElement.setAttribute('data-raster', 'true');
 
 		// Remove all tooltip elements
 		document.querySelectorAll('.tooltip').forEach(el => el.remove());

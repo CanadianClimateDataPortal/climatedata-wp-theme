@@ -1,7 +1,11 @@
 import L from 'leaflet';
 
 import { useMapMarker } from '@/hooks/use-map-marker';
-import { dispatchMapClick } from '@/lib/dispatch-map-click';
+import {
+	LOCATION_MODAL_BASE_CLASS_NAMES,
+	LOCATION_MODAL_POSITION_CLASS_NAMES,
+} from '@/lib/location-modal-class-names';
+import { cn } from '@/lib/utils';
 
 // To avoid circular dependency, and having to update elsewhere when/if these types change.
 type AddMarker = ReturnType<typeof useMapMarker>['addMarker'];
@@ -151,16 +155,6 @@ export const prepareRaster: PrepareRaster = async (
 	// Making sure the map has finished moving and loading what it has to load.
 	await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
-	if (handles) {
-		const map = handles?.map as L.Map;
-		await dispatchMapClick(map);
-		await Promise.race([
-			new Promise<void>((resolve) => map.once('moveend', () => resolve())),
-			new Promise<void>((resolve) => setTimeout(resolve, 1_000)),
-		]);
-		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-	}
-
 	await new Promise(resolve => {
 		const { locationPopupHtml, markerLatLon } = payload || {};
 
@@ -173,40 +167,26 @@ export const prepareRaster: PrepareRaster = async (
 			// Placing the marker directly, instead of dispatching
 			// `setSelectedLocation`, is deliberate: that dispatch mounts the
 			// real `LocationModal` and fires its location-lookup fetch
-			// chain, which would fight the popup HTML just injected above.
+			// chain, which would fight the popup HTML injected below.
 			handles?.clearMarkers();
 			handles?.addMarker(new L.LatLng(markerLat, markerLon), '');
 		}
 
-		const containers = document.querySelectorAll('[id^="location-modal-"]');
-		(locationPopupHtml || []).forEach((innerHtml, index) => {
-			const container = containers[index];
-			if (container && innerHtml) {
-				container.innerHTML = innerHtml;
-			}
-		});
-
-		/*
-		// Re-create the popup(s) the sending browser had open.
+		// Re-create the popup(s) the sending browser had open, by injecting
+		// straight into the DOM node `<LMapContainer>` renders its React
+		// children into — the same node `LocationModal` itself would mount
+		// into (`map.tsx` / `map-container.tsx`). Index 0 is the left/main
+		// pane, index 1 (present only in compare mode) is the right/compare
+		// pane — the same order `getLocationModalInnerHTML` captured them in.
 		const containers = [handles?.map?.getContainer(), handles?.comparisonMap?.getContainer()];
+		const className = cn(...LOCATION_MODAL_BASE_CLASS_NAMES, ...LOCATION_MODAL_POSITION_CLASS_NAMES);
 		(locationPopupHtml || []).forEach((innerHtml, index) => {
 			const container = containers[index];
 			if (!container || !innerHtml) {
 				return;
 			}
-			// This class list mirrors `location-modal.tsx`'s outer wrapper
-			// (`location-modal font-sans bg-white rounded-lg shadow-lg flex
-			// flex-col gap-6 p-6`) plus `map-container.tsx`'s
-			// `classNameForLocationModal` positioning classes. It is
-			// duplicated here, rather than imported, because both files are
-			// out of this change's scope — keep this string in sync if
-			// either one's classes change.
-			container.insertAdjacentHTML(
-				'beforeend',
-				`<div class="location-modal font-sans bg-white rounded-lg shadow-lg flex flex-col gap-6 p-6 absolute z-50 max-w-md w-full top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 max-h-[calc(100%-10rem)] md:z-30 md:top-[10rem] md:translate-y-0 md:lef  t-16 md:translate-x-0 md:max-h-[calc(100%-12rem)]">${innerHtml}</div>`,
-			);
+			container.insertAdjacentHTML('beforeend', `<div class="${className}">${innerHtml}</div>`);
 		});
-		*/
 
 		resolve(null);
 	});

@@ -5,13 +5,21 @@
  *
  */
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { __, LocaleContext } from '@/context/locale-provider';
 import { Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { encodeURL } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setRasterMode, setLegendOpen } from '@/features/map/map-slice';
-import { type PrepareRasterPostHttpPayload, prepareRaster } from '@/lib/prepare-raster';
+import { selectSelectedLocation, setLegendOpen, setRasterMode } from '@/features/map/map-slice';
+import {
+	createFetchRequestInitOptions,
+	createPrepareRasterPostHttpPayload,
+	prepareRaster,
+	type PrepareRasterPostHttpPayload,
+} from '@/lib/prepare-raster';
+import { useMap } from '@/hooks/use-map';
+import { useMapMarker } from '@/hooks/use-map-marker';
 
 // components
 import Modal from '@/components/ui/modal';
@@ -50,6 +58,12 @@ const DownloadMapModal: React.FC<{
 	const dispatch = useAppDispatch();
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
+	const selectedLocation = useAppSelector(selectSelectedLocation);
+
+	// Map handles `prepareRaster` needs to replay a popup and marker on the
+	// screenshot service's browser, which has clicked nothing itself.
+	const { map, comparisonMap } = useMap();
+	const { addMarker, clearMarkers } = useMapMarker();
 
 	// Get Salt and Data URL to download Image Map from Server API.
 	const salt: string = window.URL_ENCODER_SALT;
@@ -66,21 +80,25 @@ const DownloadMapModal: React.FC<{
 		 * this page it is about to be photographed.
 		 *
 		 * It is a closure rather than a bare reference to `prepareRaster` because
-		 * entering raster mode is now two things:
+		 * entering raster mode is two things:
 		 *
-		 * 1. Flip the app into raster mode, so React can render the page as the
+		 * 1. Flip the app into raster mode, so React renders the page as the
 		 *    exported image. This is a *set*, never a toggle, so it is safe if
 		 *    raster mode is already on (a developer previewing with `?raster=1`).
-		 * 2. Run `prepareRaster`, the existing imperative pass that strips chrome
-		 *    and fires a `resize` so the map re-lays out.
+		 * 2. Run `prepareRaster`, the imperative pass that injects the replayed
+		 *    popup/marker, strips chrome, and fires a `resize` so the map
+		 *    re-lays out.
 		 *
-		 * **The two are NOT sequential, despite reading that way.** `dispatch` only
-		 * schedules a re-render; React commits it after this function has already
-		 * returned. So `prepareRaster` — including its `resize` — runs first, and
-		 * the raster-mode commit lands afterwards. Today that is harmless, because
-		 * nothing renders differently under the flag yet. It stops being harmless
-		 * as soon as something does: see the ordering note on the `data-raster`
-		 * carrier in `App.tsx`, which has to be resolved then, not here.
+		 * The two are forced to be sequential with `flushSync`. A plain
+		 * `dispatch` only schedules a re-render — React commits it after this
+		 * function has already returned — so without it, `prepareRaster` could
+		 * run against a DOM that has not yet picked up raster mode, and a later
+		 * commit could land on top of nodes `prepareRaster` has already
+		 * injected or removed. `flushSync` forces React to commit the
+		 * raster-mode state (and anything gated on it, e.g. the `data-raster`
+		 * carrier on `SidebarProvider` in `App.tsx`) synchronously, so
+		 * `prepareRaster` only ever runs against a DOM that has already
+		 * settled into raster mode. (CLIM-1454.)
 		 *
 		 * How long the service waits after this returns is defined by the
 		 * screenshot service, which lives in another repository. Do not assume a
@@ -91,9 +109,11 @@ const DownloadMapModal: React.FC<{
 		 * it always has. The name is a fake-jQuery shim; this app has no jQuery.
 		 */
 		window.$.fn.prepare_raster = (payload?: PrepareRasterPostHttpPayload) => {
-			dispatch(setLegendOpen(true));
-			dispatch(setRasterMode(true));
-			prepareRaster(payload);
+			flushSync(() => {
+				dispatch(setLegendOpen(true));
+				dispatch(setRasterMode(true));
+			});
+			prepareRaster(payload, { map, comparisonMap, addMarker, clearMarkers });
 		};
 
 		return () => {
@@ -102,13 +122,22 @@ const DownloadMapModal: React.FC<{
 				delete window.$.fn.prepare_raster;
 			}
 		};
-	}, [dispatch]);
+	}, [
+		addMarker,
+		clearMarkers,
+		comparisonMap,
+		dispatch,
+		map,
+	]);
 
 	/**
-	 * Handles the click event for the "Download" link.
-	 * Fetches the image from the provided downloadUrl as a Blob and triggers a file download in the browser.
-	 * Sets a loading state while the request is in progress.
-	 * Includes an artificial delay for demonstration/testing purposes.
+	 * Handles the click event for the "Download" button.
+	 *
+	 * POSTs to the screenshot service with this browser's own currently-open
+	 * popup and selected location (see `createPrepareRasterPostHttpPayload`),
+	 * receives the rendered PNG as the response body, and triggers a normal
+	 * file download through an object URL — no `window.open`, no message
+	 * passing between windows.
 	 */
 	const handleDownloadClick = async () => {
 		const mapUrl = new URL(window.location.href);
@@ -123,33 +152,32 @@ const DownloadMapModal: React.FC<{
 		}
 
 		setIsGenerating(true);
-		/**
-		 * We need to pass more data, e.g. {@see exampleMoreData}
-		 * Either we use:
-		 * - `window.open` and pass messages between realms
-		 * - HTTP POST and handle attachment
-		 *
-		 * ```http
-		 * POST /raster?url=0000000000000000000-base64encodedUrl-000000000000000000000000
-		 * content-Type: application/json
-		 *
-		 * {"locationPopupHtml": [], "markerLatLon": [] }
-		 *
-		 *
-		 * HTTP/1.1 200 OK
-		 * Content-Type: application/pdf
-		 * Content-Disposition: attachment; filename="report.pdf"
-		 * Content-Length: 1048576
-		 *
-		 * [Binary PDF Data Goes Here]
-		 * ```
-		 */
-		// Currently.... it is only window.open
-		const otherWindowRealm = window.open(api_url, '_blank'); // TODO: Figure out how to control this otherWindowRealm and emulate a <form method="POST" /> submit.
-		window.otherWindowRealm = otherWindowRealm;
 
+		const markerLatLon: PrepareRasterPostHttpPayload['markerLatLon'] | null = selectedLocation
+			? [selectedLocation.lat, selectedLocation.lng]
+			: null;
+		const payload = createPrepareRasterPostHttpPayload(markerLatLon);
 
-		setIsGenerating(false);
+		try {
+			const response = await fetch(api_url, createFetchRequestInitOptions(payload));
+			if (!response.ok) {
+				throw new Error(`Map image request failed with status ${response.status}`);
+			}
+
+			const blob = await response.blob();
+			const objectUrl = URL.createObjectURL(blob);
+			const anchor = document.createElement('a');
+			anchor.href = objectUrl;
+			anchor.download = '';
+			document.body.appendChild(anchor);
+			anchor.click();
+			anchor.remove();
+			URL.revokeObjectURL(objectUrl);
+		} catch (error) {
+			console.error('Failed to download map image:', error);
+		} finally {
+			setIsGenerating(false);
+		}
 	};
 
 	// Generate download section URL with dataset and variable parameters
@@ -162,13 +190,6 @@ const DownloadMapModal: React.FC<{
 
 		return `${downloadBaseUrl}?dataset=${encodeURIComponent(dataset.term_id.toString())}&var=${encodeURIComponent(climateVariableData.id)}`;
 	}, [dataset, climateVariableData, currentLocale]);
-
-	const downloadMapModal = {
-		getDownloadUrl,
-		handleDownloadClick,
-	};
-	window.downloadMapModal = downloadMapModal;
-	console.log('downloadMapModal', downloadMapModal);
 
 	const buttonText = useMemo(() => {
 		if (isGenerating) {

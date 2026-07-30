@@ -1,14 +1,10 @@
 /**
  * Shared Tailwind class-name lists for the LocationModal's outer element.
  *
- * `prepare-raster.ts` hand-builds a LocationModal look-alike `<div>` outside
- * React, to replay the popup the sending browser had open when the
- * screenshot service captures the map. Hoisting these lists here, instead of
- * duplicating them as a string literal, is what keeps that hand-built
- * element in sync with the live component: a duplicated literal previously
- * drifted (`md:left-16` typo'd into two junk classes), silently repositioning
- * the raster replay to the horizontal centre of the map instead of the
- * intended top-left corner.
+ * Instead of duplicating the class-name lists from the typical LocationModal
+ * and the new `prepare-raster.ts` to mimick a click when it is attempted
+ * to be reproduced from `/raster?url=` Python+Selenium service to make
+ * map screenshots.
  */
 
 /**
@@ -25,9 +21,9 @@ export const LOCATION_MODAL_BASE_CLASS_NAMES = [
 
 /**
  * Fixed corner placement inside `.leaflet-container` (Leaflet forces
- * `position: relative` on it). Not anchored to the clicked lat/lng — the
- * modal never moves to the marker. Consumed by `MapContainer`
- * (`components/map-container.tsx`)'s `classNameForLocationModal`.
+ * `position: relative` on it).
+ *  Not anchored to the clicked lat/lng — the modal doesn't move
+ * to the marker.
  */
 export const LOCATION_MODAL_POSITION_CLASS_NAMES = [
 	'absolute z-50',

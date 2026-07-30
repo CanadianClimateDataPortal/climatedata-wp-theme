@@ -1,3 +1,15 @@
+/**
+ * This file is responsible for handling how to reproduce a map state when we pass its state
+ * to `/raster?url=<base64 encoded URL of the current map>` to a server-side screenshot service
+ * that's managing a "headless" browser to prepare the map page for a screenshot.
+ *
+ * (Using Python and Selenium, see `climatedata-api`, `climatedata_api/raster.py`)
+ *
+ * The process to make a screenshot is:
+ * 1. Positions the map to the desired state, with the desired dataset, climate variable, and configuration, including clicking on a point on the map and we can see the location popup. The information may be very different from one click to another, and may have had tried many places. That can include comparing two scenarios where we see a map split in two with the same location modal with different values.
+ * 2. Click the "Download" button above the map, in the modal warning "Download image from viewport" saying it is only an image download (and not the data), with note "Your export will showcase your various data options. The map position will be the one you see on your screen." and had clicked "Download".
+ * 3. The browser sends a POST request to the server-side screenshot service packaging the exact URL he was on, but also a copy of the contents inside the LocationModal and the lat,lon coordinates that was clicked so the server-side car load the same URL which will also tell the zoom level and area to be loaded, and where we can pass back the contents we had captured of the LocationModal and set back LocationModal with the contents along with the marker. The server-side service returns with an image.
+ */
 import L from 'leaflet';
 
 import { useMapMarker } from '@/hooks/use-map-marker';
@@ -75,12 +87,9 @@ export type PrepareRaster = (
 ) => Promise<void>;
 
 /**
- * This function is called JUST before sending as a POST request to the server-side screenshot service
- * so it can pass that back at `$.fn.prepare_raster` {@link prepareRaster} to prepare the map page for a screenshot. It removes interactive UI elements and tooltips, and dispatches a `resize` event so the map re-lays out at the new size.
- *
- * @remarks
- * This function is designed to be from the web browser used by the person who wants
- * to download a screenshot.
+ * This function is called JUST before sending as a POST request to the server-side screenshot
+ * service so it can pass that back at `$.fn.prepare_raster` {@link prepareRaster}
+ * to prepare the map page for a screenshot.
  */
 export const getLocationModalInnerHTML = (): null | [string, string?] => {
 	const locationModal = document.querySelectorAll('[id^="location-modal-"]');
@@ -88,6 +97,7 @@ export const getLocationModalInnerHTML = (): null | [string, string?] => {
 		return null;
 	}
 
+	// We may have two maps side-by side
 	const [left, right] = [...locationModal].map((child) => child.innerHTML);
 
 	const outcome = [left];

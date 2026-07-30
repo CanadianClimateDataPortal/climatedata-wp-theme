@@ -1,24 +1,50 @@
 import L from 'leaflet';
 
-import {
-	createExampleLocationPopupHtml,
-	EXAMPLE_PREPARE_RASTER_POST_PAYLOAD,
-} from '@/lib/prepare-raster.examples';
+import { useMapMarker } from '@/hooks/use-map-marker';
 
-
+// To avoid circular dependency, and having to update elsewhere when/if these types change.
+type AddMarker = ReturnType<typeof useMapMarker>['addMarker'];
+type ClearMarkers = ReturnType<typeof useMapMarker>['clearMarkers'];
 
 /**
  * Make an image out of the current map view and prepare it for download.
  *
  * Formerly known as `$.fn.prepare_raster` outside of `apps/`.
  */
-
 export interface PrepareRasterPostHttpPayload {
 	/**
 	 * The innerHTML of all LocationModal element(s)
 	 */
 	locationPopupHtml: [string, string?];
 	markerLatLon: [number, number];
+}
+
+/**
+ * The map handles `prepareRaster` needs to replay a popup and marker that
+ * only exist in the browser that sent the POST request. The screenshot
+ * service's browser has clicked nothing, so there is no real
+ * `LocationModal` DOM or marker for it to strip in the first place — this
+ * is what lets `prepareRaster` build one before stripping chrome.
+ *
+ * Supplied by `download-map-modal.tsx`, the only caller, via `useMap()` and
+ * `useMapMarker()` — `prepareRaster` is a plain module-level function with
+ * no React context of its own.
+ */
+export interface PrepareRasterMapHandles {
+	/** The primary map instance; `null` until Leaflet has mounted it. */
+	map: L.Map | null;
+	/** The comparison-pane map instance; `null` outside compare mode. */
+	comparisonMap: L.Map | null;
+	/**
+	 * Places a marker on every mounted pane. Mirrors the click handling in `use-map-interactions.tsx`.
+	 * @see {@link useMapMarker.addMarker}
+	 */
+	addMarker: AddMarker;
+	/**
+	 * Removes any marker(s) from every mounted pane.
+	 * @see {@link useMapMarker.clearMarkers}
+	 */
+	clearMarkers: ClearMarkers;
 }
 
 
@@ -64,9 +90,12 @@ export const getLocationModalInnerHTML = (): null | [string, string?] => {
  * Modify the DOM of this app's map page to prepare it for a screenshot.
  *
  * This function is designed to be executed by an external script (e.g. via Selenium)
- * before taking a screenshot. It removes the surrounding chrome (sidebar, headers,
- * sidebar toggle, search and zoom controls) along with any tooltips, then dispatches
- * a `resize` event so the map re-lays out at the new size.
+ * before taking a screenshot. It first replays the popup and marker carried in
+ * `payload` (see {@link PrepareRasterMapHandles}) — the screenshot service's browser
+ * has clicked nothing, so without this step there is nothing to capture — then removes
+ * the surrounding chrome (sidebar, headers, sidebar toggle, search and zoom controls)
+ * along with any tooltips, then dispatches a `resize` event so the map re-lays out at
+ * the new size.
  *
  * Opening the legend is deliberately *not* done here — the caller dispatches
  * `setLegendOpen(true)` instead, because Redux owns that state. This function used
@@ -100,38 +129,59 @@ export const getLocationModalInnerHTML = (): null | [string, string?] => {
  *
  * This is live production behaviour, not scaffolding.
  */
-export const prepareRaster = async (payload?: PrepareRasterPostHttpPayload): Promise<void> => {
-	console.log('0 prepareRaster: payload', payload);
+export const prepareRaster = async (
+	payload?: PrepareRasterPostHttpPayload,
+	handles?: PrepareRasterMapHandles,
+): Promise<void> => {
 	await new Promise(resolve => {
-		console.log('0a prepareRaster: Promise 0');
 		// This is a no-op, but it is here to illustrate the async nature of this function.
 		resolve(null);
 	});
 
-	let marker: ReturnType<typeof L.marker> | null = null;
-
 	await new Promise(resolve => {
-		console.log('1 prepareRaster: Promise 0');
-		const {
-			// locationPopupHtml,
-			markerLatLon,
-		} = payload || {};
-		const [
-			markerLat,
-			markerLon,
-		] = markerLatLon || [0, 0];
+		const { locationPopupHtml, markerLatLon } = payload || {};
 
-		if (markerLat > 0 && markerLon > 0) {
-			const latlng = new L.LatLng(markerLat, markerLon);
-			marker = L.marker(latlng);
+		// Re-create the popup(s) the sending browser had open. Index 0 is the
+		// left/main pane, index 1 (present only in compare mode) is the
+		// right/compare pane — the same indexing `getLocationModalInnerHTML`
+		// captures them in.
+		const containers = [handles?.map?.getContainer(), handles?.comparisonMap?.getContainer()];
+		(locationPopupHtml || []).forEach((innerHtml, index) => {
+			const container = containers[index];
+			if (!container || !innerHtml) {
+				return;
+			}
+			// This class list mirrors `location-modal.tsx`'s outer wrapper
+			// (`location-modal font-sans bg-white rounded-lg shadow-lg flex
+			// flex-col gap-6 p-6`) plus `map-container.tsx`'s
+			// `classNameForLocationModal` positioning classes. It is
+			// duplicated here, rather than imported, because both files are
+			// out of this change's scope — keep this string in sync if
+			// either one's classes change.
+			container.insertAdjacentHTML(
+				'beforeend',
+				`<div class="location-modal font-sans bg-white rounded-lg shadow-lg flex flex-col gap-6 p-6 absolute z-50 max-w-md w-full top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 max-h-[calc(100%-10rem)] md:z-30 md:top-[10rem] md:translate-y-0 md:left-16 md:translate-x-0 md:max-h-[calc(100%-12rem)]">${innerHtml}</div>`,
+			);
+		});
+
+		// `Number.isFinite` rather than `> 0`: every Canadian longitude is
+		// negative, so a `> 0` check silently dropped every real marker. The
+		// `[NaN, NaN]` fallback (rather than `[0, 0]`) keeps a missing
+		// `markerLatLon` from being read as a real position at 0,0.
+		const [markerLat, markerLon] = markerLatLon || [NaN, NaN];
+		if (Number.isFinite(markerLat) && Number.isFinite(markerLon)) {
+			// Placing the marker directly, instead of dispatching
+			// `setSelectedLocation`, is deliberate: that dispatch mounts the
+			// real `LocationModal` and fires its location-lookup fetch
+			// chain, which would fight the popup HTML just injected above.
+			handles?.clearMarkers();
+			handles?.addMarker(new L.LatLng(markerLat, markerLon), '');
 		}
+
 		resolve(null);
 	});
 
-	console.log('2 prepareRaster: marker', marker);
-
 	await new Promise(resolve => {
-		console.log('3 prepareRaster: Promise 1');
 		document.documentElement.setAttribute('data-raster', 'true');
 
 		// Remove elements that should not appear in the screenshot
@@ -156,69 +206,46 @@ export const prepareRaster = async (payload?: PrepareRasterPostHttpPayload): Pro
 
 		resolve(null);
 	});
-
-	console.log('3 prepareRaster: done');
 }
 
-// TEMPORARY UTILITIES UNTIL i FIGURE OUT
-
-const createMarkerLatLon = (): PrepareRasterPostHttpPayload['markerLatLon'] => {
-	const url = new URL(window.location.href);
-	const lat = parseFloat(url.searchParams.get('lat') || '0');
-	const lon = parseFloat(url.searchParams.get('lon') || '0');
-
-	return [lat, lon] as [number, number];
-}
-
-const INTERNAL_URLS_TEMPORARY = 'https://dataclimatedata.crim.ca/raster'
-
-const getCurrentLocationEscaped = (): string => {
-	const enc = btoa(window.location.href);
-	return `${INTERNAL_URLS_TEMPORARY}?url=${enc}`;
-}
-
-export const createFetchRequestInitOptions = (payload: PrepareRasterPostHttpPayload) => {
+export const createFetchRequestInitOptions = (payload?: PrepareRasterPostHttpPayload): RequestInit => {
 	const fetchOptions: RequestInit = {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify(payload),
 	};
+	if (payload) {
+		fetchOptions.body = JSON.stringify(payload);
+	}
 	return fetchOptions;
 };
 
-export const createPrepareRasterPostHttpPayload = (latLon?: [number, number]): PrepareRasterPostHttpPayload => {
-	const locationPopupHtml = getLocationModalInnerHTML() || EXAMPLE_PREPARE_RASTER_POST_PAYLOAD.locationPopupHtml;
-	const markerLatLon = latLon ||createMarkerLatLon();
+/**
+ * Builds the outgoing POST payload from the sending browser's own current
+ * state — the person clicking "Download", not the screenshot service.
+ *
+ * Returns `undefined`, never a payload with an empty `locationPopupHtml`,
+ * whenever either half is missing: no popup currently open, or no location
+ * selected. `undefined` becomes an absent request body; the server-side
+ * hook then calls `$.fn.prepare_raster()` argument-less rather than
+ * receiving a partially-empty payload. (CLIM-1454 T2.)
+ *
+ * @param markerLatLon The clicked location, read by the caller from
+ * {@link selectSelectedLocation}, or `null` when nothing is selected. Comes
+ * from Redux rather than the URL because the URL only carries the viewport
+ * centre, not the clicked point.
+ */
+export const createPrepareRasterPostHttpPayload = (
+	markerLatLon: PrepareRasterPostHttpPayload['markerLatLon'] | null,
+): PrepareRasterPostHttpPayload | undefined => {
+	const locationPopupHtml = getLocationModalInnerHTML();
+	if (!locationPopupHtml || !markerLatLon) {
+		return undefined;
+	}
 
 	return {
 		locationPopupHtml,
 		markerLatLon,
 	};
-}
-
-const prepareRaster2 = {
-	createExampleLocationPopupHtml,
-	createFetchRequestInitOptions,
-	createMarkerLatLon,
-	createPrepareRasterPostHttpPayload,
-	EXAMPLE_PREPARE_RASTER_POST_PAYLOAD,
-	getCurrentLocationEscaped,
-	getLocationModalInnerHTML,
-	INTERNAL_URLS_TEMPORARY,
-	prepareRaster,
 };
-
-console.log('prepareRaster', prepareRaster2);
-window.prepareRaster = prepareRaster2;
-
-/*
-var attempt = fetch('https://dataclimatedata.crim.ca/raster?url=aHR0cHM6Ly91YXQuY2xpbWF0ZWRhdGEuY2EvbWFwcy8%2FdmFyPWFsbG93YW5jZSZ0aD1hbGxvd2FuY2UmZGF0YXNldD0yMTkmZGF0YU9wYWNpdHk9MTAwJmxhYmVsT3BhY2l0eT0xMDAmbGF0PTU2Ljk1MDk3JmxuZz0tNzUuNDU0MTAmem9vbT03fDExNTUwNzI0ODQ%3D',
-    { method: "POST",
-	  headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({locationPopupHtml: ["Allo"],
-         markerLatLon: [56.94797, -75.45410]})
-})
-*/
-

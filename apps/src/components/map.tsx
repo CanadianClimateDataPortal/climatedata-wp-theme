@@ -98,7 +98,7 @@ const MapRoot = (
 				clearSelectedLocation={handleClearSelectedLocation}
 				selectGriddedLocation={selectGriddedLocation}
 				layerRef={primaryLayerRef}
-				className={showComparisonMap ? 'map-comparison-left' : undefined}
+				className={showComparisonMap ? 'map-comparison-left' /** See {@link useLeafletSyncContainerClassName} */: undefined}
 			/>
 			{showComparisonMap && (
 				<MapContainer

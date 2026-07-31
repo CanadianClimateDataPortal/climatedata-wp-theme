@@ -1,36 +1,15 @@
 /**
  * Grid Resolution.
  *
- * Grid resolution is **declared, not computed**. The scientists define the grid for each
- * data source; this module only maps a declared grid identity to the label they wrote for
- * it. Nothing here derives a cell size from a variable, a latitude or a bounding box.
- *
- * **The meaningful null**
- *
- * `ClimateVariableBase.getGridType()` returns `this._config.gridType ?? null`, and that
- * `null` carries information: "this variable's config declares no grid type." It is not a
- * missing value to paper over. Four map layers currently do paper over it, each inventing
- * a declaration the model never made:
- * - `interactive-regions-layer.tsx` and `selectable-rectangle-grid-layer.tsx` (twice),
- *   with `?? 'canadagrid'`,
- * - `selectable-cells-grid-layer.tsx`, with `?? GridTypes.CANADAGRID`.
- *
- * Those four build GeoServer tile URLs and are out of scope for this module. When they are
- * fixed, the pattern to copy is `RasterPrecalculatedClimateVariable.getGridType()`: it
- * defaults **inside the class**, where the knowledge lives — config first, then a
- * version-based fallback. `S2dClimateVariable` and `SeaLevelClimateVariable` already
- * declare properly too.
- *
- * This module never applies such a fallback. A grid type that is undeclared, or declared
- * but carrying no label here, resolves to `null` and the caller displays nothing.
- *
- * **Station identification**
+ * Grid resolution is declared per data source, not computed — nothing here derives a
+ * cell size from a variable, a latitude, or a bounding box. `getGridType()` returning
+ * `null` means the source declares no grid type; this module never invents a default for
+ * that case, so a grid type that is undeclared, or declared but carrying no label here,
+ * resolves to `null` and the caller displays nothing.
  *
  * Station data is measured at points, so there is no grid resolution to state for it.
  * Membership is decided by id against the {@link StationVariableIds} registry — see
- * `isStationClimateVariable` below. That registry is the single declared authority for the
- * question; also testing the class name or the interactive mode would be a second
- * mechanism answering it, invisible to a future refactor of the first.
+ * `isStationClimateVariable` below — the single declared authority for that question.
  */
 
 import {
@@ -39,12 +18,10 @@ import {
 } from '@/types/climate-variable-interface';
 
 /**
- * Grid identities
+ * Grid identities.
  *
- * What we typically use to identify the grid type of a climate variable.
- * These are the values that {@see ClimateVariableInterface.getGridType}
- * would return, and what {@see ClimateVariableConfigInterface.gridType}
- * would be set to.
+ * @see {@link ClimateVariableInterface.getGridType}
+ * @see {@link ClimateVariableConfigInterface.gridType}
  */
 export const GridTypes = {
 	CANADAGRID: 'canadagrid',
@@ -126,8 +103,11 @@ export const GRID_RESOLUTIONS_LABELS = {
 		GRID_RESOLUTION_LABEL_DAYS_WITH_HUMIDEX_ABOVE_THRESHOLD,
 	[GridTypes.SLRGRID]: GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS,
 	[GridTypes.SLRGRID_CMIP6]: GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS,
+	/**
+	 * About page "Vertical Allowance … 0.1° (approx. 11 km lat, 4-8 km lon)" — anisotropic,
+	 * unlike the other entries here. WFS-measured. Coastal-only.
+	 */
 	// NET-NEW: absent from gridResolutions (its ?? 0.0833 fallback mis-sizes this as 1/12°).
-	// About page "Vertical Allowance … 0.1° (approx. 11 km lat, 4-8 km lon)" + WFS measure. Coastal-only.
 	[GridTypes.ALLOWANCEGRID]: GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS,
 } as const satisfies Record<GridType, string>;
 

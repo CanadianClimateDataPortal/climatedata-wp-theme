@@ -1,14 +1,21 @@
 /**
- * This file is responsible for handling how to reproduce a map state when we pass its state
- * to `/raster?url=<base64 encoded URL of the current map>` to a server-side screenshot service
- * that's managing a "headless" browser to prepare the map page for a screenshot.
+ * Both halves of a screenshot round trip live in this module, running across two
+ * separate browser sessions — never assume "here" means the same browser throughout.
  *
- * (Using Python and Selenium, see `climatedata-api`, `climatedata_api/raster.py`)
+ * Sender half — the user's browser, on clicking Download:
+ * 1. `getLocationModalInnerHTML` scrapes the open LocationModal's markup.
+ * 2. `createPrepareRasterPostHttpPayload` pairs it with the clicked marker position.
+ * 3. `createFetchRequestInitOptions` wraps that payload as a POST body.
+ * 4. That POST reaches an external screenshot service; dataset, variable, and viewport
+ *    already travel separately, encoded in the request URL.
  *
- * The process to make a screenshot is:
- * 1. Positions the map to the desired state, with the desired dataset, climate variable, and configuration, including clicking on a point on the map and we can see the location popup. The information may be very different from one click to another, and may have had tried many places. That can include comparing two scenarios where we see a map split in two with the same location modal with different values.
- * 2. Click the "Download" button above the map, in the modal warning "Download image from viewport" saying it is only an image download (and not the data), with note "Your export will showcase your various data options. The map position will be the one you see on your screen." and had clicked "Download".
- * 3. The browser sends a POST request to the server-side screenshot service packaging the exact URL he was on, but also a copy of the contents inside the LocationModal and the lat,lon coordinates that was clicked so the server-side car load the same URL which will also tell the zoom level and area to be loaded, and where we can pass back the contents we had captured of the LocationModal and set back LocationModal with the contents along with the marker. The server-side service returns with an image.
+ * Receiver half — the screenshot service's headless browser, on a fresh reload of
+ * that same URL, with no popup open and no marker placed:
+ * 5. The service evaluates the global `$.fn.prepare_raster()` — the reason that literal
+ *    name exists at all — a closure that calls `prepareRaster` below.
+ * 6. `prepareRaster` replays the marker and popup carried in the POST body.
+ * 7. It strips interactive chrome and fires a resize, so the layout matches what the
+ *    user saw, before the screenshot is taken.
  */
 import L from 'leaflet';
 
@@ -51,15 +58,8 @@ export interface PrepareRasterMapHandles {
 	clearMarkers: ClearMarkers;
 }
 
-/**
- * Make an image out of the current map view and prepare it for download.
- *
- * Formerly known as `$.fn.prepare_raster` outside of `apps/`.
- */
+/** The payload POSTed to the external screenshot service before it replays this page. */
 export interface PrepareRasterPostHttpPayload {
-	/**
-	 * The innerHTML of all LocationModal element(s)
-	 */
 	locationPopupHtml: [string, string?];
 	/**
 	 * The clicked location, read by the caller from {@link selectSelectedLocation}
@@ -87,9 +87,11 @@ export type PrepareRaster = (
 ) => Promise<void>;
 
 /**
- * This function is called JUST before sending as a POST request to the server-side screenshot
- * service so it can pass that back at `$.fn.prepare_raster` {@link prepareRaster}
- * to prepare the map page for a screenshot.
+ * Runs in the user's browser.
+ *
+ * Captures the currently open LocationModal's HTML so it can travel in the
+ * outgoing payload — the screenshot service's browser has no popup of its
+ * own to read.
  */
 export const getLocationModalInnerHTML = (): null | [string, string?] => {
 	const locationModal = document.querySelectorAll('[id^="location-modal-"]');
@@ -111,53 +113,25 @@ export const getLocationModalInnerHTML = (): null | [string, string?] => {
 
 
 /**
- * This function is called from a Selenium (server-side screenshot service) (`climatedata-api`, `climatedata_api/raster.py`) in a headless browser to prepare the map page for a screenshot. It removes interactive UI elements and tooltips, and dispatches a `resize` event so the map re-lays out at the new size.
- * and it expects a payload to be passed to it BEFORE doing what this does.
+ * Runs in the screenshot service's headless browser.
  *
- * ----
+ * Replays the popup and marker carried in `payload` (see {@link PrepareRasterMapHandles}) —
+ * the screenshot service's browser has clicked nothing, so without this step there is
+ * nothing to capture — then removes the surrounding chrome and any tooltips, and dispatches
+ * a `resize` event so the map re-lays out at the new size.
  *
- * Modify the DOM of this app's map page to prepare it for a screenshot.
+ * The legend is opened by the caller dispatching `setLegendOpen(true)` rather than by
+ * clicking `#legend-toggle` here: that button flips whatever state it finds, and the
+ * legend auto-opens once the map container is wide enough — a width the screenshot always
+ * exceeds — so a click would reliably close an already-open legend just before capture.
+ * `setLegendOpen(true)` cannot misfire that way.
  *
- * This function is designed to be executed by an external script (e.g. via Selenium)
- * before taking a screenshot. It first replays the popup and marker carried in
- * `payload` (see {@link PrepareRasterMapHandles}) — the screenshot service's browser
- * has clicked nothing, so without this step there is nothing to capture — then removes
- * the surrounding chrome (sidebar, headers, sidebar toggle, search and zoom controls)
- * along with any tooltips, then dispatches a `resize` event so the map re-lays out at
- * the new size.
- *
- * Opening the legend is deliberately *not* done here — the caller dispatches
- * `setLegendOpen(true)` instead, because Redux owns that state. This function used
- * to click the `#legend-toggle` button, which flips whatever state it finds rather
- * than setting one. The legend auto-opens once the map container is wide enough and
- * the screenshot runs far above that width, so the click reliably *closed* an
- * already-open legend a moment before the capture. A set cannot misfire that way;
- * do not reintroduce the click. (CLIM-1454 R3.)
- *
- * It does not add the `to-raster` class the screenshot service waits for: that class
- * marks which element gets captured, and this app renders it statically on
- * `#wrapper-map` in `apps/src/components/map.tsx`, so it is already in place.
- *
- * Note: This function does not revert changes. A full page reload is required to restore the original UI.
- *
- * @remarks
- * Nothing inside `apps/` calls this — the caller is outside the bundle.
- * `download-map-modal.tsx` assigns it to `window.$.fn.prepare_raster` while the
- * modal is mounted; the server-side screenshot service (`climatedata-api`,
- * `climatedata_api/raster.py`) then loads this page in a headless browser and
- * evaluates `$.fn.prepare_raster()` to strip the interactive UI before capturing
- * the "Save map as image" PNG. That is the entire call path.
- *
- * The name is a trap: `fw-child/resources/js/map.js` defines its own
- * `$.fn.prepare_raster` for the legacy jQuery Explore Maps page, and a grep for
- * the name finds that one first. It does not apply here, and does not need
- * checking — `fw-child/apps/app-map.php` calls no `wp_head()`/`wp_footer()`, and
- * WordPress fires `wp_enqueue_scripts` from inside `wp_head()`, so nothing the
- * theme enqueues reaches this page, jQuery and `map.js` included. The assignment
- * made by the modal is the only definition present.
- *
- * This is live production behaviour, not scaffolding.
+ * Not reversible — restoring the original UI requires a full page reload.
  */
+// Exposed globally as $.fn.prepare_raster because a server-side headless-browser
+// screenshot service invokes that exact expression against the page. A second,
+// unrelated function under the same name lives in fw-child/resources/js/map.js;
+// it never loads on this page, so only this definition ever runs here.
 export const prepareRaster: PrepareRaster = async (
 	payload,
 	handles,
@@ -182,12 +156,10 @@ export const prepareRaster: PrepareRaster = async (
 			handles?.addMarker(new L.LatLng(markerLat, markerLon), '');
 		}
 
-		// Re-create the popup(s) the sending browser had open, by injecting
-		// straight into the DOM node `<LMapContainer>` renders its React
-		// children into — the same node `LocationModal` itself would mount
-		// into (`map.tsx` / `map-container.tsx`). Index 0 is the left/main
-		// pane, index 1 (present only in compare mode) is the right/compare
-		// pane — the same order `getLocationModalInnerHTML` captured them in.
+		// Injects straight into the DOM node `LocationModal` itself would mount
+		// into (`map.tsx` / `map-container.tsx`). Index 0 is the left/main pane,
+		// index 1 (compare mode only) the right pane — the same order
+		// `getLocationModalInnerHTML` captured them in.
 		const containers = [handles?.map?.getContainer(), handles?.comparisonMap?.getContainer()];
 		const className = cn(...LOCATION_MODAL_BASE_CLASS_NAMES, ...LOCATION_MODAL_POSITION_CLASS_NAMES);
 		(locationPopupHtml || []).forEach((innerHtml, index) => {
@@ -208,7 +180,6 @@ export const prepareRaster: PrepareRaster = async (
 
 		document.documentElement.setAttribute('data-raster', 'true');
 
-		// Remove all tooltip elements
 		document.querySelectorAll('.tooltip').forEach(el => el.remove());
 
 		// Resize the window to force a layout update.
@@ -218,6 +189,9 @@ export const prepareRaster: PrepareRaster = async (
 	});
 }
 
+/**
+ * Runs in the user's browser. Wraps the payload as the POST `fetch` init.
+ */
 export const createFetchRequestInitOptions = (payload?: PrepareRasterPostHttpPayload): RequestInit => {
 	const fetchOptions: RequestInit = {
 		method: 'POST',
@@ -239,12 +213,7 @@ export const createFetchRequestInitOptions = (payload?: PrepareRasterPostHttpPay
  * whenever either half is missing: no popup currently open, or no location
  * selected. `undefined` becomes an absent request body; the server-side
  * hook then calls `$.fn.prepare_raster()` argument-less rather than
- * receiving a partially-empty payload. (CLIM-1454 T2.)
- *
- * @param markerLatLon The clicked location, read by the caller from
- * {@link selectSelectedLocation}, or `null` when nothing is selected. Comes
- * from Redux rather than the URL because the URL only carries the viewport
- * centre, not the clicked point.
+ * receiving a partially-empty payload.
  */
 export const createPrepareRasterPostHttpPayload = (
 	markerLatLon: PrepareRasterPostHttpPayload['markerLatLon'] | null,

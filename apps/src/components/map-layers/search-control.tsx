@@ -100,14 +100,12 @@ const SearchControl = (
 	const [isTracking, setIsTracking] = useState<boolean>(false);
 
 	// we need a unique id for the search control container for cases where multiple maps
-	// are rendered on the same page -- ie. comparing emission scenarios
-	// When comparing emissions scenarios (URL Search Query `?cmp=1&cmpTo=`)
+	// are rendered on the same page -- ie. comparing emission scenarios (`?cmp=1&cmpTo=`)
 	const uniqueId = useMemo(() => {
 		const suffix = nanoid(5);
 		return 'search-control-' + suffix;
 	}, []);
 
-	// CSS className of this component's outermost element
 	const classNameForOutermostElement = cn(
 		'search-control absolute top-24 left-6 z-40 flex items-center space-x-1',
 		className,

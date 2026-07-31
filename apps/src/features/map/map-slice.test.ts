@@ -9,7 +9,6 @@ import mapReducer, {
 	setRasterMode,
 } from './map-slice';
 
-/** The slice's own initial state, as the store would build it. */
 const initialMapState = mapReducer(undefined, { type: '@@INIT' });
 
 /**
@@ -36,10 +35,9 @@ describe('map slice — raster mode', () => {
 		expect(next.isRasterMode).toBe(false);
 	});
 
-	// This is the property that matters. Raster mode is entered via the server's
-	// `prepare_raster()` closure, and the old export path failed precisely because
-	// it *toggled* rather than *set* — a repeated trigger undid the first. Applying
-	// the same value twice must be indistinguishable from applying it once.
+	// Raster mode is entered via the server's when they call `$.fn.prepare_raster`
+	// which may fire more than once for the same export.
+	// Applying the same value twice must be indistinguishable from applying it once.
 	test('is a set, not a toggle — applying true twice stays true', () => {
 		let state = mapReducer(initialMapState, setRasterMode(true));
 		state = mapReducer(state, setRasterMode(true));

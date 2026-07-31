@@ -202,15 +202,8 @@ const mapSlice = createSlice({
 		 * Deliberately a SET and never a toggle, shaped after `setLegendOpen`.
 		 * Raster mode is entered via the server-side `prepare_raster()` closure
 		 * (`components/map-info/download-map-modal.tsx`), and a set rather than a
-		 * toggle keeps a repeated entry idempotent instead of self-cancelling.
-		 *
-		 * That failure mode is not hypothetical. `prepareRaster` (`lib/utils.ts`)
-		 * used to open the legend by calling `.click()` on the `#legend-toggle`
-		 * button, which flips whatever state it finds rather than setting one. The
-		 * legend defaults to open on a wide container, and the export runs at
-		 * 2560px, so that blind click *closed* the legend immediately before the
-		 * screenshot. It has since been replaced by a `setLegendOpen(true)` on the
-		 * same export path — the same reason this setter is a set.
+		 * toggle keeps a repeated entry idempotent instead of self-cancelling: a
+		 * stale or duplicate call cannot flip raster mode back off.
 		 *
 		 * @see {@link MapState.isRasterMode} for what the flag means and who sets it.
 		 */

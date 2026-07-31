@@ -256,25 +256,12 @@ export interface MapState {
 	isLowSkillVisible: boolean;
 	/**
 	 * Whether the app is rendering for the downloadable map image ("raster mode")
-	 * rather than for a person using the page.
+	 * rather than for a person using the page. See the `data-raster` comment
+	 * above `SidebarProvider` in `App.tsx`.
 	 *
-	 * The downloadable image is produced OUTSIDE this app: a server-side headless
-	 * browser loads the Map page, calls the `window.$.fn.prepare_raster()` hook
-	 * this app installs, waits for the element carrying the `to-raster` class, and
-	 * screenshots just that element. Raster mode is how the page knows it is being
-	 * photographed.
-	 *
-	 * **Nothing reads this flag yet beyond the `data-raster` attribute in
-	 * `App.tsx`.** It is the enabling primitive, landed first so the rest is
-	 * verifiable in an ordinary browser. The intent it exists to serve — rendering
-	 * the export's own furniture (a composed title, a grid-resolution pill, an
-	 * always-expanded legend) and dropping affordances that mean nothing on a
-	 * still image — is not implemented here. Do not read the list above as a
-	 * description of current behaviour.
-	 *
-	 * It is set by the `prepare_raster` hook, assigned in
-	 * `components/map-info/download-map-modal.tsx` (the real export) — a plain
-	 * set rather than a toggle.
+	 * Set by the `prepare_raster` hook assigned in
+	 * `components/map-info/download-map-modal.tsx` — a plain set rather than a
+	 * toggle.
 	 */
 	isRasterMode: boolean;
 	/**

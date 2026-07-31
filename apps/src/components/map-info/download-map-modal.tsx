@@ -84,35 +84,24 @@ const DownloadMapModal: React.FC<{
 		 * entering raster mode is two things:
 		 *
 		 * 1. Flip the app into raster mode, so React renders the page as the
-		 *    exported image. This is a *set*, never a toggle, so it is safe if
-		 *    raster mode is already on (a developer previewing with `?raster=1`).
+		 *    exported image. This is a *set*, never a toggle, so a repeated call
+		 *    while raster mode is already on is a no-op rather than flipping it
+		 *    back off.
 		 * 2. Run `prepareRaster`, the imperative pass that injects the replayed
 		 *    popup/marker, strips chrome, and fires a `resize` so the map
 		 *    re-lays out.
 		 *
-		 * The two are forced to be sequential with `flushSync`. A plain
-		 * `dispatch` only schedules a re-render — React commits it after this
-		 * function has already returned — so without it, `prepareRaster` could
-		 * run against a DOM that has not yet picked up raster mode, and a later
-		 * commit could land on top of nodes `prepareRaster` has already
-		 * injected or removed. `flushSync` forces React to commit the
-		 * raster-mode state (and anything gated on it, e.g. the `data-raster`
-		 * carrier on `SidebarProvider` in `App.tsx`) synchronously, so
-		 * `prepareRaster` only ever runs against a DOM that has already
-		 * settled into raster mode. (CLIM-1454.)
-		 *
 		 * How long the service waits after this returns is defined by the
 		 * screenshot service, which lives in another repository. Do not assume a
 		 * settle window from this side.
-		 *
-		 * Keeping the `$.fn.prepare_raster` name is what makes this a zero-change
-		 * addition on the service's side — it still evaluates the same expression
-		 * it always has. The name is a fake-jQuery shim; this app has no jQuery.
 		 */
 		const prepare_raster: Prepare_Raster = (
 			locationPopupHtml,
 			markerLatLon,
 		) => {
+			// A plain dispatch only schedules a re-render; React would apply it after this
+			// function returns. flushSync commits it immediately, so the imperative DOM
+			// work below always runs against a page that has already switched into raster mode.
 			flushSync(() => {
 				dispatch(setLegendOpen(true));
 				dispatch(setRasterMode(true));

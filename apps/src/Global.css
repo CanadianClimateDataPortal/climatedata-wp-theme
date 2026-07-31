@@ -288,46 +288,19 @@
  * Two-sided convention for the downloadable map image, which the server
  * produces by loading this page and screenshotting it.
  *
- * `data-raster="true"` is the *mode* flag. It is set in one place — the
- * `SidebarProvider` div in `App.tsx` — and only while the page is rendering for
- * that export.
+ * `html[data-raster="true"]` is the *mode* flag, present on an ancestor only while
+ * the page is rendering for that export (i..e "download" a "screenshot" image).
  *
  * `data-raster="false"` on any descendant is a *marker* meaning "this element is
  * not part of the exported image". Markers are inert while a person is using the
  * page: they sit in the DOM doing nothing, because nothing reads them until the
  * mode flag above turns on.
  *
- * This rule is what joins the two. It is deliberately one rule rather than a list
- * of elements, so making a new element export-only is a single attribute on that
- * element, with nothing to add here — including for elements written long after
- * this rule was.
- *
- * One constraint on where a marker may go: never on an ancestor of the element
- * being captured (`#wrapper-map`, which carries `.to-raster`). The screenshot
- * service waits for that element to be *visible*, so hiding an ancestor does not
- * trim the image — it expires the wait and the export fails outright.
- *
- * Why this hides rather than deletes. An earlier version of this feature removed
- * every marked element from the DOM instead, and that is worse in two ways.
- *
- * The legend renders into a React root of its own — `map-legend.tsx` calls
- * `createRoot` on a container Leaflet made — and one of the markers lives inside
- * it. Detaching a node behind React's back leaves that root reconciling against a
- * tree that moved under it, and a failure during commit takes down the whole
- * root, not just the one element. The symptom is not a chevron that stays
- * visible; it is the entire legend disappearing. Any React-owned node carries
- * that risk, so the rule has to be one that never mutates the tree.
- *
- * And the export's final act is a synthetic `resize`, which makes Leaflet
- * re-measure. Mutating the tree and then forcing a re-measure is where rendering
- * hiccups come from. Hiding is a style recalculation React stays consistent with;
- * removing is a tree mutation it never learns about.
- *
- * (CLIM-1454 R5.)
+ * In the case of
  */
-[data-raster='true'] [data-raster='false'],
-[data-raster='true'] .map-wrapper.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-resolution,
-[data-raster='true'] .map-wrapper.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-title {
+html[data-raster='true'] [data-raster='false'],
+html[data-raster='true'] .map-wrapper.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-resolution,
+html[data-raster='true'] .map-wrapper.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-title {
 	display: none !important;
 }
 

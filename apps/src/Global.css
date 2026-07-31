@@ -281,26 +281,20 @@
 }
 
 /**
- * When exporting as image what we see on the map.
- * Things that are useless when they no longer are interactive elements
- * within a web browser.
+ * On the map SPA, when chosing "Download" to get a screenshot of the current map.
+ * Some things that are normally shown doesn't need to be shown in an PNG
+ * capture (or shown more than once, like we're doing here).
  *
- * Two-sided convention for the downloadable map image, which the server
- * produces by loading this page and screenshotting it.
+ * `html[data-raster="true"]` is the *mode* flag to adapt for making a screenshot
+ * and what aspects to adjust so that we can optimize what's displayed in the image.
+ * There are elements we have to remove (the aside, the menu) and to remove them,
+ * we use `[data-raster="false"]`.
  *
- * `html[data-raster="true"]` is the *mode* flag, present on an ancestor only while
- * the page is rendering for that export (i..e "download" a "screenshot" image).
- *
- * `data-raster="false"` on any descendant is a *marker* meaning "this element is
- * not part of the exported image". Markers are inert while a person is using the
- * page: they sit in the DOM doing nothing, because nothing reads them until the
- * mode flag above turns on.
- *
- * In the case of
+ * But that's not what this is for here. This list of selectors are about removing repetition.
  */
 html[data-raster='true'] [data-raster='false'],
-html[data-raster='true'] .map-wrapper.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-resolution,
-html[data-raster='true'] .map-wrapper.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-title {
+html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-resolution,
+html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-title {
 	display: none !important;
 }
 

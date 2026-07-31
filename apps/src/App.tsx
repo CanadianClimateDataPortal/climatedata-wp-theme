@@ -7,8 +7,6 @@ import { MapProvider } from '@/context/map-provider';
 import { AnimatedPanelProvider } from '@/context/animated-panel-provider';
 import { ClimateVariableProvider } from "@/context/climate-variable-provider";
 
-import { useAppSelector } from '@/app/hooks';
-import { selectIsRasterMode } from '@/features/map/map-slice';
 import { useLeaflet } from '@/hooks/use-leaflet';
 import { useUrlSync } from '@/hooks/use-url-sync';
 
@@ -17,8 +15,6 @@ import '@/App.css';
 function App() {
 	useUrlSync();
 	useLeaflet();
-
-	const isRasterMode = useAppSelector(selectIsRasterMode);
 
 	return (
 		<ClimateVariableProvider>
@@ -34,26 +30,13 @@ function App() {
 					There are elements we have to remove (the aside, the menu) and to remove them,
 					we use `[data-raster="false"]`.
 
-					The screenshot is just an image, and a Sidebar holds buttons that we can interact
-					with and they aren't useful as part of an image.
-					To remove the Sidebar we can use the `SidebarProvider` which will spread remainder
-					of the props onto a real `div` classed `group/sidebar-wrapper`,
-					an ancestor of the sidebar, both headers, and the `#map-root`.
-
-					There is a technique that leverages Tailwind's native "data-attribute" variant syntax;
-					`group-data-[raster=true]/sidebar-wrapper:…`; which saves us from adding a plugin.
-
-					Two things this `<SidebarProvider data-raster>` helps us with:
-
-					1. Visibility. The screenshot service is designed to wait for its target element to
-					be visible before capturing.
-
-					2. Ordering. The caller flushes this attribute's React commit
-					synchronously before calling `prepareRaster` (`lib/prepare-raster.ts`),
-					so every rule keyed off `[data-raster]` on an element has already applied by the time
-					`prepareRaster`'s own DOM changes run.
+					Raster mode is not React or Redux state. `prepareRaster` (`lib/prepare-raster.ts`)
+					sets `data-raster="true"` directly on `<html>` after removing the chrome elements
+					marked `[data-raster="false"]`. `Global.css` and the export-only info pills key
+					off that attribute directly, with no React commit to wait on and no ordering
+					between them to guarantee.
 					*/}
-					<SidebarProvider data-raster={isRasterMode ? 'true' : undefined}>
+					<SidebarProvider>
 						<AppSidebar />
 						<main className="flex flex-col h-screen">
 							<Header trailing={<SidebarTrigger className="[&_svg]:size-6" />} />

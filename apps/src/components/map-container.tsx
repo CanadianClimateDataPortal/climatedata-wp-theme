@@ -223,6 +223,36 @@ const MapContainer = (
 		};
 	}, [onMapReady, onUnmount]);
 
+	// react-leaflet's <MapContainer> (LMapContainer here) captures the `className` prop in a
+	// `useState` initializer on its first render and never re-applies it afterwards, so it does
+	// not react to prop changes. That's a problem for the primary (always-mounted) map: its
+	// `className` toggles between `undefined` and 'map-comparison-left' when comparison mode is
+	// turned on/off *after* the map has already mounted (e.g. via the "Compare scenarios"
+	// checkbox), and react-leaflet silently ignores that change. Sync the class onto the live
+	// Leaflet container ourselves so it stays correct after the initial mount.
+	const appliedComparisonClassNameRef = useRef<string | undefined>(props.className);
+
+	useEffect(() => {
+		const map = mapRef.current;
+		if (!map) return;
+
+		const previousClassName = appliedComparisonClassNameRef.current;
+		const nextClassName = props.className;
+
+		if (nextClassName === previousClassName) return;
+
+		const container = map.getContainer();
+
+		if (previousClassName) {
+			L.DomUtil.removeClass(container, previousClassName);
+		}
+		if (nextClassName) {
+			L.DomUtil.addClass(container, nextClassName);
+		}
+
+		appliedComparisonClassNameRef.current = nextClassName;
+	}, [props.className]);
+
 	return (
 		<LMapContainer
 			ref={mapRef}

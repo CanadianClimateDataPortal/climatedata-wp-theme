@@ -25,8 +25,8 @@ function App() {
 			<MapProvider>
 				<AnimatedPanelProvider>
 					{/*
-					On the map SPA, when chosing "Download" to get a screenshot of the current map.
-					Some things that are normally shown doesn't need to be shown in an PNG
+					On the map SPA, when choosing "Download" to get a screenshot of the current map.
+					Some things that are normally shown don't need to be shown in a PNG
 					capture (or shown more than once, see `Global.css`).
 
 					`html[data-raster="true"]` is the *mode* flag to adapt for making a screenshot
@@ -40,8 +40,8 @@ function App() {
 					of the props onto a real `div` classed `group/sidebar-wrapper`,
 					an ancestor of the sidebar, both headers, and the `#map-root`.
 
-					There is a technique that leverage Tailwind's native "data-attribute" variant syntax;
-					`group-data-[raster=true]/sidebar-wrapper:…`; which allows saves us on adding a plugin.
+					There is a technique that leverages Tailwind's native "data-attribute" variant syntax;
+					`group-data-[raster=true]/sidebar-wrapper:…`; which saves us from adding a plugin.
 
 					Two things this `<SidebarProvider data-raster>` helps us with:
 

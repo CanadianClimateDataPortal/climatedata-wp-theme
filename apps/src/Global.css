@@ -281,8 +281,8 @@
 }
 
 /**
- * On the map SPA, when chosing "Download" to get a screenshot of the current map.
- * Some things that are normally shown doesn't need to be shown in an PNG
+ * On the map SPA, when choosing "Download" to get a screenshot of the current map.
+ * Some things that are normally shown don't need to be shown in a PNG
  * capture (or shown more than once, like we're doing here).
  *
  * `html[data-raster="true"]` is the *mode* flag to adapt for making a screenshot
@@ -290,7 +290,7 @@
  * There are elements we have to remove (the aside, the menu) and to remove them,
  * we use `[data-raster="false"]`.
  *
- * But that's not what this is for here. This list of selectors are about removing repetition.
+ * But that's not what this is for here. This list of selectors is about removing repetition.
  */
 html[data-raster='true'] [data-raster='false'],
 html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-resolution,

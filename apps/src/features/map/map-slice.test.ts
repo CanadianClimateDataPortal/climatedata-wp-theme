@@ -35,7 +35,7 @@ describe('map slice — raster mode', () => {
 		expect(next.isRasterMode).toBe(false);
 	});
 
-	// Raster mode is entered via the server's when they call `$.fn.prepare_raster`
+	// Raster mode is entered via the server's reload, when they call `$.fn.prepare_raster`
 	// which may fire more than once for the same export.
 	// Applying the same value twice must be indistinguishable from applying it once.
 	test('is a set, not a toggle — applying true twice stays true', () => {

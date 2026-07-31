@@ -255,16 +255,6 @@ export interface MapState {
 	 */
 	isLowSkillVisible: boolean;
 	/**
-	 * Whether the app is rendering for the downloadable map image ("raster mode")
-	 * rather than for a person using the page. See the `data-raster` comment
-	 * above `SidebarProvider` in `App.tsx`.
-	 *
-	 * Set by the `prepare_raster` hook assigned in
-	 * `components/map-info/download-map-modal.tsx` — a plain set rather than a
-	 * toggle.
-	 */
-	isRasterMode: boolean;
-	/**
 	 * Represents the state of the map legend overlay.
 	 * The graphical legend that explains the map's color coding.
 	 */

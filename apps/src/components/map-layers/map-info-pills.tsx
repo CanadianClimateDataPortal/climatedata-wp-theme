@@ -13,8 +13,7 @@ import {
  * ------------
  * Export-only (i.e. what we see when clicking "Download" map image)
  * informational pills overlaid on the map: present in the DOM at all times,
- * but shown only when an ancestor `SidebarProvider` carries `data-raster="true"`
- * via the `group-data-[raster=true]/sidebar-wrapper:block` variant
+ * but shown only via the `html[data-raster="true"]` rule in `Global.css`
  * (see the `data-raster` comment in `App.tsx`).
  *  - Title pill (top-centre): climate variable title joined with the dataset version.
  *  - Grid pill (bottom-left): grid resolution note.
@@ -44,7 +43,7 @@ const MapInfoPills = (
 			<div
 				className={cn(
 					'absolute top-6 left-1/2 transform -translate-x-1/2 z-20',
-					'hidden group-data-[raster=true]/sidebar-wrapper:block',
+					'hidden',
 					'text-sm text-zinc-900 font-normal leading-5',
 					'bg-neutral-grey-light border border-cold-grey-4 shadow-md rounded-xl px-3.5 py-1.5',
 					'raster-addition-pill-title'
@@ -59,7 +58,7 @@ const MapInfoPills = (
 					<div
 						className={cn(
 							'absolute bottom-6 left-6 z-20',
-							'hidden group-data-[raster=true]/sidebar-wrapper:block',
+							'hidden',
 							'text-sm text-zinc-900 font-normal leading-5',
 							'bg-neutral-grey-light border border-cold-grey-4 shadow-md rounded-xl px-3.5 py-1.5',
 							'raster-addition-pill-resolution'

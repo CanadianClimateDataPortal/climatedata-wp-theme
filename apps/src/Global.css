@@ -290,12 +290,28 @@
  * There are elements we have to remove (the aside, the menu) and to remove them,
  * we use `[data-raster="false"]`.
  *
- * But that's not what this is for here. This list of selectors is about removing repetition.
+ * The first selector below looks redundant with that removal pass, but isn't:
+ * the legend's open/close control renders its own `[data-raster="false"]` marker
+ * into a separate React root, gated on data that resolves asynchronously. That
+ * render can land after the removal pass already ran over the document, in
+ * which case nothing in JS is left to remove it. This rule is the backstop for
+ * that marker specifically. The other two selectors are unrelated: on a
+ * comparison view they remove the right-hand map's own copy of the info pills,
+ * since only one copy should show.
  */
 html[data-raster='true'] [data-raster='false'],
 html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-resolution,
 html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-title {
 	display: none !important;
+}
+
+/**
+ * The map info pills (`MapInfoPills`) are hidden by default and revealed only
+ * when rendering for the downloadable map image.
+ */
+html[data-raster='true'] .raster-addition-pill-title,
+html[data-raster='true'] .raster-addition-pill-resolution {
+	display: block !important;
 }
 
 /* Custom scrollbar styles for variables panel */

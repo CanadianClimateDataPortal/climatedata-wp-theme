@@ -5,13 +5,12 @@
  *
  */
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { flushSync } from 'react-dom';
 import { __, LocaleContext } from '@/context/locale-provider';
 import { Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { encodeURL } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { selectSelectedLocation, setLegendOpen, setRasterMode } from '@/features/map/map-slice';
+import { selectSelectedLocation, setLegendOpen } from '@/features/map/map-slice';
 import {
 	createFetchRequestInitOptions,
 	createPrepareRasterPostHttpPayload,
@@ -80,13 +79,7 @@ const DownloadMapModal: React.FC<{
 			locationPopupHtml,
 			markerLatLon,
 		) => {
-			// A plain dispatch only schedules a re-render; React would apply it after this
-			// function returns. flushSync commits it immediately, so the imperative DOM
-			// work below always runs against a page that has already switched into raster mode.
-			flushSync(() => {
-				dispatch(setLegendOpen(true));
-				dispatch(setRasterMode(true));
-			});
+			dispatch(setLegendOpen(true));
 			let payload = undefined;
 			if (locationPopupHtml && markerLatLon) {
 				payload = {

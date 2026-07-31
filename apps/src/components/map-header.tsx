@@ -79,7 +79,7 @@ const toggleVariableDetailsPanel = () => {
 	return (
 		<>
 			<aside
-				className="map-header relative z-20"
+				className="relative z-20"
 				data-raster="false"
 			>
 				<div

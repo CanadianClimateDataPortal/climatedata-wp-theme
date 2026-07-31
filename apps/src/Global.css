@@ -314,6 +314,27 @@ html[data-raster='true'] .raster-addition-pill-resolution {
 	display: block !important;
 }
 
+/**
+ * Leaflet fades each tile in from transparent over 200ms once it has loaded:
+ * `GridLayer._tileReady` sets the tile's opacity to zero, then ramps it back up
+ * on each animation frame. Both the `load` event and `isLoading()` report the
+ * layer as finished at the *start* of that ramp, so code that waits for tiles
+ * to load — see `lib/prepare-raster.ts` — is told the map is ready while it is
+ * still fading in, and a screenshot taken then catches half-transparent tiles.
+ *
+ * Leaflet's own switch is `Map.options.fadeAnimation`, but it is only read when
+ * the map is constructed; changing it afterwards does nothing, and the live flag
+ * is private. So rather than reaching into library internals, this rule wins on
+ * the cascade instead: the ramp is written to each tile's inline `style`, and an
+ * author `!important` declaration outranks a normal style attribute.
+ *
+ * Nobody watches an animation in a headless screenshot, so dropping the fade
+ * costs nothing and removes a 200ms window in which the capture is wrong.
+ */
+html[data-raster='true'] .leaflet-tile {
+	opacity: 1 !important;
+}
+
 /* Custom scrollbar styles for variables panel */
 @layer utilities {
 	.scrollbar-thin {

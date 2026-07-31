@@ -16,6 +16,8 @@
  * 6. `prepareRaster` replays the marker and popup carried in the POST body.
  * 7. It strips interactive chrome and fires a resize, so the layout matches what the
  *    user saw, before the screenshot is taken.
+ * 8. Once everything it can observe has settled, it adds the `to-raster` class to the
+ *    element the service captures. That class is the signal the service waits on.
  */
 import L from 'leaflet';
 
@@ -110,7 +112,129 @@ export const getLocationModalInnerHTML = (): null | [string, string?] => {
 	return outcome as [string, string?];
 };
 
+/**
+ * The class name the screenshot service polls for, and then screenshots.
+ *
+ * It does two jobs at once, which is easy to miss from inside this repository:
+ * the service waits up to ten seconds for an element carrying this class to
+ * become visible, and then captures *that element* rather than the whole
+ * viewport. So it is both the "ready" signal and the definition of what ends
+ * up in the PNG. It therefore has to land on the element we want captured, and
+ * only once the contents of that element have stopped changing.
+ */
+const RASTER_READY_CLASS_NAME = 'to-raster';
 
+/** The element the service captures — the grid holding both map panes. */
+const RASTER_TARGET_ELEMENT_ID = 'map-root';
+
+/**
+ * How long {@link prepareRaster} waits for the map to settle before signalling
+ * readiness regardless.
+ *
+ * The service allows ten seconds for the class above to appear and has no error
+ * branch, so failing to signal does not produce a degraded screenshot — it
+ * produces no screenshot at all and an error for whoever clicked Download.
+ * Signalling late with a possibly imperfect map is the better of those two, so
+ * this sits below the service's ceiling with room to spare.
+ */
+const MAP_SETTLE_TIMEOUT_MS = 8_000;
+
+/**
+ * How many consecutive animation frames every tiled layer must report idle
+ * before the map counts as settled.
+ *
+ * More than one, because the two panes are synchronised in both directions (see
+ * the `sync` calls in `map.tsx`): a move on one pane propagates to the other, so
+ * the second pane starts requesting its tiles slightly *after* the first pane
+ * has finished with its own. A single idle reading can land in that gap and
+ * report a map that has not finished. Requiring consecutive idle frames narrows
+ * the window. It does not close it, and no finite number would.
+ */
+const MAP_SETTLE_STABLE_FRAMES = 3;
+
+/** A layer that takes part in Leaflet's tile-loading lifecycle. */
+type TiledLayer = { isLoading: () => boolean };
+
+const isTiledLayer = (layer: L.Layer): layer is L.Layer & TiledLayer =>
+	typeof (layer as Partial<TiledLayer>).isLoading === 'function';
+
+/**
+ * Resolves once every tiled layer on every mounted map has reported idle for
+ * {@link MAP_SETTLE_STABLE_FRAMES} consecutive animation frames, or after
+ * {@link MAP_SETTLE_TIMEOUT_MS} — `true` when the map settled, `false` on
+ * timeout.
+ *
+ * The state is polled each frame rather than composed from Leaflet's `load`
+ * event, deliberately. A layer that already finished before a listener attaches
+ * never fires `load` again, so awaiting the events would wait forever on
+ * precisely the layers that had nothing left to do. Reading the current state
+ * has no such edge to miss.
+ *
+ * `isLoading()` here is Leaflet's own method on `GridLayer` and everything that
+ * extends it — the base map tiles, the WMS layers, and the vector-tile
+ * choropleth. It is unrelated to the `isLoading` flags this app keeps in Redux
+ * for the S2D release date.
+ *
+ * KNOWN LIMIT, and it is worth stating rather than implying completeness: this
+ * cannot detect a layer that has not been created yet. Several layers only
+ * construct themselves once their own data request resolves — `variable-layer.ts`
+ * and `interactive-regions-layer.tsx` both return early from their effect until
+ * then. While such a request is in flight there is no layer on the map to report
+ * as loading, so a page that is not finished looks identical to one that is.
+ * Covering that would require those layers to advertise that they are pending,
+ * which they currently do not.
+ */
+const waitForMapsSettled = (maps: (L.Map | null)[]): Promise<boolean> => {
+	const mounted = maps.filter((map): map is L.Map => Boolean(map));
+	const startedAt = performance.now();
+	let idleFrames = 0;
+
+	return new Promise<boolean>((resolve) => {
+		const check = () => {
+			let loading = false;
+			mounted.forEach((map) => {
+				map.eachLayer((layer) => {
+					if (isTiledLayer(layer) && layer.isLoading()) {
+						loading = true;
+					}
+				});
+			});
+
+			idleFrames = loading ? 0 : idleFrames + 1;
+
+			if (idleFrames >= MAP_SETTLE_STABLE_FRAMES) {
+				resolve(true);
+				return;
+			}
+			if (performance.now() - startedAt >= MAP_SETTLE_TIMEOUT_MS) {
+				resolve(false);
+				return;
+			}
+			requestAnimationFrame(check);
+		};
+		requestAnimationFrame(check);
+	});
+};
+
+/**
+ * Resolves once the marker icons on the page have finished decoding.
+ *
+ * The marker replayed below carries a real `<img>`: Leaflet's `L.Icon` builds
+ * one from `iconUrl`, and fires no event to say it has painted. This browser
+ * has never placed a marker, so that image may not be cached and its request
+ * may only begin when the marker is added. The selector is restricted to `img`
+ * because `L.DivIcon` puts the same class on a `<div>`, and those markers carry
+ * inline SVG with nothing to fetch.
+ *
+ * Never rejects. An icon that fails to load should cost us the icon, not the
+ * whole screenshot.
+ */
+const waitForMarkerIcons = (): Promise<unknown> => {
+	const icons = document.querySelectorAll<HTMLImageElement>('img.leaflet-marker-icon');
+	return Promise.all(
+		[...icons].map((icon) => icon.decode().catch(() => undefined)),
+	);
+};
 
 /**
  * Runs in the screenshot service's headless browser.
@@ -127,6 +251,11 @@ export const getLocationModalInnerHTML = (): null | [string, string?] => {
  * `setLegendOpen(true)` cannot misfire that way.
  *
  * Not reversible — restoring the original UI requires a full page reload.
+ *
+ * Ends by adding {@link RASTER_READY_CLASS_NAME} to the capture target, which is
+ * how the service learns it may proceed. Everything awaited before that point is
+ * something the screenshot depends on *and* that the platform can report the
+ * completion of. Nothing here waits out a fixed delay.
  */
 // Exposed globally as $.fn.prepare_raster because a server-side headless-browser
 // screenshot service invokes that exact expression against the page. A second,
@@ -136,57 +265,83 @@ export const prepareRaster: PrepareRaster = async (
 	payload,
 	handles,
 ): Promise<void> => {
-	// Making sure the map has finished moving and loading what it has to load.
+	const maps = [handles?.map ?? null, handles?.comparisonMap ?? null];
+
+	// The service calls this about a second after requesting the page, which can
+	// be before the map's own first tiles have arrived. Settling here means the
+	// work below runs against a finished map rather than racing it.
+	await waitForMapsSettled(maps);
+
+	const { locationPopupHtml, markerLatLon } = payload || {};
+
+	// `Number.isFinite` rather than `> 0`: every Canadian longitude is
+	// negative, so a `> 0` check silently dropped every real marker. The
+	// `[NaN, NaN]` fallback (rather than `[0, 0]`) keeps a missing
+	// `markerLatLon` from being read as a real position at 0,0.
+	const [markerLat, markerLon] = markerLatLon || [NaN, NaN];
+	if (Number.isFinite(markerLat) && Number.isFinite(markerLon)) {
+		// Placing the marker directly, instead of dispatching
+		// `setSelectedLocation`, is deliberate: that dispatch mounts the
+		// real `LocationModal` and fires its location-lookup fetch
+		// chain, which would fight the popup HTML injected below.
+		handles?.clearMarkers();
+		handles?.addMarker(new L.LatLng(markerLat, markerLon), '');
+	}
+
+	// Injects straight into the DOM node `LocationModal` itself would mount
+	// into (`map.tsx` / `map-container.tsx`). Index 0 is the left/main pane,
+	// index 1 (compare mode only) the right pane — the same order
+	// `getLocationModalInnerHTML` captured them in.
+	const containers = [handles?.map?.getContainer(), handles?.comparisonMap?.getContainer()];
+	const className = cn(...LOCATION_MODAL_BASE_CLASS_NAMES, ...LOCATION_MODAL_POSITION_CLASS_NAMES);
+	(locationPopupHtml || []).forEach((innerHtml, index) => {
+		const container = containers[index];
+		if (!container || !innerHtml) {
+			return;
+		}
+		container.insertAdjacentHTML('beforeend', `<div class="${className}">${innerHtml}</div>`);
+	});
+
+	// Remove elements that should not appear in the screenshot
+	// Which basically makes the map take up all the available space by removing the surrounding elements.
+	document.querySelectorAll('[data-raster="false"]').forEach(el => el.remove());
+
+	document.documentElement.setAttribute('data-raster', 'true');
+
+	document.querySelectorAll('.tooltip').forEach(el => el.remove());
+
+	// Resize the window to force a layout update.
+	window.dispatchEvent(new Event('resize'));
+
+	// Leaflet does not act on `resize` synchronously — `Map._onResize` defers
+	// `invalidateSize` through `requestAnimationFrame`. This frame is where the
+	// map actually changes size and starts requesting tiles for the new viewport,
+	// so waiting for it is what makes the checks below measure the resized map
+	// instead of the one that existed a moment ago.
 	await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
-	await new Promise(resolve => {
-		const { locationPopupHtml, markerLatLon } = payload || {};
+	const [settled] = await Promise.all([
+		// Tiles for the viewport the resize just produced.
+		waitForMapsSettled(maps),
+		// Fonts for the popup markup injected above: this browser never rendered
+		// that text before, so those font requests may only have started just now.
+		document.fonts.ready,
+		// The replayed marker's icon image.
+		waitForMarkerIcons(),
+	]);
 
-		// `Number.isFinite` rather than `> 0`: every Canadian longitude is
-		// negative, so a `> 0` check silently dropped every real marker. The
-		// `[NaN, NaN]` fallback (rather than `[0, 0]`) keeps a missing
-		// `markerLatLon` from being read as a real position at 0,0.
-		const [markerLat, markerLon] = markerLatLon || [NaN, NaN];
-		if (Number.isFinite(markerLat) && Number.isFinite(markerLon)) {
-			// Placing the marker directly, instead of dispatching
-			// `setSelectedLocation`, is deliberate: that dispatch mounts the
-			// real `LocationModal` and fires its location-lookup fetch
-			// chain, which would fight the popup HTML injected below.
-			handles?.clearMarkers();
-			handles?.addMarker(new L.LatLng(markerLat, markerLon), '');
-		}
+	if (!settled) {
+		// Worth surfacing in the headless browser's console. It is the difference
+		// between "the map was ready" and "we stopped waiting and captured it
+		// anyway", which is otherwise invisible in the resulting PNG.
+		console.warn(
+			`prepareRaster: map still loading after ${MAP_SETTLE_TIMEOUT_MS}ms, capturing anyway.`,
+		);
+	}
 
-		// Injects straight into the DOM node `LocationModal` itself would mount
-		// into (`map.tsx` / `map-container.tsx`). Index 0 is the left/main pane,
-		// index 1 (compare mode only) the right pane — the same order
-		// `getLocationModalInnerHTML` captured them in.
-		const containers = [handles?.map?.getContainer(), handles?.comparisonMap?.getContainer()];
-		const className = cn(...LOCATION_MODAL_BASE_CLASS_NAMES, ...LOCATION_MODAL_POSITION_CLASS_NAMES);
-		(locationPopupHtml || []).forEach((innerHtml, index) => {
-			const container = containers[index];
-			if (!container || !innerHtml) {
-				return;
-			}
-			container.insertAdjacentHTML('beforeend', `<div class="${className}">${innerHtml}</div>`);
-		});
-
-		resolve(null);
-	});
-
-	await new Promise(resolve => {
-		// Remove elements that should not appear in the screenshot
-		// Which basically makes the map take up all the available space by removing the surrounding elements.
-		document.querySelectorAll('[data-raster="false"]').forEach(el => el.remove());
-
-		document.documentElement.setAttribute('data-raster', 'true');
-
-		document.querySelectorAll('.tooltip').forEach(el => el.remove());
-
-		// Resize the window to force a layout update.
-		window.dispatchEvent(new Event('resize'));
-
-		resolve(null);
-	});
+	document
+		.getElementById(RASTER_TARGET_ELEMENT_ID)
+		?.classList.add(RASTER_READY_CLASS_NAME);
 }
 
 /**

@@ -82,7 +82,7 @@ const MapRoot = (
 			id='wrapper-map'
 			ref={wrapperRef}
 			className={cn(
-				'map-wrapper to-raster',
+				'map-wrapper',
 				'grid gap-4 h-full z-30',
 				showComparisonMap ? 'grid-cols-2 map-comparison' : 'grid-cols-1'
 			)}

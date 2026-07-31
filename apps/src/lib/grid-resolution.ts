@@ -7,6 +7,15 @@
  * that case, so a grid type that is undeclared, or declared but carrying no label here,
  * resolves to `null` and the caller displays nothing.
  *
+ * That `null` carries information — "this variable's config declares no grid type" — it
+ * is not a missing value to paper over. Several map and download call sites ask the model
+ * the same question and answer it themselves, substituting `GridTypes.CANADAGRID` at the
+ * point of use and inventing a declaration the data model never made. Where a default
+ * legitimately belongs is inside the variable class that holds the knowledge to supply
+ * one: `RasterPrecalculatedClimateVariable.getGridType()` prefers the config's declared
+ * value and falls back on the dataset version only when the config stays silent — that is
+ * the pattern to follow.
+ *
  * Station data is measured at points, so there is no grid resolution to state for it.
  * Membership is decided by id against the {@link StationVariableIds} registry — see
  * `isStationClimateVariable` below — the single declared authority for that question.
@@ -106,8 +115,11 @@ export const GRID_RESOLUTIONS_LABELS = {
 	/**
 	 * About page "Vertical Allowance … 0.1° (approx. 11 km lat, 4-8 km lon)" — anisotropic,
 	 * unlike the other entries here. WFS-measured. Coastal-only.
+	 *
+	 * This grid type has no entry in the map layer's per-cell-size lookup (a spread of
+	 * {@link GRID_RESOLUTIONS_VALUES}), so that lookup's `?? 0.08333333333333333` fallback
+	 * silently sizes allowance cells as 1/12° — wrong for a 0.1°, anisotropic grid.
 	 */
-	// NET-NEW: absent from gridResolutions (its ?? 0.0833 fallback mis-sizes this as 1/12°).
 	[GridTypes.ALLOWANCEGRID]: GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS,
 } as const satisfies Record<GridType, string>;
 

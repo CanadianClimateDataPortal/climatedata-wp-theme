@@ -141,7 +141,6 @@ const DownloadMapModal: React.FC<{
 		const payload = createPrepareRasterPostHttpPayload(markerLatLon);
 		const fetchInit = createFetchRequestInitOptions(payload);
 
-		window.PrepareRasterPostHttpPayload = payload; // DEBUG SYMBOL to capture and try in browser devtools
 		try {
 			const response = await fetch(api_url, fetchInit);
 			if (!response.ok) {

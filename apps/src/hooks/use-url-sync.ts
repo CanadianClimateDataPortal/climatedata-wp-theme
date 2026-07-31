@@ -36,6 +36,11 @@ import {
  * and some map-specific properties like opacity
  */
 export const useUrlSync = () => {
+	// Shared by the two independent debounced URL writers below — one for
+	// variable/opacity/dataset changes (300ms), one for map coordinate changes
+	// (400ms). Each clears this same timeout before scheduling its own, so a
+	// writer that fires while the other's write is still pending cancels that
+	// pending write outright rather than merging with or queueing after it.
 	const updateTimeoutRef = useRef<number | null>(null);
 	const urlProcessingCompleteRef = useRef<boolean>(false);
 	const lastUrlUpdateRef = useRef<string>('');

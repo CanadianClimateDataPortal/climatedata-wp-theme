@@ -1,15 +1,13 @@
 /**
- * Shared Tailwind class-name lists for the LocationModal's outer element.
+ * Shared Tailwind class-name lists for the LocationModal's outer element,
+ * consumed by both the real `LocationModal` component and
+ * `prepare-raster.ts`'s hand-built look-alike `<div>` (outside React) that
+ * replays the popup for the screenshot service.
  *
- * Instead of duplicating the class-name lists from the typical LocationModal
- * and the new `prepare-raster.ts` to mimick a click when it is attempted
- * to be reproduced from `/raster?url=` Python+Selenium service to make
- * map screenshots.
- */
-
-/**
- * The look of a LocationModal's outer element: background, spacing, layout.
- * Consumed by `LocationModal` (`components/map-layers/location-modal.tsx`).
+ * Hoisted here instead of duplicated as string literals: a duplicated
+ * literal can drift — e.g. `md:left-16` typo'd into two junk classes —
+ * silently repositioning the raster replay to the horizontal centre of the
+ * map instead of the intended top-left corner.
  */
 export const LOCATION_MODAL_BASE_CLASS_NAMES = [
 	'location-modal',

@@ -31,8 +31,8 @@ const ZoomButtons = (
 		wrapperClass,
 	} = props;
 
-	// we need a unique id for the search control container for cases where multiple maps
-	// are rendered on the same page -- ie. comparing emission scenarios
+	// Unique id for this control's wrapper, needed when multiple maps are
+	// rendered on the same page -- e.g. comparing emission scenarios side by side.
 	const uniqueId = useMemo(() => {
 		const suffix = nanoid(5);
 		return 'zoom-buttons-' + suffix;

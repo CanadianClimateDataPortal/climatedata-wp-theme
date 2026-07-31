@@ -11,15 +11,15 @@ import {
 /**
  * MapInfoPills
  * ------------
- * Export-only informational pills overlaid on the map (gated by the `data-raster`
- * flag — present in the DOM but shown only in raster/export mode, hidden in the
- * live app):
+ * Export-only (i.e. what we see when clicking "Download" map image)
+ * informational pills overlaid on the map: present in the DOM at all times,
+ * but shown only when an ancestor `SidebarProvider` carries `data-raster="true"`
+ * via the `group-data-[raster=true]/sidebar-wrapper:block` variant
+ * (see the `data-raster` comment in `App.tsx`).
  *  - Title pill (top-centre): climate variable title joined with the dataset version.
  *  - Grid pill (bottom-left): grid resolution note.
  *
- * Mirrors the scenario ("SSP") pill chrome in map-container.tsx — same intent, same pattern.
- * The `group-data-[raster=true]/sidebar-wrapper:block` variant reveals each pill only when
- * an ancestor `SidebarProvider` carries `data-raster="true"` (set in App.tsx during export).
+ * Mirrors the scenario ("SSP") pill chrome in `map-container.tsx`.
  */
 const MapInfoPills = (
 ): React.ReactElement => {
@@ -40,7 +40,7 @@ const MapInfoPills = (
 
 	return (
 		<>
-			{/* Title pill — top-centre (export-only) */}
+			{/* Title pill — top-centre */}
 			<div
 				className={cn(
 					'absolute top-6 left-1/2 transform -translate-x-1/2 z-20',
@@ -54,7 +54,7 @@ const MapInfoPills = (
 			</div>
 
 			{
-				/* Grid resolution pill — bottom-left (export-only) */
+				/* Grid resolution pill — bottom-left */
 				gridResolutionLabel !== '' &&  (
 					<div
 						className={cn(

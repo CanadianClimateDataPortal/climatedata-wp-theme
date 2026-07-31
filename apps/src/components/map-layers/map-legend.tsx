@@ -68,9 +68,9 @@ const MapLegend = (
 	const rootRef = useRef<Root | null>	(null);
 
 	/**
-	 * Open legend by default when the map container has space for legend.
-	 * Legend max width is 430px (MapLegendOpenControl.maxLegendWidth)
-	 * Only check on the initial mount, no resize handling needed.
+	 * Open legend by default when the map container has space for it (max width
+	 * 430px, `MapLegendOpenControl.maxLegendWidth`). Only checked on the initial
+	 * mount — no resize handling needed.
 	 *
 	 * This runs once per mount, and `MapLegend` is mounted conditionally (see
 	 * `map-container.tsx`), so it can still fire *after* the map-image export has
@@ -79,7 +79,6 @@ const MapLegend = (
 	 * and this dispatch re-sets the value the export already asked for. Narrow the
 	 * export viewport, or raise the threshold, and that stops holding — this effect
 	 * would then have to skip its dispatch while an export is in progress.
-	 * (CLIM-1454 R3.)
 	 */
 	useEffect(() => {
 		if (!map) {

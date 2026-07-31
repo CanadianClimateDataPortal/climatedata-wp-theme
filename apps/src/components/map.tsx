@@ -79,10 +79,9 @@ const MapRoot = (
 
 	return (
 		<div
-			id='wrapper-map'
+			id='map-root'
 			ref={wrapperRef}
 			className={cn(
-				'map-wrapper',
 				'grid gap-4 h-full z-30',
 				showComparisonMap ? 'grid-cols-2 map-comparison' : 'grid-cols-1'
 			)}

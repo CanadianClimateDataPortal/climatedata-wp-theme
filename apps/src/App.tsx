@@ -25,36 +25,33 @@ function App() {
 			<MapProvider>
 				<AnimatedPanelProvider>
 					{/*
-					`data-raster` is the raster-mode flag carrier. `SidebarProvider`
-					spreads unknown props onto a real `div` classed
-					`group/sidebar-wrapper`, an ancestor of the sidebar, both headers,
-					and the map wrapper — the only element that dominates everything
-					the export has to restyle. Descendants key off it with Tailwind's
-					native data-attribute variant,
-					`group-data-[raster=true]/sidebar-wrapper:…`; no plugin needed.
+					On the map SPA, when chosing "Download" to get a screenshot of the current map.
+					Some things that are normally shown doesn't need to be shown in an PNG
+					capture (or shown more than once, see `Global.css`).
 
-					Omitted rather than set to `"false"` so a normal page load's DOM
-					is unchanged.
+					`html[data-raster="true"]` is the *mode* flag to adapt for making a screenshot
+					and what aspects to adjust so that we can optimize what's displayed in the image.
+					There are elements we have to remove (the aside, the menu) and to remove them,
+					we use `[data-raster="false"]`.
 
-					Two constraints for whoever writes the first rule against it:
+					The screenshot is just an image, and a Sidebar holds buttons that we can interact
+					with and they aren't useful as part of an image.
+					To remove the Sidebar we can use the `SidebarProvider` which will spread remainder
+					of the props onto a real `div` classed `group/sidebar-wrapper`,
+					an ancestor of the sidebar, both headers, and the `#map-root`.
 
-					Visibility. The screenshot service waits for its target element to
-					be visible — non-zero box, and every ancestor likewise — before
-					capturing. No raster rule may hide or zero-size this div or any
-					ancestor of the map wrapper; doing so does not hide chrome, it makes
-					the export time out with no image. Hide chrome by hiding the chrome
-					itself.
+					There is a technique that leverage Tailwind's native "data-attribute" variant syntax;
+					`group-data-[raster=true]/sidebar-wrapper:…`; which allows saves us on adding a plugin.
 
-					Ordering. The caller flushes this attribute's React commit
-					synchronously before calling `prepareRaster`
-					(`lib/prepare-raster.ts`), so every rule keyed off `data-raster` has
-					already applied by the time `prepareRaster`'s own DOM changes run.
+					Two things this `<SidebarProvider data-raster>` helps us with:
 
-					Persistence. Rules that key off descendant `data-raster="false"`
-					markers (see `Global.css`) hide those elements rather than removing
-					them: the map legend renders into a React root of its own, and
-					detaching a node behind React's back can take down that whole root
-					on its next commit, not just the one element.
+					1. Visibility. The screenshot service is designed to wait for its target element to
+					be visible before capturing.
+
+					2. Ordering. The caller flushes this attribute's React commit
+					synchronously before calling `prepareRaster` (`lib/prepare-raster.ts`),
+					so every rule keyed off `[data-raster]` on an element has already applied by the time
+					`prepareRaster`'s own DOM changes run.
 					*/}
 					<SidebarProvider data-raster={isRasterMode ? 'true' : undefined}>
 						<AppSidebar />

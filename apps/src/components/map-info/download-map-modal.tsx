@@ -76,25 +76,6 @@ const DownloadMapModal: React.FC<{
 		window.$ = window.$ || {};
 		window.$.fn = window.$.fn || {};
 
-		/**
-		 * The single entry point the server-side screenshot service uses to tell
-		 * this page it is about to be photographed.
-		 *
-		 * It is a closure rather than a bare reference to `prepareRaster` because
-		 * entering raster mode is two things:
-		 *
-		 * 1. Flip the app into raster mode, so React renders the page as the
-		 *    exported image. This is a *set*, never a toggle, so a repeated call
-		 *    while raster mode is already on is a no-op rather than flipping it
-		 *    back off.
-		 * 2. Run `prepareRaster`, the imperative pass that injects the replayed
-		 *    popup/marker, strips chrome, and fires a `resize` so the map
-		 *    re-lays out.
-		 *
-		 * How long the service waits after this returns is defined by the
-		 * screenshot service, which lives in another repository. Do not assume a
-		 * settle window from this side.
-		 */
 		const prepare_raster: Prepare_Raster = (
 			locationPopupHtml,
 			markerLatLon,

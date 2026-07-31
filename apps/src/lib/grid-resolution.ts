@@ -78,6 +78,8 @@ const GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS = '~11x7km' as const;
 
 /**
  * 11x7km : Days with Humidex above threshold variable
+ *
+ * Humidex uses era5landgrid, whose resolution is similar to the marine-projections grid.
  */
 const GRID_RESOLUTION_LABEL_DAYS_WITH_HUMIDEX_ABOVE_THRESHOLD =
 	GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS;

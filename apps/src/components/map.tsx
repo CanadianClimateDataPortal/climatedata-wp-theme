@@ -118,6 +118,6 @@ const MapRoot = (
 	);
 }
 
-MapRoot.displayName = 'MapRoot';
+MapRoot.displayName = 'MapRoot'; // Explicit string literal, or this name would be lost in production.
 
 export default MapRoot;

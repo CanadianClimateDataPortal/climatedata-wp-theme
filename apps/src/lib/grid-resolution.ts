@@ -4,21 +4,13 @@
  * Grid resolution is declared per data source, not computed — nothing here derives a
  * cell size from a variable, a latitude, or a bounding box.
  *
- * A source can have no grid to declare. Station data is the concrete case: it is
- * measured at individual observing stations rather than distributed across a land
- * area, so there is no cell size to state for it. `getGridType()` returning `null` is
- * how that absence is expressed — an answer, not a gap to paper over — and this module
- * never substitutes a default for it: a grid type that is undeclared, or declared but
- * carrying no label here, resolves to `null` and the caller displays nothing.
- *
  * Where a default legitimately belongs is inside the variable class that holds the
  * knowledge to supply one: `RasterPrecalculatedClimateVariable.getGridType()` prefers
  * the config's declared value and falls back on the dataset version only when the
  * config stays silent — that is the pattern to follow.
  *
- * Station-data membership is decided by id against the {@link StationVariableIds}
- * registry — see `isStationClimateVariable` below — the single declared authority for
- * that question.
+ * Station-data membership (known to be never shown using grid) is decided by id
+ * against the {@link StationVariableIds} registry as authoritative source.
  */
 
 import {

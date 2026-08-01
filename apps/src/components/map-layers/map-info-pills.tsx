@@ -9,16 +9,10 @@ import {
 } from '@/lib/grid-resolution';
 
 /**
- * MapInfoPills
- * ------------
- * Export-only (i.e. what we see when clicking "Download" map image)
- * informational pills overlaid on the map: present in the DOM at all times,
- * but shown only via the `html[data-raster="true"]` rule in `Global.css`
- * (see the `data-raster` comment in `App.tsx`).
- *  - Title pill (top-centre): climate variable title joined with the dataset version.
- *  - Grid pill (bottom-left): grid resolution note.
+ * Pills we add to the map image we prepare for download.
  *
- * Mirrors the scenario ("SSP") pill chrome in `map-container.tsx`.
+ * They're present in the DOM at all times, but shown only via
+ * the CSS Selector `html[data-raster="true"]` rule in `Global.css`
  */
 const MapInfoPills = (
 ): React.ReactElement => {
@@ -35,14 +29,15 @@ const MapInfoPills = (
 
 	const gridTypeOf = getGridTypeFor(climateVariable);
 
+	// e.g. `Grid= 10×6km`
 	const gridResolutionLabel = getGridTypeLabel(gridTypeOf);
 
 	return (
 		<>
-			{/* Title pill — top-centre */}
 			<div
 				className={cn(
-					'absolute top-6 left-1/2 transform -translate-x-1/2 z-20',
+					'absolute top-6 left-1/2' /* top-centre */,
+					'transform -translate-x-1/2 z-20',
 					'hidden',
 					'text-sm text-zinc-900 font-normal leading-5',
 					'bg-neutral-grey-light border border-cold-grey-4 shadow-md rounded-xl px-3.5 py-1.5',
@@ -53,12 +48,11 @@ const MapInfoPills = (
 			</div>
 
 			{
-				/* Grid resolution pill — bottom-left */
 				gridResolutionLabel !== '' &&  (
 					<div
 						className={cn(
-							'absolute bottom-6 left-6 z-20',
-							'hidden',
+							'absolute bottom-6 left-6' /* bottom-left */,
+							'hidden z-20',
 							'text-sm text-zinc-900 font-normal leading-5',
 							'bg-neutral-grey-light border border-cold-grey-4 shadow-md rounded-xl px-3.5 py-1.5',
 							'raster-addition-pill-resolution'

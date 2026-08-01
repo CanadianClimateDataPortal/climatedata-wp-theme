@@ -35,6 +35,14 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 		return 'station';
 	}
 
+	/**
+	 * Station data is measured at individual points, not on a grid — so there is no cell
+	 * size for the map's grid-resolution lookups to represent.
+	 */
+	getGridType(): string | null {
+		return null;
+	}
+
 	getFrequencyConfig(): FrequencyConfig | null {
 		return ClimateVariableBase.prototype.getFrequencyConfig.call(this)
 			? ClimateVariableBase.prototype.getFrequencyConfig.call(this)

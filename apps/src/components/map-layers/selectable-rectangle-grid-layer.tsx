@@ -14,6 +14,7 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, GEOSERVER_BASE_URL } from '@/lib/constants';
 import {
 	GRID_RESOLUTIONS_VALUES,
+	GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D,
 	GridTypes,
 } from '@/lib/grid-resolution';
 
@@ -83,7 +84,15 @@ const SelectableRectangleGridLayer = forwardRef<{
 			const latDiff = maxLat - minLat;
 			const lngDiff = maxLng - minLng;
 			const area = latDiff * lngDiff;
-			const resolution = gridResolutions[varGrid] ?? 0.08333333333333333;
+			/**
+			 * `climateVariable.getGridType()` returns as a simple string that is
+			 * catalogued as a {@link GridType} and in case of falling with an
+			 * erroneous Non-Numerical (NaN) and break maxCellsAllowed we give a
+			 * fallback
+			 */
+			const resolution =
+				gridResolutions[varGrid] ??
+				GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D;
 
 			return {
 				cellCount: Math.round(area / resolution ** 2),

@@ -2,23 +2,23 @@
  * Grid Resolution.
  *
  * Grid resolution is declared per data source, not computed — nothing here derives a
- * cell size from a variable, a latitude, or a bounding box. `getGridType()` returning
- * `null` means the source declares no grid type; this module never invents a default for
- * that case, so a grid type that is undeclared, or declared but carrying no label here,
- * resolves to `null` and the caller displays nothing.
+ * cell size from a variable, a latitude, or a bounding box.
  *
- * That `null` carries information — "this variable's config declares no grid type" — it
- * is not a missing value to paper over. Several map and download call sites ask the model
- * the same question and answer it themselves, substituting `GridTypes.CANADAGRID` at the
- * point of use and inventing a declaration the data model never made. Where a default
- * legitimately belongs is inside the variable class that holds the knowledge to supply
- * one: `RasterPrecalculatedClimateVariable.getGridType()` prefers the config's declared
- * value and falls back on the dataset version only when the config stays silent — that is
- * the pattern to follow.
+ * A source can have no grid to declare. Station data is the concrete case: it is
+ * measured at individual observing stations rather than distributed across a land
+ * area, so there is no cell size to state for it. `getGridType()` returning `null` is
+ * how that absence is expressed — an answer, not a gap to paper over — and this module
+ * never substitutes a default for it: a grid type that is undeclared, or declared but
+ * carrying no label here, resolves to `null` and the caller displays nothing.
  *
- * Station data is measured at points, so there is no grid resolution to state for it.
- * Membership is decided by id against the {@link StationVariableIds} registry — see
- * `isStationClimateVariable` below — the single declared authority for that question.
+ * Where a default legitimately belongs is inside the variable class that holds the
+ * knowledge to supply one: `RasterPrecalculatedClimateVariable.getGridType()` prefers
+ * the config's declared value and falls back on the dataset version only when the
+ * config stays silent — that is the pattern to follow.
+ *
+ * Station-data membership is decided by id against the {@link StationVariableIds}
+ * registry — see `isStationClimateVariable` below — the single declared authority for
+ * that question.
  */
 
 import {
@@ -45,62 +45,88 @@ export const GridTypes = {
 export type GridType = (typeof GridTypes)[keyof typeof GridTypes];
 
 /**
- * 10x6km : Standard for "Statistically Downscaled Global Climate Projections" and S2D Forecasts
+ * 10×6km : Standard for "Statistically Downscaled Global Climate Projections" and S2D Forecasts
  *
  * Value we communicate as a simplified value that we could think about when we think about
  * the distance of each map grid cells.
  */
 const GRID_RESOLUTION_LABEL_STATISTICALLY_DOWNSCALED_AND_S2D =
-	'~10x6km' as const;
+	'~10×6km' as const;
 
 /**
- * 11x7km : Marine Projections
+ * 11×7km : Marine Projections
  *
  * `climateVariableId`s:
  * - `sea_level` : Relative Sea-Level Changes
  * - `allowance` : Vertical Allowance
  */
-const GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS = '~11x7km' as const;
+const GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS = '~11×7km' as const;
 
 /**
- * 11x7km : Days with Humidex above threshold variable
+ * 11×7km : Days with Humidex above threshold variable
  *
  * Humidex uses era5landgrid, whose resolution is similar to the marine-projections grid.
  */
 const GRID_RESOLUTION_LABEL_DAYS_WITH_HUMIDEX_ABOVE_THRESHOLD =
 	GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS;
 
-const GRID_RESOLUTION_LABEL_SPEI = '~110x70km' as const;
-
-export const GRID_RESOLUTIONS_VALUES = {
-	/**
-	 * 0.08333333333333333 === 1/12. About page CanDCS-U6/U5/NRCANmet "~6x10km".
-	 */
-	[GridTypes.CANADAGRID]: 0.08333333333333333,
-	/**
-	 * 0.08333333333333333 === 1/12. About page CanDCS-M6 "~6×10 km"; same lattice.
-	 */
-	[GridTypes.CANADAGRID_M6]: 0.08333333333333333,
-	/**
-	 * 1. About page CMIP5 SPEI "a 1 degree (~100km) resolution".
-	 */
-	[GridTypes.CANADAGRID_1DEG]: 1,
-	/**
-	 * 0.1. About page Humidex/ERA5-Land "0.1° (approximately 9 km)".
-	 */
-	[GridTypes.ERA5LANDGRID]: 0.1,
-	/**
-	 * 0.1. About page Relative Sea Level Change (FR) "0,1°". Coastal-only.
-	 */
-	[GridTypes.SLRGRID]: 0.1,
-	/**
-	 * 0.1. Same dataset/lattice as SLRGRID (CMIP6 variant). Coastal-only.
-	 */
-	[GridTypes.SLRGRID_CMIP6]: 0.1,
-} as const;
+/**
+ * 110×70km : Standardized Precipitation Evapotranspiration Index (SPEI), full-degree grid
+ */
+const GRID_RESOLUTION_LABEL_SPEI = '~110×70km' as const;
 
 /**
- * @see {@link GRID_RESOLUTIONS_VALUES} for the text values of each grid type.
+ * 10×6km : Statistically Downscaled Global Climate Projections and S2D Forecasts
+ *
+ * 1/12° === 0.08333333333333333. About page CanDCS-U6/U5/M6 "~6×10km"; NRCANmet
+ * "~6×10 km" — same lattice.
+ */
+export const GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D =
+	0.08333333333333333 as const;
+
+/**
+ * 11×7km : Marine Projections
+ *
+ * `climateVariableId`s:
+ * - `sea_level` : Relative Sea-Level Changes. About page (FR) "0,1°". SLRGRID_CMIP6 is
+ *   the CMIP6 variant of the same dataset, same lattice.
+ * - `allowance` : Vertical Allowance. About page "0.1° (approx. 11 km lat, 4-8 km lon)"
+ *   — anisotropic, unlike every other entry in this table. WFS-measured.
+ *
+ * 0.1° for all three, coastal-only.
+ */
+const GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS = 0.1 as const;
+
+/**
+ * 11×7km : Days with Humidex above threshold variable
+ *
+ * 0.1°. Humidex uses era5landgrid, whose resolution is similar to the marine-projections
+ * grid. About page Humidex/ERA5-Land "0.1° (approximately 9 km)".
+ */
+const GRID_RESOLUTION_VALUE_DAYS_WITH_HUMIDEX_ABOVE_THRESHOLD =
+	GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS;
+
+/**
+ * 1° (~100km). About page CMIP5 SPEI "a 1 degree (~100km) resolution".
+ */
+const GRID_RESOLUTION_VALUE_SPEI = 1 as const;
+
+export const GRID_RESOLUTIONS_VALUES = {
+	[GridTypes.CANADAGRID]:
+		GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D,
+	[GridTypes.CANADAGRID_M6]:
+		GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D,
+	[GridTypes.CANADAGRID_1DEG]: GRID_RESOLUTION_VALUE_SPEI,
+	[GridTypes.ERA5LANDGRID]:
+		GRID_RESOLUTION_VALUE_DAYS_WITH_HUMIDEX_ABOVE_THRESHOLD,
+	[GridTypes.SLRGRID]: GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS,
+	[GridTypes.SLRGRID_CMIP6]: GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS,
+	[GridTypes.ALLOWANCEGRID]: GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS,
+} as const satisfies Record<GridType, number>;
+
+/**
+ * @see {@link GRID_RESOLUTIONS_VALUES} for the numeric resolution behind each grid
+ * type's label.
  */
 export const GRID_RESOLUTIONS_LABELS = {
 	[GridTypes.CANADAGRID]:

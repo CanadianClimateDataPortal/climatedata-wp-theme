@@ -66,4 +66,6 @@ const MapInfoPills = (
 	);
 };
 
+MapInfoPills.displayName = 'MapInfoPills'; // Explicit string literal, or this name would be lost in production.
+
 export default MapInfoPills;

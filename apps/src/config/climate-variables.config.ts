@@ -1,6 +1,5 @@
 import {
 	AveragingType,
-	ClimateVariableConfigInterface,
 	ColourType,
 	DownloadType,
 	FileFormatType,
@@ -8,6 +7,8 @@ import {
 	FrequencyType,
 	InteractiveRegionDisplay,
 	InteractiveRegionOption,
+	type ClimateVariableConfigInterface,
+	type ClimateVariableInterface,
 } from '@/types/climate-variable-interface';
 import { MapDisplayType } from '@/types/types';
 import { GridTypes } from '@/lib/grid-resolution';
@@ -1975,3 +1976,12 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 	},
 ];
+
+export const isClimateVariable = (
+	climateVariable: ClimateVariableInterface | null,
+): climateVariable is ClimateVariableInterface =>
+	typeof climateVariable === 'object' &&
+	// Just doing what's here below only would be too permissive.
+	typeof climateVariable?.getId() === 'string' &&
+	// Maybe this is too much?
+	ClimateVariables.find((c) => c.id === climateVariable.getId()) !== undefined;

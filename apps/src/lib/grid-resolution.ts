@@ -25,6 +25,7 @@ import {
 	StationVariableIds,
 	type ClimateVariableInterface,
 } from '@/types/climate-variable-interface';
+import { isClimateVariable } from '@/config/climate-variables.config';
 
 /**
  * Grid identities.
@@ -154,11 +155,6 @@ export const isGridType = (
 ): value is GridType =>
 	typeof value === 'string' && GRID_TYPE_VALUES.has(value);
 
-export const isClimateVariable = (
-	climateVariable: ClimateVariableInterface | null,
-): climateVariable is ClimateVariableInterface =>
-	typeof climateVariable === 'object' &&
-	typeof climateVariable?.getId() === 'string';
 
 export const isStationClimateVariable = (
 	climateVariable: ClimateVariableInterface | null,
@@ -166,7 +162,9 @@ export const isStationClimateVariable = (
 	isClimateVariable(climateVariable) &&
 	STATION_VARIABLE_IDS.has(climateVariable.getId());
 
-export const getGridTypeLabel = (gridType?: GridType | null): string => {
+export const getGridTypeLabel = (
+	gridType?: GridType | null,
+): string => {
 	if (gridType === undefined || gridType === null) {
 		return '';
 	} else if (

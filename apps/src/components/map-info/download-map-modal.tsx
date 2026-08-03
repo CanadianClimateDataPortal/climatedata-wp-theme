@@ -129,10 +129,6 @@ const DownloadMapModal: React.FC<{
 	 */
 	const handleDownloadClick = async () => {
 		const mapUrl = new URL(window.location.href);
-		if (window.mapPrepareRasterPostHttpPayloadDebugger !== null) {
-			// When trying to test another remote screenshot service
-			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
-		}
 		// Make sure to remove addition hashes.
 		mapUrl.hash = '';
 		// Encode the URL
@@ -145,6 +141,10 @@ const DownloadMapModal: React.FC<{
 
 		setIsGenerating(true);
 
+		if (window.mapPrepareRasterPostHttpPayloadDebugger !== null) {
+			// When trying to test another remote screenshot service
+			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
+		}
 
 		/**
 		 * This implies we have no LocationModal opened
@@ -152,6 +152,7 @@ const DownloadMapModal: React.FC<{
 		let payload: PrepareRasterPostHttpPayload | null = null;
 		if (selectedLocation !== null) {
 			payload = fromSelectedLocationToPrepareRasterPostHttpPayload(selectedLocation);
+			window.mapPrepareRasterPostHttpPayloadDebugger?.addPlace(selectedLocation?.title ?? '', window.location.href, api_url)
 		}
 		const fetchInit = createFetchRequestInitOptions(payload ?? undefined);
 

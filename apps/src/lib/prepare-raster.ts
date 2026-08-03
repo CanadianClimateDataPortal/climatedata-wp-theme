@@ -426,3 +426,53 @@ export const fromSelectedLocationToPrepareRasterPostHttpPayload = (
 
 	return payload;
 };
+/**
+ * In order to test the screenshot service, we need to set the DATA_URL and URL_ENCODER_SALT in the browser's window object.
+ * This is because the screenshot service is a separate service that needs to know where to send the request to get the data.
+ *
+ * @remark Where does this run?: In the user's browser.
+ *
+ * @example Usage example
+ *
+ * ```js
+ * // 1. From any map page, open the browser's developer console.:
+ *
+ * // 1.1. Paste and the following:
+ * window.mapPrepareRasterPostHttpPayload = null;
+ *
+ * // The above enables the debugger and will make the code to write the payload info to be written to the window object.
+ *
+ * // 1.2. Adjust the debugger to point to ANOTHER deployed screenshot service.
+ * window.mapPrepareRasterPostHttpPayloadDebugger.setup('staging.climatedata.ca', 'https://staging-data.example.org', '<salt to use>' );
+ *
+ * // The above adjusts what's needed so that we can use our local frontend app as if it was deployed at the same environment.
+ *
+ * // 2. Click the "Download" button on the map page.
+ * ```
+ */
+export class PrepareRasterPostHttpPayloadDebugger {
+	#urlHost: string | '' = '';
+
+	isSetup(): boolean {
+		return this.#urlHost !== '';
+	}
+
+	setup(
+		urlHost: string,
+		dataUrl: string,
+		salt: string,
+	) {
+		this.#urlHost = urlHost;
+		window.DATA_URL = dataUrl;
+		window.URL_ENCODER_SALT = salt;
+		console.log('DebugPrepareRasterPostHttpPayload: setup', { urlHost, dataUrl, salt });
+	}
+
+	fixUrlHost(url: URL) {
+		if (url.host !== this.#urlHost) {
+			const previousHost = url.host;
+			url.host = this.#urlHost;
+			console.warn(`fixUrlHost fixed from ${previousHost} to be ${this.#urlHost} (${url.href})`);
+		}
+	}
+}

@@ -15,6 +15,7 @@ import {
 	createFetchRequestInitOptions,
 	fromSelectedLocationToPrepareRasterPostHttpPayload,
 	prepareRaster,
+	PrepareRasterPostHttpPayloadDebugger,
 	type Prepare_Raster,
 	type PrepareRasterPostHttpPayload,
 } from '@/lib/prepare-raster';
@@ -45,10 +46,13 @@ declare global {
 		// current person's web browser and passing data to the `/raster?url=` endpoint via cURL
 		// It isn't intended to be used for storing state, but rather a temporary manual testing handle
 		mapPrepareRasterPostHttpPayload?: PrepareRasterPostHttpPayload | null;
+		mapPrepareRasterPostHttpPayloadDebugger?: PrepareRasterPostHttpPayloadDebugger;
 		URL_ENCODER_SALT: string;
 		DATA_URL: string;
 	}
 }
+
+let debuggerInstance: null | PrepareRasterPostHttpPayloadDebugger = null;
 
 const DownloadMapModal: React.FC<{
 	isOpen: boolean;
@@ -72,6 +76,11 @@ const DownloadMapModal: React.FC<{
 	// Get Salt and Data URL to download Image Map from Server API.
 	const salt: string = window.URL_ENCODER_SALT;
 	const data_url: string = window.DATA_URL;
+
+	if (debuggerInstance === null) {
+		debuggerInstance = new PrepareRasterPostHttpPayloadDebugger();
+		window.mapPrepareRasterPostHttpPayloadDebugger = debuggerInstance;
+	}
 
 	// Used by the Download Image Map server.
 	useEffect(() => {
@@ -120,6 +129,10 @@ const DownloadMapModal: React.FC<{
 	 */
 	const handleDownloadClick = async () => {
 		const mapUrl = new URL(window.location.href);
+		if (window.mapPrepareRasterPostHttpPayloadDebugger !== null) {
+			// When trying to test another remote screenshot service
+			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
+		}
 		// Make sure to remove addition hashes.
 		mapUrl.hash = '';
 		// Encode the URL

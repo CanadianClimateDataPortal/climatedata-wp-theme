@@ -178,7 +178,9 @@ const DownloadMapModal: React.FC<{
 				<Download className="w-4 h-4 text-[#FAFAFA] -mt-1" />
 			</div>
 		);
-	}, [isGenerating, __]);
+	}, [
+		isGenerating,
+	]);
 
 	return (
 		<Modal isOpen={isOpen} onClose={onClose}>

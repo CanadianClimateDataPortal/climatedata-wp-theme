@@ -183,6 +183,8 @@ const isTiledLayer = (layer: L.Layer): layer is L.Layer & TiledLayer =>
  * as loading, so a page that is not finished looks identical to one that is.
  * Covering that would require those layers to advertise that they are pending,
  * which they currently do not.
+ *
+ * @remark Where does this run?: In the user's browser.
  */
 const waitForMapsSettled = (maps: (L.Map | null)[]): Promise<boolean> => {
 	const mounted = maps.filter((map): map is L.Map => Boolean(map));
@@ -228,6 +230,8 @@ const waitForMapsSettled = (maps: (L.Map | null)[]): Promise<boolean> => {
  *
  * Never rejects. An icon that fails to load should cost us the icon, not the
  * whole screenshot.
+ *
+ * @remark Where does this run?: In the user's browser.
  */
 const waitForMarkerIcons = (): Promise<unknown> => {
 	const icons = document.querySelectorAll<HTMLImageElement>('img.leaflet-marker-icon');
@@ -345,7 +349,9 @@ export const prepareRaster: PrepareRaster = async (
 }
 
 /**
- * Runs in the user's browser. Wraps the payload as the POST `fetch` init.
+ * Wraps the payload as the POST `fetch` init.
+ *
+ * @remark Where does this run?: In the user's browser.
  */
 export const createFetchRequestInitOptions = (payload?: PrepareRasterPostHttpPayload): RequestInit => {
 	const fetchOptions: RequestInit = {

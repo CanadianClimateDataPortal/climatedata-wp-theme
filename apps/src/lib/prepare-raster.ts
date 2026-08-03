@@ -426,6 +426,8 @@ export const fromSelectedLocationToPrepareRasterPostHttpPayload = (
 
 	return payload;
 };
+
+
 /**
  * In order to test the screenshot service, we need to set the DATA_URL and URL_ENCODER_SALT in the browser's window object.
  * This is because the screenshot service is a separate service that needs to know where to send the request to get the data.
@@ -453,8 +455,14 @@ export const fromSelectedLocationToPrepareRasterPostHttpPayload = (
 export class PrepareRasterPostHttpPayloadDebugger {
 	#urlHost: string | '' = '';
 
-	isSetup(): boolean {
+	#places: [string, string, string][] = [];
+
+	get isSetup(): boolean {
 		return this.#urlHost !== '';
+	}
+
+	get places(): [string, string, string][] {
+		return [...this.#places];
 	}
 
 	setup(
@@ -474,5 +482,13 @@ export class PrepareRasterPostHttpPayloadDebugger {
 			url.host = this.#urlHost;
 			console.warn(`fixUrlHost fixed from ${previousHost} to be ${this.#urlHost} (${url.href})`);
 		}
+	}
+
+	addPlace(
+		placeName: string,
+		currentLocation: string,
+		saltedBackendLocation: string,
+	) {
+		this.#places.push([placeName, currentLocation, saltedBackendLocation]);
 	}
 }

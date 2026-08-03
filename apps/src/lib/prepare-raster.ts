@@ -21,6 +21,10 @@
  */
 import L from 'leaflet';
 
+import type {
+	MapState,
+} from '@/types/types';
+
 import { useMapMarker } from '@/hooks/use-map-marker';
 import {
 	LOCATION_MODAL_BASE_CLASS_NAMES,
@@ -375,6 +379,8 @@ export const createFetchRequestInitOptions = (payload?: PrepareRasterPostHttpPay
  * selected. `undefined` becomes an absent request body; the server-side
  * hook then calls `$.fn.prepare_raster()` argument-less rather than
  * receiving a partially-empty payload.
+ *
+ * @remark Where does this run?: In the user's browser.
  */
 export const createPrepareRasterPostHttpPayload = (
 	markerLatLon: PrepareRasterPostHttpPayload['markerLatLon'] | null,
@@ -388,4 +394,35 @@ export const createPrepareRasterPostHttpPayload = (
 		locationPopupHtml,
 		markerLatLon,
 	};
+};
+
+/**
+ * Use this to both start the execution for "Download image from viewport" and
+ * for testing the payload using cURL via CLI against the screenshot service.
+ *
+ * @remark Where does this run?: In the user's browser.
+ */
+export const fromSelectedLocationToPrepareRasterPostHttpPayload = (
+	latlng?: Record<'lat' | 'lng', number>,
+): PrepareRasterPostHttpPayload | null => {
+	let payload: PrepareRasterPostHttpPayload | null = null;
+	const markerLatLon: PrepareRasterPostHttpPayload['markerLatLon'] | null = latlng
+		? [latlng.lat, latlng.lng]
+		: null;
+
+	payload =  createPrepareRasterPostHttpPayload(markerLatLon) ?? null;
+
+	// For when we need to test using cURL against the screenshot service.
+	// To use, make sure you activate by `window.mapPrepareRasterPostHttpPayload = null` in the browser Dev Tools
+	if ('mapPrepareRasterPostHttpPayload' in window) {
+		console.info('For Manual testing against screenshot service: window.mapPrepareRasterPostHttpPayload = ', payload);
+		if (payload) {
+			window.mapPrepareRasterPostHttpPayload = window.structuredClone(payload);
+		} else {
+			window.mapPrepareRasterPostHttpPayload = null;
+			console.info('For Manual testing against screenshot service: we did not get payload', { selectedLocation, markerLatLon, locationPopupHtml: getLocationModalInnerHTML() 	});
+		}
+	}
+
+	return payload;
 };

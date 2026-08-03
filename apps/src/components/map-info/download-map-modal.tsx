@@ -13,10 +13,10 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { selectSelectedLocation, setLegendOpen } from '@/features/map/map-slice';
 import {
 	createFetchRequestInitOptions,
-	createPrepareRasterPostHttpPayload,
+	fromSelectedLocationToPrepareRasterPostHttpPayload,
 	prepareRaster,
-	type PrepareRasterPostHttpPayload,
 	type Prepare_Raster,
+	type PrepareRasterPostHttpPayload,
 } from '@/lib/prepare-raster';
 import { useMap } from '@/hooks/use-map';
 import { useMapMarker } from '@/hooks/use-map-marker';
@@ -41,6 +41,10 @@ declare global {
 				prepare_raster?: Prepare_Raster;
 			};
 		};
+		// This property is for flagging testing when we want to see what happens between
+		// current person's web browser and passing data to the `/raster?url=` endpoint via cURL
+		// It isn't intended to be used for storing state, but rather a temporary manual testing handle
+		mapPrepareRasterPostHttpPayload?: PrepareRasterPostHttpPayload | null;
 		URL_ENCODER_SALT: string;
 		DATA_URL: string;
 	}
@@ -128,11 +132,27 @@ const DownloadMapModal: React.FC<{
 
 		setIsGenerating(true);
 
-		const markerLatLon: PrepareRasterPostHttpPayload['markerLatLon'] | null = selectedLocation
-			? [selectedLocation.lat, selectedLocation.lng]
-			: null;
-		const payload = createPrepareRasterPostHttpPayload(markerLatLon);
-		const fetchInit = createFetchRequestInitOptions(payload);
+
+		/**
+		 * This implies we have no LocationModal opened
+		 */
+		let payload: PrepareRasterPostHttpPayload | null = null;
+		if (selectedLocation !== null) {
+			payload = fromSelectedLocationToPrepareRasterPostHttpPayload(selectedLocation);
+		}
+		const fetchInit = createFetchRequestInitOptions(payload ?? undefined);
+
+		if(typeof window.mapPrepareRasterPostHttpPayload !== 'undefined') {
+			// Normally, we do not want this. But when we do, what do the following mean:
+			let cURL = `curl '${api_url}' --request POST`;
+			if (!payload) {
+				// We do not have a modal opened, no data to send
+				console.log('For Manual testing against screenshot service (without any data):\n', cURL);
+			} else {
+				cURL += ` --data '${JSON.stringify(window.mapPrepareRasterPostHttpPayload)}'`
+				console.log('For Manual testing against screenshot service: (with data, use window.mapPrepareRasterPostHttpPayload):\n', cURL)
+			}
+		}
 
 		try {
 			const response = await fetch(api_url, fetchInit);

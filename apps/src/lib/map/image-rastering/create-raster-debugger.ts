@@ -4,6 +4,7 @@ import { createFetchRequestInitOptions } from './create-fetch-request-init-optio
 import { createFetchTargetToRasterWithEncodedUrl } from './create-fetch-target-to-raster-with-encoded-url';
 import { createPrepareRasterPostHttpPayload } from './create-prepare-raster-post-http-payload';
 
+import type { SignalReady } from './signal-raster-ready';
 import type { PrepareRasterPostHttpPayload } from './types';
 
 type PlaceItem = {
@@ -34,10 +35,12 @@ type PlaceItem = {
  *
  * // The above enables the debugger and will make the code to write the payload info to be written to the window object.
  *
- * // 1.2. Adjust the debugger to point to ANOTHER deployed screenshot service.
- * window.mapPrepareRasterPostHttpPayloadDebugger.setup('staging.climatedata.ca', 'https://staging-data.example.org', '<salt to use>' );
+ * // 1.2. Hold at signal, retarget another deployment, or both.
+ * window.mapPrepareRasterPostHttpPayloadDebugger.setup(true);
+ * // hold at signal, current deployment untouched
  *
- * // The above adjusts what's needed so that we can use our local frontend app as if it was deployed at the same environment.
+ * window.mapPrepareRasterPostHttpPayloadDebugger.setup(false, 'uat.climatedata.ca', 'https://dataclimatedata.crim.ca', 'override-me');
+ * // retarget staging, no hold
  *
  * // 2. Click around — each LocationModal open overwrites window.mapPrepareRasterPostHttpPayload
  * // with what it captured, and records it under `places` for later replay by index.
@@ -57,6 +60,8 @@ type PlaceItem = {
  */
 export class PrepareRasterPostHttpPayloadDebugger {
 	#urlHost: string | '' = '';
+
+	#hold: boolean = false;
 
 	#places: PlaceItem[] = [];
 
@@ -78,22 +83,50 @@ export class PrepareRasterPostHttpPayloadDebugger {
 		return [...this.#places.map((place) => ({ ...place }))];
 	}
 
+	/**
+	 * Configures the debugger. `urlHost`, `dataUrl`, and `salt` are each applied only
+	 * when provided — omitting one leaves the current deployment untouched, so a caller
+	 * can hold at signal without also having to restate a retarget it already made.
+	 *
+	 * @param hold - When true, {@link resolveSignalReady} withholds the readiness class
+	 * instead of returning `fallback`, freezing the page at capture state for inspection.
+	 * @param urlHost - Screenshot-service host to rewrite requests to. Omit to leave {@link fixUrlHost} inactive.
+	 * @param dataUrl - Overrides `window.DATA_URL`. Omit to leave the current deployment's value.
+	 * @param salt - Overrides `window.URL_ENCODER_SALT`. Omit to leave the current deployment's value.
+	 */
 	setup(
-		urlHost: string,
-		dataUrl: string,
-		salt: string,
+		hold: boolean,
+		urlHost?: string,
+		dataUrl?: string,
+		salt?: string,
 	) {
 		if (!this.isDebugMode) {
 			window.mapPrepareRasterPostHttpPayload = null;
 		}
-		this.#urlHost = urlHost;
-		window.DATA_URL = dataUrl;
-		window.URL_ENCODER_SALT = salt;
-		console.log('DebugPrepareRasterPostHttpPayload: setup', {
-			urlHost,
-			dataUrl,
-			salt,
-		});
+		this.#hold = hold;
+		if (urlHost !== undefined) {
+			this.#urlHost = urlHost;
+		}
+		if (dataUrl !== undefined) {
+			window.DATA_URL = dataUrl;
+		}
+		if (salt !== undefined) {
+			window.URL_ENCODER_SALT = salt;
+		}
+
+		const applied: Record<string, boolean | string> = {
+			hold,
+		};
+		if (urlHost !== undefined) {
+			applied.urlHost = urlHost;
+		}
+		if (dataUrl !== undefined) {
+			applied.dataUrl = dataUrl;
+		}
+		if (salt !== undefined) {
+			applied.salt = salt;
+		}
+		console.log('DebugPrepareRasterPostHttpPayload: setup', applied);
 	}
 
 	fixUrlHost(
@@ -132,6 +165,30 @@ export class PrepareRasterPostHttpPayloadDebugger {
 			return fallback;
 		}
 		return window.mapPrepareRasterPostHttpPayload ?? undefined;
+	}
+
+	/**
+	 * Resolves the readiness signal `prepareRaster` should call, applying the debug-mode
+	 * hold shared with {@link DownloadMapModal}'s production call site.
+	 *
+	 * Outside debug mode, or when `hold` is false, always returns `fallback` unchanged —
+	 * production behaviour is untouched. In debug mode with `hold` true, returns an
+	 * implementation that logs instead of adding the readiness class, so the page stays
+	 * frozen in exactly the state the screenshot service would have captured.
+	 *
+	 * @param fallback - What would signal readiness outside debug mode: `signalRasterReady`.
+	 */
+	resolveSignalReady(
+		fallback: SignalReady,
+	): SignalReady {
+		if (!this.isDebugMode || !this.#hold) {
+			return fallback;
+		}
+		return (): void => {
+			console.log(
+				'DebugPrepareRasterPostHttpPayload: withholding readiness — page frozen at capture state for inspection.',
+			);
+		};
 	}
 
 	/**

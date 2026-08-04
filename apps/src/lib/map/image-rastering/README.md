@@ -16,4 +16,4 @@ Screenshot round trip for the Maps SPA's Download button — two browser session
 - `waitForMapsSettled` — resolves once every tiled layer is idle, or the shared deadline hits.
 - `waitForMarkerIcons` — resolves once replayed marker `<img>` icons finish decoding.
 - `signalRasterReady` — adds `to-raster` to `#map-root`, the service's readiness signal.
-- `createRasterDebugger` — factory for the console debug helper replaying captured payloads.
+- `createRasterDebugger` — factory for the console debug helper: replay payloads, retarget deployments, or hold at signal.

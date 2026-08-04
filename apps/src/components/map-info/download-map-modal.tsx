@@ -78,10 +78,18 @@ const DownloadMapModal: React.FC<{
 					markerLatLon,
 				}
 			}
+			// Not `?? signalRasterReady`: resolveSignalReady always returns a function.
+			// Coalescing here would reintroduce the same bug already fixed below for
+			// resolvePostHttpPayload's payload resolution.
+			let signalReady = signalRasterReady;
+			if (window.mapPrepareRasterPostHttpPayloadDebugger) {
+				signalReady = window.mapPrepareRasterPostHttpPayloadDebugger.resolveSignalReady(signalRasterReady);
+			}
+
 			// Signalling on failure would hand the service a half-prepared page to
 			// capture as a silently wrong image. We deliberately let its wait time
 			// out instead — a visible failure, not a false `to-raster`.
-			prepareRaster(payload, { map, comparisonMap, addMarker, clearMarkers }, signalRasterReady)
+			prepareRaster(payload, { map, comparisonMap, addMarker, clearMarkers }, signalReady)
 				.catch((error) => {
 					console.error('prepareRaster failed:', error);
 				});

@@ -1,8 +1,9 @@
 /**
  * Grid Resolution.
  *
- * Grid resolution is declared per data source, not computed — nothing here derives a
- * cell size from a variable, a latitude, or a bounding box.
+ * The area of a grid we can see on a map.
+ * Each grid resolution is defined and declared per data source, no calculation
+ * needed to determine cell size, a latitude or a bounding box.
  *
  * Where a default legitimately belongs is inside the variable class that holds the
  * knowledge to supply one: `RasterPrecalculatedClimateVariable.getGridType()` prefers

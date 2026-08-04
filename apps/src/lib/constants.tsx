@@ -7,7 +7,7 @@ import {
 	S2DFrequencyTypes,
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
-import { GridTypes } from '@/lib/grid-resolution';
+import { GridTypes } from '@/lib/vocabulary';
 
 import mapPinIcon from '@/assets/map-pin.svg';
 

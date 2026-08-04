@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import {
 	getGridTypeFor,
 	getGridTypeLabel,
-} from '@/lib/grid-resolution';
+} from '@/lib/vocabulary';
 
 /**
  * Pills we add to the map image we prepare for download.

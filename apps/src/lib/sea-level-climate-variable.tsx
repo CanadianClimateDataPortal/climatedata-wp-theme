@@ -2,7 +2,7 @@ import MarineClimateVariable from '@/lib/marine-climate-variable';
 import { ColourType, DateRangeConfig, LocationModalContentParams } from '@/types/climate-variable-interface';
 import MedianOnlyVariableValues from '@/components/map-layers/median-only-variable-values';
 import { WMSParams } from '@/types/types';
-import { GridTypes } from '@/lib/grid-resolution';
+import { GridTypes } from '@/lib/vocabulary';
 
 class SeaLevelClimateVariable extends MarineClimateVariable {
 	getGridType(): string | null {

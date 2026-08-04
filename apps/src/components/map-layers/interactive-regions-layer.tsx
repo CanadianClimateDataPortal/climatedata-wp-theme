@@ -15,7 +15,7 @@ import { getDefaultFrequency } from '@/lib/utils';
 import SectionContext from '@/context/section-provider';
 import { useColorMap } from '@/hooks/use-color-map';
 import { getColour } from '@/lib/colour-scheme';
-import { GridTypes } from '@/lib/grid-resolution';
+import { GridTypes } from '@/lib/vocabulary';
 
 interface InteractiveRegionsLayerProps {
 	scenario: string;

@@ -1,10 +1,8 @@
 # `components/map/`
 
-The Maps SPA, served at `/maps` and `/cartes/`.
+The Maps SPA, served at `/maps` and `/cartes/`. Consumes cartographic map logic from `@/lib/map/`.
 
-`components/map*` siblings (`map-container.tsx`, `map-header.tsx`,
-`map-wrapper.tsx`, `map-info/`, `map-layers/`) conceptually belong here and
-will migrate into this folder over time.
+`components/map*` siblings (`map-container.tsx`, `map-header.tsx`, `map-wrapper.tsx`, `map-info/`, `map-layers/`) conceptually belong here and will migrate into this folder over time.
 
 ## Current resident
 

@@ -1,6 +1,6 @@
 # `lib/map/`
 
-Logic for the Maps SPA: models, data manipulation, computation. Not components — see `components/map/`.
+Logic about the map itself — the cartographic object, grid cells, Leaflet data — not the Maps SPA. Consumed by both `/maps` and `/download`. Not components — see `components/map/`.
 
 ## Children
 

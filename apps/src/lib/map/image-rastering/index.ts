@@ -16,7 +16,4 @@ export { createFetchRequestInitOptions } from './create-fetch-request-init-optio
 export { createFetchTargetToRasterWithEncodedUrl } from './create-fetch-target-to-raster-with-encoded-url';
 export { prepareRaster } from './prepare-raster';
 export { signalRasterReady } from './signal-raster-ready';
-export {
-	createRasterDebugger,
-	PrepareRasterPostHttpPayloadDebugger,
-} from './create-raster-debugger';
+export { installDebugPayloadAccessor } from './install-debug-payload-accessor';

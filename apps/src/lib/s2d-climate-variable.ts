@@ -22,7 +22,7 @@ import {
 	normalizeForApiFrequencyName,
 	normalizeForApiVariableId,
 } from '@/lib/s2d';
-import { GridTypes } from '@/lib/grid-resolution';
+import { GridTypes } from '@/lib/vocabulary';
 
 /**
  * Payload descriptor for S2D (Seasonal To Decadal) data download requests.

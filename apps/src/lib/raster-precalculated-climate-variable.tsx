@@ -23,7 +23,7 @@ import {
 	type PostDownloadToBlobObjectURLPayload,
 	postDownloadToBlobObjectURL,
 } from '@/services/download';
-import { GridTypes } from '@/lib/grid-resolution';
+import { GridTypes } from '@/lib/vocabulary';
 
 interface DownloadPayloadProps extends PostDownloadToBlobObjectURLPayload {
 	dataset_name: string | null;

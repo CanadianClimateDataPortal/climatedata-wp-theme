@@ -16,7 +16,7 @@ import {
 	GRID_RESOLUTIONS_VALUES,
 	GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D,
 	GridTypes,
-} from '@/lib/grid-resolution';
+} from '@/lib/vocabulary';
 
 /**
  * Component that allows to select a rectangle on the map and calculate the number of cells selected.

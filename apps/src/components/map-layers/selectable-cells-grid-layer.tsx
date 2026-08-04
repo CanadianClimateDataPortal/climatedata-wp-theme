@@ -9,7 +9,7 @@ import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, GEOSERVER_BASE_URL } from '@/lib/const
 import { MapFeatureProps } from '@/types/types';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { getFeatureId } from '@/lib/utils';
-import { GridTypes } from '@/lib/grid-resolution';
+import { GridTypes } from '@/lib/vocabulary';
 
 /**
  * Component that allows to select cells on the map and tally the number of cells selected

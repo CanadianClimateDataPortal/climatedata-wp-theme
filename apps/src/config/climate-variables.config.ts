@@ -10,7 +10,7 @@ import {
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
 import { MapDisplayType } from '@/types/types';
-import { GridTypes } from '@/lib/grid-resolution';
+import { GridTypes } from '@/lib/vocabulary';
 
 export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Test variable */

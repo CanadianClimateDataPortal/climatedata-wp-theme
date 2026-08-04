@@ -36,7 +36,7 @@ import { StepErrorMessage } from '@/lib/step-error-message';
 import { CircleAlert, InfoIcon } from 'lucide-react';
 import { useShapefile } from '@/hooks/use-shapefile';
 import { FINCH_COORDINATE_PRECISION } from '@/lib/shapefile';
-import { GridTypes } from '@/lib/grid-resolution';
+import { GridTypes } from '@/lib/vocabulary';
 
 type ErrorMessagesProps = {
 	messages: StepErrorMessage[];

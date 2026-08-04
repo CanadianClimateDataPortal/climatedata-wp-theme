@@ -21,16 +21,12 @@
  */
 import L from 'leaflet';
 
-import type {
-	MapState,
-} from '@/types/types';
-
 import { useMapMarker } from '@/hooks/use-map-marker';
 import {
 	LOCATION_MODAL_BASE_CLASS_NAMES,
 	LOCATION_MODAL_POSITION_CLASS_NAMES,
 } from '@/lib/location-modal-class-names';
-import { cn } from '@/lib/utils';
+import { cn, encodeURL } from '@/lib/utils';
 
 // To avoid circular dependency, and having to update elsewhere when/if these types change.
 type AddMarker = ReturnType<typeof useMapMarker>['addMarker'];
@@ -91,6 +87,24 @@ export type PrepareRaster = (
 	payload?: PrepareRasterPostHttpPayload,
 	handles?: PrepareRasterMapHandles,
 ) => Promise<void>;
+
+/**
+ * Take the current Map URL, encode to be used against the screenshot service.
+ *
+ * Append to `window.DATA_URL + '/raster?url='` the string given as argument, encode using `window.URL_ENCODER_SALT`.
+ *
+ * @remark Where does this run?: In the user's browser.
+ */
+export const createFetchTargetToRasterWithEncodedUrl = (
+	mapUrlString: string,
+): string => {
+	const mapUrl = new URL(mapUrlString);
+	// Encode the URL
+	const encoded_url = encodeURL(mapUrl.toString(), window.URL_ENCODER_SALT).encoded;
+	// Generate the generateMap URL.
+	const outcome = window.DATA_URL + '/raster?url=' + encoded_url;
+	return outcome;
+};
 
 /**
  * Runs in the user's browser.
@@ -383,10 +397,15 @@ export const createFetchRequestInitOptions = (payload?: PrepareRasterPostHttpPay
  * @remark Where does this run?: In the user's browser.
  */
 export const createPrepareRasterPostHttpPayload = (
-	markerLatLon: PrepareRasterPostHttpPayload['markerLatLon'] | null,
+	latlng: L.LatLngLiteral,
 ): PrepareRasterPostHttpPayload | undefined => {
+	const markerLatLon: PrepareRasterPostHttpPayload['markerLatLon'] | null = latlng
+		? [latlng.lat, latlng.lng]
+		: null;
+
 	const locationPopupHtml = getLocationModalInnerHTML();
-	if (!locationPopupHtml || !markerLatLon) {
+
+	if (!locationPopupHtml || markerLatLon === null) {
 		return undefined;
 	}
 
@@ -396,37 +415,11 @@ export const createPrepareRasterPostHttpPayload = (
 	};
 };
 
-/**
- * Use this to both start the execution for "Download image from viewport" and
- * for testing the payload using cURL via CLI against the screenshot service.
- *
- * @remark Where does this run?: In the user's browser.
- */
-export const fromSelectedLocationToPrepareRasterPostHttpPayload = (
-	latlng?: Record<'lat' | 'lng', number>,
-): PrepareRasterPostHttpPayload | null => {
-	let payload: PrepareRasterPostHttpPayload | null = null;
-	const markerLatLon: PrepareRasterPostHttpPayload['markerLatLon'] | null = latlng
-		? [latlng.lat, latlng.lng]
-		: null;
-
-	payload =  createPrepareRasterPostHttpPayload(markerLatLon) ?? null;
-
-	// For when we need to test using cURL against the screenshot service.
-	// To use, make sure you activate by `window.mapPrepareRasterPostHttpPayload = null` in the browser Dev Tools
-	if ('mapPrepareRasterPostHttpPayload' in window) {
-		console.info('For Manual testing against screenshot service: window.mapPrepareRasterPostHttpPayload = ', payload);
-		if (payload) {
-			window.mapPrepareRasterPostHttpPayload = window.structuredClone(payload);
-		} else {
-			window.mapPrepareRasterPostHttpPayload = null;
-			console.info('For Manual testing against screenshot service: we did not get payload', { selectedLocation, markerLatLon, locationPopupHtml: getLocationModalInnerHTML() 	});
-		}
-	}
-
-	return payload;
+type PlaceItem = {
+	name: string;
+	windowLocation: string;
+	latlng: L.LatLng;
 };
-
 
 /**
  * In order to test the screenshot service, we need to set the DATA_URL and URL_ENCODER_SALT in the browser's window object.
@@ -455,14 +448,14 @@ export const fromSelectedLocationToPrepareRasterPostHttpPayload = (
 export class PrepareRasterPostHttpPayloadDebugger {
 	#urlHost: string | '' = '';
 
-	#places: [string, string, string][] = [];
+	#places: PlaceItem[] = [];
 
 	get isSetup(): boolean {
 		return this.#urlHost !== '';
 	}
 
-	get places(): [string, string, string][] {
-		return [...this.#places];
+	get places(): PlaceItem[] {
+		return [...this.#places.map((place) => ({...place}))];
 	}
 
 	setup(
@@ -484,11 +477,97 @@ export class PrepareRasterPostHttpPayloadDebugger {
 		}
 	}
 
-	addPlace(
-		placeName: string,
-		currentLocation: string,
-		saltedBackendLocation: string,
+	/**
+	 * Utility to instrument each time we open a location modal during debugging to visualize on a screenshot service.
+	 *
+	 * This will mutate `window.mapPrepareRasterPostHttpPayload` and keep track of where we've clicked only when
+	 * we are in debugging mode.
+	 *
+	 * @remark To enable, set `window.mapPrepareRasterPostHttpPayload = null` in the browser's console before clicking on a location modal.
+	 */
+	addLocationModalOpenItem(
+		name: string,
+		windowLocation: string,
+		latlng: L.LatLng,
 	) {
-		this.#places.push([placeName, currentLocation, saltedBackendLocation]);
+		if (!('mapPrepareRasterPostHttpPayload' in window)) {
+			// Do not execute if we're not in debug mode.
+			// This is intended only when we need the debugger.
+			return;
+		}
+
+		const payload = createPrepareRasterPostHttpPayload(latlng);
+		if (payload) {
+			console.info('For Manual testing against screenshot service: window.mapPrepareRasterPostHttpPayload = ', payload);
+			window.mapPrepareRasterPostHttpPayload = window.structuredClone(payload);
+		} else {
+			console.info('For Manual testing against screenshot service: window.mapPrepareRasterPostHttpPayload = null');
+			window.mapPrepareRasterPostHttpPayload = null;
+		}
+
+		this.#places.push({
+			name,
+			windowLocation,
+			latlng,
+		});
+	}
+
+	/**
+	 * Doing the same as {@link DownloadMapModal}'s `handleDownloadClick` but for debugging.
+	 */
+	createFetchFor(
+		index: number,
+	): (() => ReturnType<typeof fetch>) | undefined {
+		if (!('mapPrepareRasterPostHttpPayload' in window)) {
+			// Do not execute if we're not in debug mode.
+			// This is intended only when we need the debugger.
+			return;
+		}
+		const place = this.#places[index];
+		if (!place) {
+			const message = `createFetchFor: no place at index ${index}`;
+			throw new Error(message);
+		}
+		const {
+			latlng,
+			windowLocation,
+		} = place;
+		const payload = createPrepareRasterPostHttpPayload(latlng) ?? undefined;
+		const fetchInit = createFetchRequestInitOptions(payload ?? undefined);
+		console.log(`createFetchFor(${index})`, { payload, fetchInit, place });
+		const mapUrl = new URL(windowLocation);
+		// Make sure to remove addition hashes.
+		mapUrl.hash = '';
+		const fetchTarget = createFetchTargetToRasterWithEncodedUrl(mapUrl.href);
+		console.log(`createFetchFor(${index}) 0`);
+		return (): Promise<Response> => {
+			console.log(`createFetchFor(${index}) 1`);
+			this.preFetchConsoleLog(fetchTarget, fetchInit);
+			return fetch(fetchTarget, fetchInit);
+		};
+	}
+
+	/**
+	 * Add console.log line when in debugging mode to show the cURL command that can be used to test the screenshot service.
+	 */
+	preFetchConsoleLog(
+		reqUrl: string,
+		reqInit: RequestInit,
+	) {
+		if (!('mapPrepareRasterPostHttpPayload' in window)) {
+			// Do not execute if we're not in debug mode.
+			// This is intended only when we need the debugger.
+			return;
+		}
+
+		// Normally, we do not want this. But when we do, what do the following mean:
+		let cURL = `curl '${String(reqUrl)}'`;
+		if (!reqInit.body) {
+			// We do not have a modal opened, no data to send
+			console.log('For Manual testing against screenshot service (without any data):\n', cURL);
+		} else {
+			cURL += ` --request POST --data '${JSON.stringify(window.mapPrepareRasterPostHttpPayload)}'`
+			console.log('For Manual testing against screenshot service: (with data, use window.mapPrepareRasterPostHttpPayload):\n', cURL)
+		}
 	}
 }

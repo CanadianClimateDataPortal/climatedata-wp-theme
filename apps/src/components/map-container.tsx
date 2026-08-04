@@ -34,7 +34,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useLeafletSyncContainerClassName } from '@/hooks/use-leaflet-sync-container-class-name';
 import { generateChartData } from '@/services/services';
 import { cn, getDefaultFrequency, remToPx } from '@/lib/utils';
-import { fromSelectedLocationToPrepareRasterPostHttpPayload } from '@/lib/prepare-raster';
 import SectionContext from '@/context/section-provider';
 import appConfig from '@/config/app.config';
 import {
@@ -201,12 +200,12 @@ const MapContainer = (
 		if (selectedLocation && canShowModal) {
 			const { title, latlng, featureId } = selectedLocation;
 
-			if (selectedLocation.latlng) {
-				/**
-				 * testing the payload using cURL via CLI against the screenshot service.
-				 * @see {@link fromSelectedLocationToPrepareRasterPostHttpPayload}
-				 */
-				fromSelectedLocationToPrepareRasterPostHttpPayload(selectedLocation.latlng);
+			if (selectedLocation.latlng && isComparisonMap === false) {
+				window.mapPrepareRasterPostHttpPayloadDebugger?.addLocationModalOpenItem(
+					selectedLocation?.title ?? '',
+					window.location.href,
+					selectedLocation.latlng,
+				);
 			}
 
 			setLocationModalContent(
@@ -223,12 +222,13 @@ const MapContainer = (
 			setLocationModalContent(null);
 		}
 	}, [
-		selectedLocation,
-		setLocationModalContent,
-		scenario,
 		canShowModal,
-		selectedStation,
 		handleDetailsClick,
+		isComparisonMap,
+		scenario,
+		selectedLocation,
+		selectedStation,
+		setLocationModalContent,
 	]);
 
 	useEffect(() => {

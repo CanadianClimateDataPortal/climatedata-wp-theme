@@ -8,12 +8,12 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { __, LocaleContext } from '@/context/locale-provider';
 import { Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { encodeURL } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { selectSelectedLocation, setLegendOpen } from '@/features/map/map-slice';
 import {
 	createFetchRequestInitOptions,
-	fromSelectedLocationToPrepareRasterPostHttpPayload,
+	createFetchTargetToRasterWithEncodedUrl,
+	createPrepareRasterPostHttpPayload,
 	prepareRaster,
 	PrepareRasterPostHttpPayloadDebugger,
 	type Prepare_Raster,
@@ -46,6 +46,7 @@ declare global {
 		// current person's web browser and passing data to the `/raster?url=` endpoint via cURL
 		// It isn't intended to be used for storing state, but rather a temporary manual testing handle
 		mapPrepareRasterPostHttpPayload?: PrepareRasterPostHttpPayload | null;
+		// This is to keep track of places clicked IF we're in debugging mode above
 		mapPrepareRasterPostHttpPayloadDebugger?: PrepareRasterPostHttpPayloadDebugger;
 		URL_ENCODER_SALT: string;
 		DATA_URL: string;
@@ -131,17 +132,11 @@ const DownloadMapModal: React.FC<{
 		const mapUrl = new URL(window.location.href);
 		// Make sure to remove addition hashes.
 		mapUrl.hash = '';
-		// Encode the URL
-		const encoded_url = encodeURL(mapUrl.toString(), salt).encoded;
-		// Generate the generateMap URL.
-		const api_url = data_url + '/raster?url=' + encoded_url;
-		if (!api_url) {
-			return;
-		}
+		const fetchTarget = createFetchTargetToRasterWithEncodedUrl(mapUrl.href);
 
 		setIsGenerating(true);
 
-		if (window.mapPrepareRasterPostHttpPayloadDebugger !== null) {
+		if (window.mapPrepareRasterPostHttpPayloadDebugger?.isSetup) {
 			// When trying to test another remote screenshot service
 			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
 		}
@@ -151,25 +146,15 @@ const DownloadMapModal: React.FC<{
 		 */
 		let payload: PrepareRasterPostHttpPayload | null = null;
 		if (selectedLocation !== null) {
-			payload = fromSelectedLocationToPrepareRasterPostHttpPayload(selectedLocation);
-			window.mapPrepareRasterPostHttpPayloadDebugger?.addPlace(selectedLocation?.title ?? '', window.location.href, api_url)
+			payload = createPrepareRasterPostHttpPayload(selectedLocation);
 		}
+
 		const fetchInit = createFetchRequestInitOptions(payload ?? undefined);
 
-		if(typeof window.mapPrepareRasterPostHttpPayload !== 'undefined') {
-			// Normally, we do not want this. But when we do, what do the following mean:
-			let cURL = `curl '${api_url}' --request POST`;
-			if (!payload) {
-				// We do not have a modal opened, no data to send
-				console.log('For Manual testing against screenshot service (without any data):\n', cURL);
-			} else {
-				cURL += ` --data '${JSON.stringify(window.mapPrepareRasterPostHttpPayload)}'`
-				console.log('For Manual testing against screenshot service: (with data, use window.mapPrepareRasterPostHttpPayload):\n', cURL)
-			}
-		}
+		window.mapPrepareRasterPostHttpPayloadDebugger?.preFetchConsoleLog(fetchTarget, fetchInit);
 
 		try {
-			const response = await fetch(api_url, fetchInit);
+			const response = await fetch(fetchTarget, fetchInit);
 			if (!response.ok) {
 				throw new Error(`Map image request failed with status ${response.status}`);
 			}

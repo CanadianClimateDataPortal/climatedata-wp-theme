@@ -522,7 +522,7 @@ export class PrepareRasterPostHttpPayloadDebugger {
 		salt: string,
 	) {
 		if (!this.isDebugMode) {
-			return;
+			window.mapPrepareRasterPostHttpPayload = null;
 		}
 		this.#urlHost = urlHost;
 		window.DATA_URL = dataUrl;

@@ -6,7 +6,7 @@ import {
 } from '@/lib/location-modal-class-names';
 import { cn } from '@/lib/utils';
 import { signalRasterReady } from './signal-raster-ready';
-import { MAP_SETTLE_TIMEOUT_MS, waitForMapsSettled } from './wait-for-maps-settled';
+import { MAP_SETTLE_TOTAL_BUDGET_MS, waitForMapsSettled } from './wait-for-maps-settled';
 import { waitForMarkerIcons } from './wait-for-marker-icons';
 
 import type { PrepareRaster } from './types';
@@ -45,10 +45,15 @@ export const prepareRaster: PrepareRaster = async (
 		handles?.comparisonMap ?? null,
 	];
 
+	// Computed ONCE: both waitForMapsSettled calls below share this single
+	// deadline (see MAP_SETTLE_TOTAL_BUDGET_MS) rather than each getting their
+	// own clock, so neither can spend the other's share of the budget.
+	const settleDeadline = performance.now() + MAP_SETTLE_TOTAL_BUDGET_MS;
+
 	// The service calls this about a second after requesting the page, which can
 	// be before the map's own first tiles have arrived. Settling here means the
 	// work below runs against a finished map rather than racing it.
-	await waitForMapsSettled(maps);
+	await waitForMapsSettled(maps, settleDeadline);
 
 	const {
 		locationPopupHtml,
@@ -113,8 +118,9 @@ export const prepareRaster: PrepareRaster = async (
 	await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
 	const [settled] = await Promise.all([
-		// Tiles for the viewport the resize just produced.
-		waitForMapsSettled(maps),
+		// Tiles for the viewport the resize just produced. Same deadline as the
+		// call above — inherits whatever share of the budget is left.
+		waitForMapsSettled(maps, settleDeadline),
 		// Fonts for the popup markup injected above: this browser never rendered
 		// that text before, so those font requests may only have started just now.
 		document.fonts.ready,
@@ -127,7 +133,7 @@ export const prepareRaster: PrepareRaster = async (
 		// between "the map was ready" and "we stopped waiting and captured it
 		// anyway", which is otherwise invisible in the resulting PNG.
 		console.warn(
-			`prepareRaster: map still loading after ${MAP_SETTLE_TIMEOUT_MS}ms, capturing anyway.`,
+			`prepareRaster: map still loading after ${MAP_SETTLE_TOTAL_BUDGET_MS}ms, capturing anyway.`,
 		);
 	}
 

@@ -35,9 +35,6 @@ export { getLocationModalInnerHTML } from './get-location-modal-inner-html';
 export { createPrepareRasterPostHttpPayload } from './create-prepare-raster-post-http-payload';
 export { createFetchRequestInitOptions } from './create-fetch-request-init-options';
 export { createFetchTargetToRasterWithEncodedUrl } from './create-fetch-target-to-raster-with-encoded-url';
-export { waitForMapsSettled } from './wait-for-maps-settled';
-export { waitForMarkerIcons } from './wait-for-marker-icons';
-export { signalRasterReady } from './signal-raster-ready';
 export { prepareRaster } from './prepare-raster';
 export {
 	createRasterDebugger,

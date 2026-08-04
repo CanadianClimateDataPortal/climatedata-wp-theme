@@ -319,7 +319,7 @@ html[data-raster='true'] .raster-addition-pill-resolution {
  * `GridLayer._tileReady` sets the tile's opacity to zero, then ramps it back up
  * on each animation frame. Both the `load` event and `isLoading()` report the
  * layer as finished at the *start* of that ramp, so code that waits for tiles
- * to load — see `lib/prepare-raster.ts` — is told the map is ready while it is
+ * to load — see `lib/map/image-rastering/wait-for-maps-settled.ts` — is told the map is ready while it is
  * still fading in, and a screenshot taken then catches half-transparent tiles.
  *
  * Leaflet's own switch is `Map.options.fadeAnimation`, but it is only read when

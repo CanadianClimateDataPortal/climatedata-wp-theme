@@ -18,7 +18,7 @@ import {
 	PrepareRasterPostHttpPayloadDebugger,
 	type Prepare_Raster,
 	type PrepareRasterPostHttpPayload,
-} from '@/lib/prepare-raster';
+} from '@/lib/map/image-rastering';
 import { useMap } from '@/hooks/use-map';
 import { useMapMarker } from '@/hooks/use-map-marker';
 

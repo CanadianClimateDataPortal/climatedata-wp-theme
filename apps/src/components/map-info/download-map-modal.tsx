@@ -14,8 +14,8 @@ import {
 	createFetchRequestInitOptions,
 	createFetchTargetToRasterWithEncodedUrl,
 	createPrepareRasterPostHttpPayload,
+	installDebugPayloadAccessor,
 	prepareRaster,
-	PrepareRasterPostHttpPayloadDebugger,
 	signalRasterReady,
 	type Prepare_Raster,
 	type PrepareRasterPostHttpPayload,
@@ -34,7 +34,15 @@ import {
 
 import { INTERNAL_URLS } from '@/lib/constants';
 
-let debuggerInstance: null | PrepareRasterPostHttpPayloadDebugger = null;
+// Loads `create-raster-debugger.ts` only once someone actually assigns
+// `window.mapPrepareRasterPostHttpPayload` — see `install-debug-payload-accessor.ts`.
+//
+// KNOWN RACE: clicking Download between assigning a payload and the import
+// resolving finds `window.mapPrepareRasterPostHttpPayloadDebugger` still
+// undefined, so that one click behaves as though debug mode were off. The
+// assigned payload survives — the accessor stashes it synchronously — and the
+// override applies starting with the next click. Accepted, not solved.
+installDebugPayloadAccessor();
 
 const DownloadMapModal: React.FC<{
 	isOpen: boolean;
@@ -54,11 +62,6 @@ const DownloadMapModal: React.FC<{
 	// screenshot service's browser, which has clicked nothing itself.
 	const { map, comparisonMap } = useMap();
 	const { addMarker, clearMarkers } = useMapMarker();
-
-	if (debuggerInstance === null) {
-		debuggerInstance = new PrepareRasterPostHttpPayloadDebugger();
-		window.mapPrepareRasterPostHttpPayloadDebugger = debuggerInstance;
-	}
 
 	// Used by the Download Image Map server.
 	useEffect(() => {

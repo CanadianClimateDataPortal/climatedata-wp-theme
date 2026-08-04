@@ -33,7 +33,8 @@ type PlaceItem = {
  * // 1.1. Paste and the following:
  * window.mapPrepareRasterPostHttpPayload = null;
  *
- * // The above enables the debugger and will make the code to write the payload info to be written to the window object.
+ * // The above enables the debugger and starts loading this module. It lands moments
+ * // later, so run 1.2 as its own paste rather than on the same line as 1.1.
  *
  * // 1.2. Hold at signal, retarget another deployment, or both.
  * window.mapPrepareRasterPostHttpPayloadDebugger.setup(true);
@@ -70,13 +71,17 @@ export class PrepareRasterPostHttpPayloadDebugger {
 	}
 
 	/**
-	 * Debug mode is on for as long as `window.mapPrepareRasterPostHttpPayload` exists as a
-	 * property — even when its value is `null`. Creating the property is what turns it on;
-	 * there is no separate flag. Every debug-only branch on this class reads this getter
-	 * rather than repeating the `in` check.
+	 * Debug mode is on whenever `window.mapPrepareRasterPostHttpPayload` holds a
+	 * defined value — including `null`, since assigning `null` is what enables
+	 * debug mode from the console.
+	 * `installDebugPayloadAccessor` makes the property always present on
+	 * `window`, so an `in` check would be permanently true and can no longer
+	 * tell debug mode apart from production; testing the value is what still
+	 * can. Every debug-only branch on this class reads this getter rather than
+	 * repeating the check.
 	 */
 	get isDebugMode(): boolean {
-		return 'mapPrepareRasterPostHttpPayload' in window;
+		return window.mapPrepareRasterPostHttpPayload !== undefined;
 	}
 
 	get places(): PlaceItem[] {

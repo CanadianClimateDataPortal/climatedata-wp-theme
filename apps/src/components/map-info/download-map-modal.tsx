@@ -74,10 +74,6 @@ const DownloadMapModal: React.FC<{
 	const { map, comparisonMap } = useMap();
 	const { addMarker, clearMarkers } = useMapMarker();
 
-	// Get Salt and Data URL to download Image Map from Server API.
-	const salt: string = window.URL_ENCODER_SALT;
-	const data_url: string = window.DATA_URL;
-
 	if (debuggerInstance === null) {
 		debuggerInstance = new PrepareRasterPostHttpPayloadDebugger();
 		window.mapPrepareRasterPostHttpPayloadDebugger = debuggerInstance;
@@ -127,29 +123,40 @@ const DownloadMapModal: React.FC<{
 	 * receives the rendered PNG as the response body, and triggers a normal
 	 * file download through an object URL — no `window.open`, no message
 	 * passing between windows.
+	 *
+	 * In debug mode (`window.mapPrepareRasterPostHttpPayloadDebugger` set up —
+	 * see `prepare-raster.ts`), a hand-authored `window.mapPrepareRasterPostHttpPayload`
+	 * takes precedence over the live popup/location described above.
 	 */
 	const handleDownloadClick = async () => {
 		const mapUrl = new URL(window.location.href);
 		// Make sure to remove addition hashes.
 		mapUrl.hash = '';
-		const fetchTarget = createFetchTargetToRasterWithEncodedUrl(mapUrl.href);
-
-		setIsGenerating(true);
 
 		if (window.mapPrepareRasterPostHttpPayloadDebugger?.isSetup) {
 			// When trying to test another remote screenshot service
 			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
 		}
 
+		const fetchTarget = createFetchTargetToRasterWithEncodedUrl(mapUrl.href);
+
+		setIsGenerating(true);
+
 		/**
 		 * This implies we have no LocationModal opened
 		 */
-		let payload: PrepareRasterPostHttpPayload | null = null;
+		let payload: PrepareRasterPostHttpPayload | undefined = undefined;
 		if (selectedLocation !== null) {
 			payload = createPrepareRasterPostHttpPayload(selectedLocation);
 		}
+		// Not `?? payload`: outside debug mode `resolvePostHttpPayload` already returns
+		// `payload` untouched, and inside it `undefined` is a deliberate answer meaning
+		// "send no body" — coalescing here would silently reinstate the scrape above.
+		if (window.mapPrepareRasterPostHttpPayloadDebugger) {
+			payload = window.mapPrepareRasterPostHttpPayloadDebugger.resolvePostHttpPayload(payload);
+		}
 
-		const fetchInit = createFetchRequestInitOptions(payload ?? undefined);
+		const fetchInit = createFetchRequestInitOptions(payload);
 
 		window.mapPrepareRasterPostHttpPayloadDebugger?.preFetchConsoleLog(fetchTarget, fetchInit);
 

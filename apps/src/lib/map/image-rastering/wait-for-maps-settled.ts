@@ -93,6 +93,12 @@ export const waitForMapsSettled = (
 	const mounted = maps.filter((map): map is L.Map => Boolean(map));
 	let idleFrames = 0;
 
+	// Deadline check lives inside the rAF callback deliberately — not a missing
+	// `setTimeout` fallback. Frames ARE the measurement: no frames means the page isn't
+	// rendering, so "settled" has no answer to give. A wall-clock fallback would claim
+	// ready with nothing painted, and since the service has no error branch that turns a
+	// visible failure into a silently wrong image. Browsers only pause frames for
+	// backgrounded/hidden/minimised pages — this drives one headless page, so frames fire.
 	return new Promise<boolean>((resolve) => {
 		const check = () => {
 			let loading = false;

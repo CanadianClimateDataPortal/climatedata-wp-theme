@@ -77,7 +77,13 @@ const DownloadMapModal: React.FC<{
 					markerLatLon,
 				}
 			}
-			prepareRaster(payload, { map, comparisonMap, addMarker, clearMarkers });
+			// Do not signal readiness on failure: a half-prepared page would still get
+			// the `to-raster` class and be captured as a silently wrong image. No class
+			// means the service's own 10s wait times out instead — a visible failure.
+			prepareRaster(payload, { map, comparisonMap, addMarker, clearMarkers })
+				.catch((error) => {
+					console.error('prepareRaster failed:', error);
+				});
 		}
 		window.$.fn.prepare_raster = prepare_raster;
 
@@ -105,7 +111,7 @@ const DownloadMapModal: React.FC<{
 	 * passing between windows.
 	 *
 	 * In debug mode (`window.mapPrepareRasterPostHttpPayloadDebugger` set up —
-	 * see `prepare-raster.ts`), a hand-authored `window.mapPrepareRasterPostHttpPayload`
+	 * see `create-raster-debugger.ts`), a hand-authored `window.mapPrepareRasterPostHttpPayload`
 	 * takes precedence over the live popup/location described above.
 	 */
 	const handleDownloadClick = async () => {

@@ -10,8 +10,8 @@ Screenshot round trip for the Maps SPA's Download button — two browser session
 
 ## Vocabulary
 
-- `html[data-raster="true"]` — mode flag set on the document while preparing for capture; styling keys off it.
-- `[data-raster="false"]` — marks elements to remove from the capture.
+- `html[data-raster="true"]` — persistent mode flag marking what belongs in the capture; styling keys off it to reveal elements normally hidden, like the info pills.
+- `[data-raster="false"]` on any node — marks that node and its children for one-shot removal from the DOM, performed by `prepareRaster` before the mode flag above is set.
 - `to-raster` on `#map-root` — the readiness signal the screenshot service polls for.
 
 ## Symbols

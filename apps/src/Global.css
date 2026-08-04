@@ -281,23 +281,18 @@
 }
 
 /**
- * On the map SPA, when choosing "Download" to get a screenshot of the current map.
- * Some things that are normally shown don't need to be shown in a PNG
- * capture (or shown more than once, like we're doing here).
+ * Backstop for the legend's open/close control.
+ * It renders its own `[data-raster="false"]` marker into a separate React
+ * root, gated on data that resolves asynchronously.
+ * That render can land after the removal pass already ran over the
+ * document, leaving nothing in JS to remove it.
  *
- * `html[data-raster="true"]` is the *mode* flag to adapt for making a screenshot
- * and what aspects to adjust so that we can optimize what's displayed in the image.
- * There are elements we have to remove (the aside, the menu) and to remove them,
- * we use `[data-raster="false"]`.
+ * The other two selectors handle a comparison view: they remove the
+ * right-hand map's own copies of the info pills, since only one copy should
+ * show.
  *
- * The first selector below looks redundant with that removal pass, but isn't:
- * the legend's open/close control renders its own `[data-raster="false"]` marker
- * into a separate React root, gated on data that resolves asynchronously. That
- * render can land after the removal pass already ran over the document, in
- * which case nothing in JS is left to remove it. This rule is the backstop for
- * that marker specifically. The other two selectors are unrelated: on a
- * comparison view they remove the right-hand map's own copy of the info pills,
- * since only one copy should show.
+ * Raster vocabulary (`data-raster`, `to-raster`):
+ * apps/src/lib/map/image-rastering/README.md
  */
 html[data-raster='true'] [data-raster='false'],
 html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-resolution,
@@ -306,8 +301,8 @@ html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-compa
 }
 
 /**
- * The map info pills (`MapInfoPills`) are hidden by default and revealed only
- * when rendering for the downloadable map image.
+ * The map info pills (`MapInfoPills`) are hidden by default and revealed
+ * only while preparing the raster capture.
  */
 html[data-raster='true'] .raster-addition-pill-title,
 html[data-raster='true'] .raster-addition-pill-resolution {
@@ -315,21 +310,26 @@ html[data-raster='true'] .raster-addition-pill-resolution {
 }
 
 /**
- * Leaflet fades each tile in from transparent over 200ms once it has loaded:
- * `GridLayer._tileReady` sets the tile's opacity to zero, then ramps it back up
- * on each animation frame. Both the `load` event and `isLoading()` report the
- * layer as finished at the *start* of that ramp, so code that waits for tiles
- * to load — see `lib/map/image-rastering/wait-for-maps-settled.ts` — is told the map is ready while it is
- * still fading in, and a screenshot taken then catches half-transparent tiles.
+ * Leaflet fades each tile in from transparent over 200ms once it has loaded.
+ * `GridLayer._tileReady` sets the tile's opacity to zero, then ramps it back
+ * up on each animation frame.
+ * Both the `load` event and `isLoading()` report the layer as finished at
+ * the *start* of that ramp.
+ * Code that waits for tiles to load — see
+ * `lib/map/image-rastering/wait-for-maps-settled.ts` — is told the map is
+ * ready while it is still fading in, so a screenshot taken then catches
+ * half-transparent tiles.
  *
- * Leaflet's own switch is `Map.options.fadeAnimation`, but it is only read when
- * the map is constructed; changing it afterwards does nothing, and the live flag
- * is private. So rather than reaching into library internals, this rule wins on
- * the cascade instead: the ramp is written to each tile's inline `style`, and an
- * author `!important` declaration outranks a normal style attribute.
+ * `Map.options.fadeAnimation` is Leaflet's own switch, but it is only read
+ * when the map is constructed.
+ * Changing it afterwards does nothing, and the live flag is private.
+ * This rule wins on the cascade instead: the ramp is written to each tile's
+ * inline `style`, and an author `!important` declaration outranks a normal
+ * style attribute.
  *
- * Nobody watches an animation in a headless screenshot, so dropping the fade
- * costs nothing and removes a 200ms window in which the capture is wrong.
+ * Nobody watches an animation in a headless screenshot, so dropping the
+ * fade costs nothing and removes a 200ms window in which the capture is
+ * wrong.
  */
 html[data-raster='true'] .leaflet-tile {
 	opacity: 1 !important;

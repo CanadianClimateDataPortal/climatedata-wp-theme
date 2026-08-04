@@ -1,5 +1,7 @@
 # `components/map-info/`
 
+See `apps/src/lib/map/image-rastering/README.md` for the raster vocabulary.
+
 ## Touched this PR
 
 - `download-map-modal.tsx` → `DownloadMapModal` — the Download-image modal.

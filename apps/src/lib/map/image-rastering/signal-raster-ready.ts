@@ -14,6 +14,12 @@ const RASTER_READY_CLASS_NAME = 'to-raster';
 const RASTER_TARGET_ELEMENT_ID = 'map-root';
 
 /**
+ * The readiness action `prepareRaster` calls once the capture target is ready.
+ * Lets production, a debug hold, and a test spy share one call site.
+ */
+export type SignalReady = () => void;
+
+/**
  * Signals the screenshot service that the capture target is ready, by adding
  * {@link RASTER_READY_CLASS_NAME} to the element identified by
  * {@link RASTER_TARGET_ELEMENT_ID}.

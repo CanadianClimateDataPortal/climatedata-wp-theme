@@ -100,7 +100,10 @@ export const createFetchTargetToRasterWithEncodedUrl = (
 ): string => {
 	const mapUrl = new URL(mapUrlString);
 	// Encode the URL
-	const encoded_url = encodeURL(mapUrl.toString(), window.URL_ENCODER_SALT).encoded;
+	const encoded_url = encodeURL(
+		mapUrl.toString(),
+		window.URL_ENCODER_SALT,
+	).encoded;
 	// Generate the generateMap URL.
 	const outcome = window.DATA_URL + '/raster?url=' + encoded_url;
 	return outcome;
@@ -113,7 +116,8 @@ export const createFetchTargetToRasterWithEncodedUrl = (
  * outgoing payload — the screenshot service's browser has no popup of its
  * own to read.
  */
-export const getLocationModalInnerHTML = (): null | [string, string?] => {
+export const getLocationModalInnerHTML = (
+): null | [string, string?] => {
 	const locationModal = document.querySelectorAll('[id^="location-modal-"]');
 	if (locationModal.length === 0) {
 		return null;
@@ -173,7 +177,9 @@ const MAP_SETTLE_STABLE_FRAMES = 3;
 /** A layer that takes part in Leaflet's tile-loading lifecycle. */
 type TiledLayer = { isLoading: () => boolean };
 
-const isTiledLayer = (layer: L.Layer): layer is L.Layer & TiledLayer =>
+const isTiledLayer = (
+	layer: L.Layer,
+): layer is L.Layer & TiledLayer =>
 	typeof (layer as Partial<TiledLayer>).isLoading === 'function';
 
 /**
@@ -204,7 +210,9 @@ const isTiledLayer = (layer: L.Layer): layer is L.Layer & TiledLayer =>
  *
  * @remark Where does this run?: In the user's browser.
  */
-const waitForMapsSettled = (maps: (L.Map | null)[]): Promise<boolean> => {
+const waitForMapsSettled = (
+	maps: (L.Map | null)[],
+): Promise<boolean> => {
 	const mounted = maps.filter((map): map is L.Map => Boolean(map));
 	const startedAt = performance.now();
 	let idleFrames = 0;
@@ -252,7 +260,9 @@ const waitForMapsSettled = (maps: (L.Map | null)[]): Promise<boolean> => {
  * @remark Where does this run?: In the user's browser.
  */
 const waitForMarkerIcons = (): Promise<unknown> => {
-	const icons = document.querySelectorAll<HTMLImageElement>('img.leaflet-marker-icon');
+	const icons = document.querySelectorAll<HTMLImageElement>(
+		'img.leaflet-marker-icon',
+	);
 	return Promise.all(
 		[...icons].map((icon) => icon.decode().catch(() => undefined)),
 	);
@@ -287,14 +297,20 @@ export const prepareRaster: PrepareRaster = async (
 	payload,
 	handles,
 ): Promise<void> => {
-	const maps = [handles?.map ?? null, handles?.comparisonMap ?? null];
+	const maps = [
+		handles?.map ?? null,
+		handles?.comparisonMap ?? null,
+	];
 
 	// The service calls this about a second after requesting the page, which can
 	// be before the map's own first tiles have arrived. Settling here means the
 	// work below runs against a finished map rather than racing it.
 	await waitForMapsSettled(maps);
 
-	const { locationPopupHtml, markerLatLon } = payload || {};
+	const {
+		locationPopupHtml,
+		markerLatLon,
+	} = payload || {};
 
 	// `Number.isFinite` rather than `> 0`: every Canadian longitude is
 	// negative, so a `> 0` check silently dropped every real marker. The
@@ -314,23 +330,34 @@ export const prepareRaster: PrepareRaster = async (
 	// into (`map.tsx` / `map-container.tsx`). Index 0 is the left/main pane,
 	// index 1 (compare mode only) the right pane — the same order
 	// `getLocationModalInnerHTML` captured them in.
-	const containers = [handles?.map?.getContainer(), handles?.comparisonMap?.getContainer()];
-	const className = cn(...LOCATION_MODAL_BASE_CLASS_NAMES, ...LOCATION_MODAL_POSITION_CLASS_NAMES);
+	const containers = [
+		handles?.map?.getContainer(),
+		handles?.comparisonMap?.getContainer(),
+	];
+	const className = cn(
+		...LOCATION_MODAL_BASE_CLASS_NAMES,
+		...LOCATION_MODAL_POSITION_CLASS_NAMES,
+	);
 	(locationPopupHtml || []).forEach((innerHtml, index) => {
 		const container = containers[index];
 		if (!container || !innerHtml) {
 			return;
 		}
-		container.insertAdjacentHTML('beforeend', `<div class="${className}">${innerHtml}</div>`);
+		container.insertAdjacentHTML(
+			'beforeend',
+			`<div class="${className}">${innerHtml}</div>`,
+		);
 	});
 
 	// Remove elements that should not appear in the screenshot
 	// Which basically makes the map take up all the available space by removing the surrounding elements.
-	document.querySelectorAll('[data-raster="false"]').forEach(el => el.remove());
+	document
+		.querySelectorAll('[data-raster="false"]')
+		.forEach((el) => el.remove());
 
 	document.documentElement.setAttribute('data-raster', 'true');
 
-	document.querySelectorAll('.tooltip').forEach(el => el.remove());
+	document.querySelectorAll('.tooltip').forEach((el) => el.remove());
 
 	// Resize the window to force a layout update.
 	window.dispatchEvent(new Event('resize'));
@@ -364,14 +391,16 @@ export const prepareRaster: PrepareRaster = async (
 	document
 		.getElementById(RASTER_TARGET_ELEMENT_ID)
 		?.classList.add(RASTER_READY_CLASS_NAME);
-}
+};
 
 /**
  * Wraps the payload as the POST `fetch` init.
  *
  * @remark Where does this run?: In the user's browser.
  */
-export const createFetchRequestInitOptions = (payload?: PrepareRasterPostHttpPayload): RequestInit => {
+export const createFetchRequestInitOptions = (
+	payload?: PrepareRasterPostHttpPayload,
+): RequestInit => {
 	const fetchOptions: RequestInit = {
 		method: 'POST',
 		headers: {
@@ -484,7 +513,7 @@ export class PrepareRasterPostHttpPayloadDebugger {
 	}
 
 	get places(): PlaceItem[] {
-		return [...this.#places.map((place) => ({...place}))];
+		return [...this.#places.map((place) => ({ ...place }))];
 	}
 
 	setup(
@@ -492,17 +521,31 @@ export class PrepareRasterPostHttpPayloadDebugger {
 		dataUrl: string,
 		salt: string,
 	) {
+		if (!this.isDebugMode) {
+			return;
+		}
 		this.#urlHost = urlHost;
 		window.DATA_URL = dataUrl;
 		window.URL_ENCODER_SALT = salt;
-		console.log('DebugPrepareRasterPostHttpPayload: setup', { urlHost, dataUrl, salt });
+		console.log('DebugPrepareRasterPostHttpPayload: setup', {
+			urlHost,
+			dataUrl,
+			salt,
+		});
 	}
 
-	fixUrlHost(url: URL) {
+	fixUrlHost(
+		url: URL,
+	) {
+		if (!this.isDebugMode) {
+			return;
+		}
 		if (url.host !== this.#urlHost) {
 			const previousHost = url.host;
 			url.host = this.#urlHost;
-			console.warn(`fixUrlHost fixed from ${previousHost} to be ${this.#urlHost} (${url.href})`);
+			console.warn(
+				`fixUrlHost fixed from ${previousHost} to be ${this.#urlHost} (${url.href})`
+			);
 		}
 	}
 
@@ -552,10 +595,15 @@ export class PrepareRasterPostHttpPayloadDebugger {
 
 		const payload = createPrepareRasterPostHttpPayload(latlng);
 		if (payload) {
-			console.info('For Manual testing against screenshot service: window.mapPrepareRasterPostHttpPayload = ', payload);
+			console.info(
+				'For Manual testing against screenshot service: window.mapPrepareRasterPostHttpPayload = ',
+				payload
+			);
 			window.mapPrepareRasterPostHttpPayload = window.structuredClone(payload);
 		} else {
-			console.info('For Manual testing against screenshot service: window.mapPrepareRasterPostHttpPayload = null');
+			console.info(
+				'For Manual testing against screenshot service: window.mapPrepareRasterPostHttpPayload = null'
+			);
 			window.mapPrepareRasterPostHttpPayload = null;
 		}
 
@@ -623,10 +671,13 @@ export class PrepareRasterPostHttpPayloadDebugger {
 		let cURL = `curl '${String(reqUrl)}'`;
 		if (!reqInit.body) {
 			// We do not have a modal opened, no data to send
-			console.log('For Manual testing against screenshot service (without any data):\n', cURL);
+			console.log(
+				'For Manual testing against screenshot service (without any data):\n',
+				cURL
+			);
 		} else {
-			cURL += ` --request POST --header 'Content-Type: application/json' --data '${String(reqInit.body)}'`
-			console.log('For Manual testing against screenshot service:\n', cURL)
+			cURL += ` --request POST --header 'Content-Type: application/json' --data '${String(reqInit.body)}'`;
+			console.log('For Manual testing against screenshot service:\n', cURL);
 		}
 	}
 }

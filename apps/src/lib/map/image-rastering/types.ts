@@ -2,6 +2,8 @@ import L from 'leaflet';
 
 import { useMapMarker } from '@/hooks/use-map-marker';
 
+import type { SignalReady } from './signal-raster-ready';
+
 // To avoid circular dependency, and having to update elsewhere when/if these types change.
 type AddMarker = ReturnType<typeof useMapMarker>['addMarker'];
 type ClearMarkers = ReturnType<typeof useMapMarker>['clearMarkers'];
@@ -68,4 +70,5 @@ export type Prepare_Raster = (
 export type PrepareRaster = (
 	payload?: PrepareRasterPostHttpPayload,
 	handles?: PrepareRasterMapHandles,
+	signalReady?: SignalReady,
 ) => Promise<void>;

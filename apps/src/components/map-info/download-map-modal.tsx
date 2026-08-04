@@ -16,6 +16,7 @@ import {
 	createPrepareRasterPostHttpPayload,
 	prepareRaster,
 	PrepareRasterPostHttpPayloadDebugger,
+	signalRasterReady,
 	type Prepare_Raster,
 	type PrepareRasterPostHttpPayload,
 } from '@/lib/map/image-rastering';
@@ -77,10 +78,10 @@ const DownloadMapModal: React.FC<{
 					markerLatLon,
 				}
 			}
-			// Do not signal readiness on failure: a half-prepared page would still get
-			// the `to-raster` class and be captured as a silently wrong image. No class
-			// means the service's own 10s wait times out instead — a visible failure.
-			prepareRaster(payload, { map, comparisonMap, addMarker, clearMarkers })
+			// Signalling on failure would hand the service a half-prepared page to
+			// capture as a silently wrong image. We deliberately let its wait time
+			// out instead — a visible failure, not a false `to-raster`.
+			prepareRaster(payload, { map, comparisonMap, addMarker, clearMarkers }, signalRasterReady)
 				.catch((error) => {
 					console.error('prepareRaster failed:', error);
 				});

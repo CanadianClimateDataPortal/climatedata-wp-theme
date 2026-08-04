@@ -16,7 +16,7 @@ import { useMapInteractions } from '@/hooks/use-map-interactions';
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
-const MapRoot = (
+export const MapRoot = (
 ): React.ReactElement => {
 	const { setMap, setComparisonMap } = useMap();
 	const { climateVariable } = useClimateVariable();
@@ -119,5 +119,3 @@ const MapRoot = (
 }
 
 MapRoot.displayName = 'MapRoot'; // Explicit string literal, or this name would be lost in production.
-
-export default MapRoot;

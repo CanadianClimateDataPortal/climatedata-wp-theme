@@ -6,7 +6,7 @@ import { MapInfoData } from '@/types/types';
 import { fetchMapInfoData } from '@/services/services';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import MapHeader from '@/components/map-header';
-import MapRoot from '@/components/map';
+import { MapRoot } from '@/components/map';
 
 const MapWrapper = (
 ): React.ReactElement => {

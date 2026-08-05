@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from 'vitest';
 
 import { getLocationModalInnerHTML } from './get-location-modal-inner-html';
-import { renderLocationModal } from './test-utils';
+import { renderLocationModal } from './types.examples';
 
 afterEach(() => {
 	document.body.innerHTML = '';

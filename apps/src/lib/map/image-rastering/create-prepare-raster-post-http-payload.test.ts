@@ -2,7 +2,7 @@ import L from 'leaflet';
 import { afterEach, describe, expect, test } from 'vitest';
 
 import { createPrepareRasterPostHttpPayload } from './create-prepare-raster-post-http-payload';
-import { renderLocationModal } from './test-utils';
+import { renderLocationModal } from './types.examples';
 
 // Left ('a') then right ('b') pane ids, indexed by mount order.
 const MODAL_IDS = ['a', 'b'] as const;

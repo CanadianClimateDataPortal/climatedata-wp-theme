@@ -112,7 +112,7 @@ export const prepareRaster: PrepareRaster = async (
 
 	document.querySelectorAll('.tooltip').forEach((el) => el.remove());
 
-	// Resize the window to force a layout update.
+	// Leaflet applies `resize` through the next animation frame.
 	window.dispatchEvent(new Event('resize'));
 
 	// Leaflet does not act on `resize` synchronously — `Map._onResize` defers

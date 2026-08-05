@@ -39,9 +39,9 @@ import { INTERNAL_URLS } from '@/lib/constants';
 //
 // KNOWN RACE: clicking Download between assigning a payload and the import
 // resolving finds `window.mapPrepareRasterPostHttpPayloadDebugger` still
-// undefined, so that one click behaves as though debug mode were off. The
-// assigned payload survives — the accessor stashes it synchronously — and the
-// override applies starting with the next click. Accepted, not solved.
+// undefined, so that one click behaves as though debug mode were off.
+// The payload survives — the accessor stashes it synchronously — it is
+// applied on the next click. A limitation that we will keep that way.
 installDebugPayloadAccessor();
 
 const DownloadMapModal: React.FC<{
@@ -58,14 +58,12 @@ const DownloadMapModal: React.FC<{
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
 	const selectedLocation = useAppSelector(selectSelectedLocation);
 
-	// Map handles `prepareRaster` needs to replay a popup and marker on the
-	// screenshot service's browser, which has clicked nothing itself.
+	// Map handles `prepareRaster` used to replay the captured popup and marker.
 	const { map, comparisonMap } = useMap();
 	const { addMarker, clearMarkers } = useMapMarker();
 
 	// Used by the Download Image Map server.
 	useEffect(() => {
-		// Ensure window.$ and window.$.fn exist
 		window.$ = window.$ || {};
 		window.$.fn = window.$.fn || {};
 
@@ -81,17 +79,15 @@ const DownloadMapModal: React.FC<{
 					markerLatLon,
 				}
 			}
-			// Not `?? signalRasterReady`: resolveSignalReady always returns a function.
-			// Coalescing here would reintroduce the same bug already fixed below for
-			// resolvePostHttpPayload's payload resolution.
+			// Keep the injected readiness callback when the debugger is absent.
+			// We are deliberately not providing a fallback `?? ...`: `resolveSignalReady` always returns a function.
 			let signalReady = signalRasterReady;
 			if (window.mapPrepareRasterPostHttpPayloadDebugger) {
 				signalReady = window.mapPrepareRasterPostHttpPayloadDebugger.resolveSignalReady(signalRasterReady);
 			}
 
-			// Signalling on failure would hand the service a half-prepared page to
-			// capture as a silently wrong image. We deliberately let its wait time
-			// out instead — a visible failure, not a false `to-raster`.
+			// Do not signal readiness after a preparation failure. We let its wait time out.
+			// It means the `.to-raster` className to trigger screenshot and it should have had waited longer.
 			prepareRaster(payload, { map, comparisonMap, addMarker, clearMarkers }, signalReady)
 				.catch((error) => {
 					console.error('prepareRaster failed:', error);
@@ -114,17 +110,11 @@ const DownloadMapModal: React.FC<{
 	]);
 
 	/**
-	 * Handles the click event for the "Download" button.
+	 * Handles the click event for the "Download" button from the modal.
 	 *
-	 * POSTs to the screenshot service with this browser's own currently-open
-	 * popup and selected location (see `createPrepareRasterPostHttpPayload`),
-	 * receives the rendered PNG as the response body, and triggers a normal
-	 * file download through an object URL — no `window.open`, no message
-	 * passing between windows.
-	 *
-	 * In debug mode (`window.mapPrepareRasterPostHttpPayloadDebugger` set up —
-	 * see `create-raster-debugger.ts`), a hand-authored `window.mapPrepareRasterPostHttpPayload`
-	 * takes precedence over the live popup/location described above.
+	 * Sends the current map state to the screenshot service.
+	 * Uses `createPrepareRasterPostHttpPayload`, unless we've supplied
+	 * `window.mapPrepareRasterPostHttpPayloadDebugger` with an override.
 	 */
 	const handleDownloadClick = async () => {
 		const mapUrl = new URL(window.location.href);
@@ -132,7 +122,7 @@ const DownloadMapModal: React.FC<{
 		mapUrl.hash = '';
 
 		if (window.mapPrepareRasterPostHttpPayloadDebugger?.isSetup) {
-			// When trying to test another remote screenshot service
+			// When debugging against another screenshot backend, make HTTP call to that other host.
 			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
 		}
 
@@ -140,16 +130,12 @@ const DownloadMapModal: React.FC<{
 
 		setIsGenerating(true);
 
-		/**
-		 * This implies we have no LocationModal opened
-		 */
+		// No selected location means that no `LocationModal` is open.
 		let payload: PrepareRasterPostHttpPayload | undefined = undefined;
 		if (selectedLocation !== null) {
 			payload = createPrepareRasterPostHttpPayload(selectedLocation);
 		}
-		// Not `?? payload`: outside debug mode `resolvePostHttpPayload` already returns
-		// `payload` untouched, and inside it `undefined` is a deliberate answer meaning
-		// "send no body" — coalescing here would silently reinstate the scrape above.
+		// Preserve an explicit undefined debug payload.
 		if (window.mapPrepareRasterPostHttpPayloadDebugger) {
 			payload = window.mapPrepareRasterPostHttpPayloadDebugger.resolvePostHttpPayload(payload);
 		}

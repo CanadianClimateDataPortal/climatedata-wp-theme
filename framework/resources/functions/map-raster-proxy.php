@@ -4,26 +4,34 @@ declare(strict_types=1);
 /**
  * Map raster proxy.
  *
- * This file is a standalone PHP entry point that forwards a map screenshot
- * request to the external screenshot service and streams the resulting PNG
- * back to the browser.
+ * This file forwards a map screenshot request to the external screenshot
+ * service and streams the resulting PNG back to the browser.
  *
- * The web server routes any `.php` file to PHP-FPM directly, and this file
- * boots nothing beyond that.
- * There is no `wp-load.php`, no theme, no plugins, no database connection.
- * A raster request only needs the two functions below and a cURL call, so
- * paying for a full WordPress bootstrap on the way to a 10-45 second wait on
- * Selenium bought nothing.
+ * `framework/functions.php` requires it, above its own `$includes` array,
+ * from a top-level conditional that matches `POST /maps` or `POST /cartes`
+ * and calls `exit` right after — see that file for the full reasoning.
+ * That point runs after WordPress core, plugins, and both themes'
+ * registrations have loaded, but before `init` fires, before `wp()` builds
+ * the main query, before a template is chosen, and before anything is
+ * echoed, so headers are still ours to set.
  *
- * This replaces Atom34's `register_rest_route()` version of the same idea.
- * That version is inert in git history (never `require`d, never reachable)
- * and this file physically takes its place on disk.
- * Nothing in the WordPress bootstrap chain references this file by name, and
- * it must stay that way: requiring it from `init.php` would run WordPress
- * again for every raster request, which is the exact cost this rewrite
- * removes.
- * A stray second `require` of this file elsewhere would fail loudly on the
- * `const` redeclarations below rather than silently reintroducing that cost.
+ * This file itself calls no WordPress function and reads no WordPress
+ * global, so it is independently correct if the web server ever reaches it
+ * directly instead — same output, just without the bootstrap already paid
+ * for by that point.
+ * The method and path check below is therefore real validation, not a
+ * decoration of a check `functions.php` already made.
+ *
+ * This replaces Atom34's `register_rest_route()` version of the same idea
+ * (`fw-child/resources/functions/rest-v3/map-raster.php`, commit `98538431`,
+ * deleted by this change), which paid a full WordPress bootstrap through
+ * `init`, the main query, and template selection before ever reaching its
+ * own logic.
+ * That version is inert in git history — never `require`d, never
+ * reachable — and stays there for the record.
+ *
+ * A stray second `require` of this file would fail loudly on the `const`
+ * redeclarations below rather than silently running its logic twice.
  *
  * The screenshot service renders the map in its own headless Selenium Chrome.
  * It authenticates each request by a hash of the target URL combined with a
@@ -37,11 +45,12 @@ declare(strict_types=1);
  * - A `200` response carrying `image/png`, or an error response carrying
  *   HTML that must never reach the browser as-is.
  *
- * This file's own request contract, read from a JSON body on `POST`:
- * - `mapPath` — one of the paths in `CDC_RASTER_ALLOWED_PATHS`.
- * - `mapQuery` — the map page's query string, without a leading `?`.
- * - `locationPopupHtml` — optional, one or two strings.
- * - `markerLatLon` — optional, a `[lat, lon]` pair of numbers.
+ * This file's own request contract:
+ * - The path comes from the request itself (`/maps` or `/cartes`, with or
+ *   without a trailing slash), never from the body.
+ * - A JSON body carries `mapQuery` — the map page's query string, without a
+ *   leading `?`, since a request to bare `location.pathname` carries none —
+ *   plus optionally `locationPopupHtml` and `markerLatLon`.
  *
  * No front-end code calls this endpoint yet; wiring a `fetch()` call to it is
  * later work.
@@ -88,13 +97,16 @@ $cdcRasterVerifyTls    = ( false === $cdcRasterVerifyTlsRaw || '' === $cdcRaster
 // ---------------------------------------------------------------------------
 
 /**
- * Page paths this file agrees to screenshot.
+ * Request paths this file agrees to screenshot.
  *
- * The map app answers at `/maps/` in English and `/cartes/` in French.
+ * The map app answers at `/maps` in English and `/cartes` in French, and a
+ * request may or may not carry a trailing slash, so both forms of each are
+ * listed rather than normalised — normalising would be one more thing that
+ * could disagree with `framework/functions.php`'s own matching.
  * Both entries stay literal so this file depends on no function or constant
  * defined elsewhere.
  */
-const CDC_RASTER_ALLOWED_PATHS = array( '/maps/', '/cartes/' );
+const CDC_RASTER_ALLOWED_PATHS = array( '/maps', '/maps/', '/cartes', '/cartes/' );
 
 /**
  * Longest accepted map query string, in bytes.
@@ -389,6 +401,14 @@ function cdc_raster_handle_request(): void {
 		cdc_raster_fail( 405, 'raster_method_not_allowed', 'Only POST is supported.' );
 	}
 
+	// Repeats the check `framework/functions.php` already made, so this file
+	// is correct on its own if the web server ever reaches it directly.
+	$path = (string) parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH );
+
+	if ( ! in_array( $path, CDC_RASTER_ALLOWED_PATHS, true ) ) {
+		cdc_raster_fail( 404, 'raster_invalid_path', 'Unsupported map page.' );
+	}
+
 	if ( '' === $cdcRasterBackendUrl || '' === $cdcRasterUrlSalt ) {
 		cdc_raster_fail( 503, 'raster_not_configured', 'The map screenshot service is unavailable.' );
 	}
@@ -397,12 +417,6 @@ function cdc_raster_handle_request(): void {
 
 	if ( ! is_array( $decoded ) ) {
 		cdc_raster_fail( 400, 'raster_invalid_body', 'Request body must be a JSON object.' );
-	}
-
-	$path = (string) ( $decoded['mapPath'] ?? '' );
-
-	if ( ! in_array( $path, CDC_RASTER_ALLOWED_PATHS, true ) ) {
-		cdc_raster_fail( 400, 'raster_invalid_path', 'Unsupported map page.' );
 	}
 
 	$query    = (string) ( $decoded['mapQuery'] ?? '' );
@@ -418,15 +432,88 @@ function cdc_raster_handle_request(): void {
 	$payload     = cdc_raster_extract_payload( $decoded );
 	$payloadJson = array() === $payload ? '' : (string) json_encode( $payload );
 
+	// These travel by reference into the two callbacks below: header lines
+	// arrive first and settle status/content type/content length, then body
+	// chunks arrive and read whatever the header callback already settled.
+	$status        = 0;
+	$contentType   = '';
+	$contentLength = null;
+	$decided       = false;
+	$isImage       = false;
+	$errorExcerpt  = '';
+
+	// Header and body arrive through CURLOPT_HEADERFUNCTION and
+	// CURLOPT_WRITEFUNCTION rather than CURLOPT_RETURNTRANSFER, so a
+	// successful image streams straight to the browser as cURL receives it
+	// instead of sitting fully buffered in PHP memory first — the backend's
+	// PNG can reach into the megabytes, and this file never needs the whole
+	// thing at once to decide what to do with it.
 	$ch = curl_init( $target );
 	curl_setopt_array(
 		$ch,
 		array(
 			CURLOPT_POST           => true,
-			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_TIMEOUT        => CDC_RASTER_CURL_TIMEOUT,
 			CURLOPT_SSL_VERIFYPEER => $cdcRasterVerifyTls,
 			CURLOPT_SSL_VERIFYHOST => $cdcRasterVerifyTls ? 2 : 0,
+			CURLOPT_HEADERFUNCTION => function ( $handle, string $line ) use ( &$status, &$contentType, &$contentLength ): int {
+				$trimmed = rtrim( $line, "\r\n" );
+
+				if ( 1 === preg_match( '#^HTTP/\S+\s+(\d{3})#', $trimmed, $matches ) ) {
+					// A fresh status line means a fresh set of headers,
+					// which matters if the backend ever answers through a
+					// 100-continue before its real response.
+					$status        = (int) $matches[1];
+					$contentType   = '';
+					$contentLength = null;
+				} elseif ( 0 === stripos( $trimmed, 'content-type:' ) ) {
+					$contentType = trim( substr( $trimmed, strlen( 'content-type:' ) ) );
+				} elseif ( 0 === stripos( $trimmed, 'content-length:' ) ) {
+					$contentLength = trim( substr( $trimmed, strlen( 'content-length:' ) ) );
+				}
+
+				return strlen( $line );
+			},
+			CURLOPT_WRITEFUNCTION  => function ( $handle, string $chunk ) use ( &$decided, &$isImage, &$status, &$contentType, &$contentLength, &$errorExcerpt ): int {
+				// Headers are always complete before the first body chunk
+				// arrives, so status and content type are final by now —
+				// decide once, on the first chunk, and hold that decision
+				// for the rest of the transfer.
+				if ( ! $decided ) {
+					$decided = true;
+					$isImage = ( 200 === $status ) && ( 0 === stripos( $contentType, 'image/' ) );
+
+					if ( $isImage ) {
+						http_response_code( 200 );
+						header( 'Content-Type: ' . $contentType );
+
+						if ( null !== $contentLength ) {
+							header( 'Content-Length: ' . $contentLength );
+						}
+
+						// The browser receives the image inline; the caller
+						// already holds the bytes as a Blob and names the
+						// file itself when the visitor saves it, so no
+						// Content-Disposition header travels with this
+						// response.
+						header( 'Cache-Control: private, no-store, max-age=0' );
+					}
+				}
+
+				if ( $isImage ) {
+					echo $chunk;
+					flush();
+				} elseif ( strlen( $errorExcerpt ) < CDC_RASTER_ERROR_LOG_EXCERPT ) {
+					// The screenshot service reports every failure as an
+					// HTML page — a generic 265-byte page in production, or
+					// a Werkzeug debugger dump locally — so only a bounded
+					// excerpt is kept for the log, and none of it reaches
+					// the browser.
+					$errorExcerpt .= $chunk;
+				}
+
+				return strlen( $chunk );
+			},
 		)
 	);
 
@@ -437,13 +524,23 @@ function cdc_raster_handle_request(): void {
 		curl_setopt( $ch, CURLOPT_HTTPHEADER, array( 'Content-Type: application/json' ) );
 	}
 
-	$body = curl_exec( $ch );
+	$transferred = curl_exec( $ch );
 
-	if ( false === $body ) {
+	if ( false === $transferred ) {
 		$isTimeout = CURLE_OPERATION_TIMEDOUT === curl_errno( $ch );
 		$error     = curl_error( $ch );
 
 		curl_close( $ch );
+
+		// A transport failure after streaming had already begun leaves a
+		// truncated image with the browser. There is no clean way back from
+		// that once bytes are sent — headers are gone, so this file can only
+		// log it, not answer with a clean error.
+		if ( $isImage ) {
+			error_log( sprintf( 'cdc-raster transport failure mid-stream: %s', $error ) );
+			exit;
+		}
+
 		error_log( sprintf( 'cdc-raster transport failure: %s', $error ) );
 
 		if ( $isTimeout ) {
@@ -453,37 +550,24 @@ function cdc_raster_handle_request(): void {
 		cdc_raster_fail( 502, 'raster_backend_unavailable', 'The map image service is unreachable.' );
 	}
 
-	$status      = (int) curl_getinfo( $ch, CURLINFO_HTTP_CODE );
-	$contentType = (string) curl_getinfo( $ch, CURLINFO_CONTENT_TYPE );
 	curl_close( $ch );
 
-	// Relay bytes only for a successful image.
-	// The screenshot service reports every failure as an HTML page — a
-	// generic 265-byte page in production, or a Werkzeug debugger dump
-	// locally — so it stays server-side, logged as an excerpt, and the
-	// browser gets this file's own clean error instead of someone else's
-	// stack trace.
-	if ( 200 !== $status || 0 !== stripos( $contentType, 'image/' ) ) {
-		error_log(
-			sprintf(
-				'cdc-raster backend answered %d as %s: %s',
-				$status,
-				'' === $contentType ? 'an unknown type' : $contentType,
-				substr( (string) $body, 0, CDC_RASTER_ERROR_LOG_EXCERPT )
-			)
-		);
-
-		cdc_raster_fail( 502, 'raster_backend_error', 'The map image could not be generated.' );
+	// A successful image has already streamed out through the write
+	// callback above; there is nothing left to send.
+	if ( $isImage ) {
+		exit;
 	}
 
-	// The browser receives the image inline; the caller already holds the
-	// bytes as a Blob and names the file itself when the visitor saves it,
-	// so no Content-Disposition header travels with this response.
-	http_response_code( 200 );
-	header( 'Content-Type: ' . $contentType );
-	header( 'Content-Length: ' . strlen( (string) $body ) );
-	header( 'Cache-Control: private, no-store, max-age=0' );
-	echo $body;
+	error_log(
+		sprintf(
+			'cdc-raster backend answered %d as %s: %s',
+			$status,
+			'' === $contentType ? 'an unknown type' : $contentType,
+			$errorExcerpt
+		)
+	);
+
+	cdc_raster_fail( 502, 'raster_backend_error', 'The map image could not be generated.' );
 }
 
 // PHP-FPM's SAPI is always `fpm-fcgi`, never `cli`, so this guard changes

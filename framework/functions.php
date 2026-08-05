@@ -1,6 +1,36 @@
 <?php
 
 //
+// MAP RASTER PROXY
+//
+// A POST to the map page is the Maps SPA asking for a screenshot of itself.
+// It is answered here, above the includes below, because this point runs before
+// `init` fires, before `wp()` builds the main query, before a template is chosen,
+// and before anything is echoed — so the response headers are still ours to set
+// and a binary image can be streamed straight through.
+// A GET on the same path stays untouched and renders the page as it always has.
+//
+// This still pays the WordPress and plugin bootstrap, plus the child theme's own
+// `functions.php`, which WordPress loads before this one. That cost is small beside
+// the ten to forty-five seconds the screenshot service spends driving a browser.
+//
+// The handler repeats this method and path check internally, so it stays correct
+// if it is ever reached some other way.
+
+if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
+
+	$cdc_raster_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+
+	if ( in_array( $cdc_raster_path, array( '/maps', '/maps/', '/cartes', '/cartes/' ), true ) ) {
+
+		require_once __DIR__ . '/resources/functions/map-raster-proxy.php';
+		exit;
+
+	}
+
+}
+
+//
 // INCLUDES
 //
 

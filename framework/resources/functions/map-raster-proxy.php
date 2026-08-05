@@ -488,7 +488,7 @@ function cdc_raster_handle_request(): void {
 
 // PHP-FPM's SAPI is always `fpm-fcgi`, never `cli`, so this guard changes
 // nothing in production.
-// It exists so `docker compose exec -T portal php < map-raster.php` — used
+// It exists so `docker compose exec -T portal php < map-raster-proxy.php` — used
 // to verify the two functions above against known fixtures — can define
 // everything in this file without also running a request handler that
 // expects a real HTTP request.

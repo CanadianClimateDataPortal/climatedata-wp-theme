@@ -16,6 +16,26 @@ declare module 'vitest' {
 
 global.L = L;
 
+// Two platform shims jsdom lacks, each guarded so a future jsdom shipping the
+// real thing wins over this shim. Probed empirically against this repo's jsdom
+// on 2026-08-05 — `requestAnimationFrame` already exists here and stays
+// unshimmed on purpose: the image-rastering settle loop needs the real one.
+if (typeof HTMLImageElement.prototype.decode !== 'function') {
+	// Resolves rather than rejects: `waitForMarkerIcons` always resolves
+	// regardless of `decode()`'s outcome, so a rejecting shim would test its
+	// `.catch()` branch instead of icon-decode behaviour itself.
+	HTMLImageElement.prototype.decode = (): Promise<void> => Promise.resolve();
+}
+
+if (typeof document.fonts === 'undefined') {
+	// `prepareRaster` awaits `document.fonts.ready` alongside the marker-icon
+	// and map-settle checks; jsdom has no FontFaceSet at all.
+	Object.defineProperty(document, 'fonts', {
+		configurable: true,
+		value: { ready: Promise.resolve() },
+	});
+}
+
 interface ExpectationResult {
 	pass: boolean;
 	message: () => string;

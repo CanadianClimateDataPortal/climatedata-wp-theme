@@ -102,11 +102,11 @@ class StationDataClimateVariable extends StationClimateVariable {
 	async getStationDownloadFiles(props?: StationDownloadUrlsProps): Promise<DownloadFile[]> {
 		if(!props?.stationIds || !props?.dateRange || !props?.fileFormat) return [];
 
-		const stations = props?.stationIds?.map(stationId => stationId).join('|');
+		const stations = props?.stationIds?.map(stationId => stationId).join(',');
 		const start = props?.dateRange.start + ' 00:00:00';
 		const end = props?.dateRange.end + ' 00:00:00';
 		const fileFormat = props?.fileFormat === FileFormatType.GeoJSON ? 'json' : props?.fileFormat;
-		const url = `${window.DATA_URL}/get-geomet-collection-items-links/climate-daily?datetime=${start}/${end}&STN_ID=${stations}&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=${fileFormat}`;
+		const url = `${window.DATA_URL}/get-geomet-collection-items-links/climate-daily?datetime=${start}/${end}&filter=properties.STN_ID%20IN%20(${stations})&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=${fileFormat}`;
 
 		try {
 			const response = await fetch(url);

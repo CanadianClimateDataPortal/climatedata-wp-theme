@@ -3,6 +3,7 @@ import L from 'leaflet';
 import { createFetchRequestInitOptions } from './create-fetch-request-init-options';
 import { createFetchTargetToRasterWithEncodedUrl } from './create-fetch-target-to-raster-with-encoded-url';
 import { createPrepareRasterPostHttpPayload } from './create-prepare-raster-post-http-payload';
+import { warnOnTrailingSlashInInjectedUrls } from './warn-on-trailing-slash-in-injected-urls';
 
 import type { SignalReady } from './signal-raster-ready';
 import type { PrepareRasterPostHttpPayload } from './types';
@@ -154,6 +155,12 @@ export class PrepareRasterPostHttpPayloadDebugger {
 			applied.salt = salt;
 		}
 		console.log('DebugPrepareRasterPostHttpPayload: setup', applied);
+
+		// This method assigns the injected URL globals, so it re-runs the check the
+		// page ran at load.
+		// A deployment address typed here by hand is the one route by which a trailing
+		// slash reaches those globals after the module-scope check has already passed.
+		warnOnTrailingSlashInInjectedUrls();
 	}
 
 	fixUrlHost(

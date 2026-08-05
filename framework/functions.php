@@ -1,26 +1,28 @@
 <?php
 
-// Loaded unconditionally, on every request — not only the POST branch below —
-// so `cdc_raster_proxy_is_configured()` is available wherever a normal page
-// render needs to ask the same question (see `fw-child/apps/app-map.php`).
-require_once __DIR__ . '/resources/functions/cdc-raster-proxy-config.php';
-
 //
 // MAP RASTER PROXY
 //
-// A POST to the map page is the Maps SPA asking for a screenshot of itself.
-// It is answered here, above the includes below, because this point runs before
-// `init` fires, before `wp()` builds the main query, before a template is chosen,
-// and before anything is echoed — so the response headers are still ours to set
-// and a binary image can be streamed straight through.
-// A GET on the same path stays untouched and renders the page as it always has.
+// A POST to a map page is the Maps app asking for a screenshot of itself.
+// A GET on the same path renders the page as it always has.
 //
-// This still pays the WordPress and plugin bootstrap, plus the child theme's own
-// `functions.php`, which WordPress loads before this one. That cost is small beside
-// the ten to forty-five seconds the screenshot service spends driving a browser.
+// This check belongs at the top level, above the `$includes` array below, and
+// needs to stay there.
+// Moving it into `add_action( 'init', … )` would read as more idiomatic WordPress
+// and would pay the exact cost this design removes, because `init` fires after the
+// rewrite flush and after the main query is built.
+// One map page load past that point costs 118 term-taxonomy queries over 29
+// distinct post IDs, plus 18 identical 23 KB writes of the serialized
+// `rewrite_rules` option, and a screenshot request needs none of it.
+//
+// At this point nothing has been echoed yet, so the response headers are still
+// ours to set and a binary image can stream straight through.
 //
 // The handler repeats this method and path check internally, so it stays correct
 // if it is ever reached some other way.
+//
+// The handler file's own docblock carries the full design, its trade-offs, and
+// the environment variables that configure it.
 
 if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 

@@ -7,35 +7,39 @@ declare(strict_types=1);
  * This file forwards a map screenshot request to the external screenshot
  * service and streams the resulting PNG back to the browser.
  *
- * `framework/functions.php` requires it, above its own `$includes` array,
- * from a top-level conditional that matches `POST /maps` or `POST /cartes`
- * and calls `exit` right after — see that file for the full reasoning.
+ * `framework/functions.php` requires it, above that file's own `$includes`
+ * array, from a top-level conditional matching `POST /maps` or `POST /cartes`
+ * that calls `exit` right after.
  * That point runs after WordPress core, plugins, and both themes'
- * registrations have loaded, but before `init` fires, before `wp()` builds
- * the main query, before a template is chosen, and before anything is
- * echoed, so headers are still ours to set.
+ * registrations have loaded, and before `init` fires, before `wp()` builds the
+ * main query, before a template is chosen, and before anything is echoed, so
+ * the response headers are still ours to set.
+ * Keeping the conditional at the top level is what makes the design worth
+ * having, and the cost it avoids is spelled out further down.
  *
- * This file itself calls no WordPress function and reads no WordPress
- * global, so it is independently correct if the web server ever reaches it
- * directly instead — same output, just without the bootstrap already paid
- * for by that point.
- * The method and path check below is therefore real validation, not a
- * decoration of a check `functions.php` already made.
+ * This file calls no WordPress function, reads no WordPress global, and loads
+ * no `wp-load.php`, theme, plugin, or database connection.
+ * It is therefore correct on its own if a web server ever routes to it
+ * directly, producing the same output without the bootstrap already paid for
+ * by the time `functions.php` reaches it.
+ * The method and path checks below are real validation on that path, rather
+ * than decoration of a check `functions.php` already made.
  *
- * This replaces Atom34's `register_rest_route()` version of the same idea
- * (`fw-child/resources/functions/rest-v3/map-raster.php`, commit `98538431`,
- * deleted by this change), which paid a full WordPress bootstrap through
- * `init`, the main query, and template selection before ever reaching its
- * own logic.
- * That version is inert in git history — never `require`d, never
- * reachable — and stays there for the record.
+ * That self-containment is also why this file carries no
+ * `defined( 'ABSPATH' ) || exit;` line.
+ * The guard is a WordPress idiom for files that only ever run inside a booted
+ * WordPress, and here it would abort a file designed to run without one.
  *
- * A stray second `require` of this file would fail loudly on the `const`
+ * A stray second `require` of this file fails loudly on the `const`
  * redeclarations below rather than silently running its logic twice.
  *
  * The screenshot service renders the map in its own headless Selenium Chrome.
  * It authenticates each request by a hash of the target URL combined with a
- * shared secret, computed here so the secret never leaves the server.
+ * shared secret, computed here so a proxied request needs no secret in the
+ * browser.
+ * The map page still echoes that same secret into `window.URL_ENCODER_SALT` for
+ * the direct-to-service path the Maps app falls back to, so this file leaves the
+ * secret as public as it already was.
  *
  * The service contract this file speaks to:
  * - `POST {backend URL}/raster?url=<encoded>` where `<encoded>` is
@@ -43,17 +47,29 @@ declare(strict_types=1);
  * - An optional JSON body carrying `locationPopupHtml` and `markerLatLon`,
  *   which the service replays into the page it screenshots.
  * - A `200` response carrying `image/png`, or an error response carrying
- *   HTML that must never reach the browser as-is.
+ *   HTML that must stay out of the browser.
  *
  * This file's own request contract:
- * - The path comes from the request itself (`/maps` or `/cartes`, with or
+ * - The path comes from the request line itself (`/maps` or `/cartes`, with or
  *   without a trailing slash), never from the body.
- * - A JSON body carries `mapQuery` — the map page's query string, without a
- *   leading `?`, since a request to bare `location.pathname` carries none —
- *   plus optionally `locationPopupHtml` and `markerLatLon`.
+ * - The map page's query string arrives in the JSON body as `mapQuery`, with no
+ *   leading `?`, and a query string on the request URI itself is ignored.
+ * - That same body optionally carries `locationPopupHtml` and `markerLatLon`.
  *
- * No front-end code calls this endpoint yet; wiring a `fetch()` call to it is
- * later work.
+ * The browser half of this round trip lives in
+ * `apps/src/lib/map/image-rastering/`, where `resolveRasterFetchTarget` posts to
+ * the map page's own URL once `window.RASTER_PROXY_ENABLED` is set.
+ * No deployment sets that flag yet, so this endpoint currently answers requests
+ * a developer aims at it deliberately, and the Maps app still reaches the
+ * screenshot service directly.
+ *
+ * Answering here rather than through a registered route is what keeps the cost
+ * down.
+ * A route registered the usual WordPress way is reached after `init`, and one
+ * map page load past that point costs 118 term-taxonomy queries over 29
+ * distinct post IDs plus 18 identical 23 KB writes of the serialized
+ * `rewrite_rules` option.
+ * A screenshot request needs none of that work.
  *
  * @see https://www.php.net/manual/en/book.curl.php
  */
@@ -63,19 +79,16 @@ declare(strict_types=1);
 // rotating the shared secret is a docker-compose change and nothing else.
 // ---------------------------------------------------------------------------
 
-// `framework/functions.php` already requires this unconditionally, but this
-// file documents itself as independently correct if the web server ever
-// reaches it directly — see this file's own docblock — so it requires its
-// own dependency rather than trusting an earlier require to have happened.
-require_once __DIR__ . '/cdc-raster-proxy-config.php';
-
 /**
  * Base URL of the screenshot service, without a trailing slash.
  *
- * {@see cdc_raster_backend_url()} for where this value comes from and what
- * an empty value means.
+ * Reads `CDC_RASTER_BACKEND_URL` from the environment.
+ * An empty value is a valid, fully supported state: this environment has no
+ * screenshot service configured, and the proxy answers 503.
+ * This one value carries both facts at once — whether to accept a request, and
+ * where to forward it — so no separate flag exists that could disagree with it.
  */
-$cdcRasterBackendUrl = cdc_raster_backend_url();
+$cdcRasterBackendUrl = rtrim( (string) ( getenv( 'CDC_RASTER_BACKEND_URL' ) ?: '' ), '/' );
 
 /**
  * Shared secret the screenshot service also holds, used to sign the target URL.
@@ -136,10 +149,11 @@ const CDC_RASTER_MAX_QUERY_LENGTH = 2048;
  * `max_execution_time` in `dockerfiles/build/www/configs/php/php.ini` is 30,
  * below this value, so `cdc_raster_handle_request()` below calls
  * `set_time_limit()` to raise it for the life of this request.
- * Source: (to confirm) whether this PHP-FPM build's execution timer counts
- * time spent inside `curl_exec()` — the PHP manual describes this as
- * SAPI-dependent, so `set_time_limit()` is called regardless, as a correct
- * and free defensive move either way.
+ * Whether this PHP-FPM build's execution timer counts time spent inside
+ * `curl_exec()` stays unconfirmed, since the PHP manual describes that as
+ * SAPI-dependent.
+ * `set_time_limit()` is called either way, because it is correct and free in
+ * both cases.
  */
 const CDC_RASTER_CURL_TIMEOUT = 60;
 
@@ -186,8 +200,8 @@ const CDC_RASTER_ERROR_LOG_EXCERPT = 512;
  * "Same formula as in Java lang String.java: s[0]*31^(n-1) + s[1]*31^(n-2) +
  * ... + s[n-1], in 32 bits signed arithmetic".
  *
- * Ported unchanged from Atom34 (`98538431`), verified byte-identical against
- * production before and after the move.
+ * This reproduces the browser's `hashCode` exactly, verified byte-identical
+ * against production.
  *
  * @param string $s ASCII-only input.
  *                  JavaScript iterates UTF-16 code units while `ord()` reads
@@ -236,9 +250,8 @@ function cdc_raster_hash_code( string $s ): int {
  * This function stays free of any request state so a verification script can
  * call it directly with a known URL and salt.
  *
- * Ported unchanged from Atom34 (`98538431`), verified byte-identical against
- * production before and after the move — see this ticket's report for the
- * command output.
+ * This reproduces the browser's `encodeURL` exactly, verified byte-identical
+ * against production.
  *
  * @param string $url  Absolute URL of the page to screenshot.
  * @param string $salt Shared secret the screenshot service also holds.
@@ -384,18 +397,21 @@ function cdc_raster_fail( int $status, string $code, string $message ): never {
  * Read one raster request, forward it, and answer with the image or an error.
  *
  * Rate limiting is deferred rather than reimplemented here.
- * Atom34 used WordPress transients as a counter store; this file has none,
- * and the two alternatives available without an image rebuild — APCu (not
- * among the extensions `Dockerfile` installs) or a file-based counter with
- * its own locking and cleanup — are the apparatus this rewrite exists to
- * avoid rebuilding.
- * Deferring this leaves the endpoint, once a later Atom wires a `fetch()`
- * call to it, an unauthenticated trigger for the Selenium-backed backend.
- * That is the same exposure the shared salt already carries today: it is
- * echoed into `window.URL_ENCODER_SALT` on every map page load
- * (`fw-child/apps/app-map.php`), so any visitor's browser can already
- * compute a valid signed URL and call the backend directly, unthrottled.
- * This file is no worse than that starting point, and it is not better yet.
+ * The earlier REST-route version counted requests in WordPress transients,
+ * which a file running outside a WordPress bootstrap cannot reach.
+ * The two stores available without rebuilding the image are APCu, which the
+ * `Dockerfile` does not install, and a file-based counter carrying its own
+ * locking and cleanup, and both are the apparatus this rewrite exists to shed.
+ *
+ * This endpoint is therefore an unauthenticated trigger for the
+ * Selenium-backed backend, and the Maps app already posts to it whenever the
+ * page reports the proxy as configured.
+ * That matches the exposure the shared salt already carries: the map page
+ * echoes it into `window.URL_ENCODER_SALT` on every load, so any visitor's
+ * browser can compute a valid signed URL and call the backend directly,
+ * unthrottled.
+ * This file holds that starting point rather than improving on it, and rate
+ * limiting is the work that would.
  */
 function cdc_raster_handle_request(): void {
 	global $cdcRasterBackendUrl, $cdcRasterUrlSalt, $cdcRasterVerifyTls;
@@ -416,7 +432,7 @@ function cdc_raster_handle_request(): void {
 		cdc_raster_fail( 404, 'raster_invalid_path', 'Unsupported map page.' );
 	}
 
-	if ( ! cdc_raster_proxy_is_configured() ) {
+	if ( '' === $cdcRasterBackendUrl ) {
 		cdc_raster_fail( 503, 'raster_not_configured', 'The map screenshot service is unavailable.' );
 	}
 
@@ -540,9 +556,11 @@ function cdc_raster_handle_request(): void {
 		curl_close( $ch );
 
 		// A transport failure after streaming had already begun leaves a
-		// truncated image with the browser. There is no clean way back from
-		// that once bytes are sent — headers are gone, so this file can only
-		// log it, not answer with a clean error.
+		// truncated image with the browser.
+		// The response headers went out with the first chunk, so logging the
+		// failure is all this file can still do about it.
+		// That is the trade-off streaming buys: no full image in PHP memory, and
+		// no clean error once bytes are on the wire.
 		if ( $isImage ) {
 			error_log( sprintf( 'cdc-raster transport failure mid-stream: %s', $error ) );
 			exit;
@@ -577,12 +595,12 @@ function cdc_raster_handle_request(): void {
 	cdc_raster_fail( 502, 'raster_backend_error', 'The map image could not be generated.' );
 }
 
-// PHP-FPM's SAPI is always `fpm-fcgi`, never `cli`, so this guard changes
-// nothing in production.
-// It exists so `docker compose exec -T portal php < map-raster-proxy.php` — used
-// to verify the two functions above against known fixtures — can define
-// everything in this file without also running a request handler that
-// expects a real HTTP request.
+// PHP-FPM reports `fpm-fcgi`, so this guard passes on every real request and
+// changes nothing in production.
+// It exists so `docker compose exec -T portal php < map-raster-proxy.php` can
+// define everything in this file while leaving the request handler unrun.
+// That command verifies `cdc_raster_hash_code()` and `cdc_raster_encode_url()`
+// against known fixtures, and those two functions need no HTTP request.
 if ( 'cli' !== PHP_SAPI ) {
 	cdc_raster_handle_request();
 }

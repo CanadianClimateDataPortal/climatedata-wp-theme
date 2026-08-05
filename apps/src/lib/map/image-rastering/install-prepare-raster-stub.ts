@@ -11,8 +11,10 @@ import type { Prepare_Raster } from './types';
  * that once it starts running.
  * 5s leaves roughly the other half of that 10s ceiling for the bundle to
  * parse, React to mount `DownloadMapModal`, and its registration effect to
- * run — a generous share, since production mounts land in low hundreds of
- * milliseconds.
+ * run.
+ * Measured directly on a warm load, that registration takes roughly 34ms —
+ * far under this budget — so 5s is headroom against an untested cold load,
+ * not a figure tuned against an observed failure.
  * A page that has not mounted `DownloadMapModal` within 5s of this call was
  * not going to finish `prepareRaster`'s own 9s budget before the service's
  * 10s wait expired either, so giving up here costs nothing the service was
@@ -35,12 +37,19 @@ const PREPARE_RASTER_STUB_POLL_INTERVAL_MS = 50;
 /**
  * Installs a polling stub at `window.$.fn.prepare_raster`.
  *
- * The screenshot service loads the map page, waits for `<body>` visibility,
- * sleeps one second, then evaluates `$.fn.prepare_raster(...)`.
- * `DownloadMapModal`'s registration effect (`download-map-modal.tsx`) is not
- * guaranteed to have run by then — that requires the bundle to finish
- * parsing and React to mount — so without a stub occupying the key first,
- * that call throws and the service's request fails outright.
+ * This is defence in depth against a registration race that is real in
+ * principle and unmeasured on a cold load — not a fix for an observed
+ * failure.
+ * `window.$.fn.prepare_raster` is registered inside `DownloadMapModal`'s
+ * registration effect (`download-map-modal.tsx`), which cannot run before
+ * the bundle finishes parsing and React mounts.
+ * Measured directly on a warm load, that registration completes roughly
+ * 34ms after navigation, comfortably inside the screenshot service's
+ * one-second wait before it evaluates `$.fn.prepare_raster(...)`.
+ * No cold-load measurement exists yet, and a cold load (first paint,
+ * uncached bundle) is slower than a warm one by an unknown margin, so the
+ * race stays possible in principle even though it has not been observed to
+ * cause a service failure.
  *
  * Call this as early as possible: at module scope in `main-map.tsx`, before
  * React renders anything, so the stub is the first thing to occupy
@@ -61,8 +70,11 @@ const PREPARE_RASTER_STUB_POLL_INTERVAL_MS = 50;
  * exactly as written today: `window.$.fn.prepare_raster = prepare_raster`.
  * That file is unaware this stub exists.
  * Its unmount cleanup calls this function again in place of deleting the
- * key, so a call arriving after unmount is captured rather than crashing on
- * a missing function.
+ * key.
+ * That deletion was a genuine defect independent of this race: any call
+ * arriving after an unmount hit a missing function and crashed, warm load
+ * or cold.
+ * Reinstalling the stub there closes that gap.
  *
  * `driver.execute_script` does not await anything.
  * The service's call returns as soon as this function returns, which can be

@@ -98,9 +98,11 @@ const DownloadMapModal: React.FC<{
 
 		return () => {
 			// Reinstalls the polling stub in place of the real implementation.
-			// A screenshot-service call arriving after this unmount is then
-			// captured and forwarded once a later mount registers the real
-			// implementation again, instead of hitting a deleted key.
+			// Fixes a genuine defect independent of any registration race: a
+			// screenshot-service call arriving after this unmount used to hit
+			// a deleted key and crash outright.
+			// It is now captured and forwarded once a later mount registers
+			// the real implementation again.
 			installPrepareRasterStub();
 		};
 	}, [

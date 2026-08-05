@@ -8,12 +8,16 @@ import {
 import type { Prepare_Raster } from './types';
 
 /**
- * Regression tests for {@link installPrepareRasterStub}'s registration-race fix
- * (CLIM-1454).
+ * Tests for {@link installPrepareRasterStub}'s polling contract (CLIM-1454).
  *
- * The screenshot service can call `window.$.fn.prepare_raster` before
- * `DownloadMapModal`'s effect has registered the real implementation.
- * These tests pin the stub's contract for that gap: a call arriving early is
+ * The stub is defence in depth against a registration race that is real in
+ * principle: the screenshot service could call `window.$.fn.prepare_raster`
+ * before `DownloadMapModal`'s effect has registered the real implementation.
+ * Measured on a warm load, that registration lands around 34ms after
+ * navigation, well inside the service's one-second wait, so this gap has
+ * not been the observed cause of a service failure — it remains unmeasured
+ * on a cold load.
+ * These tests pin the stub's contract regardless: a call arriving early is
  * captured and forwarded once the real implementation appears, a call
  * arriving late reaches it directly, and an abandoned poll neither loops
  * forever nor forwards to itself.

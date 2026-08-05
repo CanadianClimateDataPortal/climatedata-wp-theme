@@ -2,10 +2,11 @@
 //
 // Anything outside `apps/` relating to `prepare_raster` and Map Image Download
 // that uses the same name is effectively not used.
-// installPrepareRasterStub() below occupies it first, so a screenshot-service
-// call arriving before DownloadMapModal registers the real implementation is
-// captured and forwarded instead of crashing. See
-// lib/map/image-rastering/install-prepare-raster-stub.ts.
+// installPrepareRasterStub() below occupies it first, as defence in depth
+// against a registration race that is real in principle and unmeasured on a
+// cold load (~34ms warm against the service's one-second wait). See
+// lib/map/image-rastering/install-prepare-raster-stub.ts for the measurement
+// and the genuine unmount defect this file also closes.
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';

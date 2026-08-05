@@ -19,3 +19,4 @@ export { resolveRasterFetchTarget } from './resolve-raster-fetch-target';
 export { signalRasterReady } from './signal-raster-ready';
 export { installDebugPayloadAccessor } from './install-debug-payload-accessor';
 export { installPrepareRasterStub } from './install-prepare-raster-stub';
+export { warnOnTrailingSlashInInjectedUrls } from './warn-on-trailing-slash-in-injected-urls';

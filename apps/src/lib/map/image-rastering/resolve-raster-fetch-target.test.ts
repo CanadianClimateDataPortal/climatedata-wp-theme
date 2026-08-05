@@ -46,4 +46,33 @@ describe('resolveRasterFetchTarget', () => {
 
 		expect(target.startsWith(`${window.DATA_URL}/raster?url=`)).toBe(true);
 	});
+
+	test('the fallback URL carries a single slash before raster when window.DATA_URL ends with one', () => {
+		// The expected address is spelled out rather than derived from the global,
+		// so a doubled separator has nowhere to hide behind the same expression
+		// that produced it.
+		window.DATA_URL = 'https://dataclimatedata.example.test/';
+		window.URL_ENCODER_SALT = 'test-salt';
+		const mapUrl = new URL(MAP_PAGE_ADDRESS);
+
+		const target = resolveRasterFetchTarget(mapUrl, undefined);
+
+		expect(
+			target.startsWith('https://dataclimatedata.example.test/raster?url='),
+		).toBe(true);
+	});
+
+	test('a trailing slash on window.DATA_URL builds the same fallback URL as none', () => {
+		// Both forms are values a deployment legitimately renders into the page, and
+		// the address the screenshot service receives has to be identical either way.
+		window.URL_ENCODER_SALT = 'test-salt';
+		const mapUrl = new URL(MAP_PAGE_ADDRESS);
+
+		window.DATA_URL = 'https://dataclimatedata.example.test';
+		const fromBareAddress = resolveRasterFetchTarget(mapUrl, undefined);
+		window.DATA_URL = 'https://dataclimatedata.example.test/';
+		const fromTrailingSlashAddress = resolveRasterFetchTarget(mapUrl, undefined);
+
+		expect(fromTrailingSlashAddress).toBe(fromBareAddress);
+	});
 });

@@ -18,7 +18,10 @@ import { I18nProvider } from '@wordpress/react-i18n';
 
 import { LocaleProvider } from '@/context/locale-provider';
 import { store } from '@/app/store';
-import { installPrepareRasterStub } from '@/lib/map/image-rastering';
+import {
+	installPrepareRasterStub,
+	warnOnTrailingSlashInInjectedUrls,
+} from '@/lib/map/image-rastering';
 
 import App from '@/App';
 
@@ -27,6 +30,10 @@ import SectionContext from "@/context/section-provider";
 
 // Runs while this module is still evaluating, ahead of the React render below.
 installPrepareRasterStub();
+// Same reason, and one the constructor cannot cover: a trailing slash reaching
+// `window.DATA_URL` from a devtools override is worth naming in the console before
+// anything reads it.
+warnOnTrailingSlashInInjectedUrls();
 
 const i18n = createI18n();
 

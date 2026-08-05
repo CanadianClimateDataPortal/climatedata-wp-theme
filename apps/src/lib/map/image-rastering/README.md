@@ -49,4 +49,5 @@ Step 3 runs through the service's `driver.execute_script`, which is why everythi
 - `signalRasterReady` — adds `to-raster` to `#map-root`, the service's readiness signal.
 - `installPrepareRasterStub` — installs a polling stub at `window.$.fn.prepare_raster` at module scope, ahead of React. A call arriving before `DownloadMapModal` registers the real implementation is captured and replayed once it appears. `DownloadMapModal`'s unmount cleanup reinstalls the stub, so the key always holds a callable function. Intended never to throw, for the reason under Timing.
 - `installDebugPayloadAccessor` — installs the `window.mapPrepareRasterPostHttpPayload` accessor; assigning it a defined value lazy-loads the debugger below.
+- `warnOnTrailingSlashInInjectedUrls` — warns when an injected URL global carries a trailing slash; observes only, never corrects.
 - `createRasterDebugger` — factory for the console debug helper (replay payloads, retarget deployments, hold at signal); loaded on demand, not part of the main bundle.

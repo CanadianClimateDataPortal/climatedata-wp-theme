@@ -36,11 +36,6 @@ import {
  * and some map-specific properties like opacity
  */
 export const useUrlSync = () => {
-	// Shared by the two independent debounced URL writers below — one for
-	// variable/opacity/dataset changes (300ms), one for map coordinate changes
-	// (400ms). Each clears this same timeout before scheduling its own, so a
-	// writer that fires while the other's write is still pending cancels that
-	// pending write outright rather than merging with or queueing after it.
 	const updateTimeoutRef = useRef<number | null>(null);
 	const urlProcessingCompleteRef = useRef<boolean>(false);
 	const lastUrlUpdateRef = useRef<string>('');
@@ -100,10 +95,10 @@ export const useUrlSync = () => {
 		if (!climateVariableData) return; // Only update URL if a variable is selected
 
 		if (updateTimeoutRef.current !== null) {
-			window.clearTimeout(updateTimeoutRef.current); // Writer A: Two Debounced Writers Share One Timer And Cancel Each Other
+			window.clearTimeout(updateTimeoutRef.current);
 		}
 
-		updateTimeoutRef.current = window.setTimeout(() => { // Writer A: Two Debounced Writers...
+		updateTimeoutRef.current = window.setTimeout(() => {
 			// Serialize the current state to URL params using the shared builder
 			// (the same one the language switcher reads through
 			// `selectMapUrlSearch`) so both stay in lock-step.
@@ -124,7 +119,7 @@ export const useUrlSync = () => {
 				}
 			}
 
-			updateTimeoutRef.current = null; // Writer A: Two Debounced Writers...
+			updateTimeoutRef.current = null;
 		}, 300);
 	}, [
 		climateVariableData,
@@ -581,13 +576,12 @@ export const useUrlSync = () => {
 		
 		if (mapCoordinates && typeof window !== 'undefined') {
 			if (updateTimeoutRef.current !== null) {
-				window.clearTimeout(updateTimeoutRef.current); // Writer B: Two Debounced Writers Share One Timer And Cancel Each Other
+				window.clearTimeout(updateTimeoutRef.current);
 			}
 			
+			updateTimeoutRef.current = window.setTimeout(() => {
+				const params = new URLSearchParams(window.location.search);
 				
-			updateTimeoutRef.current = window.setTimeout(() => { // Writer B: Two Debounced Writers...
-				const params = new URLSearchParams(window.location.search); // Writer B: Two Debounced Writers...
-
 				params.set(URL_PARAMS.LATITUDE, mapCoordinates.lat.toFixed(5));
 				params.set(URL_PARAMS.LONGITUDE, mapCoordinates.lng.toFixed(5));
 				params.set(URL_PARAMS.ZOOM_LEVEL, mapCoordinates.zoom.toString());
@@ -611,7 +605,7 @@ export const useUrlSync = () => {
 					}
 				}
 				
-				updateTimeoutRef.current = null; // Writer B: Two Debounced Writers...
+				updateTimeoutRef.current = null;
 			}, 400); // Longer debounce for map movements
 		}
 	}, [mapCoordinates, isInitialized]);
@@ -620,7 +614,7 @@ export const useUrlSync = () => {
 	useEffect(() => {
 		return () => {
 			if (updateTimeoutRef.current !== null) {
-				window.clearTimeout(updateTimeoutRef.current); // Writer B: Two Debounced Writers...
+				window.clearTimeout(updateTimeoutRef.current);
 			}
 		};
 	}, []);

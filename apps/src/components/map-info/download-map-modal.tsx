@@ -144,12 +144,12 @@ const DownloadMapModal: React.FC<{
 			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
 		}
 
-		// The page render sets `window.RASTER_PROXY_DATA_URL` where the same-origin
+		// The page render sets `window.MAP_RASTER_PROXYPHP_DATA_URL` where the same-origin
 		// raster proxy is configured, and `resolveRasterFetchTarget` then posts to the
 		// page's own URL; otherwise it falls back to the salted, encoded
 		// screenshot-service URL.
 		// Round trip and vocabulary: `apps/src/lib/map/image-rastering/README.md`.
-		const fetchTarget = resolveRasterFetchTarget(mapUrl, window.RASTER_PROXY_DATA_URL);
+		const fetchTarget = resolveRasterFetchTarget(mapUrl, window.MAP_RASTER_PROXYPHP_DATA_URL);
 
 		setIsGenerating(true);
 

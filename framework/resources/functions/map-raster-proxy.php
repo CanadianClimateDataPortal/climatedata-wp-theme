@@ -58,7 +58,7 @@ declare(strict_types=1);
  *
  * The browser half of this round trip lives in
  * `apps/src/lib/map/image-rastering/`, where `resolveRasterFetchTarget` posts to
- * the map page's own URL once `window.RASTER_PROXY_DATA_URL` holds a URL.
+ * the map page's own URL once `window.MAP_RASTER_PROXYPHP_DATA_URL` holds a URL.
  * No deployment sets that global yet, so this endpoint currently answers requests
  * a developer aims at it deliberately, and the Maps app still reaches the
  * screenshot service directly.

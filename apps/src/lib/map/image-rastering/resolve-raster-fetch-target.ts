@@ -4,7 +4,7 @@ import { createFetchTargetToRasterWithEncodedUrl } from './create-fetch-target-t
  * Resolves the POST target for a Download-button screenshot request.
  *
  * @param mapUrl - The map page's own URL, hash already stripped by the caller.
- * @param proxyDataUrl - `window.RASTER_PROXY_DATA_URL` — the screenshot service
+ * @param proxyDataUrl - `window.MAP_RASTER_PROXYPHP_DATA_URL` — the screenshot service
  * address to raster through when the same-origin raster proxy is configured for
  * this environment. Its presence is the flag; the value itself stays on the
  * server side of the round trip. An empty string counts as absent, so an

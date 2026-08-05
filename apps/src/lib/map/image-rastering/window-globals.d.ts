@@ -33,6 +33,6 @@ declare global {
 		// presence rather than its value is what says the proxy is configured here.
 		// Absent is a real, supported state — it means this deployment still relies on
 		// the encoded-URL fallback.
-		RASTER_PROXY_DATA_URL?: string;
+		MAP_RASTER_PROXYPHP_DATA_URL?: string;
 	}
 }

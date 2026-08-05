@@ -1,55 +1,100 @@
 <?php
+declare(strict_types=1);
+
 /**
- * Map raster endpoint.
+ * Map raster proxy.
  *
- * This file defines a same-origin REST endpoint that forwards a map screenshot
- * request to the external screenshot service and returns the resulting PNG.
+ * This file is a standalone PHP entry point that forwards a map screenshot
+ * request to the external screenshot service and streams the resulting PNG
+ * back to the browser.
+ *
+ * The web server routes any `.php` file to PHP-FPM directly, and this file
+ * boots nothing beyond that.
+ * There is no `wp-load.php`, no theme, no plugins, no database connection.
+ * A raster request only needs the two functions below and a cURL call, so
+ * paying for a full WordPress bootstrap on the way to a 10-45 second wait on
+ * Selenium bought nothing.
+ *
+ * This replaces Atom34's `register_rest_route()` version of the same idea.
+ * That version is inert in git history (never `require`d, never reachable)
+ * and this file physically takes its place on disk.
+ * Nothing in the WordPress bootstrap chain references this file by name, and
+ * it must stay that way: requiring it from `init.php` would run WordPress
+ * again for every raster request, which is the exact cost this rewrite
+ * removes.
+ * A stray second `require` of this file elsewhere would fail loudly on the
+ * `const` redeclarations below rather than silently reintroducing that cost.
  *
  * The screenshot service renders the map in its own headless Selenium Chrome.
  * It authenticates each request by a hash of the target URL combined with a
- * shared secret, historically computed in the visitor's browser. Computing that
- * hash here keeps the shared secret on the server and gives the portal a place
- * of its own to apply policy such as rate limiting.
+ * shared secret, computed here so the secret never leaves the server.
  *
- * The service contract this endpoint speaks to:
- * - `POST {DATA_URL}/raster?url=<encoded>` where `<encoded>` is
+ * The service contract this file speaks to:
+ * - `POST {backend URL}/raster?url=<encoded>` where `<encoded>` is
  *   `urlencode( base64( "<url>|<hash>" ) )`.
  * - An optional JSON body carrying `locationPopupHtml` and `markerLatLon`,
  *   which the service replays into the page it screenshots.
- * - A `200` response carrying `image/png`, or an error response carrying HTML.
+ * - A `200` response carrying `image/png`, or an error response carrying
+ *   HTML that must never reach the browser as-is.
  *
- * This file is standalone and registers nothing until it is required.
- * Adding `require_once dirname( __FILE__ ) . '/map-raster.php';` to
- * `cdc_rest_v3_init()` in `init.php` activates it.
+ * This file's own request contract, read from a JSON body on `POST`:
+ * - `mapPath` — one of the paths in `CDC_RASTER_ALLOWED_PATHS`.
+ * - `mapQuery` — the map page's query string, without a leading `?`.
+ * - `locationPopupHtml` — optional, one or two strings.
+ * - `markerLatLon` — optional, a `[lat, lon]` pair of numbers.
  *
- * @see https://developer.wordpress.org/rest-api/extending-the-rest-api/adding-custom-endpoints/
+ * No front-end code calls this endpoint yet; wiring a `fetch()` call to it is
+ * later work.
+ *
+ * @see https://www.php.net/manual/en/book.curl.php
  */
 
-// Exit if accessed directly.
-defined( 'ABSPATH' ) || exit;
+// ---------------------------------------------------------------------------
+// Configuration, read from the environment so retargeting the backend or
+// rotating the shared secret is a docker-compose change and nothing else.
+// ---------------------------------------------------------------------------
 
 /**
- * Seconds to wait for the screenshot service to answer.
+ * Base URL of the screenshot service, without a trailing slash.
  *
- * The service sleeps 1 second, waits up to 10 seconds for the page to signal
- * readiness, then sleeps a further 4 seconds before capturing. A successful
- * request therefore takes at least 15 seconds and has no hard ceiling.
- *
- * This value is the innermost link of a chain. PHP's `max_execution_time`, the
- * FastCGI read timeout, and any upstream reverse-proxy timeout each need to
- * exceed it. A shorter link higher up surfaces as a generic gateway error with
- * nothing useful in the logs.
- *
- * Source: (to confirm) the production values of the three outer timeouts.
- *
- * Every constant here uses `defined() || define()` so a `WP_`-prefixed
- * environment variable can override it. The Docker image's `wp-config.php`
- * defines a PHP constant from every environment variable starting with `WP_`,
- * stripping that prefix, before any theme code loads. Setting
- * `WP_CDC_RASTER_BACKEND_TIMEOUT=60` therefore changes this value with no code
- * edit.
+ * Unset or empty means the service is not configured for this environment.
  */
-defined( 'CDC_RASTER_BACKEND_TIMEOUT' ) || define( 'CDC_RASTER_BACKEND_TIMEOUT', 45 );
+$cdcRasterBackendUrl = rtrim( (string) ( getenv( 'CDC_RASTER_BACKEND_URL' ) ?: '' ), '/' );
+
+/**
+ * Shared secret the screenshot service also holds, used to sign the target URL.
+ */
+$cdcRasterUrlSalt = (string) ( getenv( 'CDC_RASTER_URL_SALT' ) ?: '' );
+
+/**
+ * Whether cURL verifies the backend's TLS certificate.
+ *
+ * Defaults to true.
+ * Set `CDC_RASTER_BACKEND_VERIFY_TLS` to `0`, `false`, `no`, or `off` to
+ * accept a self-signed backend certificate, which a local or staging
+ * deployment may need.
+ */
+$cdcRasterVerifyTlsRaw = getenv( 'CDC_RASTER_BACKEND_VERIFY_TLS' );
+$cdcRasterVerifyTls    = ( false === $cdcRasterVerifyTlsRaw || '' === $cdcRasterVerifyTlsRaw )
+	? true
+	: ! in_array( strtolower( $cdcRasterVerifyTlsRaw ), array( '0', 'false', 'no', 'off' ), true );
+
+// ---------------------------------------------------------------------------
+// Tuning constants.
+//
+// These stay as plain `const` rather than deployment-target values, because
+// they tune this file's own behaviour rather than pointing it at a
+// different backend.
+// ---------------------------------------------------------------------------
+
+/**
+ * Page paths this file agrees to screenshot.
+ *
+ * The map app answers at `/maps/` in English and `/cartes/` in French.
+ * Both entries stay literal so this file depends on no function or constant
+ * defined elsewhere.
+ */
+const CDC_RASTER_ALLOWED_PATHS = array( '/maps/', '/cartes/' );
 
 /**
  * Longest accepted map query string, in bytes.
@@ -57,63 +102,40 @@ defined( 'CDC_RASTER_BACKEND_TIMEOUT' ) || define( 'CDC_RASTER_BACKEND_TIMEOUT',
  * A map's state serialises to a few hundred bytes.
  * A cap keeps the signed string bounded and removes a cheap amplification lever.
  */
-defined( 'CDC_RASTER_MAX_QUERY_LENGTH' ) || define( 'CDC_RASTER_MAX_QUERY_LENGTH', 2048 );
+const CDC_RASTER_MAX_QUERY_LENGTH = 2048;
 
 /**
- * Requests allowed from one client address within `CDC_RASTER_RATE_LIMIT_WINDOW`.
+ * Seconds cURL waits for the whole request, connect through response body.
  *
- * Each accepted request occupies the screenshot service's browser for 15 seconds
- * or more, so the service is the scarce resource this protects.
+ * The screenshot service sleeps 1 second, waits up to 10 seconds for the
+ * page to signal readiness, then sleeps a further 4 seconds before
+ * capturing — a floor of roughly 15 seconds.
+ * Observed healthy requests run 10-45 seconds under real load.
+ * 60 seconds clears that ceiling with margin for network and TLS overhead
+ * while still freeing a PHP-FPM worker from a stuck backend in bounded time.
+ *
+ * `max_execution_time` in `dockerfiles/build/www/configs/php/php.ini` is 30,
+ * below this value, so `cdc_raster_handle_request()` below calls
+ * `set_time_limit()` to raise it for the life of this request.
+ * Source: (to confirm) whether this PHP-FPM build's execution timer counts
+ * time spent inside `curl_exec()` — the PHP manual describes this as
+ * SAPI-dependent, so `set_time_limit()` is called regardless, as a correct
+ * and free defensive move either way.
  */
-defined( 'CDC_RASTER_RATE_LIMIT_MAX' ) || define( 'CDC_RASTER_RATE_LIMIT_MAX', 5 );
-
-/**
- * Length of the rate-limiting window, in seconds.
- */
-defined( 'CDC_RASTER_RATE_LIMIT_WINDOW' ) || define( 'CDC_RASTER_RATE_LIMIT_WINDOW', 600 );
+const CDC_RASTER_CURL_TIMEOUT = 60;
 
 /**
  * Bytes of a failed backend response kept in the error log.
  *
- * The service answers failures with an HTML debugger page that reaches tens of
- * kilobytes, so the log keeps a readable prefix rather than the whole body.
+ * The service answers failures with an HTML page — a small generic page in
+ * production, or tens of kilobytes of Werkzeug debugger markup locally — so
+ * the log keeps a readable prefix rather than the whole body.
  */
-defined( 'CDC_RASTER_ERROR_LOG_EXCERPT' ) || define( 'CDC_RASTER_ERROR_LOG_EXCERPT', 512 );
+const CDC_RASTER_ERROR_LOG_EXCERPT = 512;
 
-/**
- * Full REST route of this endpoint, as `WP_REST_Request::get_route()` reports it.
- *
- * The binary response filter compares against this to recognise its own route.
- */
-defined( 'CDC_RASTER_ROUTE' ) || define( 'CDC_RASTER_ROUTE', '/cdc/v3/map-raster' );
-
-/**
- * Register the map raster endpoint.
- *
- * The route name follows the kebab-case nouns already used across `cdc/v3`.
- *
- * `permission_callback` returns true for everyone on purpose. The map is a
- * public page and anonymous visitors are the intended users of this feature.
- * The controls that carry weight here are the map URL reconstruction in
- * `cdc_rest_v3_map_raster_build_map_url()`, which makes the scheme, the host and
- * the path impossible to influence from a request, and the rate limiting in
- * `cdc_rest_v3_map_raster_rate_limit_exceeded()`.
- *
- * A nonce would add little. WordPress derives a nonce for a logged-out visitor
- * from an empty session token, so every anonymous visitor receives the same
- * value and a single request for the map page reveals it. A nonce also expires
- * after 12 to 24 hours, which would break a map page that a visitor left open
- * overnight.
- */
-register_rest_route(
-	'cdc/v3',
-	'map-raster',
-	array(
-		'methods'             => WP_REST_Server::CREATABLE,
-		'callback'            => 'cdc_rest_v3_map_raster',
-		'permission_callback' => '__return_true',
-	)
-);
+// ---------------------------------------------------------------------------
+// Pure helpers.
+// ---------------------------------------------------------------------------
 
 /**
  * Hash a string the way `hashCode()` in `apps/src/lib/utils.ts` does.
@@ -127,28 +149,34 @@ register_rest_route(
  *         }, 0);
  *     }
  *
- * The arithmetic is signed 32-bit two's complement. JavaScript's `a & a` looks
- * redundant and exists to force the ToInt32 coercion that bitwise operators
- * apply. PHP integers are 64 bits wide and `<<` keeps growing them, so each
+ * The arithmetic is signed 32-bit two's complement.
+ * JavaScript's `a & a` looks redundant and exists to force the ToInt32
+ * coercion that bitwise operators apply.
+ * PHP integers are 64 bits wide and `<<` keeps growing them, so each
  * iteration here masks the accumulator back to 32 bits and restores the sign.
- * Masking every iteration reaches the same result as JavaScript's single mask at
- * the end, because shifting, subtracting and adding are all well defined modulo
- * 2^32.
+ * Masking every iteration reaches the same result as JavaScript's single mask
+ * at the end, because shifting, subtracting and adding are all well defined
+ * modulo 2^32.
  *
- * Results are routinely negative and carry a leading minus sign into the signed
- * string. Both verification fixtures below produce negative hashes.
+ * Results are routinely negative and carry a leading minus sign into the
+ * signed string.
+ * Both verification fixtures for this function produce negative hashes.
  *
- * The screenshot service computes the same value with numpy 32-bit integers in
- * `calculate_hash()`, and describes the formula as:
- * "Same formula as in Java lang String.java: s[0]*31^(n-1) + s[1]*31^(n-2) + ...
- * + s[n-1], in 32 bits signed arithmetic".
+ * The screenshot service computes the same value with numpy 32-bit integers
+ * in `calculate_hash()`, and describes the formula as:
+ * "Same formula as in Java lang String.java: s[0]*31^(n-1) + s[1]*31^(n-2) +
+ * ... + s[n-1], in 32 bits signed arithmetic".
+ *
+ * Ported unchanged from Atom34 (`98538431`), verified byte-identical against
+ * production before and after the move.
  *
  * @param string $s ASCII-only input.
  *                  JavaScript iterates UTF-16 code units while `ord()` reads
  *                  bytes, so the two agree below U+0080 and diverge above it.
  *                  Callers pass the result of `URL.toString()`, which
  *                  percent-encodes everything outside ASCII.
- *                  `cdc_rest_v3_map_raster_reject_query()` enforces this.
+ *                  `cdc_raster_reject_query()` enforces this for the query
+ *                  portion of that URL.
  *
  * @return int Signed 32-bit hash.
  */
@@ -182,19 +210,16 @@ function cdc_raster_hash_code( string $s ): int {
  * `base64_encode()` matches `btoa()` for ASCII input, since `btoa()` encodes
  * Latin-1 bytes and PHP encodes bytes.
  *
- * `rawurlencode()` matches `encodeURIComponent()` for base64 output. The two
- * differ only over the characters `!*'()`, and base64 produces none of them.
+ * `rawurlencode()` matches `encodeURIComponent()` for base64 output.
+ * The two differ only over the characters `!*'()`, and base64 produces none
+ * of them.
  *
- * This function stays free of WordPress and of request state so a verification
- * script can call it directly with a known URL and salt.
+ * This function stays free of any request state so a verification script can
+ * call it directly with a known URL and salt.
  *
- * Verified against two known-good fixtures, both byte for byte:
- *
- * - Production. URL
- *   `https://climatedata.ca/maps/?var=freeze_thaw_cycles&th=dlyfrzthw_tx0_tn-1&cmp=1&cmpTo=ssp585&region=gridded_data&dataset=216&dataOpacity=70&labelOpacity=71&lat=45.50683&lng=-72.33398&zoom=10`
- *   with salt `deVAzhKYmPjN` gives hash `-1829354212`.
- * - Development. The same query string on host `dev-en.climatedata.ca` with
- *   salt `override-me` gives hash `-1247340579`.
+ * Ported unchanged from Atom34 (`98538431`), verified byte-identical against
+ * production before and after the move — see this ticket's report for the
+ * command output.
  *
  * @param string $url  Absolute URL of the page to screenshot.
  * @param string $salt Shared secret the screenshot service also holds.
@@ -208,121 +233,32 @@ function cdc_raster_encode_url( string $url, string $salt ): string {
 }
 
 /**
- * Read the screenshot service's base URL.
- *
- * The `DATA_URL` constant is the preferred source, because the Docker image
- * defines it from a `WP_DATA_URL` environment variable and therefore keeps
- * deployment configuration outside the image. The theme's global falls in behind
- * it so existing deployments keep working unchanged.
- *
- * @return string Base URL without a trailing slash, or an empty string.
- */
-function cdc_rest_v3_map_raster_data_url(): string {
-	if ( defined( 'DATA_URL' ) && is_string( DATA_URL ) && '' !== DATA_URL ) {
-		return untrailingslashit( DATA_URL );
-	}
-
-	if ( isset( $GLOBALS['vars']['data_url'] ) && is_string( $GLOBALS['vars']['data_url'] ) ) {
-		return untrailingslashit( $GLOBALS['vars']['data_url'] );
-	}
-
-	return '';
-}
-
-/**
- * Read the shared secret used to sign the target URL.
- *
- * The `URL_ENCODER_SALT` constant is the preferred source for the same reason as
- * `cdc_rest_v3_map_raster_data_url()`, and it additionally keeps the secret out
- * of the repository. Rotating the secret then becomes a deployment variable
- * change, which matters because the screenshot service holds the same value and
- * the two rotate together.
- *
- * @return string Shared secret, or an empty string.
- */
-function cdc_rest_v3_map_raster_salt(): string {
-	if ( defined( 'URL_ENCODER_SALT' ) && is_string( URL_ENCODER_SALT ) && '' !== URL_ENCODER_SALT ) {
-		return URL_ENCODER_SALT;
-	}
-
-	if ( isset( $GLOBALS['vars']['url_encoder_salt'] ) && is_string( $GLOBALS['vars']['url_encoder_salt'] ) ) {
-		return $GLOBALS['vars']['url_encoder_salt'];
-	}
-
-	return '';
-}
-
-/**
- * List the page paths this endpoint agrees to screenshot.
- *
- * The map app answers at `/maps/` in English and `/cartes/` in French.
- * Both entries stay literal so this file keeps working once the surrounding
- * theme moves, and so it depends on no function defined elsewhere.
- *
- * @return string[] Accepted paths, each with leading and trailing slashes.
- */
-function cdc_rest_v3_map_raster_paths(): array {
-	return array(
-		'/maps/',
-		'/cartes/',
-	);
-}
-
-/**
- * Build the absolute URL the screenshot service will load.
- *
- * The scheme and the host come from `home_url()`, which the theme filters per
- * language so it yields the domain the visitor is already on. A request supplies
- * only the path, checked against `cdc_rest_v3_map_raster_paths()`, and the query
- * string. Keeping the host out of a request's reach is what stops this endpoint
- * from signing URLs of someone else's choosing.
- *
- * The query string is concatenated exactly as it arrived. Parsing it and
- * rebuilding it would reorder parameters and re-encode characters such as the
- * commas in `coords`, which would produce a valid signature over a URL that
- * differs from the page the visitor is looking at. That failure is silent: the
- * screenshot would come back showing a slightly different map rather than
- * failing.
- *
- * @param string $path  One of the accepted map paths.
- * @param string $query Query string with no leading `?`, possibly empty.
- *
- * @return string Absolute URL.
- */
-function cdc_rest_v3_map_raster_build_map_url( string $path, string $query ): string {
-	$map_url = untrailingslashit( home_url() ) . $path;
-
-	if ( '' !== $query ) {
-		$map_url .= '?' . $query;
-	}
-
-	return $map_url;
-}
-
-/**
  * Describe why a query string is unacceptable, or return an empty string.
  *
  * Three rules apply.
  *
  * A length cap keeps the signed string bounded.
  *
- * The vertical bar is reserved. The screenshot service separates the URL from
- * its hash on that character and splits into exactly two parts, so a URL
- * carrying one makes the service raise and answer `400`. Refusing it here
- * returns a message that names the cause.
+ * The vertical bar is reserved.
+ * The screenshot service separates the URL from its hash on that character
+ * and splits into exactly two parts, so a URL carrying one makes the service
+ * raise and answer `400`.
+ * Refusing it here returns a message that names the cause.
  *
  * Bytes at or above `0x80` would hash differently on each side, because
- * JavaScript reads UTF-16 code units where `cdc_raster_hash_code()` reads bytes.
- * A browser builds the query with `URL.toString()`, which percent-encodes those
- * characters, so a well-formed request never carries them. Checking anyway keeps
- * the guarantee inside this file rather than resting on the caller.
+ * JavaScript reads UTF-16 code units where `cdc_raster_hash_code()` reads
+ * bytes.
+ * A browser builds the query with `URL.toString()`, which percent-encodes
+ * those characters, so a well-formed request never carries them.
+ * Checking anyway keeps the guarantee inside this file rather than resting
+ * on the caller.
  *
  * @param string $query Query string with no leading `?`.
  *
  * @return string Error code, or an empty string when the query is acceptable.
  */
-function cdc_rest_v3_map_raster_reject_query( string $query ): string {
-	if ( strlen( $query ) > (int) CDC_RASTER_MAX_QUERY_LENGTH ) {
+function cdc_raster_reject_query( string $query ): string {
+	if ( strlen( $query ) > CDC_RASTER_MAX_QUERY_LENGTH ) {
 		return 'raster_invalid_query';
 	}
 
@@ -338,85 +274,55 @@ function cdc_rest_v3_map_raster_reject_query( string $query ): string {
 }
 
 /**
- * Resolve the address to rate limit against.
+ * Read this site's own scheme and host, the way `wp-config.php` does.
  *
- * The site runs behind a reverse proxy, which `wp-config.php` shows by trusting
- * `HTTP_X_FORWARDED_PROTO` to decide the scheme. `REMOTE_ADDR` therefore holds
- * the proxy's address and the visitor's address arrives in a forwarded header.
+ * `dockerfiles/build/www/configs/wordpress/wp-config.php` trusts
+ * `HTTP_X_FORWARDED_PROTO` for the same reason: nginx terminates TLS, but a
+ * reverse proxy in front of it may terminate TLS again and forward plain
+ * HTTP, in which case `$_SERVER['HTTPS']` alone would read as off.
+ * Mirroring that trust decision here keeps this file's idea of "same origin"
+ * consistent with WordPress's.
  *
- * Source: (to confirm) which proxy terminates production traffic, and which
- * header it sets. A client can set `X-Forwarded-For` itself, so this function
- * gives a real limit only once the trusted proxy is known and its own entry is
- * the one read. Until then it groups requests usefully for honest traffic while
- * a determined caller can still present a different value.
+ * The host comes from the request the browser actually sent, never from a
+ * request body — that is what keeps a caller from signing a URL on a host of
+ * its own choosing.
  *
- * Keeping the whole question inside one function leaves one place to correct.
- *
- * @return string Address used as the rate limiting key.
+ * @return string Origin such as `https://dev-en.climatedata.ca`, no trailing slash.
  */
-function cdc_rest_v3_map_raster_client_address(): string {
-	if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-		$forwarded = explode( ',', (string) $_SERVER['HTTP_X_FORWARDED_FOR'] );
-		$candidate = trim( $forwarded[0] );
+function cdc_raster_site_origin(): string {
+	$forwardedHttps = isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] )
+		&& 'https' === $_SERVER['HTTP_X_FORWARDED_PROTO'];
+	$directHttps    = isset( $_SERVER['HTTPS'] )
+		&& '' !== $_SERVER['HTTPS']
+		&& 'off' !== $_SERVER['HTTPS'];
+	$scheme         = ( $forwardedHttps || $directHttps ) ? 'https://' : 'http://';
+	$host           = (string) ( $_SERVER['HTTP_HOST'] ?? '' );
 
-		if ( '' !== $candidate ) {
-			return $candidate;
-		}
-	}
-
-	if ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
-		return (string) $_SERVER['REMOTE_ADDR'];
-	}
-
-	return 'unknown';
+	return $scheme . $host;
 }
 
 /**
- * Record one request and report whether the caller has run out of allowance.
+ * Extract the screenshot payload from a decoded request body.
  *
- * The window is fixed rather than sliding. It opens on a caller's first request
- * and closes `CDC_RASTER_RATE_LIMIT_WINDOW` seconds later, whereupon the count
- * restarts. A fixed window lets a caller spend one window's allowance at its end
- * and the next window's at its start. That is acceptable here, because the
- * resource being protected recovers on its own and the goal is to bound sustained
- * load rather than to smooth every burst.
+ * The screenshot service validates the two keys independently, so this
+ * function keeps whichever one arrives well formed and drops the other.
+ * It mirrors the service's own rules: `locationPopupHtml` is a list of one
+ * or two strings, and `markerLatLon` is a pair of numbers.
  *
- * @return bool True once the caller has exceeded the allowance.
+ * An empty array means the request carries no payload.
+ * The caller then sends no body at all, because the service reads its body
+ * with a bare `request.get_json()` that raises on an empty body when the
+ * content type announces JSON, answering `400` instead of falling back to a
+ * screenshot without a marker.
+ *
+ * @param array<string, mixed> $decoded Decoded JSON request body.
+ *
+ * @return array<string, mixed> Payload to forward, possibly empty.
  */
-function cdc_rest_v3_map_raster_rate_limit_exceeded(): bool {
-	$key   = 'cdc_raster_rl_' . md5( cdc_rest_v3_map_raster_client_address() );
-	$count = (int) get_transient( $key );
-
-	if ( $count >= (int) CDC_RASTER_RATE_LIMIT_MAX ) {
-		return true;
-	}
-
-	set_transient( $key, $count + 1, (int) CDC_RASTER_RATE_LIMIT_WINDOW );
-
-	return false;
-}
-
-/**
- * Extract the screenshot payload from a request body.
- *
- * The screenshot service validates the two keys independently, so this function
- * keeps whichever one arrives well formed and drops the other. It mirrors the
- * service's own rules: `locationPopupHtml` is a list of one or two strings, and
- * `markerLatLon` is a pair of numbers.
- *
- * An empty array means the request carries no payload. The caller then sends no
- * body at all, because the service reads its body with a bare `request.get_json()`
- * that raises on an empty body when the content type announces JSON, answering
- * `400` instead of falling back to a screenshot without a marker.
- *
- * @param WP_REST_Request $request Incoming request.
- *
- * @return array Payload to forward, possibly empty.
- */
-function cdc_rest_v3_map_raster_payload( $request ): array {
+function cdc_raster_extract_payload( array $decoded ): array {
 	$payload = array();
-	$popup   = $request->get_param( 'locationPopupHtml' );
-	$marker  = $request->get_param( 'markerLatLon' );
+	$popup   = $decoded['locationPopupHtml'] ?? null;
+	$marker  = $decoded['markerLatLon'] ?? null;
 
 	if ( is_array( $popup ) && count( $popup ) >= 1 && count( $popup ) <= 2 ) {
 		$strings = array_filter( $popup, 'is_string' );
@@ -438,206 +344,154 @@ function cdc_rest_v3_map_raster_payload( $request ): array {
 }
 
 /**
- * Build the `Content-Disposition` header for a successful response.
+ * Answer with a small JSON error body and stop.
  *
- * The screenshot service suggests a descriptive file name of its own. That value
- * arrives from another service, so this function accepts it only when it looks
- * like a plain attachment file name and composes its own otherwise.
- *
- * Reading this header needs no negotiation now that the response is same-origin,
- * so a browser can recover the suggested name.
- *
- * @param string $suggested Header the screenshot service returned.
- *
- * @return string Header value to send.
+ * @param int    $status  HTTP status code.
+ * @param string $code    Short machine-readable error code.
+ * @param string $message Human-readable message, safe to display.
  */
-function cdc_rest_v3_map_raster_disposition( string $suggested ): string {
-	if ( 1 === preg_match( '/^attachment; ?filename="[^"\r\n]{1,200}"$/', $suggested ) ) {
-		return $suggested;
-	}
-
-	return 'attachment; filename="climatedata-map.png"';
+function cdc_raster_fail( int $status, string $code, string $message ): never {
+	http_response_code( $status );
+	header( 'Content-Type: application/json; charset=utf-8' );
+	echo json_encode( array( 'error' => $code, 'message' => $message ) );
+	exit;
 }
 
+// ---------------------------------------------------------------------------
+// The pass-through itself.
+// ---------------------------------------------------------------------------
+
 /**
- * Forward a map screenshot request and return the resulting image.
+ * Read one raster request, forward it, and answer with the image or an error.
  *
- * The image travels back through `cdc_rest_v3_map_raster_serve_png()`, because
- * the REST server serialises a callback's return value to JSON and PNG bytes
- * survive no such trip.
- *
- * @param WP_REST_Request $request Incoming request.
- *
- * @return WP_REST_Response|WP_Error Response carrying the image, or an error.
+ * Rate limiting is deferred rather than reimplemented here.
+ * Atom34 used WordPress transients as a counter store; this file has none,
+ * and the two alternatives available without an image rebuild — APCu (not
+ * among the extensions `Dockerfile` installs) or a file-based counter with
+ * its own locking and cleanup — are the apparatus this rewrite exists to
+ * avoid rebuilding.
+ * Deferring this leaves the endpoint, once a later Atom wires a `fetch()`
+ * call to it, an unauthenticated trigger for the Selenium-backed backend.
+ * That is the same exposure the shared salt already carries today: it is
+ * echoed into `window.URL_ENCODER_SALT` on every map page load
+ * (`fw-child/apps/app-map.php`), so any visitor's browser can already
+ * compute a valid signed URL and call the backend directly, unthrottled.
+ * This file is no worse than that starting point, and it is not better yet.
  */
-function cdc_rest_v3_map_raster( $request ) {
-	$data_url = cdc_rest_v3_map_raster_data_url();
-	$salt     = cdc_rest_v3_map_raster_salt();
+function cdc_raster_handle_request(): void {
+	global $cdcRasterBackendUrl, $cdcRasterUrlSalt, $cdcRasterVerifyTls;
 
-	if ( '' === $data_url || '' === $salt ) {
-		return new WP_Error(
-			'raster_not_configured',
-			esc_html__( 'The map screenshot service is unavailable.', 'cdc' ),
-			array( 'status' => 503 )
-		);
+	// Raised above CDC_RASTER_CURL_TIMEOUT — see that constant's docblock.
+	set_time_limit( CDC_RASTER_CURL_TIMEOUT + 5 );
+
+	if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+		header( 'Allow: POST' );
+		cdc_raster_fail( 405, 'raster_method_not_allowed', 'Only POST is supported.' );
 	}
 
-	if ( cdc_rest_v3_map_raster_rate_limit_exceeded() ) {
-		return new WP_Error(
-			'raster_rate_limited',
-			esc_html__( 'Too many map image requests. Please try again shortly.', 'cdc' ),
-			array( 'status' => 429 )
-		);
+	if ( '' === $cdcRasterBackendUrl || '' === $cdcRasterUrlSalt ) {
+		cdc_raster_fail( 503, 'raster_not_configured', 'The map screenshot service is unavailable.' );
 	}
 
-	$path = (string) $request->get_param( 'mapPath' );
+	$decoded = json_decode( (string) file_get_contents( 'php://input' ), true );
 
-	if ( ! in_array( $path, cdc_rest_v3_map_raster_paths(), true ) ) {
-		return new WP_Error(
-			'raster_invalid_path',
-			esc_html__( 'Unsupported map page.', 'cdc' ),
-			array( 'status' => 400 )
-		);
+	if ( ! is_array( $decoded ) ) {
+		cdc_raster_fail( 400, 'raster_invalid_body', 'Request body must be a JSON object.' );
 	}
 
-	$query    = (string) $request->get_param( 'mapQuery' );
-	$rejected = cdc_rest_v3_map_raster_reject_query( $query );
+	$path = (string) ( $decoded['mapPath'] ?? '' );
+
+	if ( ! in_array( $path, CDC_RASTER_ALLOWED_PATHS, true ) ) {
+		cdc_raster_fail( 400, 'raster_invalid_path', 'Unsupported map page.' );
+	}
+
+	$query    = (string) ( $decoded['mapQuery'] ?? '' );
+	$rejected = cdc_raster_reject_query( $query );
 
 	if ( '' !== $rejected ) {
-		return new WP_Error(
-			$rejected,
-			esc_html__( 'Unsupported map address.', 'cdc' ),
-			array( 'status' => 400 )
-		);
+		cdc_raster_fail( 400, $rejected, 'Unsupported map address.' );
 	}
 
-	$map_url = cdc_rest_v3_map_raster_build_map_url( $path, $query );
-	$target  = $data_url . '/raster?url=' . cdc_raster_encode_url( $map_url, $salt );
-	$payload = cdc_rest_v3_map_raster_payload( $request );
+	$mapUrl = cdc_raster_site_origin() . $path . ( '' !== $query ? '?' . $query : '' );
+	$target = $cdcRasterBackendUrl . '/raster?url=' . cdc_raster_encode_url( $mapUrl, $cdcRasterUrlSalt );
 
-	$args = array(
-		'timeout' => (int) CDC_RASTER_BACKEND_TIMEOUT,
+	$payload     = cdc_raster_extract_payload( $decoded );
+	$payloadJson = array() === $payload ? '' : (string) json_encode( $payload );
+
+	$ch = curl_init( $target );
+	curl_setopt_array(
+		$ch,
+		array(
+			CURLOPT_POST           => true,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_TIMEOUT        => CDC_RASTER_CURL_TIMEOUT,
+			CURLOPT_SSL_VERIFYPEER => $cdcRasterVerifyTls,
+			CURLOPT_SSL_VERIFYHOST => $cdcRasterVerifyTls ? 2 : 0,
+		)
 	);
 
-	// Send a body only when there is a payload, so the screenshot service reaches
-	// its own path for a request without a marker.
-	if ( ! empty( $payload ) ) {
-		$args['headers'] = array( 'Content-Type' => 'application/json' );
-		$args['body']    = wp_json_encode( $payload );
+	// Send a body only when there is a payload, so the screenshot service
+	// reaches its own path for a request without a marker.
+	if ( '' !== $payloadJson ) {
+		curl_setopt( $ch, CURLOPT_POSTFIELDS, $payloadJson );
+		curl_setopt( $ch, CURLOPT_HTTPHEADER, array( 'Content-Type: application/json' ) );
 	}
 
-	$response = wp_remote_post( $target, $args );
+	$body = curl_exec( $ch );
 
-	if ( is_wp_error( $response ) ) {
-		$message = $response->get_error_message();
+	if ( false === $body ) {
+		$isTimeout = CURLE_OPERATION_TIMEDOUT === curl_errno( $ch );
+		$error     = curl_error( $ch );
 
-		error_log( sprintf( 'cdc/v3/map-raster transport failure: %s', $message ) );
+		curl_close( $ch );
+		error_log( sprintf( 'cdc-raster transport failure: %s', $error ) );
 
-		// A timeout reports itself in the message, and it is worth separating
-		// because it points at the timeout chain rather than at the service.
-		if ( false !== stripos( $message, 'timed out' ) || false !== stripos( $message, 'timeout' ) ) {
-			return new WP_Error(
-				'raster_backend_timeout',
-				esc_html__( 'The map image took too long to generate.', 'cdc' ),
-				array( 'status' => 504 )
-			);
+		if ( $isTimeout ) {
+			cdc_raster_fail( 504, 'raster_backend_timeout', 'The map image took too long to generate.' );
 		}
 
-		return new WP_Error(
-			'raster_backend_unavailable',
-			esc_html__( 'The map image service is unreachable.', 'cdc' ),
-			array( 'status' => 502 )
-		);
+		cdc_raster_fail( 502, 'raster_backend_unavailable', 'The map image service is unreachable.' );
 	}
 
-	$status       = (int) wp_remote_retrieve_response_code( $response );
-	$content_type = (string) wp_remote_retrieve_header( $response, 'content-type' );
-	$body         = wp_remote_retrieve_body( $response );
+	$status      = (int) curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+	$contentType = (string) curl_getinfo( $ch, CURLINFO_CONTENT_TYPE );
+	curl_close( $ch );
 
 	// Relay bytes only for a successful image.
-	// The screenshot service reports every failure as an HTML page, which reaches
-	// tens of kilobytes and describes its own internals, so it stays server-side
-	// and the log keeps a readable excerpt of it.
-	if ( 200 !== $status || 0 !== stripos( $content_type, 'image/' ) ) {
+	// The screenshot service reports every failure as an HTML page — a
+	// generic 265-byte page in production, or a Werkzeug debugger dump
+	// locally — so it stays server-side, logged as an excerpt, and the
+	// browser gets this file's own clean error instead of someone else's
+	// stack trace.
+	if ( 200 !== $status || 0 !== stripos( $contentType, 'image/' ) ) {
 		error_log(
 			sprintf(
-				'cdc/v3/map-raster backend answered %d as %s: %s',
+				'cdc-raster backend answered %d as %s: %s',
 				$status,
-				'' === $content_type ? 'an unknown type' : $content_type,
-				substr( $body, 0, (int) CDC_RASTER_ERROR_LOG_EXCERPT )
+				'' === $contentType ? 'an unknown type' : $contentType,
+				substr( (string) $body, 0, CDC_RASTER_ERROR_LOG_EXCERPT )
 			)
 		);
 
-		return new WP_Error(
-			'raster_backend_error',
-			esc_html__( 'The map image could not be generated.', 'cdc' ),
-			array( 'status' => 502 )
-		);
+		cdc_raster_fail( 502, 'raster_backend_error', 'The map image could not be generated.' );
 	}
 
-	$result = new WP_REST_Response(
-		array(
-			'cdcRasterPng'         => $body,
-			'cdcRasterDisposition' => cdc_rest_v3_map_raster_disposition(
-				(string) wp_remote_retrieve_header( $response, 'content-disposition' )
-			),
-		),
-		200
-	);
-
-	return $result;
-}
-
-/**
- * Send the PNG bytes instead of a JSON document.
- *
- * The REST server encodes a callback's return value as JSON. This filter runs
- * after the server has chosen its headers and before it writes a body, which is
- * the point where an endpoint can answer with something other than JSON.
- * Calling `header()` here replaces the JSON content type the server already
- * queued, because PHP holds headers until the first byte of output.
- *
- * Every other response, an error among them, passes straight through and the
- * server encodes it as usual.
- *
- * @param bool             $served  True once a response has been written.
- * @param WP_HTTP_Response $result  Result the server is about to write.
- * @param WP_REST_Request  $request Request being served.
- * @param WP_REST_Server   $server  Server instance.
- *
- * @return bool True once this filter has written the response.
- */
-function cdc_rest_v3_map_raster_serve_png( $served, $result, $request, $server ) {
-	if ( $served ) {
-		return $served;
-	}
-
-	if ( ! is_a( $request, 'WP_REST_Request' ) || CDC_RASTER_ROUTE !== $request->get_route() ) {
-		return $served;
-	}
-
-	if ( ! is_a( $result, 'WP_HTTP_Response' ) ) {
-		return $served;
-	}
-
-	$data = $result->get_data();
-
-	if ( ! is_array( $data ) || ! isset( $data['cdcRasterPng'] ) ) {
-		return $served;
-	}
-
-	$png = (string) $data['cdcRasterPng'];
-
-	header( 'Content-Type: image/png' );
-	header( 'Content-Length: ' . strlen( $png ) );
-	header( 'Content-Disposition: ' . $data['cdcRasterDisposition'] );
-
-	// Each image reflects one visitor's map, so it belongs to that response alone.
+	// The browser receives the image inline; the caller already holds the
+	// bytes as a Blob and names the file itself when the visitor saves it,
+	// so no Content-Disposition header travels with this response.
+	http_response_code( 200 );
+	header( 'Content-Type: ' . $contentType );
+	header( 'Content-Length: ' . strlen( (string) $body ) );
 	header( 'Cache-Control: private, no-store, max-age=0' );
-
-	echo $png;
-
-	return true;
+	echo $body;
 }
 
-add_filter( 'rest_pre_serve_request', 'cdc_rest_v3_map_raster_serve_png', 10, 4 );
+// PHP-FPM's SAPI is always `fpm-fcgi`, never `cli`, so this guard changes
+// nothing in production.
+// It exists so `docker compose exec -T portal php < map-raster.php` — used
+// to verify the two functions above against known fixtures — can define
+// everything in this file without also running a request handler that
+// expects a real HTTP request.
+if ( 'cli' !== PHP_SAPI ) {
+	cdc_raster_handle_request();
+}

@@ -13,6 +13,7 @@ export {
 export { getLocationModalInnerHTML } from './get-location-modal-inner-html';
 export { createPrepareRasterPostHttpPayload } from './create-prepare-raster-post-http-payload';
 export { createFetchRequestInitOptions } from './create-fetch-request-init-options';
+export { createFetchTargetToRasterWithEncodedUrl } from './create-fetch-target-to-raster-with-encoded-url';
 export { prepareRaster } from './prepare-raster';
 export { signalRasterReady } from './signal-raster-ready';
 export { installDebugPayloadAccessor } from './install-debug-payload-accessor';

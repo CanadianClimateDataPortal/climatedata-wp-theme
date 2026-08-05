@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { selectSelectedLocation, setLegendOpen } from '@/features/map/map-slice';
 import {
 	createFetchRequestInitOptions,
+	createFetchTargetToRasterWithEncodedUrl,
 	createPrepareRasterPostHttpPayload,
 	installDebugPayloadAccessor,
 	installPrepareRasterStub,
@@ -132,10 +133,15 @@ const DownloadMapModal: React.FC<{
 			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
 		}
 
-		// The proxy at `/maps/` and `/cartes/` derives both path and query string from
-		// the request URI it receives, so posting to the page's own URL carries
-		// everything the proxy needs — no client-side encoding step required.
-		const fetchTarget = mapUrl.href;
+		// The encoded target sends this request straight to the screenshot service.
+		// A same-origin PHP proxy answering `POST /maps/` and `POST /cartes/` also exists
+		// (`framework/resources/functions/map-raster-proxy.php`), and it derives both path
+		// and query string from the request URI, so posting to `mapUrl.href` would carry
+		// everything it needs and make this encoding step unnecessary.
+		// That proxy returns 503 until its backend is configured, and the configuration
+		// flag that lets this call site choose between the two paths is still to come,
+		// so this keeps the direct target until that flag exists.
+		const fetchTarget = createFetchTargetToRasterWithEncodedUrl(mapUrl.href);
 
 		setIsGenerating(true);
 

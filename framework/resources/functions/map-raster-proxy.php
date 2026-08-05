@@ -63,12 +63,19 @@ declare(strict_types=1);
 // rotating the shared secret is a docker-compose change and nothing else.
 // ---------------------------------------------------------------------------
 
+// `framework/functions.php` already requires this unconditionally, but this
+// file documents itself as independently correct if the web server ever
+// reaches it directly — see this file's own docblock — so it requires its
+// own dependency rather than trusting an earlier require to have happened.
+require_once __DIR__ . '/cdc-raster-proxy-config.php';
+
 /**
  * Base URL of the screenshot service, without a trailing slash.
  *
- * Unset or empty means the service is not configured for this environment.
+ * {@see cdc_raster_backend_url()} for where this value comes from and what
+ * an empty value means.
  */
-$cdcRasterBackendUrl = rtrim( (string) ( getenv( 'CDC_RASTER_BACKEND_URL' ) ?: '' ), '/' );
+$cdcRasterBackendUrl = cdc_raster_backend_url();
 
 /**
  * Shared secret the screenshot service also holds, used to sign the target URL.
@@ -409,7 +416,7 @@ function cdc_raster_handle_request(): void {
 		cdc_raster_fail( 404, 'raster_invalid_path', 'Unsupported map page.' );
 	}
 
-	if ( '' === $cdcRasterBackendUrl || '' === $cdcRasterUrlSalt ) {
+	if ( ! cdc_raster_proxy_is_configured() ) {
 		cdc_raster_fail( 503, 'raster_not_configured', 'The map screenshot service is unavailable.' );
 	}
 

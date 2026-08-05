@@ -1,5 +1,10 @@
 <?php
 
+// Loaded unconditionally, on every request — not only the POST branch below —
+// so `cdc_raster_proxy_is_configured()` is available wherever a normal page
+// render needs to ask the same question (see `fw-child/apps/app-map.php`).
+require_once __DIR__ . '/resources/functions/cdc-raster-proxy-config.php';
+
 //
 // MAP RASTER PROXY
 //

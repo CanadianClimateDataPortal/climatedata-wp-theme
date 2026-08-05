@@ -91,6 +91,9 @@ $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
         // DATA URL for the map app
         window.DATA_URL = '<?php echo isset( $GLOBALS['vars']['data_url'] ) ? htmlspecialchars( $GLOBALS['vars']['data_url'], ENT_QUOTES, 'UTF-8' ) : ''; ?>';
 
+        // Raster proxy flag for the map app — present only when the same-origin screenshot proxy is configured
+        <?php if ( cdc_raster_proxy_is_configured() ) : ?>window.RASTER_PROXY_ENABLED = true;<?php endif; ?>
+
         // Disable Leaflet's 3D features
         L_DISABLE_3D = true;
 

@@ -12,11 +12,11 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { selectSelectedLocation, setLegendOpen } from '@/features/map/map-slice';
 import {
 	createFetchRequestInitOptions,
-	createFetchTargetToRasterWithEncodedUrl,
 	createPrepareRasterPostHttpPayload,
 	installDebugPayloadAccessor,
 	installPrepareRasterStub,
 	prepareRaster,
+	resolveRasterFetchTarget,
 	signalRasterReady,
 	type Prepare_Raster,
 	type PrepareRasterPostHttpPayload,
@@ -127,21 +127,20 @@ const DownloadMapModal: React.FC<{
 
 		if (window.mapPrepareRasterPostHttpPayloadDebugger?.isSetup) {
 			// When debugging against another screenshot backend, make HTTP call to that other host.
-			// fixUrlHost rewrites mapUrl's host in place, so the POST below travels cross-origin.
-			// That is the debugger's own intended behavior — it exists to target a different
-			// screenshot-service deployment than the same-origin proxy this fetchTarget otherwise reaches.
+			// fixUrlHost rewrites mapUrl's host in place before fetchTarget is resolved below.
+			// When the proxy is enabled, that sends the POST cross-origin instead of through the
+			// local proxy — deliberate, so the debugger can point requests elsewhere on purpose.
 			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
 		}
 
-		// The encoded target sends this request straight to the screenshot service.
-		// A same-origin PHP proxy answering `POST /maps/` and `POST /cartes/` also exists
-		// (`framework/resources/functions/map-raster-proxy.php`), and it derives both path
-		// and query string from the request URI, so posting to `mapUrl.href` would carry
-		// everything it needs and make this encoding step unnecessary.
-		// That proxy returns 503 until its backend is configured, and the configuration
-		// flag that lets this call site choose between the two paths is still to come,
-		// so this keeps the direct target until that flag exists.
-		const fetchTarget = createFetchTargetToRasterWithEncodedUrl(mapUrl.href);
+		// window.RASTER_PROXY_ENABLED is set by the page render only when the
+		// same-origin PHP proxy is configured for this environment.
+		// When it is set, resolveRasterFetchTarget posts to the page's own URL —
+		// the proxy derives path and query string from that request, so no
+		// client-side encoding step is required.
+		// When it is absent, resolveRasterFetchTarget falls back to the salted,
+		// encoded screenshot-service URL this module has always used.
+		const fetchTarget = resolveRasterFetchTarget(mapUrl, window.RASTER_PROXY_ENABLED);
 
 		setIsGenerating(true);
 

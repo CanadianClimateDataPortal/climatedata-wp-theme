@@ -19,6 +19,13 @@ type PlaceItem = {
 	payload: PrepareRasterPostHttpPayload | undefined;
 };
 
+type SetupState = {
+		hold: boolean,
+		urlHost: string,
+		dataUrl: string,
+		salt: string,
+};
+
 /**
  * In order to test the screenshot service, we need to set the DATA_URL and URL_ENCODER_SALT in the browser's window object.
  * This is because the screenshot service is a separate service that needs to know where to send the request to get the data.
@@ -84,8 +91,18 @@ export class PrepareRasterPostHttpPayloadDebugger {
 		return window.mapPrepareRasterPostHttpPayload !== undefined;
 	}
 
+	/** Recorded `LocationModal` locations. Use the index with `createFetchFor` to replay one. */
 	get places(): PlaceItem[] {
 		return [...this.#places.map((place) => ({ ...place }))];
+	}
+
+	get setupState(): SetupState {
+		return {
+			hold: this.#hold,
+			urlHost: this.#urlHost,
+			dataUrl: window.DATA_URL,
+			salt: window.URL_ENCODER_SALT,
+		};
 	}
 
 	/**

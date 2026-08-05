@@ -12,7 +12,6 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { selectSelectedLocation, setLegendOpen } from '@/features/map/map-slice';
 import {
 	createFetchRequestInitOptions,
-	createFetchTargetToRasterWithEncodedUrl,
 	createPrepareRasterPostHttpPayload,
 	installDebugPayloadAccessor,
 	installPrepareRasterStub,
@@ -127,10 +126,16 @@ const DownloadMapModal: React.FC<{
 
 		if (window.mapPrepareRasterPostHttpPayloadDebugger?.isSetup) {
 			// When debugging against another screenshot backend, make HTTP call to that other host.
+			// fixUrlHost rewrites mapUrl's host in place, so the POST below travels cross-origin.
+			// That is the debugger's own intended behavior — it exists to target a different
+			// screenshot-service deployment than the same-origin proxy this fetchTarget otherwise reaches.
 			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
 		}
 
-		const fetchTarget = createFetchTargetToRasterWithEncodedUrl(mapUrl.href);
+		// The proxy at `/maps/` and `/cartes/` derives both path and query string from
+		// the request URI it receives, so posting to the page's own URL carries
+		// everything the proxy needs — no client-side encoding step required.
+		const fetchTarget = mapUrl.href;
 
 		setIsGenerating(true);
 

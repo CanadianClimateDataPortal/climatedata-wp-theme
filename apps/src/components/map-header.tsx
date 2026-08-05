@@ -78,6 +78,12 @@ const toggleVariableDetailsPanel = () => {
 
 	return (
 		<>
+			{/*
+			`data-raster="false"` removes the breadcrumb and controls strip from the
+			exported map image; `MapInfoPills` carries the variable title into that
+			image instead.
+			Vocabulary: `apps/src/lib/map/image-rastering/README.md`.
+			*/}
 			<aside
 				className="relative z-20"
 				data-raster="false"

@@ -4,8 +4,13 @@ import type {
 } from './types';
 import type { PrepareRasterPostHttpPayloadDebugger } from './create-raster-debugger';
 
-// Extend the global Window interface to allow simulation of jQuery-style API.
-// This is used to expose a `prepare_raster` function on `$.fn`
+// Declares the globals this namespace reads and writes on `window`.
+//
+// `$` here is a plain object this app creates itself, shaped to satisfy the
+// `$.fn.prepare_raster(…)` expression the screenshot service evaluates. jQuery is
+// absent from the map page, so nothing else defines or consumes it: the stub in
+// `install-prepare-raster-stub.ts` creates it at module scope, and
+// `download-map-modal.tsx` assigns the real implementation onto it.
 declare global {
 	interface Window {
 		$?: {
@@ -13,11 +18,13 @@ declare global {
 				prepare_raster?: Prepare_Raster;
 			};
 		};
-		// This property is for flagging testing when we want to see what happens between
-		// current person's web browser and passing data to the `/raster?url=` endpoint via cURL
-		// It isn't intended to be used for storing state, but rather a temporary manual testing handle
+		// A temporary manual-testing handle, assigned from the browser console. Holding any
+		// defined value here — `null` included — turns debug mode on and lazy-loads the
+		// debugger below. It carries the payload for the next request, so the same bytes
+		// the Download button sends can be replayed by hand against the screenshot service.
 		mapPrepareRasterPostHttpPayload?: PrepareRasterPostHttpPayload | null;
-		// This is to keep track of places clicked IF we're in debugging mode above
+		// The lazy-loaded debugger, present once debug mode has been turned on above. Records
+		// each place clicked so any of them can be replayed later by index.
 		mapPrepareRasterPostHttpPayloadDebugger?: PrepareRasterPostHttpPayloadDebugger;
 		URL_ENCODER_SALT: string;
 		DATA_URL: string;

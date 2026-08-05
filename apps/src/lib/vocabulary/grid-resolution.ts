@@ -1,17 +1,18 @@
 /**
- * Grid Resolution.
+ * @file Grid Resolution
  *
- * The area of a grid we can see on a map.
- * Each grid resolution is defined and declared per data source, no calculation
- * needed to determine cell size, a latitude or a bounding box.
+ * How large one cell of the grid a map is drawn on happens to be.
+ * Each resolution is declared per data source, so reading one takes no calculation
+ * from a latitude or a bounding box.
  *
- * Where a default legitimately belongs is inside the variable class that holds the
- * knowledge to supply one: `RasterPrecalculatedClimateVariable.getGridType()` prefers
- * the config's declared value and falls back on the dataset version only when the
- * config stays silent — that is the pattern to follow.
+ * A default belongs inside the variable class that holds the knowledge to supply one:
+ * `RasterPrecalculatedClimateVariable.getGridType()` prefers the config's declared
+ * value and falls back on the dataset version only when the config stays silent.
+ * That is the pattern to follow.
  *
- * Station-data membership (known to be never shown using grid) is decided by id
- * against the {@link StationVariableIds} registry as authoritative source.
+ * Station data is measured at points and is shown without a grid.
+ * Membership is decided by id against the {@link StationVariableIds} registry, the
+ * authoritative source for it.
  */
 
 import {
@@ -78,13 +79,13 @@ export const GridTypes = {
 	 *
 	 * Same lattice, same `?var=sea_level` variable, selected when the dataset version is CMIP6.
 	 *
-	 * Resolution: {@link GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS}.
+	 * Resolution: {@link GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS}.
 	 */
 	SLRGRID_CMIP6: 'slrgrid-cmip6',
 	/**
 	 * Vertical Allowance lattice, coastal-only and anisotropic.
 	 *
-   * `climateVariableId`s:
+	 * `climateVariableId`s:
 	 * - `?var=allowance`.
 	 *
 	 * Resolution: {@link GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS}.
@@ -97,7 +98,7 @@ export type GridType = (typeof GridTypes)[keyof typeof GridTypes];
 /**
  * 10×6km : Standard for "Statistically Downscaled Global Climate Projections" and S2D Forecasts
  *
- * {@link GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D}.
+ * Degree size: {@link GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D}.
  *
  * S2D shares this label because `S2DClimateVariable.getGridType()`
  * reports the same `canadagrid` lattice a forecast is selected on.
@@ -124,8 +125,8 @@ const GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS = '~11×7km' as const;
  *
  * Source: (to confirm)
  *
- * Humidex uses era5landgrid.
- * The code se-uses {@link GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS}'s value on that basis.
+ * Humidex uses era5landgrid, whose resolution is similar to the marine-projections grid.
+ * The code re-uses {@link GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS}'s value on that basis.
  *
  * - Published as '0.1° (approximately 9 km)'
  *   ({@link https://climatedata.ca/about/our-data/#humidex | Humidex})
@@ -171,7 +172,9 @@ export const GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D =
  *   ({@link https://climatedata.ca/about/our-data/#vert_allowance | Vertical Allowance})
  *   — anisotropic, unlike every other entry in this table. WFS-measured.
  *
- * 0.1° for all three, coastal-only.
+ * 0.1° for each of `slrgrid`, `slrgrid-cmip6`, and `allowancegrid`, all coastal-only.
+ * {@link GRID_RESOLUTION_VALUE_DAYS_WITH_HUMIDEX_ABOVE_THRESHOLD} re-uses the same
+ * number for a land grid, on similarity of resolution rather than shared provenance.
  */
 const GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS = 0.1 as const;
 
@@ -187,7 +190,9 @@ const GRID_RESOLUTION_VALUE_DAYS_WITH_HUMIDEX_ABOVE_THRESHOLD =
 	GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS;
 
 /**
- * 1° (~100km).
+ * 100×100km : Standardized Precipitation Evapotranspiration Index (SPEI), full-degree grid
+ *
+ * 1°.
  *
  * - Published as 'a 1 degree (~100km) resolution'
  *   ({@link https://climatedata.ca/about/our-data/#mip5-spei | CMIP5 SPEI})
@@ -261,11 +266,17 @@ export const isGridType = (
 ): value is GridType =>
 	typeof value === 'string' && GRID_TYPE_VALUES.has(value);
 
+/**
+ * Whether a value carries enough of the climate-variable shape to be asked for its id.
+ *
+ * Duck-typed on `getId()` alone, which is as much as the callers below need.
+ * Anything else answering to that one method passes, so treat this as a guard against
+ * `null` and the wrong shape rather than proof of the real class.
+ */
 export const isClimateVariable = (
 	climateVariable: ClimateVariableInterface | null,
 ): climateVariable is ClimateVariableInterface =>
 	typeof climateVariable === 'object' &&
-	// Just doing what's here is probably too permissive.
 	typeof climateVariable?.getId() === 'string';
 
 export const isStationClimateVariable = (

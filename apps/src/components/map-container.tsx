@@ -200,6 +200,13 @@ const MapContainer = (
 		if (selectedLocation && canShowModal) {
 			const { title, latlng, featureId } = selectedLocation;
 
+			// Records the opened location so the console debugger can replay it later.
+			// `window.mapPrepareRasterPostHttpPayloadDebugger` is an ambient global with
+			// no import edge, so a search for importers of the debugger module will not
+			// surface this call site; grep the global's name to find every one of them.
+			// It stays undefined until someone opts into debug mode — see
+			// `apps/src/lib/map/image-rastering/install-debug-payload-accessor.ts`.
+			// Only the primary map contributes, since both maps share one payload.
 			if (selectedLocation.latlng && isComparisonMap === false) {
 				window.mapPrepareRasterPostHttpPayloadDebugger?.addLocationModalOpenItem(
 					selectedLocation?.title ?? '',
@@ -240,7 +247,12 @@ const MapContainer = (
 		};
 	}, [onMapReady, onUnmount]);
 
-	// Otherwise className 'map-comparison-left' on element MapContainer doesn't get updated.
+	/**
+	 * Keeps a later `className` such as 'map-comparison-left' applied to the
+	 * container, which react-leaflet freezes after its first render.
+	 *
+	 * @see {@link useLeafletSyncContainerClassName} for the mechanism.
+	 */
 	useLeafletSyncContainerClassName(mapRef, props.className);
 
 	return (

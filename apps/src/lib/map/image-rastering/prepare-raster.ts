@@ -32,11 +32,12 @@ import type { PrepareRaster } from './types';
  * Everything awaited before that point is something the screenshot depends on
  * *and* that the platform can report the completion of. Nothing here waits out
  * a fixed delay.
+ *
+ * Exposed globally as `$.fn.prepare_raster` because the screenshot service
+ * invokes that exact expression against the page.
+ * The legacy WordPress theme ships an unrelated function under the same name, and
+ * it never loads on this page, so this definition is the only one that runs here.
  */
-// Exposed globally as $.fn.prepare_raster because a server-side headless-browser
-// screenshot service invokes that exact expression against the page. A second,
-// unrelated function under the same name lives in fw-child/resources/js/map.js;
-// it never loads on this page, so only this definition ever runs here.
 export const prepareRaster: PrepareRaster = async (
 	payload,
 	handles,
@@ -102,17 +103,20 @@ export const prepareRaster: PrepareRaster = async (
 		);
 	});
 
-	// Remove elements that should not appear in the screenshot
-	// Which basically makes the map take up all the available space by removing the surrounding elements.
+	// `[data-raster="false"]` is a one-shot removal marker: every node carrying it
+	// leaves the DOM here, which is what lets the map take the whole viewport.
+	// Consumed before the mode flag below, so the two never both apply to a node.
 	document
 		.querySelectorAll('[data-raster="false"]')
 		.forEach((el) => el.remove());
 
+	// `html[data-raster="true"]` is the persistent inclusion flag marking what
+	// belongs in the capture. Styling keys off it to reveal elements normally
+	// hidden, such as the info pills.
 	document.documentElement.setAttribute('data-raster', 'true');
 
 	document.querySelectorAll('.tooltip').forEach((el) => el.remove());
 
-	// Leaflet applies `resize` through the next animation frame.
 	window.dispatchEvent(new Event('resize'));
 
 	// Leaflet does not act on `resize` synchronously — `Map._onResize` defers

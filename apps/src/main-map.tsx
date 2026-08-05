@@ -1,12 +1,15 @@
 // Looking for `window.$.fn.prepare_raster`?
 //
-// Anything outside `apps/` relating to `prepare_raster` and Map Image Download
-// that uses the same name is effectively not used.
-// installPrepareRasterStub() below occupies it first, as defence in depth
-// against a registration race that is real in principle and unmeasured on a
-// cold load (~34ms warm against the service's one-second wait). See
-// lib/map/image-rastering/install-prepare-raster-stub.ts for the measurement
-// and the genuine unmount defect this file also closes.
+// The `prepare_raster` name also appears outside `apps/`; this entry point owns
+// the definition the screenshot service actually reaches.
+// `installPrepareRasterStub()` below claims the global first, so a call landing
+// before React mounts is held and replayed once `DownloadMapModal` registers
+// the real implementation.
+// It is defence in depth against a registration race that is real in principle
+// and unmeasured on a cold load: registration takes roughly 34ms on a warm
+// load, against the service's one-second wait.
+// `lib/map/image-rastering/install-prepare-raster-stub.ts` carries that
+// measurement and the unmount defect the same stub closes.
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
@@ -22,8 +25,7 @@ import App from '@/App';
 import '@/Global.css';
 import SectionContext from "@/context/section-provider";
 
-// As early as possible: before the bundle finishes parsing this file, before
-// React mounts anything below.
+// Runs while this module is still evaluating, ahead of the React render below.
 installPrepareRasterStub();
 
 const i18n = createI18n();

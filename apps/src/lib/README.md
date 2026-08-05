@@ -1,8 +1,15 @@
 # `lib/`
 
-## Touched this PR
+Core modules shared by both SPAs: the climate-variable class hierarchy, formatting and colour helpers, and the domain logic the React tree in `components/` calls into.
 
-- `location-modal-class-names.ts` — `LOCATION_MODAL_BASE_CLASS_NAMES`, `LOCATION_MODAL_POSITION_CLASS_NAMES` — shared Tailwind classes for `LocationModal` and its raster replay.
-- `utils.ts` — `encodeURL`, `hashCode` (salted URL encoding for the screenshot service), `cn` (Tailwind class merge).
+## Children
 
-Cross-app map logic like `location-modal-class-names.ts` is a migration candidate into `map/` in a later PR — not moved here. Grid vocabulary moved to `vocabulary/` in this PR.
+- `map/` — logic about the cartographic map itself, including the Download button's screenshot round trip. See its own README.
+- `vocabulary/` — domain models as controlled vocabularies. See its own README.
+
+## Residents worth knowing about
+
+- `location-modal-class-names.ts` — `LOCATION_MODAL_BASE_CLASS_NAMES` and `LOCATION_MODAL_POSITION_CLASS_NAMES`, the Tailwind classes the React `LocationModal` render path and its raster replay both have to agree on.
+- `utils.ts` — `encodeURL` and `hashCode` (salted URL encoding for the screenshot service), `cn` (Tailwind class merge).
+
+`location-modal-class-names.ts` is cross-app map logic, so `map/` is where it belongs; it stays here until a migration pass moves it.

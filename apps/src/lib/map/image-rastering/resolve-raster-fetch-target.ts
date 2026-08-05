@@ -11,7 +11,7 @@ import { createFetchTargetToRasterWithEncodedUrl } from './create-fetch-target-t
  * @returns `mapUrl.href` directly when the proxy is enabled, since the proxy
  * derives path and query string from the request it receives. Otherwise the
  * salted, encoded screenshot-service URL {@link createFetchTargetToRasterWithEncodedUrl}
- * builds, this module's original behavior.
+ * builds, which addresses the service directly.
  *
  * @example
  * ```typescript

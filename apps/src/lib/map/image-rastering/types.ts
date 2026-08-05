@@ -26,12 +26,12 @@ export interface PrepareRasterMapHandles {
 	comparisonMap: L.Map | null;
 	/**
 	 * Places a marker on every mounted pane. Mirrors the click handling in `use-map-interactions.tsx`.
-	 * @see {@link useMapMarker.addMarker}
+	 * @see {@link useMapMarker} — the hook this is destructured from.
 	 */
 	addMarker: AddMarker;
 	/**
 	 * Removes any marker(s) from every mounted pane.
-	 * @see {@link useMapMarker.clearMarkers}
+	 * @see {@link useMapMarker} — the hook this is destructured from.
 	 */
 	clearMarkers: ClearMarkers;
 }
@@ -42,8 +42,8 @@ export interface PrepareRasterMapHandles {
  * @remark All-or-nothing by design. The screenshot service validates `locationPopupHtml`
  * and `markerLatLon` independently and will accept one without the other — that is
  * defence in depth on the service side, not a contract this sender relies on. Do not
- * loosen createPrepareRasterPostHttpPayload to send a partial payload; it must keep
- * returning `undefined` when either half is missing.
+ * loosen {@link createPrepareRasterPostHttpPayload} to send a partial payload; it must
+ * keep returning `undefined` when either half is missing.
  */
 export interface PrepareRasterPostHttpPayload {
 	locationPopupHtml: [string, string?];
@@ -67,6 +67,14 @@ export type Prepare_Raster = (
 	markerLatLon?: PrepareRasterPostHttpPayload['markerLatLon'],
 ) => void;
 
+/**
+ * The receiver-side implementation {@link Prepare_Raster} forwards to, once
+ * `download-map-modal.tsx` has paired the incoming arguments with this page's map
+ * handles.
+ *
+ * `signalReady` is injected so production, a debug hold, and a test spy share one
+ * call site; omitting it selects the real signal.
+ */
 export type PrepareRaster = (
 	payload?: PrepareRasterPostHttpPayload,
 	handles?: PrepareRasterMapHandles,

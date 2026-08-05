@@ -21,6 +21,19 @@ import MenuIcon from "@/icons/menu-icon";
 
 const SIDEBAR_WIDTH_MOBILE = '18rem';
 
+/**
+ * Every `data-raster="false"` in this file marks a node for removal from the
+ * exported map image, which shows the map alone.
+ * The sidebar and both of its toggles are chrome the reader of that image
+ * cannot use.
+ *
+ * `SidebarTrigger` and `SidebarRail` also moved off a shared
+ * `id="sidebar-toggle"` and onto a `sidebar-toggle` class, since both render at
+ * once and two nodes cannot carry the same id.
+ *
+ * Vocabulary: `apps/src/lib/map/image-rastering/README.md`.
+ */
+
 const Sidebar = React.forwardRef<
 	HTMLDivElement,
 	React.ComponentProps<'div'> & {

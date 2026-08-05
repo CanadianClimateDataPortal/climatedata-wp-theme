@@ -47,6 +47,15 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 					<span className="font-sans text-sm font-normal leading-5 text-black">
 						{__('Legend')}
 					</span>
+					{/*
+					`data-raster="false"` drops the chevron from the exported map
+					image, which keeps the legend itself and its label.
+					This control renders into its own React root, so the marker can
+					appear after `prepareRaster` has finished removing markers; the
+					`html[data-raster='true'] [data-raster='false']` rule in
+					`Global.css` is the backstop that catches it.
+					Vocabulary: `apps/src/lib/map/image-rastering/README.md`.
+					*/}
 					<span data-raster="false">
 						{isOpen ? (
 							<ChevronUp className="w-4 h-4 text-brand-blue" />

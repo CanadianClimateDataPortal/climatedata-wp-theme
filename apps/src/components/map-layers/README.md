@@ -2,7 +2,7 @@
 
 ## Touched this PR
 
-- `map-info-pills.tsx` → `MapInfoPills` — title/grid-resolution pills shown only in the rastered download image.
+- `map-info-pills.tsx` → `MapInfoPills` — title and grid-resolution pills, revealed only while preparing the exported map image.
 - `search-control.tsx` → `SearchControl` — Leaflet search box wrapping `leaflet-search`.
 - `location-modal.tsx` → `LocationModal` — positioned modal shell for a clicked location.
 - `location-modal-content.tsx` → `LocationModalContent` — title/subtitle/details body inside `LocationModal`.

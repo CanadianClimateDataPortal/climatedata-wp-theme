@@ -25,8 +25,6 @@ let loadStarted = false;
  * The assigned value is stashed synchronously, independent of whether the
  * dynamic import has resolved — nothing assigned through this setter is ever
  * lost.
- * {@link loadStarted} guards re-entry, because unlike a one-shot click this
- * setter can fire repeatedly.
  *
  * This is the only debug-related code that ships eagerly in the main bundle —
  * everything else in this namespace's debug surface loads through the

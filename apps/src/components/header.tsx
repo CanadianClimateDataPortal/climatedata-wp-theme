@@ -29,6 +29,9 @@ const AppHeader = (
 	const { trailing } = props;
 
 	return (
+		// `data-raster="false"` marks the whole site header for removal from the
+		// exported map image, which shows the map alone.
+		// Vocabulary: `apps/src/lib/map/image-rastering/README.md`.
 		<header
 			data-raster="false"
 			className="flex items-center justify-between px-4 py-1.5"

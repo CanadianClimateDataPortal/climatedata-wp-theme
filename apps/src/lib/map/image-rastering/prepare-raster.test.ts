@@ -13,20 +13,19 @@ import type { PrepareRasterMapHandles } from './types';
  * chrome-strip, settle, and signal sequence `$.fn.prepare_raster` invokes.
  *
  * Group A exercises the seam and its side effects against the null-maps
- * path — no `L.Map` mounted — the shape the CLIM-1454 spike proved resolves
- * without deadlocking.
+ * path — no `L.Map` mounted — which resolves rather than deadlocking,
+ * because every map read goes through optional chaining.
  *
  * Group B is the regression that matters most: `prepareRaster` must spend
  * ONE shared {@link MAP_SETTLE_TOTAL_BUDGET_MS} window across both of its
  * internal `waitForMapsSettled` calls, not one window per call. See
  * `wait-for-maps-settled.ts`'s doc comment on that constant for why the
- * budget exists and what it is measured against.
+ * budget exists and what its arithmetic runs against.
  */
 
 /**
  * Fresh, uninstrumented handles for the null-maps path — no `L.Map` mounted
- * on either pane, matching the shape the CLIM-1454 spike proved
- * `prepareRaster` resolves against without deadlocking.
+ * on either pane.
  *
  * Hand-built and cast rather than a real `L.Map`: `prepareRaster` only ever
  * reads `map` / `comparisonMap` through optional chaining, so `null` is a
@@ -122,11 +121,10 @@ describe('prepareRaster — seam and side effects (null-maps path)', () => {
 		const removeOrder = removeSpy.mock.invocationCallOrder[0];
 		const modeFlagOrder = setAttributeSpy.mock.invocationCallOrder[modeFlagCallIndex];
 
-		// The Atom29 vocabulary distinction: data-raster="true" is a
-		// persistent inclusion flag, data-raster="false" is a one-shot
-		// removal marker consumed before that flag is set. They are not a
-		// matched pair, so only ordering — not both end states — is honest
-		// to assert here.
+		// `data-raster="true"` is a persistent inclusion flag and
+		// `data-raster="false"` is a one-shot removal marker consumed before
+		// that flag is set. Two independent mechanisms rather than a matched
+		// pair, so ordering is the only honest thing to assert here.
 		expect(removeOrder).toBeLessThan(modeFlagOrder);
 	});
 

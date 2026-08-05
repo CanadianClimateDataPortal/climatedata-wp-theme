@@ -45,8 +45,10 @@ describe('waitForMapsSettled', () => {
 		const settled = await waitForMapsSettled([fakeMap], alreadyExpiredDeadline);
 		const elapsed = performance.now() - start;
 
-		// Two orders of magnitude under the 9000ms internal-clock reversion this
-		// discriminates against — headroom against jsdom timing noise, not tightness.
+		// Loose on purpose: this only has to separate "resolved immediately" from
+		// "fell back to an internal clock", and an internal clock would run for
+		// MAP_SETTLE_TOTAL_BUDGET_MS — two orders of magnitude away. The slack is
+		// headroom against jsdom timing noise.
 		expect(settled).toBe(false);
 		expect(elapsed).toBeLessThan(50);
 	});

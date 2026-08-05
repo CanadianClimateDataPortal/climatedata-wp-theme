@@ -68,15 +68,12 @@ const MapLegend = (
 	const rootRef = useRef<Root | null>	(null);
 
 	/**
-	 * Open legend by default when the map container has space for legend.
-	 * Legend max width is 430px (MapLegendOpenControl.MAX_LEGEND_WIDTH)
-	 * Only check on the initial mount, no resize handling needed.
+	 * Opens the legend by default when the map container is wide enough to hold it.
+	 * The 430px ceiling comes from {@link MapLegendOpenControl.maxLegendWidth}.
 	 *
-	 * Only checked on the initial mount — no resize handling needed.
-	 *
-	 * This runs once per mount, and `MapLegend` is mounted conditionally (see
-	 * `map-container.tsx`), so it can still fire *after* the map-image export has
-	 * forced the legend open.
+	 * This runs once per mount, with no resize handling.
+	 * `MapLegend` mounts conditionally — see `map-container.tsx` — so a remount can
+	 * fire this *after* the map-image export has already forced the legend open.
 	 */
 	useEffect(() => {
 		if (!map) {

@@ -6,22 +6,23 @@ import L from 'leaflet';
  * and threads it through both calls unchanged, so neither call can spend the other's
  * share.
  *
- * Sized against the screenshot service's real ceiling: after invoking `prepare_raster`
- * the service waits up to 10s for the `to-raster` class to become visible, then raises
- * an unhandled timeout — HTTP 500, no image. 9s leaves roughly a second under that for
- * the synchronous DOM work between the two calls (marker placement, popup injection,
- * chrome removal) and for script-invocation overhead, neither of which this budget
- * otherwise accounts for.
+ * Sized against the screenshot service's real ceiling: it waits up to 10s for the
+ * `to-raster` class to become visible, then raises an unhandled timeout — HTTP 500,
+ * no image.
+ * 9s leaves roughly a second under that for the synchronous DOM work between the two
+ * calls (marker placement, popup injection, chrome removal) and for script-invocation
+ * overhead, neither of which this budget otherwise accounts for.
+ * The full service timeline this arithmetic runs against is in ./README.md.
  *
- * The service also sleeps 4s AFTER the ready class appears, before screenshotting —
- * which is why this budget does not need to guarantee every tile finished; a tile
- * landing inside that trailing window is still captured. It grants no time before the
- * 10s wait, so it cannot rescue a signal that arrives too late.
+ * 9s is that arithmetic and nothing more.
+ * How long the work it covers actually takes has never been measured, so treat the
+ * headroom as assumed rather than demonstrated.
  *
- * @remark `document.fonts.ready` and {@link waitForMarkerIcons} are NOT bounded by
- * this budget. They run alongside the second settle call via `Promise.all` and have
- * no timeout of their own, so a slow font or icon load can still push `prepareRaster`
- * past it. Pre-existing; out of scope.
+ * @remark `document.fonts.ready` and {@link waitForMarkerIcons} sit outside this
+ * budget.
+ * They run alongside the second settle call via `Promise.all` and have no timeout of
+ * their own, so a slow font or icon load can still push `prepareRaster` past it.
+ * A known limit of the design, left as it stands.
  */
 export const MAP_SETTLE_TOTAL_BUDGET_MS = 9_000;
 
@@ -36,9 +37,9 @@ export const MAP_SETTLE_TOTAL_BUDGET_MS = 9_000;
  * report a map that has not finished. Requiring consecutive idle frames narrows
  * the window. It does not close it, and no finite number would.
  *
- * This value and the original 8000ms single-call timeout were introduced together
- * in one commit and never tuned against observed behaviour — the provenance is
- * "chosen alongside the design", not measured. Do not re-derive either number.
+ * 3 is judgement rather than measurement — chosen alongside the design and never
+ * tuned against observed behaviour, the same provenance
+ * {@link MAP_SETTLE_TOTAL_BUDGET_MS} carries.
  */
 const MAP_SETTLE_STABLE_FRAMES = 3;
 
@@ -93,12 +94,15 @@ export const waitForMapsSettled = (
 	const mounted = maps.filter((map): map is L.Map => Boolean(map));
 	let idleFrames = 0;
 
-	// Deadline check lives inside the rAF callback deliberately — not a missing
-	// `setTimeout` fallback. Frames ARE the measurement: no frames means the page isn't
-	// rendering, so "settled" has no answer to give. A wall-clock fallback would claim
-	// ready with nothing painted, and since the service has no error branch that turns a
-	// visible failure into a silently wrong image. Browsers only pause frames for
-	// backgrounded/hidden/minimised pages — this drives one headless page, so frames fire.
+	// The deadline check lives inside the rAF callback deliberately: frames ARE the
+	// measurement here.
+	// No frames means the page is not rendering, and a map that is not rendering has no
+	// settled state to report.
+	// A wall-clock fallback would report ready with nothing painted, and the service has
+	// no error branch to catch that — it would turn a visible failure into a silently
+	// wrong image.
+	// Browsers pause frames for backgrounded, hidden, and minimised pages only, and this
+	// drives one headless page, so frames fire.
 	return new Promise<boolean>((resolve) => {
 		const check = () => {
 			let loading = false;

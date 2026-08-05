@@ -6,9 +6,9 @@
  * `getLocationModalInnerHTML` scrapes and `createPrepareRasterPostHttpPayload`
  * carries in its payload.
  *
- * @see {@link ./types.ts} — `PrepareRasterPostHttpPayload.locationPopupHtml`, the shape this markup fills
- * @see {@link ./get-location-modal-inner-html.ts} — the scraper this markup exercises
- * @see {@link ./create-prepare-raster-post-http-payload.ts} — the payload builder this markup exercises
+ * @see {@link PrepareRasterPostHttpPayload.locationPopupHtml} — the shape this markup fills
+ * @see {@link getLocationModalInnerHTML} — the scraper this markup exercises
+ * @see {@link createPrepareRasterPostHttpPayload} — the payload builder this markup exercises
  */
 
 import type { PrepareRasterPostHttpPayload } from './types';

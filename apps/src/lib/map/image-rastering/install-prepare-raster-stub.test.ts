@@ -8,7 +8,7 @@ import {
 import type { Prepare_Raster } from './types';
 
 /**
- * Tests for {@link installPrepareRasterStub}'s polling contract (CLIM-1454).
+ * Tests for {@link installPrepareRasterStub}'s polling contract.
  *
  * The stub is defence in depth against a registration race that is real in
  * principle: the screenshot service could call `window.$.fn.prepare_raster`
@@ -22,9 +22,10 @@ import type { Prepare_Raster } from './types';
  * arriving late reaches it directly, and an abandoned poll neither loops
  * forever nor forwards to itself.
  *
- * No `vi.mock` — `vi.useFakeTimers` is a different tool, established for
- * this namespace by the settle tests, and `performance` is genuinely faked
- * here the same way.
+ * `vi.useFakeTimers` drives both `setTimeout` and `performance`, so a 5s
+ * deadline costs the suite no wall-clock time.
+ * The stub is exercised through the real `window.$.fn` it installs, which is
+ * why `afterEach` deletes that global rather than restoring a module mock.
  */
 
 /**

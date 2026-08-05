@@ -5,10 +5,12 @@ import ZoomButtons from '@/components/ui/zoom-buttons';
 import { DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM } from '@/lib/constants';
 
 /**
- * ZoomControl Component
+ * `ZoomControlLayer` — binds the `ZoomButtons` pair to the Leaflet map it is
+ * rendered inside.
  *
- * This component adds buttons to zoom in and out of the map.
- *
+ * It reads the current zoom from `useMap()` and steps it one level at a time,
+ * clamped between `DEFAULT_MIN_ZOOM` and `DEFAULT_MAX_ZOOM`.
+ * `ZoomButtons` in `components/ui/zoom-buttons.tsx` owns the markup.
  */
 const ZoomControlLayer = (): React.ReactElement => {
 	const map = useMap();

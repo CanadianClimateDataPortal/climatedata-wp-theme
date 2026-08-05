@@ -1,8 +1,11 @@
 /**
- * Download map modal component.
+ * Modal offering an image export of the map the user is currently looking at.
  *
- * A modal component that allows users to download the map as an image.
+ * "Download" here means that image export, produced by a screenshot service.
+ * The Download SPA at `/download`, which exports climate data files, is a
+ * separate feature living under `components/download/`.
  *
+ * @see `apps/src/lib/map/image-rastering/README.md` for the full round trip.
  */
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { __, LocaleContext } from '@/context/locale-provider';
@@ -35,14 +38,18 @@ import {
 
 import { INTERNAL_URLS } from '@/lib/constants';
 
-// Loads `create-raster-debugger.ts` only once someone actually assigns
-// `window.mapPrepareRasterPostHttpPayload` — see `install-debug-payload-accessor.ts`.
-//
-// KNOWN RACE: clicking Download between assigning a payload and the import
-// resolving finds `window.mapPrepareRasterPostHttpPayloadDebugger` still
-// undefined, so that one click behaves as though debug mode were off.
-// The payload survives — the accessor stashes it synchronously — it is
-// applied on the next click. A limitation that we will keep that way.
+/**
+ * Installs the `window.mapPrepareRasterPostHttpPayload` accessor.
+ * Assigning that global a defined value lazy-loads {@link createRasterDebugger},
+ * which keeps the debugger out of the main bundle until someone asks for it.
+ *
+ * KNOWN RACE: a Download click landing between that assignment and the dynamic
+ * import resolving still reads `window.mapPrepareRasterPostHttpPayloadDebugger`
+ * as undefined, so that one click behaves as though debug mode were off.
+ * The payload survives, because the accessor stashes it synchronously, and it
+ * applies on the next click.
+ * We accept this limitation.
+ */
 installDebugPayloadAccessor();
 
 const DownloadMapModal: React.FC<{
@@ -53,17 +60,19 @@ const DownloadMapModal: React.FC<{
 	const localeContext = useContext(LocaleContext);
 	const currentLocale = localeContext?.locale || 'en';
 
-	// Get dataset and variable information for download URL
 	const dispatch = useAppDispatch();
+	// Dataset and variable feed the Download SPA link that `getDownloadUrl` builds.
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
+	// The open location, whose markup travels in the screenshot service's POST payload.
 	const selectedLocation = useAppSelector(selectSelectedLocation);
 
-	// Map handles `prepareRaster` used to replay the captured popup and marker.
+	// Map handles that `prepareRaster` uses to replay the captured popup and marker.
 	const { map, comparisonMap } = useMap();
 	const { addMarker, clearMarkers } = useMapMarker();
 
-	// Used by the Download Image Map server.
+	// Registers `window.$.fn.prepare_raster`, the entry point the screenshot
+	// service calls from inside its own headless browser session.
 	useEffect(() => {
 		window.$ = window.$ || {};
 		window.$.fn = window.$.fn || {};
@@ -80,15 +89,16 @@ const DownloadMapModal: React.FC<{
 					markerLatLon,
 				}
 			}
-			// Keep the injected readiness callback when the debugger is absent.
-			// We are deliberately not providing a fallback `?? ...`: `resolveSignalReady` always returns a function.
+			// `signalRasterReady` stands as the readiness callback while no debugger is loaded.
+			// `resolveSignalReady` always returns a function, so a `?? ...` fallback would be dead code.
 			let signalReady = signalRasterReady;
 			if (window.mapPrepareRasterPostHttpPayloadDebugger) {
 				signalReady = window.mapPrepareRasterPostHttpPayloadDebugger.resolveSignalReady(signalRasterReady);
 			}
 
-			// Do not signal readiness after a preparation failure. We let its wait time out.
-			// It means the `.to-raster` className to trigger screenshot and it should have had waited longer.
+			// A failed preparation leaves `to-raster` off `#map-root`, so the screenshot
+			// service's readiness wait times out instead of firing.
+			// Timing out beats capturing a map that never finished preparing.
 			prepareRaster(payload, { map, comparisonMap, addMarker, clearMarkers }, signalReady)
 				.catch((error) => {
 					console.error('prepareRaster failed:', error);
@@ -97,12 +107,11 @@ const DownloadMapModal: React.FC<{
 		window.$.fn.prepare_raster = prepare_raster;
 
 		return () => {
-			// Reinstalls the polling stub in place of the real implementation.
-			// Fixes a genuine defect independent of any registration race: a
-			// screenshot-service call arriving after this unmount used to hit
-			// a deleted key and crash outright.
-			// It is now captured and forwarded once a later mount registers
-			// the real implementation again.
+			// Reinstalls the polling stub where the real implementation was.
+			// A screenshot-service call arriving after this unmount used to hit a
+			// deleted key and crash outright.
+			// The stub now captures that call and forwards it once a later mount
+			// registers the real implementation again.
 			installPrepareRasterStub();
 		};
 	}, [
@@ -114,42 +123,44 @@ const DownloadMapModal: React.FC<{
 	]);
 
 	/**
-	 * Handles the click event for the "Download" button from the modal.
+	 * Handles the click on the modal's "Download" button.
 	 *
-	 * Sends the current map state to the screenshot service.
-	 * Uses `createPrepareRasterPostHttpPayload`, unless we've supplied
-	 * `window.mapPrepareRasterPostHttpPayloadDebugger` with an override.
+	 * POSTs the current map view to the screenshot service, then hands the
+	 * returned image to the browser as a file download.
+	 * The body comes from {@link createPrepareRasterPostHttpPayload}, unless
+	 * `window.mapPrepareRasterPostHttpPayloadDebugger` supplies an override.
 	 */
 	const handleDownloadClick = async () => {
 		const mapUrl = new URL(window.location.href);
-		// Make sure to remove addition hashes.
+		// The screenshot service reloads this URL, and the fragment adds nothing it can use.
 		mapUrl.hash = '';
 
 		if (window.mapPrepareRasterPostHttpPayloadDebugger?.isSetup) {
-			// When debugging against another screenshot backend, make HTTP call to that other host.
-			// fixUrlHost rewrites mapUrl's host in place before fetchTarget is resolved below.
-			// When the proxy is enabled, that sends the POST cross-origin instead of through the
-			// local proxy — deliberate, so the debugger can point requests elsewhere on purpose.
+			// `fixUrlHost` rewrites `mapUrl`'s host in place, before the fetch target
+			// is resolved below, so the POST reaches a different screenshot-service
+			// deployment.
+			// With the proxy enabled that POST goes cross-origin rather than through
+			// the local proxy, which is the point of pointing the debugger elsewhere.
 			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
 		}
 
-		// window.RASTER_PROXY_ENABLED is set by the page render only when the
-		// same-origin PHP proxy is configured for this environment.
-		// When it is set, resolveRasterFetchTarget posts to the page's own URL —
-		// the proxy derives path and query string from that request, so no
-		// client-side encoding step is required.
-		// When it is absent, resolveRasterFetchTarget falls back to the salted,
-		// encoded screenshot-service URL this module has always used.
+		// The page render sets `window.RASTER_PROXY_ENABLED` where the same-origin
+		// PHP proxy is configured, and `resolveRasterFetchTarget` then posts to the
+		// page's own URL; otherwise it falls back to the salted, encoded
+		// screenshot-service URL.
+		// Round trip and vocabulary: `apps/src/lib/map/image-rastering/README.md`.
 		const fetchTarget = resolveRasterFetchTarget(mapUrl, window.RASTER_PROXY_ENABLED);
 
 		setIsGenerating(true);
 
-		// No selected location means that no `LocationModal` is open.
+		// A selected location means a `LocationModal` is open, and its markup
+		// becomes the payload the service replays.
 		let payload: PrepareRasterPostHttpPayload | undefined = undefined;
 		if (selectedLocation !== null) {
 			payload = createPrepareRasterPostHttpPayload(selectedLocation);
 		}
-		// Preserve an explicit undefined debug payload.
+		// `resolvePostHttpPayload` may return undefined on purpose, so its answer
+		// replaces the payload outright rather than merging with it.
 		if (window.mapPrepareRasterPostHttpPayloadDebugger) {
 			payload = window.mapPrepareRasterPostHttpPayloadDebugger.resolvePostHttpPayload(payload);
 		}

@@ -24,10 +24,8 @@ export type SignalReady = () => void;
  * {@link RASTER_READY_CLASS_NAME} to the element identified by
  * {@link RASTER_TARGET_ELEMENT_ID}.
  *
- * Called last by `prepareRaster`, once everything it can observe has settled.
- * Everything awaited before that call is something the screenshot depends on
- * *and* that the platform can report the completion of — nothing before this
- * point waits out a fixed delay.
+ * Called last by {@link prepareRaster}, once everything it can observe has
+ * settled. What it awaits first, and why, is documented there.
  *
  * @remark Where does this run?: In the screenshot service's browser.
  */

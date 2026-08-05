@@ -14,7 +14,12 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useMapInteractions } from '@/hooks/use-map-interactions';
 
 /**
- * Renders a Leaflet map, including custom panes and tile layers.
+ * Root of the Maps SPA's map area.
+ *
+ * Renders one `MapContainer`, and a second synced alongside it when the user is
+ * comparing two emission scenarios (`?cmp=1&cmpTo=`).
+ * The `#map-root` element it owns is what the screenshot service polls for the
+ * `to-raster` readiness class — see `apps/src/lib/map/image-rastering/README.md`.
  */
 export const MapRoot = (
 ): React.ReactElement => {
@@ -98,7 +103,9 @@ export const MapRoot = (
 				clearSelectedLocation={handleClearSelectedLocation}
 				selectGriddedLocation={selectGriddedLocation}
 				layerRef={primaryLayerRef}
-				className={showComparisonMap ? 'map-comparison-left' /** See {@link useLeafletSyncContainerClassName} */: undefined}
+				// This class arrives after the container's first render, so
+				// `useLeafletSyncContainerClassName` re-applies it inside `MapContainer`.
+				className={showComparisonMap ? 'map-comparison-left' : undefined}
 			/>
 			{showComparisonMap && (
 				<MapContainer

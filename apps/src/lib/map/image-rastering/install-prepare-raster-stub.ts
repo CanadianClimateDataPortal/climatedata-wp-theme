@@ -5,20 +5,16 @@ import type { Prepare_Raster } from './types';
  * `$.fn.prepare_raster` before giving up quietly.
  *
  * Sized against the same external ceiling {@link MAP_SETTLE_TOTAL_BUDGET_MS} is
- * sized against.
- * The screenshot service waits up to 10s total for `to-raster` to appear after
- * invoking `prepare_raster`, and `prepareRaster` itself can spend up to 9s of
- * that once it starts running.
- * 5s leaves roughly the other half of that 10s ceiling for the bundle to
- * parse, React to mount `DownloadMapModal`, and its registration effect to
- * run.
- * Measured directly on a warm load, that registration takes roughly 34ms —
- * far under this budget — so 5s is headroom against an untested cold load,
- * not a figure tuned against an observed failure.
- * A page that has not mounted `DownloadMapModal` within 5s of this call was
- * not going to finish `prepareRaster`'s own 9s budget before the service's
- * 10s wait expired either, so giving up here costs nothing the service was
- * going to grant anyway.
+ * sized against — the service's 10s wait for `to-raster`, timeline in ./README.md.
+ * This 5s and that 9s are separate give-up points rather than two shares of the
+ * same 10s; a page that spends all of both has already lost the service.
+ * What 5s buys is time for the bundle to parse, React to mount
+ * `DownloadMapModal`, and its registration effect to run.
+ * Measured directly on a warm load, that registration takes roughly 34ms — far
+ * under this budget — so 5s is headroom against an untested cold load rather
+ * than a figure tuned against an observed failure.
+ * A page still unmounted 5s after this call was going to miss the service's
+ * wait regardless, so giving up here costs nothing that was still available.
  */
 export const PREPARE_RASTER_STUB_POLL_DEADLINE_MS = 5_000;
 
@@ -37,44 +33,48 @@ const PREPARE_RASTER_STUB_POLL_INTERVAL_MS = 50;
 /**
  * Installs a polling stub at `window.$.fn.prepare_raster`.
  *
- * This is defence in depth against a registration race that is real in
- * principle and unmeasured on a cold load — not a fix for an observed
- * failure.
- * `window.$.fn.prepare_raster` is registered inside `DownloadMapModal`'s
- * registration effect (`download-map-modal.tsx`), which cannot run before
- * the bundle finishes parsing and React mounts.
- * Measured directly on a warm load, that registration completes roughly
- * 34ms after navigation, comfortably inside the screenshot service's
- * one-second wait before it evaluates `$.fn.prepare_raster(...)`.
- * No cold-load measurement exists yet, and a cold load (first paint,
- * uncached bundle) is slower than a warm one by an unknown margin, so the
- * race stays possible in principle even though it has not been observed to
- * cause a service failure.
+ * Intended never to throw.
+ * The screenshot service reaches this stub through `driver.execute_script`, so an
+ * exception escaping it arrives as a `JavascriptException` and kills the export
+ * outright — a failure indistinguishable, from the service's side, from no
+ * application being on the page at all.
+ * A call this stub cannot forward is dropped silently instead: the deadline branch
+ * returns without logging, rejecting, or invoking anything.
+ *
+ * Forwarding does not yet enforce that contract, and the gap is worth knowing
+ * about.
+ * A synchronous throw from the real implementation propagates straight out through
+ * `current.call(fn, ...args)`, and because `prepare_raster` is async, a rejection
+ * reached along this path is discarded rather than caught the way
+ * `download-map-modal.tsx` catches it at its own call site.
  *
  * Call this as early as possible: at module scope in `main-map.tsx`, before
  * React renders anything, so the stub is the first thing to occupy
  * `window.$.fn.prepare_raster`.
  *
  * A call the stub receives is captured, then replayed once the real
- * implementation appears.
+ * implementation appears, within {@link PREPARE_RASTER_STUB_POLL_DEADLINE_MS}.
  * Readiness is judged by identity — comparing `window.$.fn.prepare_raster`
- * against the stub's own reference — not a boolean flag, so there is
- * nothing separate to keep in sync.
+ * against the stub's own reference — so no separate boolean needs keeping in
+ * sync.
  * The captured call forwards via `current.call(fn, ...args)` rather than
  * `current(...args)`, so the receiver matches how the service invokes it —
  * `$.fn.prepare_raster(...)`, receiver `$.fn` — because a bare call would
  * silently hand the real implementation `this === undefined` under strict
  * mode.
  *
- * `download-map-modal.tsx` keeps registering the real implementation
- * exactly as written today: `window.$.fn.prepare_raster = prepare_raster`.
- * That file is unaware this stub exists.
- * Its unmount cleanup calls this function again in place of deleting the
- * key.
- * That deletion was a genuine defect independent of this race: any call
- * arriving after an unmount hit a missing function and crashed, warm load
- * or cold.
- * Reinstalling the stub there closes that gap.
+ * The stub serves two situations, and the evidence behind them differs.
+ * A call arriving BEFORE registration is defence in depth against a race that
+ * is real in principle and unmeasured on a cold load: the real implementation
+ * is registered inside `DownloadMapModal`'s registration effect
+ * (`download-map-modal.tsx`), which cannot run before the bundle finishes
+ * parsing and React mounts.
+ * A call arriving AFTER that component unmounts still finds a working function,
+ * and that is why its cleanup reinstalls this stub rather than clearing the key:
+ * an absent key sends the service's call into `undefined`, warm load or cold.
+ * That file registers the real implementation as
+ * `window.$.fn.prepare_raster = prepare_raster` on mount, and calls this function
+ * on unmount.
  *
  * `driver.execute_script` does not await anything.
  * The service's call returns as soon as this function returns, which can be

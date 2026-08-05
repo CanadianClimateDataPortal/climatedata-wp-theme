@@ -9,10 +9,12 @@ import {
 } from '@/lib/vocabulary';
 
 /**
- * Pills we add to the map image we prepare for download.
+ * Pills carrying the variable title and grid resolution into the exported map image.
  *
- * They're present in the DOM at all times, but shown only via
- * the CSS Selector `html[data-raster="true"]` rule in `Global.css`
+ * They sit in the DOM at all times and stay hidden until the
+ * `html[data-raster="true"]` rules in `Global.css` reveal them, which happens
+ * only while a capture is being prepared.
+ * Vocabulary: `apps/src/lib/map/image-rastering/README.md`.
  */
 const MapInfoPills = (
 ): React.ReactElement => {
@@ -29,7 +31,7 @@ const MapInfoPills = (
 
 	const gridTypeOf = getGridTypeFor(climateVariable);
 
-	// e.g. `Grid= 10×6km`
+	// e.g. '~10×6km', rendered further down as "Grid= ~10×6km".
 	const gridResolutionLabel = getGridTypeLabel(gridTypeOf);
 
 	return (

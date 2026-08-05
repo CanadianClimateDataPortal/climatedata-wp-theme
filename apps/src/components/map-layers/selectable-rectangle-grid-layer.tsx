@@ -85,10 +85,13 @@ const SelectableRectangleGridLayer = forwardRef<{
 			const lngDiff = maxLng - minLng;
 			const area = latDiff * lngDiff;
 			/**
-			 * `climateVariable.getGridType()` returns as a simple string that is
-			 * catalogued as a {@link GridType} and in case of falling with an
-			 * erroneous Non-Numerical (NaN) and break maxCellsAllowed we give a
-			 * fallback
+			 * `climateVariable.getGridType()` returns a plain string, while the
+			 * grids we hold resolutions for are catalogued as {@link GridType}.
+			 * An uncatalogued string misses the lookup, and dividing by that
+			 * undefined resolution would make `cellCount` NaN — which compares
+			 * false against `maxCellsAllowed` and silently lifts the selection
+			 * limit.
+			 * The fallback keeps the arithmetic on a real number.
 			 */
 			const resolution =
 				gridResolutions[varGrid] ??

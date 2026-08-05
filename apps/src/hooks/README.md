@@ -1,6 +1,22 @@
 # `hooks/`
 
+Shared React hooks.
+A hook belongs here when more than one component needs it, or when it isolates a workaround worth naming.
+
+## `use-leaflet.ts` is load-bearing
+
+`useLeaflet()` looks disposable, because `App.tsx` calls it and discards the `config` object it returns.
+That return value is indeed unused. The module is not.
+
+Two things keep it alive:
+
+- Its `useEffect` patches `L.DomEvent.fakeStop` on every mount, at both call sites. Leaflet removed that function years ago; `leaflet-search` still calls it.
+- Its side-effect imports pull in Leaflet's own stylesheet along with `leaflet-search` and `leaflet.vectorgrid`.
+
+Deleting the module strips the map's CSS and breaks the search control.
+Dropping only the unused `config` return is safe; dropping the module is not.
+
 ## Touched this PR
 
 - `use-leaflet-sync-container-class-name.tsx` → `useLeafletSyncContainerClassName` — re-applies a container `className` react-leaflet freezes after first mount.
-- `use-url-sync.ts` → `useUrlSync` — syncs climate-variable/map state with URL query params, both directions.
+  A separate, unrelated module from `use-leaflet.ts` above, despite the similar name.

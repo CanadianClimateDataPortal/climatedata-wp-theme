@@ -281,18 +281,21 @@
 }
 
 /**
- * Backstop for the legend's open/close control.
- * It renders its own `[data-raster="false"]` marker into a separate React
- * root, gated on data that resolves asynchronously.
- * That render can land after the removal pass already ran over the
- * document, leaving nothing in JS to remove it.
+ * Backstop for markers that appear after the removal pass.
+ * `prepareRaster` owns the general removal: it strips every
+ * `[data-raster="false"]` node in JS before setting the
+ * `html[data-raster="true"]` flag that activates this rule.
+ * This rule's remaining job is the legend's open/close control: that control
+ * renders its own marker into a separate React root, gated on data that
+ * resolves asynchronously, so the render can land once the pass is already
+ * over and nothing in JS is left to remove it.
  *
- * The other two selectors handle a comparison view: they remove the
- * right-hand map's own copies of the info pills, since only one copy should
- * show.
+ * The other two selectors handle a comparison view.
+ * They hide the right-hand map's own copies of the info pills, since one copy
+ * belongs in the capture.
  *
- * Raster vocabulary (`data-raster`, `to-raster`):
- * apps/src/lib/map/image-rastering/README.md
+ * Raster vocabulary (`data-raster`, `to-raster`) has one home:
+ * `apps/src/lib/map/image-rastering/README.md`
  */
 html[data-raster='true'] [data-raster='false'],
 html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-resolution,
@@ -301,8 +304,8 @@ html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-compa
 }
 
 /**
- * The map info pills (`MapInfoPills`) are hidden by default and revealed
- * only while preparing the raster capture.
+ * The map info pills (`MapInfoPills`) stay hidden in the live app and become
+ * visible only while preparing the raster capture.
  */
 html[data-raster='true'] .raster-addition-pill-title,
 html[data-raster='true'] .raster-addition-pill-resolution {
@@ -310,26 +313,25 @@ html[data-raster='true'] .raster-addition-pill-resolution {
 }
 
 /**
- * Leaflet fades each tile in from transparent over 200ms once it has loaded.
- * `GridLayer._tileReady` sets the tile's opacity to zero, then ramps it back
- * up on each animation frame.
- * Both the `load` event and `isLoading()` report the layer as finished at
- * the *start* of that ramp.
- * Code that waits for tiles to load — see
- * `lib/map/image-rastering/wait-for-maps-settled.ts` — is told the map is
- * ready while it is still fading in, so a screenshot taken then catches
- * half-transparent tiles.
+ * Holds every tile fully opaque so a screenshot never catches one mid-fade.
  *
- * `Map.options.fadeAnimation` is Leaflet's own switch, but it is only read
- * when the map is constructed.
- * Changing it afterwards does nothing, and the live flag is private.
+ * Leaflet fades each tile in from transparent over 200ms once it has loaded:
+ * `GridLayer._tileReady` sets the tile's opacity to zero, then ramps it back up
+ * on each animation frame.
+ * Both the `load` event and `isLoading()` report the layer as finished at the
+ * *start* of that ramp, so code waiting on tiles — see
+ * `lib/map/image-rastering/wait-for-maps-settled.ts` — hears "ready" while the
+ * map is still fading in.
+ *
+ * Leaflet's own switch, `Map.options.fadeAnimation`, is read once at map
+ * construction and the live flag is private, so flipping it later has no
+ * effect.
  * This rule wins on the cascade instead: the ramp is written to each tile's
  * inline `style`, and an author `!important` declaration outranks a normal
  * style attribute.
  *
- * Nobody watches an animation in a headless screenshot, so dropping the
- * fade costs nothing and removes a 200ms window in which the capture is
- * wrong.
+ * A headless screenshot has no viewer to appreciate the animation, so dropping
+ * the fade costs nothing and closes a 200ms window of wrong captures.
  */
 html[data-raster='true'] .leaflet-tile {
 	opacity: 1 !important;

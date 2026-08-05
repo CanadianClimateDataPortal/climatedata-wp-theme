@@ -1,8 +1,9 @@
 /**
- * ZoomControl Component
+ * `ZoomButtons` — the plus/minus pair for zooming a map in and out.
  *
- * A custom control for zooming in and out on the map.
- *
+ * Presentation only: it renders buttons and reports clicks.
+ * `ZoomControlLayer` in `components/map-layers/zoom-control.tsx` is what binds
+ * those clicks to a Leaflet map.
  */
 import React, {
 	useMemo,
@@ -47,6 +48,9 @@ const ZoomButtons = (
 	);
 
 	return (
+		// `data-raster="false"` drops the zoom control from the exported map image,
+		// where a button does nothing.
+		// Vocabulary: `apps/src/lib/map/image-rastering/README.md`.
 		<div
 			className="absolute bottom-6 left-6 z-20 overflow-y-auto"
 			data-raster="false"

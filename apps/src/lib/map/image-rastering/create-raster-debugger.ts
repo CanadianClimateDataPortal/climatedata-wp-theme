@@ -27,8 +27,13 @@ type SetupState = {
 };
 
 /**
- * In order to test the screenshot service, we need to set the DATA_URL and URL_ENCODER_SALT in the browser's window object.
- * This is because the screenshot service is a separate service that needs to know where to send the request to get the data.
+ * Console helper for exercising the screenshot service by hand.
+ *
+ * The service lives at whatever `window.DATA_URL` names, and requests to it are
+ * signed with `window.URL_ENCODER_SALT`. Both are stamped into the page by the
+ * WordPress template, so pointing this browser at a different deployment means
+ * overwriting them — which is what {@link PrepareRasterPostHttpPayloadDebugger.setup}
+ * is for.
  *
  * @remark Where does this run?: In the user's browser.
  *
@@ -81,10 +86,10 @@ export class PrepareRasterPostHttpPayloadDebugger {
 	 * Debug mode is on whenever `window.mapPrepareRasterPostHttpPayload` holds a
 	 * defined value — including `null`, since assigning `null` is what enables
 	 * debug mode from the console.
-	 * `installDebugPayloadAccessor` makes the property always present on
-	 * `window`, so an `in` check would be permanently true and can no longer
-	 * tell debug mode apart from production; testing the value is what still
-	 * can. Every debug-only branch on this class reads this getter rather than
+	 * `installDebugPayloadAccessor` keeps the property present on `window` at all
+	 * times, so testing its value is what separates debug mode from production —
+	 * an `in` check is permanently true and answers nothing.
+	 * Every debug-only branch on this class reads this getter rather than
 	 * repeating the check.
 	 */
 	get isDebugMode(): boolean {
@@ -214,12 +219,14 @@ export class PrepareRasterPostHttpPayloadDebugger {
 	}
 
 	/**
-	 * Utility to instrument each time we open a location modal during debugging to visualize on a screenshot service.
+	 * Records one `LocationModal` opening, so that place can be sent to the screenshot
+	 * service later.
 	 *
-	 * This will mutate `window.mapPrepareRasterPostHttpPayload`, and record the payload
-	 * alongside where we've clicked, only when we are in debugging mode. Storing the
-	 * payload here — rather than recomputing it later — is what lets {@link createFetchFor}
-	 * replay this exact place even after a different LocationModal has since been opened.
+	 * Overwrites `window.mapPrepareRasterPostHttpPayload` and appends to `places`, both
+	 * only in debug mode.
+	 * Storing the payload here — rather than recomputing it later — is what lets
+	 * {@link createFetchFor} replay this exact place even after a different
+	 * LocationModal has since been opened.
 	 *
 	 * @remark To enable, set `window.mapPrepareRasterPostHttpPayload = null` in the browser's console before clicking on a location modal.
 	 */
@@ -229,8 +236,6 @@ export class PrepareRasterPostHttpPayloadDebugger {
 		latlng: L.LatLng,
 	) {
 		if (!this.isDebugMode) {
-			// Do not execute if we're not in debug mode.
-			// This is intended only when we need the debugger.
 			return;
 		}
 
@@ -263,8 +268,6 @@ export class PrepareRasterPostHttpPayloadDebugger {
 		index: number,
 	): (() => ReturnType<typeof fetch>) | undefined {
 		if (!this.isDebugMode) {
-			// Do not execute if we're not in debug mode.
-			// This is intended only when we need the debugger.
 			return;
 		}
 		const place = this.#places[index];
@@ -277,12 +280,15 @@ export class PrepareRasterPostHttpPayloadDebugger {
 		const fetchInit = createFetchRequestInitOptions(payload);
 		console.log(`createFetchFor(${index})`, { payload, fetchInit, place });
 		const mapUrl = new URL(windowLocation);
-		// Make sure to remove addition hashes.
+		// The hash is client-side state the service has no use for.
 		mapUrl.hash = '';
 		if (this.isSetup) {
 			// When trying to test another remote screenshot service
 			this.fixUrlHost(mapUrl);
 		}
+		// Always the encoded-URL target, never `resolveRasterFetchTarget`: retargeting
+		// another deployment means addressing that deployment's service by host, and the
+		// same-origin proxy branch can only ever reach the one serving this page.
 		const fetchTarget = createFetchTargetToRasterWithEncodedUrl(mapUrl.href);
 		return (): Promise<Response> => {
 			this.preFetchConsoleLog(fetchTarget, fetchInit);
@@ -291,7 +297,8 @@ export class PrepareRasterPostHttpPayloadDebugger {
 	}
 
 	/**
-	 * Add console.log line when in debugging mode to show the cURL command that can be used to test the screenshot service.
+	 * Logs the equivalent `curl` command for a request, so the same call can be repeated
+	 * from a shell.
 	 *
 	 * Prints `reqInit.body` itself — the exact bytes {@link createFetchFor} and
 	 * `handleDownloadClick` send on the wire — rather than re-reading
@@ -303,15 +310,12 @@ export class PrepareRasterPostHttpPayloadDebugger {
 		reqInit: RequestInit,
 	) {
 		if (!this.isDebugMode) {
-			// Do not execute if we're not in debug mode.
-			// This is intended only when we need the debugger.
 			return;
 		}
 
-		// Normally, we do not want this. But when we do, what do the following mean:
 		let cURL = `curl '${String(reqUrl)}'`;
 		if (!reqInit.body) {
-			// We do not have a modal opened, no data to send
+			// No modal was open when this was built, so there is no data to send.
 			console.log(
 				'For Manual testing against screenshot service (without any data):\n',
 				cURL

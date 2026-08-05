@@ -93,6 +93,11 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 			}) }
 
 			{!isS2DVariable && (
+				// `data-raster="false"` drops the "Go to details" link from the
+				// exported map image, where a link leads nowhere.
+				// The rest of this modal's markup is scraped and replayed into that
+				// image by `getLocationModalInnerHTML`.
+				// Vocabulary: `apps/src/lib/map/image-rastering/README.md`.
 				<p
 					className="text-right"
 					data-raster="false"

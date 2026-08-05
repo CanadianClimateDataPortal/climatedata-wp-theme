@@ -27,6 +27,12 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {
 		const internalRef = useRef<HTMLDivElement>(null);
 
+		// Unique id, needed when multiple maps are rendered on the same page
+		// -- e.g. comparing emission scenarios side by side.
+		// The `location-modal-` prefix is a contract: `getLocationModalInnerHTML`
+		// selects on it to scrape this markup into the map-image export payload.
+		// Renaming the prefix here without renaming it there exports a map with
+		// no popup on it.
 		const uniqueId = useMemo(() => {
 			const suffix = nanoid(5);
 			return 'location-modal-' + suffix;
@@ -50,7 +56,6 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 			// External overrides from className prop
 			className
 		);
-
 
 		return (
 			<div

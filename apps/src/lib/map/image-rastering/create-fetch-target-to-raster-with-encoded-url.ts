@@ -1,9 +1,18 @@
 import { encodeURL } from '@/lib/utils';
 
 /**
- * Take the current Map URL, encode to be used against the screenshot service.
+ * Builds the screenshot service's own `/raster?url=` endpoint, carrying the map
+ * page's URL salted and encoded with {@link encodeURL}.
  *
- * Append to `window.DATA_URL + '/raster?url='` the string given as argument, encode using `window.URL_ENCODER_SALT`.
+ * This is the fallback branch of {@link resolveRasterFetchTarget}, reached when
+ * `window.RASTER_PROXY_ENABLED` is absent — the deployment has no same-origin PHP
+ * proxy, so the request goes to the service directly. It is also the target
+ * `createRasterDebugger`'s `createFetchFor` uses unconditionally, since retargeting
+ * another deployment means addressing that deployment's service by host.
+ *
+ * @param mapUrlString - The map page's own URL, hash already stripped by the caller.
+ *
+ * @returns `window.DATA_URL` + `/raster?url=` + the encoded map URL.
  *
  * @remark Where does this run?: In the user's browser.
  */
@@ -11,12 +20,10 @@ export const createFetchTargetToRasterWithEncodedUrl = (
 	mapUrlString: string,
 ): string => {
 	const mapUrl = new URL(mapUrlString);
-	// Encode the URL
 	const encoded_url = encodeURL(
 		mapUrl.toString(),
 		window.URL_ENCODER_SALT,
 	).encoded;
-	// Generate the generateMap URL.
 	const outcome = window.DATA_URL + '/raster?url=' + encoded_url;
 	return outcome;
 };

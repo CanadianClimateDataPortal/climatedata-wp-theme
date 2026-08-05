@@ -15,6 +15,7 @@ import {
 	createFetchTargetToRasterWithEncodedUrl,
 	createPrepareRasterPostHttpPayload,
 	installDebugPayloadAccessor,
+	installPrepareRasterStub,
 	prepareRaster,
 	signalRasterReady,
 	type Prepare_Raster,
@@ -96,10 +97,11 @@ const DownloadMapModal: React.FC<{
 		window.$.fn.prepare_raster = prepare_raster;
 
 		return () => {
-			// Clean up if needed
-			if (window.$?.fn?.prepare_raster) {
-				delete window.$.fn.prepare_raster;
-			}
+			// Reinstalls the polling stub in place of the real implementation.
+			// A screenshot-service call arriving after this unmount is then
+			// captured and forwarded once a later mount registers the real
+			// implementation again, instead of hitting a deleted key.
+			installPrepareRasterStub();
 		};
 	}, [
 		addMarker,

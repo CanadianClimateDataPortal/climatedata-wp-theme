@@ -4,26 +4,29 @@ import { createFetchTargetToRasterWithEncodedUrl } from './create-fetch-target-t
  * Resolves the POST target for a Download-button screenshot request.
  *
  * @param mapUrl - The map page's own URL, hash already stripped by the caller.
- * @param proxyEnabled - `window.RASTER_PROXY_ENABLED` — set only when the
- * page render found the same-origin PHP proxy configured for this
- * environment.
+ * @param proxyDataUrl - `window.RASTER_PROXY_DATA_URL` — the screenshot service
+ * address to raster through when the same-origin raster proxy is configured for
+ * this environment. Its presence is the flag; the value itself stays on the
+ * server side of the round trip. An empty string counts as absent, so an
+ * environment variable set to `""` leaves the fallback in place.
  *
- * @returns `mapUrl.href` directly when the proxy is enabled, since the proxy
- * derives path and query string from the request it receives. Otherwise the
+ * @returns `mapUrl.href` directly when a proxy data URL is present, since the
+ * proxy derives path and query string from the request it receives. Otherwise the
  * salted, encoded screenshot-service URL {@link createFetchTargetToRasterWithEncodedUrl}
  * builds, which addresses the service directly.
  *
  * @example
  * ```typescript
- * resolveRasterFetchTarget(mapUrl, true); // mapUrl.href
+ * resolveRasterFetchTarget(mapUrl, 'https://data.example.test'); // mapUrl.href
  * resolveRasterFetchTarget(mapUrl, undefined); // createFetchTargetToRasterWithEncodedUrl(mapUrl.href)
  * ```
  */
 export const resolveRasterFetchTarget = (
 	mapUrl: URL,
-	proxyEnabled: boolean | undefined,
+	proxyDataUrl: string | undefined,
 ): string => {
-	if (proxyEnabled) {
+	const hasProxyDataUrl = typeof proxyDataUrl === 'string' && proxyDataUrl !== '';
+	if (hasProxyDataUrl) {
 		return mapUrl.href;
 	}
 	return createFetchTargetToRasterWithEncodedUrl(mapUrl.href);

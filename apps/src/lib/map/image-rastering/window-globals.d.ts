@@ -28,9 +28,11 @@ declare global {
 		mapPrepareRasterPostHttpPayloadDebugger?: PrepareRasterPostHttpPayloadDebugger;
 		URL_ENCODER_SALT: string;
 		DATA_URL: string;
-		// Set by the page render only when the same-origin raster proxy is
-		// configured for this environment. Absent is a real, supported state —
-		// it means this deployment still relies on the encoded-URL fallback.
-		RASTER_PROXY_ENABLED?: boolean;
+		// The `DATA_URL` to use when rastering through the same-origin raster proxy,
+		// carrying no trailing slash. Often the same address as `DATA_URL` above, so its
+		// presence rather than its value is what says the proxy is configured here.
+		// Absent is a real, supported state — it means this deployment still relies on
+		// the encoded-URL fallback.
+		RASTER_PROXY_DATA_URL?: string;
 	}
 }

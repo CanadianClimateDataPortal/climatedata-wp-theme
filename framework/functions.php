@@ -26,9 +26,9 @@
 
 if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 
-	$cdc_raster_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+	$map_raster_proxy_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
 
-	if ( in_array( $cdc_raster_path, array( '/maps', '/maps/', '/cartes', '/cartes/' ), true ) ) {
+	if ( in_array( $map_raster_proxy_path, array( '/maps', '/maps/', '/cartes', '/cartes/' ), true ) ) {
 
 		require_once __DIR__ . '/resources/functions/map-raster-proxy.php';
 		exit;

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Map raster proxy.
+ * Portal raster proxy.
  *
  * This file forwards a map screenshot request to the external screenshot
  * service and streams the resulting PNG back to the browser.
@@ -58,8 +58,8 @@ declare(strict_types=1);
  *
  * The browser half of this round trip lives in
  * `apps/src/lib/map/image-rastering/`, where `resolveRasterFetchTarget` posts to
- * the map page's own URL once `window.RASTER_PROXY_ENABLED` is set.
- * No deployment sets that flag yet, so this endpoint currently answers requests
+ * the map page's own URL once `window.RASTER_PROXY_DATA_URL` holds a URL.
+ * No deployment sets that global yet, so this endpoint currently answers requests
  * a developer aims at it deliberately, and the Maps app still reaches the
  * screenshot service directly.
  *
@@ -82,31 +82,37 @@ declare(strict_types=1);
 /**
  * Base URL of the screenshot service, without a trailing slash.
  *
- * Reads `CDC_RASTER_BACKEND_URL` from the environment.
+ * Reads `MAP_RASTER_PROXYPHP_DATA_URL` from the environment.
  * An empty value is a valid, fully supported state: this environment has no
  * screenshot service configured, and the proxy answers 503.
- * This one value carries both facts at once — whether to accept a request, and
- * where to forward it — so no separate flag exists that could disagree with it.
+ * This value says where to forward a request; the shared secret below says
+ * whether the forwarded request can be signed, and both are required before
+ * the proxy accepts anything.
  */
-$cdcRasterBackendUrl = rtrim( (string) ( getenv( 'CDC_RASTER_BACKEND_URL' ) ?: '' ), '/' );
+$mapRasterProxyDataUrl = rtrim( (string) ( getenv( 'MAP_RASTER_PROXYPHP_DATA_URL' ) ?: '' ), '/' );
 
 /**
  * Shared secret the screenshot service also holds, used to sign the target URL.
+ *
+ * Reads `MAP_RASTER_PROXYPHP_URL_SALT` from the environment.
+ * An empty value leaves every forwarded URL unsigned, which the screenshot
+ * service rejects, so an empty value means this environment is unconfigured
+ * exactly as much as an empty base URL does.
  */
-$cdcRasterUrlSalt = (string) ( getenv( 'CDC_RASTER_URL_SALT' ) ?: '' );
+$mapRasterProxyUrlSalt = (string) ( getenv( 'MAP_RASTER_PROXYPHP_URL_SALT' ) ?: '' );
 
 /**
- * Whether cURL verifies the backend's TLS certificate.
+ * Whether this proxy verifies the backend's TLS certificate.
  *
  * Defaults to true.
- * Set `CDC_RASTER_BACKEND_VERIFY_TLS` to `0`, `false`, `no`, or `off` to
+ * Set `MAP_RASTER_PROXYPHP_VERIFY_TLS` to `0`, `false`, `no`, or `off` to
  * accept a self-signed backend certificate, which a local or staging
  * deployment may need.
  */
-$cdcRasterVerifyTlsRaw = getenv( 'CDC_RASTER_BACKEND_VERIFY_TLS' );
-$cdcRasterVerifyTls    = ( false === $cdcRasterVerifyTlsRaw || '' === $cdcRasterVerifyTlsRaw )
+$mapRasterProxyVerifyTlsRaw = getenv( 'MAP_RASTER_PROXYPHP_VERIFY_TLS' );
+$mapRasterProxyVerifyTls    = ( false === $mapRasterProxyVerifyTlsRaw || '' === $mapRasterProxyVerifyTlsRaw )
 	? true
-	: ! in_array( strtolower( $cdcRasterVerifyTlsRaw ), array( '0', 'false', 'no', 'off' ), true );
+	: ! in_array( strtolower( $mapRasterProxyVerifyTlsRaw ), array( '0', 'false', 'no', 'off' ), true );
 
 // ---------------------------------------------------------------------------
 // Tuning constants.
@@ -126,7 +132,7 @@ $cdcRasterVerifyTls    = ( false === $cdcRasterVerifyTlsRaw || '' === $cdcRaster
  * Both entries stay literal so this file depends on no function or constant
  * defined elsewhere.
  */
-const CDC_RASTER_ALLOWED_PATHS = array( '/maps', '/maps/', '/cartes', '/cartes/' );
+const MAP_RASTER_PROXY_ALLOWED_PATHS = array( '/maps', '/maps/', '/cartes', '/cartes/' );
 
 /**
  * Longest accepted map query string, in bytes.
@@ -134,10 +140,11 @@ const CDC_RASTER_ALLOWED_PATHS = array( '/maps', '/maps/', '/cartes', '/cartes/'
  * A map's state serialises to a few hundred bytes.
  * A cap keeps the signed string bounded and removes a cheap amplification lever.
  */
-const CDC_RASTER_MAX_QUERY_LENGTH = 2048;
+const MAP_RASTER_PROXY_MAX_QUERY_LENGTH = 2048;
 
 /**
- * Seconds cURL waits for the whole request, connect through response body.
+ * Seconds this proxy waits for one forwarded request, connect through response
+ * body.
  *
  * The screenshot service sleeps 1 second, waits up to 10 seconds for the
  * page to signal readiness, then sleeps a further 4 seconds before
@@ -147,7 +154,7 @@ const CDC_RASTER_MAX_QUERY_LENGTH = 2048;
  * while still freeing a PHP-FPM worker from a stuck backend in bounded time.
  *
  * `max_execution_time` in `dockerfiles/build/www/configs/php/php.ini` is 30,
- * below this value, so `cdc_raster_handle_request()` below calls
+ * below this value, so `map_raster_proxy_handle_request()` below calls
  * `set_time_limit()` to raise it for the life of this request.
  * Whether this PHP-FPM build's execution timer counts time spent inside
  * `curl_exec()` stays unconfirmed, since the PHP manual describes that as
@@ -155,7 +162,7 @@ const CDC_RASTER_MAX_QUERY_LENGTH = 2048;
  * `set_time_limit()` is called either way, because it is correct and free in
  * both cases.
  */
-const CDC_RASTER_CURL_TIMEOUT = 60;
+const MAP_RASTER_PROXY_TIMEOUT = 60;
 
 /**
  * Bytes of a failed backend response kept in the error log.
@@ -164,7 +171,7 @@ const CDC_RASTER_CURL_TIMEOUT = 60;
  * production, or tens of kilobytes of Werkzeug debugger markup locally — so
  * the log keeps a readable prefix rather than the whole body.
  */
-const CDC_RASTER_ERROR_LOG_EXCERPT = 512;
+const MAP_RASTER_PROXY_ERROR_LOG_EXCERPT = 512;
 
 // ---------------------------------------------------------------------------
 // Pure helpers.
@@ -208,12 +215,12 @@ const CDC_RASTER_ERROR_LOG_EXCERPT = 512;
  *                  bytes, so the two agree below U+0080 and diverge above it.
  *                  Callers pass the result of `URL.toString()`, which
  *                  percent-encodes everything outside ASCII.
- *                  `cdc_raster_reject_query()` enforces this for the query
+ *                  `map_raster_proxy_reject_query()` enforces this for the query
  *                  portion of that URL.
  *
  * @return int Signed 32-bit hash.
  */
-function cdc_raster_hash_code( string $s ): int {
+function map_raster_proxy_hash_code( string $s ): int {
 	$a   = 0;
 	$len = strlen( $s );
 
@@ -258,8 +265,8 @@ function cdc_raster_hash_code( string $s ): int {
  *
  * @return string Value ready to append to `?url=`.
  */
-function cdc_raster_encode_url( string $url, string $salt ): string {
-	$hash = cdc_raster_hash_code( $url . $salt );
+function map_raster_proxy_encode_url( string $url, string $salt ): string {
+	$hash = map_raster_proxy_hash_code( $url . $salt );
 
 	return rawurlencode( base64_encode( $url . '|' . $hash ) );
 }
@@ -278,7 +285,7 @@ function cdc_raster_encode_url( string $url, string $salt ): string {
  * Refusing it here returns a message that names the cause.
  *
  * Bytes at or above `0x80` would hash differently on each side, because
- * JavaScript reads UTF-16 code units where `cdc_raster_hash_code()` reads
+ * JavaScript reads UTF-16 code units where `map_raster_proxy_hash_code()` reads
  * bytes.
  * A browser builds the query with `URL.toString()`, which percent-encodes
  * those characters, so a well-formed request never carries them.
@@ -289,8 +296,8 @@ function cdc_raster_encode_url( string $url, string $salt ): string {
  *
  * @return string Error code, or an empty string when the query is acceptable.
  */
-function cdc_raster_reject_query( string $query ): string {
-	if ( strlen( $query ) > CDC_RASTER_MAX_QUERY_LENGTH ) {
+function map_raster_proxy_reject_query( string $query ): string {
+	if ( strlen( $query ) > MAP_RASTER_PROXY_MAX_QUERY_LENGTH ) {
 		return 'raster_invalid_query';
 	}
 
@@ -321,7 +328,7 @@ function cdc_raster_reject_query( string $query ): string {
  *
  * @return string Origin such as `https://dev-en.climatedata.ca`, no trailing slash.
  */
-function cdc_raster_site_origin(): string {
+function map_raster_proxy_site_origin(): string {
 	$forwardedHttps = isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] )
 		&& 'https' === $_SERVER['HTTP_X_FORWARDED_PROTO'];
 	$directHttps    = isset( $_SERVER['HTTPS'] )
@@ -351,7 +358,7 @@ function cdc_raster_site_origin(): string {
  *
  * @return array<string, mixed> Payload to forward, possibly empty.
  */
-function cdc_raster_extract_payload( array $decoded ): array {
+function map_raster_proxy_extract_payload( array $decoded ): array {
 	$payload = array();
 	$popup   = $decoded['locationPopupHtml'] ?? null;
 	$marker  = $decoded['markerLatLon'] ?? null;
@@ -382,7 +389,7 @@ function cdc_raster_extract_payload( array $decoded ): array {
  * @param string $code    Short machine-readable error code.
  * @param string $message Human-readable message, safe to display.
  */
-function cdc_raster_fail( int $status, string $code, string $message ): never {
+function map_raster_proxy_fail( int $status, string $code, string $message ): never {
 	http_response_code( $status );
 	header( 'Content-Type: application/json; charset=utf-8' );
 	echo json_encode( array( 'error' => $code, 'message' => $message ) );
@@ -390,7 +397,7 @@ function cdc_raster_fail( int $status, string $code, string $message ): never {
 }
 
 // ---------------------------------------------------------------------------
-// The pass-through itself.
+// The proxy itself.
 // ---------------------------------------------------------------------------
 
 /**
@@ -413,46 +420,52 @@ function cdc_raster_fail( int $status, string $code, string $message ): never {
  * This file holds that starting point rather than improving on it, and rate
  * limiting is the work that would.
  */
-function cdc_raster_handle_request(): void {
-	global $cdcRasterBackendUrl, $cdcRasterUrlSalt, $cdcRasterVerifyTls;
+function map_raster_proxy_handle_request(): void {
+	global $mapRasterProxyDataUrl, $mapRasterProxyUrlSalt, $mapRasterProxyVerifyTls;
 
-	// Raised above CDC_RASTER_CURL_TIMEOUT — see that constant's docblock.
-	set_time_limit( CDC_RASTER_CURL_TIMEOUT + 5 );
+	// Raised above MAP_RASTER_PROXY_TIMEOUT — see that constant's docblock.
+	set_time_limit( MAP_RASTER_PROXY_TIMEOUT + 5 );
 
 	if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
 		header( 'Allow: POST' );
-		cdc_raster_fail( 405, 'raster_method_not_allowed', 'Only POST is supported.' );
+		map_raster_proxy_fail( 405, 'raster_method_not_allowed', 'Only POST is supported.' );
 	}
 
 	// Repeats the check `framework/functions.php` already made, so this file
 	// is correct on its own if the web server ever reaches it directly.
 	$path = (string) parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH );
 
-	if ( ! in_array( $path, CDC_RASTER_ALLOWED_PATHS, true ) ) {
-		cdc_raster_fail( 404, 'raster_invalid_path', 'Unsupported map page.' );
+	if ( ! in_array( $path, MAP_RASTER_PROXY_ALLOWED_PATHS, true ) ) {
+		map_raster_proxy_fail( 404, 'raster_invalid_path', 'Unsupported map page.' );
 	}
 
-	if ( '' === $cdcRasterBackendUrl ) {
-		cdc_raster_fail( 503, 'raster_not_configured', 'The map screenshot service is unavailable.' );
+	// The proxy needs both the base URL to forward to and the shared secret to
+	// sign that URL with, so either one missing means this environment is not
+	// configured.
+	// Answering 503 here keeps an incomplete configuration from reaching the
+	// screenshot service with an unsigned URL and coming back as a 502
+	// transport error, which would describe the wrong problem.
+	if ( '' === $mapRasterProxyDataUrl || '' === $mapRasterProxyUrlSalt ) {
+		map_raster_proxy_fail( 503, 'raster_not_configured', 'The map screenshot service is unavailable.' );
 	}
 
 	$decoded = json_decode( (string) file_get_contents( 'php://input' ), true );
 
 	if ( ! is_array( $decoded ) ) {
-		cdc_raster_fail( 400, 'raster_invalid_body', 'Request body must be a JSON object.' );
+		map_raster_proxy_fail( 400, 'raster_invalid_body', 'Request body must be a JSON object.' );
 	}
 
 	$query    = (string) ( $decoded['mapQuery'] ?? '' );
-	$rejected = cdc_raster_reject_query( $query );
+	$rejected = map_raster_proxy_reject_query( $query );
 
 	if ( '' !== $rejected ) {
-		cdc_raster_fail( 400, $rejected, 'Unsupported map address.' );
+		map_raster_proxy_fail( 400, $rejected, 'Unsupported map address.' );
 	}
 
-	$mapUrl = cdc_raster_site_origin() . $path . ( '' !== $query ? '?' . $query : '' );
-	$target = $cdcRasterBackendUrl . '/raster?url=' . cdc_raster_encode_url( $mapUrl, $cdcRasterUrlSalt );
+	$mapUrl = map_raster_proxy_site_origin() . $path . ( '' !== $query ? '?' . $query : '' );
+	$target = $mapRasterProxyDataUrl . '/raster?url=' . map_raster_proxy_encode_url( $mapUrl, $mapRasterProxyUrlSalt );
 
-	$payload     = cdc_raster_extract_payload( $decoded );
+	$payload     = map_raster_proxy_extract_payload( $decoded );
 	$payloadJson = array() === $payload ? '' : (string) json_encode( $payload );
 
 	// These travel by reference into the two callbacks below: header lines
@@ -476,9 +489,9 @@ function cdc_raster_handle_request(): void {
 		$ch,
 		array(
 			CURLOPT_POST           => true,
-			CURLOPT_TIMEOUT        => CDC_RASTER_CURL_TIMEOUT,
-			CURLOPT_SSL_VERIFYPEER => $cdcRasterVerifyTls,
-			CURLOPT_SSL_VERIFYHOST => $cdcRasterVerifyTls ? 2 : 0,
+			CURLOPT_TIMEOUT        => MAP_RASTER_PROXY_TIMEOUT,
+			CURLOPT_SSL_VERIFYPEER => $mapRasterProxyVerifyTls,
+			CURLOPT_SSL_VERIFYHOST => $mapRasterProxyVerifyTls ? 2 : 0,
 			CURLOPT_HEADERFUNCTION => function ( $handle, string $line ) use ( &$status, &$contentType, &$contentLength ): int {
 				$trimmed = rtrim( $line, "\r\n" );
 
@@ -526,7 +539,7 @@ function cdc_raster_handle_request(): void {
 				if ( $isImage ) {
 					echo $chunk;
 					flush();
-				} elseif ( strlen( $errorExcerpt ) < CDC_RASTER_ERROR_LOG_EXCERPT ) {
+				} elseif ( strlen( $errorExcerpt ) < MAP_RASTER_PROXY_ERROR_LOG_EXCERPT ) {
 					// The screenshot service reports every failure as an
 					// HTML page — a generic 265-byte page in production, or
 					// a Werkzeug debugger dump locally — so only a bounded
@@ -562,17 +575,17 @@ function cdc_raster_handle_request(): void {
 		// That is the trade-off streaming buys: no full image in PHP memory, and
 		// no clean error once bytes are on the wire.
 		if ( $isImage ) {
-			error_log( sprintf( 'cdc-raster transport failure mid-stream: %s', $error ) );
+			error_log( sprintf( 'map-raster-proxy transport failure mid-stream: %s', $error ) );
 			exit;
 		}
 
-		error_log( sprintf( 'cdc-raster transport failure: %s', $error ) );
+		error_log( sprintf( 'map-raster-proxy transport failure: %s', $error ) );
 
 		if ( $isTimeout ) {
-			cdc_raster_fail( 504, 'raster_backend_timeout', 'The map image took too long to generate.' );
+			map_raster_proxy_fail( 504, 'raster_backend_timeout', 'The map image took too long to generate.' );
 		}
 
-		cdc_raster_fail( 502, 'raster_backend_unavailable', 'The map image service is unreachable.' );
+		map_raster_proxy_fail( 502, 'raster_backend_unavailable', 'The map image service is unreachable.' );
 	}
 
 	curl_close( $ch );
@@ -585,22 +598,22 @@ function cdc_raster_handle_request(): void {
 
 	error_log(
 		sprintf(
-			'cdc-raster backend answered %d as %s: %s',
+			'map-raster-proxy backend answered %d as %s: %s',
 			$status,
 			'' === $contentType ? 'an unknown type' : $contentType,
 			$errorExcerpt
 		)
 	);
 
-	cdc_raster_fail( 502, 'raster_backend_error', 'The map image could not be generated.' );
+	map_raster_proxy_fail( 502, 'raster_backend_error', 'The map image could not be generated.' );
 }
 
 // PHP-FPM reports `fpm-fcgi`, so this guard passes on every real request and
 // changes nothing in production.
 // It exists so `docker compose exec -T portal php < map-raster-proxy.php` can
 // define everything in this file while leaving the request handler unrun.
-// That command verifies `cdc_raster_hash_code()` and `cdc_raster_encode_url()`
+// That command verifies `map_raster_proxy_hash_code()` and `map_raster_proxy_encode_url()`
 // against known fixtures, and those two functions need no HTTP request.
 if ( 'cli' !== PHP_SAPI ) {
-	cdc_raster_handle_request();
+	map_raster_proxy_handle_request();
 }

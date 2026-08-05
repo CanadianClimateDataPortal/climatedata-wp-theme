@@ -5,7 +5,7 @@ import { encodeURL } from '@/lib/utils';
  * page's URL salted and encoded with {@link encodeURL}.
  *
  * This is the fallback branch of {@link resolveRasterFetchTarget}, reached when
- * `window.RASTER_PROXY_ENABLED` is absent — the deployment has no same-origin PHP
+ * `window.RASTER_PROXY_DATA_URL` is absent — the deployment has no same-origin raster
  * proxy, so the request goes to the service directly. It is also the target
  * `createRasterDebugger`'s `createFetchFor` uses unconditionally, since retargeting
  * another deployment means addressing that deployment's service by host.

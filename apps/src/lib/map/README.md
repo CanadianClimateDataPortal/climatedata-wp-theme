@@ -5,8 +5,8 @@ Consumed by both `/maps` and `/download`.
 
 "Map" carries two meanings in this codebase, so it is worth stating which one this folder holds.
 The Maps SPA is the page served at `/maps`; this folder is about the thing rendered on it.
-The React components that render it live in `components/map/`.
+The React components that render it live in [`components/map/`](../../components/map/).
 
 ## Children
 
-- `image-rastering/` — the Download-button screenshot round trip; see its own README.
+- [`image-rastering/`](./image-rastering/) — the Download-button screenshot round trip; see its own README.

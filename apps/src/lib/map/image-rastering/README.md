@@ -21,8 +21,8 @@ The screenshot service sets every deadline in this namespace. Its sequence, from
 
 Two constants are sized against step 4's 10s ceiling, and both are arithmetic against it rather than figures measured against observed runs:
 
-- `MAP_SETTLE_TOTAL_BUDGET_MS` (9s, `wait-for-maps-settled.ts`) — the whole of `prepareRaster`'s settling, both `waitForMapsSettled` calls combined. Leaves roughly a second for the synchronous DOM work between them and for script-invocation overhead.
-- `PREPARE_RASTER_STUB_POLL_DEADLINE_MS` (5s, `install-prepare-raster-stub.ts`) — how long the stub waits for the real implementation to be registered, covering bundle parse and React mount.
+- `MAP_SETTLE_TOTAL_BUDGET_MS` (9s, [`wait-for-maps-settled.ts`](./wait-for-maps-settled.ts)) — the whole of `prepareRaster`'s settling, both `waitForMapsSettled` calls combined. Leaves roughly a second for the synchronous DOM work between them and for script-invocation overhead.
+- `PREPARE_RASTER_STUB_POLL_DEADLINE_MS` (5s, [`install-prepare-raster-stub.ts`](./install-prepare-raster-stub.ts)) — how long the stub waits for the real implementation to be registered, covering bundle parse and React mount.
 
 The two are separate give-up points rather than two shares of one 10s: a page that spends all of both has already lost the service.
 

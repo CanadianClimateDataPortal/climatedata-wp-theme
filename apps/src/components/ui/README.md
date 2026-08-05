@@ -9,10 +9,10 @@ Anything naming a variable, a grid, a region or a dataset belongs in a domain fo
 
 These entries cover the files worked on to date, and this is not a complete inventory of the folder.
 
-- `sidebar.tsx` → `Sidebar`, `SidebarTrigger`, `SidebarRail` — the collapsible left panel.
+- [`sidebar.tsx`](./sidebar.tsx) → `Sidebar`, `SidebarTrigger`, `SidebarRail` — the collapsible left panel.
   The three of them gained `data-raster="false"` so the panel and its toggles drop out of the exported map image.
   `SidebarTrigger` and `SidebarRail` also moved from a shared `id="sidebar-toggle"` to a `sidebar-toggle` class, since both render at once and an id has to stay unique.
-- `zoom-buttons.tsx` → `ZoomButtons` — the plus/minus pair.
+- [`zoom-buttons.tsx`](./zoom-buttons.tsx) → `ZoomButtons` — the plus/minus pair.
   Owns its `ZoomButtonsProps` locally rather than importing a shared type, and generates a unique wrapper id so two maps can render side by side.
 
-`data-raster` and `to-raster` have one home: `apps/src/lib/map/image-rastering/README.md`.
+`data-raster` and `to-raster` have one home: [`apps/src/lib/map/image-rastering/README.md`](../../lib/map/image-rastering/README.md).

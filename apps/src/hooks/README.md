@@ -5,7 +5,7 @@ A hook belongs here when more than one component needs it, or when it isolates a
 
 ## `use-leaflet.ts` is load-bearing
 
-`useLeaflet()` looks disposable, because `App.tsx` calls it and discards the `config` object it returns.
+`useLeaflet()` looks disposable, because [`App.tsx`](../App.tsx) calls it and discards the `config` object it returns.
 That return value is indeed unused. The module is not.
 
 Two things keep it alive:
@@ -20,5 +20,5 @@ Dropping only the unused `config` return is safe; dropping the module is not.
 
 These entries cover the files worked on to date, and this is not a complete inventory of the folder.
 
-- `use-leaflet-sync-container-class-name.tsx` → `useLeafletSyncContainerClassName` — re-applies a container `className` react-leaflet freezes after first mount.
-  A separate, unrelated module from `use-leaflet.ts` above, despite the similar name.
+- [`use-leaflet-sync-container-class-name.tsx`](./use-leaflet-sync-container-class-name.tsx) → `useLeafletSyncContainerClassName` — re-applies a container `className` react-leaflet freezes after first mount.
+  A separate, unrelated module from [`use-leaflet.ts`](./use-leaflet.ts) above, despite the similar name.

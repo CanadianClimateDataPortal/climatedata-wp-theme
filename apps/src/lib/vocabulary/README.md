@@ -5,6 +5,6 @@ Values are declared with the record pattern — an `as const` object plus a unio
 
 ## Residents
 
-- `grid-resolution.ts` — `GridTypes`, the grid identities, each with its cell size in degrees and the matching label in kilometres.
+- [`grid-resolution.ts`](./grid-resolution.ts) — `GridTypes`, the grid identities, each with its cell size in degrees and the matching label in kilometres.
 
-Other vocabularies are still `enum`s in `types/climate-variable-interface.ts`, and belong here as they migrate.
+Other vocabularies are still `enum`s in [`types/climate-variable-interface.ts`](../../types/climate-variable-interface.ts), and belong here as they migrate.

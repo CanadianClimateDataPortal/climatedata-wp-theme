@@ -16,7 +16,9 @@ Two things keep it alive:
 Deleting the module strips the map's CSS and breaks the search control.
 Dropping only the unused `config` return is safe; dropping the module is not.
 
-## Touched this PR
+## Documented so far
+
+These entries cover the files worked on to date, and this is not a complete inventory of the folder.
 
 - `use-leaflet-sync-container-class-name.tsx` → `useLeafletSyncContainerClassName` — re-applies a container `className` react-leaflet freezes after first mount.
   A separate, unrelated module from `use-leaflet.ts` above, despite the similar name.

@@ -1,6 +1,8 @@
 # `components/map-layers/`
 
-## Touched this PR
+## Documented so far
+
+These entries cover the files worked on to date, and this is not a complete inventory of the folder.
 
 - `map-info-pills.tsx` → `MapInfoPills` — title and grid-resolution pills, revealed only while preparing the exported map image.
 - `search-control.tsx` → `SearchControl` — Leaflet search box wrapping `leaflet-search`.

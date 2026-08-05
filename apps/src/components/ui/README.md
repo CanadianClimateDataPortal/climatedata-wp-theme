@@ -5,7 +5,9 @@ Generic presentation primitives, shared by both SPAs.
 A component belongs here when its path, filename and export name are free of climate-domain vocabulary.
 Anything naming a variable, a grid, a region or a dataset belongs in a domain folder instead, even when it looks generic today.
 
-## Touched this PR
+## Documented so far
+
+These entries cover the files worked on to date, and this is not a complete inventory of the folder.
 
 - `sidebar.tsx` → `Sidebar`, `SidebarTrigger`, `SidebarRail` — the collapsible left panel.
   The three of them gained `data-raster="false"` so the panel and its toggles drop out of the exported map image.

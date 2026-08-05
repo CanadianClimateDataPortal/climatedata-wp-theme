@@ -10,7 +10,9 @@ A multi-step wizard: pick a dataset, a variable, a location, then options, and r
 That feature lives in `components/map-info/download-map-modal.tsx` and `apps/src/lib/map/image-rastering/`, and shares no code with this folder.
 This folder is about data files; that one is about a picture.
 
-## Touched this PR
+## Documented so far
+
+These entries cover the files worked on to date, and this is not a complete inventory of the folder.
 
 - `steps.tsx` → `Steps` — the wizard shell holding every step.
   Now takes its default grid name from the `GridTypes` catalogue in `@/lib/vocabulary` rather than a bare `'canadagrid'` string, so the same intent reads the same way everywhere the grid name appears.

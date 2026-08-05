@@ -19,6 +19,8 @@ The settle loop in `lib/map/image-rastering/wait-for-maps-settled.ts` is timed a
 Probed against this repo's jsdom on 2026-08-05.
 Re-probe after a jsdom upgrade: a shim whose guard now passes is dead weight, and an API that disappeared needs a new one.
 
-## Touched this PR
+## Documented so far
+
+These entries cover the files worked on to date, and this is not a complete inventory of the folder.
 
 - `setup.ts` — added the two guarded shims above.

@@ -11,7 +11,9 @@ Sub-folders carry their own README:
 - `download/` — the Download SPA, served at `/download`.
 - `ui/` — generic presentation primitives, free of climate-domain vocabulary.
 
-## Touched this PR
+## Documented so far
+
+These entries cover the files worked on to date, and this is not a complete inventory of the folder.
 
 - `header.tsx` → `AppHeader` — site header; carries a `data-raster="false"` marker so it drops out of the exported map image.
 - `map-header.tsx` → `MapHeader` — variable title and controls above the map; same marker, same reason.

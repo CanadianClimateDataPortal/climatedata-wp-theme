@@ -12,10 +12,6 @@ declare global {
 				prepare_raster?: Prepare_Raster;
 			};
 		};
-		// This property is for flagging testing when we want to see what happens between
-		// current person's web browser and passing data to the `/raster?url=` endpoint via cURL
-		// It isn't intended to be used for storing state, but rather a temporary manual testing handle
-		mapPrepareRasterPostHttpPayload?: PrepareRasterPostHttpPayload | null;
 		URL_ENCODER_SALT: string;
 		DATA_URL: string;
 	}

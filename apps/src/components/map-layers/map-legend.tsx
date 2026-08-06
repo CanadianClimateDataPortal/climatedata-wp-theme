@@ -69,7 +69,7 @@ const MapLegend = (
 
 	/**
 	 * Open legend by default when the map container has space for legend.
-	 * Legend max width is 430px (MapLegendOpenControl.MAX_LEGEND_WIDTH)
+	 * Legend max width is 430px (MapLegendOpenControl.maxLegendWidth)
 	 * Only check on the initial mount, no resize handling needed.
 	 *
 	 * Only checked on the initial mount — no resize handling needed.

@@ -71,7 +71,8 @@ const DownloadMapModal: React.FC<{
 					markerLatLon,
 				}
 			}
-			// We are deliberately not providing a fallback `?? ...`: `resolveSignalReady` always returns a function.
+			// No `?? ...` fallback needed: `resolveSignalReady` ships as an identity
+			// function, returning the `signalRasterReady` passed to it.
 			const signalReady = resolveSignalReady(signalRasterReady);
 
 			// Do not signal readiness after a preparation failure. We let its wait time out.

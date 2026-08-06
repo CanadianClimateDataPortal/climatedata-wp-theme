@@ -86,7 +86,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 			const area = latDiff * lngDiff;
 			/**
 			 * `climateVariable.getGridType()` returns as a simple string that is
-			 * catalogued as a {@link GridType} and in case of falling with an
+			 * catalogued as a `GridType` and in case of falling with an
 			 * erroneous Non-Numerical (NaN) and break maxCellsAllowed we give a
 			 * fallback
 			 */

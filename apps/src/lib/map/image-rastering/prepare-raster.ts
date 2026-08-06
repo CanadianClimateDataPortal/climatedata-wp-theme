@@ -14,7 +14,7 @@ import type { PrepareRaster } from './types';
 /**
  * Runs in the screenshot service's headless browser.
  *
- * Replays the popup and marker carried in `payload` (see {@link PrepareRasterMapHandles}) —
+ * Replays the popup and marker carried in `payload` (see `PrepareRasterMapHandles`) —
  * the screenshot service's browser has clicked nothing, so without this step there is
  * nothing to capture — then removes the surrounding chrome and any tooltips, and dispatches
  * a `resize` event so the map re-lays out at the new size.
@@ -40,9 +40,9 @@ import type { PrepareRaster } from './types';
 export const prepareRaster: PrepareRaster = async (
 	payload,
 	handles,
-	// Injected so the same function can serve production, a debug hold, and a
-	// test spy — without a debug branch inside this receiver-side production
-	// code. Defaults to the real signal, so two-argument callers are unaffected.
+	// Injected so a caller can substitute its own readiness signal without a
+	// branch inside this receiver-side production code. Defaults to the real
+	// signal, so two-argument callers are unaffected.
 	signalReady = signalRasterReady,
 ): Promise<void> => {
 	const maps = [

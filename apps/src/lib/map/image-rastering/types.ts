@@ -26,12 +26,12 @@ export interface PrepareRasterMapHandles {
 	comparisonMap: L.Map | null;
 	/**
 	 * Places a marker on every mounted pane. Mirrors the click handling in `use-map-interactions.tsx`.
-	 * @see {@link useMapMarker.addMarker}
+	 * @see {@link useMapMarker} — its `addMarker`.
 	 */
 	addMarker: AddMarker;
 	/**
 	 * Removes any marker(s) from every mounted pane.
-	 * @see {@link useMapMarker.clearMarkers}
+	 * @see {@link useMapMarker} — its `clearMarkers`.
 	 */
 	clearMarkers: ClearMarkers;
 }
@@ -45,7 +45,7 @@ export interface PrepareRasterPostHttpPayload {
 	 */
 	locationPopupHtml: [string, string?];
 	/**
-	 * The clicked location, read by the caller from {@link selectSelectedLocation}
+	 * The clicked location, read by the caller from `selectSelectedLocation`
 	 * or `null` when nothing is selected.
 	 *
 	 * Comes from Redux rather than the URL because the URL only carries the viewport centre,

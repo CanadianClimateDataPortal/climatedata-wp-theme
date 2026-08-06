@@ -23,7 +23,7 @@ import {
  * Grid identities.
  *
  * @see {@link ClimateVariableInterface.getGridType}
- * @see {@link ClimateVariableConfigInterface.gridType}
+ * @see `ClimateVariableConfigInterface.gridType`
  */
 export const GridTypes = {
 	/**

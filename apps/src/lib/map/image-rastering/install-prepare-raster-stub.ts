@@ -4,7 +4,7 @@ import type { Prepare_Raster } from './types';
  * How long {@link installPrepareRasterStub}'s polling stub waits for the real
  * `$.fn.prepare_raster` before giving up quietly.
  *
- * Sized against the same external ceiling {@link MAP_SETTLE_TOTAL_BUDGET_MS} is
+ * Sized against the same external ceiling `MAP_SETTLE_TOTAL_BUDGET_MS` is
  * sized against — the service's 10s wait for `to-raster`, timeline in ./README.md.
  * This 5s and that 9s are separate give-up points rather than two shares of the
  * same 10s; a page that spends all of both has already lost the service.
@@ -48,9 +48,8 @@ const PREPARE_RASTER_STUB_POLL_INTERVAL_MS = 50;
  * reached along this path is discarded rather than caught the way
  * `download-map-modal.tsx` catches it at its own call site.
  *
- * Call this as early as possible: at module scope in `main-map.tsx`, before
- * React renders anything, so the stub is the first thing to occupy
- * `window.$.fn.prepare_raster`.
+ * Called at module scope in `main-map.tsx`, before React renders anything, so
+ * the stub is the first thing to occupy `window.$.fn.prepare_raster`.
  *
  * A call the stub receives is captured, then replayed once the real
  * implementation appears, within {@link PREPARE_RASTER_STUB_POLL_DEADLINE_MS}.

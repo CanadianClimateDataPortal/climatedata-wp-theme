@@ -15,7 +15,7 @@ const RASTER_TARGET_ELEMENT_ID = 'map-root';
 
 /**
  * The readiness action `prepareRaster` calls once the capture target is ready.
- * Lets production, a debug hold, and a test spy share one call site.
+ * The seam a caller substitutes its own through.
  */
 export type SignalReady = () => void;
 

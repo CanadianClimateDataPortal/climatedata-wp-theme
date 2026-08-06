@@ -4,7 +4,11 @@ import type L from 'leaflet';
 
 import { prepareRaster } from './prepare-raster';
 import { MAP_SETTLE_TOTAL_BUDGET_MS } from './wait-for-maps-settled';
-import { EXAMPLE_PREPARE_RASTER_POST_PAYLOAD, renderLocationModal } from './types.examples';
+import {
+	createExampleLocationPopupHtml,
+	EXAMPLE_PREPARE_RASTER_POST_PAYLOAD,
+	renderLocationModal,
+} from './types.examples';
 
 import type { PrepareRasterMapHandles } from './types';
 
@@ -21,6 +25,11 @@ import type { PrepareRasterMapHandles } from './types';
  * internal `waitForMapsSettled` calls, not one window per call. See
  * `wait-for-maps-settled.ts`'s doc comment on that constant for why the
  * budget exists and what its arithmetic runs against.
+ *
+ * Group C covers where the replayed popup lands. The receiver normally runs
+ * on a freshly loaded page holding no popup, so the replay has to insert one;
+ * a browser that has already clicked holds one, so the replay has to take its
+ * place instead of piling a second copy on top of it.
  */
 
 /**
@@ -63,6 +72,62 @@ const createPermanentlyLoadingMap = (): L.Map => {
 		getContainer: (): HTMLElement => document.createElement('div'),
 	} as unknown as L.Map;
 };
+
+/**
+ * Mounts the DOM node Leaflet hands back from `getContainer`, which is also
+ * the node `prepareRaster` places the replayed popup into.
+ *
+ * Attached to `document.body` because `prepareRaster` strips its
+ * `[data-raster="false"]` nodes through a document-wide query, which reaches
+ * nothing detached.
+ *
+ * @returns The mounted container, for assertions against its own children.
+ */
+const renderMapContainer = (): HTMLElement => {
+	const el = document.createElement('div');
+	el.className = 'leaflet-container';
+	document.body.appendChild(el);
+	return el;
+};
+
+/**
+ * Hand-built map stub reporting no layers, whose `getContainer` hands back
+ * the same element every call.
+ *
+ * The stable element is the point: `prepareRaster` reads the container to
+ * place the replayed popup and the assertions read it afterwards, so a stub
+ * minting a fresh element per call would hand the test a different node than
+ * the one the function wrote into.
+ *
+ * Reporting no layers lets `waitForMapsSettled` resolve on its third idle
+ * frame, which keeps these tests off the settle deadline entirely.
+ *
+ * @param container - The element {@link renderMapContainer} produced for this pane.
+ */
+const createSettledMap = (
+	container: HTMLElement,
+): L.Map =>
+	({
+		eachLayer: (): void => undefined,
+		getContainer: (): HTMLElement => container,
+	}) as unknown as L.Map;
+
+/**
+ * Handles for one or two settled panes, built from {@link createSettledMap}.
+ *
+ * @param container - The left/main pane's container.
+ * @param comparisonContainer - The comparison pane's container; omitted outside compare mode.
+ */
+const createSettledMapHandles = (
+	container: HTMLElement,
+	comparisonContainer?: HTMLElement,
+): PrepareRasterMapHandles =>
+	({
+		map: createSettledMap(container),
+		comparisonMap: comparisonContainer ? createSettledMap(comparisonContainer) : null,
+		addMarker: vi.fn(),
+		clearMarkers: vi.fn(),
+	}) as unknown as PrepareRasterMapHandles;
 
 afterEach(() => {
 	// jsdom keeps DOM nodes and the mode-flag attribute alive across tests
@@ -216,5 +281,115 @@ describe('prepareRaster — shared settle-deadline budget (CLIM-1454 regression)
 		expect(signalReady).toHaveBeenCalledTimes(1);
 
 		await donePromise;
+	});
+});
+
+describe('prepareRaster — where the replayed popup lands', () => {
+	test('takes the place of the LocationModal a pane already holds', async () => {
+		const container = renderMapContainer();
+		const mountedModal = renderLocationModal('a', 'Already Mounted Title');
+		container.append(mountedModal);
+
+		await prepareRaster(
+			{
+				locationPopupHtml: [createExampleLocationPopupHtml('Replayed Title')],
+				markerLatLon: EXAMPLE_PREPARE_RASTER_POST_PAYLOAD.markerLatLon,
+			},
+			createSettledMapHandles(container),
+			vi.fn(),
+		);
+
+		// The pane holds one popup rather than the two an append stacks, and the
+		// node that was mounted has left the tree entirely — the two readings
+		// together are what separate a replacement from a removal or a no-op.
+		expect(container.children).toHaveLength(1);
+		expect(mountedModal.isConnected).toBe(false);
+		expect(container.textContent).not.toContain('Already Mounted Title');
+		expect(container.textContent).toContain('Replayed Title');
+	});
+
+	test('inserts a popup into a pane holding none, the freshly-loaded-page case', async () => {
+		const container = renderMapContainer();
+
+		await prepareRaster(
+			{
+				locationPopupHtml: [createExampleLocationPopupHtml('Replayed Title')],
+				markerLatLon: EXAMPLE_PREPARE_RASTER_POST_PAYLOAD.markerLatLon,
+			},
+			createSettledMapHandles(container),
+			vi.fn(),
+		);
+
+		// `location-modal` comes from the shared class-name list the real
+		// LocationModal and this hand-built look-alike both render with, so its
+		// presence says the inserted node is the popup stand-in and not a bare div.
+		expect(container.children).toHaveLength(1);
+		expect(container.firstElementChild?.classList.contains('location-modal')).toBe(true);
+		expect(container.textContent).toContain('Replayed Title');
+	});
+
+	test('keeps each compare-mode replay inside the pane it was captured from', async () => {
+		const container = renderMapContainer();
+		const comparisonContainer = renderMapContainer();
+		container.append(renderLocationModal('a', 'Left Mounted Title'));
+		comparisonContainer.append(renderLocationModal('b', 'Right Mounted Title'));
+
+		await prepareRaster(
+			{
+				locationPopupHtml: [
+					createExampleLocationPopupHtml('Left Replayed Title'),
+					createExampleLocationPopupHtml('Right Replayed Title'),
+				],
+				markerLatLon: EXAMPLE_PREPARE_RASTER_POST_PAYLOAD.markerLatLon,
+			},
+			createSettledMapHandles(container, comparisonContainer),
+			vi.fn(),
+		);
+
+		expect(container.children).toHaveLength(1);
+		expect(comparisonContainer.children).toHaveLength(1);
+
+		// Index 0 pairs with the left/main pane and index 1 with the comparison
+		// pane. A document-wide lookup for the mounted popup would satisfy both
+		// panes from whichever node it found first, landing both replays in one
+		// container and leaving the other pane showing its stale popup.
+		expect(container.textContent).toContain('Left Replayed Title');
+		expect(container.textContent).not.toContain('Right Replayed Title');
+		expect(container.textContent).not.toContain('Left Mounted Title');
+		expect(comparisonContainer.textContent).toContain('Right Replayed Title');
+		expect(comparisonContainer.textContent).not.toContain('Left Replayed Title');
+		expect(comparisonContainer.textContent).not.toContain('Right Mounted Title');
+	});
+
+	test('inserts into an empty pane while replacing in the other, in the same run', async () => {
+		const container = renderMapContainer();
+		const comparisonContainer = renderMapContainer();
+		comparisonContainer.append(renderLocationModal('b', 'Right Mounted Title'));
+
+		await prepareRaster(
+			{
+				locationPopupHtml: [
+					createExampleLocationPopupHtml('Left Replayed Title'),
+					createExampleLocationPopupHtml('Right Replayed Title'),
+				],
+				markerLatLon: EXAMPLE_PREPARE_RASTER_POST_PAYLOAD.markerLatLon,
+			},
+			createSettledMapHandles(container, comparisonContainer),
+			vi.fn(),
+		);
+
+		// Only the comparison pane starts with a popup, so the two panes take
+		// different branches in one run: the left inserts, the right replaces.
+		// This asymmetry is what makes the pane lookup observable. A lookup
+		// spanning the whole document would answer the left pane with the RIGHT
+		// pane's mounted popup, overwrite it with the left markup, then append
+		// the right markup beside it — leaving the left pane empty and the right
+		// pane carrying both.
+		expect(container.children).toHaveLength(1);
+		expect(comparisonContainer.children).toHaveLength(1);
+		expect(container.textContent).toContain('Left Replayed Title');
+		expect(comparisonContainer.textContent).toContain('Right Replayed Title');
+		expect(comparisonContainer.textContent).not.toContain('Left Replayed Title');
+		expect(comparisonContainer.textContent).not.toContain('Right Mounted Title');
 	});
 });

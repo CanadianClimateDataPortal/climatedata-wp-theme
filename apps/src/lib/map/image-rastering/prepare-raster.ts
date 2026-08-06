@@ -19,6 +19,12 @@ import type { PrepareRaster } from './types';
  * nothing to capture — then removes the surrounding chrome and any tooltips, and dispatches
  * a `resize` event so the map re-lays out at the new size.
  *
+ * The popup replay replaces an already-mounted `LocationModal` when the pane holds one,
+ * and inserts a fresh node when the pane holds none.
+ * Both cases are real: this normally runs against a page nobody has clicked, and the same
+ * entry point stays reachable from a browser that already has a popup open.
+ * The captured markup arrives from {@link getLocationModalInnerHTML} on the sender side.
+ *
  * The legend is opened by the caller dispatching `setLegendOpen(true)` rather than by
  * clicking `#legend-toggle` here: that button flips whatever state it finds, and the
  * legend auto-opens once the map container is wide enough — a width the screenshot always
@@ -97,10 +103,23 @@ export const prepareRaster: PrepareRaster = async (
 		if (!container || !innerHtml) {
 			return;
 		}
-		container.insertAdjacentHTML(
-			'beforeend',
-			`<div class="${className}">${innerHtml}</div>`,
-		);
+		const replayedModal = document.createElement('div');
+		replayedModal.className = className;
+		replayedModal.innerHTML = innerHtml;
+		// `[id^="location-modal-"]` is the selector `getLocationModalInnerHTML` scrapes
+		// with on the sender side, narrowed here to this one pane so compare mode keeps
+		// each popup with the map it was captured from.
+		const mountedModal = container.querySelector('[id^="location-modal-"]');
+		if (mountedModal) {
+			// The captured markup describes the very popup this pane is already showing.
+			// Replacing that node leaves a single popup on screen, where appending would
+			// stack a second copy over the first and the capture would show it doubled.
+			mountedModal.replaceWith(replayedModal);
+		} else {
+			// The screenshot service loads this page fresh and clicks nothing, so most
+			// runs arrive with no popup to replace and this replay is the only one.
+			container.append(replayedModal);
+		}
 	});
 
 	// `[data-raster="false"]` is a one-shot removal marker: every node carrying it

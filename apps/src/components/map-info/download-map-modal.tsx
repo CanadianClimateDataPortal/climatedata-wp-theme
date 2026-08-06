@@ -15,6 +15,7 @@ import {
 	createFetchTargetToRasterWithEncodedUrl,
 	createPrepareRasterPostHttpPayload,
 	installDebugPayloadAccessor,
+	installPrepareRasterStub,
 	prepareRaster,
 	signalRasterReady,
 	type Prepare_Raster,
@@ -62,7 +63,8 @@ const DownloadMapModal: React.FC<{
 	const { map, comparisonMap } = useMap();
 	const { addMarker, clearMarkers } = useMapMarker();
 
-	// Used by the Download Image Map server.
+	// Registers `window.$.fn.prepare_raster`, the entry point the screenshot
+	// service calls from inside its own headless browser session.
 	useEffect(() => {
 		window.$ = window.$ || {};
 		window.$.fn = window.$.fn || {};
@@ -96,10 +98,12 @@ const DownloadMapModal: React.FC<{
 		window.$.fn.prepare_raster = prepare_raster;
 
 		return () => {
-			// Clean up if needed
-			if (window.$?.fn?.prepare_raster) {
-				delete window.$.fn.prepare_raster;
-			}
+			// Reinstalls the polling stub where the real implementation was.
+			// A screenshot-service call arriving after this unmount used to hit a
+			// deleted key and crash outright.
+			// The stub now captures that call and forwards it once a later mount
+			// registers the real implementation again.
+			installPrepareRasterStub();
 		};
 	}, [
 		addMarker,
@@ -110,7 +114,7 @@ const DownloadMapModal: React.FC<{
 	]);
 
 	/**
-	 * Handles the click event for the "Download" button from the modal.
+	 * Handles the click on the modal's "Download" button.
 	 *
 	 * Sends the current map state to the screenshot service.
 	 * Uses `createPrepareRasterPostHttpPayload`, unless we've supplied

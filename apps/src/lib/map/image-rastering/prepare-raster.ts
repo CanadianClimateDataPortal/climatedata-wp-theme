@@ -96,10 +96,23 @@ export const prepareRaster: PrepareRaster = async (
 		if (!container || !innerHtml) {
 			return;
 		}
-		container.insertAdjacentHTML(
-			'beforeend',
-			`<div class="${className}">${innerHtml}</div>`,
-		);
+		const replayedModal = document.createElement('div');
+		replayedModal.className = className;
+		replayedModal.innerHTML = innerHtml;
+		// `[id^="location-modal-"]` is the selector `getLocationModalInnerHTML` scrapes
+		// with on the sender side, narrowed here to this one pane so compare mode keeps
+		// each popup with the map it was captured from.
+		const mountedModal = container.querySelector('[id^="location-modal-"]');
+		if (mountedModal) {
+			// The captured markup describes the very popup this pane is already showing.
+			// Replacing that node leaves a single popup on screen, where appending would
+			// stack a second copy over the first and the capture would show it doubled.
+			mountedModal.replaceWith(replayedModal);
+		} else {
+			// The screenshot service loads this page fresh and clicks nothing, so most
+			// runs arrive with no popup to replace and this replay is the only one.
+			container.append(replayedModal);
+		}
 	});
 
 	// Remove elements that should not appear in the screenshot

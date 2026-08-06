@@ -58,14 +58,6 @@ $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
     <?php include ( locate_template ( 'template/google-tags-head.php' ) ); ?>
 
 	<?php
-	// This template renders standalone: it never calls wp_head() or wp_footer().
-	// WordPress fires wp_enqueue_scripts from inside wp_head(), so nothing the
-	// theme enqueues reaches this page, including jQuery and the 'map-app'
-	// handle that carries map.js.
-	// The React app's $.fn.prepare_raster assignment is therefore the only one
-	// on this page, with nothing to collide with or override.
-	// See apps/src/lib/map/image-rastering/README.md for what prepare_raster does.
-
 	// Add favicon.
 	add_favicon();
 

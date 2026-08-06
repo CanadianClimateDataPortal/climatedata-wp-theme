@@ -206,9 +206,10 @@ export class PrepareRasterPostHttpPayloadDebugger {
 	 * hold shared with {@link DownloadMapModal}'s production call site.
 	 *
 	 * Outside debug mode, or when `hold` is false, always returns `fallback` unchanged —
-	 * production behaviour is untouched. In debug mode with `hold` true, returns an
-	 * implementation that logs instead of adding the readiness class, so the page stays
-	 * frozen in exactly the state the screenshot service would have captured.
+	 * production behaviour is untouched.
+	 * In debug mode with `hold` true, returns an implementation that withholds the
+	 * readiness class and halts the page where it stands, so what is on screen is what
+	 * the screenshot service would have captured.
 	 *
 	 * @param fallback - What would signal readiness outside debug mode: `signalRasterReady`.
 	 */
@@ -219,9 +220,28 @@ export class PrepareRasterPostHttpPayloadDebugger {
 			return fallback;
 		}
 		return (): void => {
+			// The message lands before the halt below, so a reader with no developer
+			// tools open learns what happened instead of watching the page carry on.
 			console.log(
-				'DebugPrepareRasterPostHttpPayload: withholding readiness — page frozen at capture state for inspection.',
+				'DebugPrepareRasterPostHttpPayload: withholding readiness — halting at capture state for inspection. Resume with F8.',
 			);
+			// Halting the page is this mode's whole purpose.
+			// Withholding the readiness class on its own leaves React rendering, Leaflet
+			// animating and map tiles arriving, so the page drifts away from the moment
+			// worth looking at within a frame or two.
+			// A breakpoint blocks every JavaScript callback at once — timers, animation
+			// frames, network handlers, promise continuations — which is what holds the
+			// DOM still, and it costs no processor time because the thread waits rather
+			// than spins.
+			// A page with no developer tools attached runs straight past this statement,
+			// which the ECMAScript specification guarantees, so anyone who has not opted
+			// in sees ordinary behaviour.
+			// This project's minifier keeps the statement.
+			// Moving the build to terser, setting esbuild's `drop` option, or adopting a
+			// minifier that strips debugger statements ends this mode with no error to
+			// notice, so check that before changing either.
+			// eslint-disable-next-line no-debugger -- the breakpoint is this method's behaviour, not a leftover
+			debugger;
 		};
 	}
 

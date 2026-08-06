@@ -319,17 +319,6 @@ html[data-raster='true'] .raster-addition-pill-resolution {
  * `lib/map/image-rastering/wait-for-maps-settled.ts` — is told the map is
  * ready while it is still fading in, so a screenshot taken then catches
  * half-transparent tiles.
- *
- * `Map.options.fadeAnimation` is Leaflet's own switch, but it is only read
- * when the map is constructed.
- * Changing it afterwards does nothing, and the live flag is private.
- * This rule wins on the cascade instead: the ramp is written to each tile's
- * inline `style`, and an author `!important` declaration outranks a normal
- * style attribute.
- *
- * Nobody watches an animation in a headless screenshot, so dropping the
- * fade costs nothing and removes a 200ms window in which the capture is
- * wrong.
  */
 html[data-raster='true'] .leaflet-tile {
 	opacity: 1 !important;

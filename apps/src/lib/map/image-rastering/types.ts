@@ -38,14 +38,11 @@ export interface PrepareRasterMapHandles {
 
 /**
  * The payload POSTed to the external screenshot service before it replays this page.
- *
- * @remark All-or-nothing by design. The screenshot service validates `locationPopupHtml`
- * and `markerLatLon` independently and will accept one without the other — that is
- * defence in depth on the service side, not a contract this sender relies on. Do not
- * loosen createPrepareRasterPostHttpPayload to send a partial payload; it must keep
- * returning `undefined` when either half is missing.
  */
 export interface PrepareRasterPostHttpPayload {
+	/**
+	 * The HTML of the LocationPopup(s) that was/were open when the user clicked the "Download" button.
+	 */
 	locationPopupHtml: [string, string?];
 	/**
 	 * The clicked location, read by the caller from {@link selectSelectedLocation}

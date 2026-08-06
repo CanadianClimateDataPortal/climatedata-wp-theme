@@ -1,7 +1,8 @@
 import { encodeURL } from '@/lib/utils';
 
 /**
- * Take the current Map URL, encode to be used against the screenshot service.
+ * Builds the screenshot service's own `/raster?url=` endpoint, carrying the map
+ * page's URL salted and encoded with {@link encodeURL}.
  *
  * Append to `window.DATA_URL + '/raster?url='` the string given as argument, encode using `window.URL_ENCODER_SALT`.
  *
@@ -11,12 +12,10 @@ export const createFetchTargetToRasterWithEncodedUrl = (
 	mapUrlString: string,
 ): string => {
 	const mapUrl = new URL(mapUrlString);
-	// Encode the URL
 	const encoded_url = encodeURL(
 		mapUrl.toString(),
 		window.URL_ENCODER_SALT,
 	).encoded;
-	// Generate the generateMap URL.
-	const outcome = window.DATA_URL + '/raster?url=' + encoded_url;
-	return outcome;
+	const rasterEndpoint = new URL('/raster', window.DATA_URL);
+	return `${rasterEndpoint.href}?url=${encoded_url}`;
 };

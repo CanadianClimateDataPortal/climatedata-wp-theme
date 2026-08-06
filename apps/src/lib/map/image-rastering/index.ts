@@ -17,3 +17,4 @@ export { createFetchTargetToRasterWithEncodedUrl } from './create-fetch-target-t
 export { prepareRaster } from './prepare-raster';
 export { signalRasterReady } from './signal-raster-ready';
 export { installDebugPayloadAccessor } from './install-debug-payload-accessor';
+export { installPrepareRasterStub } from './install-prepare-raster-stub';

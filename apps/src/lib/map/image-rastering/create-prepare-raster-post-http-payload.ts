@@ -10,9 +10,9 @@ import type { PrepareRasterPostHttpPayload } from './types';
  *
  * Returns `undefined`, never a payload with an empty `locationPopupHtml`,
  * whenever either half is missing: no popup currently open, or no location
- * selected. `undefined` becomes an absent request body; the server-side
- * hook then calls `$.fn.prepare_raster()` argument-less rather than
- * receiving a partially-empty payload.
+ * selected. `undefined` becomes an absent request body, and the screenshot
+ * service then calls `$.fn.prepare_raster()` argument-less rather than
+ * passing on a partially-empty payload.
  *
  * @remark Where does this run?: In the user's browser.
  */

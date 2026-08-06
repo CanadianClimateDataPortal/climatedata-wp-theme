@@ -1,7 +1,5 @@
 # `lib/map/`
 
-Logic about the map itself — the cartographic object, grid cells, Leaflet data — not the Maps SPA. Consumed by both `/maps` and `/download`. Not components — see `components/map/`.
+The map as a cartographic object — grid cells, Leaflet data, what gets drawn. Not the Maps SPA: that is [`components/map/`](../../components/map/).
 
-## Children
-
-- `image-rastering/` — the Download-button screenshot round trip; see its own README.
+- [`image-rastering/`](./image-rastering/) — the round trip that produces the downloaded map image. See its own README.

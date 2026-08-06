@@ -10,11 +10,15 @@ import { I18nProvider } from '@wordpress/react-i18n';
 
 import { LocaleProvider } from '@/context/locale-provider';
 import { store } from '@/app/store';
+import { installPrepareRasterStub } from '@/lib/map/image-rastering';
 
 import App from '@/App';
 
 import '@/Global.css';
 import SectionContext from "@/context/section-provider";
+
+// Runs while this module is still evaluating, ahead of the React render below.
+installPrepareRasterStub();
 
 const i18n = createI18n();
 

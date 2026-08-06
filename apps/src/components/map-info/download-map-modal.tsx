@@ -35,16 +35,6 @@ import {
 
 import { INTERNAL_URLS } from '@/lib/constants';
 
-// Loads `create-raster-debugger.ts` only once someone actually assigns
-// `window.mapPrepareRasterPostHttpPayload` — see `install-debug-payload-accessor.ts`.
-//
-// KNOWN RACE: clicking Download between assigning a payload and the import
-// resolving finds `window.mapPrepareRasterPostHttpPayloadDebugger` still
-// undefined, so that one click behaves as though debug mode were off.
-// The payload survives — the accessor stashes it synchronously — it is
-// applied on the next click. A limitation that we will keep that way.
-installDebugPayloadAccessor();
-
 const DownloadMapModal: React.FC<{
 	isOpen: boolean;
 	onClose: () => void;

@@ -1,6 +1,5 @@
 import type {
 	Prepare_Raster,
-	PrepareRasterPostHttpPayload,
 } from './types';
 
 // Extend the global Window interface to allow simulation of jQuery-style API.

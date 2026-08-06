@@ -14,9 +14,9 @@ import {
 	createFetchRequestInitOptions,
 	createFetchTargetToRasterWithEncodedUrl,
 	createPrepareRasterPostHttpPayload,
-	installDebugPayloadAccessor,
 	installPrepareRasterStub,
 	prepareRaster,
+	resolveSignalReady,
 	signalRasterReady,
 	type Prepare_Raster,
 	type PrepareRasterPostHttpPayload,
@@ -71,12 +71,8 @@ const DownloadMapModal: React.FC<{
 					markerLatLon,
 				}
 			}
-			// Keep the injected readiness callback when the debugger is absent.
 			// We are deliberately not providing a fallback `?? ...`: `resolveSignalReady` always returns a function.
-			let signalReady = signalRasterReady;
-			if (window.mapPrepareRasterPostHttpPayloadDebugger) {
-				signalReady = window.mapPrepareRasterPostHttpPayloadDebugger.resolveSignalReady(signalRasterReady);
-			}
+			const signalReady = resolveSignalReady(signalRasterReady);
 
 			// Do not signal readiness after a preparation failure. We let its wait time out.
 			// It means the `.to-raster` className to trigger screenshot and it should have had waited longer.
@@ -107,18 +103,11 @@ const DownloadMapModal: React.FC<{
 	 * Handles the click on the modal's "Download" button.
 	 *
 	 * Sends the current map state to the screenshot service.
-	 * Uses `createPrepareRasterPostHttpPayload`, unless we've supplied
-	 * `window.mapPrepareRasterPostHttpPayloadDebugger` with an override.
 	 */
 	const handleDownloadClick = async () => {
 		const mapUrl = new URL(window.location.href);
 		// Make sure to remove addition hashes.
 		mapUrl.hash = '';
-
-		if (window.mapPrepareRasterPostHttpPayloadDebugger?.isSetup) {
-			// When debugging against another screenshot backend, make HTTP call to that other host.
-			window.mapPrepareRasterPostHttpPayloadDebugger?.fixUrlHost(mapUrl);
-		}
 
 		const fetchTarget = createFetchTargetToRasterWithEncodedUrl(mapUrl.href);
 
@@ -129,14 +118,7 @@ const DownloadMapModal: React.FC<{
 		if (selectedLocation !== null) {
 			payload = createPrepareRasterPostHttpPayload(selectedLocation);
 		}
-		// Preserve an explicit undefined debug payload.
-		if (window.mapPrepareRasterPostHttpPayloadDebugger) {
-			payload = window.mapPrepareRasterPostHttpPayloadDebugger.resolvePostHttpPayload(payload);
-		}
-
 		const fetchInit = createFetchRequestInitOptions(payload);
-
-		window.mapPrepareRasterPostHttpPayloadDebugger?.preFetchConsoleLog(fetchTarget, fetchInit);
 
 		try {
 			const response = await fetch(fetchTarget, fetchInit);

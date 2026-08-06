@@ -200,14 +200,6 @@ const MapContainer = (
 		if (selectedLocation && canShowModal) {
 			const { title, latlng, featureId } = selectedLocation;
 
-			if (selectedLocation.latlng && isComparisonMap === false) {
-				window.mapPrepareRasterPostHttpPayloadDebugger?.addLocationModalOpenItem(
-					selectedLocation?.title ?? '',
-					window.location.href,
-					selectedLocation.latlng,
-				);
-			}
-
 			setLocationModalContent(
 				<LocationModalContent
 					title={title}

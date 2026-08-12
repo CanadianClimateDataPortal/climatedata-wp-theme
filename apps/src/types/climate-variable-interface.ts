@@ -71,6 +71,7 @@ export enum FrequencyDisplayModeOption {
  * All frequency types.
  */
 export enum FrequencyType {
+	DECADAL = 'decadal',
 	ANNUAL = 'ann',
 	ANNUAL_JUL_JUN = 'annual_jul_jun',
 	MONTHLY = 'months',
@@ -88,6 +89,7 @@ export enum FrequencyType {
  *
  */
 export const FrequencyTypes = {
+	DECADAL: FrequencyType.DECADAL,
 	ANNUAL: FrequencyType.ANNUAL,
 	ANNUAL_JUL_JUN: FrequencyType.ANNUAL_JUL_JUN,
 	MONTHLY: FrequencyType.MONTHLY,
@@ -107,7 +109,7 @@ export const FrequencyTypes = {
 export const S2DFrequencyTypes = {
 	MONTHLY: FrequencyTypes.MONTHLY,
 	SEASONAL: FrequencyTypes.SEASONAL,
-	DECADAL: 'decadal',
+	DECADAL: FrequencyTypes.DECADAL,
 } as const;
 
 /**

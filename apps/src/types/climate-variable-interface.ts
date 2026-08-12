@@ -72,6 +72,9 @@ export enum FrequencyDisplayModeOption {
  */
 export enum FrequencyType {
 	DECADAL = 'decadal',
+	DECADAL_ANNUAL = 'decadal_ann',
+	DECADAL_MAY_SEP = 'decadal_may_sep',
+	DECADAL_NOV_MAR = 'decadal_nov_mar',
 	ANNUAL = 'ann',
 	ANNUAL_JUL_JUN = 'annual_jul_jun',
 	MONTHLY = 'months',

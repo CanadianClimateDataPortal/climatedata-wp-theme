@@ -5,20 +5,26 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 import Dropdown from '@/components/ui/dropdown';
 
-import { FrequencyType } from '@/types/climate-variable-interface';
+import {
+	S2DFrequencyTypes,
+	type S2DFrequencyType,
+} from '@/types/climate-variable-interface';
 
 const FrequencyField = {
 	key: 'frequencies',
 	label: __('Frequencies'),
 	options: [
-		{ value: FrequencyType.MONTHLY, label: __('Monthly') },
-		{ value: FrequencyType.SEASONAL, label: __('Seasonal (3 months)') },
+		{ value: S2DFrequencyTypes.MONTHLY, label: __('Monthly') },
+		{ value: S2DFrequencyTypes.SEASONAL, label: __('Seasonal (3 months)') },
+		{ value: S2DFrequencyTypes.DECADAL_ANNUAL, label: __('Decadal (5 years; Annual)') },
+		{ value: S2DFrequencyTypes.DECADAL_MAY_SEP, label: __('Decadal (5 years; May-Sep)') },
+		{ value: S2DFrequencyTypes.DECADAL_NOV_MAR, label: __('Decadal (5 years; Nov-Mar)') },
 	],
 };
 
 export interface S2DFrequencyFieldDropdownProps {
 	tooltip?: React.ReactNode;
-	afterOnChange?: (value: FrequencyType | string) => void;
+	afterOnChange?: (value: S2DFrequencyType | string) => void;
 }
 
 export const S2DFrequencyFieldDropdown = (
@@ -30,11 +36,11 @@ export const S2DFrequencyFieldDropdown = (
 	} = useClimateVariable();
 	const { afterOnChange, ...restProps } = props;
 
-	const value = climateVariable?.getFrequency() ?? FrequencyType.MONTHLY;
+	const value = climateVariable?.getFrequency() ?? S2DFrequencyTypes.MONTHLY;
 
 	const fieldProps = {
 		label: FrequencyField.label,
-		onChange: (value: FrequencyType | string) => {
+		onChange: (value: S2DFrequencyType | string) => {
 			setFrequency(value);
 			afterOnChange?.(value);
 		},
@@ -43,7 +49,7 @@ export const S2DFrequencyFieldDropdown = (
 	};
 
 	return (
-		<Dropdown<FrequencyType | string>
+		<Dropdown<S2DFrequencyType | string>
 			key={FrequencyField.key}
 			placeholder={__('Select an option')}
 			options={FrequencyField.options}

@@ -41,6 +41,7 @@ const FrequencySelect = ({
 	downloadType,
 }: FrequencySelectProps) => {
 
+	const hasDecadal = isFrequencyEnabled(config, section, FrequencyType.DECADAL);
 	const hasAnnual = isFrequencyEnabled(config, section, FrequencyType.ANNUAL);
 	const hasAnnualJulJun = isFrequencyEnabled(config, section, FrequencyType.ANNUAL_JUL_JUN);
 	const hasMonths = isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
@@ -55,7 +56,9 @@ const FrequencySelect = ({
 		if (value !== undefined) {
 			setSelectValue(value);
 		} else {
-			if (hasAnnual) {
+			if (hasDecadal) {
+				setSelectValue(FrequencyType.DECADAL);
+			} else if (hasAnnual) {
 				setSelectValue(FrequencyType.ANNUAL);
 			} else if (hasAnnualJulJun) {
 				setSelectValue(FrequencyType.ANNUAL_JUL_JUN);
@@ -74,7 +77,18 @@ const FrequencySelect = ({
 				onValueChange(selectValue);
 			}
 		}
-	}, [selectValue, value, onValueChange, hasMonths, hasAllMonths, hasSeasons, hasDaily, hasAnnual, hasAnnualJulJun]);
+	}, [
+		selectValue,
+		value,
+		onValueChange,
+		hasDecadal,
+		hasAnnual,
+		hasAnnualJulJun,
+		hasDaily,
+		hasAllMonths,
+		hasMonths,
+		hasSeasons,
+	]);
 
 	const months = [
 		'jan',
@@ -159,6 +173,9 @@ const FrequencySelect = ({
 		
 		return (
 			<SelectContent>
+				{hasDecadal && <SelectItem value={FrequencyType.DECADAL}>
+					{__('Decadal')}
+				</SelectItem>}
 				{hasAnnual && <SelectItem value={FrequencyType.ANNUAL}>
 					{__(annualLabel)}
 				</SelectItem>}

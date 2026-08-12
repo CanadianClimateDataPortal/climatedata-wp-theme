@@ -68,7 +68,7 @@ const TimePeriodsControl: React.FC = () => {
 		<SidebarMenuItem>
 			<div className="time-periods-control">
 				<ControlTitle
-					title={__('Time Periods')}
+					title={__('Time Periods') + ' periods-control'}
 					tooltip={__('Move the slider to select your time period of interest.')}
 				/>
 				<Slider.Root

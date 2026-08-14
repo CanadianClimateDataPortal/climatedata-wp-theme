@@ -29,7 +29,7 @@ export interface S2DFrequencyFieldDropdownProps {
 
 export const S2DFrequencyFieldDropdown = (
 	props: S2DFrequencyFieldDropdownProps,
-) => {
+): React.ReactNode => {
 	const {
 		climateVariable,
 		setFrequency,
@@ -58,4 +58,4 @@ export const S2DFrequencyFieldDropdown = (
 	);
 };
 
-S2DFrequencyFieldDropdown.displayName = 'S2DFrequencyFieldDropdown';
+S2DFrequencyFieldDropdown.displayName = 'S2DFrequencyFieldDropdown'; // Explicit string literal, or this name would be lost in production.

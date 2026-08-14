@@ -71,10 +71,6 @@ export enum FrequencyDisplayModeOption {
  * All frequency types.
  */
 export enum FrequencyType {
-	DECADAL = 'decadal',
-	DECADAL_ANNUAL = 'decadal_ann',
-	DECADAL_MAY_SEP = 'decadal_may_sep',
-	DECADAL_NOV_MAR = 'decadal_nov_mar',
 	ANNUAL = 'ann',
 	ANNUAL_JUL_JUN = 'annual_jul_jun',
 	MONTHLY = 'months',
@@ -89,10 +85,8 @@ export enum FrequencyType {
 
 /**
  * In order to transition away from enums, we define an object with the same values.
- *
  */
 export const FrequencyTypes = {
-	DECADAL: FrequencyType.DECADAL,
 	ANNUAL: FrequencyType.ANNUAL,
 	ANNUAL_JUL_JUN: FrequencyType.ANNUAL_JUL_JUN,
 	MONTHLY: FrequencyType.MONTHLY,
@@ -110,9 +104,29 @@ export const FrequencyTypes = {
  * S2D frequency types - subset of available frequencies.
  */
 export const S2DFrequencyTypes = {
-	MONTHLY: FrequencyTypes.MONTHLY,
-	SEASONAL: FrequencyTypes.SEASONAL,
-	DECADAL: FrequencyTypes.DECADAL,
+	MONTHLY: FrequencyType.MONTHLY,
+	SEASONAL: FrequencyType.SEASONAL,
+	/**
+	 * Decadal Frequency taking all 12 months of the year into account.
+	 *
+	 * @remark
+	 * String 'decadal-ann' is also what's expected by the Geoserver API
+	 */
+	DECADAL_ANNUAL: 'decadal-ann',
+	/**
+	 * Decadal Frequency only taking the "hot" months of a year.
+	 *
+	 * @remark
+	 * String 'decadal-may-sep' is also what's expected by the Geoserver API
+	 */
+	DECADAL_MAY_SEP: 'decadal-may-sep',
+	/**
+	 * Decadal Frequency only taking the "cold" months of a year.
+	 *
+	 * @remark
+	 * String 'decadal-nov-mar' is also what's expected by the Geoserver API
+	 */
+	DECADAL_NOV_MAR: 'decadal-nov-mar',
 } as const;
 
 /**

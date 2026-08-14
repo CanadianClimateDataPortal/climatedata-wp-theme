@@ -268,7 +268,6 @@ export function getUnitName(unit: string): string {
  */
 export function getFrequencyName(frequency: string): string {
 	const nameMap: { [key: string]: string } = {
-		decadal: __('Decadal'),
 		ann: __('Annual'),
 		jan: __('January'),
 		feb: __('February'),

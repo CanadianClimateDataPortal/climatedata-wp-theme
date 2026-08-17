@@ -117,9 +117,12 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 	 * - <FT>: the forecast type (e.g. "expected" or "unusual")
 	 */
 	getLayerValue(): string {
+		const fallbackFrequency = S2DFrequencyTypes.SEASONAL;
+
 		const forecastType = this.getForecastType();
 		const isForecast = this.getForecastDisplay() === ForecastDisplays.FORECAST;
-		const frequency = this.getFrequency() ?? FrequencyType.SEASONAL;
+		const frequency = (this.getFrequency() ??
+			fallbackFrequency) as S2DFrequencyType;
 		const variable = normalizeForApiVariableId(this.getId());
 
 		const frequencyNameMap: Record<S2DFrequencyType, string> = {
@@ -135,7 +138,9 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 			[ForecastTypes.UNUSUAL]: 'unusual',
 		};
 
-		const frequencyName = frequencyNameMap[frequency];
+		const frequencyName = Reflect.has(frequencyNameMap, frequency)
+			? Reflect.get(frequencyNameMap, frequency)
+			: frequencyNameMap[fallbackFrequency];
 		const forecastTypeName = forecastTypeMap[forecastType];
 
 		if (isForecast) {

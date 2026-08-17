@@ -824,9 +824,11 @@ const ProbabilitiesPart = (
 	const TitleLine = () => (
 		<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 			{sprintf(
-				frequency === FrequencyType.MONTHLY
-					? __('Monthly %s probability:')
-					: __('Seasonal %s probability:'),
+				/^decadal-/.test(frequency)
+					? __('Decadal %s probability:')
+					: frequency === S2DFrequencyTypes.MONTHLY
+						? __('Monthly %s probability:')
+						: __('Seasonal %s probability:'),
 				variableName
 			)}
 		</span>

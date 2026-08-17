@@ -187,11 +187,23 @@ export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
 }
 
 /**
- * For S2D variables, the number of available periods for each frequency type.
+ * Period of time covered by the forecast.
+ *
+ * For S2D variables, the number of available periods we want to show forecasts for each frequency type.
+ *
+ * In other words: When we want to show Forecasting, we take the next ... bundled together.
+ *
+ * These numbers are more of a convention encoded in the APIs and other data source we are being a frontend for.
  */
-export const S2D_NB_PERIODS: { [key in S2DFrequencyType]: number } = {
+export const S2D_NB_PERIODS: Record<S2DFrequencyType, number> = {
+	// 3 months: the current month, the next month and the one after.
 	[S2DFrequencyTypes.MONTHLY]: 3,
+	// TODO: Find better explanation.
+	// Example: Assuming we are in the month of august, a list of 10 items where each items contain 3 months.
+	// List would contain:  (1) Aug to October (2) Sept to November. (3) Oct to December of this year (4) November of this year to January of next year (...) May of next year to July of this year and closing the loop
+	// Moving window of 10 items. The list of 10 items starts by containing the 1st day of current month to the 3rd month on the last day.
 	[S2DFrequencyTypes.SEASONAL]: 10,
+	// ... I fail at finding words for the meaning of 2
 	[S2DFrequencyTypes.DECADAL_ANNUAL]: 2,
 	[S2DFrequencyTypes.DECADAL_MAY_SEP]: 2,
 	[S2DFrequencyTypes.DECADAL_NOV_MAR]: 2,

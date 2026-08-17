@@ -13,6 +13,7 @@ import {
 	formatPeriodRange,
 	findPeriodIndexForDateRange,
 	getPeriods,
+	isFrequencyTypeDecadal,
 	type PeriodRange,
 } from '@/lib/s2d';
 import {
@@ -140,7 +141,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 	let shouldSliderBeDisabled = isLoadingReleaseDate;
 	if (
 		forecastDisplay === ForecastDisplays.CLIMATOLOGY &&
-		/^decadal-/.test(frequency ?? '')
+		isFrequencyTypeDecadal(frequency ?? '')
 	) {
 		// Cacher ou désactiver le time slider quand le type Climatology est sélectionné avec Decadal,
 		// vu que Climatology utilise les mêmes données pour les 2 time periods.

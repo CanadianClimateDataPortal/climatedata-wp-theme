@@ -316,6 +316,12 @@ export const S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE: Record<
 	// [S2DFrequencyTypes.DECADAL_NOV_MAR]: 'decadal-nov-mar', // ^
 };
 
+export const isFrequencyTypeDecadal = (
+	frequencyType?: S2DFrequencyType | string | null,
+): boolean => {
+	return typeof frequencyType === 'string' && /^decadal-/.test(frequencyType ?? '')
+};
+
 /**
  * Convert an S2D climate variable's id to the one to use in S2D API requests.
  *

@@ -15,6 +15,7 @@ import {
 	extractSkillLevelData,
 	generatePeriodRangeLabel,
 	normalizeProbabilitiesBarChartPercent,
+	isFrequencyTypeDecadal,
 	type LocationS2DData,
 } from '@/lib/s2d';
 import { ColourMap } from '@/types/types';
@@ -824,7 +825,7 @@ const ProbabilitiesPart = (
 	const TitleLine = () => (
 		<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 			{sprintf(
-				/^decadal-/.test(frequency)
+				isFrequencyTypeDecadal(frequency)
 					? __('Decadal %s probability:')
 					: frequency === S2DFrequencyTypes.MONTHLY
 						? __('Monthly %s probability:')

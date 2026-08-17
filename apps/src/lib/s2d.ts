@@ -5,8 +5,8 @@ import {
 	ForecastType,
 	ForecastTypes,
 	FrequencyType,
-	FrequencyTypes,
 	S2DFrequencyType,
+	S2DFrequencyTypes,
 } from '@/types/climate-variable-interface';
 import type {
 	ProgressBarProps,
@@ -59,9 +59,9 @@ export interface LocationS2DData {
  */
 export function getPeriodEnd(
 	periodStart: Date,
-	frequency: FrequencyType
+	frequency: S2DFrequencyType,
 ): Date {
-	const periodLength = frequency === FrequencyType.SEASONAL ? 3 : 1;
+	const periodLength = frequency === S2DFrequencyTypes.SEASONAL ? 3 : 1;
 	const periodEnd = new Date(periodStart);
 	periodEnd.setUTCMonth(periodStart.getUTCMonth() + periodLength);
 	periodEnd.setUTCDate(0);
@@ -84,7 +84,7 @@ export function getPeriodEnd(
  * @example
  * ```typescript
  * const releaseDate = new Date('2025-10-15');
- * const periods = getPeriods(releaseDate, FrequencyType.MONTHLY);
+ * const periods = getPeriods(releaseDate, S2DFrequencyTypes.MONTHLY);
  * // Returned periods are (as array of Date instances): [
  * //   [2025-10-01, 2025-10-31]
  * //   [2025-11-01, 2025-11-30]
@@ -196,8 +196,8 @@ export function buildSkillLayerName(
 ): string | null {
 
 	const frequencyNameMap: Record<string, string> = {
-		[FrequencyType.SEASONAL]: 'seasonal',
-		[FrequencyType.MONTHLY]: 'monthly',
+		[S2DFrequencyTypes.SEASONAL]: 'seasonal',
+		[S2DFrequencyTypes.MONTHLY]: 'monthly',
 	}
 
 	let variableId = climateVariable.getId();
@@ -309,8 +309,8 @@ export const S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE: Record<
 	S2DFrequencyType,
 	string
 > = {
-	[FrequencyTypes.MONTHLY]: 'Monthly',
-	[FrequencyTypes.SEASONAL]: 'Seasonal',
+	[S2DFrequencyTypes.MONTHLY]: 'Monthly',
+	[S2DFrequencyTypes.SEASONAL]: 'Seasonal',
 };
 
 /**
@@ -328,15 +328,18 @@ export function normalizeForApiVariableId(variableId: string): string {
 /**
  * Convert an S2D frequency type to the one to use in S2D API requests.
  *
- * @param frequency - The frequency, e.g. `FrequencyType.SEASONAL`.
+ * @param frequency - The frequency, e.g. `S2DFrequencyTypes.SEASONAL`.
  * @returns The frequency name to use for S2D API requests, e.g. `"seasonal"`
  */
 export function normalizeForApiFrequencyName(
 	frequency: S2DFrequencyType | string
 ): string {
 	const frequencyNameMap: Record<string, string> = {
-		[FrequencyType.SEASONAL]: 'seasonal',
-		[FrequencyType.MONTHLY]: 'monthly',
+		[S2DFrequencyTypes.SEASONAL]: 'seasonal',
+		[S2DFrequencyTypes.MONTHLY]: 'monthly',
+	  [S2DFrequencyTypes.DECADAL_ANNUAL]: S2DFrequencyTypes.DECADAL_ANNUAL,
+	  [S2DFrequencyTypes.DECADAL_MAY_SEP]: S2DFrequencyTypes.DECADAL_MAY_SEP,
+	  [S2DFrequencyTypes.DECADAL_NOV_MAR]: S2DFrequencyTypes.DECADAL_NOV_MAR,
 	};
 
 	return frequencyNameMap[frequency] ?? frequency;

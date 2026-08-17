@@ -24,7 +24,8 @@ import {
 	ForecastType,
 	ForecastTypes,
 	FrequencyType,
-	S2DFrequencyType,
+	S2DFrequencyTypes,
+	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
 import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
@@ -108,8 +109,11 @@ const tooltipClimatology = __(
 );
 
 const FREQUENCY_LABEL = {
-	[FrequencyType.MONTHLY]: __('Monthly'),
-	[FrequencyType.SEASONAL]: __('Seasonal'),
+	[S2DFrequencyTypes.MONTHLY]: __('Monthly'),
+	[S2DFrequencyTypes.SEASONAL]: __('Seasonal'),
+	[S2DFrequencyTypes.DECADAL_ANNUAL]: __('Decadal (5 years; Annual)'),
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]: __('Decadal (5 years; May-Sep)'),
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]: __('Decadal (5 years; Nov-Mar)'),
 } as const;
 
 /**

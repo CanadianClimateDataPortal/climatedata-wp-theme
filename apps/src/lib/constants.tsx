@@ -4,7 +4,8 @@ import { ColourScheme, ColourSchemeType, DatasetKey } from '@/types/types';
 import { MAP_CONFIG } from '@/config/map.config';
 import {
 	FrequencyType,
-	S2DFrequencyType,
+	S2DFrequencyTypes,
+	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
 import mapPinIcon from '@/assets/map-pin.svg';
@@ -189,8 +190,11 @@ export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
  * For S2D variables, the number of available periods for each frequency type.
  */
 export const S2D_NB_PERIODS: { [key in S2DFrequencyType]: number } = {
-	[FrequencyType.MONTHLY]: 3,
-	[FrequencyType.SEASONAL]: 10,
+	[S2DFrequencyTypes.MONTHLY]: 3,
+	[S2DFrequencyTypes.SEASONAL]: 10,
+	[S2DFrequencyTypes.DECADAL_ANNUAL]: 2,
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]: 2,
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]: 2,
 };
 
 export const AHCCD_SQUARE_ICON = (

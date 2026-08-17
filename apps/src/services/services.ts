@@ -693,7 +693,7 @@ export const fetchS2DReleaseDate = async (
 export const fetchS2DLocationData = async (
 	latlng: Pick<L.LatLng, 'lat' | 'lng'>,
 	variableId: string,
-	frequency: FrequencyType,
+	frequency: S2DFrequencyType,
 	period: Date,
 	fetchOptions?: FetchOptions
 ): Promise<LocationS2DData | null> => {

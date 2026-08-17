@@ -137,6 +137,16 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		selectedPeriod = matchingDatePeriodIndex ?? 0;
 	}
 
+	let shouldSliderBeDisabled = isLoadingReleaseDate;
+	if (
+		forecastDisplay === ForecastDisplays.CLIMATOLOGY &&
+		/^decadal-/.test(frequency ?? '')
+	) {
+		// Cacher ou désactiver le time slider quand le type Climatology est sélectionné avec Decadal,
+		// vu que Climatology utilise les mêmes données pour les 2 time periods.
+		shouldSliderBeDisabled = true;
+	}
+
 	const {
 		minimumLabel,
 		maximumLabel,
@@ -207,13 +217,14 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 					className={cn(
 						'relative flex items-center select-none mx-6',
 						'mt-16 [touch-action:none]',
+						'aria-disabled:opacity-50',
 						isLoadingReleaseDate && 'opacity-50'
 					)}
 					min={0}
 					max={periods ? periods.length - 1 : 0}
 					value={[selectedPeriod]}
 					onValueChange={handlePeriodChange}
-					disabled={isLoadingReleaseDate}
+					disabled={shouldSliderBeDisabled}
 				>
 					<Slider.Track
 						className={cn(
@@ -260,7 +271,8 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 				<div
 					className={cn(
 						'flex justify-between mt-2.5 mx-4 text-sm uppercase',
-						isLoadingReleaseDate && 'hidden'
+						isLoadingReleaseDate && 'hidden',
+						shouldSliderBeDisabled && 'opacity-50',
 					)}
 				>
 					<span>{minimumLabel}</span>

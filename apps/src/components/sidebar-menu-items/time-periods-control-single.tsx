@@ -84,7 +84,7 @@ const TimePeriodsControlSingle: React.FC<TimePeriodsControlSingleProps> = ({
 		<SidebarMenuItem>
 			<div className="time-periods-control">
 				<ControlTitle
-					title={__('Time Periods') + ' periods-control-single'}
+					title={__('Time Periods')}
 					tooltip={controlTooltip}
 				/>
 				<Slider.Root

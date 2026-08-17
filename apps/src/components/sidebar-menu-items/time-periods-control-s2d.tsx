@@ -211,7 +211,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		<SidebarMenuItem>
 			<div className="time-periods-control">
 				<ControlTitle
-					title={__('Time Periods') + ' periods-control-s2d'}
+					title={__('Time Periods')}
 					tooltip={controlTooltip}
 				/>
 				<Slider.Root

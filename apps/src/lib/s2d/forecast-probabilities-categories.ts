@@ -8,12 +8,12 @@ import {
 } from '@/types/climate-variable-interface';
 
 /**
- * Builds forecast category definitions for the given forecast type.
+ * Builds forecast category definitions for the given forecast type
  *
  * Used by both the map legend tooltip and the probability bars tooltip
  * to share consistent category names and percentile descriptions.
  */
-export const buildForecastCategories = (
+export const buildForecastProbabilitiesCategories = (
 	forecastType: ForecastType,
 ): DefinitionItem[] => {
 	if (forecastType === ForecastTypes.EXPECTED) {

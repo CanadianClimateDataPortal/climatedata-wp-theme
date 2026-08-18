@@ -12,6 +12,7 @@ import { FetchError, fetchS2DLocationData } from '@/services/services';
 import { formatValue } from '@/lib/format';
 import { cn, utc } from '@/lib/utils';
 import {
+	buildForecastProbabilitiesCategories,
 	extractSkillLevelData,
 	generatePeriodRangeLabel,
 	getProbabilitiesBarChartColour,
@@ -29,7 +30,6 @@ import {
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
-import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
 import S2DLocationModalForecastSummary from '@/components/map-layers/s2d-location-modal-forecast-summary';
 
 import ProgressBar from '@/components/ui/progress-bar';
@@ -753,7 +753,7 @@ const ForecastProbabilitiesPart = (
 	);
 
 	// Category definitions parallel to progressBars, for tooltip content
-	const forecastCategories = buildForecastCategories(forecastType);
+	const forecastCategories = buildForecastProbabilitiesCategories(forecastType);
 
 	const tooltipProbabilityContent = isLoaded ? (
 		<div className="p-1">

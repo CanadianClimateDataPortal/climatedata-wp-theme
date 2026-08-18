@@ -400,18 +400,24 @@ export const generatePeriodRangeLabel = (
 ): string | null => {
 	const periodStart = utc(dateRangeStart);
 
+	const isDecadalFrequencyType = isFrequencyTypeDecadal(frequency);
+
 	if (!periodStart) {
 		return null;
 	}
 
-	const periodStartLabel = formatIntlDate(periodStart, locale, { month: 'long' });
+	const periodStartLabel = isDecadalFrequencyType
+		? formatIntlDate(periodStart, locale, { year: 'numeric' })
+		: formatIntlDate(periodStart, locale, { month: 'long' });
 
 	if (frequency === FrequencyType.MONTHLY) {
 		return periodStartLabel;
 	}
 
 	const periodEnd = getPeriodEnd(periodStart, frequency);
-	const periodEndLabel = formatIntlDate(periodEnd, locale, { month: 'long' });
+	const periodEndLabel = isDecadalFrequencyType
+		? formatIntlDate(periodEnd, locale, { year: 'numeric' })
+		: formatIntlDate(periodEnd, locale, { month: 'long' });
 
 	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
 };

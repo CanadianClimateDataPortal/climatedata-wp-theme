@@ -111,9 +111,9 @@ const tooltipClimatology = __(
 const FREQUENCY_LABEL: Record<S2DFrequencyType, string> = {
 	[S2DFrequencyTypes.MONTHLY]: __('Monthly'),
 	[S2DFrequencyTypes.SEASONAL]: __('Seasonal'),
-	[S2DFrequencyTypes.DECADAL_ANNUAL]: __('Decadal (5 years; Annual)'),
-	[S2DFrequencyTypes.DECADAL_MAY_SEP]: __('Decadal (5 years; May-Sep)'),
-	[S2DFrequencyTypes.DECADAL_NOV_MAR]: __('Decadal (5 years; Nov-Mar)'),
+	[S2DFrequencyTypes.DECADAL_ANNUAL]: sprintf(__('Decadal (%s)'), __('Annual')),
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]:  sprintf(__('Decadal (%s)'), __('May-Sep')),
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]:  sprintf(__('Decadal (%s)'), __('Nov-Mar')),
 } as const;
 
 /**

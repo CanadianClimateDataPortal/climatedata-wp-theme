@@ -1,6 +1,7 @@
 import React from 'react';
+import { sprintf } from '@wordpress/i18n';
 
-import { __ } from '@/context/locale-provider';
+import { __, _n } from '@/context/locale-provider';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 import Dropdown from '@/components/ui/dropdown';
@@ -10,15 +11,41 @@ import {
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
+const formatLabelDecadalFrequencyField = (label: string): string => {
+	return sprintf(
+		__('Decadal (%s)'),
+		sprintf(
+			'%s; %s',
+			sprintf(_n('%s year', '%s years', 5), 5),
+			__(label),
+		)
+	);
+};
+
 const FrequencyField = {
 	key: 'frequencies',
 	label: __('Frequencies'),
 	options: [
-		{ value: S2DFrequencyTypes.MONTHLY, label: __('Monthly') },
-		{ value: S2DFrequencyTypes.SEASONAL, label: __('Seasonal (3 months)') },
-		{ value: S2DFrequencyTypes.DECADAL_ANNUAL, label: __('Decadal (5 years; Annual)') },
-		{ value: S2DFrequencyTypes.DECADAL_MAY_SEP, label: __('Decadal (5 years; May-Sep)') },
-		{ value: S2DFrequencyTypes.DECADAL_NOV_MAR, label: __('Decadal (5 years; Nov-Mar)') },
+		{
+			value: S2DFrequencyTypes.MONTHLY,
+			label: __('Monthly'),
+		},
+		{
+			value: S2DFrequencyTypes.SEASONAL,
+			label: __('Seasonal (3 months)'),
+		},
+		{
+			value: S2DFrequencyTypes.DECADAL_ANNUAL,
+			label: formatLabelDecadalFrequencyField('Annual'),
+		},
+		{
+			value: S2DFrequencyTypes.DECADAL_MAY_SEP,
+			label: formatLabelDecadalFrequencyField('May-Sep'),
+		},
+		{
+			value: S2DFrequencyTypes.DECADAL_NOV_MAR,
+			label: formatLabelDecadalFrequencyField('Nov-Mar'),
+		},
 	],
 };
 

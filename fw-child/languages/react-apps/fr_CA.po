@@ -829,6 +829,11 @@ msgstr "mm/jour"
 msgid "Degree Days"
 msgstr "Degrés-jours"
 
+msgid "%s year"
+msgid_plural "%s years"
+msgstr[0] "%s an"
+msgstr[1] "%s ans"
+
 msgid "%s day"
 msgid_plural "%s days"
 msgstr[0] "%s jour"
@@ -1190,8 +1195,14 @@ msgstr "Les périodes disponibles changeront si une fréquence différente est s
 msgid "Seasonal (3 months)"
 msgstr "Saisonnière (3 mois)"
 
-msgid "Decadal (5 years)"
-msgstr "Décennale (5 ans)"
+msgid "Decadal (%s)"
+msgstr "Décennale (%s)"
+
+msgid  "May-Sep"
+msgstr "Mai-Sep"
+
+msgid  "Nov-Mar"
+msgstr "Nov-Mar"
 
 msgid "Release date:"
 msgstr "Date de sortie :"

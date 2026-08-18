@@ -108,7 +108,7 @@ const tooltipClimatology = __(
 		'exact values that define the forecast outcomes for this location.'
 );
 
-const FREQUENCY_LABEL = {
+const FREQUENCY_LABEL: Record<S2DFrequencyType, string> = {
 	[S2DFrequencyTypes.MONTHLY]: __('Monthly'),
 	[S2DFrequencyTypes.SEASONAL]: __('Seasonal'),
 	[S2DFrequencyTypes.DECADAL_ANNUAL]: __('Decadal (5 years; Annual)'),
@@ -870,7 +870,11 @@ const LocationModalContentPart = (
 	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 
 	if (!(frequency in FREQUENCY_LABEL)) {
-		throw new Error(`Unknown frequency: ${frequency}`);
+		const message  = `LocationModalContentPart: Unknown frequency: ${frequency}`;
+		console.error(message);
+		return (
+			<></>
+		);
 	}
 
 	const DateRangeLine = dateRangeStart

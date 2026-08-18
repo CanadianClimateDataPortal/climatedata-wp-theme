@@ -11,7 +11,7 @@ import { __ } from '@/context/locale-provider';
 import { ParsedLatLon } from '@/types/types';
 import { format } from 'date-fns';
 
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: ClassValue[]): string {
 	return twMerge(clsx(inputs));
 }
 

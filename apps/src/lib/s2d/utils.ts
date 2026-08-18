@@ -1,149 +1,18 @@
-import { sprintf } from '@wordpress/i18n';
-import { S2D_FORECAST_CONVENTIONAL_NB_PERIODS } from '@/lib/constants';
 import {
 	ClimateVariableInterface,
 	ForecastType,
 	ForecastTypes,
-	FrequencyType,
 	S2DFrequencyType,
 	S2DFrequencyTypes,
 } from '@/types/climate-variable-interface';
 import { formatUTCDate, utc } from '@/lib/utils';
-import { formatIntlDate } from '@/lib/format';
 import { __ } from '@/context/locale-provider';
 
 import type {
 	ExtractS2DDownloadStepFilenameComponent,
 	LocationS2DData,
-	PeriodRange,
 	SkillLevelData,
 } from './types';
-
-/**
- * For a period start return the end date of the period based on the frequency.
- *
- * For "monthly" frequency, the period end is the end of the same month.
- * For "seasonal", the period end is the end of the 3rd following month.
- *
- * @param periodStart - The date representing the start of the period
- * @param frequency - The frequency for which we want the period end
- * @returns - The date for the end of the period
- */
-export function getPeriodEnd(
-	periodStart: Date,
-	frequency: S2DFrequencyType,
-): Date {
-	const periodLength = frequency === S2DFrequencyTypes.SEASONAL ? 3 : 1;
-	// TODO: This should probably use S2D_FORECAST_CONVENTIONAL_NB_PERIODS, gotta check where and when it is used.
-	const periodEnd = new Date(periodStart);
-	periodEnd.setUTCMonth(periodStart.getUTCMonth() + periodLength);
-	periodEnd.setUTCDate(0);
-	return periodEnd;
-}
-
-/**
- * Return the time periods for a release date and specific frequency.
- *
- * The number and length of time periods depend on the frequency:
- * - Seasonal frequency: 10 x 3-month periods, at 1-month interval
- * - Monthly frequency: 3 x 1-month periods, at 1-month interval
- *
- * The first period starts on the same month as the release date. A period start
- * is always the first day of the month, and a period end is always the last
- * day of the month.
- *
- * All dates are in UTC time.
- *
- * @example
- * ```typescript
- * const releaseDate = new Date('2025-10-15');
- * const periods = getPeriods(releaseDate, S2DFrequencyTypes.MONTHLY);
- * // Returned periods are (as array of Date instances): [
- * //   [2025-10-01, 2025-10-31]
- * //   [2025-11-01, 2025-11-30]
- * //   [2025-12-01, 2025-12-31]
- * // ]
- * ```
- *
- * @param releaseDate - The release date of the data.
- * @param frequency - The frequency for which to get the periods.
- * @returns An array of [start, end] date instances for each period.
- */
-export function getPeriods(
-	releaseDate: Date,
-	frequency: S2DFrequencyType,
-): PeriodRange[] {
-	const nbPeriods = S2D_FORECAST_CONVENTIONAL_NB_PERIODS[frequency];
-	const periodInterval = 1; // Periods are 1 month apart
-	const periods: [Date, Date][] = [];
-	const lastPeriod = new Date(
-		// Set to the first day of the month
-		Date.UTC(releaseDate.getUTCFullYear(), releaseDate.getUTCMonth(), 1)
-	);
-
-	for (let i = 0; i < nbPeriods; i++) {
-		const periodStart = new Date(lastPeriod);
-		const periodEnd = getPeriodEnd(periodStart, frequency);
-
-		periods.push([periodStart, periodEnd]);
-
-		lastPeriod.setUTCMonth(lastPeriod.getUTCMonth() + periodInterval);
-	}
-
-	return periods;
-}
-
-/**
- * Find the index of the period range that matches a string date range.
- *
- * A date range is an array of exactly two strings representing a date, in UTC
- * time. Each string must be of the form 'YYYY-MM-DD'. The date range is
- * generally created from the `dateRange` URL parameter.
- *
- * To find the matching period, only the first date of the date range is used.
- *
- * @param dateRange - The date range to search for. An array of exactly two
- *   strings.
- * @param availablePeriods - The period ranges to search in.
- * @returns - The index of the period range that matches the date range, or
- *   null if not found.
- */
-export function findPeriodIndexForDateRange(
-	dateRange: [string, string],
-	availablePeriods: PeriodRange[]
-): number | null {
-	const rangeStart = utc(dateRange[0]);
-
-	if (rangeStart === null) {
-		return null;
-	}
-
-	const foundIndex = availablePeriods.findIndex(
-		(period) => rangeStart.toDateString() === period[0].toDateString()
-	);
-
-	return foundIndex === -1 ? null : foundIndex;
-}
-
-/**
- * Transform a period range (Date instances) to a date range (strings).
- *
- * A date range is two strings representing dates in UTC time. The strings are
- * of the form 'YYYY-MM-DD'.
- *
- * @param periodRange - The period range to transform.
- * @param dateFormat - The format to use for the date strings.
- * @returns - The date range as an array of two dates in string.
- */
-export const formatPeriodRange = (
-	periodRange: PeriodRange,
-	dateFormat = 'yyyy-MM-dd',
-): [string, string] => {
-	const rangeStart = formatUTCDate(periodRange[0], dateFormat);
-	const rangeEnd = formatUTCDate(periodRange[1], dateFormat);
-
-	return [rangeStart, rangeEnd];
-};
 
 /**
  * Create and return the GeoServer layer name for the Skill layer.
@@ -386,38 +255,3 @@ export const extractSkillLevelData = (
 	return output;
 };
 
-/**
- * Generate a period range label for a given date range and frequency.
- *
- * @param dateRangeStart - Start date of the period. Example: 2025-08-01
- * @param frequency - Frequency type
- * @param locale - Locale to use for formatting
- */
-export const generatePeriodRangeLabel = (
-	dateRangeStart: string,
-	frequency: S2DFrequencyType,
-	locale: string
-): string | null => {
-	const periodStart = utc(dateRangeStart);
-
-	const isDecadalFrequencyType = isFrequencyTypeDecadal(frequency);
-
-	if (!periodStart) {
-		return null;
-	}
-
-	const periodStartLabel = isDecadalFrequencyType
-		? formatIntlDate(periodStart, locale, { year: 'numeric' })
-		: formatIntlDate(periodStart, locale, { month: 'long' });
-
-	if (frequency === FrequencyType.MONTHLY) {
-		return periodStartLabel;
-	}
-
-	const periodEnd = getPeriodEnd(periodStart, frequency);
-	const periodEndLabel = isDecadalFrequencyType
-		? formatIntlDate(periodEnd, locale, { year: 'numeric' })
-		: formatIntlDate(periodEnd, locale, { month: 'long' });
-
-	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
-};

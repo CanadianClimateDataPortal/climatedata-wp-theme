@@ -10,7 +10,7 @@ import {
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 import { utc } from '@/lib/utils';
-import { S2D_NB_PERIODS } from '@/lib/constants';
+import { S2D_FORECAST_CONVENTIONAL_NB_PERIODS } from '@/lib/constants';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 
 /**
@@ -47,7 +47,7 @@ describe('getPeriods', () => {
 		(frequency, periodLength) => {
 			const releaseDate = utc('2025-08-05') as Date;
 			const periods = getPeriods(releaseDate, frequency);
-			const nbPeriods = S2D_NB_PERIODS[frequency];
+			const nbPeriods = S2D_FORECAST_CONVENTIONAL_NB_PERIODS[frequency];
 
 			test(`generates correct number of periods (${nbPeriods})`, () => {
 				expect(periods).toHaveLength(nbPeriods);

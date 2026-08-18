@@ -187,6 +187,13 @@ export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
 }
 
 /**
+ * As name implies "decadal" describes 10 years,
+ * but the way we expose and manage data in the backends and as
+ * per how it is a convention; we split the decade in two periods.
+ */
+const S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL = 2;
+
+/**
  * Period of time covered by the forecast.
  *
  * For S2D variables, the number of available periods we want to show forecasts for each frequency type.
@@ -195,19 +202,23 @@ export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
  *
  * These numbers are more of a convention encoded in the APIs and other data source we are being a frontend for.
  */
-export const S2D_NB_PERIODS: Record<S2DFrequencyType, number> = {
+export const S2D_FORECAST_CONVENTIONAL_NB_PERIODS: Record<S2DFrequencyType, number> = {
 	// 3 months: the current month, the next month and the one after.
-	[S2DFrequencyTypes.MONTHLY]: 3,
+	[S2DFrequencyTypes.MONTHLY]:
+		3,
 	// TODO: Find better explanation.
 	// Example: Assuming we are in the month of august, a list of 10 items where each items contain 3 months.
 	// List would contain:  (1) Aug to October (2) Sept to November. (3) Oct to December of this year (4) November of this year to January of next year (...) May of next year to July of this year and closing the loop
 	// Moving window of 10 items. The list of 10 items starts by containing the 1st day of current month to the 3rd month on the last day.
-	[S2DFrequencyTypes.SEASONAL]: 10,
-	// ... I fail at finding words for the meaning of 2
-	[S2DFrequencyTypes.DECADAL_ANNUAL]: 2,
-	[S2DFrequencyTypes.DECADAL_MAY_SEP]: 2,
-	[S2DFrequencyTypes.DECADAL_NOV_MAR]: 2,
-};
+	[S2DFrequencyTypes.SEASONAL]:
+		10,
+	[S2DFrequencyTypes.DECADAL_ANNUAL]:
+		S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL,
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]:
+		S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL,
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]:
+		S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL,
+ } as const;
 
 export const AHCCD_SQUARE_ICON = (
 	<svg width="20" height="20" viewBox="0 0 20 20">

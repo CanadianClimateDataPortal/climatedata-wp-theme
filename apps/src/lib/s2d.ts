@@ -1,5 +1,5 @@
 import { sprintf } from '@wordpress/i18n';
-import { S2D_NB_PERIODS } from '@/lib/constants';
+import { S2D_FORECAST_CONVENTIONAL_NB_PERIODS } from '@/lib/constants';
 import {
 	ClimateVariableInterface,
 	ForecastType,
@@ -62,6 +62,7 @@ export function getPeriodEnd(
 	frequency: S2DFrequencyType,
 ): Date {
 	const periodLength = frequency === S2DFrequencyTypes.SEASONAL ? 3 : 1;
+	// TODO: This should probably use S2D_FORECAST_CONVENTIONAL_NB_PERIODS, gotta check where and when it is used.
 	const periodEnd = new Date(periodStart);
 	periodEnd.setUTCMonth(periodStart.getUTCMonth() + periodLength);
 	periodEnd.setUTCDate(0);
@@ -100,7 +101,7 @@ export function getPeriods(
 	releaseDate: Date,
 	frequency: S2DFrequencyType,
 ): PeriodRange[] {
-	const nbPeriods = S2D_NB_PERIODS[frequency];
+	const nbPeriods = S2D_FORECAST_CONVENTIONAL_NB_PERIODS[frequency];
 	const periodInterval = 1; // Periods are 1 month apart
 	const periods: [Date, Date][] = [];
 	const lastPeriod = new Date(

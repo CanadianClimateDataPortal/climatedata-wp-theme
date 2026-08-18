@@ -47,7 +47,7 @@ interface S2DVariableValuesProps {
 	latlng: Pick<L.LatLng, 'lat' | 'lng'>;
 }
 
-interface PopupContentProps {
+interface PopupContentPartProps {
 	locationData: LocationS2DData | null;
 	dateRangeStart: string | null;
 	frequency: S2DFrequencyType;
@@ -56,7 +56,7 @@ interface PopupContentProps {
 	unit: string;
 }
 
-interface ProbabilitiesPartProps {
+interface ForecastProbabilitiesPartProps {
 	locationData: LocationS2DData | null;
 	forecastType: ForecastType;
 	forecastDisplay: ForecastDisplay;
@@ -257,7 +257,12 @@ export const getProbabilityColour = (
  * Main component for the location popup of a S2D variable. Wrapper containing
  * the logic, around the actual component.
  */
-export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
+export const S2DVariableValues = (
+	props: S2DVariableValuesProps,
+): React.ReactElement => {
+	const {
+		latlng,
+	} = props;
 	const { releaseDate } = useS2D();
 	const { climateVariable } = useClimateVariable();
 
@@ -355,7 +360,7 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 	);
 };
 
-S2DVariableValues.displayName = 'S2DVariableValues';
+S2DVariableValues.displayName = 'S2DVariableValues'; // Explicit string literal, or this name would be lost in production.
 
 export default S2DVariableValues;
 
@@ -378,9 +383,14 @@ const TextLoader = () => {
  *
  * @param locationData - The loaded location data. Can be null while loading.
  */
-const SkillLevelPart = ({ locationData }: SkillLevelPartProps) => {
-	const { locale } = useLocale();
+const SkillLevelPart = (
+	props: SkillLevelPartProps,
+): React.ReactElement => {
+	const {
+		locationData,
+	} = props;
 
+	const { locale } = useLocale();
 	const {
 		skillCRPSS,
 		skillLevel,
@@ -446,16 +456,22 @@ const SkillLevelPart = ({ locationData }: SkillLevelPartProps) => {
 	);
 };
 
+SkillLevelPart.displayName = 'SkillLevelPart'; // Explicit string literal, or this name would be lost in production.
+
 /**
  * Component for the section showing the "Forecast" values.
  *
  * @param locationData - The loaded location data. Can be null while loading.
  * @param unit - The climate variable's unit
  */
-const ForecastValuesPart = ({
-	locationData,
-	unit,
-}: ForecastValuesPartProps) => {
+const ForecastValuesPart = (
+	props: ForecastValuesPartProps,
+): React.ReactElement => {
+	const {
+		locationData,
+		unit,
+	} = props;
+
 	const { locale } = useLocale();
 	const nearNormalRange: number[] | null = locationData
 		? [
@@ -540,6 +556,8 @@ const ForecastValuesPart = ({
 	);
 };
 
+ForecastValuesPart.displayName = 'ForecastValuesPart'; // Explicit string literal, or this name would be lost in production.
+
 /**
  * Component for the section showing the "Climatology" values.
  *
@@ -547,11 +565,15 @@ const ForecastValuesPart = ({
  * @param forecastType - The type of forecast (expected or unusual)
  * @param unit - The climate variable's unit
  */
-const ClimatologyValuesPart = ({
-	locationData,
-	forecastType,
-	unit,
-}: ClimatologyValuesPartProps) => {
+const ClimatologyValuesPart = (
+	props: ClimatologyValuesPartProps,
+): React.ReactElement => {
+	const {
+		locationData,
+		forecastType,
+		unit,
+	} = props;
+
 	const { locale } = useLocale();
 	let lowValue = 0;
 	let highValue = 0;
@@ -673,6 +695,8 @@ const ClimatologyValuesPart = ({
 	);
 };
 
+ClimatologyValuesPart.displayName = 'ClimatologyValuesPart'; // Explicit string literal, or this name would be lost in production.
+
 /**
  * Component for the probabilities section.
  *
@@ -683,8 +707,8 @@ const ClimatologyValuesPart = ({
  * @param unit - The climate variable's unit
  * @constructor
  */
-const ProbabilitiesPart = (
-	props: ProbabilitiesPartProps,
+const ForecastProbabilitiesPart = (
+	props: ForecastProbabilitiesPartProps,
 ): React.ReactNode => {
 	const {
 		forecastDisplay,
@@ -802,7 +826,6 @@ const ProbabilitiesPart = (
 			];
 		}
 	}
-
 
 	const { climateVariable } = useClimateVariable();
 	const variableId = climateVariable?.getId();
@@ -923,6 +946,8 @@ const ProbabilitiesPart = (
 	);
 };
 
+ForecastProbabilitiesPart.displayName = 'ForecastProbabilitiesPart'; // Explicit string literal, or this name would be lost in production.
+
 /**
  * Actual content component of the popup.
  *
@@ -934,15 +959,20 @@ const ProbabilitiesPart = (
  * @param variableName - The climate variable's name
  * @param unit - The climate variable's unit
  */
-const PopupContent = ({
-	locationData,
-	dateRangeStart,
-	frequency,
-	forecastType,
-	forecastDisplay,
-	unit,
-}: PopupContentProps) => {
+const PopupContentPart = (
+	props: PopupContentPartProps,
+): React.ReactElement => {
+	const {
+		locationData,
+		dateRangeStart,
+		frequency,
+		forecastType,
+		forecastDisplay,
+		unit,
+	} = props;
+
 	const { locale } = useLocale();
+
 	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 
 	if (!(frequency in FREQUENCY_LABEL)) {
@@ -986,7 +1016,7 @@ const PopupContent = ({
 			</dl>
 
 			{isForecast && (
-				<ProbabilitiesPart
+				<ForecastProbabilitiesPart
 					locationData={locationData}
 					forecastType={forecastType}
 					forecastDisplay={forecastDisplay}
@@ -999,4 +1029,4 @@ const PopupContent = ({
 	);
 };
 
-PopupContent.displayName = 'Content';
+PopupContentPart.displayName = 'PopupContentPart'; // Explicit string literal, or this name would be lost in production.

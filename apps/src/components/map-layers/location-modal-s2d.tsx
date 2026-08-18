@@ -30,7 +30,7 @@ import {
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
-import S2DLocationModalForecastSummary from '@/components/map-layers/s2d-location-modal-forecast-summary';
+import LocationModalS2DForecastSummary from '@/components/map-layers/location-modal-s2d-forecast-summary';
 
 import ProgressBar from '@/components/ui/progress-bar';
 import type {
@@ -42,7 +42,7 @@ import StarRating from '@/components/ui/star-rating';
 import S2DReleaseDate from '@/components/s2d-release-date';
 import { Spinner } from '@/components/ui/spinner';
 
-interface S2DVariableValuesProps {
+interface LocationModalS2DProps {
 	latlng: Pick<L.LatLng, 'lat' | 'lng'>;
 }
 
@@ -151,8 +151,8 @@ const SKILL_LEVEL_TOOLTIP = [
  * Main component for the location popup of a S2D variable. Wrapper containing
  * the logic, around the actual component.
  */
-export const S2DVariableValues = (
-	props: S2DVariableValuesProps,
+export const LocationModalS2D = (
+	props: LocationModalS2DProps,
 ): React.ReactElement => {
 	const {
 		latlng,
@@ -254,9 +254,9 @@ export const S2DVariableValues = (
 	);
 };
 
-S2DVariableValues.displayName = 'S2DVariableValues'; // Explicit string literal, or this name would be lost in production.
+LocationModalS2D.displayName = 'LocationModalS2D'; // Explicit string literal, or this name would be lost in production.
 
-export default S2DVariableValues;
+export default LocationModalS2D;
 
 /**
  * Component to display a loading spinner, where a text is expected.
@@ -829,7 +829,7 @@ const ForecastProbabilitiesPart = (
 			{isForecast && (
 				<section className="mt-9 flex items-center justify-between box-border my-2">
 					<S2DReleaseDate className="flex" />
-					<S2DLocationModalForecastSummary
+					<LocationModalS2DForecastSummary
 						progressBars={progressBars}
 						locationData={locationData}
 					/>

@@ -149,7 +149,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		shouldSliderBeDisabled = true;
 	}
 
-	const {
+	let {
 		minimumLabel,
 		maximumLabel,
 		tickLabels,
@@ -159,6 +159,11 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		forecastDisplay !== ForecastDisplays.CLIMATOLOGY,
 	);
 	const tickLabel = periods ? tickLabels[selectedPeriod] : '...';
+
+	if (isFrequencyTypeDecadal(frequency)) {
+		minimumLabel = minimumLabel.split(' ')[1];
+		maximumLabel = maximumLabel.split(' ')[1];
+	}
 
 	let controlTooltip: React.ReactNode = __(
 		'Move the slider to select your time period of interest.'

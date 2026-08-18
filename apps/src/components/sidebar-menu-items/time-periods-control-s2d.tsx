@@ -219,7 +219,6 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 				<ControlTitle
 					title={__('Time Periods')}
 					tooltip={controlTooltip}
-					id="time-periods-control-title"
 				/>
 				<Slider.Root
 					className={cn(
@@ -233,8 +232,6 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 					value={[selectedPeriod]}
 					onValueChange={handlePeriodChange}
 					disabled={shouldSliderBeDisabled}
-					aria-labelledby="time-periods-control-title"
-					aria-valuetext={selectedPeriod}
 				>
 					<Slider.Track
 						className={cn(

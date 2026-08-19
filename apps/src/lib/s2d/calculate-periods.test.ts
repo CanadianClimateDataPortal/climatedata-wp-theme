@@ -124,6 +124,83 @@ describe('getPeriods', () => {
 		}
 	);
 
+	describe('Confirm documented behavior', () => {
+		const releaseDate = utc('2025-08-05') as Date;
+
+		// Keep these descriptions identical to the corresponding lines in {@link getPeriods}.
+		describe.each([
+			{
+				commentLine: 'Seasonal frequency: 10 x 3-month periods, at 1-month interval',
+				frequencies: [S2DFrequencyTypes.SEASONAL],
+				expectedNbPeriods: 10,
+				periodLengthInMonths: 3,
+				periodStartIntervalInMonths: 1,
+				expectedPeriodJump: [3, 'month'],
+			},
+			{
+				commentLine: 'Monthly frequency: 3 x 1-month periods, at 1-month interval',
+				frequencies: [S2DFrequencyTypes.MONTHLY],
+				expectedNbPeriods: 3,
+				periodLengthInMonths: 1,
+				periodStartIntervalInMonths: 1,
+				expectedPeriodJump: [1, 'month'],
+			},
+			{
+				commentLine: 'Decadal frequency: 2 x 5-year periods, at 5-year interval',
+				frequencies: [
+					S2DFrequencyTypes.DECADAL_ANNUAL,
+					S2DFrequencyTypes.DECADAL_MAY_SEP,
+					S2DFrequencyTypes.DECADAL_NOV_MAR,
+				],
+				expectedNbPeriods: 2,
+				periodLengthInMonths: 5 * 12,
+				periodStartIntervalInMonths: 5 * 12,
+				expectedPeriodJump: [5, 'year'],
+			},
+		] as Array<{
+			commentLine: string;
+			frequencies: S2DFrequencyType[];
+			expectedNbPeriods: number;
+			periodLengthInMonths: number;
+			periodStartIntervalInMonths: number;
+			expectedPeriodJump: [number, 'month'] | [number, 'year'];
+		}>)('$commentLine', ({
+			frequencies,
+			expectedNbPeriods,
+			periodLengthInMonths,
+			periodStartIntervalInMonths,
+			expectedPeriodJump,
+		}) => {
+			frequencies.forEach((frequency) => {
+				test(`${frequency} uses the documented period span and count`, () => {
+					const periods = getPeriods(releaseDate, frequency);
+
+					expect(S2D_FORECAST_CONVENTIONAL_NB_PERIODS[frequency]).toBe(expectedNbPeriods);
+					expect(periods).toHaveLength(expectedNbPeriods);
+					expect(resolveFrequencyPeriodJump(frequency)).toEqual(expectedPeriodJump);
+
+					periods.forEach(([start, end]) => {
+						// The end date is inclusive, so a one-month period has a month-number difference of zero.
+						expect(monthNumberDiff(start, end)).toBe(periodLengthInMonths - 1);
+					});
+				});
+
+				test(`${frequency} starts periods at the documented interval`, () => {
+					const periods = getPeriods(releaseDate, frequency);
+
+					for (let i = 1; i < periods.length; i++) {
+						const previousStart = periods[i - 1][0];
+						const currentStart = periods[i][0];
+						expect(monthNumberDiff(previousStart, currentStart)).toBe(
+							periodStartIntervalInMonths
+						);
+					}
+				});
+			});
+		});
+	});
+
+
 	test('"seasons" correctly handles leap year and varying month lengths', () => {
 		const releaseDate = utc('2023-08-05') as Date;
 		const expectedPeriods = [

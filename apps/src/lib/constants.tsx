@@ -195,9 +195,9 @@ const S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL = 2;
 /**
  * Number of forecast periods displayed for each S2D frequency.
  *
- * Monthly forecasts show three one-month periods.
- * Seasonal forecasts show ten overlapping three-month periods.
- * Decadal forecasts show two consecutive five-year periods.
+ * - Seasonal frequency: 10 x 3-month periods, at 1-month interval (with overlap)
+ * - Monthly frequency: 3 x 1-month periods, at 1-month interval
+ * - Decadal frequency: 2 x 5-year periods, at 5-year interval
  *
  * These counts are frontend conventions that match the period structure exposed by the APIs.
  */

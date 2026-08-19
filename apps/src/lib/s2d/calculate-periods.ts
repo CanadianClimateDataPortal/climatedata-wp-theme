@@ -95,6 +95,8 @@ const getPeriodEnd = (
  *
  * All dates are in UTC time.
  *
+ * @see {@link S2D_FORECAST_CONVENTIONAL_NB_PERIODS} for the number of periods per frequency.
+ *
  * @example
  * ```typescript
  * const releaseDate = new Date('2025-10-15');

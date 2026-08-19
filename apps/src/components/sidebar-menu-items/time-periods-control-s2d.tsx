@@ -211,6 +211,8 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		setDateRange(formatPeriodRange(period));
 	};
 
+	// @TODO Check what to adjust `ControlTitle` and `Slider.Root` when Climatology + Decadal
+	//       `forecastDisplay !== ForecastDisplays.CLIMATOLOGY`
 	return (
 		<SidebarMenuItem>
 			<div className="time-periods-control">

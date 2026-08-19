@@ -37,6 +37,7 @@ export function buildSkillLayerName(
 	releaseDate: Date
 ): string | null {
 
+	// @TODO Fix should probably NOT `null` for every Decadal frequency.
 	const frequencyNameMap: Record<string, string> = {
 		[S2DFrequencyTypes.SEASONAL]: 'seasonal',
 		[S2DFrequencyTypes.MONTHLY]: 'monthly',

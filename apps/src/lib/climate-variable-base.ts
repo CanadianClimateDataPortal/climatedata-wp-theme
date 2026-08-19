@@ -524,6 +524,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getLayerValue(scenario: string | null | undefined, section?: string): string {
+		// @TODO Check effect for all Decadal variants
 		const version = this.getVersion() === 'cmip5' ? '' : this.getVersion();
 		const threshold = this.getThreshold();
 

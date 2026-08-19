@@ -16,6 +16,6 @@ export const createFetchTargetToRasterWithEncodedUrl = (
 		mapUrl.toString(),
 		window.URL_ENCODER_SALT,
 	).encoded;
-	const rasterEndpoint = new URL('/raster', window.DATA_URL);
+	const rasterEndpoint = new URL('/raster', 'https://127.0.0.1:5443');
 	return `${rasterEndpoint.href}?url=${encoded_url}`;
 };

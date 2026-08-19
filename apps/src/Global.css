@@ -280,6 +280,50 @@
 	dominant-baseline: middle;
 }
 
+/**
+ * Backstop for the legend's open/close control.
+ * It renders its own `[data-raster="false"]` marker into a separate React
+ * root, gated on data that resolves asynchronously.
+ * That render can land after the removal pass already ran over the
+ * document, leaving nothing in JS to remove it.
+ *
+ * The other two selectors handle a comparison view: they remove the
+ * right-hand map's own copies of the info pills, since only one copy should
+ * show.
+ *
+ * Raster vocabulary (`data-raster`, `to-raster`):
+ * apps/src/lib/map/image-rastering/README.md
+ */
+html[data-raster='true'] [data-raster='false'],
+html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-resolution,
+html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-comparison-right .raster-addition-pill-title {
+	display: none !important;
+}
+
+/**
+ * The map info pills (`MapInfoPills`) are hidden by default and revealed
+ * only while preparing the raster capture.
+ */
+html[data-raster='true'] .raster-addition-pill-title,
+html[data-raster='true'] .raster-addition-pill-resolution {
+	display: block !important;
+}
+
+/**
+ * Leaflet fades each tile in from transparent over 200ms once it has loaded.
+ * `GridLayer._tileReady` sets the tile's opacity to zero, then ramps it back
+ * up on each animation frame.
+ * Both the `load` event and `isLoading()` report the layer as finished at
+ * the *start* of that ramp.
+ * Code that waits for tiles to load — see
+ * `lib/map/image-rastering/wait-for-maps-settled.ts` — is told the map is
+ * ready while it is still fading in, so a screenshot taken then catches
+ * half-transparent tiles.
+ */
+html[data-raster='true'] .leaflet-tile {
+	opacity: 1 !important;
+}
+
 /* Custom scrollbar styles for variables panel */
 @layer utilities {
 	.scrollbar-thin {

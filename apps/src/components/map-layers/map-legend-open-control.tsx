@@ -47,11 +47,13 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 					<span className="font-sans text-sm font-normal leading-5 text-black">
 						{__('Legend')}
 					</span>
-					{isOpen ? (
-						<ChevronUp className="w-4 h-4 text-brand-blue" />
-					) : (
-						<ChevronDown className="w-4 h-4 text-brand-blue" />
-					)}
+					<span data-raster="false">
+						{isOpen ? (
+							<ChevronUp className="w-4 h-4 text-brand-blue" />
+						) : (
+							<ChevronDown className="w-4 h-4 text-brand-blue" />
+						)}
+					</span>
 				</button>
 			</div>
 			{isOpen && children && (

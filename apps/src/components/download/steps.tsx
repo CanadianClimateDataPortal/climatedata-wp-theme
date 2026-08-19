@@ -36,6 +36,7 @@ import { StepErrorMessage } from '@/lib/step-error-message';
 import { CircleAlert, InfoIcon } from 'lucide-react';
 import { useShapefile } from '@/hooks/use-shapefile';
 import { FINCH_COORDINATE_PRECISION } from '@/lib/shapefile';
+import { GridTypes } from '@/lib/vocabulary';
 
 type ErrorMessagesProps = {
 	messages: StepErrorMessage[];
@@ -229,7 +230,7 @@ const Steps: React.FC = () => {
 				const decimals = climateVariable.getDecimalPlace?.();
 				const interactiveRegion = climateVariable.getInteractiveRegion?.();
 				const selectedPoints = climateVariable.getSelectedPoints?.();
-				const gridType = climateVariable.getGridType?.() ?? 'canadagrid';
+				const gridType = climateVariable.getGridType?.() ?? GridTypes.CANADAGRID;
 
 				let latList = '';
 				let lonList = '';

@@ -29,7 +29,10 @@ const AppHeader = (
 	const { trailing } = props;
 
 	return (
-		<header id="header" className="flex items-center justify-between px-4 py-1.5">
+		<header
+			data-raster="false"
+			className="flex items-center justify-between px-4 py-1.5"
+		>
 			<div className="flex items-center grow">
 				<a href="/"><img src={Logo} alt={__('Climate Data')} /></a>
 				<a href="/">

@@ -12,6 +12,11 @@ import { useLocale } from '@/hooks/use-locale';
 import { setCenter, setZoom } from '@/features/download/download-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, GEOSERVER_BASE_URL } from '@/lib/constants';
+import {
+	GRID_RESOLUTIONS_VALUES,
+	GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D,
+	GridTypes,
+} from '@/lib/vocabulary';
 
 /**
  * Component that allows to select a rectangle on the map and calculate the number of cells selected.
@@ -32,19 +37,12 @@ const SelectableRectangleGridLayer = forwardRef<{
 	const { locale } = useLocale();
 
 	const gridResolutions = useMemo<Record<string, number>>(
-			() => ({
-			canadagrid: 0.08333333333333333,
-			'canadagrid-m6': 0.08333333333333333,
-			canadagrid1deg: 1,
-			slrgrid: 0.1,
-			'slrgrid-cmip6': 0.1,
-			era5landgrid: 0.1,
-		}),
+		() => ({...GRID_RESOLUTIONS_VALUES }),
 		[]
 	);
 
 	// Grid configuration for visual reference
-	const gridName = climateVariable?.getGridType() ?? 'canadagrid';
+	const gridName = climateVariable?.getGridType() ?? GridTypes.CANADAGRID;
 	const tileLayerUrl = `${GEOSERVER_BASE_URL}/geoserver/gwc/service/tms/1.0.0/CDC:${gridName}@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf`;
 
 	const tileLayerStyles = useMemo(
@@ -68,7 +66,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 
 	const getSelectedShapeData = useCallback(
 		(layer: L.Layer) => {
-			const varGrid = climateVariable?.getGridType() ?? 'canadagrid';
+			const varGrid = climateVariable?.getGridType() ?? GridTypes.CANADAGRID;
 			const geojson = (layer as L.Polygon).toGeoJSON() as GeoJSON.Feature;
 
 			// these coordinates are an array of linear rings.. the first element at
@@ -86,7 +84,15 @@ const SelectableRectangleGridLayer = forwardRef<{
 			const latDiff = maxLat - minLat;
 			const lngDiff = maxLng - minLng;
 			const area = latDiff * lngDiff;
-			const resolution = gridResolutions[varGrid] ?? 0.08333333333333333;
+			/**
+			 * `climateVariable.getGridType()` returns as a simple string that is
+			 * catalogued as a `GridType` and in case of falling with an
+			 * erroneous Non-Numerical (NaN) and break maxCellsAllowed we give a
+			 * fallback
+			 */
+			const resolution =
+				gridResolutions[varGrid] ??
+				GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D;
 
 			return {
 				cellCount: Math.round(area / resolution ** 2),

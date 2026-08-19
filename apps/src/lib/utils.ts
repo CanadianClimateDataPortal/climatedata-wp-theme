@@ -182,35 +182,6 @@ export const encodeURL = (url: string, salt: string) => {
 	return { encoded, hash };
 };
 
-/**
- * Modify the DOM to prepare the "Explore Maps" page for a screenshot.
- *
- * This function is designed to be executed by an external script (e.g. via Selenium)
- * before taking a screenshot. It removes certain UI elements and applies a specific
- * class to the map container to render the map in a cleaner, full-screen layout.
- *
- * Note: This function does not revert changes. A full page reload is required to restore the original UI.
- */
-export function prepareRaster(): void {
-	// Simulate a click on the legend toggle button
-	const legendToggle = document.getElementById('legend-toggle');
-	if (legendToggle instanceof HTMLElement) {
-		legendToggle.click();
-	}
-	// Remove elements that should not appear in the screenshot
-	['map-sidebar', 'header', 'sidebar-toggle', 'header-map', 'map-search-control', 'map-zoom-control'].forEach(id => {
-		const el = document.getElementById(id);
-		if (el) {
-			el.remove();
-		}
-	});
-
-	// Remove all tooltip elements
-	document.querySelectorAll('.tooltip').forEach(el => el.remove());
-
-	// Resize the window to force a layout update.
-	window.dispatchEvent(new Event('resize'));
-}
 
 /**
  * Extracts a feature ID from the properties object of a map layer click event.

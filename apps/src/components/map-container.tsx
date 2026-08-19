@@ -24,12 +24,14 @@ import SearchControl from '@/components/map-layers/search-control';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
 import InteractiveStationsLayer from '@/components/map-layers/interactive-stations-layer';
 import LocationModal from '@/components/map-layers/location-modal';
+import MapInfoPills from '@/components/map-layers/map-info-pills';
 import LocationInfoPanel from '@/components/map-info/location-info-panel';
 
 import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLeafletSyncContainerClassName } from '@/hooks/use-leaflet-sync-container-class-name';
 import { generateChartData } from '@/services/services';
 import { cn, getDefaultFrequency, remToPx } from '@/lib/utils';
 import SectionContext from '@/context/section-provider';
@@ -41,6 +43,7 @@ import {
 	GEOSERVER_BASE_URL,
 	SIDEBAR_WIDTH,
 } from '@/lib/constants';
+import { LOCATION_MODAL_POSITION_CLASS_NAMES } from '@/lib/location-modal-class-names';
 import { LocationModalContent } from '@/components/map-layers/location-modal-content';
 import { SelectedLocationInfo, Station } from '@/types/types';
 import { InteractiveRegionOption } from '@/types/climate-variable-interface';
@@ -65,23 +68,28 @@ interface MapContainerProps {
 	) => void;
 	// @ts-expect-error: L.VectorGrid is a valid type
 	layerRef?: React.MutableRefObject<L.VectorGrid | null>;
+	className?: string;
 }
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
-export default function MapContainer({
-	onMapReady,
-	onUnmount,
-	isComparisonMap = false,
-	onOver,
-	onOut,
-	onClick,
-	selectedLocation,
-	clearSelectedLocation,
-	selectGriddedLocation,
-	layerRef,
-}: MapContainerProps): React.ReactElement {
+const MapContainer = (
+	props: MapContainerProps,
+): React.ReactElement => {
+	const {
+		onMapReady,
+		onUnmount,
+		isComparisonMap = false,
+		onOver,
+		onOut,
+		onClick,
+		selectedLocation,
+		clearSelectedLocation,
+		selectGriddedLocation,
+		layerRef,
+	} = props;
+
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
 	const [selectedStation, setSelectedStation] = useState<Station | null>(null);
 
@@ -104,19 +112,16 @@ export default function MapContainer({
 
 	const scenarioLabel = appConfig.scenarios.find(item => item.value === scenario)?.label ?? scenario;
 
-	// CSS classes to position the location modal
-	const locationModalClassName = cn(
-		'absolute z-50',
-		'max-w-md w-full',
-		'top-1/2 -translate-y-1/2',
-		'left-1/2 -translate-x-1/2',
-		'max-h-[calc(100%-10rem)]',
-		// Medium screens and up: position from top left
-		'md:z-30',
-		'md:top-[10rem] md:translate-y-0',
-		'md:left-16 md:translate-x-0',
-		'md:max-h-[calc(100%-12rem)]',
-	);
+	const classNameForOutermostElement = [
+		'h-full',
+		'w-full',
+		'z-10',
+	];
+	if (typeof props.className == 'string') {
+		classNameForOutermostElement.push(props.className);
+	}
+
+	const classNameForLocationModal = cn(...LOCATION_MODAL_POSITION_CLASS_NAMES);
 
 	const handleLocationModalOpen = (content: React.ReactNode) => {
 		setLocationModalContent(content);
@@ -208,7 +213,15 @@ export default function MapContainer({
 		else if(!selectedStation) {
 			setLocationModalContent(null);
 		}
-	}, [selectedLocation, setLocationModalContent, scenario, canShowModal, selectedStation, handleDetailsClick]);
+	}, [
+		canShowModal,
+		handleDetailsClick,
+		isComparisonMap,
+		scenario,
+		selectedLocation,
+		selectedStation,
+		setLocationModalContent,
+	]);
 
 	useEffect(() => {
 		if (mapRef.current) {
@@ -218,6 +231,9 @@ export default function MapContainer({
 			if (onUnmount) onUnmount();
 		};
 	}, [onMapReady, onUnmount]);
+
+	// Otherwise className 'map-comparison-left' on element MapContainer doesn't get updated.
+	useLeafletSyncContainerClassName(mapRef, props.className);
 
 	return (
 		<LMapContainer
@@ -229,7 +245,7 @@ export default function MapContainer({
 			minZoom={DEFAULT_MIN_ZOOM}
 			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}
-			className="z-10 h-full w-full"
+			className={classNameForOutermostElement.join(' ')}
 			bounds={CANADA_BOUNDS}
 		>
 			<MapEvents
@@ -237,7 +253,9 @@ export default function MapContainer({
 				onUnmount={onUnmount}
 			/>
 			{climateVariable?.getInteractiveMode() === 'region' && (
-				<MapLegend />
+				!isComparisonMap && (
+					<MapLegend />
+				)
 			)}
 
 			{/* Use the unified CustomPanesLayer with 'standard' mode */}
@@ -246,19 +264,20 @@ export default function MapContainer({
 			{/* Use the unified VariableLayer */}
 			<VariableLayer isComparisonMap={isComparisonMap} />
 
-			<ZoomControl />
-
 			{/* Show search control if not a comparison map. */}
 			{ !isComparisonMap && (
-				<SearchControl
-					onSelectGriddedLocation={selectGriddedLocation}
-				/>
+				<>
+					<ZoomControl />
+					<SearchControl
+						onSelectGriddedLocation={selectGriddedLocation}
+					/>
+				</>
 			) }
 
 			<LocationModal
 				isOpen={canShowModal}
 				onClose={handleLocationModalClose}
-				className={locationModalClassName}
+				className={classNameForLocationModal}
 			>
 				{locationModalContent}
 			</LocationModal>
@@ -326,6 +345,12 @@ export default function MapContainer({
 					{scenarioLabel}
 				</div>
 			)}
+
+			<MapInfoPills />
 		</LMapContainer>
 	);
-}
+};
+
+MapContainer.displayName = 'MapContainer'; // Explicit string literal, or this name would be lost in production.
+
+export default MapContainer;

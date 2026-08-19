@@ -78,7 +78,10 @@ const toggleVariableDetailsPanel = () => {
 
 	return (
 		<>
-			<aside id="header-map" className="map-header relative z-20">
+			<aside
+				className="relative z-20"
+				data-raster="false"
+			>
 				<div
 					ref={ref}
 					className="absolute top-0 left-0 overflow-y-auto w-full"

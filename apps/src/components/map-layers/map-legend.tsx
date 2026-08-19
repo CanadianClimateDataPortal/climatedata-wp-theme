@@ -29,8 +29,8 @@ import type { MapLegendCommon, MapLegendCommonProps } from '@/components/map-lay
 const LazyMapLegendForecastS2D = lazy<MapLegendForecastS2D>(() => import('@/components/map-layers/map-legend-forecast-s2d'));
 const LazyMapLegendCommon = lazy<React.MemoExoticComponent<MapLegendCommon>>(() => import('@/components/map-layers/map-legend-common'));
 
-
-const MapLegend: React.FC = () => {
+const MapLegend = (
+): React.ReactElement | null => {
 	const dispatch = useAppDispatch();
 	const isOpen = useAppSelector((state) => state.map.legend.isOpen);
 
@@ -69,8 +69,14 @@ const MapLegend: React.FC = () => {
 
 	/**
 	 * Open legend by default when the map container has space for legend.
-	 * Legend max width is 430px (MapLegendOpenControl.MAX_LEGEND_WIDTH)
+	 * Legend max width is 430px (MapLegendOpenControl.maxLegendWidth)
 	 * Only check on the initial mount, no resize handling needed.
+	 *
+	 * Only checked on the initial mount — no resize handling needed.
+	 *
+	 * This runs once per mount, and `MapLegend` is mounted conditionally (see
+	 * `map-container.tsx`), so it can still fire *after* the map-image export has
+	 * forced the legend open.
 	 */
 	useEffect(() => {
 		if (!map) {

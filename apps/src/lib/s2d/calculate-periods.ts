@@ -23,11 +23,14 @@ type PeriodJumpUnit = 'month' | 'year';
  * tuples `getPeriods` returns, and from the step used to start the next tuple.
  *
  * @param frequency - The frequency whose period span should be resolved.
+ * @param noThrow - If true, the function will return a default value instead of throwing an error for unsupported frequencies.
+ *
  * @returns A tuple containing the jump size and unit, such as `[3, 'month']` for seasonal frequency.
  * @throws An error if the frequency type is not supported.
  */
 export const resolveFrequencyPeriodJump = (
 	frequency: S2DFrequencyType,
+	noThrow: boolean = true,
 ): [number, PeriodJumpUnit] => {
 	let periodJumpSize = 1;
 	let periodJumpSizeUnit: PeriodJumpUnit = 'month';
@@ -40,6 +43,9 @@ export const resolveFrequencyPeriodJump = (
 	} else if (frequency === S2DFrequencyTypes.MONTHLY) {
 		periodJumpSize = 1;
 	} else {
+		if (noThrow) {
+			return [periodJumpSize, periodJumpSizeUnit];
+		}
 		throw new Error(
 			sprintf(
 				__('Unsupported frequency type: %s'),
@@ -69,7 +75,7 @@ const getPeriodEnd = (
 	const [
 		periodJumpSize,
 		periodJumpSizeUnit,
-	] = resolveFrequencyPeriodJump(frequency);
+	] = resolveFrequencyPeriodJump(frequency, false);
 	const periodEnd = new Date(periodStart);
 	if (periodJumpSizeUnit === 'year') {
 		periodEnd.setUTCFullYear(periodStart.getUTCFullYear() + periodJumpSize);

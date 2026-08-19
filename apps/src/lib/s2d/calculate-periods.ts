@@ -11,7 +11,10 @@ import { formatIntlDate } from '@/lib/format';
 import type {
 	PeriodRange,
 } from './types';
-import { isFrequencyTypeDecadal } from './utils';
+import {
+	isFrequencyTypeDecadal,
+	isFrequencyTypeS2D,
+} from './utils';
 
 type PeriodJumpUnit = 'month' | 'year';
 

@@ -17,6 +17,7 @@ import {
 	type PeriodRange,
 } from '@/lib/s2d';
 import {
+	ForecastDisplay,
 	ForecastDisplays,
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
@@ -36,12 +37,14 @@ type SliderLabels = {
  *
  * @param periods - The periods to show on the slider.
  * @param locale - Locale to use for formatting.
- * @param showYears - If false, the year is not shown in the min/max labels.
+ * @param forecastDisplay - A decision factor that has an impact on how to format labels and tickLabels in some situations
+ * @param frequencyType - Another decision factor for the same reasons as forecastDisplay
  */
 const generateSliderLabels = (
 	periods: PeriodRange[] | null,
 	locale: string,
-	showYears: boolean = true,
+	forecastDisplay: ForecastDisplay | null,
+	frequencyType: S2DFrequencyType | null,
 ): SliderLabels => {
 	if (!periods) {
 		return {
@@ -54,21 +57,100 @@ const generateSliderLabels = (
 	const firstPeriod = periods[0][0];
 	const lastPeriod = periods[periods.length - 1][1];
 
-	const formatMinMaxLabel = showYears
+	const isActuallyForecast = forecastDisplay === ForecastDisplays.FORECAST;
+
+	const formatMinMaxLabel = isActuallyForecast
 		? formatShortMonthYear
 		: formatShortMonth;
 
-	const minimumLabel = formatMinMaxLabel(firstPeriod, locale);
-	const maximumLabel = formatMinMaxLabel(lastPeriod, locale);
+	let minimumLabel = formatMinMaxLabel(firstPeriod, locale);
+	let maximumLabel = formatMinMaxLabel(lastPeriod, locale);
+
+	if (isFrequencyTypeDecadal(frequencyType) && isActuallyForecast) {
+		/**
+		 * rel: CLIM-1447 We need only the year when `FrequencyTypes.DECADAL_...`.
+		 * Manual confirmation made that `Intl.DateTimeFormat(locale, {...}).format()` returns the same "month year" string ordering for both French and English.
+		 */
+		minimumLabel = minimumLabel.split(' ')[1];
+		maximumLabel = maximumLabel.split(' ')[1];
+	}
 
 	const tickLabels = periods.map((period) => {
-		const startMonth = formatShortMonth(period[0], locale, true);
-		if (period[0].getUTCMonth() === period[1].getUTCMonth()) {
-			return startMonth;
+		if (isFrequencyTypeDecadal(frequencyType)) {
+			/**
+			 * @TODO Testing needed (in a follow-up PR) for the following descriptions:
+			 *
+			 * New behavior since CLIM-1447:
+			 *
+			 * ```js
+			 * const tickLabels = [
+			 *   "2026-2030",
+			 *   "2031-2035"
+			 * ]
+			 * ```
+			 *
+			 * Notice:
+			 * - No need to fence for `ForecastDisplays.FORECAST` since a DECADAL is what makes the difference for this.
+			 * - Only 2 items
+			 */
+			const startYear = formatShortMonthYear(period[0], locale).split(' ')[1];
+			const endYear = formatShortMonthYear(period[1], locale).split(' ')[1];
+			return `${startYear}-${endYear}`;
+		} else {
+			/**
+			 * @TODO Testing needed (in a follow-up PR) for the following descriptions:
+			 *
+			 * Original behavior until CLIM-1447:
+			 *
+			 * Example when in French:
+			 *
+			 * ```js
+			 * const tickLabels = [
+			 *   "août-oct",
+			 *   "sept-nov",
+			 *   "oct-déc",
+			 *   // ...
+			 * ]
+			 * ```
+			 *
+			 * Example When in English:
+			 *
+			 * ```js
+			 * const tickLabels = [
+			 *   "Aug-Oct",
+			 *   "Sep-Nov",
+			 *   "Oct-Dec",
+			 *   // ...
+			 * ]
+			 * ```
+			 * Notice:
+			 * - In french the labels are in lowercase and Capitalized in English
+			 *
+			 */
+			const startMonth = formatShortMonth(period[0], locale, true);
+			if (period[0].getUTCMonth() === period[1].getUTCMonth()) {
+				return startMonth;
+			}
+			const endMonth = formatShortMonth(period[1], locale, true);
+			return `${startMonth}-${endMonth}`;
 		}
-		const endMonth = formatShortMonth(period[1], locale, true);
-		return `${startMonth}-${endMonth}`;
 	});
+
+
+	/**
+	 * @TODO Testing needed (in a follow-up PR) for the following descriptions:
+	 *
+	 * Describing original behavior the way it was written until CLIM-1447:
+	 *
+	 * 1. When {@link ForecastDisplays.FORECAST} this function's final output here should look like:
+	 * ```js
+	 * {
+	 *   minimumLabel: '',
+	 * }
+	 * ```
+	 */
+
+	console.log('generateSliderLabels', { showYears: isActuallyForecast, periods, minimumLabel, maximumLabel, tickLabels });
 
 	return {
 		minimumLabel,
@@ -119,11 +201,11 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 	const { locale } = useLocale();
 
 	const dateRange = climateVariable?.getDateRange();
-	const frequency = climateVariable?.getFrequency() ?? null;
-	const forecastDisplay = climateVariable?.getForecastDisplay();
+	const frequencyType = (climateVariable?.getFrequency() ?? null) as null | S2DFrequencyType;
+	const forecastDisplay = climateVariable?.getForecastDisplay() ?? null;
 	const periods =
-		releaseDate && frequency
-			? getPeriods(releaseDate, frequency as S2DFrequencyType)
+		releaseDate && frequencyType
+			? getPeriods(releaseDate, frequencyType as S2DFrequencyType)
 			: null;
 	const isLoadingReleaseDate = releaseDate === null;
 
@@ -141,27 +223,23 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 	let shouldSliderBeDisabled = isLoadingReleaseDate;
 	if (
 		forecastDisplay === ForecastDisplays.CLIMATOLOGY &&
-		isFrequencyTypeDecadal(frequency ?? '')
+		isFrequencyTypeDecadal(frequencyType ?? '')
 	) {
 		// Decadal climatology uses the same data for both periods, so the time slider has no effect.
 		shouldSliderBeDisabled = true;
 	}
 
-	let {
+	const {
 		minimumLabel,
 		maximumLabel,
 		tickLabels,
 	} = generateSliderLabels(
 		periods,
 		locale,
-		forecastDisplay !== ForecastDisplays.CLIMATOLOGY,
+		forecastDisplay,
+		frequencyType,
 	);
 	const tickLabel = periods ? tickLabels[selectedPeriod] : '...';
-
-	if (isFrequencyTypeDecadal(frequency)) {
-		minimumLabel = minimumLabel.split(' ')[1];
-		maximumLabel = maximumLabel.split(' ')[1];
-	}
 
 	let controlTooltip: React.ReactNode = __(
 		'Move the slider to select your time period of interest.'

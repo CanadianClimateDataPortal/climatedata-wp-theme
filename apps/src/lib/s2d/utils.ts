@@ -2,12 +2,14 @@ import {
 	ClimateVariableInterface,
 	ForecastType,
 	ForecastTypes,
+	FrequencyType,
 	S2DFrequencyType,
 	S2DFrequencyTypes,
 } from '@/types/climate-variable-interface';
 import { formatUTCDate, utc } from '@/lib/utils';
 import { __ } from '@/context/locale-provider';
 
+import { assertIsS2DFrequencyType } from '@/types/assertions';
 import type {
 	ExtractS2DDownloadStepFilenameComponent,
 	LocationS2DData,
@@ -159,10 +161,28 @@ export const S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE: Record<
 	// [S2DFrequencyTypes.DECADAL_NOV_MAR]: 'decadal-nov-mar', // ^
 };
 
+export const isFrequencyTypeS2D = (
+	frequencyType?: FrequencyType | S2DFrequencyType | string | null,
+): frequencyType is S2DFrequencyType => {
+	let outcome = false;
+	try {
+		assertIsS2DFrequencyType(frequencyType ?? '');
+		outcome = true;
+	} catch {
+		outcome = false;
+	}
+
+	return outcome;
+};
+
 export const isFrequencyTypeDecadal = (
 	frequencyType?: S2DFrequencyType | string | null,
 ): boolean => {
-	return typeof frequencyType === 'string' && /^decadal-/.test(frequencyType ?? '')
+	if (isFrequencyTypeS2D(frequencyType)) {
+		return /^decadal-/.test(frequencyType);
+	}
+
+	return false;
 };
 
 /**

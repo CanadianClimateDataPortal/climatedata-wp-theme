@@ -324,6 +324,7 @@ const SkillLevelPart = (
 			className="flex flex-col-reverse mb-1"
 			role="group"
 			aria-labelledby="skill-level-label"
+			data-part="skill-level"
 		>
 			<dt id="skill-level-label" className="mt-0">
 				<div className="flex flex-row gap-2">
@@ -408,6 +409,7 @@ const ForecastValuesPart = (
 				className="flex flex-col-reverse"
 				role="group"
 				aria-labelledby="historical-median-label"
+				data-part="historical-median"
 			>
 				<dt id="historical-median-label">
 					<div className="flex flex-row gap-2 mb-1">
@@ -430,6 +432,7 @@ const ForecastValuesPart = (
 				className="flex flex-col-reverse"
 				role="group"
 				aria-labelledby="temperature-range-label"
+				data-part="near-normal-range"
 			>
 				<dt id="temperature-range-label">
 					<div className="flex flex-row gap-2 mb-1">
@@ -536,6 +539,7 @@ const ClimatologyValuesPart = (
 					className="flex flex-col-reverse"
 					role="group"
 					aria-labelledby="historical-high-cutoff-label"
+					data-part="above-normal-unusual-high"
 				>
 					<dt id="historical-high-cutoff-label">
 						<div className="flex flex-row gap-2">
@@ -554,6 +558,7 @@ const ClimatologyValuesPart = (
 					className="flex flex-col-reverse"
 					role="group"
 					aria-labelledby="historical-median-label"
+					data-part="historical-median"
 				>
 					<dt id="historical-median-label">
 						<div className="flex flex-row gap-2">
@@ -572,6 +577,7 @@ const ClimatologyValuesPart = (
 					className="flex flex-col-reverse"
 					role="group"
 					aria-labelledby="historical-low-cutoff-label"
+					data-part="below-normal-unusual-low"
 				>
 					<dt id="historical-low-cutoff-label">
 						<div className="flex flex-row gap-2">
@@ -902,6 +908,7 @@ const LocationModalContentPart = (
 						'flex flex-col-reverse mb-1',
 						!isForecast ? 'col-span-2' : ''
 					)}
+					data-part="frequency-name-line"
 				>
 					<dt className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 						{FrequencyNameLine}

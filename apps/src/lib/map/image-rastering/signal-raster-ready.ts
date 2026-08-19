@@ -8,7 +8,7 @@
  * up in the PNG. It therefore has to land on the element we want captured, and
  * only once the contents of that element have stopped changing.
  */
-const RASTER_READY_CLASS_NAME = 'to-raster';
+const RASTER_READY_CLASS_NAME = 'ready-to-raster-here';
 
 /** The element the service captures — the grid holding both map panes. */
 const RASTER_TARGET_ELEMENT_ID = 'map-root';

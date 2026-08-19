@@ -877,9 +877,20 @@ const LocationModalContentPart = (
 		);
 	}
 
-	const DateRangeLine = dateRangeStart
+	let DateRangeLine = dateRangeStart
 		? generatePeriodRangeLabel(dateRangeStart, frequency, locale)
 		: null;
+
+	if (isFrequencyTypeDecadal(frequency) && DateRangeLine !== null) {
+		/**
+		 * Support both 'Juillet à Août' (or other variants) and differentiate when we want '2026-2030' instead of what would be '2026 à 2030'
+		 *
+		 * rel: CLIM-1447 We need only the year when `FrequencyTypes.DECADAL_...`.
+		 * Manual confirmation made that `Intl.DateTimeFormat(locale, {...}).format()` returns the same "month year" string ordering for both French and English.
+		 */
+		DateRangeLine = DateRangeLine.split(' ').filter(Number).join('-');
+	}
+
 	const FrequencyNameLine = FREQUENCY_LABEL[frequency];
 
 	return (

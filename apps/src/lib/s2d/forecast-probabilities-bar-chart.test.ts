@@ -12,7 +12,7 @@ describe('getProbabilitiesBarChartColour', () => {
 			colourMap = {
 				// Notice the gaps in colours and quantities
 				// Each "outcome" is a line with "bars" making a gradient of colours
-				// In this test suite, colours[0] length must match quantities[0] length but a normal bar chart would have exactly the same count per outcome. @TODO Improve comment
+				// This fixture uses matching, variable-length colour and quantity groups to test flattened outcome indexing.
 				colours: [
 					//   BAR 1 |   BAR 2 |    BAR 3 |    BAR 4 |    BAR 5 |    BAR 6
 					// outcome 0         |          |          |          |

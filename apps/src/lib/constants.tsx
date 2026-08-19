@@ -187,31 +187,25 @@ export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
 }
 
 /**
- * As name implies "decadal" describes 10 years,
- * but the way we expose and manage data in the backends and as
- * per how it is a convention; we split the decade in two periods.
- * @TODO Improve comment
+ * Decadal forecasts use two consecutive five-year periods to represent a ten-year interval.
+ * This is a frontend convention matching the period structure exposed by the APIs.
  */
 const S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL = 2;
 
 /**
- * Period of time covered by the forecast.
+ * Number of forecast periods displayed for each S2D frequency.
  *
- * For S2D variables, the number of available periods we want to show forecasts for each frequency type.
+ * Monthly forecasts show three one-month periods.
+ * Seasonal forecasts show ten overlapping three-month periods.
+ * Decadal forecasts show two consecutive five-year periods.
  *
- * In other words: When we want to show Forecasting, we take the next ... bundled together.
- *
- * These numbers are more of a convention encoded in the APIs and other data source we are being a frontend for.
- * @TODO Improve comment
+ * These counts are frontend conventions that match the period structure exposed by the APIs.
  */
 export const S2D_FORECAST_CONVENTIONAL_NB_PERIODS: Record<S2DFrequencyType, number> = {
-	// 3 months: the current month, the next month and the one after.
+	// The current month and the following two months.
 	[S2DFrequencyTypes.MONTHLY]:
 		3,
-	// @TODO Improve comment
-	// Example: Assuming we are in the month of august, a list of 10 items where each items contain 3 months.
-	// List would contain:  (1) Aug to October (2) Sept to November. (3) Oct to December of this year (4) November of this year to January of next year (...) May of next year to July of this year and closing the loop
-	// Moving window of 10 items. The list of 10 items starts by containing the 1st day of current month to the 3rd month on the last day.
+	// Ten overlapping three-month periods, each starting one month after the previous period.
 	[S2DFrequencyTypes.SEASONAL]:
 		10,
 	[S2DFrequencyTypes.DECADAL_ANNUAL]:

@@ -143,9 +143,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		forecastDisplay === ForecastDisplays.CLIMATOLOGY &&
 		isFrequencyTypeDecadal(frequency ?? '')
 	) {
-		// @TODO Improve comment
-		// Cacher ou désactiver le time slider quand le type Climatology est sélectionné avec Decadal,
-		// vu que Climatology utilise les mêmes données pour les 2 time periods.
+		// Decadal climatology uses the same data for both periods, so the time slider has no effect.
 		shouldSliderBeDisabled = true;
 	}
 

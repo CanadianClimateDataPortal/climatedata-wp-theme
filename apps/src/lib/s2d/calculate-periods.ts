@@ -16,35 +16,20 @@ import { isFrequencyTypeDecadal } from './utils';
 type PeriodJumpUnit = 'month' | 'year';
 
 /**
- * Describe how many units to "jump" ahead when describing time ranges.
+ * Resolve the span of one period for a frequency.
  *
- * Allows to describe without ambiguity what we mean by "the end of the period"
- * for a given frequency type.
+ * The returned jump is used by `getPeriodEnd` to calculate the period's inclusive
+ * end boundary. It is distinct from `nbPeriods`, which controls how many `[start, end]`
+ * tuples `getPeriods` returns, and from the step used to start the next tuple.
  *
- * For "monthly" frequency, the period end is the end of the same month.
- * For "seasonal", the period end is the end of the 3rd following month.
- * For "decadal" frequencies, the period end is the end of the 5th year.
- *
- * @param frequency - The frequency type for which to resolve the period end jump.
- * @returns A tuple containing the jump size and the jump unit. e.g. [3, 'month'] for seasonal frequency.
+ * @param frequency - The frequency whose period span should be resolved.
+ * @returns A tuple containing the jump size and unit, such as `[3, 'month']` for seasonal frequency.
  * @throws An error if the frequency type is not supported.
  */
 export const resolveFrequencyPeriodJump = (
 	frequency: S2DFrequencyType,
 ): [number, PeriodJumpUnit] => {
-	/**
-	 * This is not the same as what's described in
-	 * {@link S2D_FORECAST_CONVENTIONAL_NB_PERIODS} because it is
-	 * about the actual length of the period ... in
-	 * *number of a {@link PeriodJumpUnit}* and not
-	 * *how many periods* of available data to look at.
-	 * @TODO Improve comment
-	 */
 	let periodJumpSize = 1;
-	/**
-	 * Up to before supporting {@link S2DFrequencyTypes} of type "decadal",
-	 * the period end was always calculated in months.
-	 */
 	let periodJumpSizeUnit: PeriodJumpUnit = 'month';
 	if (frequency === S2DFrequencyTypes.SEASONAL) {
 		// Because a season is 3 months long.
@@ -71,14 +56,11 @@ export const resolveFrequencyPeriodJump = (
 
 
 /**
- * For a period start return the end date of the period based on the frequency.
+ * Calculate the inclusive end date for a period starting at `periodStart`.
  *
- * @TODO Improve comment
- *
- *
- * @param periodStart - The date representing the start of the period
- * @param frequency - The frequency for which we want the period end
- * @returns - The date for the end of the period
+ * @param periodStart - The first day of the period.
+ * @param frequency - The frequency that determines the period length.
+ * @returns The last day of the period.
  */
 const getPeriodEnd = (
 	periodStart: Date,
@@ -152,10 +134,8 @@ export const getPeriods = (
 			periods.push([periodStart, periodEnd]);
 			if (periodJumpSizeUnit === 'month') {
 				/**
-				 * "moving window" of months.
-				 * The line below makes it so that for a given {@link nbPeriods} list length
-				 * each item cover more than one month, and we move one month at a time.
-				 * @TODO Improve comment
+				 * Monthly and seasonal periods overlap, so advance the next period by one month.
+				 * This creates a moving window while preserving the configured list length.
 				 */
 				lastPeriod.setUTCMonth(lastPeriod.getUTCMonth() + 1 /* "window of months", moving by 1 month at a time */);
 			} else {

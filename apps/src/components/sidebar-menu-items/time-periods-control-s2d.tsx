@@ -66,7 +66,7 @@ const generateSliderLabels = (
 	let minimumLabel = formatMinMaxLabel(firstPeriod, locale);
 	let maximumLabel = formatMinMaxLabel(lastPeriod, locale);
 
-	if (isFrequencyTypeDecadal(frequencyType) && isActuallyForecast) {
+	if (isFrequencyTypeDecadal(frequencyType)) {
 		/**
 		 * rel: CLIM-1447 We need only the year when `FrequencyTypes.DECADAL_...`.
 		 * Manual confirmation made that `Intl.DateTimeFormat(locale, {...}).format()` returns the same "month year" string ordering for both French and English.

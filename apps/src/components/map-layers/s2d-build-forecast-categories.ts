@@ -13,7 +13,7 @@ import {
  * Used by both the map legend tooltip and the probability bars tooltip
  * to share consistent category names and percentile descriptions.
  */
-export const buildForecastProbabilitiesCategories = ( // Formerly known as `buildForecastCategories`
+export const buildForecastCategories = ( // Suggested rename `buildForecastProbabilitiesCategories`
 	forecastType: ForecastType,
 ): DefinitionItem[] => {
 	if (forecastType === ForecastTypes.EXPECTED) {

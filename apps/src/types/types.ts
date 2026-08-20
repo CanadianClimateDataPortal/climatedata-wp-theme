@@ -251,7 +251,7 @@ export interface MapState {
 	 *
 	 * Only meaningful for S2D variables when Forecast Display = "Forecast".
 	 *
-	 * Controlled by `MaskLowSkillField` in `components/s2d/skill.tsx`.
+	 * Controlled by `MaskLowSkillField` in `components/fields/skill.tsx`.
 	 */
 	isLowSkillVisible: boolean;
 	/**

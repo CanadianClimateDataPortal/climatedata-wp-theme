@@ -11,7 +11,7 @@ import { selectSelectedLocationTitle } from '@/features/map/map-slice';
 
 import S2DReleaseDate from '@/components/s2d-release-date';
 
-import { buildForecastProbabilitiesCategories } from '@/lib/s2d';
+import { buildForecastProbabilitiesCategories } from '@/components/map-layers/s2d-build-forecast-categories';
 
 import { type ProgressBarProps } from '@/types/progress-bar';
 

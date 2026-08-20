@@ -10,7 +10,7 @@ import {
 	InteractiveRegionOption,
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
-import LocationModalS2D from '@/components/map-layers/location-modal-s2d';
+import LocationModalS2D from '@/components/map-layers/s2d-variable-values';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
 import { WMSParams } from '@/types/types';
 import { formatUTCDate, utc } from '@/lib/utils';

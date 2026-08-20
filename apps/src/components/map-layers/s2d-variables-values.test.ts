@@ -11,26 +11,22 @@ describe('getProbabilityColour', () => {
 		beforeEach(() => {
 			colourMap = {
 				// Notice the gaps in colours and quantities
-				// Each "outcome" is a line with "bars" making a gradient of colours
-				// This fixture uses matching, variable-length colour and quantity groups to test flattened outcome indexing.
+				// This is deliberate and not a situation enforced here.
 				colours: [
-					//   BAR 1 |   BAR 2 |    BAR 3 |    BAR 4 |    BAR 5 |    BAR 6
-					// outcome 0         |          |          |          |
+					// outcome 0
 					'#001010', '#001020', '#001030',
-					// outcome 1         |          |          |          |
-					/*         |         */'#002030', '#002040', '#002050',
-					// outcome 2         |          |          |          |
-					/*       */'#003020',/*        */ '#003040', '#003050', '#003060',
+					// outcome 1
+					/*                  */'#002030', '#002040', '#002050',
+					// outcome 2
+					/*       */'#003020',/*        */'#003040', '#003050', '#003060',
 				],
-				//           |         |          |          |          |
 				quantities: [
-					//         |         |          |          |          |
-					// outcome 0         |          |          |          |
-					/**/1010,/*|*/ 1020,/* */ 1030,
-					// outcome 1         |          |          |          |
-					/*				 |            */2030,/* */ 2040,/* */ 2050,
-					// outcome 2         |          |          |          |
-					/*         |*/ 3020,/*          | */ 3040,/* */ 3050,/* */ 3060,
+					// outcome 0
+					1010, 1020, 1030,
+					// outcome 1
+					/*				*/2030, 2040, 2050,
+					// outcome 2
+					/*  */3020,/*   */3040, 3050, 3060,
 				],
 				type: ColourSchemeType.DIVERGENT,
 				isDivergent: true,
@@ -88,18 +84,8 @@ describe('getProbabilityColour', () => {
 	describe('when percentage is 100', () => {
 		beforeEach(() => {
 			colourMap = {
-				colours: [
-					'#001010',
-					'#001100',
-					'#002030',
-					'#002030',
-				],
-				quantities: [
-					1010,
-					1100,
-					2030,
-					3030,
-				],
+				colours: ['#001010', '#001100', '#002030', '#002030'],
+				quantities: [1010, 1100, 2030, 3030],
 			} as unknown as ColourMap;
 		});
 

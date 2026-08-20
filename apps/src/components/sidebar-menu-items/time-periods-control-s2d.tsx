@@ -136,21 +136,21 @@ const generateSliderLabels = (
 		}
 	});
 
-
 	/**
 	 * @TODO Testing needed (in a follow-up PR) for the following descriptions:
 	 *
 	 * Describing original behavior the way it was written until CLIM-1447:
 	 *
-	 * 1. When {@link ForecastDisplays.FORECAST} this function's final output here should look like:
+	 * What is now `isActuallyForecast` was originally `showYear` which would make `minimumLabel` have the year.
+	 *
 	 * ```js
-	 * {
-	 *   minimumLabel: '',
+	 * const sliderLabels = {
+	 *   minimumLabel: 'août 2026',
+	 *   maximumLabel: 'juil. 2027',
+	 *   tickLabels: [ ... ]
 	 * }
 	 * ```
 	 */
-
-	console.log('generateSliderLabels', { showYears: isActuallyForecast, periods, minimumLabel, maximumLabel, tickLabels });
 
 	return {
 		minimumLabel,

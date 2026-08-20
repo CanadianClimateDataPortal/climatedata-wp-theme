@@ -192,7 +192,7 @@ const isWhite = (colour: `#${string}`): boolean =>
  * @param colorMap - The colour map containing the colours
  * @returns The colour associated with the given percentage and outcome.
  */
-export const getProbabilitiesBarChartColour = ( // formerly known as `getProbabilityColour`
+export const getProbabilityColour = ( // Suggested rename `getProbabilitiesBarChartColour`
 	outcome: number,
 	percentage: number,
 	colorMap: ColourMap
@@ -759,7 +759,7 @@ const ForecastProbabilitiesPart = (
 					),
 					labelTooltipCutoff: '> ' + formatValue(aboveValue, unit, 1, locale),
 					percent: abovePercentage,
-					fillHexCode: getProbabilitiesBarChartColour(
+					fillHexCode: getProbabilityColour(
 						0,
 						abovePercentage,
 						colorMap
@@ -778,7 +778,7 @@ const ForecastProbabilitiesPart = (
 						formatValue(aboveValue, unit, 1, locale)
 					),
 					percent: nearPercentage,
-					fillHexCode: getProbabilitiesBarChartColour(
+					fillHexCode: getProbabilityColour(
 						1,
 						nearPercentage,
 						colorMap
@@ -791,7 +791,7 @@ const ForecastProbabilitiesPart = (
 					),
 					labelTooltipCutoff: '< ' + formatValue(belowValue, unit, 1, locale),
 					percent: belowPercentage,
-					fillHexCode: getProbabilitiesBarChartColour(
+					fillHexCode: getProbabilityColour(
 						2,
 						belowPercentage,
 						colorMap
@@ -812,7 +812,7 @@ const ForecastProbabilitiesPart = (
 					),
 					labelTooltipCutoff: '> ' + formatValue(higherValue, unit, 1, locale),
 					percent: higherPercentage,
-					fillHexCode: getProbabilitiesBarChartColour(
+					fillHexCode: getProbabilityColour(
 						0,
 						higherPercentage,
 						colorMap
@@ -825,7 +825,7 @@ const ForecastProbabilitiesPart = (
 					),
 					labelTooltipCutoff: '< ' + formatValue(lowerValue, unit, 1, locale),
 					percent: lowerPercentage,
-					fillHexCode: getProbabilitiesBarChartColour(
+					fillHexCode: getProbabilityColour(
 						1,
 						lowerPercentage,
 						colorMap

@@ -574,7 +574,7 @@ export const generatePeriodRangeLabel = (
  * The method of trimming decimal values to determine if the value is part of the cutoff.
  *
  * @see {@link LocationS2DData} for the cutoffs and probabilities values.
- * @see {@link getProbabilitiesBarChartColour} for how the normalized percent value is used to determine the colour of the probability bar.
+ * @see {@link getProbabilityColour} for how the normalized percent value is used to determine the colour of the probability bar.
  */
 export const normalizeProbabilitiesBarChartPercent = (
 	input: Pick<ProgressBarProps, 'percent'>,

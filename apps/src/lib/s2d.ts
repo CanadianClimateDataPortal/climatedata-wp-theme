@@ -56,15 +56,15 @@ type PeriodJumpUnit = 'month' | 'year';
  * tuples `getPeriods` returns, and from the step used to start the next tuple.
  *
  * @param frequency - The frequency whose period span should be resolved.
- * @param noThrow - If true, the function will return a default value instead of throwing an error for unsupported frequencies.
+ * @param throws - If true, the function will throw an error for unsupported frequencies; otherwise, it returns null.
  *
  * @returns A tuple containing the jump size and unit, such as `[3, 'month']` for seasonal frequency.
  * @throws An error if the frequency type is not supported.
  */
 export const resolveFrequencyPeriodJump = (
 	frequency: S2DFrequencyType,
-	noThrow: boolean = true,
-): [number, PeriodJumpUnit] => {
+	throws: boolean = true,
+): [number, PeriodJumpUnit] | null => {
 	let periodJumpSize = 1;
 	let periodJumpSizeUnit: PeriodJumpUnit = 'month';
 	if (frequency === S2DFrequencyTypes.SEASONAL) {
@@ -76,8 +76,8 @@ export const resolveFrequencyPeriodJump = (
 	} else if (frequency === S2DFrequencyTypes.MONTHLY) {
 		periodJumpSize = 1;
 	} else {
-		if (noThrow) {
-			return [periodJumpSize, periodJumpSizeUnit];
+		if (!throws) {
+			return null;
 		}
 		throw new Error(
 			sprintf(
@@ -105,10 +105,11 @@ const getPeriodEnd = (
 	periodStart: Date,
 	frequency: S2DFrequencyType,
 ): Date => {
+	const jump = resolveFrequencyPeriodJump(frequency, false);
 	const [
 		periodJumpSize,
 		periodJumpSizeUnit,
-	] = resolveFrequencyPeriodJump(frequency, false);
+	] = jump ?? [1, 'month'];
 	const periodEnd = new Date(periodStart);
 	if (periodJumpSizeUnit === 'year') {
 		periodEnd.setUTCFullYear(periodStart.getUTCFullYear() + periodJumpSize);
@@ -164,11 +165,12 @@ export const getPeriods = (
 	);
 
 	try {
+		const jump = resolveFrequencyPeriodJump(frequency, true) as [number, PeriodJumpUnit];
+		// Because the above throws; it should never gets null beyond here.
 		const [
 			periodJumpSize,
 			periodJumpSizeUnit,
-		] = resolveFrequencyPeriodJump(frequency);
-
+		] = jump;
 		for (let i = 0; i < nbPeriods; i++) {
 			const periodStart = new Date(lastPeriod);
 			const periodEnd = getPeriodEnd(periodStart, frequency);
@@ -184,11 +186,8 @@ export const getPeriods = (
 				lastPeriod.setUTCFullYear(lastPeriod.getUTCFullYear() + periodJumpSize);
 			}
 		}
-	} catch (error) {
-		console.error(
-			`Error calculating periods for frequency "${frequency}":`,
-			error
-		);
+	} catch {
+		// Nothing to do, shoul ddefault to an empty array
 	}
 
 

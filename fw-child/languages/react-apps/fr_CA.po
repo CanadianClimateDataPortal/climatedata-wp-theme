@@ -1202,10 +1202,10 @@ msgid "Decadal %s probability:"
 msgstr "Probabilité décennale pour \"%s\""
 
 msgid  "May-Sep"
-msgstr "Mai-Sep"
+msgstr "mai-sep"
 
 msgid  "Nov-Mar"
-msgstr "Nov-Mar"
+msgstr "nov-mar"
 
 msgid "Release date:"
 msgstr "Date de sortie :"

@@ -75,6 +75,14 @@ export const S2DFrequencyFieldDropdown = (
 		...restProps,
 	};
 
+	// BEGIN: We probably DO NOT WANT THIS (no we don't!)
+	for (const option of FrequencyField.options) {
+		if (/Annuelle/.test(option.label)) {
+			option.label = option.label.replace('Annuelle', 'annuelle');
+		}
+	}
+	// END: We probably DO NOT WANT THIS
+
 	return (
 		<Dropdown<S2DFrequencyType | string>
 			key={FrequencyField.key}

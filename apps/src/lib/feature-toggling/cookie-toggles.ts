@@ -1,4 +1,5 @@
-import { readCookieEntries, type CookieEntries } from './cookie-jar';
+import { readCookieEntries } from './cookie-jar';
+import type { CookieEntries } from './types';
 
 /**
  * These functions answer three questions about a cookie.

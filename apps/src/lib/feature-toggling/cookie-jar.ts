@@ -16,7 +16,6 @@ export type CookieEntries = ReadonlyMap<string, string>;
  * Turns `a=1; b=2` into `Map { 'a' => '1', 'b' => '2' }`.
  *
  * This function is pure, so it can be tested without a browser or framework.
- * Pass it a string and inspect the returned map.
  *
  * Pairs without `=` are skipped.
  * Both sides are trimmed because cookie entries are separated by `'; '`.
@@ -45,8 +44,7 @@ export const parseCookieString = (raw: string): CookieEntries => {
 	return entries;
 };
 
-// The `typeof` guard keeps this module importable under Node.
-// Unit tests can load it without a DOM.
+// The `typeof` guard keeps this module to be usable in unit tests without a DOM.
 const readRawCookieString = (): string =>
 	typeof document === 'undefined' ? '' : document.cookie;
 
@@ -58,7 +56,6 @@ export const readCookieEntries = (): CookieEntries => {
 	// Illustration.
 	// This comparison is the entire cache.
 	// Reading `document.cookie` uses one native getter.
-	// Comparing the two short strings is inexpensive.
 	// Parsing is the expensive step, so it runs only when the cookie jar changes.
 	// A React component can therefore call this on every render.
 
@@ -83,4 +80,4 @@ export const readCookieEntries = (): CookieEntries => {
 // React's `useSyncExternalStore` can subscribe a component to a value outside React.
 // `@reduxjs/toolkit` can hold the shared state used by both apps and publish the
 // result instead.
-// Either approach would call `readCookieEntries` without changing it.
+// Either approach would call `readCookieEntries` without changing things.

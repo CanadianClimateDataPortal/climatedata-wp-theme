@@ -1,3 +1,11 @@
+/**
+ * Reads `document.cookie` and parses it only when its value changes.
+ *
+ * The browser returns the entire cookie jar as one string.
+ * Reading that string is cheap, but splitting it into entries is not.
+ * The cached entries are discarded when the cookie string changes.
+ */
+
 import type { CookieEntries } from './types';
 
 /**

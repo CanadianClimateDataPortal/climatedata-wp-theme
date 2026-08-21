@@ -1,7 +1,18 @@
 # feature-toggling
 
-Hides unfinished or unproven behaviour behind a cookie.
-The code ships to production, but the behaviour stays hidden until we enable it.
+Keeps an unfinished feature out of the interface while its code already ships.
+
+## What a toggle is for
+
+A toggle controls the entry point, not the capability.
+It adds the buttons a feature normally gets once it is complete.
+Until then the code is in place and not visible.
+
+A toggle is not a security boundary, and it promises nothing about URLs.
+Anyone can put any query parameter into any URL, and the interface may then look off.
+People reach a feature by clicking a button, and that button is what a toggle controls.
+
+## Usage
 
 ```ts
 import { hasCookie } from '@/lib/feature-toggling';
@@ -42,8 +53,6 @@ comparison.
 
 Nothing reports cookie changes, and nothing needs to.
 The toggle takes effect when someone edits the cookie and reloads the page.
-A browser's `cookieStore` change event could provide an event-driven version,
-but it is asynchronous and Chromium-only, so it is not used here.
 For information about updating the interface without a reload, see the note at
 the end of `cookie-jar.ts`.
 

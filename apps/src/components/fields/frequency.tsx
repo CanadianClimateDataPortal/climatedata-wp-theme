@@ -5,6 +5,7 @@ import { __, _n } from '@/context/locale-provider';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 import Dropdown from '@/components/ui/dropdown';
+import { hasCookie } from '@/lib/feature-toggling';
 
 import {
 	S2DFrequencyTypes,
@@ -34,20 +35,45 @@ const FrequencyField = {
 			value: S2DFrequencyTypes.SEASONAL,
 			label: __('Seasonal (3 months)'),
 		},
-		{
-			value: S2DFrequencyTypes.DECADAL_ANNUAL,
-			label: formatLabelDecadalFrequencyField('Annual'),
-		},
-		{
-			value: S2DFrequencyTypes.DECADAL_MAY_SEP,
-			label: formatLabelDecadalFrequencyField('May-Sep'),
-		},
-		{
-			value: S2DFrequencyTypes.DECADAL_NOV_MAR,
-			label: formatLabelDecadalFrequencyField('Nov-Mar'),
-		},
 	],
 };
+
+const S2D_FREQUENCIES_TO_ADD_SUPPORT = [
+	{
+		value: S2DFrequencyTypes.DECADAL_ANNUAL,
+		label: formatLabelDecadalFrequencyField('Annual'),
+	},
+	{
+		value: S2DFrequencyTypes.DECADAL_MAY_SEP,
+		label: formatLabelDecadalFrequencyField('May-Sep'),
+	},
+	{
+		value: S2DFrequencyTypes.DECADAL_NOV_MAR,
+		label: formatLabelDecadalFrequencyField('Nov-Mar'),
+	},
+];
+
+/**
+ * Feature toggle for the decadal frequencies.
+ *
+ * The decadal frequencies already work when requested through the URL, with
+ * `&freq=decadal-ann`, `&freq=decadal-may-sep` or `&freq=decadal-nov-mar`.
+ * This toggle keeps them out of the dropdown until they are ready for a public
+ * audience.
+ *
+ * Enable it from the DevTools console, then reload the page.
+ * `document.cookie = 'S2D_FREQUENCIES_TO_ADD_SUPPORT=yes'`
+ *
+ * Removing the toggle means deleting this constant and merging the two option
+ * lists into one.
+ */
+const TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS = 'S2D_FREQUENCIES_TO_ADD_SUPPORT';
+
+// Built once, so when/if made part of rendering the dropdown it'll have everything.
+const FREQUENCY_OPTIONS_WITH_DECADAL = [
+	...FrequencyField.options,
+	...S2D_FREQUENCIES_TO_ADD_SUPPORT,
+];
 
 export interface S2DFrequencyFieldDropdownProps {
 	tooltip?: React.ReactNode;
@@ -65,6 +91,10 @@ export const S2DFrequencyFieldDropdown = (
 
 	const value = climateVariable?.getFrequency() ?? S2DFrequencyTypes.MONTHLY;
 
+	const options = hasCookie(TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS)
+		? FREQUENCY_OPTIONS_WITH_DECADAL
+		: FrequencyField.options;
+
 	const fieldProps = {
 		label: FrequencyField.label,
 		onChange: (value: S2DFrequencyType | string) => {
@@ -79,7 +109,7 @@ export const S2DFrequencyFieldDropdown = (
 		<Dropdown<S2DFrequencyType | string>
 			key={FrequencyField.key}
 			placeholder={__('Select an option')}
-			options={FrequencyField.options}
+			options={options}
 			{...fieldProps}
 		/>
 	);

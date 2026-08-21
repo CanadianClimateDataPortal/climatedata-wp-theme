@@ -23,8 +23,8 @@ export type CookieEntries = ReadonlyMap<string, string>;
  */
 export const parseCookieString = (raw: string): CookieEntries => {
 	// Illustration.
-	// Cookie string syntax is handled here and nowhere else.
-	// Every other function in this module works with a `Map`.
+	// Keep cookie-string parsing in this function.
+	// All other functions in this module work with a `Map`.
 
 	const entries = new Map<string, string>();
 
@@ -32,8 +32,8 @@ export const parseCookieString = (raw: string): CookieEntries => {
 		const separator = pair.indexOf('=');
 		if (separator === -1) {
 			// Illustration.
-			// A fragment without `=` is not a cookie.
-			// `document.cookie` can hold one when a cookie was written badly.
+			// Skip fragments without `=` because they are not valid cookies.
+			// `document.cookie` can contain one if a cookie was written incorrectly.
 			continue;
 		}
 		const name = pair.slice(0, separator).trim();
@@ -45,10 +45,8 @@ export const parseCookieString = (raw: string): CookieEntries => {
 	return entries;
 };
 
-/** The only function in this module that touches the DOM. */
-// Illustration.
-// The `typeof` guard keeps the module importable under Node.
-// A unit test can load this file without a DOM.
+// The `typeof` guard keeps this module importable under Node.
+// Unit tests can load it without a DOM.
 const readRawCookieString = (): string =>
 	typeof document === 'undefined' ? '' : document.cookie;
 
@@ -58,10 +56,10 @@ let cachedEntries: CookieEntries = new Map();
 /** Returns the current cookies, re-parsing them only when the cookie string changes. */
 export const readCookieEntries = (): CookieEntries => {
 	// Illustration.
-	// The comparison below is the entire cache.
-	// Reading `document.cookie` costs one native getter.
-	// Comparing two short strings costs close to nothing.
-	// Parsing is the expensive step and it runs only when the jar changed.
+	// This comparison is the entire cache.
+	// Reading `document.cookie` uses one native getter.
+	// Comparing the two short strings is inexpensive.
+	// Parsing is the expensive step, so it runs only when the cookie jar changes.
 	// A React component can therefore call this on every render.
 
 	const raw = readRawCookieString();
@@ -76,14 +74,13 @@ export const readCookieEntries = (): CookieEntries => {
 
 // Illustration, reactivity. Skip unless the question comes up.
 //
-// Nothing here tells anyone that a cookie changed.
-// A toggle changes when someone edits a cookie and reloads the page, so a caller
-// asking at render time already has the current answer.
+// This module does not notify callers when a cookie changes.
+// A toggle changes when someone edits a cookie and reloads the page.
+// A caller that checks during render therefore gets the current value.
 //
-// Updating the interface without a reload would be built outside this module,
-// with what the apps already carry.
-// `useSyncExternalStore` from React subscribes a component to a value that lives
-// outside React.
-// `@reduxjs/toolkit` holds the shared state of both apps and could publish the
+// To update the interface without a reload, add that behavior outside this module
+// using infrastructure that the apps already have.
+// React's `useSyncExternalStore` can subscribe a component to a value outside React.
+// `@reduxjs/toolkit` can hold the shared state used by both apps and publish the
 // result instead.
-// Either one calls `readCookieEntries` and leaves it unchanged.
+// Either approach would call `readCookieEntries` without changing it.

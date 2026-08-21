@@ -40,9 +40,12 @@ string it parsed, and parses it again only when that string changes.
 Calling a check on every React render uses one native getter and one string
 comparison.
 
-Nothing reports that a cookie changed, and nothing needs to.
-A toggle changes when someone edits a cookie and reloads the page.
-`cookie-jar.ts` ends with a note on what updating without a reload would take.
+Nothing reports cookie changes, and nothing needs to.
+The toggle takes effect when someone edits the cookie and reloads the page.
+A browser's `cookieStore` change event could provide an event-driven version,
+but it is asynchronous and Chromium-only, so it is not used here.
+For information about updating the interface without a reload, see the note at
+the end of `cookie-jar.ts`.
 
 ## Testing
 

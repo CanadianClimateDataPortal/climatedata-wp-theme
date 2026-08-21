@@ -24,13 +24,13 @@ import { readCookieEntries, type CookieEntries } from './cookie-jar';
  */
 
 // Illustration.
-// Three named functions instead of one function with a mode argument.
-// Each name states the question it answers, so a call site reads as the
-// sentence a reviewer wants to check.
+// Use three named functions instead of one function with a mode argument.
+// Each name states the question it answers, so the call site reads like the
+// question a reviewer needs to check.
 //
 // The second parameter is the testing seam.
-// A test passes `parseCookieString('FLAG=true')` and never touches a DOM.
-// Production code leaves it out and reads the live cookie jar.
+// Tests can pass `parseCookieString('FLAG=true')` without touching the DOM.
+// Production code omits it and reads the live cookie jar.
 /** Returns `true` when the cookie is set, regardless of its value. */
 export const hasCookie = (
 	name: string,
@@ -38,8 +38,8 @@ export const hasCookie = (
 ): boolean => entries.has(name);
 
 // Illustration.
-// A missing cookie and a cookie holding `yes` both answer `false` here.
-// Silence means off, which is the safe direction for a fence.
+// A missing cookie and a cookie with the value `yes` both return `false` here.
+// Treating an unrecognised value as off is the safe choice for a fence.
 /** Returns `true` when the cookie value is exactly `true`. */
 export const isCookieTrue = (
 	name: string,
@@ -48,8 +48,8 @@ export const isCookieTrue = (
 
 // Illustration.
 // This is not the negation of `isCookieTrue`.
-// Both answer `false` when the cookie is absent.
-// That is how a caller tells "said no" apart from "said nothing".
+// Both return `false` when the cookie is absent.
+// This lets a caller distinguish "said no" from "said nothing".
 /** Returns `true` when the cookie value is exactly `false`. */
 export const isCookieFalse = (
 	name: string,

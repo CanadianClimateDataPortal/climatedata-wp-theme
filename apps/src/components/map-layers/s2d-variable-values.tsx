@@ -1005,6 +1005,15 @@ const LocationModalContentPart = (
 		DateRangeLine = DateRangeLine.split(' ').filter(Number).join('-');
 	}
 
+	if (!isForecast && isFrequencyTypeDecadal(frequency)) {
+		/**
+		 * Climatology uses the same data for every time period, so a period label
+		 * such as '2026-2030' would suggest the value belongs to those years.
+		 * The frequency label below stays visible.
+		 */
+		DateRangeLine = null;
+	}
+
 	const FrequencyNameLine = FREQUENCY_LABEL[frequency];
 
 	return (

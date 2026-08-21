@@ -62,20 +62,7 @@ export const readCookieEntries = (): CookieEntries => {
 	// Reading `document.cookie` costs one native getter.
 	// Comparing two short strings costs close to nothing.
 	// Parsing is the expensive step and it runs only when the jar changed.
-	// A React component can therefore call this on every render, which is what
-	// this module is for and where it stops.
-	//
-	// Nothing here tells anyone that a cookie changed.
-	// A toggle changes when someone edits a cookie and reloads the page, so a
-	// caller asking at render time already has the current answer.
-	//
-	// Reacting to a change without a reload would be built outside this module,
-	// with what the apps already carry.
-	// `useSyncExternalStore` from React subscribes a component to a value that
-	// lives outside React.
-	// `@reduxjs/toolkit` holds the shared state of both apps and could publish
-	// the result instead.
-	// Either one would call this function and keep it unchanged.
+	// A React component can therefore call this on every render.
 
 	const raw = readRawCookieString();
 
@@ -86,3 +73,17 @@ export const readCookieEntries = (): CookieEntries => {
 
 	return cachedEntries;
 };
+
+// Illustration, reactivity. Skip unless the question comes up.
+//
+// Nothing here tells anyone that a cookie changed.
+// A toggle changes when someone edits a cookie and reloads the page, so a caller
+// asking at render time already has the current answer.
+//
+// Updating the interface without a reload would be built outside this module,
+// with what the apps already carry.
+// `useSyncExternalStore` from React subscribes a component to a value that lives
+// outside React.
+// `@reduxjs/toolkit` holds the shared state of both apps and could publish the
+// result instead.
+// Either one calls `readCookieEntries` and leaves it unchanged.

@@ -388,9 +388,9 @@ export const S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE: Record<
 > = {
 	[S2DFrequencyTypes.MONTHLY]: 'Monthly',
 	[S2DFrequencyTypes.SEASONAL]: 'Seasonal',
-	// [S2DFrequencyTypes.DECADAL_ANNUAL]: 'decadal-ann',      // @TODO Confirm what would be the equivalent for download
-	// [S2DFrequencyTypes.DECADAL_MAY_SEP]: 'decadal-may-sep', // ^
-	// [S2DFrequencyTypes.DECADAL_NOV_MAR]: 'decadal-nov-mar', // ^
+	[S2DFrequencyTypes.DECADAL_ANNUAL]: 'DecadalAnnual',   // @TODO Confirm what would be the string to be used for download filename.
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]: 'DecadalMaySep',  // ^
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]: 'DecadalNovMar',  // ^
 };
 
 export const isFrequencyTypeS2D = (

@@ -128,9 +128,9 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 		const frequencyNameMap: Record<S2DFrequencyType, string> = {
 			[S2DFrequencyTypes.SEASONAL]: 'seasonal',
 			[S2DFrequencyTypes.MONTHLY]: 'monthly',
-			[S2DFrequencyTypes.DECADAL_ANNUAL]: 'decadal',
-			[S2DFrequencyTypes.DECADAL_MAY_SEP]: 'decadal',
-			[S2DFrequencyTypes.DECADAL_NOV_MAR]: 'decadal',
+			[S2DFrequencyTypes.DECADAL_ANNUAL]: S2DFrequencyTypes.DECADAL_ANNUAL,
+			[S2DFrequencyTypes.DECADAL_MAY_SEP]: S2DFrequencyTypes.DECADAL_MAY_SEP,
+			[S2DFrequencyTypes.DECADAL_NOV_MAR]: S2DFrequencyTypes.DECADAL_NOV_MAR,
 		} as const;
 
 		const forecastTypeMap: Record<string, string> = {

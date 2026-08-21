@@ -1,11 +1,13 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
+import { isFrequencyTypeS2D } from './s2d';
 import {
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
 	FrequencyType,
 	InteractiveRegionOption,
+	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 import { __ } from '@/context/locale-provider';
 import { ParsedLatLon } from '@/types/types';
@@ -63,7 +65,9 @@ export const splitTextByMatch = (
 	return result.filter((part) => part.text.length > 0);
 };
 
-export const getFrequencyType = (frequency: string): FrequencyType | undefined =>  {
+export const getFrequencyType = (
+	frequency: string,
+): S2DFrequencyType | FrequencyType | undefined =>  {
 	let frequencyCode;
 
 	if (frequency === 'ann') {
@@ -74,6 +78,8 @@ export const getFrequencyType = (frequency: string): FrequencyType | undefined =
 		frequencyCode = FrequencyType.MS;
 	} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
 		frequencyCode = FrequencyType.QSDEC;
+	} else if (isFrequencyTypeS2D(frequency)) {
+		frequencyCode = frequency;
 	}
 
 	return frequencyCode;

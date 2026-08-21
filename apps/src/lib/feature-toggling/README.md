@@ -40,8 +40,16 @@ string it parsed, and parses it again only when the string changes.
 There is no timer or subscription to keep in sync.
 Calling a check on every React render uses one native getter and one string comparison.
 
-`cookieStore`'s `change` event could provide an event-driven version.
-It is asynchronous and Chromium-only, so it is not used here.
+Nothing here reports that a cookie changed.
+A toggle changes when someone edits a cookie and reloads the page, so asking at
+render time is enough.
+
+Updating the interface without a reload would be built outside this module, with
+what the apps already carry.
+`useSyncExternalStore` from React subscribes a component to a value living
+outside React.
+`@reduxjs/toolkit` could publish the result into the shared store instead.
+Either one calls these functions and leaves them unchanged.
 
 ## Testing
 

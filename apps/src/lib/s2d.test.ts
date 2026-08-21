@@ -123,7 +123,13 @@ describe('getPeriods', () => {
 	);
 
 	describe('Confirm documented behavior', () => {
-		const releaseDate = utc('2025-08-05') as Date;
+		let releaseDate: Date;
+		beforeEach(() => {
+			/**
+			 * For `S2DFrequencyTypes.DECADAL_*` frequencies, the `releaseDate` would ALWAYS be set to January the 1st of the year.
+			 */
+			releaseDate = utc('2025-01-01') as Date;
+		});
 
 		// Keep these descriptions identical to the corresponding lines in {@link getPeriods}.
 		describe.each([

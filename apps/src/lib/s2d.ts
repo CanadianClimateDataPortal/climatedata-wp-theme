@@ -75,7 +75,7 @@ export const resolveFrequencyPeriodJump = (
 		periodJumpSize = 3;
 	} else if (isFrequencyTypeDecadal(frequency)) {
 		periodJumpSizeUnit = 'year';
-		periodJumpSize = 5; // There might be some logic to adjust this here
+		periodJumpSize = 5;
 	} else if (frequency === S2DFrequencyTypes.MONTHLY) {
 		periodJumpSize = 1;
 	} else {

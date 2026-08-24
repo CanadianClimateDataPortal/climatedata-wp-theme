@@ -1007,9 +1007,11 @@ const LocationModalContentPart = (
 
 	if (!isForecast && isFrequencyTypeDecadal(frequency)) {
 		/**
-		 * Climatology uses the same data for every time period, so a period label
-		 * such as '2026-2030' would suggest the value belongs to those years.
-		 * The frequency label below stays visible.
+		 * Climatology uses the same data for every time period, so a period
+		 * such as '2026-2030' would suggest the values belong to those years.
+		 *
+		 * We're Removing it to not cause confusion.
+		 * That will make a floating "Décennale (...)" sub-heading in smaller text.
 		 */
 		DateRangeLine = null;
 	}

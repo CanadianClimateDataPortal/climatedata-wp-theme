@@ -220,14 +220,9 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		selectedPeriod = matchingDatePeriodIndex ?? 0;
 	}
 
-	let shouldSliderBeDisabled = isLoadingReleaseDate;
-	if (
+	const isDecadalClimatology =
 		forecastDisplay === ForecastDisplays.CLIMATOLOGY &&
-		isFrequencyTypeDecadal(frequencyType ?? '')
-	) {
-		// Decadal climatology uses the same data for both periods, so the time slider has no effect.
-		shouldSliderBeDisabled = true;
-	}
+		isFrequencyTypeDecadal(frequencyType ?? '');
 
 	const {
 		minimumLabel,
@@ -289,8 +284,21 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		setDateRange(formatPeriodRange(period));
 	};
 
-	// @TODO Check what to adjust `ControlTitle` and `Slider.Root` when Climatology + Decadal
-	//       `forecastDisplay !== ForecastDisplays.CLIMATOLOGY`
+	if (isDecadalClimatology) {
+		/**
+		 * Climatology uses the same data for every time period, so a period
+		 * such as '2026-2030' would suggest the values belong to those years.
+		 *
+		 * Hiding the whole control, and not only greying it, keeps the year
+		 * values out of sight: title, tooltip, slider and endpoint labels.
+		 *
+		 * Same reasoning as for `DateRangeLine` in
+		 * `components/map-layers/s2d-variable-values.tsx` in
+		 * `LocationModalContentPart`.
+		 */
+		return null;
+	}
+
 	return (
 		<SidebarMenuItem>
 			<div className="time-periods-control">
@@ -302,14 +310,13 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 					className={cn(
 						'relative flex items-center select-none mx-6',
 						'mt-16 [touch-action:none]',
-						'aria-disabled:opacity-50',
 						isLoadingReleaseDate && 'opacity-50'
 					)}
 					min={0}
 					max={periods ? periods.length - 1 : 0}
 					value={[selectedPeriod]}
 					onValueChange={handlePeriodChange}
-					disabled={shouldSliderBeDisabled}
+					disabled={isLoadingReleaseDate}
 				>
 					<Slider.Track
 						className={cn(
@@ -356,8 +363,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 				<div
 					className={cn(
 						'flex justify-between mt-2.5 mx-4 text-sm uppercase',
-						isLoadingReleaseDate && 'hidden',
-						shouldSliderBeDisabled && 'opacity-50',
+						isLoadingReleaseDate && 'hidden'
 					)}
 				>
 					<span>{minimumLabel}</span>

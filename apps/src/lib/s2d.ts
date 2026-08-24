@@ -444,9 +444,9 @@ export function normalizeForApiFrequencyName(
 	const frequencyNameMap: Record<string, string> = {
 		[S2DFrequencyTypes.SEASONAL]: 'seasonal',
 		[S2DFrequencyTypes.MONTHLY]: 'monthly',
-	  [S2DFrequencyTypes.DECADAL_ANNUAL]: S2DFrequencyTypes.DECADAL_ANNUAL,
-	  [S2DFrequencyTypes.DECADAL_MAY_SEP]: S2DFrequencyTypes.DECADAL_MAY_SEP,
-	  [S2DFrequencyTypes.DECADAL_NOV_MAR]: S2DFrequencyTypes.DECADAL_NOV_MAR,
+		[S2DFrequencyTypes.DECADAL_ANNUAL]: S2DFrequencyTypes.DECADAL_ANNUAL,
+		[S2DFrequencyTypes.DECADAL_MAY_SEP]: S2DFrequencyTypes.DECADAL_MAY_SEP,
+		[S2DFrequencyTypes.DECADAL_NOV_MAR]: S2DFrequencyTypes.DECADAL_NOV_MAR,
 	};
 
 	return frequencyNameMap[frequency] ?? frequency;

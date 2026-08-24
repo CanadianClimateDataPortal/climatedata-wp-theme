@@ -68,7 +68,6 @@ const generateSliderLabels = (
 
 	if (isFrequencyTypeDecadal(frequencyType)) {
 		/**
-		 * rel: CLIM-1447 We need only the year when `FrequencyTypes.DECADAL_...`.
 		 * Manual confirmation made that `Intl.DateTimeFormat(locale, {...}).format()` returns the same "month year" string ordering for both French and English.
 		 */
 		minimumLabel = minimumLabel.split(' ')[1];
@@ -78,30 +77,18 @@ const generateSliderLabels = (
 	const tickLabels = periods.map((period) => {
 		if (isFrequencyTypeDecadal(frequencyType)) {
 			/**
-			 * @TODO Testing needed (in a follow-up PR) for the following descriptions:
-			 *
-			 * New behavior since CLIM-1447:
-			 *
 			 * ```js
 			 * const tickLabels = [
 			 *   "2026-2030",
 			 *   "2031-2035"
 			 * ]
 			 * ```
-			 *
-			 * Notice:
-			 * - No need to fence for `ForecastDisplays.FORECAST` since a DECADAL is what makes the difference for this.
-			 * - Only 2 items
 			 */
 			const startYear = formatShortMonthYear(period[0], locale).split(' ')[1];
 			const endYear = formatShortMonthYear(period[1], locale).split(' ')[1];
 			return `${startYear}-${endYear}`;
 		} else {
 			/**
-			 * @TODO Testing needed (in a follow-up PR) for the following descriptions:
-			 *
-			 * Original behavior until CLIM-1447:
-			 *
 			 * Example when in French:
 			 *
 			 * ```js
@@ -123,8 +110,6 @@ const generateSliderLabels = (
 			 *   // ...
 			 * ]
 			 * ```
-			 * Notice:
-			 * - In french the labels are in lowercase and Capitalized in English
 			 *
 			 */
 			const startMonth = formatShortMonth(period[0], locale, true);
@@ -137,12 +122,6 @@ const generateSliderLabels = (
 	});
 
 	/**
-	 * @TODO Testing needed (in a follow-up PR) for the following descriptions:
-	 *
-	 * Describing original behavior the way it was written until CLIM-1447:
-	 *
-	 * What is now `isActuallyForecast` was originally `showYear` which would make `minimumLabel` have the year.
-	 *
 	 * ```js
 	 * const sliderLabels = {
 	 *   minimumLabel: 'août 2026',

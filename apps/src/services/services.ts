@@ -20,7 +20,6 @@ import {
 	WP_API_VARIABLE_PATH,
 } from '@/lib/constants';
 import {
-	FrequencyType,
 	InteractiveRegionOption,
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';

@@ -8,6 +8,9 @@ import {
 	S2DFrequencyType,
 	S2DFrequencyTypes,
 } from '@/types/climate-variable-interface';
+import type {
+	ProgressBarProps,
+} from '@/types/progress-bar';
 import { formatUTCDate, utc } from '@/lib/utils';
 import { formatIntlDate } from '@/lib/format';
 import { __ } from '@/context/locale-provider';

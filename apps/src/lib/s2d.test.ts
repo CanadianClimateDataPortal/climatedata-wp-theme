@@ -296,7 +296,9 @@ describe('resolveFrequencyPeriodJump', () => {
 		expectedPeriodJumpUnit,
 	 }) => {
 		test(`${frequencyNameMap[frequency]}:\t ${expectedPeriodJumpSize}-${expectedPeriodJumpUnit}`, () => {
-			const [jumpSize, jumpUnit] = resolveFrequencyPeriodJump(frequency);
+			const jump = resolveFrequencyPeriodJump(frequency);
+			expect(jump).not.toBeNull();
+			const [jumpSize, jumpUnit] = jump!;
 			expect(jumpSize).toBe(expectedPeriodJumpSize);
 			expect(jumpUnit).toBe(expectedPeriodJumpUnit);
 		});

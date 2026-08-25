@@ -192,7 +192,7 @@ const isWhite = (colour: `#${string}`): boolean =>
  * @param colorMap - The colour map containing the colours
  * @returns The colour associated with the given percentage and outcome.
  */
-export const getProbabilityColour = ( // Suggested rename `getProbabilitiesBarChartColour`
+export const getProbabilityColour = (
 	outcome: number,
 	percentage: number,
 	colorMap: ColourMap

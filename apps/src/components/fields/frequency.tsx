@@ -5,7 +5,10 @@ import { __ } from '@/context/locale-provider';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 import Dropdown from '@/components/ui/dropdown';
-import { hasCookie } from '@/lib/feature-toggling';
+import {
+	hasCookie,
+	TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS,
+} from '@/lib/feature-toggling';
 
 import {
 	S2DFrequencyTypes,
@@ -53,23 +56,12 @@ const S2D_FREQUENCIES_TO_ADD_SUPPORT = [
 	},
 ];
 
-/**
- * Feature toggle for the decadal frequencies.
- *
- * The decadal frequencies already work when requested through the URL, with
- * `&freq=decadal-ann`, `&freq=decadal-may-sep` or `&freq=decadal-nov-mar`.
- * This toggle keeps them out of the dropdown until they are ready for a public
- * audience.
- *
- * Enable it from the DevTools console, then reload the page.
- * `document.cookie = 'S2D_FREQUENCIES_TO_ADD_SUPPORT=yes'`
- *
- * Removing the toggle means deleting this constant and merging the two option
- * lists into one.
- */
-const TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS = 'S2D_FREQUENCIES_TO_ADD_SUPPORT';
-
-// Built once, so when/if made part of rendering the dropdown it'll have everything.
+// Build this list once so it already contains every option if it becomes the
+// dropdown's default list later.
+//
+// The decadal options stay hidden until they are ready for a public audience.
+// `TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS` documents how to reveal them.
+// Removing the toggle means merging these two option lists into one.
 const FREQUENCY_OPTIONS_WITH_DECADAL = [
 	...FrequencyField.options,
 	...S2D_FREQUENCIES_TO_ADD_SUPPORT,

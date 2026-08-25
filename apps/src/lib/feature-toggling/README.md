@@ -28,6 +28,23 @@ Enable a toggle in the DevTools console, then reload the page:
 document.cookie = 'S2D_FREQUENCIES_TO_ADD_SUPPORT=yes';
 ```
 
+## From a URL
+
+Someone who does not write JavaScript can set the same cookie from the address bar.
+The parameter has the same name as the cookie.
+Use `1` to add the cookie and `0` to remove it.
+
+```
+https://climatedata.ca/maps/?…&S2D_FREQUENCIES_TO_ADD_SUPPORT=1
+https://donneesclimatiques.ca/cartes/?…&S2D_FREQUENCIES_TO_ADD_SUPPORT=0
+```
+
+Any other value does nothing.
+The parameter is removed from the URL after it is read.
+A link copied afterwards therefore does not pass the toggle to someone who did not ask for it.
+
+`enableCookieToggle(name)` and `disableCookieToggle(name)` write the cookie.
+
 ## Three checks
 
 | Function | True when |

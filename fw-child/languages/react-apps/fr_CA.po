@@ -1210,6 +1210,9 @@ msgstr "Mai-Sep"
 msgid  "Nov-Mar"
 msgstr "Nov-Mar"
 
+msgid "Unsupported frequency type: %s"
+msgstr "Type de fréquence non pris en charge : %s"
+
 msgid "Release date:"
 msgstr "Date de sortie :"
 

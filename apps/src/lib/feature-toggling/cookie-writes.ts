@@ -29,7 +29,8 @@ export const enableCookieToggle = (name: string): void => {
 		return;
 	}
 
-	document.cookie = `${name}=yes; max-age=${TOGGLE_COOKIE_LIFETIME_IN_SECONDS}`;
+	// Omitting `path=/` would make the cookie visible only from the path it was created from.
+	document.cookie = `${name}=yes; max-age=${TOGGLE_COOKIE_LIFETIME_IN_SECONDS}; path=/`;
 };
 
 /**
@@ -43,5 +44,5 @@ export const disableCookieToggle = (name: string): void => {
 		return;
 	}
 
-	document.cookie = `${name}=; max-age=-99999999`;
+	document.cookie = `${name}=; max-age=-99999999; path=/`;
 };

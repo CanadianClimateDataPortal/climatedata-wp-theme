@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { __, _n } from '@/context/locale-provider';
-import { getPeriods, PeriodRange } from '@/lib/s2d';
+import { getPeriods, PeriodRange, isFrequencyTypeDecadal } from '@/lib/s2d';
 
 import { Checkbox, CheckboxFactory } from '@/components/ui/checkbox';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
@@ -81,7 +81,7 @@ const generatePeriodsOptions = (
 
 	return periods.map((period) => {
 		const parts = []
-		let lineTemplate = '';
+		let lineTemplate = '%s';
 		if (frequency === FrequencyType.MONTHLY) {
 			/**
 			 * For “Monthly”, we show the full month name followed by the year.
@@ -101,6 +101,14 @@ const generatePeriodsOptions = (
 			parts.push((isSameYear ? monthFormatter : monthYearFormatter).format(period[0]));
 			parts.push(monthYearFormatter.format(period[1]));
 			lineTemplate = __('%s to %s');
+		} else if (isFrequencyTypeDecadal(frequency)) {
+			parts.push(period[0].getUTCFullYear());
+			parts.push(period[1].getUTCFullYear());
+			lineTemplate = __('%s-%s');
+		}
+
+		if (parts.length === 0) {
+			parts.push('...'); // Display something, instead of nothing.
 		}
 
 		return {

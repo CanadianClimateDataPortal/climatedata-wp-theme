@@ -67,9 +67,6 @@ const generateSliderLabels = (
 	let maximumLabel = formatMinMaxLabel(lastPeriod, locale);
 
 	if (isFrequencyTypeDecadal(frequencyType)) {
-		/**
-		 * Manual confirmation made that `Intl.DateTimeFormat(locale, {...}).format()` returns the same "month year" string ordering for both French and English.
-		 */
 		minimumLabel = minimumLabel.split(' ')[1];
 		maximumLabel = maximumLabel.split(' ')[1];
 	}
@@ -140,6 +137,9 @@ const generateSliderLabels = (
 
 /**
  * Return the short month and year of a date, localized.
+ *
+ * Both the English and the French locales place the month before the year.
+ * The ordering was confirmed by hand for both locales.
  */
 const formatShortMonthYear = (date: Date, locale: string): string => {
 	return new Intl.DateTimeFormat(locale, {

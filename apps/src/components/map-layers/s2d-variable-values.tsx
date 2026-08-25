@@ -998,8 +998,6 @@ const LocationModalContentPart = (
 	if (isFrequencyTypeDecadal(frequency) && DateRangeLine !== null) {
 		/**
 		 * Support both 'Juillet à Août' (or other variants) and differentiate when we want '2026-2030' instead of what would be '2026 à 2030'
-		 *
-		 * Manual confirmation made that `Intl.DateTimeFormat(locale, {...}).format()` returns the same "month year" string ordering for both French and English.
 		 */
 		DateRangeLine = DateRangeLine.split(' ').filter(Number).join('-');
 	}

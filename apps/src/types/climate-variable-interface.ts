@@ -108,23 +108,14 @@ export const S2DFrequencyTypes = {
 	SEASONAL: FrequencyType.SEASONAL,
 	/**
 	 * Decadal Frequency taking all 12 months of the year into account.
-	 *
-	 * @remark
-	 * String 'decadal-ann' is also what's expected by the Geoserver API
 	 */
 	DECADAL_ANNUAL: 'decadal-ann',
 	/**
 	 * Decadal Frequency only taking the "hot" months of a year.
-	 *
-	 * @remark
-	 * String 'decadal-may-sep' is also what's expected by the Geoserver API
 	 */
 	DECADAL_MAY_SEP: 'decadal-may-sep',
 	/**
 	 * Decadal Frequency only taking the "cold" months of a year.
-	 *
-	 * @remark
-	 * String 'decadal-nov-mar' is also what's expected by the Geoserver API
 	 */
 	DECADAL_NOV_MAR: 'decadal-nov-mar',
 } as const;

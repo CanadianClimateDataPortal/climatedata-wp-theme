@@ -1195,6 +1195,9 @@ msgstr "Les périodes disponibles changeront si une fréquence différente est s
 msgid "Seasonal (3 months)"
 msgstr "Saisonnière (3 mois)"
 
+msgid "5 years"
+msgstr "5 ans"
+
 msgid "Decadal (%s)"
 msgstr "Décennale (%s)"
 

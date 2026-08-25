@@ -1,7 +1,7 @@
 import React from 'react';
 import { sprintf } from '@wordpress/i18n';
 
-import { __, _n } from '@/context/locale-provider';
+import { __ } from '@/context/locale-provider';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 import Dropdown from '@/components/ui/dropdown';
@@ -17,7 +17,7 @@ const formatLabelDecadalFrequencyField = (label: string): string => {
 		__('Decadal (%s)'),
 		sprintf(
 			'%s; %s',
-			sprintf(_n('%s year', '%s years', 5), 5),
+			__('5 years'),
 			__(label),
 		)
 	);

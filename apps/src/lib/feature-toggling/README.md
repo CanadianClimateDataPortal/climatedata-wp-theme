@@ -61,18 +61,6 @@ An absent or unreadable value then counts as "no".
 These checks do not establish trust.
 Anyone can set these cookies from the console, so do not use them to gate data.
 
-## Why there is no polling
-
-`readCookieEntries()` compares the current `document.cookie` string with the last
-string it parsed, and parses it again only when that string changes.
-Calling a check on every React render uses one native getter and one string
-comparison.
-
-Nothing reports cookie changes, and nothing needs to.
-The toggle takes effect when someone edits the cookie and reloads the page.
-For information about updating the interface without a reload, see the note at
-the end of `cookie-jar.ts`.
-
 ## Testing
 
 `parseCookieString` is pure and does not touch the DOM.

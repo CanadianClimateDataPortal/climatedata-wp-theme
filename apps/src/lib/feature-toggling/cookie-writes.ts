@@ -10,7 +10,6 @@
  * Otherwise, the browser keeps the original cookie and the toggle appears stuck.
  */
 
-// Illustration.
 // Ninety days is long enough for someone exploring an unfinished feature not to
 // need the link again, but short enough for a forgotten toggle to expire.
 const TOGGLE_COOKIE_LIFETIME_IN_SECONDS = 60 * 60 * 24 * 90; // 90 days.

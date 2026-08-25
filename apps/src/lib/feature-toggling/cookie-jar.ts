@@ -17,7 +17,6 @@ import type { CookieEntries } from './types';
  * Both sides are trimmed because cookie entries are separated by `'; '`.
  */
 export const parseCookieString = (raw: string): CookieEntries => {
-	// Illustration.
 	// Keep cookie-string parsing in this function.
 	// All other functions in this module work with a `Map`.
 
@@ -26,7 +25,6 @@ export const parseCookieString = (raw: string): CookieEntries => {
 	for (const pair of raw.split(';')) {
 		const separator = pair.indexOf('=');
 		if (separator === -1) {
-			// Illustration.
 			// Skip fragments without `=` because they are not valid cookies.
 			// `document.cookie` can contain one if a cookie was written incorrectly.
 			continue;
@@ -49,8 +47,7 @@ let cachedEntries: CookieEntries = new Map();
 
 /** Returns the current cookies, re-parsing them only when the cookie string changes. */
 export const readCookieEntries = (): CookieEntries => {
-	// Illustration.
-	// This comparison is the entire cache.
+	// This comparison is the cache invalidation check.
 	// Reading `document.cookie` uses one native getter.
 	// Parsing is the expensive step, so it runs only when the cookie jar changes.
 	// A React component can therefore call this on every render.
@@ -64,16 +61,3 @@ export const readCookieEntries = (): CookieEntries => {
 
 	return cachedEntries;
 };
-
-// Illustration, reactivity. Skip unless the question comes up.
-//
-// This module does not notify callers when a cookie changes.
-// A toggle changes when someone edits a cookie and reloads the page.
-// A caller that checks during render therefore gets the current value.
-//
-// To update the interface without a reload, add that behavior outside this module
-// using infrastructure that the apps already have.
-// React's `useSyncExternalStore` can subscribe a component to a value outside React.
-// `@reduxjs/toolkit` can hold the shared state used by both apps and publish the
-// result instead.
-// Either approach would call `readCookieEntries` without changing things.

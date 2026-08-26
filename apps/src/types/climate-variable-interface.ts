@@ -101,7 +101,10 @@ export const FrequencyTypes = {
 } as const;
 
 /**
- * S2D frequency types - subset of available frequencies.
+ * Frequency types S2D variables accept.
+ *
+ * Two members are borrowed from `FrequencyType`.
+ * The decadal members are not, because they're specific to S2D variables.
  */
 export const S2DFrequencyTypes = {
 	MONTHLY: FrequencyType.MONTHLY,
@@ -123,7 +126,8 @@ export const S2DFrequencyTypes = {
 /**
  * Type for the supported frequency types for S2D variables.
  *
- * A subset of `FrequencyType`.
+ * The decadal members have no equivalent in `FrequencyType`, so a value of this
+ * type is not assignable to `FrequencyType`.
  */
 export type S2DFrequencyType = typeof S2DFrequencyTypes[keyof typeof S2DFrequencyTypes];
 

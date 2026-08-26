@@ -113,7 +113,7 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 	 *
 	 * Where:
 	 * - <VAR>: the API variable's ID
-	 * - <F>: the frequency (e.g. "seasonal" or "monthly")
+	 * - <F>: the frequency (e.g. "seasonal", "monthly" or "decadal-ann")
 	 * - <FT>: the forecast type (e.g. "expected" or "unusual")
 	 */
 	getLayerValue(): string {

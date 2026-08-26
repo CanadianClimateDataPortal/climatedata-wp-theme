@@ -78,6 +78,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 		);
 	}
 
+	// The `data-part` attributes below, are inspection landmarks.
 	return (
 		<div className="min-h-0 overflow-y-auto">
 			<h2

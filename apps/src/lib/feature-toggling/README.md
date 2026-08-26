@@ -70,5 +70,3 @@ plain unit tests:
 ```ts
 expect(isCookieTrue('FLAG', parseCookieString('FLAG=true'))).toBe(true);
 ```
-
-Introduced for CLIM-1447, the first of several S2D map views.

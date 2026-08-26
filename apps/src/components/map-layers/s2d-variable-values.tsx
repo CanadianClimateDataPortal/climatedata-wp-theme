@@ -14,7 +14,7 @@ import { cn, findCeilingIndex, utc } from '@/lib/utils';
 import {
 	extractSkillLevelData,
 	generatePeriodRangeLabel,
-	isFrequencyTypeDecadal,
+	isFrequencyTypeS2DDecadal,
 	normalizeProbabilitiesBarChartPercent,
 	type LocationS2DData,
 } from '@/lib/s2d';
@@ -109,6 +109,9 @@ const tooltipClimatology = __(
 		'exact values that define the forecast outcomes for this location.'
 );
 
+/**
+ * Frequency labels for the location modal.
+ */
 const FREQUENCY_LABEL: Record<S2DFrequencyType, string> = {
 	[S2DFrequencyTypes.MONTHLY]: __('Monthly'),
 	[S2DFrequencyTypes.SEASONAL]: __('Seasonal'),
@@ -856,7 +859,7 @@ const ForecastProbabilitiesPart = (
 	const TitleLine = () => (
 		<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 			{sprintf(
-				isFrequencyTypeDecadal(frequency)
+				isFrequencyTypeS2DDecadal(frequency)
 					? __('Decadal %s probability:')
 					: frequency === S2DFrequencyTypes.MONTHLY
 						? __('Monthly %s probability:')
@@ -995,20 +998,24 @@ const LocationModalContentPart = (
 		? generatePeriodRangeLabel(dateRangeStart, frequency, locale)
 		: null;
 
-	if (isFrequencyTypeDecadal(frequency) && DateRangeLine !== null) {
+	if (isFrequencyTypeS2DDecadal(frequency) && DateRangeLine !== null) {
 		/**
-		 * Support both 'Juillet à Août' (or other variants) and differentiate when we want '2026-2030' instead of what would be '2026 à 2030'
+		 * A month range keeps its localised wording, such as 'Juillet à Août',
+		 * but a year range reads better as '2026-2030' than as '2026 à 2030'.
 		 */
 		DateRangeLine = DateRangeLine.split(' ').filter(Number).join('-');
 	}
 
-	if (!isForecast && isFrequencyTypeDecadal(frequency)) {
+	if (!isForecast && isFrequencyTypeS2DDecadal(frequency)) {
 		/**
 		 * Climatology uses the same data for every time period, so a period
 		 * such as '2026-2030' would suggest the values belong to those years.
+		 * Dropping the line leaves the frequency label alone under the title.
 		 *
 		 * We're Removing it to not cause confusion.
 		 * That will make a floating "Décennale (...)" sub-heading in smaller text.
+		 * The time-period slider is hidden for the same reason, in
+		 * `components/sidebar-menu-items/time-periods-control-s2d.tsx`.
 		 */
 		DateRangeLine = null;
 	}

@@ -199,7 +199,9 @@ const S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL = 2;
  * - Monthly frequency: 3 x 1-month periods, at 1-month interval
  * - Decadal frequency: 2 x 5-year periods, at 5-year interval
  *
- * These counts are frontend conventions that match the period structure exposed by the APIs.
+ * Seasonal periods overlap because they advance by one month while spanning
+ * three, which is why ten of them cover twelve months.
+ * Decadal periods do not overlap, so the two of them cover the ten years.
  */
 export const S2D_FORECAST_CONVENTIONAL_NB_PERIODS: Record<S2DFrequencyType, number> = {
 	// The current month and the following two months.

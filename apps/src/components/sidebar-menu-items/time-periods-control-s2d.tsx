@@ -13,7 +13,7 @@ import {
 	formatPeriodRange,
 	findPeriodIndexForDateRange,
 	getPeriods,
-	isFrequencyTypeDecadal,
+	isFrequencyTypeS2DDecadal,
 	type PeriodRange,
 } from '@/lib/s2d';
 import {
@@ -66,49 +66,21 @@ const generateSliderLabels = (
 	let minimumLabel = formatMinMaxLabel(firstPeriod, locale);
 	let maximumLabel = formatMinMaxLabel(lastPeriod, locale);
 
-	if (isFrequencyTypeDecadal(frequencyType)) {
+	if (isFrequencyTypeS2DDecadal(frequencyType)) {
+		// returns `<month> <year>` in both locales, so the second token is the year.
 		minimumLabel = minimumLabel.split(' ')[1];
 		maximumLabel = maximumLabel.split(' ')[1];
 	}
 
 	const tickLabels = periods.map((period) => {
-		if (isFrequencyTypeDecadal(frequencyType)) {
-			/**
-			 * ```js
-			 * const tickLabels = [
-			 *   "2026-2030",
-			 *   "2031-2035"
-			 * ]
-			 * ```
-			 */
+		if (isFrequencyTypeS2DDecadal(frequencyType)) {
+			// Year ranges, such as "2026-2030" then "2031-2035".
 			const startYear = formatShortMonthYear(period[0], locale).split(' ')[1];
 			const endYear = formatShortMonthYear(period[1], locale).split(' ')[1];
 			return `${startYear}-${endYear}`;
 		} else {
-			/**
-			 * Example when in French:
-			 *
-			 * ```js
-			 * const tickLabels = [
-			 *   "août-oct",
-			 *   "sept-nov",
-			 *   "oct-déc",
-			 *   // ...
-			 * ]
-			 * ```
-			 *
-			 * Example When in English:
-			 *
-			 * ```js
-			 * const tickLabels = [
-			 *   "Aug-Oct",
-			 *   "Sep-Nov",
-			 *   "Oct-Dec",
-			 *   // ...
-			 * ]
-			 * ```
-			 *
-			 */
+			// Month ranges, such as "Aug-Oct" then "Sep-Nov", or "août-oct" then
+			// "sept-nov" in French. A one-month period collapses to a single month.
 			const startMonth = formatShortMonth(period[0], locale, true);
 			if (period[0].getUTCMonth() === period[1].getUTCMonth()) {
 				return startMonth;
@@ -117,16 +89,6 @@ const generateSliderLabels = (
 			return `${startMonth}-${endMonth}`;
 		}
 	});
-
-	/**
-	 * ```js
-	 * const sliderLabels = {
-	 *   minimumLabel: 'août 2026',
-	 *   maximumLabel: 'juil. 2027',
-	 *   tickLabels: [ ... ]
-	 * }
-	 * ```
-	 */
 
 	return {
 		minimumLabel,
@@ -201,7 +163,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 
 	const isDecadalClimatology =
 		forecastDisplay === ForecastDisplays.CLIMATOLOGY &&
-		isFrequencyTypeDecadal(frequencyType ?? '');
+		isFrequencyTypeS2DDecadal(frequencyType ?? '');
 
 	const {
 		minimumLabel,

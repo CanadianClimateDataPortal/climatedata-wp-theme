@@ -73,7 +73,7 @@ export const resolveFrequencyPeriodJump = (
 	if (frequency === S2DFrequencyTypes.SEASONAL) {
 		// Because a season is 3 months long.
 		periodJumpSize = 3;
-	} else if (isFrequencyTypeDecadal(frequency)) {
+	} else if (isFrequencyTypeS2DDecadal(frequency)) {
 		periodJumpSizeUnit = 'year';
 		periodJumpSize = 5;
 	} else if (frequency === S2DFrequencyTypes.MONTHLY) {
@@ -168,8 +168,8 @@ export const getPeriods = (
 	);
 
 	try {
+		// Asked to throw, so the null branch of the return type cannot happen here.
 		const jump = resolveFrequencyPeriodJump(frequency, true) as [number, PeriodJumpUnit];
-		// Because the above throws; it should never gets null beyond here.
 		const [
 			periodJumpSize,
 			periodJumpSizeUnit,
@@ -179,18 +179,18 @@ export const getPeriods = (
 			const periodEnd = getPeriodEnd(periodStart, frequency);
 			periods.push([periodStart, periodEnd]);
 			if (periodJumpSizeUnit === 'month') {
-				/**
-				 * Monthly and seasonal periods overlap, so advance the next period by one month.
-				 * This creates a moving window while preserving the configured list length.
-				 */
-				lastPeriod.setUTCMonth(lastPeriod.getUTCMonth() + 1 /* "window of months", moving by 1 month at a time */);
+				// A sliding window: each period starts one month after the previous
+				// one, whatever its own length, so seasonal periods overlap.
+				lastPeriod.setUTCMonth(lastPeriod.getUTCMonth() + 1);
 			} else {
-				// In contrast to a "moving window" of months, we do not want years to overlap.
+				// Decadal periods must not overlap, so the next one starts where the
+				// previous one ended.
 				lastPeriod.setUTCFullYear(lastPeriod.getUTCFullYear() + periodJumpSize);
 			}
 		}
 	} catch {
-		// Nothing to do, shoul ddefault to an empty array
+		// An unsupported frequency yields no periods at all, rather than a
+		// partially built list callers would have to second-guess.
 	}
 
 
@@ -396,6 +396,9 @@ export const S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE: Record<
 	[S2DFrequencyTypes.DECADAL_NOV_MAR]: 'DecadalNovMar',  // ^
 };
 
+/**
+ * Narrow an unknown frequency to one an S2D variable accepts.
+ */
 export const isFrequencyTypeS2D = (
 	frequencyType?: FrequencyType | S2DFrequencyType | string | null,
 ): frequencyType is S2DFrequencyType => {
@@ -410,9 +413,15 @@ export const isFrequencyTypeS2D = (
 	return outcome;
 };
 
-export const isFrequencyTypeDecadal = (
+/**
+ * Tell whether a frequency is one of the decadal ones.
+ *
+ * The test is the `decadal-` prefix shared by every decadal slug, so a fourth
+ * one can be added to `S2DFrequencyTypes` without editing any caller of this.
+ */
+export const isFrequencyTypeS2DDecadal = (
 	frequencyType?: S2DFrequencyType | string | null,
-): boolean => {
+): frequencyType is S2DFrequencyType => {
 	if (isFrequencyTypeS2D(frequencyType)) {
 		return /^decadal-/.test(frequencyType);
 	}
@@ -551,7 +560,7 @@ export const generatePeriodRangeLabel = (
 ): string | null => {
 	const periodStart = utc(dateRangeStart);
 
-	const isDecadalFrequencyType = isFrequencyTypeDecadal(frequency);
+	const isDecadalFrequencyType = isFrequencyTypeS2DDecadal(frequency);
 
 	if (!periodStart) {
 		return null;

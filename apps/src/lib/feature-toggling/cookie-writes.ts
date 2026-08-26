@@ -18,11 +18,10 @@ const TOGGLE_COOKIE_LIFETIME_IN_SECONDS = 60 * 60 * 24 * 90; // 90 days.
 const isDocumentAvailable = (): boolean => typeof document !== 'undefined';
 
 /**
- * Sets the toggle cookie, so `hasCookie(name)` returns `true` from now on.
+ * Sets the toggle cookie, so `hasCookie(name)` check would return `true`.
  *
- * The value is `yes`, which is what someone entering the cookie by hand types.
- * Nothing reads the value.
- * `hasCookie` checks whether the name is present, so any value would have the same effect.
+ * This is for when we only check for cookie existence.
+ * The cookie value is not used.
  */
 export const enableCookieToggle = (name: string): void => {
 	if (!isDocumentAvailable()) {
@@ -34,7 +33,7 @@ export const enableCookieToggle = (name: string): void => {
 };
 
 /**
- * Deletes the toggle cookie, so `hasCookie(name)` returns `false` again.
+ * Deletes the toggle cookie, so `hasCookie(name)` check would return `false`.
  *
  * The cookie must disappear; setting a falsy value is not enough.
  * `hasCookie` checks the name and never reads the value.

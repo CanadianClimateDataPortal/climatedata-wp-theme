@@ -240,9 +240,7 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 			if (payload.month && payload.dataset_name) {
 				const frequencyType = getFrequencyType(payload.month);
 				const scenario = payload.dataset_name;
-				// CanDCS has no pre-calculated entry for any S2D frequency, and
-				// `getFrequencyType` now returns S2D codes rather than `undefined`.
-				// The guard covers the whole S2D set, monthly and seasonal included,
+				// CanDCS has no pre-calculated entry for any S2D frequency.
 				if (frequencyType && !isFrequencyTypeS2D(frequencyType)) {
 					availableVars = getCanDCSVariableIds(scenario, frequencyType);
 				}

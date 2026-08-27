@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { __, _n } from '@/context/locale-provider';
-import { getPeriods, PeriodRange, isFrequencyTypeDecadal } from '@/lib/s2d';
+import { getPeriods, PeriodRange, isFrequencyTypeS2DDecadal } from '@/lib/s2d';
 
 import { Checkbox, CheckboxFactory } from '@/components/ui/checkbox';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
@@ -101,7 +101,7 @@ const generatePeriodsOptions = (
 			parts.push((isSameYear ? monthFormatter : monthYearFormatter).format(period[0]));
 			parts.push(monthYearFormatter.format(period[1]));
 			lineTemplate = __('%s to %s');
-		} else if (isFrequencyTypeDecadal(frequency)) {
+		} else if (isFrequencyTypeS2DDecadal(frequency)) {
 			parts.push(period[0].getUTCFullYear());
 			parts.push(period[1].getUTCFullYear());
 			lineTemplate = __('%s-%s');

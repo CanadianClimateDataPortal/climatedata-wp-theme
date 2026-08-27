@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
-import { isFrequencyTypeS2D } from './s2d';
+import { isFrequencyTypeS2D } from '@/types/assertions';
 import {
 	FrequencyConfig,
 	FrequencyDisplayModeOption,

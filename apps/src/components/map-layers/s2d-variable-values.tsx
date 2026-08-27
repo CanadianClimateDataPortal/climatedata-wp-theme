@@ -14,10 +14,10 @@ import { cn, findCeilingIndex, utc } from '@/lib/utils';
 import {
 	extractSkillLevelData,
 	generatePeriodRangeLabel,
-	isFrequencyTypeS2DDecadal,
 	normalizeProbabilitiesBarChartPercent,
 	type LocationS2DData,
 } from '@/lib/s2d';
+import { isFrequencyTypeS2DDecadal } from '@/types/assertions';
 import { ColourMap } from '@/types/types';
 import {
 	ForecastDisplay,

@@ -15,7 +15,7 @@ import { formatUTCDate, utc } from '@/lib/utils';
 import { formatIntlDate } from '@/lib/format';
 import { __ } from '@/context/locale-provider';
 
-import { assertIsS2DFrequencyType } from '@/types/assertions';
+import { isFrequencyTypeS2DDecadal } from '@/types/assertions';
 
 export type PeriodRange = [Date, Date];
 
@@ -394,39 +394,6 @@ export const S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE: Record<
 	[S2DFrequencyTypes.DECADAL_ANNUAL]: 'DecadalAnnual',   // @TODO Confirm what would be the string to be used for download filename.
 	[S2DFrequencyTypes.DECADAL_MAY_SEP]: 'DecadalMaySep',  // ^
 	[S2DFrequencyTypes.DECADAL_NOV_MAR]: 'DecadalNovMar',  // ^
-};
-
-/**
- * Narrow an unknown frequency to one an S2D variable accepts.
- */
-export const isFrequencyTypeS2D = (
-	frequencyType?: FrequencyType | S2DFrequencyType | string | null,
-): frequencyType is S2DFrequencyType => {
-	let outcome = false;
-	try {
-		assertIsS2DFrequencyType(frequencyType ?? '');
-		outcome = true;
-	} catch {
-		outcome = false;
-	}
-
-	return outcome;
-};
-
-/**
- * Tell whether a frequency is one of the decadal ones.
- *
- * The test is the `decadal-` prefix shared by every decadal slug, so a fourth
- * one can be added to `S2DFrequencyTypes` without editing any caller of this.
- */
-export const isFrequencyTypeS2DDecadal = (
-	frequencyType?: S2DFrequencyType | string | null,
-): frequencyType is S2DFrequencyType => {
-	if (isFrequencyTypeS2D(frequencyType)) {
-		return /^decadal-/.test(frequencyType);
-	}
-
-	return false;
 };
 
 /**

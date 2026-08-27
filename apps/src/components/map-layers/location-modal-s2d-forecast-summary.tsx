@@ -29,9 +29,9 @@ import {
 import {
 	extractSkillLevelData,
 	generatePeriodRangeLabel,
-	normalizeProbabilitiesBarChartPercent,
 	type LocationS2DData,
 } from '@/lib/s2d';
+import { normalizeProbabilitiesBarChartPercent } from '@/lib/s2d-forecast-probabilities-bar-chart';
 import {
 	formatValue,
 } from '@/lib/format';

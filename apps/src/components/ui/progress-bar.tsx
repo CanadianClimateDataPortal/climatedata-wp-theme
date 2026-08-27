@@ -8,7 +8,7 @@ import {
 } from '@/types/progress-bar';
 import {
 	normalizeProbabilitiesBarChartPercent,
-} from '@/lib/s2d';
+} from '@/lib/s2d-forecast-probabilities-bar-chart';
 
 /**
  * Progress Bar to illustrate a percent value.

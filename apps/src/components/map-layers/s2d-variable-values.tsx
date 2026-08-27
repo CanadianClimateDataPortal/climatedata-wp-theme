@@ -31,7 +31,7 @@ import {
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
-import { buildForecastProbabilitiesCategories } from '@/components/map-layers/s2d-build-forecast-categories';
+import { buildForecastProbabilitiesCategories } from '@/lib/s2d-build-forecast-categories';
 import LocationModalS2DForecastSummary from '@/components/map-layers/location-modal-s2d-forecast-summary';
 
 import ProgressBar from '@/components/ui/progress-bar';

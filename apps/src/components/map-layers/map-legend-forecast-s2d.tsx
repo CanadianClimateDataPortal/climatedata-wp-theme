@@ -6,7 +6,7 @@ import chroma from 'chroma-js';
 import { __ } from '@/context/locale-provider';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import { type DefinitionItem, DefinitionList } from '@/components/ui/definition-list';
-import { buildForecastProbabilitiesCategories } from '@/components/map-layers/s2d-build-forecast-categories';
+import { buildForecastProbabilitiesCategories } from '@/lib/s2d-build-forecast-categories';
 import { type ColourQuantitiesMap } from '@/types/types';
 import {
 	ForecastTypes,

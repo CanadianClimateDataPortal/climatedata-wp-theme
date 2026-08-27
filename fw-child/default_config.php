@@ -18,6 +18,8 @@ function custom_global_vars()
     $vars['cookieyes_id_fr'] = ""; // ID for French site
     $vars['cookieyes_id_en'] = ""; // ID for English site
 
+    $vars['carto_basemaps_api_key'] = "";
+
     $vars['feedback_email'] = "nullbox@climatedata.ca";
     $vars['training_email'] = "nullbox@climatedata.ca";
     $vars['support_email'] = "nullbox@climatedata.ca";

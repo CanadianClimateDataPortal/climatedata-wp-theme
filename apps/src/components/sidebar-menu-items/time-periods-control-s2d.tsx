@@ -234,7 +234,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		 * values out of sight: title, tooltip, slider and endpoint labels.
 		 *
 		 * Same reasoning as for `DateRangeLine` in
-		 * `components/map-layers/s2d-variable-values.tsx` in
+		 * `components/map-layers/location-modal-s2d.tsx` in
 		 * `LocationModalContentPart`.
 		 */
 		return null;

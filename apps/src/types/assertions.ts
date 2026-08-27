@@ -90,3 +90,36 @@ export const assertIsForecastDisplay: (
 		ForecastDisplays,
 		'ForecastDisplay'
 	);
+
+/**
+ * Narrow an unknown frequency to one an S2D variable accepts.
+ */
+export const isFrequencyTypeS2D = (
+	frequencyType?: FrequencyType | S2DFrequencyType | string | null,
+): frequencyType is S2DFrequencyType => {
+	let outcome = false;
+	try {
+		assertIsS2DFrequencyType(frequencyType ?? '');
+		outcome = true;
+	} catch {
+		outcome = false;
+	}
+
+	return outcome;
+};
+
+/**
+ * Tell whether a frequency is one of the decadal ones.
+ *
+ * The test is the `decadal-` prefix shared by every decadal slug, so a fourth
+ * one can be added to `S2DFrequencyTypes` without editing any caller of this.
+ */
+export const isFrequencyTypeS2DDecadal = (
+	frequencyType?: S2DFrequencyType | string | null,
+): frequencyType is S2DFrequencyType => {
+	if (isFrequencyTypeS2D(frequencyType)) {
+		return /^decadal-/.test(frequencyType);
+	}
+
+	return false;
+};

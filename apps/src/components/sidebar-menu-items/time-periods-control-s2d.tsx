@@ -13,9 +13,9 @@ import {
 	formatPeriodRange,
 	findPeriodIndexForDateRange,
 	getPeriods,
-	isFrequencyTypeS2DDecadal,
 	type PeriodRange,
 } from '@/lib/s2d';
+import { isFrequencyTypeS2DDecadal } from '@/types/assertions';
 import {
 	ForecastDisplay,
 	ForecastDisplays,

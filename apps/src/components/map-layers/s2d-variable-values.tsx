@@ -29,7 +29,7 @@ import {
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
-import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
+import { buildForecastProbabilitiesCategories } from '@/components/map-layers/s2d-build-forecast-categories';
 import LocationModalS2DForecastSummary from '@/components/map-layers/location-modal-s2d-forecast-summary';
 
 import ProgressBar from '@/components/ui/progress-bar';
@@ -870,7 +870,7 @@ const ForecastProbabilitiesPart = (
 	);
 
 	// Category definitions parallel to progressBars, for tooltip content
-	const forecastCategories = buildForecastCategories(forecastType);
+	const forecastCategories = buildForecastProbabilitiesCategories(forecastType);
 
 	const tooltipProbabilityContent = isLoaded ? (
 		<div className="p-1">

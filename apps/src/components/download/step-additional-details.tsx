@@ -6,7 +6,7 @@ import { Checkbox, CheckboxFactory } from '@/components/ui/checkbox';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
 import { StepContainer, StepContainerDescription } from '@/components/download/step-container';
 import { EmissionScenariosTooltip } from '@/components/sidebar-menu-items/emission-scenarios-control';
-import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
+import { S2DFrequencyFieldDropdown } from '@/components/sidebar-menu-items/frequencies-dropdown-s2d';
 import S2DReleaseDate from '@/components/s2d-release-date';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";

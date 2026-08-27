@@ -2,13 +2,11 @@ import { __ } from '@/context/locale-provider';
 
 import { SidebarMenuItem, SidebarSeparator } from '@/components/ui/sidebar';
 
-import {
-	S2DForecastDisplayFieldDropdown,
-	S2DForecastTypeFieldDropdown,
-} from '@/components/fields/forecast';
-import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
+import { S2DForecastDisplayFieldDropdown } from '@/components/sidebar-menu-items/forecast-display-dropdown-s2d';
+import { S2DForecastTypeFieldDropdown } from '@/components/sidebar-menu-items/forecast-type-dropdown-s2d';
+import { S2DFrequencyFieldDropdown } from '@/components/sidebar-menu-items/frequencies-dropdown-s2d';
 import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
-import { MaskLowSkillField } from '@/components/fields/skill';
+import { MaskLowSkillField } from '@/components/sidebar-menu-items/mask-low-skill-control-s2d';
 
 const tooltipForecastTypes = __(
 	'S2D forecasts are shown as probabilities for how conditions will compare to historical climate conditions between 1991 and 2020. ' +

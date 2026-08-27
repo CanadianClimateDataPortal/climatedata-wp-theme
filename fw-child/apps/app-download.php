@@ -67,6 +67,9 @@ $locale_data = cdc_extract_locale_data( 'react-apps', get_locale() );
         // DATA URL for the download app
         window.DATA_URL = '<?php echo isset( $GLOBALS['vars']['data_url'] ) ? htmlspecialchars( $GLOBALS['vars']['data_url'], ENT_QUOTES, 'UTF-8' ) : ''; ?>';
 
+        // Carto basemaps API key
+        window.CARTO_BASEMAPS_API_KEY = '<?php echo isset( $GLOBALS['vars']['carto_basemaps_api_key'] ) ? htmlspecialchars( $GLOBALS['vars']['carto_basemaps_api_key'], ENT_QUOTES, 'UTF-8' ) : ''; ?>';
+
         // Disable Leaflet's 3D features
         L_DISABLE_3D = true;
 

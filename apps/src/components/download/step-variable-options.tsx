@@ -6,7 +6,7 @@ import {
 } from '@/components/download/step-container';
 import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-download-fields";
 import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
-import { S2DForecastTypeFieldDropdown } from '@/components/fields/forecast';
+import { S2DForecastTypeFieldDropdown } from '@/components/sidebar-menu-items/forecast-type-dropdown-s2d';
 import { DefinitionList, type DefinitionItem } from '@/components/ui/definition-list';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useS2D } from '@/hooks/use-s2d';

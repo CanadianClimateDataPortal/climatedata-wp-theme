@@ -59,6 +59,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
 	const scenarioLabel = appConfig.scenarios.filter((item) => item.value === scenario)[0]?.label;
 
+	// Reminder: These normally are coming from WordPress and might not have their translation equivalent
 	const subTitleParts: string[] = [
 		__(datasetLabel),
 		__(climateVariableTitle),
@@ -77,12 +78,19 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 		);
 	}
 
+	// The `data-part` attributes below, are inspection landmarks.
 	return (
 		<div className="min-h-0 overflow-y-auto">
-			<h2 className="mb-1 text-2xl font-semibold leading-7 text-cdc-black">
+			<h2
+				className="mb-1 text-2xl font-semibold leading-7 text-cdc-black"
+				data-part="location-modal-content-title"
+			>
 				{title}
 			</h2>
-			<p className="m-0 text-sm leading-5 text-neutral-grey-medium">
+			<p
+				className="m-0 text-sm leading-5 text-neutral-grey-medium"
+				data-part="location-modal-content-subTitleParts"
+			>
 				{subTitleParts.filter(Boolean).join(' - ')}
 			</p>
 
@@ -93,7 +101,10 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 			}) }
 
 			{!isS2DVariable && (
-				<p className="text-right">
+				<p
+					className="text-right"
+					data-part="location-modal-content-see-details"
+				>
 					<a
 						href="#"
 						aria-label={__('Go to details section')}

@@ -18,6 +18,7 @@ import {
 import RasterPrecalcultatedClimateVariableValues
 	from '../components/map-layers/raster-precalculated-climate-variable-values';
 import { getFrequencyType } from '@/lib/utils.ts';
+import { isFrequencyTypeS2D } from '@/lib/s2d';
 import { WMSParams } from '@/types/types';
 import {
 	type PostDownloadToBlobObjectURLPayload,
@@ -239,7 +240,8 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 			if (payload.month && payload.dataset_name) {
 				const frequencyType = getFrequencyType(payload.month);
 				const scenario = payload.dataset_name;
-				if (frequencyType) {
+				// CanDCS has no pre-calculated entry for any S2D frequency.
+				if (frequencyType && !isFrequencyTypeS2D(frequencyType)) {
 					availableVars = getCanDCSVariableIds(scenario, frequencyType);
 				}
 			}

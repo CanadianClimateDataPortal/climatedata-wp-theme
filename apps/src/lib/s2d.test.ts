@@ -1,17 +1,28 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import {
-	buildSkillLayerName, buildSkillLayerTime,
 	findPeriodIndexForDateRange,
 	getPeriods,
 	PeriodRange,
+	resolveFrequencyPeriodJump,
+	buildSkillLayerName,
+	buildSkillLayerTime,
 } from '@/lib/s2d';
 import {
 	FrequencyType,
 	S2DFrequencyType,
+	S2DFrequencyTypes,
 } from '@/types/climate-variable-interface';
 import { utc } from '@/lib/utils';
-import { S2D_NB_PERIODS } from '@/lib/constants';
+import { S2D_FORECAST_CONVENTIONAL_NB_PERIODS } from '@/lib/constants';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
+
+const frequencyNameMap: Record<S2DFrequencyType, string> = {
+	[S2DFrequencyTypes.SEASONAL]: 'SEASONAL',
+	[S2DFrequencyTypes.MONTHLY]: 'MONTHLY',
+	[S2DFrequencyTypes.DECADAL_ANNUAL]: 'DECADAL_ANNUAL',
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]: 'DECADAL_MAY_SEP',
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]: 'DECADAL_NOV_MAR',
+} as const;
 
 /**
  * Return the difference in month number from dateA to dateB.
@@ -47,7 +58,7 @@ describe('getPeriods', () => {
 		(frequency, periodLength) => {
 			const releaseDate = utc('2025-08-05') as Date;
 			const periods = getPeriods(releaseDate, frequency);
-			const nbPeriods = S2D_NB_PERIODS[frequency];
+			const nbPeriods = S2D_FORECAST_CONVENTIONAL_NB_PERIODS[frequency];
 
 			test(`generates correct number of periods (${nbPeriods})`, () => {
 				expect(periods).toHaveLength(nbPeriods);
@@ -111,6 +122,88 @@ describe('getPeriods', () => {
 		}
 	);
 
+	describe('Confirm documented behavior', () => {
+		let releaseDate: Date;
+		beforeEach(() => {
+			/**
+			 * For `S2DFrequencyTypes.DECADAL_*` frequencies, the `releaseDate` would ALWAYS be set to January the 1st of the year.
+			 */
+			releaseDate = utc('2025-01-01') as Date;
+		});
+
+		// Keep these descriptions identical to the corresponding lines in {@link getPeriods}.
+		describe.each([
+			{
+				commentLine: 'Seasonal frequency: 10 x 3-month periods, at 1-month interval',
+				frequencies: [S2DFrequencyTypes.SEASONAL],
+				expectedNbPeriods: 10,
+				periodLengthInMonths: 3,
+				periodStartIntervalInMonths: 1,
+				expectedPeriodJump: [3, 'month'],
+			},
+			{
+				commentLine: 'Monthly frequency: 3 x 1-month periods, at 1-month interval',
+				frequencies: [S2DFrequencyTypes.MONTHLY],
+				expectedNbPeriods: 3,
+				periodLengthInMonths: 1,
+				periodStartIntervalInMonths: 1,
+				expectedPeriodJump: [1, 'month'],
+			},
+			{
+				commentLine: 'Decadal frequency: 2 x 5-year periods, at 5-year interval',
+				frequencies: [
+					S2DFrequencyTypes.DECADAL_ANNUAL,
+					S2DFrequencyTypes.DECADAL_MAY_SEP,
+					S2DFrequencyTypes.DECADAL_NOV_MAR,
+				],
+				expectedNbPeriods: 2,
+				periodLengthInMonths: 5 * 12,
+				periodStartIntervalInMonths: 5 * 12,
+				expectedPeriodJump: [5, 'year'],
+			},
+		] as Array<{
+			commentLine: string;
+			frequencies: S2DFrequencyType[];
+			expectedNbPeriods: number;
+			periodLengthInMonths: number;
+			periodStartIntervalInMonths: number;
+			expectedPeriodJump: [number, 'month'] | [number, 'year'];
+		}>)('$commentLine', ({
+			frequencies,
+			expectedNbPeriods,
+			periodLengthInMonths,
+			periodStartIntervalInMonths,
+			expectedPeriodJump,
+		}) => {
+			frequencies.forEach((frequency) => {
+				test(`${frequency} uses the documented period span and count`, () => {
+					const periods = getPeriods(releaseDate, frequency);
+
+					expect(S2D_FORECAST_CONVENTIONAL_NB_PERIODS[frequency]).toBe(expectedNbPeriods);
+					expect(periods).toHaveLength(expectedNbPeriods);
+					expect(resolveFrequencyPeriodJump(frequency)).toEqual(expectedPeriodJump);
+
+					periods.forEach(([start, end]) => {
+						// The end date is inclusive, so a one-month period has a month-number difference of zero.
+						expect(monthNumberDiff(start, end)).toBe(periodLengthInMonths - 1);
+					});
+				});
+
+				test(`${frequency} starts periods at the documented interval`, () => {
+					const periods = getPeriods(releaseDate, frequency);
+
+					for (let i = 1; i < periods.length; i++) {
+						const previousStart = periods[i - 1][0];
+						const currentStart = periods[i][0];
+						expect(monthNumberDiff(previousStart, currentStart)).toBe(
+							periodStartIntervalInMonths
+						);
+					}
+				});
+			});
+		});
+	});
+
 	test('"seasons" correctly handles leap year and varying month lengths', () => {
 		const releaseDate = utc('2023-08-05') as Date;
 		const expectedPeriods = [
@@ -155,6 +248,60 @@ describe('getPeriods', () => {
 		// @ts-expect-error - Testing an unsupported frequency
 		const actualPeriods = getPeriods(releaseDate, FrequencyType.ANNUAL);
 		expect(actualPeriods).toHaveLength(0);
+	});
+});
+
+describe('resolveFrequencyPeriodJump', () => {
+	describe('only works with S2DFrequencyType', () => {
+		test('throws an error for an unsupported frequency', () => {
+			// @ts-expect-error - Testing an unsupported frequency
+			expect(() => resolveFrequencyPeriodJump(FrequencyType.ANNUAL)).toThrow(
+				'Unsupported frequency type: ann'
+			);
+		});
+	});
+	describe.each([
+		{
+			frequency: S2DFrequencyTypes.SEASONAL,
+			expectedPeriodJumpSize: 3,
+			expectedPeriodJumpUnit: 'month',
+		},
+		{
+			frequency: S2DFrequencyTypes.MONTHLY,
+			expectedPeriodJumpSize: 1,
+			expectedPeriodJumpUnit: 'month',
+		},
+		{
+			frequency: S2DFrequencyTypes.DECADAL_ANNUAL,
+			expectedPeriodJumpSize: 5,
+			expectedPeriodJumpUnit: 'year',
+		},
+		{
+			frequency: S2DFrequencyTypes.DECADAL_MAY_SEP,
+			expectedPeriodJumpSize: 5,
+			expectedPeriodJumpUnit: 'year',
+		},
+		{
+			frequency: S2DFrequencyTypes.DECADAL_NOV_MAR,
+			expectedPeriodJumpSize: 5,
+			expectedPeriodJumpUnit: 'year',
+		},
+	] as Array<{
+		frequency: S2DFrequencyType;
+		expectedPeriodJumpSize: number;
+		expectedPeriodJumpUnit: 'month' | 'year';
+	}>)('S2DFrequencyTypes', ({
+		frequency,
+		expectedPeriodJumpSize,
+		expectedPeriodJumpUnit,
+	 }) => {
+		test(`${frequencyNameMap[frequency]}:\t ${expectedPeriodJumpSize}-${expectedPeriodJumpUnit}`, () => {
+			const jump = resolveFrequencyPeriodJump(frequency);
+			expect(jump).not.toBeNull();
+			const [jumpSize, jumpUnit] = jump!;
+			expect(jumpSize).toBe(expectedPeriodJumpSize);
+			expect(jumpUnit).toBe(expectedPeriodJumpUnit);
+		});
 	});
 });
 
@@ -306,3 +453,4 @@ describe('buildSkillLayerTime', () => {
 		expect(timeValue).toBeNull();
 	});
 });
+

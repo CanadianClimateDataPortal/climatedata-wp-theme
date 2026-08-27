@@ -85,7 +85,6 @@ export enum FrequencyType {
 
 /**
  * In order to transition away from enums, we define an object with the same values.
- *
  */
 export const FrequencyTypes = {
 	ANNUAL: FrequencyType.ANNUAL,
@@ -102,17 +101,33 @@ export const FrequencyTypes = {
 } as const;
 
 /**
- * S2D frequency types - subset of available frequencies.
+ * Frequency types S2D variables accept.
+ *
+ * Two members are borrowed from `FrequencyType`.
+ * The decadal members are not, because they're specific to S2D variables.
  */
 export const S2DFrequencyTypes = {
-    MONTHLY: FrequencyTypes.MONTHLY,
-    SEASONAL: FrequencyTypes.SEASONAL,
+	MONTHLY: FrequencyType.MONTHLY,
+	SEASONAL: FrequencyType.SEASONAL,
+	/**
+	 * Decadal Frequency taking all 12 months of the year into account.
+	 */
+	DECADAL_ANNUAL: 'decadal-ann',
+	/**
+	 * Decadal Frequency only taking the "hot" months of a year.
+	 */
+	DECADAL_MAY_SEP: 'decadal-may-sep',
+	/**
+	 * Decadal Frequency only taking the "cold" months of a year.
+	 */
+	DECADAL_NOV_MAR: 'decadal-nov-mar',
 } as const;
 
 /**
  * Type for the supported frequency types for S2D variables.
  *
- * A subset of `FrequencyType`.
+ * The decadal members have no equivalent in `FrequencyType`, so a value of this
+ * type is not assignable to `FrequencyType`.
  */
 export type S2DFrequencyType = typeof S2DFrequencyTypes[keyof typeof S2DFrequencyTypes];
 

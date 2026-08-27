@@ -13,9 +13,11 @@ import {
 	formatPeriodRange,
 	findPeriodIndexForDateRange,
 	getPeriods,
+	isFrequencyTypeS2DDecadal,
 	type PeriodRange,
 } from '@/lib/s2d';
 import {
+	ForecastDisplay,
 	ForecastDisplays,
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
@@ -35,12 +37,14 @@ type SliderLabels = {
  *
  * @param periods - The periods to show on the slider.
  * @param locale - Locale to use for formatting.
- * @param showYears - If false, the year is not shown in the min/max labels.
+ * @param forecastDisplay - A decision factor that has an impact on how to format labels and tickLabels in some situations
+ * @param frequencyType - Another decision factor for the same reasons as forecastDisplay
  */
 const generateSliderLabels = (
 	periods: PeriodRange[] | null,
 	locale: string,
-	showYears: boolean = true,
+	forecastDisplay: ForecastDisplay | null,
+	frequencyType: S2DFrequencyType | null,
 ): SliderLabels => {
 	if (!periods) {
 		return {
@@ -53,20 +57,37 @@ const generateSliderLabels = (
 	const firstPeriod = periods[0][0];
 	const lastPeriod = periods[periods.length - 1][1];
 
-	const formatMinMaxLabel = showYears
+	const isActuallyForecast = forecastDisplay === ForecastDisplays.FORECAST;
+
+	const formatMinMaxLabel = isActuallyForecast
 		? formatShortMonthYear
 		: formatShortMonth;
 
-	const minimumLabel = formatMinMaxLabel(firstPeriod, locale);
-	const maximumLabel = formatMinMaxLabel(lastPeriod, locale);
+	let minimumLabel = formatMinMaxLabel(firstPeriod, locale);
+	let maximumLabel = formatMinMaxLabel(lastPeriod, locale);
+
+	if (isFrequencyTypeS2DDecadal(frequencyType)) {
+		// returns `<month> <year>` in both locales, so the second token is the year.
+		minimumLabel = minimumLabel.split(' ')[1];
+		maximumLabel = maximumLabel.split(' ')[1];
+	}
 
 	const tickLabels = periods.map((period) => {
-		const startMonth = formatShortMonth(period[0], locale, true);
-		if (period[0].getUTCMonth() === period[1].getUTCMonth()) {
-			return startMonth;
+		if (isFrequencyTypeS2DDecadal(frequencyType)) {
+			// Year ranges, such as "2026-2030" then "2031-2035".
+			const startYear = formatShortMonthYear(period[0], locale).split(' ')[1];
+			const endYear = formatShortMonthYear(period[1], locale).split(' ')[1];
+			return `${startYear}-${endYear}`;
+		} else {
+			// Month ranges, such as "Aug-Oct" then "Sep-Nov", or "août-oct" then
+			// "sept-nov" in French. A one-month period collapses to a single month.
+			const startMonth = formatShortMonth(period[0], locale, true);
+			if (period[0].getUTCMonth() === period[1].getUTCMonth()) {
+				return startMonth;
+			}
+			const endMonth = formatShortMonth(period[1], locale, true);
+			return `${startMonth}-${endMonth}`;
 		}
-		const endMonth = formatShortMonth(period[1], locale, true);
-		return `${startMonth}-${endMonth}`;
 	});
 
 	return {
@@ -78,6 +99,9 @@ const generateSliderLabels = (
 
 /**
  * Return the short month and year of a date, localized.
+ *
+ * Both the English and the French locales place the month before the year.
+ * The ordering was confirmed by hand for both locales.
  */
 const formatShortMonthYear = (date: Date, locale: string): string => {
 	return new Intl.DateTimeFormat(locale, {
@@ -118,11 +142,11 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 	const { locale } = useLocale();
 
 	const dateRange = climateVariable?.getDateRange();
-	const frequency = climateVariable?.getFrequency() ?? null;
-	const forecastDisplay = climateVariable?.getForecastDisplay();
+	const frequencyType = (climateVariable?.getFrequency() ?? null) as null | S2DFrequencyType;
+	const forecastDisplay = climateVariable?.getForecastDisplay() ?? null;
 	const periods =
-		releaseDate && frequency
-			? getPeriods(releaseDate, frequency as S2DFrequencyType)
+		releaseDate && frequencyType
+			? getPeriods(releaseDate, frequencyType as S2DFrequencyType)
 			: null;
 	const isLoadingReleaseDate = releaseDate === null;
 
@@ -137,6 +161,10 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		selectedPeriod = matchingDatePeriodIndex ?? 0;
 	}
 
+	const isDecadalClimatology =
+		forecastDisplay === ForecastDisplays.CLIMATOLOGY &&
+		isFrequencyTypeS2DDecadal(frequencyType ?? '');
+
 	const {
 		minimumLabel,
 		maximumLabel,
@@ -144,7 +172,8 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 	} = generateSliderLabels(
 		periods,
 		locale,
-		forecastDisplay !== ForecastDisplays.CLIMATOLOGY,
+		forecastDisplay,
+		frequencyType,
 	);
 	const tickLabel = periods ? tickLabels[selectedPeriod] : '...';
 
@@ -195,6 +224,21 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 
 		setDateRange(formatPeriodRange(period));
 	};
+
+	if (isDecadalClimatology) {
+		/**
+		 * Climatology uses the same data for every time period, so a period
+		 * such as '2026-2030' would suggest the values belong to those years.
+		 *
+		 * Hiding the whole control, and not only greying it, keeps the year
+		 * values out of sight: title, tooltip, slider and endpoint labels.
+		 *
+		 * Same reasoning as for `DateRangeLine` in
+		 * `components/map-layers/s2d-variable-values.tsx` in
+		 * `LocationModalContentPart`.
+		 */
+		return null;
+	}
 
 	return (
 		<SidebarMenuItem>

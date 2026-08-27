@@ -4,12 +4,13 @@ import {
 	type LocationModalContentParams,
 	ForecastDisplays,
 	ForecastTypes,
-	FrequencyType,
+	S2DFrequencyTypes,
 	InteractiveRegionConfig,
 	InteractiveRegionDisplay,
 	InteractiveRegionOption,
+	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
-import S2DVariableValues from '@/components/map-layers/s2d-variable-values';
+import LocationModalS2D from '@/components/map-layers/s2d-variable-values';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
 import { WMSParams } from '@/types/types';
 import { formatUTCDate, utc } from '@/lib/utils';
@@ -81,7 +82,7 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 	}
 
 	getFrequency(): string | null {
-		return super.getFrequency() ?? FrequencyType.SEASONAL;
+		return super.getFrequency() ?? S2DFrequencyTypes.SEASONAL;
 	}
 
 	getColourOptionsStatus(): boolean {
@@ -112,26 +113,34 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 	 *
 	 * Where:
 	 * - <VAR>: the API variable's ID
-	 * - <F>: the frequency (e.g. "seasonal" or "monthly")
+	 * - <F>: the frequency (e.g. "seasonal", "monthly" or "decadal-ann")
 	 * - <FT>: the forecast type (e.g. "expected" or "unusual")
 	 */
 	getLayerValue(): string {
+		const fallbackFrequency = S2DFrequencyTypes.SEASONAL;
+
 		const forecastType = this.getForecastType();
 		const isForecast = this.getForecastDisplay() === ForecastDisplays.FORECAST;
-		const frequency = this.getFrequency() ?? FrequencyType.SEASONAL;
+		const frequency = (this.getFrequency() ??
+			fallbackFrequency) as S2DFrequencyType;
 		const variable = normalizeForApiVariableId(this.getId());
 
-		const frequencyNameMap: Record<string, string> = {
-			[FrequencyType.SEASONAL]: 'seasonal',
-			[FrequencyType.MONTHLY]: 'monthly',
-		}
+		const frequencyNameMap: Record<S2DFrequencyType, string> = {
+			[S2DFrequencyTypes.SEASONAL]: 'seasonal',
+			[S2DFrequencyTypes.MONTHLY]: 'monthly',
+			[S2DFrequencyTypes.DECADAL_ANNUAL]: S2DFrequencyTypes.DECADAL_ANNUAL,
+			[S2DFrequencyTypes.DECADAL_MAY_SEP]: S2DFrequencyTypes.DECADAL_MAY_SEP,
+			[S2DFrequencyTypes.DECADAL_NOV_MAR]: S2DFrequencyTypes.DECADAL_NOV_MAR,
+		} as const;
 
 		const forecastTypeMap: Record<string, string> = {
 			[ForecastTypes.EXPECTED]: 'expected',
 			[ForecastTypes.UNUSUAL]: 'unusual',
-		}
+		};
 
-		const frequencyName = frequencyNameMap[frequency];
+		const frequencyName = Reflect.has(frequencyNameMap, frequency)
+			? Reflect.get(frequencyNameMap, frequency)
+			: frequencyNameMap[fallbackFrequency];
 		const forecastTypeName = forecastTypeMap[forecastType];
 
 		if (isForecast) {
@@ -173,7 +182,7 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 	): React.ReactNode | null {
 		const { latlng } = params;
 		return createElement(
-			S2DVariableValues,
+			LocationModalS2D,
 			{
 				latlng,
 			},

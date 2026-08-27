@@ -14,6 +14,7 @@ import { cn, findCeilingIndex, utc } from '@/lib/utils';
 import {
 	extractSkillLevelData,
 	generatePeriodRangeLabel,
+	isFrequencyTypeS2DDecadal,
 	normalizeProbabilitiesBarChartPercent,
 	type LocationS2DData,
 } from '@/lib/s2d';
@@ -24,11 +25,12 @@ import {
 	ForecastType,
 	ForecastTypes,
 	FrequencyType,
-	S2DFrequencyType,
+	S2DFrequencyTypes,
+	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
 import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
-import S2DLocationModalForecastSummary from '@/components/map-layers/s2d-location-modal-forecast-summary';
+import LocationModalS2DForecastSummary from '@/components/map-layers/location-modal-s2d-forecast-summary';
 
 import ProgressBar from '@/components/ui/progress-bar';
 import type {
@@ -41,11 +43,11 @@ import StarRating from '@/components/ui/star-rating';
 import S2DReleaseDate from '@/components/s2d-release-date';
 import { Spinner } from '@/components/ui/spinner';
 
-interface S2DVariableValuesProps {
+interface LocationModalS2DProps {
 	latlng: Pick<L.LatLng, 'lat' | 'lng'>;
 }
 
-interface PopupContentProps {
+interface LocationModalContentPartProps {
 	locationData: LocationS2DData | null;
 	dateRangeStart: string | null;
 	frequency: S2DFrequencyType;
@@ -54,7 +56,7 @@ interface PopupContentProps {
 	unit: string;
 }
 
-interface ProbabilitiesPartProps {
+interface ForecastProbabilitiesPartProps {
 	locationData: LocationS2DData | null;
 	forecastType: ForecastType;
 	forecastDisplay: ForecastDisplay;
@@ -107,9 +109,15 @@ const tooltipClimatology = __(
 		'exact values that define the forecast outcomes for this location.'
 );
 
-const FREQUENCY_LABEL = {
-	[FrequencyType.MONTHLY]: __('Monthly'),
-	[FrequencyType.SEASONAL]: __('Seasonal'),
+/**
+ * Frequency labels for the location modal.
+ */
+const FREQUENCY_LABEL: Record<S2DFrequencyType, string> = {
+	[S2DFrequencyTypes.MONTHLY]: __('Monthly'),
+	[S2DFrequencyTypes.SEASONAL]: __('Seasonal'),
+	[S2DFrequencyTypes.DECADAL_ANNUAL]: sprintf(__('Decadal (%s)'), __('Annual')),
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]:  sprintf(__('Decadal (%s)'), __('May-Sep')),
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]:  sprintf(__('Decadal (%s)'), __('Nov-Mar')),
 } as const;
 
 /**
@@ -142,6 +150,7 @@ const SKILL_LEVEL_TOOLTIP = [
 	),
 ];
 
+
 /**
  * Return true if two numbers are in the same thousand.
  */
@@ -155,6 +164,7 @@ const isSameThousand = (valueA: number, valueB: number): boolean =>
  */
 const isWhite = (colour: `#${string}`): boolean =>
 	colour.toUpperCase() === '#FFFFFF' || colour.toUpperCase() === '#FFF';
+
 
 /**
  * Given a colour map, returns the colour for a specific percentage and outcome.
@@ -252,7 +262,12 @@ export const getProbabilityColour = (
  * Main component for the location popup of a S2D variable. Wrapper containing
  * the logic, around the actual component.
  */
-export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
+export const LocationModalS2D = (
+	props: LocationModalS2DProps,
+): React.ReactElement => {
+	const {
+		latlng,
+	} = props;
 	const { releaseDate } = useS2D();
 	const { climateVariable } = useClimateVariable();
 
@@ -339,7 +354,7 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 	const effectiveLocationData = hasDataLoaded ? locationData : null;
 
 	return (
-		<PopupContent
+		<LocationModalContentPart
 			locationData={effectiveLocationData}
 			dateRangeStart={dateRangeStart}
 			frequency={frequency}
@@ -350,9 +365,9 @@ export const S2DVariableValues = ({ latlng }: S2DVariableValuesProps) => {
 	);
 };
 
-S2DVariableValues.displayName = 'S2DVariableValues';
+LocationModalS2D.displayName = 'LocationModalS2D'; // Explicit string literal, or this name would be lost in production.
 
-export default S2DVariableValues;
+export default LocationModalS2D;
 
 /**
  * Component to display a loading spinner, where a text is expected.
@@ -373,9 +388,14 @@ const TextLoader = () => {
  *
  * @param locationData - The loaded location data. Can be null while loading.
  */
-const SkillLevelPart = ({ locationData }: SkillLevelPartProps) => {
-	const { locale } = useLocale();
+const SkillLevelPart = (
+	props: SkillLevelPartProps,
+): React.ReactElement => {
+	const {
+		locationData,
+	} = props;
 
+	const { locale } = useLocale();
 	const {
 		skillCRPSS,
 		skillLevel,
@@ -415,6 +435,7 @@ const SkillLevelPart = ({ locationData }: SkillLevelPartProps) => {
 			className="flex flex-col-reverse mb-1"
 			role="group"
 			aria-labelledby="skill-level-label"
+			data-part="skill-level"
 		>
 			<dt id="skill-level-label" className="mt-0">
 				<div className="flex flex-row gap-2">
@@ -441,16 +462,22 @@ const SkillLevelPart = ({ locationData }: SkillLevelPartProps) => {
 	);
 };
 
+SkillLevelPart.displayName = 'SkillLevelPart'; // Explicit string literal, or this name would be lost in production.
+
 /**
  * Component for the section showing the "Forecast" values.
  *
  * @param locationData - The loaded location data. Can be null while loading.
  * @param unit - The climate variable's unit
  */
-const ForecastValuesPart = ({
-	locationData,
-	unit,
-}: ForecastValuesPartProps) => {
+const ForecastValuesPart = (
+	props: ForecastValuesPartProps,
+): React.ReactElement => {
+	const {
+		locationData,
+		unit,
+	} = props;
+
 	const { locale } = useLocale();
 	const nearNormalRange: number[] | null = locationData
 		? [
@@ -493,6 +520,7 @@ const ForecastValuesPart = ({
 				className="flex flex-col-reverse"
 				role="group"
 				aria-labelledby="historical-median-label"
+				data-part="historical-median"
 			>
 				<dt id="historical-median-label">
 					<div className="flex flex-row gap-2 mb-1">
@@ -515,6 +543,7 @@ const ForecastValuesPart = ({
 				className="flex flex-col-reverse"
 				role="group"
 				aria-labelledby="temperature-range-label"
+				data-part="near-normal-range"
 			>
 				<dt id="temperature-range-label">
 					<div className="flex flex-row gap-2 mb-1">
@@ -535,6 +564,8 @@ const ForecastValuesPart = ({
 	);
 };
 
+ForecastValuesPart.displayName = 'ForecastValuesPart'; // Explicit string literal, or this name would be lost in production.
+
 /**
  * Component for the section showing the "Climatology" values.
  *
@@ -542,11 +573,15 @@ const ForecastValuesPart = ({
  * @param forecastType - The type of forecast (expected or unusual)
  * @param unit - The climate variable's unit
  */
-const ClimatologyValuesPart = ({
-	locationData,
-	forecastType,
-	unit,
-}: ClimatologyValuesPartProps) => {
+const ClimatologyValuesPart = (
+	props: ClimatologyValuesPartProps,
+): React.ReactElement => {
+	const {
+		locationData,
+		forecastType,
+		unit,
+	} = props;
+
 	const { locale } = useLocale();
 	let lowValue = 0;
 	let highValue = 0;
@@ -615,6 +650,7 @@ const ClimatologyValuesPart = ({
 					className="flex flex-col-reverse"
 					role="group"
 					aria-labelledby="historical-high-cutoff-label"
+					data-part="above-normal-unusual-high"
 				>
 					<dt id="historical-high-cutoff-label">
 						<div className="flex flex-row gap-2">
@@ -633,6 +669,7 @@ const ClimatologyValuesPart = ({
 					className="flex flex-col-reverse"
 					role="group"
 					aria-labelledby="historical-median-label"
+					data-part="historical-median"
 				>
 					<dt id="historical-median-label">
 						<div className="flex flex-row gap-2">
@@ -651,6 +688,7 @@ const ClimatologyValuesPart = ({
 					className="flex flex-col-reverse"
 					role="group"
 					aria-labelledby="historical-low-cutoff-label"
+					data-part="below-normal-unusual-low"
 				>
 					<dt id="historical-low-cutoff-label">
 						<div className="flex flex-row gap-2">
@@ -668,6 +706,8 @@ const ClimatologyValuesPart = ({
 	);
 };
 
+ClimatologyValuesPart.displayName = 'ClimatologyValuesPart'; // Explicit string literal, or this name would be lost in production.
+
 /**
  * Component for the probabilities section.
  *
@@ -678,8 +718,8 @@ const ClimatologyValuesPart = ({
  * @param unit - The climate variable's unit
  * @constructor
  */
-const ProbabilitiesPart = (
-	props: ProbabilitiesPartProps,
+const ForecastProbabilitiesPart = (
+	props: ForecastProbabilitiesPartProps,
 ): React.ReactNode => {
 	const {
 		forecastDisplay,
@@ -798,7 +838,6 @@ const ProbabilitiesPart = (
 		}
 	}
 
-
 	const { climateVariable } = useClimateVariable();
 	const variableId = climateVariable?.getId();
 	const variableName = climateVariable?.getTitle() ?? '';
@@ -820,9 +859,11 @@ const ProbabilitiesPart = (
 	const TitleLine = () => (
 		<span className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 			{sprintf(
-				frequency === FrequencyType.MONTHLY
-					? __('Monthly %s probability:')
-					: __('Seasonal %s probability:'),
+				isFrequencyTypeS2DDecadal(frequency)
+					? __('Decadal %s probability:')
+					: frequency === S2DFrequencyTypes.MONTHLY
+						? __('Monthly %s probability:')
+						: __('Seasonal %s probability:'),
 				variableName
 			)}
 		</span>
@@ -905,7 +946,7 @@ const ProbabilitiesPart = (
 			{isForecast && (
 				<section className="mt-9 flex items-center justify-between box-border my-2">
 					<S2DReleaseDate className="flex" />
-					<S2DLocationModalForecastSummary
+					<LocationModalS2DForecastSummary
 						progressBars={progressBars}
 						locationData={locationData}
 					/>
@@ -915,6 +956,8 @@ const ProbabilitiesPart = (
 		</section>
 	);
 };
+
+ForecastProbabilitiesPart.displayName = 'ForecastProbabilitiesPart'; // Explicit string literal, or this name would be lost in production.
 
 /**
  * Actual content component of the popup.
@@ -927,24 +970,56 @@ const ProbabilitiesPart = (
  * @param variableName - The climate variable's name
  * @param unit - The climate variable's unit
  */
-const PopupContent = ({
-	locationData,
-	dateRangeStart,
-	frequency,
-	forecastType,
-	forecastDisplay,
-	unit,
-}: PopupContentProps) => {
+const LocationModalContentPart = (
+	props: LocationModalContentPartProps,
+): React.ReactElement => {
+	const {
+		locationData,
+		dateRangeStart,
+		frequency,
+		forecastType,
+		forecastDisplay,
+		unit,
+	} = props;
+
 	const { locale } = useLocale();
+
 	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 
 	if (!(frequency in FREQUENCY_LABEL)) {
-		throw new Error(`Unknown frequency: ${frequency}`);
+		const message  = `LocationModalContentPart: Unknown frequency: ${frequency}`;
+		console.error(message);
+		return (
+			<></>
+		);
 	}
 
-	const DateRangeLine = dateRangeStart
+	let DateRangeLine = dateRangeStart
 		? generatePeriodRangeLabel(dateRangeStart, frequency, locale)
 		: null;
+
+	if (isFrequencyTypeS2DDecadal(frequency) && DateRangeLine !== null) {
+		/**
+		 * A month range keeps its localised wording, such as 'Juillet à Août',
+		 * but a year range reads better as '2026-2030' than as '2026 à 2030'.
+		 */
+		DateRangeLine = DateRangeLine.split(' ').filter(Number).join('-');
+	}
+
+	if (!isForecast && isFrequencyTypeS2DDecadal(frequency)) {
+		/**
+		 * Climatology uses the same data for every time period, so a period
+		 * such as '2026-2030' would suggest the values belong to those years.
+		 * Dropping the line leaves the frequency label alone under the title.
+		 *
+		 * We're Removing it to not cause confusion.
+		 * That will make a floating "Décennale (...)" sub-heading in smaller text.
+		 * The time-period slider is hidden for the same reason, in
+		 * `components/sidebar-menu-items/time-periods-control-s2d.tsx`.
+		 */
+		DateRangeLine = null;
+	}
+
 	const FrequencyNameLine = FREQUENCY_LABEL[frequency];
 
 	return (
@@ -956,6 +1031,7 @@ const PopupContent = ({
 						'flex flex-col-reverse mb-1',
 						!isForecast ? 'col-span-2' : ''
 					)}
+					data-part="frequency-name-line"
 				>
 					<dt className="text-xs font-semibold tracking-wider uppercase text-neutral-grey-medium">
 						{FrequencyNameLine}
@@ -979,7 +1055,7 @@ const PopupContent = ({
 			</dl>
 
 			{isForecast && (
-				<ProbabilitiesPart
+				<ForecastProbabilitiesPart
 					locationData={locationData}
 					forecastType={forecastType}
 					forecastDisplay={forecastDisplay}
@@ -992,4 +1068,4 @@ const PopupContent = ({
 	);
 };
 
-PopupContent.displayName = 'Content';
+LocationModalContentPart.displayName = 'LocationModalContentPart'; // Explicit string literal, or this name would be lost in production.

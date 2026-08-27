@@ -1,12 +1,12 @@
 import { sprintf } from '@wordpress/i18n';
-import { S2D_NB_PERIODS } from '@/lib/constants';
+import { S2D_FORECAST_CONVENTIONAL_NB_PERIODS } from '@/lib/constants';
 import {
 	ClimateVariableInterface,
 	ForecastType,
 	ForecastTypes,
 	FrequencyType,
-	FrequencyTypes,
 	S2DFrequencyType,
+	S2DFrequencyTypes,
 } from '@/types/climate-variable-interface';
 import type {
 	ProgressBarProps,
@@ -14,6 +14,8 @@ import type {
 import { formatUTCDate, utc } from '@/lib/utils';
 import { formatIntlDate } from '@/lib/format';
 import { __ } from '@/context/locale-provider';
+
+import { assertIsS2DFrequencyType } from '@/types/assertions';
 
 export type PeriodRange = [Date, Date];
 
@@ -47,26 +49,80 @@ export interface LocationS2DData {
 	skill_CRPSS: number;
 }
 
+type PeriodJumpUnit = 'month' | 'year';
+
 /**
- * For a period start return the end date of the period based on the frequency.
+ * Resolve the span of one period for a frequency.
  *
- * For "monthly" frequency, the period end is the end of the same month.
- * For "seasonal", the period end is the end of the 3rd following month.
+ * The returned jump is used by `getPeriodEnd` to calculate the period's inclusive
+ * end boundary. It is distinct from `nbPeriods`, which controls how many `[start, end]`
+ * tuples `getPeriods` returns, and from the step used to start the next tuple.
  *
- * @param periodStart - The date representing the start of the period
- * @param frequency - The frequency for which we want the period end
- * @returns - The date for the end of the period
+ * @param frequency - The frequency whose period span should be resolved.
+ * @param throws - If true, the function will throw an error for unsupported frequencies; otherwise, it returns null.
+ *
+ * @returns A tuple containing the jump size and unit, such as `[3, 'month']` for seasonal frequency.
+ * @throws An error if the frequency type is not supported.
  */
-export function getPeriodEnd(
+export const resolveFrequencyPeriodJump = (
+	frequency: S2DFrequencyType,
+	throws: boolean = true,
+): [number, PeriodJumpUnit] | null => {
+	let periodJumpSize = 1;
+	let periodJumpSizeUnit: PeriodJumpUnit = 'month';
+	if (frequency === S2DFrequencyTypes.SEASONAL) {
+		// Because a season is 3 months long.
+		periodJumpSize = 3;
+	} else if (isFrequencyTypeS2DDecadal(frequency)) {
+		periodJumpSizeUnit = 'year';
+		periodJumpSize = 5;
+	} else if (frequency === S2DFrequencyTypes.MONTHLY) {
+		periodJumpSize = 1;
+	} else {
+		if (!throws) {
+			return null;
+		}
+		throw new Error(
+			sprintf(
+				__('Unsupported frequency type: %s'),
+				frequency
+			)
+		);
+	}
+
+	return [
+		periodJumpSize,
+		periodJumpSizeUnit,
+	];
+};
+
+
+/**
+ * Calculate the inclusive end date for a period starting at `periodStart`.
+ *
+ * @param periodStart - The first day of the period.
+ * @param frequency - The frequency that determines the period length.
+ * @returns The last day of the period.
+ */
+const getPeriodEnd = (
 	periodStart: Date,
-	frequency: FrequencyType
-): Date {
-	const periodLength = frequency === FrequencyType.SEASONAL ? 3 : 1;
+	frequency: S2DFrequencyType,
+): Date => {
+	const jump = resolveFrequencyPeriodJump(frequency, false);
+	const [
+		periodJumpSize,
+		periodJumpSizeUnit,
+	] = jump ?? [1, 'month'];
 	const periodEnd = new Date(periodStart);
-	periodEnd.setUTCMonth(periodStart.getUTCMonth() + periodLength);
+	if (periodJumpSizeUnit === 'year') {
+		periodEnd.setUTCFullYear(periodStart.getUTCFullYear() + periodJumpSize);
+	} else {
+		periodEnd.setUTCMonth(periodStart.getUTCMonth() + periodJumpSize);
+	}
 	periodEnd.setUTCDate(0);
 	return periodEnd;
-}
+};
+
 
 /**
  * Return the time periods for a release date and specific frequency.
@@ -74,6 +130,7 @@ export function getPeriodEnd(
  * The number and length of time periods depend on the frequency:
  * - Seasonal frequency: 10 x 3-month periods, at 1-month interval
  * - Monthly frequency: 3 x 1-month periods, at 1-month interval
+ * - Decadal frequency: 2 x 5-year periods, at 5-year interval
  *
  * The first period starts on the same month as the release date. A period start
  * is always the first day of the month, and a period end is always the last
@@ -81,10 +138,12 @@ export function getPeriodEnd(
  *
  * All dates are in UTC time.
  *
+ * @see {@link S2D_FORECAST_CONVENTIONAL_NB_PERIODS} for the number of periods per frequency.
+ *
  * @example
  * ```typescript
  * const releaseDate = new Date('2025-10-15');
- * const periods = getPeriods(releaseDate, FrequencyType.MONTHLY);
+ * const periods = getPeriods(releaseDate, S2DFrequencyTypes.MONTHLY);
  * // Returned periods are (as array of Date instances): [
  * //   [2025-10-01, 2025-10-31]
  * //   [2025-11-01, 2025-11-30]
@@ -96,29 +155,47 @@ export function getPeriodEnd(
  * @param frequency - The frequency for which to get the periods.
  * @returns An array of [start, end] date instances for each period.
  */
-export function getPeriods(
+export const getPeriods = (
 	releaseDate: Date,
 	frequency: S2DFrequencyType,
-): PeriodRange[] {
-	const nbPeriods = S2D_NB_PERIODS[frequency];
-	const periodInterval = 1; // Periods are 1 month apart
-	const periods: [Date, Date][] = [];
+): PeriodRange[] => {
+	// nbPeriods: In other words; how long the list will be
+	const nbPeriods = S2D_FORECAST_CONVENTIONAL_NB_PERIODS[frequency];
+	const periods: PeriodRange[] = [];
 	const lastPeriod = new Date(
 		// Set to the first day of the month
 		Date.UTC(releaseDate.getUTCFullYear(), releaseDate.getUTCMonth(), 1)
 	);
 
-	for (let i = 0; i < nbPeriods; i++) {
-		const periodStart = new Date(lastPeriod);
-		const periodEnd = getPeriodEnd(periodStart, frequency);
-
-		periods.push([periodStart, periodEnd]);
-
-		lastPeriod.setUTCMonth(lastPeriod.getUTCMonth() + periodInterval);
+	try {
+		// Asked to throw, so the null branch of the return type cannot happen here.
+		const jump = resolveFrequencyPeriodJump(frequency, true) as [number, PeriodJumpUnit];
+		const [
+			periodJumpSize,
+			periodJumpSizeUnit,
+		] = jump;
+		for (let i = 0; i < nbPeriods; i++) {
+			const periodStart = new Date(lastPeriod);
+			const periodEnd = getPeriodEnd(periodStart, frequency);
+			periods.push([periodStart, periodEnd]);
+			if (periodJumpSizeUnit === 'month') {
+				// A sliding window: each period starts one month after the previous
+				// one, whatever its own length, so seasonal periods overlap.
+				lastPeriod.setUTCMonth(lastPeriod.getUTCMonth() + 1);
+			} else {
+				// Decadal periods must not overlap, so the next one starts where the
+				// previous one ended.
+				lastPeriod.setUTCFullYear(lastPeriod.getUTCFullYear() + periodJumpSize);
+			}
+		}
+	} catch {
+		// An unsupported frequency yields no periods at all, rather than a
+		// partially built list callers would have to second-guess.
 	}
 
+
 	return periods;
-}
+};
 
 /**
  * Find the index of the period range that matches a string date range.
@@ -196,8 +273,11 @@ export function buildSkillLayerName(
 ): string | null {
 
 	const frequencyNameMap: Record<string, string> = {
-		[FrequencyType.SEASONAL]: 'seasonal',
-		[FrequencyType.MONTHLY]: 'monthly',
+		[S2DFrequencyTypes.SEASONAL]: 'seasonal',
+		[S2DFrequencyTypes.MONTHLY]: 'monthly',
+		[S2DFrequencyTypes.DECADAL_ANNUAL]: S2DFrequencyTypes.DECADAL_ANNUAL,
+		[S2DFrequencyTypes.DECADAL_MAY_SEP]: S2DFrequencyTypes.DECADAL_MAY_SEP,
+		[S2DFrequencyTypes.DECADAL_NOV_MAR]: S2DFrequencyTypes.DECADAL_NOV_MAR,
 	}
 
 	let variableId = climateVariable.getId();
@@ -309,8 +389,44 @@ export const S2D_DOWNLOAD_FILENAME_MAP_FREQUENCY_TYPE: Record<
 	S2DFrequencyType,
 	string
 > = {
-	[FrequencyTypes.MONTHLY]: 'Monthly',
-	[FrequencyTypes.SEASONAL]: 'Seasonal',
+	[S2DFrequencyTypes.MONTHLY]: 'Monthly',
+	[S2DFrequencyTypes.SEASONAL]: 'Seasonal',
+	[S2DFrequencyTypes.DECADAL_ANNUAL]: 'DecadalAnnual',   // @TODO Confirm what would be the string to be used for download filename.
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]: 'DecadalMaySep',  // ^
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]: 'DecadalNovMar',  // ^
+};
+
+/**
+ * Narrow an unknown frequency to one an S2D variable accepts.
+ */
+export const isFrequencyTypeS2D = (
+	frequencyType?: FrequencyType | S2DFrequencyType | string | null,
+): frequencyType is S2DFrequencyType => {
+	let outcome = false;
+	try {
+		assertIsS2DFrequencyType(frequencyType ?? '');
+		outcome = true;
+	} catch {
+		outcome = false;
+	}
+
+	return outcome;
+};
+
+/**
+ * Tell whether a frequency is one of the decadal ones.
+ *
+ * The test is the `decadal-` prefix shared by every decadal slug, so a fourth
+ * one can be added to `S2DFrequencyTypes` without editing any caller of this.
+ */
+export const isFrequencyTypeS2DDecadal = (
+	frequencyType?: S2DFrequencyType | string | null,
+): frequencyType is S2DFrequencyType => {
+	if (isFrequencyTypeS2D(frequencyType)) {
+		return /^decadal-/.test(frequencyType);
+	}
+
+	return false;
 };
 
 /**
@@ -328,15 +444,18 @@ export function normalizeForApiVariableId(variableId: string): string {
 /**
  * Convert an S2D frequency type to the one to use in S2D API requests.
  *
- * @param frequency - The frequency, e.g. `FrequencyType.SEASONAL`.
+ * @param frequency - The frequency, e.g. `S2DFrequencyTypes.SEASONAL`.
  * @returns The frequency name to use for S2D API requests, e.g. `"seasonal"`
  */
 export function normalizeForApiFrequencyName(
 	frequency: S2DFrequencyType | string
 ): string {
 	const frequencyNameMap: Record<string, string> = {
-		[FrequencyType.SEASONAL]: 'seasonal',
-		[FrequencyType.MONTHLY]: 'monthly',
+		[S2DFrequencyTypes.SEASONAL]: 'seasonal',
+		[S2DFrequencyTypes.MONTHLY]: 'monthly',
+		[S2DFrequencyTypes.DECADAL_ANNUAL]: S2DFrequencyTypes.DECADAL_ANNUAL,
+		[S2DFrequencyTypes.DECADAL_MAY_SEP]: S2DFrequencyTypes.DECADAL_MAY_SEP,
+		[S2DFrequencyTypes.DECADAL_NOV_MAR]: S2DFrequencyTypes.DECADAL_NOV_MAR,
 	};
 
 	return frequencyNameMap[frequency] ?? frequency;
@@ -441,18 +560,24 @@ export const generatePeriodRangeLabel = (
 ): string | null => {
 	const periodStart = utc(dateRangeStart);
 
+	const isDecadalFrequencyType = isFrequencyTypeS2DDecadal(frequency);
+
 	if (!periodStart) {
 		return null;
 	}
 
-	const periodStartLabel = formatIntlDate(periodStart, locale, { month: 'long' });
+	const periodStartLabel = isDecadalFrequencyType
+		? formatIntlDate(periodStart, locale, { year: 'numeric' })
+		: formatIntlDate(periodStart, locale, { month: 'long' });
 
 	if (frequency === FrequencyType.MONTHLY) {
 		return periodStartLabel;
 	}
 
 	const periodEnd = getPeriodEnd(periodStart, frequency);
-	const periodEndLabel = formatIntlDate(periodEnd, locale, { month: 'long' });
+	const periodEndLabel = isDecadalFrequencyType
+		? formatIntlDate(periodEnd, locale, { year: 'numeric' })
+		: formatIntlDate(periodEnd, locale, { month: 'long' });
 
 	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
 };

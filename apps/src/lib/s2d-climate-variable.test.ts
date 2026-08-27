@@ -3,7 +3,7 @@ import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import {
 	ForecastDisplays,
 	ForecastTypes,
-	FrequencyType,
+	S2DFrequencyTypes,
 } from '@/types/climate-variable-interface';
 import { WMSParams } from '@/types/types';
 import L from 'leaflet';
@@ -42,8 +42,8 @@ describe('getLayerValue', () => {
 		[ForecastTypes.UNUSUAL, 'unusual'],
 	])('with frequency "%s"', (forecast, forecastName) => {
 		describe.each([
-			[FrequencyType.SEASONAL, 'seasonal'],
-			[FrequencyType.MONTHLY, 'monthly'],
+			[S2DFrequencyTypes.SEASONAL, 'seasonal'],
+			[S2DFrequencyTypes.MONTHLY, 'monthly'],
 		])('with frequency "%s"', (frequency, frequencyName) => {
 			describe.each([
 				[ForecastDisplays.CLIMATOLOGY, 'climatology'],

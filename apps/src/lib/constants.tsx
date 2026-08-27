@@ -4,7 +4,8 @@ import { ColourScheme, ColourSchemeType, DatasetKey } from '@/types/types';
 import { MAP_CONFIG } from '@/config/map.config';
 import {
 	FrequencyType,
-	S2DFrequencyType,
+	S2DFrequencyTypes,
+	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
 import mapPinIcon from '@/assets/map-pin.svg';
@@ -186,12 +187,36 @@ export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
 }
 
 /**
- * For S2D variables, the number of available periods for each frequency type.
+ * Decadal forecasts use two consecutive five-year periods to represent a ten-year interval.
+ * This is a frontend convention matching the period structure exposed by the APIs.
  */
-export const S2D_NB_PERIODS: { [key in S2DFrequencyType]: number } = {
-	[FrequencyType.MONTHLY]: 3,
-	[FrequencyType.SEASONAL]: 10,
-};
+const S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL = 2;
+
+/**
+ * Number of forecast periods displayed for each S2D frequency.
+ *
+ * - Seasonal frequency: 10 x 3-month periods, at 1-month interval (with overlap)
+ * - Monthly frequency: 3 x 1-month periods, at 1-month interval
+ * - Decadal frequency: 2 x 5-year periods, at 5-year interval
+ *
+ * Seasonal periods overlap because they advance by one month while spanning
+ * three, which is why ten of them cover twelve months.
+ * Decadal periods do not overlap, so the two of them cover the ten years.
+ */
+export const S2D_FORECAST_CONVENTIONAL_NB_PERIODS: Record<S2DFrequencyType, number> = {
+	// The current month and the following two months.
+	[S2DFrequencyTypes.MONTHLY]:
+		3,
+	// Ten overlapping three-month periods, each starting one month after the previous period.
+	[S2DFrequencyTypes.SEASONAL]:
+		10,
+	[S2DFrequencyTypes.DECADAL_ANNUAL]:
+		S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL,
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]:
+		S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL,
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]:
+		S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL,
+ } as const;
 
 export const AHCCD_SQUARE_ICON = (
 	<svg width="20" height="20" viewBox="0 0 20 20">

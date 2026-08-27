@@ -220,13 +220,13 @@ const LineTheTimePeriodForVariableHas = (
 	const variableName = climateVariable?.getTitle() ?? '';
 
 	const dateRange = climateVariable?.getDateRange();
-	// Same logic around dateRangeStart in S2DVariableValues
+	// Same logic around dateRangeStart in LocationModalS2D
 	const dateRangeStart = dateRange ? dateRange[0] : null;
 
 	let formattedPeriodRange = '';
 
 	if (dateRangeStart !== null) {
-		// Same logic around DateRangeLine in S2DVariableValues
+		// Same logic around DateRangeLine in LocationModalS2D
 		const DateRangeLine = dateRangeStart
 			? generatePeriodRangeLabel(dateRangeStart, frequency, locale)
 			: null;
@@ -397,13 +397,14 @@ const ForecastSummaryContents = (
 	);
 };
 
+ForecastSummaryContents.displayName = 'ForecastSummaryContents'; // Explicit string literal, or this name would be lost in production.
 
-type S2DLocationModalForecastSummaryProps =
+type LocationModalS2DForecastSummaryProps =
 	WithLocationData &
 	WithProgressBars;
 
-export const S2DLocationModalForecastSummary = (
-	props: S2DLocationModalForecastSummaryProps,
+export const LocationModalS2DForecastSummary = (
+	props: LocationModalS2DForecastSummaryProps,
 ): React.ReactNode => {
 	const {
 		progressBars,
@@ -427,5 +428,7 @@ export const S2DLocationModalForecastSummary = (
 	);
 };
 
-export default S2DLocationModalForecastSummary;
+LocationModalS2DForecastSummary.displayName = 'LocationModalS2DForecastSummary'; // Explicit string literal, or this name would be lost in production.
+
+export default LocationModalS2DForecastSummary;
 

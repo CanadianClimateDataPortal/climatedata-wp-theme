@@ -11,7 +11,6 @@ import { selectSelectedLocationTitle } from '@/features/map/map-slice';
 
 import S2DReleaseDate from '@/components/s2d-release-date';
 
-import { buildForecastProbabilitiesCategories } from '@/lib/s2d-build-forecast-categories';
 
 import { type ProgressBarProps } from '@/types/progress-bar';
 
@@ -27,11 +26,12 @@ import {
 } from '@/types/climate-variable-interface';
 
 import {
+	buildForecastProbabilitiesCategories,
 	extractSkillLevelData,
 	generatePeriodRangeLabel,
+	normalizeProbabilitiesBarChartPercent,
 	type LocationS2DData,
 } from '@/lib/s2d';
-import { normalizeProbabilitiesBarChartPercent } from '@/lib/s2d-forecast-probabilities-bar-chart';
 import {
 	formatValue,
 } from '@/lib/format';

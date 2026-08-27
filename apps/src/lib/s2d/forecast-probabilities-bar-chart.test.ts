@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { ColourMap, ColourSchemeType } from '@/types/types';
-import { getProbabilitiesBarChartColour } from '@/lib/s2d-forecast-probabilities-bar-chart';
+import { getProbabilitiesBarChartColour } from '@/lib/s2d';
 
 describe('getProbabilitiesBarChartColour', () => {
 	let colourMap: ColourMap;

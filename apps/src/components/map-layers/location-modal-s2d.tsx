@@ -12,14 +12,13 @@ import { FetchError, fetchS2DLocationData } from '@/services/services';
 import { formatValue } from '@/lib/format';
 import { cn, utc } from '@/lib/utils';
 import {
+	buildForecastProbabilitiesCategories,
 	extractSkillLevelData,
 	generatePeriodRangeLabel,
-	type LocationS2DData,
-} from '@/lib/s2d';
-import {
 	getProbabilitiesBarChartColour,
 	normalizeProbabilitiesBarChartPercent,
-} from '@/lib/s2d-forecast-probabilities-bar-chart';
+	type LocationS2DData,
+} from '@/lib/s2d';
 import { isFrequencyTypeS2DDecadal } from '@/types/assertions';
 import {
 	ForecastDisplay,
@@ -31,7 +30,6 @@ import {
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 
-import { buildForecastProbabilitiesCategories } from '@/lib/s2d-build-forecast-categories';
 import LocationModalS2DForecastSummary from '@/components/map-layers/location-modal-s2d-forecast-summary';
 
 import ProgressBar from '@/components/ui/progress-bar';

@@ -15,6 +15,23 @@ import type {
 } from './types';
 
 /**
+ * Map S2D frequency types to the frequency names used in S2D API requests
+ * and GeoServer layer names.
+ *
+ * Callers differ in how they treat a frequency missing from this map:
+ * `buildSkillLayerName` yields null, `normalizeForApiFrequencyName` passes
+ * the input through, and `S2DClimateVariable.getLayerValue` falls back to
+ * the seasonal name.
+ */
+export const S2D_API_FREQUENCY_NAME_MAP: Record<string, string> = {
+	[S2DFrequencyTypes.SEASONAL]: 'seasonal',
+	[S2DFrequencyTypes.MONTHLY]: 'monthly',
+	[S2DFrequencyTypes.DECADAL_ANNUAL]: S2DFrequencyTypes.DECADAL_ANNUAL,
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]: S2DFrequencyTypes.DECADAL_MAY_SEP,
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]: S2DFrequencyTypes.DECADAL_NOV_MAR,
+};
+
+/**
  * Create and return the GeoServer layer name for the Skill layer.
  *
  * "Skill" in meteorology refers to forecast accuracy relative to a baseline
@@ -37,26 +54,13 @@ export function buildSkillLayerName(
 	releaseDate: Date
 ): string | null {
 
-	const frequencyNameMap: Record<string, string> = {
-		[S2DFrequencyTypes.SEASONAL]: 'seasonal',
-		[S2DFrequencyTypes.MONTHLY]: 'monthly',
-		[S2DFrequencyTypes.DECADAL_ANNUAL]: S2DFrequencyTypes.DECADAL_ANNUAL,
-		[S2DFrequencyTypes.DECADAL_MAY_SEP]: S2DFrequencyTypes.DECADAL_MAY_SEP,
-		[S2DFrequencyTypes.DECADAL_NOV_MAR]: S2DFrequencyTypes.DECADAL_NOV_MAR,
-	}
-
-	let variableId = climateVariable.getId();
+	const variableId = normalizeForApiVariableId(climateVariable.getId());
 	const variableFrequency = climateVariable.getFrequency() ?? '';
-	const frequency = frequencyNameMap[variableFrequency];
+	const frequency = S2D_API_FREQUENCY_NAME_MAP[variableFrequency];
 	const referencePeriod = String(releaseDate.getUTCMonth() + 1).padStart(2, '0');
 
 	if (!frequency) {
 		return null;
-	}
-
-	// Trim the "s2d_" prefix from the variable ID if it exists.
-	if (variableId.startsWith('s2d_')) {
-		variableId = variableId.slice(4);
 	}
 
 	return `CDC:s2d-skill-${variableId}-${frequency}-${referencePeriod}`;
@@ -182,15 +186,7 @@ export function normalizeForApiVariableId(variableId: string): string {
 export function normalizeForApiFrequencyName(
 	frequency: S2DFrequencyType | string
 ): string {
-	const frequencyNameMap: Record<string, string> = {
-		[S2DFrequencyTypes.SEASONAL]: 'seasonal',
-		[S2DFrequencyTypes.MONTHLY]: 'monthly',
-		[S2DFrequencyTypes.DECADAL_ANNUAL]: S2DFrequencyTypes.DECADAL_ANNUAL,
-		[S2DFrequencyTypes.DECADAL_MAY_SEP]: S2DFrequencyTypes.DECADAL_MAY_SEP,
-		[S2DFrequencyTypes.DECADAL_NOV_MAR]: S2DFrequencyTypes.DECADAL_NOV_MAR,
-	};
-
-	return frequencyNameMap[frequency] ?? frequency;
+	return S2D_API_FREQUENCY_NAME_MAP[frequency] ?? frequency;
 }
 
 /**

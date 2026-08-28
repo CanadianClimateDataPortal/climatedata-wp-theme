@@ -14,7 +14,9 @@ import { cn, utc } from '@/lib/utils';
 import {
 	buildForecastProbabilitiesCategories,
 	extractSkillLevelData,
+	formatYear,
 	generatePeriodRangeLabel,
+	getPeriodEnd,
 	getProbabilitiesBarChartColour,
 	normalizeProbabilitiesBarChartPercent,
 	type LocationS2DData,
@@ -886,16 +888,19 @@ const LocationModalContentPart = (
 		);
 	}
 
-	let DateRangeLine = dateRangeStart
-		? generatePeriodRangeLabel(dateRangeStart, frequency, locale)
-		: null;
-
-	if (isFrequencyTypeS2DDecadal(frequency) && DateRangeLine !== null) {
-		/**
-		 * A month range keeps its localised wording, such as 'Juillet à Août',
-		 * but a year range reads better as '2026-2030' than as '2026 à 2030'.
-		 */
-		DateRangeLine = DateRangeLine.split(' ').filter(Number).join('-');
+	let DateRangeLine: string | null = null;
+	if (dateRangeStart) {
+		const periodStart = utc(dateRangeStart);
+		if (isFrequencyTypeS2DDecadal(frequency) && periodStart) {
+			/**
+			 * A month range keeps its localised wording, such as 'Juillet à Août',
+			 * but a year range reads better as '2026-2030' than as '2026 à 2030'.
+			 */
+			const periodEnd = getPeriodEnd(periodStart, frequency);
+			DateRangeLine = `${formatYear(periodStart, locale)}-${formatYear(periodEnd, locale)}`;
+		} else {
+			DateRangeLine = generatePeriodRangeLabel(dateRangeStart, frequency, locale);
+		}
 	}
 
 	if (!isForecast && isFrequencyTypeS2DDecadal(frequency)) {

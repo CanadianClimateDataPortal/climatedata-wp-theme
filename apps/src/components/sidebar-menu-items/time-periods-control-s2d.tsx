@@ -11,6 +11,7 @@ import { useS2D } from '@/hooks/use-s2d';
 import { useLocale } from '@/hooks/use-locale';
 import {
 	formatPeriodRange,
+	formatYear,
 	findPeriodIndexForDateRange,
 	getPeriods,
 	type PeriodRange,
@@ -67,16 +68,15 @@ const generateSliderLabels = (
 	let maximumLabel = formatMinMaxLabel(lastPeriod, locale);
 
 	if (isFrequencyTypeS2DDecadal(frequencyType)) {
-		// returns `<month> <year>` in both locales, so the second token is the year.
-		minimumLabel = minimumLabel.split(' ')[1];
-		maximumLabel = maximumLabel.split(' ')[1];
+		minimumLabel = formatYear(firstPeriod, locale);
+		maximumLabel = formatYear(lastPeriod, locale);
 	}
 
 	const tickLabels = periods.map((period) => {
 		if (isFrequencyTypeS2DDecadal(frequencyType)) {
 			// Year ranges, such as "2026-2030" then "2031-2035".
-			const startYear = formatShortMonthYear(period[0], locale).split(' ')[1];
-			const endYear = formatShortMonthYear(period[1], locale).split(' ')[1];
+			const startYear = formatYear(period[0], locale);
+			const endYear = formatYear(period[1], locale);
 			return `${startYear}-${endYear}`;
 		} else {
 			// Month ranges, such as "Aug-Oct" then "Sep-Nov", or "août-oct" then

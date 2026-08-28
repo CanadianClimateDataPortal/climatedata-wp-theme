@@ -11,15 +11,15 @@ import React from 'react';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { ForecastDisplays } from '@/types/climate-variable-interface';
 
-export interface S2DForecastDisplaySkillFieldCheckboxProps {
+export interface MaskLowSkillControlS2DProps {
 	tooltip?: React.ReactNode;
 }
 
 /**
  * @see {@link selectLowSkillVisibility} — "skill" is an S2D-specific concept
  */
-export const MaskLowSkillField = (
-	props: S2DForecastDisplaySkillFieldCheckboxProps,
+export const MaskLowSkillControlS2D = (
+	props: MaskLowSkillControlS2DProps,
 ) => {
 	const { climateVariable } = useClimateVariable();
 
@@ -62,4 +62,4 @@ export const MaskLowSkillField = (
 	);
 };
 
-MaskLowSkillField.displayName = 'MaskLowSkillField';
+MaskLowSkillControlS2D.displayName = 'MaskLowSkillControlS2D';

@@ -11,5 +11,4 @@ export * from './create-fetch-request-init-options';
 export * from './create-fetch-target-to-raster-with-encoded-url';
 export * from './prepare-raster';
 export * from './signal-raster-ready';
-export * from './resolve-signal-ready';
 export * from './install-prepare-raster-stub';

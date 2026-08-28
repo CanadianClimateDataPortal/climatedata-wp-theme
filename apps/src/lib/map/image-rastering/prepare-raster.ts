@@ -27,11 +27,9 @@ import type { PrepareRaster } from './types';
  *
  * Not reversible — restoring the original UI requires a full page reload.
  *
- * Ends by calling `signalReady`, the injected readiness signal — defaults to
- * {@link signalRasterReady} — which is how the service learns it may proceed.
- * Everything awaited before that point is something the screenshot depends on
- * *and* that the platform can report the completion of. Nothing here waits out
- * a fixed delay.
+ * Ends by calling {@link signalRasterReady} internally. That function is made
+ * to modify the DOM by adding something specific (`RASTER_READY_CLASS_NAME`)
+ * that the screenshot service is polling for to take the screenshot.
  */
 // Exposed globally as $.fn.prepare_raster because a server-side headless-browser
 // screenshot service invokes that exact expression against the page. A second,
@@ -40,10 +38,6 @@ import type { PrepareRaster } from './types';
 export const prepareRaster: PrepareRaster = async (
 	payload,
 	handles,
-	// Injected so a caller can substitute its own readiness signal without a
-	// branch inside this receiver-side production code. Defaults to the real
-	// signal, so two-argument callers are unaffected.
-	signalReady = signalRasterReady,
 ): Promise<void> => {
 	const maps = [
 		handles?.map ?? null,
@@ -155,5 +149,5 @@ export const prepareRaster: PrepareRaster = async (
 		);
 	}
 
-	signalReady();
+	signalRasterReady();
 };

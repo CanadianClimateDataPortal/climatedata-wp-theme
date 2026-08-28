@@ -19,12 +19,12 @@ const ForecastTypeField = {
 	],
 };
 
-export interface S2DForecastTypeFieldDropdownProps {
+export interface ForecastTypeDropdownS2DProps {
 	tooltip?: React.ReactNode;
 }
 
-export const S2DForecastTypeFieldDropdown = (
-	props: S2DForecastTypeFieldDropdownProps
+export const ForecastTypeDropdownS2D = (
+	props: ForecastTypeDropdownS2DProps
 ) => {
 	const {
 		climateVariable,
@@ -51,5 +51,5 @@ export const S2DForecastTypeFieldDropdown = (
 	);
 };
 
-S2DForecastTypeFieldDropdown.displayName = 'S2DForecastTypeFieldDropdown';
-S2DForecastTypeFieldDropdown.DEFAULT_VALUE = ForecastTypes.EXPECTED;
+ForecastTypeDropdownS2D.displayName = 'ForecastTypeDropdownS2D';
+ForecastTypeDropdownS2D.DEFAULT_VALUE = ForecastTypes.EXPECTED;

@@ -6,7 +6,7 @@ import {
 } from '@/components/download/step-container';
 import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-download-fields";
 import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
-import { S2DForecastTypeFieldDropdown } from '@/components/sidebar-menu-items/forecast-type-dropdown-s2d';
+import { ForecastTypeDropdownS2D } from '@/components/sidebar-menu-items/forecast-type-dropdown-s2d';
 import { DefinitionList, type DefinitionItem } from '@/components/ui/definition-list';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useS2D } from '@/hooks/use-s2d';
@@ -120,7 +120,7 @@ const StepVariableOptions: StepComponent = ({ onChangeValidity }) => {
 			<div className="gap-4">
 				{isS2DVariable ? (
 					<div className="mb-8 sm:w-64">
-						<S2DForecastTypeFieldDropdown
+						<ForecastTypeDropdownS2D
 							tooltip={tooltipForecastType}
 						/>
 					</div>

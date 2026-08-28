@@ -879,6 +879,8 @@ const LocationModalContentPart = (
 	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
 
 	if (!(frequency in FREQUENCY_LABEL)) {
+		// Pin the silent error paths as deliberate contracts.
+		// This ensures what the code is currently assuming is explicit.
 		const message  = `LocationModalContentPart: Unknown frequency: ${frequency}`;
 		console.error(message);
 		return (

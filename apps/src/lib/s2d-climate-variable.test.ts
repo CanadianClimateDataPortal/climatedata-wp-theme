@@ -83,8 +83,8 @@ describe('getLayerValue', () => {
 				);
 
 				test('layer has the correct frequency', () => {
-					const layer = climateVariable.getLayerValue();
-					const layerParts = layer.split('-');
+					const layer = climateVariable.getLayerValue(); // e.g. "CDC:s2d-forecast-test-seasonal-expected"
+					const layerParts = layer.split('-'); // e.g. `['CDC:s2d', 'forecast', 'test', 'seasonal', 'expected']`
 					expect(layerParts[3]).toEqual(frequencyName);
 				});
 
@@ -105,6 +105,59 @@ describe('getLayerValue', () => {
 					expect(layerParts).toHaveLength(nbExpectedParts);
 				});
 			});
+		});
+	});
+
+	/**
+	 * We have to test decadal frequencies separately because their slugs contain hyphens.
+	 *
+	 * For example, the frequency `S2DFrequencyTypes.DECADAL_ANNUAL` contains the string
+	 * "decadal-ann", and the test suite above that assumes a single-word frequency
+	 * like "seasonal" (taken from "CDC:s2d-forecast-test-seasonal-expected").
+	 */
+	describe.each([
+		[S2DFrequencyTypes.DECADAL_ANNUAL],
+		[S2DFrequencyTypes.DECADAL_MAY_SEP],
+		[S2DFrequencyTypes.DECADAL_NOV_MAR],
+	])('with decadal frequency "%s"', (frequency) => {
+		beforeEach(() => {
+			climateVariable.getFrequency = () => frequency;
+			climateVariable.getForecastType = () => ForecastTypes.EXPECTED;
+		});
+
+		test('builds the forecast layer name', () => {
+			climateVariable.getForecastDisplay = () => ForecastDisplays.FORECAST;
+			expect(climateVariable.getLayerValue()).toEqual(
+				`CDC:s2d-forecast-test-${frequency}-expected`
+			);
+		});
+
+		test('builds the climatology layer name', () => {
+			climateVariable.getForecastDisplay = () =>
+				ForecastDisplays.CLIMATOLOGY;
+			expect(climateVariable.getLayerValue()).toEqual(
+				`CDC:s2d-climatology-test-${frequency}`
+			);
+		});
+	});
+
+	describe('with a frequency missing from the name map', () => {
+		/**
+		 * Pin the silent error paths as deliberate contracts.
+		 * This ensures what the code is currently assuming is explicit.
+		 *
+		 * The fallback "seasonal" (instead of "not-a-frequency") is deliberate.
+		 * An unknown frequency must still yield a well-formed layer name,
+		 * because `getLayerValue` silently substitutes with "seasonal" frequency name
+		 * as a fallback rather than an undefined value or something else.
+		 */
+		test('falls back to the seasonal name', () => {
+			climateVariable.getFrequency = () => 'not-a-frequency';
+			climateVariable.getForecastType = () => ForecastTypes.EXPECTED;
+			climateVariable.getForecastDisplay = () => ForecastDisplays.FORECAST;
+			expect(climateVariable.getLayerValue()).toEqual(
+				'CDC:s2d-forecast-test-seasonal-expected'
+			);
 		});
 	});
 });

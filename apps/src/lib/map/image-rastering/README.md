@@ -24,5 +24,4 @@ Everything [`index.ts`](./index.ts) exports:
 - `createFetchRequestInitOptions` — wraps a payload as the POST `fetch` init.
 - `createFetchTargetToRasterWithEncodedUrl` — builds the salted, encoded screenshot-service URL.
 - `signalRasterReady` — adds `to-raster` to `#map-root`.
-- `resolveSignalReady` — returns the readiness callback `prepareRaster` should use; the seam a caller substitutes its own through.
 - `installPrepareRasterStub` — installs the start-up placeholder described above.

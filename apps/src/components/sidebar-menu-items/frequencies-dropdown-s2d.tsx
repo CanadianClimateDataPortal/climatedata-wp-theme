@@ -67,13 +67,13 @@ const FREQUENCY_OPTIONS_WITH_DECADAL = [
 	...S2D_FREQUENCIES_TO_ADD_SUPPORT,
 ];
 
-export interface S2DFrequencyFieldDropdownProps {
+interface FrequenciesDropdownS2DProps {
 	tooltip?: React.ReactNode;
 	afterOnChange?: (value: S2DFrequencyType | string) => void;
 }
 
-export const S2DFrequencyFieldDropdown = (
-	props: S2DFrequencyFieldDropdownProps,
+export const FrequenciesDropdownS2D = (
+	props: FrequenciesDropdownS2DProps,
 ): React.ReactNode => {
 	const {
 		climateVariable,
@@ -107,4 +107,4 @@ export const S2DFrequencyFieldDropdown = (
 	);
 };
 
-S2DFrequencyFieldDropdown.displayName = 'S2DFrequencyFieldDropdown'; // Explicit string literal, or this name would be lost in production.
+FrequenciesDropdownS2D.displayName = 'FrequenciesDropdownS2D'; // Explicit string literal, or this name would be lost in production.

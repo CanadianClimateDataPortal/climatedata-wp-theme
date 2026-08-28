@@ -4,7 +4,7 @@ import { SidebarMenuItem, SidebarSeparator } from '@/components/ui/sidebar';
 
 import { S2DForecastDisplayFieldDropdown } from '@/components/sidebar-menu-items/forecast-display-dropdown-s2d';
 import { S2DForecastTypeFieldDropdown } from '@/components/sidebar-menu-items/forecast-type-dropdown-s2d';
-import { S2DFrequencyFieldDropdown } from '@/components/sidebar-menu-items/frequencies-dropdown-s2d';
+import { FrequenciesDropdownS2D } from '@/components/sidebar-menu-items/frequencies-dropdown-s2d';
 import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
 import { MaskLowSkillField } from '@/components/sidebar-menu-items/mask-low-skill-control-s2d';
 
@@ -60,7 +60,7 @@ const SidebarInnerS2D = () => {
 			<SidebarSeparator />
 
 			<SidebarMenuItem>
-				<S2DFrequencyFieldDropdown
+				<FrequenciesDropdownS2D
 					tooltip={tooltipFrequencies}
 				/>
 			</SidebarMenuItem>

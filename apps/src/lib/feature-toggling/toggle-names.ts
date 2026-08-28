@@ -11,7 +11,7 @@
  *
  * The decadal frequencies already work when requested through the URL, with
  * `&freq=decadal-ann`, `&freq=decadal-may-sep` or `&freq=decadal-nov-mar`.
- * When this toggle is inactive, the `S2DFrequencyFieldDropdown` keeps them hidden
+ * When this toggle is inactive, the `FrequenciesDropdownS2D` keeps them hidden
  * until they are ready for a public audience.
  *
  * To activate it, use the browser DevTools or add a URL query parameter:

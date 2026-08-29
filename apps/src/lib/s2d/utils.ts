@@ -54,13 +54,18 @@ export function buildSkillLayerName(
 	releaseDate: Date
 ): string | null {
 
-	const variableId = normalizeForApiVariableId(climateVariable.getId());
+	let variableId = normalizeForApiVariableId(climateVariable.getId());
 	const variableFrequency = climateVariable.getFrequency() ?? '';
 	const frequency = S2D_API_FREQUENCY_NAME_MAP[variableFrequency];
 	const referencePeriod = String(releaseDate.getUTCMonth() + 1).padStart(2, '0');
 
 	if (!frequency) {
 		return null;
+	}
+
+	// Trim the "s2d_" prefix from the variable ID if it exists.
+	if (variableId.startsWith('s2d_')) {
+		variableId = variableId.slice(4);
 	}
 
 	return `CDC:s2d-skill-${variableId}-${frequency}-${referencePeriod}`;

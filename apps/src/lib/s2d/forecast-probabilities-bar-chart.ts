@@ -48,7 +48,7 @@ const isWhite = (colour: `#${string}`): boolean =>
  * @param colorMap - The colour map containing the colours
  * @returns The colour associated with the given percentage and outcome.
  */
-export const getProbabilitiesBarChartColour = (
+export const getProbabilityColour = (
 	outcome: number,
 	percentage: number,
 	colorMap: ColourMap
@@ -116,7 +116,7 @@ export const getProbabilitiesBarChartColour = (
  * The method of trimming decimal values to determine if the value is part of the cutoff.
  *
  * @see {@link LocationS2DData} for the cutoffs and probabilities values.
- * @see {@link getProbabilitiesBarChartColour} for how the normalized percent value is used to determine the colour of the probability bar.
+ * @see {@link getProbabilityColour} for how the normalized percent value is used to determine the colour of the probability bar.
  */
 export const normalizeProbabilitiesBarChartPercent = (
 	input: Pick<ProgressBarProps, 'percent'>,

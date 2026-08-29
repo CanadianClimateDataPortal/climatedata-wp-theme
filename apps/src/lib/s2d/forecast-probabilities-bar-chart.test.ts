@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { ColourMap, ColourSchemeType } from '@/types/types';
-import { getProbabilitiesBarChartColour } from '@/lib/s2d';
+import { getProbabilityColour } from '@/lib/s2d';
 
-describe('getProbabilitiesBarChartColour', () => {
+describe('getProbabilityColour', () => {
 	let colourMap: ColourMap;
 	const defaultColour = '#909090';
 	const whiteColours = ['#ffffff', '#fff', '#FFFFFF', '#FFF'];
@@ -34,16 +34,16 @@ describe('getProbabilitiesBarChartColour', () => {
 		});
 
 		test('returns correct colour if exact quantity', () => {
-			const colour = getProbabilitiesBarChartColour(1, 40, colourMap);
-			// As per the description of {getProbabilitiesBarChartColour}, the colour
+			const colour = getProbabilityColour(1, 40, colourMap);
+			// As per the description of {getProbabilityColour}, the colour
 			// returned for a value matching an exact quantity is the colour
 			// of the next quantity (because the boundaries are exclusive).
 			expect(colour).toEqual('#002050');
 		});
 
 		test('percentage is rounded (rounded down)', () => {
-			const colour = getProbabilitiesBarChartColour(2, 50.4, colourMap);
-			// As per the description of {getProbabilitiesBarChartColour}, the colour
+			const colour = getProbabilityColour(2, 50.4, colourMap);
+			// As per the description of {getProbabilityColour}, the colour
 			// returned for a value matching an exact quantity, after rounding,
 			// is the colour of the next quantity (because the boundaries are
 			// exclusive).
@@ -51,32 +51,32 @@ describe('getProbabilitiesBarChartColour', () => {
 		});
 
 		test('percentage is rounded (rounded up)', () => {
-			const colour = getProbabilitiesBarChartColour(2, 49.6, colourMap);
+			const colour = getProbabilityColour(2, 49.6, colourMap);
 			expect(colour).toEqual('#003060');
 		});
 
 		test('returns the next colour if less than the exact quantity (in quantity range)', () => {
-			const colour = getProbabilitiesBarChartColour(2, 42, colourMap);
+			const colour = getProbabilityColour(2, 42, colourMap);
 			expect(colour).toEqual('#003050');
 		});
 
 		test('returns the next colour if less than the exact quantity (below minimum quantity)', () => {
-			const colour = getProbabilitiesBarChartColour(0, 2, colourMap);
+			const colour = getProbabilityColour(0, 2, colourMap);
 			expect(colour).toEqual('#001010');
 		});
 
 		test('returns the default colour if greater than max of same outcome', () => {
-			const colour = getProbabilitiesBarChartColour(1, 61, colourMap);
+			const colour = getProbabilityColour(1, 61, colourMap);
 			expect(colour).toEqual(defaultColour);
 		});
 
 		test('returns the default colour if greater than max of last outcome', () => {
-			const colour = getProbabilitiesBarChartColour(2, 70, colourMap);
+			const colour = getProbabilityColour(2, 70, colourMap);
 			expect(colour).toEqual(defaultColour);
 		});
 
 		test('returns the default colour if outcome greater than max outcome', () => {
-			const colour = getProbabilitiesBarChartColour(3, 10, colourMap);
+			const colour = getProbabilityColour(3, 10, colourMap);
 			expect(colour).toEqual(defaultColour);
 		});
 	});
@@ -93,7 +93,7 @@ describe('getProbabilitiesBarChartColour', () => {
 			// If there is a colour specified for the exact quantity of 100,
 			// we return this colour (contrary to other cases where we return
 			// the next colour)
-			const colour = getProbabilitiesBarChartColour(0, 100, colourMap);
+			const colour = getProbabilityColour(0, 100, colourMap);
 			// The correct colour with an exact match is the one after (i.e. the
 			// same as if the percentage was >40)
 			expect(colour).toEqual('#001100');
@@ -103,7 +103,7 @@ describe('getProbabilitiesBarChartColour', () => {
 			// If there is no colour specified for the exact quantity of 100,
 			// have the default behaviour of returning the default colour if
 			// no coulour available for the outcome.
-			const colour = getProbabilitiesBarChartColour(1, 100, colourMap);
+			const colour = getProbabilityColour(1, 100, colourMap);
 			// The correct colour with an exact match is the one after (i.e. the
 			// same as if the percentage was >40)
 			expect(colour).toEqual(defaultColour);
@@ -126,7 +126,7 @@ describe('getProbabilitiesBarChartColour', () => {
 					'#001095',
 				];
 				colourMap.quantities = [1030, 1050, 1095];
-				const colour = getProbabilitiesBarChartColour(0, 22, colourMap);
+				const colour = getProbabilityColour(0, 22, colourMap);
 				expect(colour).toEqual('#001095');
 			}
 		);
@@ -141,7 +141,7 @@ describe('getProbabilitiesBarChartColour', () => {
 					'#002050',
 				];
 				colourMap.quantities = [1020, 1050, 1100, 2050];
-				const colour = getProbabilitiesBarChartColour(0, 35, colourMap);
+				const colour = getProbabilityColour(0, 35, colourMap);
 				expect(colour).toEqual(defaultColour);
 			}
 		);
@@ -156,7 +156,7 @@ describe('getProbabilitiesBarChartColour', () => {
 					whiteColour,
 				];
 				colourMap.quantities = [1020, 1050, 1100, 2050];
-				const colour = getProbabilitiesBarChartColour(1, 51, colourMap);
+				const colour = getProbabilityColour(1, 51, colourMap);
 				expect(colour).toEqual(defaultColour);
 			}
 		);

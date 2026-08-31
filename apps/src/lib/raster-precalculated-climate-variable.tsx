@@ -18,7 +18,7 @@ import {
 import RasterPrecalcultatedClimateVariableValues
 	from '../components/map-layers/raster-precalculated-climate-variable-values';
 import { getFrequencyType } from '@/lib/utils.ts';
-import { isFrequencyTypeS2D } from '@/lib/s2d';
+import { isFrequencyTypeS2D } from '@/types/assertions';
 import { WMSParams } from '@/types/types';
 import {
 	type PostDownloadToBlobObjectURLPayload,

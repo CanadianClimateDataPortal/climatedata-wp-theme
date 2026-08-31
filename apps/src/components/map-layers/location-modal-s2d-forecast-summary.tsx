@@ -11,7 +11,6 @@ import { selectSelectedLocationTitle } from '@/features/map/map-slice';
 
 import S2DReleaseDate from '@/components/s2d-release-date';
 
-import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
 
 import { type ProgressBarProps } from '@/types/progress-bar';
 
@@ -27,6 +26,7 @@ import {
 } from '@/types/climate-variable-interface';
 
 import {
+	buildForecastProbabilitiesCategories,
 	extractSkillLevelData,
 	generatePeriodRangeLabel,
 	normalizeProbabilitiesBarChartPercent,
@@ -318,7 +318,7 @@ const LineListForecastCategories = (
 		climateVariable?.getForecastType() ?? ForecastTypes.UNUSUAL;
 
 	// Category definitions parallel to progressBars, for tooltip content
-	const forecastCategories = buildForecastCategories(forecastType);
+	const forecastCategories = buildForecastProbabilitiesCategories(forecastType);
 
 	return (
 		<>

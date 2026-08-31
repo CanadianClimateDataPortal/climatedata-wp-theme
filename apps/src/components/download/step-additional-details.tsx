@@ -6,7 +6,7 @@ import { Checkbox, CheckboxFactory } from '@/components/ui/checkbox';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
 import { StepContainer, StepContainerDescription } from '@/components/download/step-container';
 import { EmissionScenariosTooltip } from '@/components/sidebar-menu-items/emission-scenarios-control';
-import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
+import { FrequenciesDropdownS2D } from '@/components/sidebar-menu-items/frequencies-dropdown-s2d';
 import S2DReleaseDate from '@/components/s2d-release-date';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
@@ -553,7 +553,7 @@ const StepAdditionalDetails: StepComponent = (props): React.ReactElement => {
 			{isS2DVariable ? (
 				<>
 					<div className="mb-2 sm:w-64">
-						<S2DFrequencyFieldDropdown
+						<FrequenciesDropdownS2D
 							// Reset list of selected periods when changing frequency
 							afterOnChange={() => setSelectedPeriods([])}
 							tooltip={tooltipS2DFrequency}

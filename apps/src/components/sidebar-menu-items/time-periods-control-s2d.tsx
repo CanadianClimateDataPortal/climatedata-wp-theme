@@ -12,12 +12,11 @@ import { useLocale } from '@/hooks/use-locale';
 import {
 	formatPeriodRange,
 	findPeriodIndexForDateRange,
+	generateSliderLabels,
 	getPeriods,
-	isFrequencyTypeS2DDecadal,
-	type PeriodRange,
 } from '@/lib/s2d';
+import { isFrequencyTypeS2DDecadal } from '@/types/assertions';
 import {
-	ForecastDisplay,
 	ForecastDisplays,
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
@@ -25,109 +24,6 @@ import {
 export interface TimePeriodsControlS2DProps {
 	tooltip?: React.ReactNode;
 }
-
-type SliderLabels = {
-	minimumLabel: string;
-	maximumLabel: string;
-	tickLabels: string[];
-};
-
-/**
- * Generate the labels to be used on the slider, based on the provided periods.
- *
- * @param periods - The periods to show on the slider.
- * @param locale - Locale to use for formatting.
- * @param forecastDisplay - A decision factor that has an impact on how to format labels and tickLabels in some situations
- * @param frequencyType - Another decision factor for the same reasons as forecastDisplay
- */
-const generateSliderLabels = (
-	periods: PeriodRange[] | null,
-	locale: string,
-	forecastDisplay: ForecastDisplay | null,
-	frequencyType: S2DFrequencyType | null,
-): SliderLabels => {
-	if (!periods) {
-		return {
-			minimumLabel: '',
-			maximumLabel: '',
-			tickLabels: [],
-		};
-	}
-
-	const firstPeriod = periods[0][0];
-	const lastPeriod = periods[periods.length - 1][1];
-
-	const isActuallyForecast = forecastDisplay === ForecastDisplays.FORECAST;
-
-	const formatMinMaxLabel = isActuallyForecast
-		? formatShortMonthYear
-		: formatShortMonth;
-
-	let minimumLabel = formatMinMaxLabel(firstPeriod, locale);
-	let maximumLabel = formatMinMaxLabel(lastPeriod, locale);
-
-	if (isFrequencyTypeS2DDecadal(frequencyType)) {
-		// returns `<month> <year>` in both locales, so the second token is the year.
-		minimumLabel = minimumLabel.split(' ')[1];
-		maximumLabel = maximumLabel.split(' ')[1];
-	}
-
-	const tickLabels = periods.map((period) => {
-		if (isFrequencyTypeS2DDecadal(frequencyType)) {
-			// Year ranges, such as "2026-2030" then "2031-2035".
-			const startYear = formatShortMonthYear(period[0], locale).split(' ')[1];
-			const endYear = formatShortMonthYear(period[1], locale).split(' ')[1];
-			return `${startYear}-${endYear}`;
-		} else {
-			// Month ranges, such as "Aug-Oct" then "Sep-Nov", or "août-oct" then
-			// "sept-nov" in French. A one-month period collapses to a single month.
-			const startMonth = formatShortMonth(period[0], locale, true);
-			if (period[0].getUTCMonth() === period[1].getUTCMonth()) {
-				return startMonth;
-			}
-			const endMonth = formatShortMonth(period[1], locale, true);
-			return `${startMonth}-${endMonth}`;
-		}
-	});
-
-	return {
-		minimumLabel,
-		maximumLabel,
-		tickLabels,
-	};
-};
-
-/**
- * Return the short month and year of a date, localized.
- *
- * Both the English and the French locales place the month before the year.
- * The ordering was confirmed by hand for both locales.
- */
-const formatShortMonthYear = (date: Date, locale: string): string => {
-	return new Intl.DateTimeFormat(locale, {
-		month: 'short',
-		year: 'numeric',
-		timeZone: 'UTC',
-	}).format(date);
-};
-
-/**
- * Return the short month name of a date, localized.
- *
- * @param date - The date to format.
- * @param locale - The locale to use for formatting.
- * @param removeDots - If true, the dots are removed from the formatted month name.
- */
-const formatShortMonth = (date: Date, locale: string, removeDots: boolean = false): string => {
-	const formatted = Intl.DateTimeFormat(locale, {
-		month: 'short',
-		timeZone: 'UTC',
-	}).format(date);
-
-	return removeDots
-		? formatted.replace('.', '')
-		: formatted;
-};
 
 /**
  * Time period selector for S2D variables.
@@ -234,7 +130,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		 * values out of sight: title, tooltip, slider and endpoint labels.
 		 *
 		 * Same reasoning as for `DateRangeLine` in
-		 * `components/map-layers/s2d-variable-values.tsx` in
+		 * `components/map-layers/location-modal-s2d.tsx` in
 		 * `LocationModalContentPart`.
 		 */
 		return null;

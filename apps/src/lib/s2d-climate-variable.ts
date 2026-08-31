@@ -10,7 +10,7 @@ import {
 	InteractiveRegionOption,
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
-import LocationModalS2D from '@/components/map-layers/s2d-variable-values';
+import LocationModalS2D from '@/components/map-layers/location-modal-s2d';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
 import { WMSParams } from '@/types/types';
 import { formatUTCDate, utc } from '@/lib/utils';
@@ -22,6 +22,7 @@ import {
 import {
 	normalizeForApiFrequencyName,
 	normalizeForApiVariableId,
+	S2D_API_FREQUENCY_NAME_MAP,
 } from '@/lib/s2d';
 
 /**
@@ -125,22 +126,14 @@ class S2DClimateVariable extends RasterPrecalculatedClimateVariable {
 			fallbackFrequency) as S2DFrequencyType;
 		const variable = normalizeForApiVariableId(this.getId());
 
-		const frequencyNameMap: Record<S2DFrequencyType, string> = {
-			[S2DFrequencyTypes.SEASONAL]: 'seasonal',
-			[S2DFrequencyTypes.MONTHLY]: 'monthly',
-			[S2DFrequencyTypes.DECADAL_ANNUAL]: S2DFrequencyTypes.DECADAL_ANNUAL,
-			[S2DFrequencyTypes.DECADAL_MAY_SEP]: S2DFrequencyTypes.DECADAL_MAY_SEP,
-			[S2DFrequencyTypes.DECADAL_NOV_MAR]: S2DFrequencyTypes.DECADAL_NOV_MAR,
-		} as const;
-
 		const forecastTypeMap: Record<string, string> = {
 			[ForecastTypes.EXPECTED]: 'expected',
 			[ForecastTypes.UNUSUAL]: 'unusual',
 		};
 
-		const frequencyName = Reflect.has(frequencyNameMap, frequency)
-			? Reflect.get(frequencyNameMap, frequency)
-			: frequencyNameMap[fallbackFrequency];
+		const frequencyName = Reflect.has(S2D_API_FREQUENCY_NAME_MAP, frequency)
+			? Reflect.get(S2D_API_FREQUENCY_NAME_MAP, frequency)
+			: S2D_API_FREQUENCY_NAME_MAP[fallbackFrequency];
 		const forecastTypeName = forecastTypeMap[forecastType];
 
 		if (isForecast) {

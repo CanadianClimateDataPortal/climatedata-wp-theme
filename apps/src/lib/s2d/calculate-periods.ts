@@ -1,0 +1,362 @@
+import { sprintf } from '@wordpress/i18n';
+import { S2D_FORECAST_CONVENTIONAL_NB_PERIODS } from '@/lib/constants';
+import {
+	ForecastDisplay,
+	ForecastDisplays,
+	FrequencyType,
+	S2DFrequencyType,
+	S2DFrequencyTypes,
+} from '@/types/climate-variable-interface';
+import { formatUTCDate, utc } from '@/lib/utils';
+import { formatIntlDate } from '@/lib/format';
+import { __ } from '@/context/locale-provider';
+import { isFrequencyTypeS2DDecadal } from '@/types/assertions';
+
+import type { PeriodRange } from './types';
+
+type PeriodJumpUnit = 'month' | 'year';
+
+/**
+ * Resolve the span of one period for a frequency.
+ *
+ * The returned jump is used by `getPeriodEnd` to calculate the period's inclusive
+ * end boundary. It is distinct from `nbPeriods`, which controls how many `[start, end]`
+ * tuples `getPeriods` returns, and from the step used to start the next tuple.
+ *
+ * @param frequency - The frequency whose period span should be resolved.
+ * @param throws - If true, the function will throw an error for unsupported frequencies; otherwise, it returns null.
+ *
+ * @returns A tuple containing the jump size and unit, such as `[3, 'month']` for seasonal frequency.
+ * @throws An error if the frequency type is not supported.
+ */
+export const resolveFrequencyPeriodJump = (
+	frequency: S2DFrequencyType,
+	throws: boolean = true,
+): [number, PeriodJumpUnit] | null => {
+	let periodJumpSize = 1;
+	let periodJumpSizeUnit: PeriodJumpUnit = 'month';
+	if (frequency === S2DFrequencyTypes.SEASONAL) {
+		// Because a season is 3 months long.
+		periodJumpSize = 3;
+	} else if (isFrequencyTypeS2DDecadal(frequency)) {
+		periodJumpSizeUnit = 'year';
+		periodJumpSize = 5;
+	} else if (frequency === S2DFrequencyTypes.MONTHLY) {
+		periodJumpSize = 1;
+	} else {
+		if (!throws) {
+			return null;
+		}
+		throw new Error(
+			sprintf(
+				__('Unsupported frequency type: %s'),
+				frequency
+			)
+		);
+	}
+
+	return [
+		periodJumpSize,
+		periodJumpSizeUnit,
+	];
+};
+
+
+/**
+ * Calculate the inclusive end date for a period starting at `periodStart`.
+ *
+ * @param periodStart - The first day of the period.
+ * @param frequency - The frequency that determines the period length.
+ * @returns The last day of the period.
+ */
+export const getPeriodEnd = (
+	periodStart: Date,
+	frequency: S2DFrequencyType,
+): Date => {
+	const jump = resolveFrequencyPeriodJump(frequency, false);
+	const [
+		periodJumpSize,
+		periodJumpSizeUnit,
+	] = jump ?? [1, 'month'];
+	const periodEnd = new Date(periodStart);
+	if (periodJumpSizeUnit === 'year') {
+		periodEnd.setUTCFullYear(periodStart.getUTCFullYear() + periodJumpSize);
+	} else {
+		periodEnd.setUTCMonth(periodStart.getUTCMonth() + periodJumpSize);
+	}
+	periodEnd.setUTCDate(0);
+	return periodEnd;
+};
+
+
+/**
+ * Return the time periods for a release date and specific frequency.
+ *
+ * The number and length of time periods depend on the frequency:
+ * - Seasonal frequency: 10 x 3-month periods, at 1-month interval
+ * - Monthly frequency: 3 x 1-month periods, at 1-month interval
+ * - Decadal frequency: 2 x 5-year periods, at 5-year interval
+ *
+ * The first period starts on the same month as the release date. A period start
+ * is always the first day of the month, and a period end is always the last
+ * day of the month.
+ *
+ * All dates are in UTC time.
+ *
+ * @see {@link S2D_FORECAST_CONVENTIONAL_NB_PERIODS} for the number of periods per frequency.
+ *
+ * @example
+ * ```typescript
+ * const releaseDate = new Date('2025-10-15');
+ * const periods = getPeriods(releaseDate, S2DFrequencyTypes.MONTHLY);
+ * // Returned periods are (as array of Date instances): [
+ * //   [2025-10-01, 2025-10-31]
+ * //   [2025-11-01, 2025-11-30]
+ * //   [2025-12-01, 2025-12-31]
+ * // ]
+ * ```
+ *
+ * @param releaseDate - The release date of the data.
+ * @param frequency - The frequency for which to get the periods.
+ * @returns An array of [start, end] date instances for each period.
+ */
+export const getPeriods = (
+	releaseDate: Date,
+	frequency: S2DFrequencyType,
+): PeriodRange[] => {
+	// nbPeriods: In other words; how long the list will be
+	const nbPeriods = S2D_FORECAST_CONVENTIONAL_NB_PERIODS[frequency];
+	const periods: PeriodRange[] = [];
+	const lastPeriod = new Date(
+		// Set to the first day of the month
+		Date.UTC(releaseDate.getUTCFullYear(), releaseDate.getUTCMonth(), 1)
+	);
+
+	try {
+		// Asked to throw, so the null branch of the return type cannot happen here.
+		const jump = resolveFrequencyPeriodJump(frequency, true) as [number, PeriodJumpUnit];
+		const [
+			periodJumpSize,
+			periodJumpSizeUnit,
+		] = jump;
+		for (let i = 0; i < nbPeriods; i++) {
+			const periodStart = new Date(lastPeriod);
+			const periodEnd = getPeriodEnd(periodStart, frequency);
+			periods.push([periodStart, periodEnd]);
+			if (periodJumpSizeUnit === 'month') {
+				// A sliding window: each period starts one month after the previous
+				// one, whatever its own length, so seasonal periods overlap.
+				lastPeriod.setUTCMonth(lastPeriod.getUTCMonth() + 1);
+			} else {
+				// Decadal periods must not overlap, so the next one starts where the
+				// previous one ended.
+				lastPeriod.setUTCFullYear(lastPeriod.getUTCFullYear() + periodJumpSize);
+			}
+		}
+	} catch {
+		// An unsupported frequency yields no periods at all, rather than a
+		// partially built list callers would have to second-guess.
+	}
+
+
+	return periods;
+};
+
+/**
+ * Find the index of the period range that matches a string date range.
+ *
+ * A date range is an array of exactly two strings representing a date, in UTC
+ * time. Each string must be of the form 'YYYY-MM-DD'. The date range is
+ * generally created from the `dateRange` URL parameter.
+ *
+ * To find the matching period, only the first date of the date range is used.
+ *
+ * @param dateRange - The date range to search for. An array of exactly two
+ *   strings.
+ * @param availablePeriods - The period ranges to search in.
+ * @returns - The index of the period range that matches the date range, or
+ *   null if not found.
+ */
+export function findPeriodIndexForDateRange(
+	dateRange: [string, string],
+	availablePeriods: PeriodRange[]
+): number | null {
+	const rangeStart = utc(dateRange[0]);
+
+	if (rangeStart === null) {
+		return null;
+	}
+
+	const foundIndex = availablePeriods.findIndex(
+		(period) => rangeStart.toDateString() === period[0].toDateString()
+	);
+
+	return foundIndex === -1 ? null : foundIndex;
+}
+
+/**
+ * Transform a period range (Date instances) to a date range (strings).
+ *
+ * A date range is two strings representing dates in UTC time. The strings are
+ * of the form 'YYYY-MM-DD'.
+ *
+ * @param periodRange - The period range to transform.
+ * @param dateFormat - The format to use for the date strings.
+ * @returns - The date range as an array of two dates in string.
+ */
+export const formatPeriodRange = (
+	periodRange: PeriodRange,
+	dateFormat = 'yyyy-MM-dd',
+): [string, string] => {
+	const rangeStart = formatUTCDate(periodRange[0], dateFormat);
+	const rangeEnd = formatUTCDate(periodRange[1], dateFormat);
+
+	return [rangeStart, rangeEnd];
+};
+
+/**
+ * Format only the year of a date, localized.
+ *
+ * @param date - The date whose year to format.
+ * @param locale - Locale to use for formatting.
+ */
+export const formatYear = (date: Date, locale: string): string =>
+	formatIntlDate(date, locale, { year: 'numeric' });
+
+/**
+ * Generate a period range label for a given date range and frequency.
+ *
+ * @param dateRangeStart - Start date of the period. Example: 2025-08-01
+ * @param frequency - Frequency type
+ * @param locale - Locale to use for formatting
+ */
+export const generatePeriodRangeLabel = (
+	dateRangeStart: string,
+	frequency: S2DFrequencyType,
+	locale: string
+): string | null => {
+	const periodStart = utc(dateRangeStart);
+
+	const isDecadalFrequencyType = isFrequencyTypeS2DDecadal(frequency);
+
+	if (!periodStart) {
+		return null;
+	}
+
+	const periodStartLabel = isDecadalFrequencyType
+		? formatYear(periodStart, locale)
+		: formatIntlDate(periodStart, locale, { month: 'long' });
+
+	if (frequency === FrequencyType.MONTHLY) {
+		return periodStartLabel;
+	}
+
+	const periodEnd = getPeriodEnd(periodStart, frequency);
+	const periodEndLabel = isDecadalFrequencyType
+		? formatYear(periodEnd, locale)
+		: formatIntlDate(periodEnd, locale, { month: 'long' });
+
+	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
+};
+
+/**
+ * Return the short month and year of a date, localized.
+ *
+ * Both the English and the French locales place the month before the year.
+ * The ordering was confirmed by hand for both locales.
+ */
+const formatShortMonthYear = (date: Date, locale: string): string => {
+	return new Intl.DateTimeFormat(locale, {
+		month: 'short',
+		year: 'numeric',
+		timeZone: 'UTC',
+	}).format(date);
+};
+
+/**
+ * Return the short month name of a date, localized.
+ *
+ * @param date - The date to format.
+ * @param locale - The locale to use for formatting.
+ * @param removeDots - If true, the dots are removed from the formatted month name.
+ */
+const formatShortMonth = (date: Date, locale: string, removeDots: boolean = false): string => {
+	const formatted = Intl.DateTimeFormat(locale, {
+		month: 'short',
+		timeZone: 'UTC',
+	}).format(date);
+
+	return removeDots
+		? formatted.replace('.', '')
+		: formatted;
+};
+
+export type SliderLabels = {
+	minimumLabel: string;
+	maximumLabel: string;
+	tickLabels: string[];
+};
+
+/**
+ * Generate the labels to be used on the slider, based on the provided periods.
+ *
+ * @param periods - The periods to show on the slider.
+ * @param locale - Locale to use for formatting.
+ * @param forecastDisplay - A decision factor that has an impact on how to format labels and tickLabels in some situations
+ * @param frequencyType - Another decision factor for the same reasons as forecastDisplay
+ */
+export const generateSliderLabels = (
+	periods: PeriodRange[] | null,
+	locale: string,
+	forecastDisplay: ForecastDisplay | null,
+	frequencyType: S2DFrequencyType | null,
+): SliderLabels => {
+	if (!periods) {
+		return {
+			minimumLabel: '',
+			maximumLabel: '',
+			tickLabels: [],
+		};
+	}
+
+	const firstPeriod = periods[0][0];
+	const lastPeriod = periods[periods.length - 1][1];
+
+	const isActuallyForecast = forecastDisplay === ForecastDisplays.FORECAST;
+
+	const formatMinMaxLabel = isActuallyForecast
+		? formatShortMonthYear
+		: formatShortMonth;
+
+	let minimumLabel = formatMinMaxLabel(firstPeriod, locale);
+	let maximumLabel = formatMinMaxLabel(lastPeriod, locale);
+
+	if (isFrequencyTypeS2DDecadal(frequencyType)) {
+		minimumLabel = formatYear(firstPeriod, locale);
+		maximumLabel = formatYear(lastPeriod, locale);
+	}
+
+	const tickLabels = periods.map((period) => {
+		if (isFrequencyTypeS2DDecadal(frequencyType)) {
+			// Year ranges, such as "2026-2030" then "2031-2035".
+			const startYear = formatYear(period[0], locale);
+			const endYear = formatYear(period[1], locale);
+			return `${startYear}-${endYear}`;
+		} else {
+			// Month ranges, such as "Aug-Oct" then "Sep-Nov", or "août-oct" then
+			// "sept-nov" in French. A one-month period collapses to a single month.
+			const startMonth = formatShortMonth(period[0], locale, true);
+			if (period[0].getUTCMonth() === period[1].getUTCMonth()) {
+				return startMonth;
+			}
+			const endMonth = formatShortMonth(period[1], locale, true);
+			return `${startMonth}-${endMonth}`;
+		}
+	});
+
+	return {
+		minimumLabel,
+		maximumLabel,
+		tickLabels,
+	};
+};

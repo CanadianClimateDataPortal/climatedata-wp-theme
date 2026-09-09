@@ -1,3 +1,4 @@
+import { sprintf } from '@wordpress/i18n';
 import {__} from "@/context/locale-provider.tsx";
 
 const appConfig = {
@@ -181,6 +182,18 @@ const appConfig = {
 		{
 			value: "seasons",
 			label: "Seasonal",
+		},
+		{
+			value: "decadal-ann",
+			label: sprintf(__("Decadal (%s)"), __("Annual")),
+		},
+		{
+			value: "decadal-may-sep",
+			label: sprintf(__("Decadal (%s)"), __("May-Sep")),
+		},
+		{
+			value: "decadal-nov-mar",
+			label: sprintf(__("Decadal (%s)"), __("Nov-Mar")),
 		},
 	],
 }

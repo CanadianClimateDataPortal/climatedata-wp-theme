@@ -130,11 +130,18 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
+		/**
+		 * `forecastDisplay` updates synchronously, well before the legend payload arrives.
+		 * {@link colorMap} value can still hold the previous data, particularly when switching
+		 * between forecast and climatology.
+		 * A climatology payload carries temperatures like -30, not "band" quantities
+		 * like 1040. That mismatch would throw a MultiBandLegendError.
+		 * To avoid such mismatches, {@link colorMap} returns `null` to properly make differentiation.
+		 */
 		if (!colorMap) {
 			rootRef.current.render(<></>);
 			return;
 		}
-
 		if (showForecastLegendOfS2D) {
 			rootRef.current.render(
 				<MapLegendOpenControl

@@ -44,6 +44,21 @@ export function useColorMap() {
 			return null;
 		}
 
+		// legendData can still hold the previous layer's response while a new
+		// fetch is in flight for the layer the user just selected. GeoServer
+		// echoes the requested layer back as Legend[0].layerName, so compare
+		// it against the layer we currently want, and treat a mismatch the
+		// same as no data yet, rather than transform a response that belongs
+		// to a different layer.
+		//
+		// GeoServer's response omits the "CDC:" workspace prefix that every
+		// layer name in this app is built with (see getLayerValue in
+		// climate-variable-base.ts and s2d-climate-variable.ts), so strip it
+		// from layerValue before comparing.
+		if (legendData.Legend[0]?.layerName !== layerValue?.replace(/^CDC:/, '')) {
+			return null;
+		}
+
 		const isCustomScheme = colorScheme && colorScheme in DEFAULT_COLOUR_SCHEMES;
 		const legendColourMapEntries = legendData.Legend[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap?.entries ?? [];
 		const values = legendColourMapEntries.map((entry) => Number(entry.quantity))
@@ -65,7 +80,7 @@ export function useColorMap() {
 			isDivergent,
 		} as ColourMap;
 
-	}, [colorScheme, legendData]);
+	}, [colorScheme, legendData, layerValue]);
 
 	return { colorMap };
 }

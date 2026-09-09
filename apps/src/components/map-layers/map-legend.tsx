@@ -139,7 +139,15 @@ const MapLegend: React.FC = () => {
 		 * To avoid such mismatches, {@link colorMap} returns `null` to properly make differentiation.
 		 */
 		if (!colorMap) {
-			rootRef.current.render(<></>);
+			// Keep the Legend button mounted while colorMap is not ready.
+			// This stops the button from popping out and back in
+			// each toggle.
+			rootRef.current.render(
+				<MapLegendOpenControl
+					isOpen={isOpen}
+					toggleOpen={() => dispatch(setLegendOpen(!isOpen))}
+				/>
+			);
 			return;
 		}
 		if (showForecastLegendOfS2D) {

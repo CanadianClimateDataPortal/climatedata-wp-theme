@@ -14,6 +14,7 @@ import {
 } from '@/types/climate-variable-interface';
 
 import {
+	MultiBandLegendError,
 	transformColorMapToMultiBandLegend,
 	type MultiBandLegend,
 } from '@/lib/multi-band-legend';
@@ -132,6 +133,18 @@ export const MapLegendForecastS2D = (
 	} = props;
 
 	const transformed = transformColorMapToMultiBandLegend(colorMap);
+	// The row count is a fact about forecastType. It is not a
+	// property of what the server sent. A truncated response would
+	// otherwise silently take the wrong label branch below.
+	const expectedRowCount: Record<ForecastType, number> = {
+		[ForecastTypes.EXPECTED]: 3,
+		[ForecastTypes.UNUSUAL]: 2,
+	};
+	if (forecastType && transformed.rows.length !== expectedRowCount[forecastType]) {
+		throw new MultiBandLegendError(
+			`Expected ${expectedRowCount[forecastType]} rows for forecast type "${forecastType}", got ${transformed.rows.length}`
+		);
+	}
 	if (transformed.rows.length === 3) {
 		// We know it's for Forecast
 		data = transformed;

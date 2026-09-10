@@ -148,7 +148,7 @@ export const MapLegendForecastS2D = (
 		data = transformed;
 		// MultiBandLegendGroup ships a placeholder label. Without this loop the legend shows "Line 0".
 		LEGEND_ROW_LABELS[forecastType].forEach((label, index) => {
-			Reflect.set(data.rows?.[index], 'label', label);
+			Reflect.set(data.rows[index], 'label', label);
 		});
 	}
 

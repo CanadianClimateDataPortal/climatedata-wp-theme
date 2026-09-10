@@ -6,7 +6,10 @@ import chroma from 'chroma-js';
 import { __ } from '@/context/locale-provider';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import { type DefinitionItem, DefinitionList } from '@/components/ui/definition-list';
-import { buildForecastProbabilitiesCategories } from '@/lib/s2d';
+import {
+	buildForecastProbabilitiesCategories,
+	LEGEND_ROW_LABELS,
+} from '@/lib/s2d';
 import { type ColourQuantitiesMap } from '@/types/types';
 import {
 	ForecastTypes,
@@ -133,23 +136,18 @@ export const MapLegendForecastS2D = (
 	} = props;
 
 	const transformed = transformColorMapToMultiBandLegend(colorMap);
-	// buildForecastProbabilitiesCategories returns long forms and translates. Keep these separate.
-	const rowLabels: Record<ForecastType, string[]> = {
-		[ForecastTypes.EXPECTED]: ['Above', 'Near', 'Below'],
-		[ForecastTypes.UNUSUAL]: ['Unusually high', 'Unusually low'],
-	};
 	// The row count is a fact about forecastType. It is not a
 	// property of what the server sent. A short response would
-	// otherwise crash rowLabels[forecastType].forEach below.
-	if (forecastType && transformed.rows.length !== rowLabels[forecastType].length) {
+	// otherwise crash LEGEND_ROW_LABELS[forecastType].forEach below.
+	if (forecastType && transformed.rows.length !== LEGEND_ROW_LABELS[forecastType].length) {
 		throw new MultiBandLegendError(
-			`Expected ${rowLabels[forecastType].length} rows for forecast type "${forecastType}", got ${transformed.rows.length}`
+			`Expected ${LEGEND_ROW_LABELS[forecastType].length} rows for forecast type "${forecastType}", got ${transformed.rows.length}`
 		);
 	}
 	if (forecastType) {
 		data = transformed;
 		// MultiBandLegendGroup ships a placeholder label. Without this loop the legend shows "Line 0".
-		rowLabels[forecastType].forEach((label, index) => {
+		LEGEND_ROW_LABELS[forecastType].forEach((label, index) => {
 			Reflect.set(data.rows?.[index], 'label', label);
 		});
 	}

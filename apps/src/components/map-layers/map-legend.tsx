@@ -47,6 +47,8 @@ const MapLegend: React.FC = () => {
 	const colourScheme = climateVariable?.getColourScheme();
 	const isDelta = climateVariable?.getDataValue() === 'delta';
 	const unit = climateVariable?.getUnitLegend();
+	// When the unit is a day-of-year, we make the legend a little bit larger
+	const legendWidth = unit?.startsWith('DoY') && !isDelta ? 120 : 100;
 	const legendConfig =
 		climateVariable?.getLegendConfig(isDelta ? MapDisplayType.DELTA : MapDisplayType.ABSOLUTE) ??
 		undefined;
@@ -130,20 +132,17 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
-		/**
-		 * {@link colorMap} can still hold the previous layer's data here.
-		 * The legend payload arrives after forecastDisplay changes.
-		 * Returning `null` marks a clear not-ready state instead of stale data.
-		 * The real value then differs from `null`, and React renders the change.
-		 */
+		// colorMap is null until the data for the current layer arrives.
 		if (!colorMap) {
-			// Keep the Legend button mounted while colorMap is not ready.
-			// This stops the button from popping out and back in
-			// each toggle.
+			// Render the button now, at the width the loaded branch will use.
+			// The button would otherwise vanish and return on every switch.
+			// The legend would otherwise jump when the data lands.
+			// S2D forecast passes no width, so match that and pass none.
 			rootRef.current.render(
 				<MapLegendOpenControl
 					isOpen={isOpen}
 					toggleOpen={() => dispatch(setLegendOpen(!isOpen))}
+					width={showForecastLegendOfS2D ? undefined : legendWidth}
 				/>
 			);
 			return;
@@ -181,8 +180,7 @@ const MapLegend: React.FC = () => {
 			<MapLegendOpenControl
 				isOpen={isOpen}
 				toggleOpen={() => dispatch(setLegendOpen(!isOpen))}
-				/* When the unit is a day of the year, we make the legend a little bit larger */
-				width={unit?.startsWith('DoY') && !isDelta ? 120 : 100}
+				width={legendWidth}
 			>
 				<Suspense fallback={'...'}>
 					<LazyMapLegendCommon
@@ -208,6 +206,7 @@ const MapLegend: React.FC = () => {
 		legendConfig,
 		isDelta,
 		unit,
+		legendWidth,
 		locale,
 		forecastType,
 		showForecastLegendOfS2D,

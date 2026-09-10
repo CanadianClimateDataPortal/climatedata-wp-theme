@@ -136,12 +136,12 @@ export const MapLegendForecastS2D = (
 	} = props;
 
 	const transformed = transformColorMapToMultiBandLegend(colorMap);
-	// The row count is a fact about forecastType. It is not a
-	// property of what the server sent. A short response would
-	// otherwise crash LEGEND_ROW_LABELS[forecastType].forEach below.
+	// The row count is a fact about forecastType.
+	// The backend server response is following the same convention.
+	// A short response would otherwise crash LEGEND_ROW_LABELS[forecastType].forEach below.
 	if (forecastType && transformed.rows.length !== LEGEND_ROW_LABELS[forecastType].length) {
 		throw new MultiBandLegendError(
-			`Expected ${LEGEND_ROW_LABELS[forecastType].length} rows for forecast type "${forecastType}", got ${transformed.rows.length}`
+			`Expected ${LEGEND_ROW_LABELS[forecastType].length} rows for forecast type "${forecastType}", got ${transformed.rows.length}`,
 		);
 	}
 	if (forecastType) {

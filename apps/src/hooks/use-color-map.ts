@@ -44,12 +44,16 @@ export function useColorMap() {
 			return null;
 		}
 
-		// legendData can hold the response for the layer we just left.
-		// GeoServer echoes layerName without the CDC: prefix, so strip it before comparing.
-		// See getLayerValue in climate-variable-base.ts and s2d-climate-variable.ts.
-		// A mismatch means the data is not ready.
-		// Return null, which differs from either payload.
-		// React then renders when the right data lands.
+		/**
+		 * `legendData` can hold the response for the layer we just left.
+		 * GeoServer echoes layerName without the CDC: prefix, so strip it before comparing
+		 * and use this comparison to determine if the legend data matches the current layer.
+		 * See `layerValue` in `climate-variable-base.ts` and `s2d-climate-variable.ts`.
+		 *
+		 * To detect during a re-execution if data is ready these two has to be matching.
+		 * Anytime the layer names match, the data is considered ready,
+		 * otherwise, return `null` to signal React renderer pass to notice the value change.
+		 */
 		if (legendData.Legend[0]?.layerName !== layerValue?.replace(/^CDC:/, '')) {
 			return null;
 		}

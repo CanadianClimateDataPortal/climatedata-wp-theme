@@ -133,30 +133,25 @@ export const MapLegendForecastS2D = (
 	} = props;
 
 	const transformed = transformColorMapToMultiBandLegend(colorMap);
-	// The row count is a fact about forecastType. It is not a
-	// property of what the server sent. A truncated response would
-	// otherwise silently take the wrong label branch below.
-	const expectedRowCount: Record<ForecastType, number> = {
-		[ForecastTypes.EXPECTED]: 3,
-		[ForecastTypes.UNUSUAL]: 2,
+	// buildForecastProbabilitiesCategories returns long forms and translates. Keep these separate.
+	const rowLabels: Record<ForecastType, string[]> = {
+		[ForecastTypes.EXPECTED]: ['Above', 'Near', 'Below'],
+		[ForecastTypes.UNUSUAL]: ['Unusually high', 'Unusually low'],
 	};
-	if (forecastType && transformed.rows.length !== expectedRowCount[forecastType]) {
+	// The row count is a fact about forecastType. It is not a
+	// property of what the server sent. A short response would
+	// otherwise crash rowLabels[forecastType].forEach below.
+	if (forecastType && transformed.rows.length !== rowLabels[forecastType].length) {
 		throw new MultiBandLegendError(
-			`Expected ${expectedRowCount[forecastType]} rows for forecast type "${forecastType}", got ${transformed.rows.length}`
+			`Expected ${rowLabels[forecastType].length} rows for forecast type "${forecastType}", got ${transformed.rows.length}`
 		);
 	}
-	if (transformed.rows.length === 3) {
-		// We know it's for Forecast
+	if (forecastType) {
 		data = transformed;
-		// There's probably a better way to do this
-		Reflect.set(data.rows?.[0], 'label', 'Above');
-		Reflect.set(data.rows?.[1], 'label', 'Near');
-		Reflect.set(data.rows?.[2], 'label', 'Below');
-	} else if (transformed.rows.length === 2) {
-		// We know it's climatology
-		data = transformed;
-		Reflect.set(data.rows?.[0], 'label', 'Unusually high');
-		Reflect.set(data.rows?.[1], 'label', 'Unusually low');
+		// MultiBandLegendGroup ships a placeholder label. Without this loop the legend shows "Line 0".
+		rowLabels[forecastType].forEach((label, index) => {
+			Reflect.set(data.rows?.[index], 'label', label);
+		});
 	}
 
 	const probabilityStatement: ProbabilityStatementProps = {

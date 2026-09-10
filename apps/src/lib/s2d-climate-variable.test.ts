@@ -109,11 +109,10 @@ describe('getLayerValue', () => {
 	});
 
 	/**
-	 * We have to test decadal frequencies separately because their slugs contain hyphens.
-	 *
-	 * For example, the frequency `S2DFrequencyTypes.DECADAL_ANNUAL` contains the string
-	 * "decadal-ann", and the test suite above that assumes a single-word frequency
-	 * like "seasonal" (taken from "CDC:s2d-forecast-test-seasonal-expected").
+	 * Decadal frequency slugs contain hyphens.
+	 * The tests above split a layer name on hyphens.
+	 * That split assumes one word per segment.
+	 * Decadal frequencies break that assumption, so we test them here.
 	 */
 	describe.each([
 		[S2DFrequencyTypes.DECADAL_ANNUAL],
@@ -143,13 +142,9 @@ describe('getLayerValue', () => {
 
 	describe('with a frequency missing from the name map', () => {
 		/**
-		 * Pin the silent error paths as deliberate contracts.
-		 * This ensures what the code is currently assuming is explicit.
-		 *
-		 * The fallback "seasonal" (instead of "not-a-frequency") is deliberate.
-		 * An unknown frequency must still yield a well-formed layer name,
-		 * because `getLayerValue` silently substitutes with "seasonal" frequency name
-		 * as a fallback rather than an undefined value or something else.
+		 * An unknown frequency must still yield a valid layer name.
+		 * getLayerValue falls back to "seasonal" on purpose.
+		 * This test protects that fallback.
 		 */
 		test('falls back to the seasonal name', () => {
 			climateVariable.getFrequency = () => 'not-a-frequency';

@@ -241,12 +241,9 @@ describe('getPeriods', () => {
 	});
 
 	/**
-	 * Pin the silent error paths as deliberate contracts.
-	 * This ensures what the code is currently assuming is explicit.
-	 *
-	 * The silence is deliberate. `getPeriods` catches the unsupported-frequency
-	 * (e.g. "not-a-frequency") throw of `resolveFrequencyPeriodJump` and
-	 * returns an empty array (`PeriodRange[]`).
+	 * getPeriods catches the unsupported-frequency throw from
+	 * resolveFrequencyPeriodJump. It returns an empty array instead.
+	 * The silence is on purpose, and this test protects it.
 	 */
 	describe('silently yields no periods for an unsupported frequency', () => {
 		const releaseDate = utc('2025-10-5 10:12:34') as Date;

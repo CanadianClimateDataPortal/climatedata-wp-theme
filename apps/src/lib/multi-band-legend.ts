@@ -217,8 +217,8 @@ const validateScaleConsistency = (
 	ranges: GroupRange[]
 ): void => {
 	if (ranges.length === 0) {
-		// Ensure an empty quantities array is caught early.
-		// Otherwise a caller with an empty ranges array would get a raw TypeError when trying to access ranges[0]
+		// An empty quantities array must fail here, right away.
+		// A silent return would let the bad state pass unnoticed.
 		throw new MultiBandLegendError('validateScaleConsistency ranges argument received unexpected empty array.');
 	}
 

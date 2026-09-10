@@ -131,12 +131,10 @@ const MapLegend: React.FC = () => {
 		}
 
 		/**
-		 * `forecastDisplay` updates synchronously, well before the legend payload arrives.
-		 * {@link colorMap} value can still hold the previous data, particularly when switching
-		 * between forecast and climatology.
-		 * A climatology payload carries temperatures like -30, not "band" quantities
-		 * like 1040. That mismatch would throw a MultiBandLegendError.
-		 * To avoid such mismatches, {@link colorMap} returns `null` to properly make differentiation.
+		 * {@link colorMap} can still hold the previous layer's data here.
+		 * The legend payload arrives after forecastDisplay changes.
+		 * Returning `null` marks a clear not-ready state instead of stale data.
+		 * The real value then differs from `null`, and React renders the change.
 		 */
 		if (!colorMap) {
 			// Keep the Legend button mounted while colorMap is not ready.

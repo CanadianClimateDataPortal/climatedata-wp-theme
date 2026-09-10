@@ -44,17 +44,12 @@ export function useColorMap() {
 			return null;
 		}
 
-		// legendData can still hold the previous layer's response while a new
-		// fetch is in flight for the layer the user just selected. GeoServer
-		// echoes the requested layer back as Legend[0].layerName, so compare
-		// it against the layer we currently want, and treat a mismatch the
-		// same as no data yet, rather than transform a response that belongs
-		// to a different layer.
-		//
-		// GeoServer's response omits the "CDC:" workspace prefix that every
-		// layer name in this app is built with (see getLayerValue in
-		// climate-variable-base.ts and s2d-climate-variable.ts), so strip it
-		// from layerValue before comparing.
+		// legendData can hold the response for the layer we just left.
+		// GeoServer echoes layerName without the CDC: prefix, so strip it before comparing.
+		// See getLayerValue in climate-variable-base.ts and s2d-climate-variable.ts.
+		// A mismatch means the data is not ready.
+		// Return null, which differs from either payload.
+		// React then renders when the right data lands.
 		if (legendData.Legend[0]?.layerName !== layerValue?.replace(/^CDC:/, '')) {
 			return null;
 		}

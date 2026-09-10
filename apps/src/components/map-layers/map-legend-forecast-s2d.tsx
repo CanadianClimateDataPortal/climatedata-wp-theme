@@ -136,9 +136,9 @@ export const MapLegendForecastS2D = (
 	} = props;
 
 	const transformed = transformColorMapToMultiBandLegend(colorMap);
-	// The row count is a fact about forecastType.
-	// The backend server response is following the same convention.
-	// A short response would otherwise crash LEGEND_ROW_LABELS[forecastType].forEach below.
+	// forecastType decides the row count, not the response.
+	// GeoServer sends the same number of bands per forecast type.
+	// A short response would crash LEGEND_ROW_LABELS[forecastType].forEach below.
 	if (forecastType && transformed.rows.length !== LEGEND_ROW_LABELS[forecastType].length) {
 		throw new MultiBandLegendError(
 			`Expected ${LEGEND_ROW_LABELS[forecastType].length} rows for forecast type "${forecastType}", got ${transformed.rows.length}`,

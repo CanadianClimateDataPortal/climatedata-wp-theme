@@ -135,7 +135,8 @@ const MapLegend: React.FC = () => {
 		// colorMap is null until the data for the current layer arrives.
 		if (!colorMap) {
 			// Render the button now, at the width the loaded branch will use.
-			// The button would otherwise vanish or jump around and return on every switch.
+			// The button would otherwise vanish and return on every switch.
+			// The showForecastLegendOfS2D branch below passes no width. Match it.
 			rootRef.current.render(
 				<MapLegendOpenControl
 					isOpen={isOpen}

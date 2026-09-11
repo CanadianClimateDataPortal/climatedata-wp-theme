@@ -83,8 +83,8 @@ describe('getLayerValue', () => {
 				);
 
 				test('layer has the correct frequency', () => {
-					const layer = climateVariable.getLayerValue();
-					const layerParts = layer.split('-');
+					const layer = climateVariable.getLayerValue(); // e.g. "CDC:s2d-forecast-test-seasonal-expected"
+					const layerParts = layer.split('-'); // e.g. `['CDC:s2d', 'forecast', 'test', 'seasonal', 'expected']`
 					expect(layerParts[3]).toEqual(frequencyName);
 				});
 
@@ -105,6 +105,54 @@ describe('getLayerValue', () => {
 					expect(layerParts).toHaveLength(nbExpectedParts);
 				});
 			});
+		});
+	});
+
+	/**
+	 * Decadal frequency slugs contain hyphens.
+	 * The tests above split a layer name on hyphens.
+	 * That split assumes one word per segment.
+	 * Decadal frequencies break that assumption, so we test them here.
+	 */
+	describe.each([
+		[S2DFrequencyTypes.DECADAL_ANNUAL],
+		[S2DFrequencyTypes.DECADAL_MAY_SEP],
+		[S2DFrequencyTypes.DECADAL_NOV_MAR],
+	])('with decadal frequency "%s"', (frequency) => {
+		beforeEach(() => {
+			climateVariable.getFrequency = () => frequency;
+			climateVariable.getForecastType = () => ForecastTypes.EXPECTED;
+		});
+
+		test('builds the forecast layer name', () => {
+			climateVariable.getForecastDisplay = () => ForecastDisplays.FORECAST;
+			expect(climateVariable.getLayerValue()).toEqual(
+				`CDC:s2d-forecast-test-${frequency}-expected`
+			);
+		});
+
+		test('builds the climatology layer name', () => {
+			climateVariable.getForecastDisplay = () =>
+				ForecastDisplays.CLIMATOLOGY;
+			expect(climateVariable.getLayerValue()).toEqual(
+				`CDC:s2d-climatology-test-${frequency}`
+			);
+		});
+	});
+
+	describe('with a frequency missing from the name map', () => {
+		/**
+		 * An unknown frequency must still yield a valid layer name.
+		 * getLayerValue falls back to "seasonal" on purpose.
+		 * This test protects that fallback.
+		 */
+		test('falls back to the seasonal name', () => {
+			climateVariable.getFrequency = () => 'not-a-frequency';
+			climateVariable.getForecastType = () => ForecastTypes.EXPECTED;
+			climateVariable.getForecastDisplay = () => ForecastDisplays.FORECAST;
+			expect(climateVariable.getLayerValue()).toEqual(
+				'CDC:s2d-forecast-test-seasonal-expected'
+			);
 		});
 	});
 });

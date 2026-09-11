@@ -47,6 +47,8 @@ const MapLegend: React.FC = () => {
 	const colourScheme = climateVariable?.getColourScheme();
 	const isDelta = climateVariable?.getDataValue() === 'delta';
 	const unit = climateVariable?.getUnitLegend();
+	// When the unit is a day-of-year, we make the legend a little bit larger
+	const legendWidth = unit?.startsWith('DoY') && !isDelta ? 120 : 100;
 	const legendConfig =
 		climateVariable?.getLegendConfig(isDelta ? MapDisplayType.DELTA : MapDisplayType.ABSOLUTE) ??
 		undefined;
@@ -130,11 +132,20 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
+		// colorMap is null until the data for the current layer arrives.
 		if (!colorMap) {
-			rootRef.current.render(<></>);
+			// Render the button now, at the width the loaded branch will use.
+			// The button would otherwise vanish and return on every switch.
+			// The showForecastLegendOfS2D branch below passes no width. Match it.
+			rootRef.current.render(
+				<MapLegendOpenControl
+					isOpen={isOpen}
+					toggleOpen={() => dispatch(setLegendOpen(!isOpen))}
+					width={showForecastLegendOfS2D ? undefined : legendWidth}
+				/>
+			);
 			return;
 		}
-
 		if (showForecastLegendOfS2D) {
 			rootRef.current.render(
 				<MapLegendOpenControl
@@ -168,8 +179,7 @@ const MapLegend: React.FC = () => {
 			<MapLegendOpenControl
 				isOpen={isOpen}
 				toggleOpen={() => dispatch(setLegendOpen(!isOpen))}
-				/* When the unit is a day of the year, we make the legend a little bit larger */
-				width={unit?.startsWith('DoY') && !isDelta ? 120 : 100}
+				width={legendWidth}
 			>
 				<Suspense fallback={'...'}>
 					<LazyMapLegendCommon
@@ -195,6 +205,7 @@ const MapLegend: React.FC = () => {
 		legendConfig,
 		isDelta,
 		unit,
+		legendWidth,
 		locale,
 		forecastType,
 		showForecastLegendOfS2D,

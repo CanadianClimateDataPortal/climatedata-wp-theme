@@ -6,7 +6,10 @@ import chroma from 'chroma-js';
 import { __ } from '@/context/locale-provider';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import { type DefinitionItem, DefinitionList } from '@/components/ui/definition-list';
-import { buildForecastProbabilitiesCategories } from '@/lib/s2d';
+import {
+	buildForecastProbabilitiesCategories,
+	LEGEND_ROW_LABELS,
+} from '@/lib/s2d';
 import { type ColourQuantitiesMap } from '@/types/types';
 import {
 	ForecastTypes,
@@ -14,6 +17,7 @@ import {
 } from '@/types/climate-variable-interface';
 
 import {
+	MultiBandLegendError,
 	transformColorMapToMultiBandLegend,
 	type MultiBandLegend,
 } from '@/lib/multi-band-legend';
@@ -132,18 +136,20 @@ export const MapLegendForecastS2D = (
 	} = props;
 
 	const transformed = transformColorMapToMultiBandLegend(colorMap);
-	if (transformed.rows.length === 3) {
-		// We know it's for Forecast
+	// forecastType decides the row count, not the response.
+	// GeoServer sends the same number of bands per forecast type.
+	// A short response would crash LEGEND_ROW_LABELS[forecastType].forEach below.
+	if (forecastType && transformed.rows.length !== LEGEND_ROW_LABELS[forecastType].length) {
+		throw new MultiBandLegendError(
+			`Expected ${LEGEND_ROW_LABELS[forecastType].length} rows for forecast type "${forecastType}", got ${transformed.rows.length}`,
+		);
+	}
+	if (forecastType) {
 		data = transformed;
-		// There's probably a better way to do this
-		Reflect.set(data.rows?.[0], 'label', 'Above');
-		Reflect.set(data.rows?.[1], 'label', 'Near');
-		Reflect.set(data.rows?.[2], 'label', 'Below');
-	} else if (transformed.rows.length === 2) {
-		// We know it's climatology
-		data = transformed;
-		Reflect.set(data.rows?.[0], 'label', 'Unusually high');
-		Reflect.set(data.rows?.[1], 'label', 'Unusually low');
+		// MultiBandLegendGroup ships a placeholder label. Without this loop the legend shows "Line 0".
+		LEGEND_ROW_LABELS[forecastType].forEach((label, index) => {
+			Reflect.set(data.rows[index], 'label', label);
+		});
 	}
 
 	const probabilityStatement: ProbabilityStatementProps = {

@@ -61,8 +61,8 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 
 	// Reminder: These normally are coming from WordPress and might not have their translation equivalent
 	const subTitleParts: string[] = [
-		__(datasetLabel),
-		__(climateVariableTitle),
+		datasetLabel,
+		climateVariableTitle,
 	];
 
 	if (isS2DVariable) {

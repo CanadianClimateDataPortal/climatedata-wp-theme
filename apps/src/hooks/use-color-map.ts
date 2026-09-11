@@ -44,6 +44,22 @@ export function useColorMap() {
 			return null;
 		}
 
+		/**
+		 * `legendData` can hold the response for the layer we just left.
+		 * GeoServer echoes layerName without the `CDC:` prefix.
+		 * Strip it before you compare the two names.
+		 *
+		 * `layerValue` above holds the result of `climateVariable.getLayerValue()`.
+		 * `ClimateVariableBase` and `S2DClimateVariable` each implement that method.
+		 *
+		 * A match means the data belongs to the current layer.
+		 * A mismatch returns `null`, which differs from either payload.
+		 * React then notices the change and renders when the right data lands.
+		 */
+		if (legendData.Legend[0]?.layerName !== layerValue?.replace(/^CDC:/, '')) {
+			return null;
+		}
+
 		const isCustomScheme = colorScheme && colorScheme in DEFAULT_COLOUR_SCHEMES;
 		const legendColourMapEntries = legendData.Legend[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap?.entries ?? [];
 		const values = legendColourMapEntries.map((entry) => Number(entry.quantity))
@@ -65,7 +81,7 @@ export function useColorMap() {
 			isDivergent,
 		} as ColourMap;
 
-	}, [colorScheme, legendData]);
+	}, [colorScheme, legendData, layerValue]);
 
 	return { colorMap };
 }

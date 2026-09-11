@@ -36,6 +36,39 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 
 			<?php
 
+				if ( !empty ( $variable_datasets ) ) {
+
+			?>
+
+			<div class="var-item-sectors d-flex flex-wrap mt-1">
+				<?php
+						foreach ( $variable_datasets as $dataset ) {
+							$dataset_term_id   = $dataset->term_id;
+							$dataset_term_name = $dataset->name;
+
+// 							if ( 'fr' === $current_lang ) {
+// 								$sector_term_name_fr = get_field( 'admin_term_title_fr', $sector );
+// 								$sector_term_name    = ( empty( $sector_term_name_fr ) ) ? $sector_term_name : $sector_term_name_fr;
+// 							}
+				?>
+
+				<span class="badge all-caps text-bg-light mt-1 me-1"><?php echo esc_html( $dataset_term_name ); ?></span>
+
+				<?php
+
+						}
+
+				?>
+			</div>
+
+			<?php
+
+				}
+
+			?>
+
+			<?php
+
 				if ( !empty ( $this_sectors ) ) {
 
 			?>

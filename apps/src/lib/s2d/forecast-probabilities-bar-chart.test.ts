@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { ColourMap, ColourSchemeType } from '@/types/types';
-import { getProbabilityColour } from '@/components/map-layers/s2d-variable-values';
+import { getProbabilityColour } from '@/lib/s2d';
 
 describe('getProbabilityColour', () => {
 	let colourMap: ColourMap;

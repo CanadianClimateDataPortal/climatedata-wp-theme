@@ -2,13 +2,11 @@ import { __ } from '@/context/locale-provider';
 
 import { SidebarMenuItem, SidebarSeparator } from '@/components/ui/sidebar';
 
-import {
-	S2DForecastDisplayFieldDropdown,
-	S2DForecastTypeFieldDropdown,
-} from '@/components/fields/forecast';
-import { S2DFrequencyFieldDropdown } from '@/components/fields/frequency';
+import { ForecastDisplayDropdownS2D } from '@/components/sidebar-menu-items/forecast-display-dropdown-s2d';
+import { ForecastTypeDropdownS2D } from '@/components/sidebar-menu-items/forecast-type-dropdown-s2d';
+import { FrequenciesDropdownS2D } from '@/components/sidebar-menu-items/frequencies-dropdown-s2d';
 import { TimePeriodsControlS2D } from '@/components/sidebar-menu-items/time-periods-control-s2d';
-import { MaskLowSkillField } from '@/components/fields/skill';
+import { MaskLowSkillControlS2D } from '@/components/sidebar-menu-items/mask-low-skill-control-s2d';
 
 const tooltipForecastTypes = __(
 	'S2D forecasts are shown as probabilities for how conditions will compare to historical climate conditions between 1991 and 2020. ' +
@@ -43,17 +41,17 @@ const SidebarInnerS2D = () => {
 	return (
 		<>
 			<SidebarMenuItem>
-				<S2DForecastTypeFieldDropdown
+				<ForecastTypeDropdownS2D
 					tooltip={tooltipForecastTypes}
 				/>
 			</SidebarMenuItem>
 
 			<SidebarMenuItem>
 				<div className="flex flex-col gap-4">
-					<S2DForecastDisplayFieldDropdown
+					<ForecastDisplayDropdownS2D
 						tooltip={tooltipForecastDisplay}
 					/>
-					<MaskLowSkillField
+					<MaskLowSkillControlS2D
 						tooltip={tooltipForecastDisplayLowSkill}
 					/>
 				</div>
@@ -62,7 +60,7 @@ const SidebarInnerS2D = () => {
 			<SidebarSeparator />
 
 			<SidebarMenuItem>
-				<S2DFrequencyFieldDropdown
+				<FrequenciesDropdownS2D
 					tooltip={tooltipFrequencies}
 				/>
 			</SidebarMenuItem>

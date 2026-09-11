@@ -6,7 +6,7 @@ import chroma from 'chroma-js';
 import { __ } from '@/context/locale-provider';
 import TooltipWidget from '@/components/ui/tooltip-widget';
 import { type DefinitionItem, DefinitionList } from '@/components/ui/definition-list';
-import { buildForecastCategories } from '@/components/map-layers/s2d-build-forecast-categories';
+import { buildForecastProbabilitiesCategories } from '@/lib/s2d';
 import { type ColourQuantitiesMap } from '@/types/types';
 import {
 	ForecastTypes,
@@ -63,7 +63,7 @@ const ProbabilityStatement = (props: ProbabilityStatementProps) => {
 	);
 
 	const statementRows: DefinitionItem[] = forecastType
-		? buildForecastCategories(forecastType)
+		? buildForecastProbabilitiesCategories(forecastType)
 		: [];
 
 	let afterStatementParagraph: string | undefined;

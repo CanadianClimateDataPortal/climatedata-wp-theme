@@ -8,6 +8,10 @@ The [**_Developing with Docker Compose_**](./docs/developing-with-docker-compose
 document explains how to set up a Docker Compose environment for development.
 If you want to develop, you should start here.
 
+The [**_Developing with the screenshot service_**](./docs/developing-with-the-screenshot-service.md)
+document explains how to run the screenshot service next to the portal, to
+download a map image locally.
+
 The [**_Git branching strategy_**](./docs/git-branching-strategy.md) explains
 how we use Git and branches for development, when releasing versions, when
 developing hot fixes, etc.

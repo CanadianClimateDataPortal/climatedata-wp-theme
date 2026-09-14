@@ -202,11 +202,11 @@ Both files below are ignored by Git, so nothing tracked changes.
 
      # Local development only. Gives the `climatedata-api` screenshot service an
      # HTTPS front door on port 5001, so the HTTPS map page can call it.
-     # The server block itself is dockerfiles/mounts/config/raster-proxy.conf.
      portal:
-       # The screenshot service runs on the host, not in a container. This name is
-       # how the portal container reaches it. The service must listen on 0.0.0.0,
-       # because a service bound to 127.0.0.1 is unreachable from here.
+       # The screenshot service runs on the host, not in a container.
+       # This name is how the portal container reaches it.
+       # The service must listen on 0.0.0.0, because a service bound to
+       # 127.0.0.1 is unreachable from here.
        extra_hosts:
          - "host.docker.internal:host-gateway"
        volumes:
@@ -241,13 +241,14 @@ const rasterEndpoint = new URL('/raster', window.DATA_URL);
 to:
 
 ```ts
-const rasterEndpoint = new URL('/raster', 'https://dev-en.climatedata.ca:5001');
+const rasterEndpoint = new URL('/raster', 'https://dev-en.climatedata.ca:5001'); // Keep with no trailing slash
 ```
 
 `window.DATA_URL` is one value, shared by other places in the map app, GeoServer
-among them. Pointing it at the proxy would send all of them to the proxy. This
-one line redirects the raster call only, and leaves the rest untouched. The URL
-uses the hostname, not `127.0.0.1`, for the reason given in
+among them.
+Pointing it at the proxy would send all of them to the proxy.
+This one line redirects the raster call only, and leaves the rest untouched.
+The URL uses the hostname, not `127.0.0.1`, for the reason given in
 [Why the hostname matters](#why-the-hostname-matters).
 
 **Do not commit this change.** When you are done, undo it:
@@ -262,8 +263,8 @@ Before you use the browser, check the proxy and the service with curl.
 Nothing in this procedure leaves a file inside the repository, apart from the
 two ignored files of [step 4](#4-add-the-https-proxy-to-the-portal).
 `git status` must show only the one-line edit of
-[step 5](#5-point-the-frontend-at-the-proxy). When a command saves an image,
-give it an explicit path outside the repository, as below.
+[step 5](#5-point-the-frontend-at-the-proxy).
+When a command saves an image, give it an explicit path outside the repository, as below.
 
 1. Check the CORS preflight. The answer must be `HTTP 204`, with the three
    `Access-Control-Allow-*` headers:
@@ -363,23 +364,6 @@ hash differs too. This is expected.
 
 ## Troubleshoot
 
-### The map page returns an HTTP 500 error after a branch checkout
-
-**Issue**: `/maps/` returns an HTTP 500 error after you switch branches, and it
-does not recover by itself.
-
-`apps/src/lib/s2d` is a directory on `main` and a file, `apps/src/lib/s2d.ts`,
-on the `CLIM-1454` branch. Git swaps one for the other, the Vite watcher of the
-_Task Runner_ (see
-[TypeScript files in apps/](./developing-with-docker-compose.md#typescript-files-in-apps))
-keeps the old path, and `fw-child/apps/dist/` becomes empty. This
-entry stops applying once pull request 709 merges into `main`.
-
-**Solution:** restart the _Task Runner_:
-```shell
-./dev.sh compose restart task-runner
-```
-
 ### The proxy cannot reach the screenshot service
 
 **Issue**: calls to `https://dev-en.climatedata.ca:5001/raster` fail, because
@@ -396,20 +380,12 @@ that a firewall on the host does not block the traffic from the container.
 certificate issuer.
 
 Port `443` serves `cert.pem`, which holds only the leaf certificate (see
-`dockerfiles/build/www/configs/nginx/climatedata-site.conf`), the case the
-Certbot `README` in `dockerfiles/mounts/ssl/` warns about. Port `5001` serves
-`fullchain.pem`, which holds the full chain. Browsers fetch the missing
-intermediate certificate themselves, but curl does not.
+[`dockerfiles/build/www/configs/nginx/climatedata-site.conf`](../dockerfiles/build/www/configs/nginx/climatedata-site.conf)),
+the case the Certbot `README` in `dockerfiles/mounts/ssl/` warns about.
+Port `5001` serves `fullchain.pem`, which holds the full chain.
+Browsers fetch the missing intermediate certificate themselves, but curl does not.
 
 **Solution:** add the `-k` option to curl for port `443`.
-
-### The map image shows "API KEY REQUIRED"
-
-**Issue**: a map image produced locally shows "API KEY REQUIRED" across the
-basemap tiles.
-
-**Solution:** none is needed. This is expected in local development only, and
-it does not affect production.
 
 ### Expired SSL certificate
 

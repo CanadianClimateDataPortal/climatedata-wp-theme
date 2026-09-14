@@ -45,7 +45,7 @@ Natively, the browser first sends a CORS preflight (`OPTIONS`) request.
 The Flask application of `climatedata-api` answers that preflight, but with no CORS headers,
 so the browser would reject the call.
 
-The [`installation.txt` file in the [`climatedata-api`](https://github.com/CanadianClimateDataPortal/climatedata-api)
+The `installation.txt` file in the [`climatedata-api`](https://github.com/CanadianClimateDataPortal/climatedata-api)
 repository is an old setup note, not the deployed configuration.
 The nginx block it shows adds the `Access-Control-Allow-Origin` header only.
 It does not answer a preflight.
@@ -56,6 +56,7 @@ Listening to the port `5001` with TLS, and properly answering to preflight with 
 path on a running service clone of the code maintained in the `climatedata-api` project, and we'll proxy
 `/raster` (e.g. `https://dev-fr.climatedata.ca:5001/raster`) to the screenshot service on port `5000`
 of our cloned copy of that backend.
+The other reason is that in production, the hostname to serve this service is a completely different hostname (e.g. `data.climatedata.ca`)
 
 ### Why the hostname matters
 

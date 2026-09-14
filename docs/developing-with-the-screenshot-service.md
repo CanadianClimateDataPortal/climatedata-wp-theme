@@ -1,29 +1,27 @@
 # Developing with the screenshot service
 
-This documentation explains how to run the portal site and the screenshot
-service together on one machine. You then download a map image that carries
-the enriched information: the title, the legend, the grid, and the location
-popup with its marker.
+This documentation explains how to run the portal site (i.e., the _Climate Data_ website)
+and the screenshot service together on one machine.
 
-The screenshot service is the `climatedata-api` project. Its `/raster` endpoint
-loads a map page in a headless Chrome and returns a PNG image. Nothing here adds
-a capability. It documents how to run what already exists.
+The screenshot service is the
+[`climatedata-api` project](https://github.com/CanadianClimateDataPortal/climatedata-api).
+Its `/raster` endpoint loads a map page in a headless Chrome and returns a PNG image.
+
 
 ## Requirements
 
-* The Docker assets. The command needs the server `<URL>`, and asks for a
-  username and a password unless you pass them as options (see
-  [Setup](./developing-with-docker-compose.md#setup)):
+* The Docker assets. The command needs the server `<URL>`, and asks for a username and a password
+  unless you pass them as options (see [Setup](./developing-with-docker-compose.md#setup)):
   ```shell
   ./dev.sh download-docker-assets <URL>
   ```
-  It writes the certificate files to `dockerfiles/mounts/ssl/`. The proxy of
-  [step 4](#4-add-the-https-proxy-to-the-portal) serves `fullchain.pem` and
-  `privkey.pem` from there, on port `5001`.
+  It writes the certificate files to `dockerfiles/mounts/ssl/`
+  (Alternatively, you can create the `ssl/` folder inside [`dockerfiles/mounts/`](../mounts/)).
+  The proxy of [step 4](#4-add-the-https-proxy-to-the-portal)
+  serves with TLS using `fullchain.pem` and `privkey.pem` certificates, on port `5001`.
 
-  The certificate does not have to be the production one. It must match the
-  hostname (see [Why the hostname matters](#why-the-hostname-matters)), and
-  both your browser and the headless Chrome of the service must trust it: the
+  It must match the hostname (see [Why the hostname matters](#why-the-hostname-matters)),
+  and both your browser and the headless Chrome of the service must trust it: the
   service cannot ignore certificate errors without a change to its code. A
   self-signed certificate works only when its authority is in the trust store
   of the machine, for example one installed with `mkcert`.
@@ -34,23 +32,36 @@ a capability. It documents how to run what already exists.
 
 ## Why a proxy is needed
 
-The map app calls `/raster` with a cross-origin `POST` request that sends JSON.
-The browser first sends a CORS preflight (`OPTIONS`) request. The Flask
-application of `climatedata-api` answers that preflight, but with no CORS
-headers, so the browser rejects the call.
+The `/map` React app calls `/raster` with a
+[cross-origin ("CORS")](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS 'Cross-Origin Resource Sharing')
+`POST` request that [sends JSON](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type)
+over TLS. Without this procedure, we get an error when trying to call a production endpoint
 
-The `installation.txt` file in the `climatedata-api` repository is an old setup
-note, not the deployed configuration. The nginx block it shows adds the
-`Access-Control-Allow-Origin` header only. It does not answer a preflight.
+Because we're sending JSON using correct `Content-Type: application/json`, and the production and development
+Virtual Hosts serving our React app, we also have to make the `/raster` endpoint to be properly compliant so
+we do not get web browser security errors.
 
-Locally, the portal's own nginx fills the gap. It listens on port `5001` with
-TLS, answers the preflight with the CORS headers, and forwards `/raster` to the
-screenshot service on port `5000` of the host machine.
+Natively, the browser first sends a CORS preflight (`OPTIONS`) request.
+The Flask application of `climatedata-api` answers that preflight, but with no CORS headers,
+so the browser would reject the call.
+
+The [`installation.txt` file in the [`climatedata-api`](https://github.com/CanadianClimateDataPortal/climatedata-api)
+repository is an old setup note, not the deployed configuration.
+The nginx block it shows adds the `Access-Control-Allow-Origin` header only.
+It does not answer a preflight.
+
+Since this document is about developing locally on the service, we'll compensate what would normally be the production server's responsibility.
+
+Listening to the port `5001` with TLS, and properly answering to preflight with the CORS headers on the `/raster`
+path on a running service clone of the code maintained in the `climatedata-api` project, and we'll proxy
+`/raster` (e.g. `https://dev-fr.climatedata.ca:5001/raster`) to the screenshot service on port `5000`
+of our cloned copy of that backend.
 
 ### Why the hostname matters
 
-Chrome and Firefox allow an HTTPS page to call `http://localhost`. So the real
-blockers are CORS, described in [Why a proxy is needed](#why-a-proxy-is-needed),
+Chrome and Firefox allow an HTTPS page to call `http://localhost`.
+So the real blockers are about Web Browser security regarding Cross-Origin Resource Sharing (a.k.a. *CORS*),
+described in [Why a proxy is needed](#why-a-proxy-is-needed),
 and the name on the certificate.
 
 The certificate in `dockerfiles/mounts/ssl/` is a publicly trusted
@@ -58,27 +69,23 @@ wildcard certificate for the `climatedata.ca` and `donneesclimatiques.ca`
 domains. It carries no IP address, so `https://127.0.0.1:5001` fails the name
 validation, in your browser and in the headless Chrome of the service.
 
-`dev-en.climatedata.ca` and `dev-fr.climatedata.ca` both resolve to `127.0.0.1`
-in public DNS. No hosts file entry is needed, and the certificate validates.
+`dev-en.climatedata.ca` and `dev-fr.climatedata.ca` both resolve to `127.0.0.1` in public DNS.
+No hosts file entry is needed, and the certificate validates.
 This is why the frontend calls `https://dev-en.climatedata.ca:5001`.
 
 ## Setup
 
 ### 1. Install the screenshot service
 
-1. Clone the `climatedata-api` repository next to this one, and check out the
-   branch of pull request 43:
+1. Clone the `climatedata-api` repository next to this one:
    ```shell
    git clone git@github.com:CanadianClimateDataPortal/climatedata-api.git ../API/repo
-   cd ../API/repo
-   git checkout CLIM-1454-update-raster-endpoint-with-new-payload
    ```
-   The directory name `../API/repo` is only an example. Choose any directory:
-   nothing in either repository depends on it.
+   The directory name `../API/repo` is only an example. Nothing in either repositories are depending on it.
 2. From the root of the `climatedata-api` clone, create a virtual environment.
    The `--python-preference only-managed` option makes uv download its own
-   CPython, so no system Python is needed. Without it, uv can pick another
-   Python that is already on the machine:
+   CPython, so no system Python is needed.
+   Without it, uv can pick another Python that is already on the machine:
    ```shell
    uv venv --python 3.9 --python-preference only-managed .venv
    ```
@@ -148,12 +155,6 @@ Both files below are ignored by Git, so nothing tracked changes.
    # The map app calls the screenshot service with a cross-origin POST. That
    # service is the `climatedata-api` project, run separately by the developer,
    # listening on port 5000 of the host machine.
-   #
-   # This block gives that service an HTTPS front door, using the certificate the
-   # portal already mounts. It answers on port 5001 for the two development
-   # hostnames, which resolve to 127.0.0.1 in public DNS. The certificate is a
-   # wildcard for *.climatedata.ca and carries no IP address, so an address such as
-   # https://127.0.0.1:5001 fails name validation and a hostname must be used.
 
    server {
        listen 5001 ssl;

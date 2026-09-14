@@ -11,13 +11,22 @@ a capability. It documents how to run what already exists.
 
 ## Requirements
 
-* The Docker assets. They include the SSL certificate that the proxy of
-  [step 4](#4-add-the-https-proxy-to-the-portal) also serves on port `5001`.
-  The tech lead gives you the `<URL>` and the credentials (see
+* The Docker assets. The command needs the server `<URL>`, and asks for a
+  username and a password unless you pass them as options (see
   [Setup](./developing-with-docker-compose.md#setup)):
   ```shell
   ./dev.sh download-docker-assets <URL>
   ```
+  It writes the certificate files to `dockerfiles/mounts/ssl/`. The proxy of
+  [step 4](#4-add-the-https-proxy-to-the-portal) serves `fullchain.pem` and
+  `privkey.pem` from there, on port `5001`.
+
+  The certificate does not have to be the production one. It must match the
+  hostname (see [Why the hostname matters](#why-the-hostname-matters)), and
+  both your browser and the headless Chrome of the service must trust it: the
+  service cannot ignore certificate errors without a change to its code. A
+  self-signed certificate works only when its authority is in the trust store
+  of the machine, for example one installed with `mkcert`.
 * The portal running with Docker Compose, as described in
   [Developing with Docker Compose](./developing-with-docker-compose.md#setup).
 * Google Chrome, installed on the host machine.
@@ -44,7 +53,7 @@ Chrome and Firefox allow an HTTPS page to call `http://localhost`. So the real
 blockers are CORS, described in [Why a proxy is needed](#why-a-proxy-is-needed),
 and the name on the certificate.
 
-The certificate in `dockerfiles/mounts/ssl/cert.pem` is a publicly trusted
+The certificate in `dockerfiles/mounts/ssl/` is a publicly trusted
 wildcard certificate for the `climatedata.ca` and `donneesclimatiques.ca`
 domains. It carries no IP address, so `https://127.0.0.1:5001` fails the name
 validation, in your browser and in the headless Chrome of the service.
@@ -386,7 +395,8 @@ that a firewall on the host does not block the traffic from the container.
 certificate issuer.
 
 Port `443` serves `cert.pem`, which holds only the leaf certificate (see
-`dockerfiles/build/www/configs/nginx/climatedata-site.conf`). Port `5001` serves
+`dockerfiles/build/www/configs/nginx/climatedata-site.conf`), the case the
+Certbot `README` in `dockerfiles/mounts/ssl/` warns about. Port `5001` serves
 `fullchain.pem`, which holds the full chain. Browsers fetch the missing
 intermediate certificate themselves, but curl does not.
 

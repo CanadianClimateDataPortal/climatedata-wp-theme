@@ -267,13 +267,12 @@ git checkout -- apps/src/lib/map/image-rastering/create-fetch-target-to-raster-w
 
 1. Open <https://dev-en.climatedata.ca/maps/>, and move the map to any area.
 2. Click a location on the map, so that its popup opens.
-3. Open the developer tools of the browser, on the network tab.
-4. In the map header, click the red download icon.
-5. Under the title **Télécharger l'image de la vue actuelle**, click the
-   download button. It shows a generating state while the service takes the
+4. In the map header, click the red 'download' button, it will open a modal
+5. Under the title **Download image from viewport**, click the
+   download button. The button will show a generating state while the service takes the
    screenshot.
 
-In the network tab, find the `POST` request to
+In the browser dev tools, in the network tab, find the `POST` request to
 `https://dev-en.climatedata.ca:5001/raster` and confirm that it did not return
 an error.
 A `502` means that the proxy cannot reach the service. See

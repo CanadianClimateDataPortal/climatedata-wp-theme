@@ -14,7 +14,7 @@ for the portal site (i.e., the _Climate Data_ website).
    ```shell
    ./dev.sh download-docker-assets <URL>
    ```
-   FYI: The files will be downloaded to the `dockerfiles/mount/` directory
+   FYI: The files will be downloaded to the `dockerfiles/mounts/` directory
    (inside the `ssl/` and `wp-plugins/` directories).
 4. Start the services (always use the `dev.sh` script):
    ```shell

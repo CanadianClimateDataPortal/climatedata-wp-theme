@@ -7,11 +7,11 @@ import L from 'leaflet';
  * share.
  *
  * Sized against the screenshot service's real ceiling: after invoking `prepare_raster`
- * the service waits up to 10s for the `to-raster` class to become visible, then raises
- * an unhandled timeout — HTTP 500, no image. 9s leaves roughly a second under that for
- * the synchronous DOM work between the two calls (marker placement, popup injection,
- * chrome removal) and for script-invocation overhead, neither of which this budget
- * otherwise accounts for.
+ * the service waits up to 10s for the `ready-to-raster-here` class to become visible,
+ * then raises an unhandled timeout — HTTP 500, no image.
+ * 9s leaves roughly a second under that for the synchronous DOM work between the two
+ * calls (marker placement, popup injection, chrome removal) and for script-invocation
+ * overhead, neither of which this budget otherwise accounts for.
  *
  * The service also sleeps 4s AFTER the ready class appears, before screenshotting —
  * which is why this budget does not need to guarantee every tile finished; a tile

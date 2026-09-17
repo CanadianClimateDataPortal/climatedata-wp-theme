@@ -5,7 +5,8 @@ import type { Prepare_Raster } from './types';
  * `$.fn.prepare_raster` before giving up quietly.
  *
  * Sized against the same external ceiling `MAP_SETTLE_TOTAL_BUDGET_MS` is
- * sized against — the service's 10s wait for `to-raster`, timeline in ./README.md.
+ * sized against — the service's 10s wait for `ready-to-raster-here`,
+ * timeline in ./README.md.
  * This 5s and that 9s are separate give-up points rather than two shares of the
  * same 10s; a page that spends all of both has already lost the service.
  * What 5s buys is time for the bundle to parse, React to mount
@@ -79,7 +80,7 @@ const PREPARE_RASTER_STUB_POLL_INTERVAL_MS = 50;
  * The service's call returns as soon as this function returns, which can be
  * well before the forwarded call resolves — true whether that call reaches
  * the real implementation directly or through this stub's poll.
- * `signalRasterReady` adding the `to-raster` class remains the only
+ * `signalRasterReady` adding the `ready-to-raster-here` class remains the only
  * synchronisation the service has; a returned call means script execution
  * reached the end of this function, nothing about the work it started.
  *

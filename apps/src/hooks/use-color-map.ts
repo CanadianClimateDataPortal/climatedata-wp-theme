@@ -49,9 +49,6 @@ export function useColorMap() {
 		 * GeoServer echoes layerName without the `CDC:` prefix.
 		 * Strip it before you compare the two names.
 		 *
-		 * `layerValue` above holds the result of `climateVariable.getLayerValue()`.
-		 * `ClimateVariableBase` and `S2DClimateVariable` each implement that method.
-		 *
 		 * A match means the data belongs to the current layer.
 		 * A mismatch returns `null`, which differs from either payload.
 		 * React then notices the change and renders when the right data lands.

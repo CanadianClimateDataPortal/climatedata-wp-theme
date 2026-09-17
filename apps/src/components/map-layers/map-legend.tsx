@@ -61,6 +61,7 @@ const MapLegend: React.FC = () => {
 	const showClimatologyLegendOfS2D = isS2DVariable && forecastDisplay == ForecastDisplays.CLIMATOLOGY;
 
 	// When the unit is a day-of-year, we make the legend a little bit larger
+	// Also, width is not defined for S2D Forecast variables since the legend is handled differently for this use case.
 	const legendWidth = showForecastLegendOfS2D ? undefined : (unit?.startsWith('DoY') && !isDelta ? 120 : 100)
 
 	// For the default colour palette, isCategorical defaults to the default legend's type

@@ -4,7 +4,9 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { __ } from '@/context/locale-provider';
 import { cn } from '@/lib/utils';
 
-export interface MapLegendOpenControlProps {
+export interface MapLegendOpenControlProps
+	extends React.DOMAttributes<HTMLDivElement>
+{
 	children?: React.ReactNode;
 	isOpen: boolean;
 	width?: number;
@@ -19,6 +21,7 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 		isOpen,
 		width,
 		toggleOpen,
+		...rest
 	} = props;
 
 	const rootElementStyle: React.CSSProperties = {
@@ -33,7 +36,9 @@ export const MapLegendOpenControl = (props: MapLegendOpenControlProps) => {
 	return (
 		<div
 			className="relative space-y-[5px]"
+			data-part="map-legend-open-control"
 			style={rootElementStyle}
+			{...rest}
 		>
 			<div className="flex flex-col items-end">
 				<button

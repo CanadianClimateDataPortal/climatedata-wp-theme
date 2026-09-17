@@ -47,6 +47,7 @@ const MapLegend: React.FC = () => {
 	const colourScheme = climateVariable?.getColourScheme();
 	const isDelta = climateVariable?.getDataValue() === 'delta';
 	const unit = climateVariable?.getUnitLegend();
+
 	const legendConfig =
 		climateVariable?.getLegendConfig(isDelta ? MapDisplayType.DELTA : MapDisplayType.ABSOLUTE) ??
 		undefined;
@@ -58,6 +59,10 @@ const MapLegend: React.FC = () => {
 	// Whether to show the regular legend or the S2D forecast legend
 	const showForecastLegendOfS2D = isS2DVariable && forecastDisplay === ForecastDisplays.FORECAST;
 	const showClimatologyLegendOfS2D = isS2DVariable && forecastDisplay == ForecastDisplays.CLIMATOLOGY;
+
+	// When the unit is a day-of-year, we make the legend a little bit larger
+	// Also, width is not defined for S2D Forecast variables since the legend is handled differently for this use case.
+	const legendWidth = showForecastLegendOfS2D ? undefined : (unit?.startsWith('DoY') && !isDelta ? 120 : 100)
 
 	// For the default colour palette, isCategorical defaults to the default legend's type
 	if ((colourScheme === null || colourScheme === 'default') && legendData && legendData.Legend) {
@@ -130,16 +135,25 @@ const MapLegend: React.FC = () => {
 			return;
 		}
 
+		// colorMap is null until the data for the current layer arrives.
 		if (!colorMap) {
-			rootRef.current.render(<></>);
+			// Render the button now, at the width the loaded branch will use.
+			// The button would otherwise vanish and return on every switch.
+			rootRef.current.render(
+				<MapLegendOpenControl
+					isOpen={isOpen}
+					toggleOpen={() => dispatch(setLegendOpen(!isOpen))}
+					width={legendWidth}
+				/>
+			);
 			return;
 		}
-
 		if (showForecastLegendOfS2D) {
 			rootRef.current.render(
 				<MapLegendOpenControl
 					isOpen={isOpen}
 					toggleOpen={() => dispatch(setLegendOpen(!isOpen))}
+					width={legendWidth}
 				>
 					<Suspense fallback={'...'}>
 						<LazyMapLegendForecastS2D
@@ -168,8 +182,7 @@ const MapLegend: React.FC = () => {
 			<MapLegendOpenControl
 				isOpen={isOpen}
 				toggleOpen={() => dispatch(setLegendOpen(!isOpen))}
-				/* When the unit is a day of the year, we make the legend a little bit larger */
-				width={unit?.startsWith('DoY') && !isDelta ? 120 : 100}
+				width={legendWidth}
 			>
 				<Suspense fallback={'...'}>
 					<LazyMapLegendCommon
@@ -195,6 +208,7 @@ const MapLegend: React.FC = () => {
 		legendConfig,
 		isDelta,
 		unit,
+		legendWidth,
 		locale,
 		forecastType,
 		showForecastLegendOfS2D,

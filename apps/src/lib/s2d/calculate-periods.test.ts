@@ -240,11 +240,26 @@ describe('getPeriods', () => {
 		});
 	});
 
-	test('returns an empty array for an unsupported frequency', () => {
+	/**
+	 * getPeriods catches the unsupported-frequency throw from
+	 * resolveFrequencyPeriodJump. It returns an empty array instead.
+	 * The silence is on purpose, and this test protects it.
+	 */
+	describe('silently yields no periods for an unsupported frequency', () => {
 		const releaseDate = utc('2025-10-5 10:12:34') as Date;
-		// @ts-expect-error - Testing an unsupported frequency
-		const actualPeriods = getPeriods(releaseDate, FrequencyType.ANNUAL);
-		expect(actualPeriods).toHaveLength(0);
+
+		test('does not throw', () => {
+			expect(() =>
+				// @ts-expect-error - Testing an unsupported frequency
+				getPeriods(releaseDate, 'not-a-frequency')
+			).not.toThrow();
+		});
+
+		test('returns an empty array for an unsupported frequency', () => {
+			// @ts-expect-error - Testing an unsupported frequency
+			const actualPeriods = getPeriods(releaseDate, 'not-a-frequency');
+			expect(actualPeriods).toHaveLength(0);
+		});
 	});
 });
 

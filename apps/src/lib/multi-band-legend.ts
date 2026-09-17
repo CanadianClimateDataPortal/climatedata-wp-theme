@@ -2,13 +2,20 @@ import { type ColourQuantitiesMap } from '@/types/types';
 import { AbstractError } from '@/lib/errors';
 
 /**
- * @file Multi-Band Legend Transformation (S2D Forecasts Only)
+ * @file Multi-Band Legend Transformation
  *
- * This module handles transformation of S2D (Sub-seasonal to Decadal) forecast data
- * into a format suitable for rendering horizontal multi-band probability legends.
+ * This module builds a legend with several bands. The input encodes the band
+ * index in the thousands digit. That encoding is the GXYY pattern.
  *
- * ⚠️ SPECIALIZED MODULE - Only accepts GXYY-encoded multi-band format
- * ⚠️ NOT for standard single-gradient legends (use regular legend components instead)
+ * The pattern is not specific to meteorology. It is one way to encode a legend
+ * for banded data. So this module sits outside the S2D namespace. It knows
+ * nothing about forecasts.
+ *
+ * S2D forecasts are the only producer today. The backend team that manages S2D
+ * data designed the encoding. The shape comes from GeoServer.
+ *
+ * ⚠️ Only accepts GXYY-encoded multi-band input.
+ * ⚠️ NOT for standard single-gradient legends (use regular legend components instead).
  *
  * @see EXAMPLE_COLOR_MAP_S2D_MULTIBAND (`@/hooks/use-color-map.examples`) - Example input format
  */
@@ -217,7 +224,9 @@ const validateScaleConsistency = (
 	ranges: GroupRange[]
 ): void => {
 	if (ranges.length === 0) {
-		return;
+		// An empty quantities array must fail here, right away.
+		// A silent return would let the bad state pass unnoticed.
+		throw new MultiBandLegendError('validateScaleConsistency ranges argument received unexpected empty array.');
 	}
 
 	// Extract scale from first group as reference

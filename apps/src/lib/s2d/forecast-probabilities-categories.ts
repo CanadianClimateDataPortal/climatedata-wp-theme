@@ -8,6 +8,21 @@ import {
 } from '@/types/climate-variable-interface';
 
 /**
+ * Row labels for the multi-band legend, by forecast type.
+ *
+ * These strings stay untranslated on purpose. The legend passes each one
+ * through __() when it renders the row.
+ *
+ * Keep them apart from buildForecastProbabilitiesCategories below. That
+ * function returns the long forms, such as "Above normal". It also applies
+ * __() itself. Merging the two would change the legend wording.
+ */
+export const LEGEND_ROW_LABELS: Record<ForecastType, string[]> = {
+	[ForecastTypes.EXPECTED]: ['Above', 'Near', 'Below'],
+	[ForecastTypes.UNUSUAL]: ['Unusually high', 'Unusually low'],
+};
+
+/**
  * Builds forecast category definitions for the given forecast type
  *
  * Used by both the map legend tooltip and the probability bars tooltip

@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import {
 	transformColorMapToMultiBandLegend,
 	InvalidQuantityFormatError,
+	MultiBandLegendError,
 	ScaleMismatchError,
 } from '@/lib/multi-band-legend';
 
@@ -255,6 +256,17 @@ describe('multi-band-legend', () => {
 					expect(() =>
 						transformColorMapToMultiBandLegend(input)
 					).toThrowError(ScaleMismatchError);
+				});
+
+				it('throws MultiBandLegendError instead of crashing on empty quantities', () => {
+					const input: TransformColorMapInputParam = {
+						colours: [],
+						quantities: [],
+					};
+
+					expect(() =>
+						transformColorMapToMultiBandLegend(input)
+					).toThrowError(MultiBandLegendError);
 				});
 			});
 		});

@@ -69,7 +69,7 @@ export const resolveFrequencyPeriodJump = (
  * @param frequency - The frequency that determines the period length.
  * @returns The last day of the period.
  */
-const getPeriodEnd = (
+export const getPeriodEnd = (
 	periodStart: Date,
 	frequency: S2DFrequencyType,
 ): Date => {
@@ -215,6 +215,15 @@ export const formatPeriodRange = (
 };
 
 /**
+ * Format only the year of a date, localized.
+ *
+ * @param date - The date whose year to format.
+ * @param locale - Locale to use for formatting.
+ */
+export const formatYear = (date: Date, locale: string): string =>
+	formatIntlDate(date, locale, { year: 'numeric' });
+
+/**
  * Generate a period range label for a given date range and frequency.
  *
  * @param dateRangeStart - Start date of the period. Example: 2025-08-01
@@ -235,7 +244,7 @@ export const generatePeriodRangeLabel = (
 	}
 
 	const periodStartLabel = isDecadalFrequencyType
-		? formatIntlDate(periodStart, locale, { year: 'numeric' })
+		? formatYear(periodStart, locale)
 		: formatIntlDate(periodStart, locale, { month: 'long' });
 
 	if (frequency === FrequencyType.MONTHLY) {
@@ -244,7 +253,7 @@ export const generatePeriodRangeLabel = (
 
 	const periodEnd = getPeriodEnd(periodStart, frequency);
 	const periodEndLabel = isDecadalFrequencyType
-		? formatIntlDate(periodEnd, locale, { year: 'numeric' })
+		? formatYear(periodEnd, locale)
 		: formatIntlDate(periodEnd, locale, { month: 'long' });
 
 	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
@@ -323,16 +332,14 @@ export const generateSliderLabels = (
 	let maximumLabel = formatMinMaxLabel(lastPeriod, locale);
 
 	if (isFrequencyTypeS2DDecadal(frequencyType)) {
-		// returns `<month> <year>` in both locales, so the second token is the year.
-		minimumLabel = minimumLabel.split(' ')[1];
-		maximumLabel = maximumLabel.split(' ')[1];
+		minimumLabel = formatYear(firstPeriod, locale);
+		maximumLabel = formatYear(lastPeriod, locale);
 	}
 
 	const tickLabels = periods.map((period) => {
 		if (isFrequencyTypeS2DDecadal(frequencyType)) {
-			// Year ranges, such as "2026-2030" then "2031-2035".
-			const startYear = formatShortMonthYear(period[0], locale).split(' ')[1];
-			const endYear = formatShortMonthYear(period[1], locale).split(' ')[1];
+			const startYear = formatYear(period[0], locale);
+			const endYear = formatYear(period[1], locale);
 			return `${startYear}-${endYear}`;
 		} else {
 			// Month ranges, such as "Aug-Oct" then "Sep-Nov", or "août-oct" then

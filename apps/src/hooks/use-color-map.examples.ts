@@ -70,7 +70,7 @@ export const EXAMPLE_COLOR_MAP_DISCRETE_SINGLE: ColourQuantitiesMap = {
 
 
 // ============================================================================
-// S2D MULTI-BAND FORMAT (EXCEPTION - SPECIFIC TO MapLegendInnerS2D COMPONENT)
+// S2D MULTI-BAND FORMAT (EXCEPTION - SPECIFIC TO MapLegendForecastS2D COMPONENT)
 // ============================================================================
 
 /**
@@ -79,13 +79,16 @@ export const EXAMPLE_COLOR_MAP_DISCRETE_SINGLE: ColourQuantitiesMap = {
  * ⚠️ THIS IS A SPECIALIZED FORMAT used ONLY for S2D (Sub-seasonal to Decadal) forecast visualizations.
  * ⚠️ Most of the application uses EXAMPLE_COLOR_MAP_DISCRETE_SINGLE instead.
  *
- * SPECIFIC TO: MapLegendInnerS2D component (`@/components/map-layers/map-legend-inner-s2d`)
- * CONSUMED BY: {@link transformColorMapToMultiBandLegend} → {@link MapLegendInnerS2D}
+ * SPECIFIC TO: MapLegendForecastS2D component (`@/components/map-layers/map-legend-forecast-s2d`)
+ * CONSUMED BY: {@link transformColorMapToMultiBandLegend} → {@link MapLegendForecastS2D}
  * NOT COMPATIBLE WITH: {@link MapLegendCommon}
  *
  * This represents the transformed response from GeoServer's GetLegendGraphic endpoint
  * for S2D forecasts that require displaying multiple probability bands simultaneously
  * (e.g., "Above Normal", "Near Normal", "Below Normal").
+ *
+ * The backend team that manages S2D data designed this encoding. The shape
+ * comes from GeoServer, not from this application.
  *
  * Format: Quantities use GXYY encoding pattern
  * - G (1st digit): Grouping/outcome index (1-9) - identifies which band (e.g. Above, Near, Below)
@@ -110,7 +113,7 @@ export const EXAMPLE_COLOR_MAP_DISCRETE_SINGLE: ColourQuantitiesMap = {
  *
  * @see useColorMap (`@/hooks/use-color-map`) - Hook that fetches and transforms this data
  * @see transformColorMapToMultiBandLegend (`@/lib/multi-band-legend`) - Transforms GXYY format
- * @see MapLegendInnerS2D (`@/components/map-layers/map-legend-inner-s2d`) - Horizontal multi-band legend renderer
+ * @see MapLegendForecastS2D (`@/components/map-layers/map-legend-forecast-s2d`) - Horizontal multi-band legend renderer
  * @see EXAMPLE_COLOR_MAP_DISCRETE_SINGLE - The standard format used everywhere else
  */
 export const EXAMPLE_COLOR_MAP_S2D_MULTIBAND: ColourQuantitiesMap = {

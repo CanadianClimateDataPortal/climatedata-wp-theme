@@ -291,7 +291,7 @@
  * right-hand map's own copies of the info pills, since only one copy should
  * show.
  *
- * Raster vocabulary (`data-raster`, `to-raster`):
+ * Raster vocabulary (`data-raster`, `ready-to-raster-here`):
  * apps/src/lib/map/image-rastering/README.md
  */
 html[data-raster='true'] [data-raster='false'],

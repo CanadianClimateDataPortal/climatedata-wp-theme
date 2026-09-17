@@ -280,15 +280,6 @@ A `502` means that the proxy cannot reach the service. See
 Any other error comes from the service itself, so read its output in the
 terminal where it runs.
 
-Then open the downloaded image. It must carry the four elements: the
-title, the legend, the grid, and the location popup with its marker. It can
-also show a scenario pill, which was already in exported images before this
-work.
-
-The browser sends the inner HTML of the popup to the service. The close button
-and the "See details" link of the popup carry `data-raster="false"`, so neither
-appears in the image.
-
 ## Troubleshoot
 
 ### The proxy cannot reach the screenshot service

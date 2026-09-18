@@ -10,9 +10,10 @@ import type { PrepareRasterPostHttpPayload } from './types';
  *
  * Returns `undefined`, never a payload with an empty `locationPopupHtml`,
  * whenever either half is missing: no popup currently open, or no location
- * selected. `undefined` becomes an absent request body, and the screenshot
- * service then calls `$.fn.prepare_raster()` argument-less rather than
- * passing on a partially-empty payload.
+ * selected.
+ * `createFetchRequestInitOptions` then sends `{}` as the body.
+ * The screenshot service then calls `$.fn.prepare_raster()` without arguments,
+ * instead of receiving a partial payload.
  *
  * @remark Where does this run?: In the user's browser.
  */

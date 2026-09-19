@@ -107,6 +107,8 @@ const MapContainer = (
 		(climateVariable?.getScenarioCompareTo() ?? '') :
 		(climateVariable?.getScenario() ?? '');
 
+	const showComparisonMap = !!(climateVariable?.getScenarioCompare() && climateVariable?.getScenarioCompareTo());
+
 	const showLandmassMask = climateVariable && climateVariable instanceof MarineClimateVariable;
 	const showLowSkillLayer = climateVariable && climateVariable instanceof S2DClimateVariable;
 
@@ -253,7 +255,7 @@ const MapContainer = (
 				onUnmount={onUnmount}
 			/>
 			{climateVariable?.getInteractiveMode() === 'region' && (
-				!isComparisonMap && (
+				(!showComparisonMap || isComparisonMap) && (
 					<MapLegend />
 				)
 			)}

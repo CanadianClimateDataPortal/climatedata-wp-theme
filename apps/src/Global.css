@@ -300,9 +300,6 @@ html[data-raster='true'] #map-root.map-comparison > .leaflet-container.map-compa
 	display: none !important;
 }
 
-#map-root.map-comparison > .leaflet-container.map-comparison-left .leaflet-control-container .leaflet-top.leaflet-right > .legend-wrapper {
-	display: none !important;
-}
 /**
  * The map info pills (`MapInfoPills`) are hidden by default and revealed
  * only while preparing the raster capture.

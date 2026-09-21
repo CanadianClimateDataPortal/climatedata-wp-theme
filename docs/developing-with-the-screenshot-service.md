@@ -225,10 +225,6 @@ Both files below are ignored by Git, so nothing tracked changes.
    file that already exposes the Ladle port becomes:
    ```yaml
    services:
-     task-runner:
-       ports:
-         - "61000:61000"  # Ladle development server
-
      # Local development only. Gives the `climatedata-api` screenshot service an
      # HTTPS front door on port 5001, so the HTTPS map page can call it.
      portal:
@@ -245,7 +241,6 @@ Both files below are ignored by Git, so nothing tracked changes.
        ports:
          - "5001:5001"
    ```
-   If you do not use Ladle, leave out the `task-runner` entry.
 4. Restart the services. A new published port needs a restart. Reloading nginx
    with `./dev.sh nginx -s reload` is not enough:
    ```shell

@@ -32,13 +32,7 @@ export const MAP_SETTLE_TOTAL_BUDGET_MS = 9_000;
  * More than one, because the two panes are synchronised in both directions (see
  * the `sync` calls in `map.tsx`): a move on one pane propagates to the other, so
  * the second pane starts requesting its tiles slightly *after* the first pane
- * has finished with its own. A single idle reading can land in that gap and
- * report a map that has not finished. Requiring consecutive idle frames narrows
- * the window. It does not close it, and no finite number would.
- *
- * This value and the original 8000ms single-call timeout were introduced together
- * in one commit and never tuned against observed behaviour — the provenance is
- * "chosen alongside the design", not measured. Do not re-derive either number.
+ * has finished with its own.
  */
 const MAP_SETTLE_STABLE_FRAMES = 3;
 
@@ -93,7 +87,7 @@ export const waitForMapsSettled = (
 	const mounted = maps.filter((map): map is L.Map => Boolean(map));
 	let idleFrames = 0;
 
-	// Deadline check lives inside the rAF callback deliberately — not a missing
+	// Deadline check lives inside the `requestAnimationFrame` callback deliberately — not a missing
 	// `setTimeout` fallback. Frames ARE the measurement: no frames means the page isn't
 	// rendering, so "settled" has no answer to give. A wall-clock fallback would claim
 	// ready with nothing painted, and since the service has no error branch that turns a

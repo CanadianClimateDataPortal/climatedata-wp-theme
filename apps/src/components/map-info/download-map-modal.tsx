@@ -16,7 +16,7 @@ import {
 	createPrepareRasterPostHttpPayload,
 	installPrepareRasterStub,
 	prepareRaster,
-	type Prepare_Raster,
+	type Window_Fn_Prepare_Raster,
 	type PrepareRasterPostHttpPayload,
 } from '@/lib/map/image-rastering';
 import { useMap } from '@/hooks/use-map';
@@ -57,7 +57,7 @@ const DownloadMapModal: React.FC<{
 		window.$ = window.$ || {};
 		window.$.fn = window.$.fn || {};
 
-		const prepare_raster: Prepare_Raster = (
+		const prepare_raster: Window_Fn_Prepare_Raster = (
 			locationPopupHtml,
 			markerLatLon,
 		) => {

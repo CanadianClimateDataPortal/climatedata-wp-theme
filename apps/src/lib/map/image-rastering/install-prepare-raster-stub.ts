@@ -1,4 +1,4 @@
-import type { Prepare_Raster } from './types';
+import type { Window_Fn_Prepare_Raster } from './types';
 
 /**
  * How long {@link installPrepareRasterStub}'s polling stub waits for the real
@@ -91,7 +91,7 @@ export const installPrepareRasterStub = (): void => {
 	window.$.fn = window.$.fn || {};
 	const fn = window.$.fn;
 
-	const stub: Prepare_Raster = (...args): void => {
+	const stub: Window_Fn_Prepare_Raster = (...args): void => {
 		const expiresAt = performance.now() + PREPARE_RASTER_STUB_POLL_DEADLINE_MS;
 
 		const poll = (): void => {

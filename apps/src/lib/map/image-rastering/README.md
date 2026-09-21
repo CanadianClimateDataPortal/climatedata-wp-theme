@@ -18,7 +18,7 @@ The round trip spans two browsers, not one.
 
 Everything [`index.ts`](./index.ts) exports:
 
-- `prepareRaster` — receiver-side replay, settle and signal; what `$.fn.prepare_raster` calls.
+- `prepareRaster: PrepareRasterClosure` — receiver-side replay, settle and signal; what `$.fn.prepare_raster: Window_Fn_Prepare_Raster` calls when running from the screenshot service.
 - `getLocationModalInnerHTML` — scrapes the sender's open `LocationModal` markup.
 - `createPrepareRasterPostHttpPayload` — builds the sender's POST payload from the open popup and marker.
 - `createFetchRequestInitOptions` — wraps a payload as the POST `fetch` init.

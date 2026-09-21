@@ -9,7 +9,7 @@ import { signalRasterReady } from './signal-raster-ready';
 import { MAP_SETTLE_TOTAL_BUDGET_MS, waitForMapsSettled } from './wait-for-maps-settled';
 import { waitForMarkerIcons } from './wait-for-marker-icons';
 
-import type { PrepareRaster } from './types';
+import type { PrepareRasterClosure } from './types';
 
 /**
  * Runs in the screenshot service's headless browser.
@@ -35,7 +35,7 @@ import type { PrepareRaster } from './types';
 // screenshot service invokes that exact expression against the page. A second,
 // unrelated function under the same name lives in fw-child/resources/js/map.js;
 // it never loads on this page, so only this definition ever runs here.
-export const prepareRaster: PrepareRaster = async (
+export const prepareRaster: PrepareRasterClosure = async (
 	payload,
 	handles,
 ): Promise<void> => {

@@ -1,5 +1,5 @@
 import type {
-	Prepare_Raster,
+	Window_Fn_Prepare_Raster,
 } from './types';
 
 // Extend the global Window interface to allow simulation of jQuery-style API.
@@ -8,7 +8,7 @@ declare global {
 	interface Window {
 		$?: {
 			fn?: {
-				prepare_raster?: Prepare_Raster;
+				prepare_raster?: Window_Fn_Prepare_Raster;
 			};
 		};
 		URL_ENCODER_SALT: string;

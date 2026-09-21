@@ -59,12 +59,12 @@ export interface PrepareRasterPostHttpPayload {
  * screenshot service (`climatedata-api`, `climatedata_api/raster.py`) in a headless browser
  * to prepare the map page for a screenshot.
  */
-export type Prepare_Raster = (
+export type Window_Fn_Prepare_Raster = (
 	locationPopupHtml?: PrepareRasterPostHttpPayload['locationPopupHtml'],
 	markerLatLon?: PrepareRasterPostHttpPayload['markerLatLon'],
 ) => void;
 
-export type PrepareRaster = (
+export type PrepareRasterClosure = (
 	payload?: PrepareRasterPostHttpPayload,
 	handles?: PrepareRasterMapHandles,
 	signalReady?: SignalReady,

@@ -120,12 +120,35 @@ the Python version and the platform, so find it with `find`.
 
 1. From the root of the `climatedata-api` clone, ask `selenium-manager` for a
    driver that matches the installed Chrome:
+   - On a development machine or VM a past run of Selenium with Chrome
+     may no longer work when the version of chrome gets updated
+   - The following command will give the versions installed, there may be more than one.
+     Pick the one that is the most recent and accurate depending on your setup (uv, venv, etc.)
    ```shell
-   SELENIUM_MANAGER=$(find .venv -name selenium-manager -type f)
+   find .venv -name selenium-manager -type f
+   .venv/lib/python3.9/site-packages/selenium/webdriver/common/linux/selenium-manager
+   .venv/lib/python3.9/site-packages/selenium/webdriver/common/macos/selenium-manager
+   ```
+   - Use one of the entries from `selenium-manager` and run it
+   ```shell
+   export SELENIUM_MANAGER=".venv/lib/python3.9/site-packages/selenium/webdriver/common/linux/selenium-manager"
    "$SELENIUM_MANAGER" --browser chrome --output json
    ```
+   - The command above output looks like this:
+   ```
+   {
+     "logs": [],
+     "result": {
+       "code": 0,
+       "message": "",
+       "driver_path": "/usr/bin/chromedriver",
+       "browser_path": "/usr/bin/google-chrome"
+     }
+   }%
+   ```
 2. Read `driver_path` in the output. The driver must match the installed
-   Chrome. Run the command again after a Chrome update.
+   Chrome.
+   Run the command again after a Chrome update.
 
 ### 3. Start the screenshot service
 

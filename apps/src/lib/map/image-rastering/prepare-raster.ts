@@ -31,10 +31,8 @@ import type { PrepareRasterClosure } from './types';
  * to modify the DOM by adding something specific (`RASTER_READY_CLASS_NAME`)
  * that the screenshot service is polling for to take the screenshot.
  */
-// Exposed globally as $.fn.prepare_raster because a server-side headless-browser
-// screenshot service invokes that exact expression against the page. A second,
-// unrelated function under the same name lives in fw-child/resources/js/map.js;
-// it never loads on this page, so only this definition ever runs here.
+// Exposed globally as `$.fn.prepare_raster` because a server-side headless-browser
+// screenshot service invokes that exact expression against the page.
 export const prepareRaster: PrepareRasterClosure = async (
 	payload,
 	handles,

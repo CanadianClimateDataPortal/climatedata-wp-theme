@@ -1,12 +1,12 @@
-import type { PrepareRasterPostHttpPayload } from './types';
+import type { SelectedLocationSnapshot } from './types';
 
 /**
  * Wraps the payload as the POST `fetch` init.
  *
  * @remark Where does this run?: In the user's browser.
  */
-export const createFetchRequestInitOptions = (
-	payload?: PrepareRasterPostHttpPayload,
+export const createFetchRequestInitToRaster = (
+	payload?: SelectedLocationSnapshot,
 ): RequestInit => {
 	const fetchOptions: RequestInit = {
 		method: 'POST',

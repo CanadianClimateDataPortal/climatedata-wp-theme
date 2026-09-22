@@ -37,9 +37,10 @@ export interface PrepareRasterMapHandles {
 }
 
 /**
- * The payload POSTed to the external screenshot service before it replays this page.
+ * The part of the user's view that the map URL does not carry: the open location popup and its marker.
+ * Sent as the POST body so that the screenshot service can reproduce it.
  */
-export interface PrepareRasterPostHttpPayload {
+export interface SelectedLocationSnapshot {
 	/**
 	 * The HTML of the LocationPopup(s) that was/were open when the user clicked the "Download" button.
 	 */
@@ -60,12 +61,13 @@ export interface PrepareRasterPostHttpPayload {
  * to prepare the map page for a screenshot.
  */
 export type Window_Fn_Prepare_Raster = (
-	locationPopupHtml?: PrepareRasterPostHttpPayload['locationPopupHtml'],
-	markerLatLon?: PrepareRasterPostHttpPayload['markerLatLon'],
+	locationPopupHtml?: SelectedLocationSnapshot['locationPopupHtml'],
+	markerLatLon?: SelectedLocationSnapshot['markerLatLon'],
 ) => void;
 
+/** Signature of `prepareRaster`, which documents what it does. */
 export type PrepareRasterClosure = (
-	payload?: PrepareRasterPostHttpPayload,
+	payload?: SelectedLocationSnapshot,
 	handles?: PrepareRasterMapHandles,
 	signalReady?: SignalReady,
 ) => Promise<void>;

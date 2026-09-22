@@ -46,10 +46,41 @@
 
 								<?php
 
-									$all_tags = get_terms ( array (
-										'taxonomy' => $filter_tax,
-										'hide_empty' => false
-									) );
+									// For variable-dataset taxonomy, only show datasets that have variables displayed on this page
+									if ( 'variable-dataset' === $filter_tax ) {
+										// Get all variables that are shown on the Variable page
+										$displayed_vars = new WP_Query( array(
+											'post_type' => 'variable',
+											'posts_per_page' => -1,
+											'post_status' => 'publish',
+											'meta_query' => array(
+												array(
+													'key' => 'show_in_listing',
+													'value' => '1',
+												),
+											),
+										) );
+
+										// Collect all dataset terms from displayed variables
+										$displayed_datasets = array();
+										foreach ( $displayed_vars->posts as $var ) {
+											$var_datasets = get_the_terms( $var->ID, $filter_tax );
+											if ( ! empty( $var_datasets ) && ! is_wp_error( $var_datasets ) ) {
+												foreach ( $var_datasets as $dataset ) {
+													$displayed_datasets[ $dataset->term_id ] = $dataset;
+												}
+											}
+										}
+
+										// Convert to array of term objects
+										$all_tags = array_values( $displayed_datasets );
+									} else {
+										// For other taxonomies, all filter options are displayed
+										$all_tags = get_terms ( array (
+											'taxonomy' => $filter_tax,
+											'hide_empty' => false
+										) );
+									}
 
 									if ( !empty ( $all_tags ) ) {
 

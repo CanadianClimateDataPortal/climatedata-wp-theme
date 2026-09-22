@@ -82,9 +82,9 @@ export const GridTypes = {
 	 */
 	SLRGRID_CMIP6: 'slrgrid-cmip6',
 	/**
-	 * Vertical Allowance lattice, coastal-only and anisotropic.
+	 * Vertical Allowance lattice, coastal-only.
 	 *
-   * `climateVariableId`s:
+	 * `climateVariableId`s:
 	 * - `?var=allowance`.
 	 *
 	 * Resolution: {@link GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS}.
@@ -108,8 +108,6 @@ const GRID_RESOLUTION_LABEL_STATISTICALLY_DOWNSCALED_AND_S2D =
 /**
  * 11×7km : Marine Projections
  *
- * Source: (to confirm)
- *
  * `climateVariableId`s:
  * - `?var=sea_level` : Relative Sea-Level Changes
  * - `?var=allowance` : Vertical Allowance
@@ -122,10 +120,8 @@ const GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS = '~11×7km' as const;
 /**
  * 11×7km : Days with Humidex above threshold variable
  *
- * Source: (to confirm)
- *
  * Humidex uses era5landgrid.
- * The code se-uses {@link GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS}'s value on that basis.
+ * The code re-uses {@link GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS}'s value on that basis.
  *
  * - Published as '0.1° (approximately 9 km)'
  *   ({@link https://climatedata.ca/about/our-data/#humidex | Humidex})
@@ -164,14 +160,10 @@ export const GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D =
  * - `?var=sea_level` : Relative Sea-Level Changes.
  *   Published as '0,1° (environ 11 km de latitude, 2-8 km de longitude)'
  *   ({@link https://donneesclimatiques.ca/le-portail/nos-donnees/#sea_level | Changement relatif du niveau de la mer})
- *   — French only; the English page states no figure for this dataset.
  *
  * - `?var=allowance` : Vertical Allowance.
  *   Published as '0.1° (approximately 11 km latitude, 4-8 km longitude)'
  *   ({@link https://climatedata.ca/about/our-data/#vert_allowance | Vertical Allowance})
- *   — anisotropic, unlike every other entry in this table. WFS-measured.
- *
- * 0.1° for all three, coastal-only.
  */
 const GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS = 0.1 as const;
 
@@ -228,11 +220,8 @@ export const GRID_RESOLUTIONS_LABELS = {
 		GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS,
 	[GridTypes.SLRGRID_CMIP6]:
 		GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS,
-	/**
-	 * See {@link GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS} — anisotropic, unlike every
-	 * other entry here.
-	 */
-	[GridTypes.ALLOWANCEGRID]: GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS,
+	[GridTypes.ALLOWANCEGRID]:
+		GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS,
 } as const satisfies Record<GridType, string>;
 
 /**

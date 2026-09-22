@@ -120,7 +120,7 @@ the Python version and the platform, so find it with `find`.
 
 1. From the root of the `climatedata-api` clone, ask `selenium-manager` for a
    driver that matches the installed Chrome:
-   - On a development machine or VM a past run of Selenium with Chrome
+   - On a development machine or VM, a past run of Selenium with Chrome
      may no longer work when the version of chrome gets updated
    - The following command will give the versions installed, there may be more than one.
      Pick the one that is the most recent and accurate depending on your setup (uv, venv, etc.)

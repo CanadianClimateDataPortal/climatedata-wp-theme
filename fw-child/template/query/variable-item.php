@@ -46,13 +46,25 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 							$dataset_term_id   = $dataset->term_id;
 							$dataset_term_name = $dataset->name;
 
+							// Determine the color based on dataset name
+							$badge_style = 'background-color: #e8f4e8; color: #333;'; // Default green
+
+							// Check for S2D (pink)
+							if ( strpos( $dataset_term_name, 'Seasonal to Decadal Forecasts' ) !== false ) {
+								$badge_style = 'background-color: #f8e4f5; color: #333;';
+							}
+							// Check for Projections (blue)
+							elseif ( strpos( $dataset_term_name, 'Projections' ) !== false ) {
+								$badge_style = 'background-color: #d4e9f7; color: #333;';
+							}
+
 // 							if ( 'fr' === $current_lang ) {
 // 								$sector_term_name_fr = get_field( 'admin_term_title_fr', $sector );
 // 								$sector_term_name    = ( empty( $sector_term_name_fr ) ) ? $sector_term_name : $sector_term_name_fr;
 // 							}
 				?>
 
-				<span class="badge all-caps text-bg-light mt-1 me-1 text-wrap"><?php echo esc_html( $dataset_term_name ); ?></span>
+				<span class="badge all-caps mt-1 me-1 text-wrap" style="<?php echo esc_attr( $badge_style ); ?>"><?php echo esc_html( $dataset_term_name ); ?></span>
 
 				<?php
 

@@ -27,8 +27,8 @@ import {
  */
 export const GridTypes = {
 	/**
-	 * 1/12° lattice for Statistically Downscaled Global Climate Projections (CanDCS-U5/U6,
-	 * CMIP5).
+	 * 1/12° lattice for Statistically Downscaled Global Climate Projections
+	 * (CanDCS-U5 and CanDCS-U6, for CMIP5 and CMIP6 respectively).
 	 *
 	 * The fallback `RasterPrecalculatedClimateVariable.getGridType()` resolves to when a variable's
 	 * config declares no `gridType` and the dataset version is not CMIP6 — which is currently
@@ -78,7 +78,7 @@ export const GridTypes = {
 	 *
 	 * Same lattice, same `?var=sea_level` variable, selected when the dataset version is CMIP6.
 	 *
-	 * Resolution: {@link GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS}.
+	 * Resolution: {@link GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS}.
 	 */
 	SLRGRID_CMIP6: 'slrgrid-cmip6',
 	/**
@@ -120,12 +120,10 @@ const GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS = '~11×7km' as const;
 /**
  * 11×7km : Days with Humidex above threshold variable
  *
- * Humidex uses era5landgrid.
- * The code re-uses {@link GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS}'s value on that basis.
+ * Reuses {@link GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS}, because both grids are 0.1°.
  *
  * - Published as '0.1° (approximately 9 km)'
- *   ({@link https://climatedata.ca/about/our-data/#humidex | Humidex})
- *   — a single-axis figure that does not obviously match '11×7'.
+ *   ({@link https://climatedata.ca/about/our-data/#humidex | Humidex}).
  */
 const GRID_RESOLUTION_LABEL_DAYS_WITH_HUMIDEX_ABOVE_THRESHOLD =
 	GRID_RESOLUTION_LABEL_MARINE_PROJECTIONS;
@@ -157,7 +155,7 @@ export const GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D =
  * 11×7km : Marine Projections
  *
  * `climateVariableId`s:
- * - `?var=sea_level` : Relative Sea-Level Changes.
+ * - `?var=sea_level` : Relative Sea-Level Changes (CMIP5).
  *   Published as '0,1° (environ 11 km de latitude, 2-8 km de longitude)'
  *   ({@link https://donneesclimatiques.ca/le-portail/nos-donnees/#sea_level | Changement relatif du niveau de la mer})
  *
@@ -170,7 +168,7 @@ const GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS = 0.1 as const;
 /**
  * 11×7km : Days with Humidex above threshold variable
  *
- * 0.1°. Humidex uses era5landgrid, whose resolution is similar to the marine-projections grid.
+ * 0.1°, the same value as {@link GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS}.
  *
  * - Published as '0.1° (approximately 9 km)'
  *   ({@link https://climatedata.ca/about/our-data/#humidex | Humidex}).

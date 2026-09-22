@@ -16,6 +16,6 @@ export const createFetchTargetToRasterWithEncodedUrl = (
 		mapUrl.toString(),
 		window.URL_ENCODER_SALT,
 	).encoded;
-	const rasterEndpoint = new URL('/raster', 'https://dev-en.climatedata.ca:5001');
+	const rasterEndpoint = new URL('/raster', window.DATA_URL);
 	return `${rasterEndpoint.href}?url=${encoded_url}`;
 };

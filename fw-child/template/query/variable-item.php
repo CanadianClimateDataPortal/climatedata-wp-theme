@@ -52,7 +52,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 // 							}
 				?>
 
-				<span class="badge all-caps text-bg-light mt-1 me-1"><?php echo esc_html( $dataset_term_name ); ?></span>
+				<span class="badge all-caps text-bg-light mt-1 me-1 text-wrap"><?php echo esc_html( $dataset_term_name ); ?></span>
 
 				<?php
 

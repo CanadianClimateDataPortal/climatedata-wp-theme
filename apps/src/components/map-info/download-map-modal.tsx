@@ -11,13 +11,13 @@ import { Button } from '@/components/ui/button';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { selectSelectedLocation, setLegendOpen } from '@/features/map/map-slice';
 import {
-	createFetchRequestInitOptions,
+	createFetchRequestInitToRaster,
 	createFetchTargetToRasterWithEncodedUrl,
-	createPrepareRasterPostHttpPayload,
+	createSelectedLocationSnapshot,
 	installPrepareRasterStub,
 	prepareRaster,
 	type Window_Fn_Prepare_Raster,
-	type PrepareRasterPostHttpPayload,
+	type SelectedLocationSnapshot,
 } from '@/lib/map/image-rastering';
 import { useMap } from '@/hooks/use-map';
 import { useMapMarker } from '@/hooks/use-map-marker';
@@ -101,7 +101,7 @@ const DownloadMapModal: React.FC<{
 	/**
 	 * Handles the click on the modal's "Download" button.
 	 *
-	 * Sends the current map state to the screenshot service.
+	 * POSTs the current view to the screenshot service, then saves the returned PNG as the downloaded map image.
 	 */
 	const handleDownloadClick = async () => {
 		const mapUrl = new URL(window.location.href);
@@ -113,11 +113,11 @@ const DownloadMapModal: React.FC<{
 		setIsGenerating(true);
 
 		// No selected location means that no `LocationModal` is open.
-		let payload: PrepareRasterPostHttpPayload | undefined = undefined;
+		let payload: SelectedLocationSnapshot | undefined = undefined;
 		if (selectedLocation !== null) {
-			payload = createPrepareRasterPostHttpPayload(selectedLocation);
+			payload = createSelectedLocationSnapshot(selectedLocation);
 		}
-		const fetchInit = createFetchRequestInitOptions(payload);
+		const fetchInit = createFetchRequestInitToRaster(payload);
 
 		try {
 			const response = await fetch(fetchTarget, fetchInit);

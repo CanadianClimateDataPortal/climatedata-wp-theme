@@ -1,7 +1,3 @@
-// Looking for `window.$.fn.prepare_raster`?
-//
-// Anything outside `apps/` relating to `prepare_raster` and Map Image Download
-// that uses the same name is effectively not used.
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';

@@ -5,8 +5,6 @@ export {
 	GRID_RESOLUTIONS_LABELS,
 	GRID_RESOLUTIONS_VALUES,
 	GridTypes,
-	isClimateVariable,
 	isGridType,
-	isStationClimateVariable,
 	type GridType,
 } from './grid-resolution';

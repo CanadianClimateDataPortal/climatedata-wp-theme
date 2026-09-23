@@ -152,13 +152,12 @@ export const GRID_RESOLUTION_VALUE_STATISTICALLY_DOWNSCALED_AND_S2D =
  * 11×7km : Marine Projections
  *
  * `climateVariableId`s:
- * - `?var=sea_level` : Relative Sea-Level Changes (CMIP5).
- *   Published as '0,1° (environ 11 km de latitude, 2-8 km de longitude)'
+ * - `?var=sea_level` : Relative Sea-Level Changes.
  *   ({@link https://donneesclimatiques.ca/le-portail/nos-donnees/#sea_level | Changement relatif du niveau de la mer})
- *
  * - `?var=allowance` : Vertical Allowance.
- *   Published as '0.1° (approximately 11 km latitude, 4-8 km longitude)'
  *   ({@link https://climatedata.ca/about/our-data/#vert_allowance | Vertical Allowance})
+ *
+ * Both `sea_level` and `allowance` are available with the same resolution of '0.1° (approximately 11 km latitude, 2-8 km longitude)'
  */
 const GRID_RESOLUTION_VALUE_MARINE_PROJECTIONS = 0.1 as const;
 

@@ -16,6 +16,7 @@
 
 import {
 	StationVariableIds,
+	InteractiveRegionOption,
 	type ClimateVariableInterface,
 } from '@/types/climate-variable-interface';
 
@@ -275,17 +276,15 @@ export const getGridTypeLabel = (
 };
 
 /**
- * The grid identity to display for a climate variable, or `null` when there is none to
- * show.
+ * The grid identity to display on the map for a climate variable,
+ * or `null` when there is none to show.
  *
  * @remarks
- * Two unrelated situations yield `null`, and neither is an error:
+ * These cases yield `null`, and none of them is an error:
  * - the variable is station data, which is measured at points and has no grid;
- * - the variable declares no grid type, or one this module carries no label for.
- *
- * Display is otherwise not conditioned on how the map is being browsed. The sizes are
- * declared per data source, so a variable shown by region still has the grid its data was
- * produced on, and still states it.
+ * - the variable declares no grid type, or one this module carries no label for;
+ * - the map shows the variable by region instead of by grid cell, because its
+ *   interactive region is not `gridded_data`.
  */
 export const getGridTypeFor = (
 	climateVariable: ClimateVariableInterface | null,
@@ -293,8 +292,18 @@ export const getGridTypeFor = (
 	if (isStationClimateVariable(climateVariable)) {
 		return null;
 	}
+	const isGriddedInteractiveRegion =
+		climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA;
+	if (!isGriddedInteractiveRegion) {
+		// The map draws region shapes, not grid cells. A grid size would then describe
+		// nothing on screen, even when the variable's data comes from a grid.
+		return null;
+	}
 
+	// e.g. 'canadagrid-m6'
 	const declaredGridType = climateVariable?.getGridType() ?? null;
 
-	return isGridType(declaredGridType) ? declaredGridType : null;
+	const outcome = isGridType(declaredGridType) ? declaredGridType : null;
+
+	return outcome;
 };

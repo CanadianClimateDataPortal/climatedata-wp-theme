@@ -24,12 +24,13 @@ const MapInfoPills = (
 		(version) => version.value === climateVariable?.getVersion(),
 	)?.label;
 
-	// e.g. title 'Hottest Day' + version 'CMIP6' → "Hottest Day - CMIP6"
+	// e.g. title 'Jour le plus chaud' + version 'CMIP6' → "Jour le plus chaud - CMIP6"
 	const titleContent = [title, versionLabel].filter(Boolean).join(' - ');
 
+	// e.g. 'canadagrid-m6'
 	const gridTypeOf = getGridTypeFor(climateVariable);
 
-	// e.g. `Grid= 10×6km`
+	// e.g. `~10×6km`
 	const gridResolutionLabel = getGridTypeLabel(gridTypeOf);
 
 	return (

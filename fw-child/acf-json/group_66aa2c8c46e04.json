@@ -241,6 +241,66 @@
             "placeholder": "",
             "prepend": "",
             "append": ""
+        },
+        {
+            "key": "field_6ab3e2d784d55",
+            "label": "Variable Dataset - Title (Singular)",
+            "name": "tax_var-dataset_title_single_fr",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_6ab3e35684d56",
+            "label": "Variable Dataset - Title (Plural)",
+            "name": "tax_var-dataset_title_plural_fr",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_6ab3e37384d57",
+            "label": "Variable Dataset - Slug",
+            "name": "tax_var-dataset_slug_fr",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
         }
     ],
     "location": [
@@ -261,5 +321,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1722953740
+    "modified": 1790174223
 }

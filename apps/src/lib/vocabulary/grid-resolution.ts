@@ -9,13 +9,9 @@
  * knowledge to supply one: `RasterPrecalculatedClimateVariable.getGridType()` prefers
  * the config's declared value and falls back on the dataset version only when the
  * config stays silent — that is the pattern to follow.
- *
- * Station-data membership (known to be never shown using grid) is decided by id
- * against the {@link StationVariableIds} registry as authoritative source.
  */
 
 import {
-	StationVariableIds,
 	InteractiveRegionOption,
 	type ClimateVariableInterface,
 } from '@/types/climate-variable-interface';
@@ -233,34 +229,12 @@ export const GRID_RESOLUTIONS_LABELS = {
 const GRID_TYPE_VALUES = new Set<string>(Object.values(GridTypes));
 
 /**
- * Climate-variable ids that identify station data.
- *
- * @remarks
- * Kept private, so that registry stays the single declaration.
- * Ask through {@link isStationClimateVariable}.
- */
-const STATION_VARIABLE_IDS = new Set<string>(Object.values(StationVariableIds));
-
-/**
  * Whether a value is a grid identity this module carries a resolution label for.
  */
 export const isGridType = (
 	value: unknown,
 ): value is GridType =>
 	typeof value === 'string' && GRID_TYPE_VALUES.has(value);
-
-export const isClimateVariable = (
-	climateVariable: ClimateVariableInterface | null,
-): climateVariable is ClimateVariableInterface =>
-	typeof climateVariable === 'object' &&
-	// Just doing what's here is probably too permissive.
-	typeof climateVariable?.getId() === 'string';
-
-export const isStationClimateVariable = (
-	climateVariable: ClimateVariableInterface | null,
-): boolean =>
-	isClimateVariable(climateVariable) &&
-	STATION_VARIABLE_IDS.has(climateVariable.getId());
 
 export const getGridTypeLabel = (
 	gridType?: GridType | null,
@@ -281,7 +255,8 @@ export const getGridTypeLabel = (
  *
  * @remarks
  * These cases yield `null`, and none of them is an error:
- * - the variable is station data, which is measured at points and has no grid;
+ * - the variable is station data, measured at points: `StationClimateVariable.getGridType()`
+ *   returns `null`;
  * - the variable declares no grid type, or one this module carries no label for;
  * - the map shows the variable by region instead of by grid cell, because its
  *   interactive region is not `gridded_data`.
@@ -289,9 +264,6 @@ export const getGridTypeLabel = (
 export const getGridTypeFor = (
 	climateVariable: ClimateVariableInterface | null,
 ): GridType | null => {
-	if (isStationClimateVariable(climateVariable)) {
-		return null;
-	}
 	const isGriddedInteractiveRegion =
 		climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA;
 	if (!isGriddedInteractiveRegion) {

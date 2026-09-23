@@ -72,8 +72,6 @@ const DownloadMapModal: React.FC<{
 
 			/**
 			 * Do not signal readiness after a preparation failure. We let its wait time out.
-			 * If it does time out, it is because the `RASTER_READY_CLASS_NAME`
-			 * className to trigger screenshot did not happen and it should have had waited longer.
 			 */
 			prepareRaster(payload, { map, comparisonMap, addMarker, clearMarkers })
 				.catch((error) => {

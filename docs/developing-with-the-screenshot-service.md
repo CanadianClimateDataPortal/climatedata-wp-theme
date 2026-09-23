@@ -221,8 +221,7 @@ Both files below are ignored by Git, so nothing tracked changes.
    ```
 3. Add a `portal` entry to your `compose.override.yaml` (see
    [Custom setup](./developing-with-docker-compose.md#custom-setup)). The file
-   has one `services:` key, and every service goes under it. For example, a
-   file that already exposes the Ladle port becomes:
+   has one `services:` key, and every service goes under it. For example:
    ```yaml
    services:
      # Local development only. Gives the `climatedata-api` screenshot service an

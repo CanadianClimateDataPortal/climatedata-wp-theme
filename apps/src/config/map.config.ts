@@ -3,16 +3,26 @@ import type { LatLngExpression, LatLngBounds } from 'leaflet';
 
 type WmsParam = { SLD_BODY: string, layers: string };
 
-const getBaseTileUrl = (): string => {
-	const baseUrl = '//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png';
-
+const addCartoApiKeyIfAvailable = (url: string): string => {
 	// The API key is obtained from https://carto.com/basemaps/apikey/, and was added as a requirement by CARTO
 	// for tile requests in August 2026.
 	// They have a free usage limit of 5 million monthly tile requests.
 	// To be determined if we would need to find an alternative solution eventually.
 	const cartoKey = (window as Window & { CARTO_BASEMAPS_API_KEY?: string }).CARTO_BASEMAPS_API_KEY?.trim();
 
-	return cartoKey ? `${baseUrl}?key=${encodeURIComponent(cartoKey)}` : baseUrl;
+	return cartoKey ? `${url}?key=${encodeURIComponent(cartoKey)}` : url;
+};
+
+const getBaseTileUrl = (): string => {
+	const baseUrl = '//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png';
+
+	return addCartoApiKeyIfAvailable(baseUrl);
+};
+
+const getLabelsTileUrl = (): string => {
+	const labelsUrl = '//{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png';
+
+	return addCartoApiKeyIfAvailable(labelsUrl);
 };
 
 // Common map configuration
@@ -35,7 +45,7 @@ export const MAP_CONFIG = {
 	baseTileUrl: getBaseTileUrl(),
 
 	// Labels tiles
-	labelsTileUrl: "//{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png",
+	labelsTileUrl: getLabelsTileUrl(),
 
 	// Landmass filter for marine data (transforms green to white)
 	landmassFilter: 'saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(298deg) brightness(100%) contrast(98%)',

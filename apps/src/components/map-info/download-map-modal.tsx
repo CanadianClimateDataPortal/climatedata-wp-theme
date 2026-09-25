@@ -19,6 +19,7 @@ import {
 	type Window_Fn_Prepare_Raster,
 	type SelectedLocationSnapshot,
 } from '@/lib/map/image-rastering';
+import { getFilenameFromContentDisposition } from '@/lib/download/get-filename-from-content-disposition';
 import { useMap } from '@/hooks/use-map';
 import { useMapMarker } from '@/hooks/use-map-marker';
 
@@ -32,6 +33,7 @@ import {
 } from '@/components/map-info/modal-section';
 
 import { INTERNAL_URLS } from '@/lib/constants';
+
 
 const DownloadMapModal: React.FC<{
 	isOpen: boolean;
@@ -129,12 +131,10 @@ const DownloadMapModal: React.FC<{
 			anchor.href = objectUrl;
 
 			const contentDisposition = response.headers.get('content-disposition');
-			if (contentDisposition && contentDisposition.includes('filename=')) {
-				const filename = contentDisposition.split('filename=')[1].trim().replace(/"/g, '');
-				anchor.setAttribute('download', filename);
-			} else {
-				anchor.setAttribute('download', '');
-			}
+			// The header reads as null unless the screenshot service lists it in
+			// `Access-Control-Expose-Headers`. An empty `download` then lets the browser pick the name.
+			const filename = getFilenameFromContentDisposition(contentDisposition);
+			anchor.setAttribute('download', filename ?? '');
 
 			document.body.appendChild(anchor);
 			anchor.click();

@@ -127,7 +127,15 @@ const DownloadMapModal: React.FC<{
 			const objectUrl = URL.createObjectURL(blob);
 			const anchor = document.createElement('a');
 			anchor.href = objectUrl;
-			anchor.download = '';
+
+			const contentDisposition = response.headers.get('content-disposition');
+			if (contentDisposition && contentDisposition.includes('filename=')) {
+				const filename = contentDisposition.split('filename=')[1].trim().replace(/"/g, '');
+				anchor.setAttribute('download', filename);
+			} else {
+				anchor.setAttribute('download', '');
+			}
+
 			document.body.appendChild(anchor);
 			anchor.click();
 			anchor.remove();

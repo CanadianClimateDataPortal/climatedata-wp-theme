@@ -34,10 +34,12 @@ export const getFilenameFromContentDisposition = (
 	if (!plain) {
 		return null;
 	}
+	// The unquoted branch also catches a malformed value with an opening quote
+	// but no closing one, so drop that stray leading quote from the name.
 	const filename =
 		plain[1] !== undefined ?
 			plain[1].replace(/\\(.)/g, '$1') :
-			plain[2].trim();
+			plain[2].trim().replace(/^"/, '');
 
 	return filename || null;
 };

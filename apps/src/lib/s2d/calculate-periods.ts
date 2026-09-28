@@ -224,6 +224,15 @@ export const formatYear = (date: Date, locale: string): string =>
 	formatIntlDate(date, locale, { year: 'numeric' });
 
 /**
+ * Map S2D decadal frequency types to their display labels.
+ */
+const DECADAL_FREQUENCY_LABELS: Partial<Record<S2DFrequencyType, string>> = {
+	[S2DFrequencyTypes.DECADAL_ANNUAL]: __('Jan-Dec'),
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]: __('May-Sep'),
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]: __('Nov-Mar'),
+} as const;
+
+/**
  * Generate a period range label for a given date range and frequency.
  *
  * @param dateRangeStart - Start date of the period. Example: 2025-08-01
@@ -256,7 +265,17 @@ export const generatePeriodRangeLabel = (
 		? formatYear(periodEnd, locale)
 		: formatIntlDate(periodEnd, locale, { month: 'long' });
 
-	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
+	let label = sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
+
+	// Add frequency detail for decadal frequencies
+	if (isDecadalFrequencyType) {
+		const frequencyDetail = DECADAL_FREQUENCY_LABELS[frequency];
+		if (frequencyDetail) {
+			label = sprintf(__('%s (%s)'), label, frequencyDetail);
+		}
+	}
+
+	return label;
 };
 
 /**

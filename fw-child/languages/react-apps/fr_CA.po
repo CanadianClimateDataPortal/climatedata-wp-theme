@@ -1210,6 +1210,9 @@ msgstr "Décennale (%s)"
 msgid "Decadal %s probability:"
 msgstr "Probabilité décennale pour \"%s\""
 
+msgid  "Jan-Dec"
+msgstr "Jan-Déc"
+
 msgid  "May-Sep"
 msgstr "Mai-Sep"
 

@@ -1,5 +1,5 @@
 import { sprintf } from '@wordpress/i18n';
-import { S2D_FORECAST_CONVENTIONAL_NB_PERIODS } from '@/lib/constants';
+import { S2D_DECADAL_FREQUENCY_LABELS, S2D_FORECAST_CONVENTIONAL_NB_PERIODS } from '@/lib/constants';
 import {
 	ForecastDisplay,
 	ForecastDisplays,
@@ -224,15 +224,6 @@ export const formatYear = (date: Date, locale: string): string =>
 	formatIntlDate(date, locale, { year: 'numeric' });
 
 /**
- * Map S2D decadal frequency types to their display labels.
- */
-const DECADAL_FREQUENCY_LABELS: Partial<Record<S2DFrequencyType, string>> = {
-	[S2DFrequencyTypes.DECADAL_ANNUAL]: __('Jan-Dec'),
-	[S2DFrequencyTypes.DECADAL_MAY_SEP]: __('May-Sep'),
-	[S2DFrequencyTypes.DECADAL_NOV_MAR]: __('Nov-Mar'),
-} as const;
-
-/**
  * Generate a period range label for a given date range and frequency.
  *
  * @param dateRangeStart - Start date of the period. Example: 2025-08-01
@@ -269,7 +260,7 @@ export const generatePeriodRangeLabel = (
 
 	// Add frequency detail for decadal frequencies
 	if (isDecadalFrequencyType) {
-		const frequencyDetail = DECADAL_FREQUENCY_LABELS[frequency];
+		const frequencyDetail = S2D_DECADAL_FREQUENCY_LABELS[frequency];
 		if (frequencyDetail) {
 			label = sprintf(__('%s (%s)'), label, frequencyDetail);
 		}

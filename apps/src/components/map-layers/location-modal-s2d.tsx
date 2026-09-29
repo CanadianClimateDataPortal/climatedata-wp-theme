@@ -43,6 +43,7 @@ import TooltipWidget from '@/components/ui/tooltip-widget';
 import StarRating from '@/components/ui/star-rating';
 import S2DReleaseDate from '@/components/s2d-release-date';
 import { Spinner } from '@/components/ui/spinner';
+import {S2D_DECADAL_FREQUENCY_LABELS} from "@/lib/constants.tsx";
 
 interface LocationModalS2DProps {
 	latlng: Pick<L.LatLng, 'lat' | 'lng'>;
@@ -116,9 +117,9 @@ const tooltipClimatology = __(
 const FREQUENCY_LABEL: Record<S2DFrequencyType, string> = {
 	[S2DFrequencyTypes.MONTHLY]: __('Monthly'),
 	[S2DFrequencyTypes.SEASONAL]: __('Seasonal'),
-	[S2DFrequencyTypes.DECADAL_ANNUAL]: sprintf(__('Decadal (%s)'), __('Annual')),
-	[S2DFrequencyTypes.DECADAL_MAY_SEP]:  sprintf(__('Decadal (%s)'), __('May-Sep')),
-	[S2DFrequencyTypes.DECADAL_NOV_MAR]:  sprintf(__('Decadal (%s)'), __('Nov-Mar')),
+	[S2DFrequencyTypes.DECADAL_ANNUAL]: sprintf(__('Decadal (%s)'), S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_ANNUAL]),
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]:  sprintf(__('Decadal (%s)'), S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_MAY_SEP]),
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]:  sprintf(__('Decadal (%s)'), S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_NOV_MAR]),
 } as const;
 
 /**

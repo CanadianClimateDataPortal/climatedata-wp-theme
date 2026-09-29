@@ -22,7 +22,10 @@ export default function TooltipWidget({
 	return (
 		<>
 			<Popover>
-				<PopoverTrigger className="text-dark-purple">
+				<PopoverTrigger
+					className="text-dark-purple"
+					data-raster="false"
+				>
 					<InfoIcon size={16} />
 				</PopoverTrigger>
 				<PopoverContent side={side ?? undefined}>

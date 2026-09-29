@@ -78,7 +78,10 @@ export default function NoticeBanner({
 	return (
 		<>
 			<div {...props}>
-				<div className="flex justify-center text-sm">
+				<div
+					className="flex justify-center text-sm"
+					data-raster="false"
+				>
 					<div
 						className={cn(
 							'flex flex-row items-center gap-x-3',

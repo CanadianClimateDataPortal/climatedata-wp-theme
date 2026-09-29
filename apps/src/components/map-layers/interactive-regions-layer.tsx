@@ -15,6 +15,7 @@ import { getDefaultFrequency } from '@/lib/utils';
 import SectionContext from '@/context/section-provider';
 import { useColorMap } from '@/hooks/use-color-map';
 import { getColour } from '@/lib/colour-scheme';
+import { GridTypes } from '@/lib/vocabulary';
 
 interface InteractiveRegionsLayerProps {
 	scenario: string;
@@ -54,7 +55,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({
 	} = useMemo(() => ({
 		threshold: climateVariable?.getThreshold() ?? '',
 		datasetVersion: climateVariable?.getVersion() ?? '',
-		gridType: climateVariable?.getGridType() ?? 'canadagrid',
+		gridType: climateVariable?.getGridType() ?? GridTypes.CANADAGRID,
 		interactiveRegion: climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA,
 		startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
 		isDelta7100: climateVariable?.getDataValue() === 'delta',

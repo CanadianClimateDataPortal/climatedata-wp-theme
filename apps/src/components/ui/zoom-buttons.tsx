@@ -4,20 +4,41 @@
  * A custom control for zooming in and out on the map.
  *
  */
-import React from 'react';
+import React, {
+	useMemo,
+} from 'react';
+import { nanoid } from 'nanoid';
 import { Plus, Minus } from 'lucide-react';
+
 import { __ } from '@/context/locale-provider';
 
-import { ZoomControlProps } from '@/types/types';
 import { cn } from '@/lib/utils';
 
-const ZoomButtons: React.FC<ZoomControlProps> = ({
-	onZoomIn,
-	onZoomOut,
-	className,
-	wrapperClass,
-}) => {
-	const buttonClasses = cn(
+interface ZoomButtonsProps {
+	className?: string;
+	onZoomIn: () => void;
+	onZoomOut: () => void;
+	wrapperClass?: string;
+}
+
+const ZoomButtons = (
+	props: ZoomButtonsProps,
+): React.ReactElement => {
+	const {
+		onZoomIn,
+		onZoomOut,
+		className,
+		wrapperClass,
+	} = props;
+
+	// Unique id for this control's wrapper, needed when multiple maps are
+	// rendered on the same page -- e.g. comparing emission scenarios side by side.
+	const uniqueId = useMemo(() => {
+		const suffix = nanoid(5);
+		return 'zoom-buttons-' + suffix;
+	}, []);
+
+	const classNameForButton = cn(
 		'flex items-center justify-center',
 		'w-9 h-9',
 		'bg-white hover:bg-cold-gray-3',
@@ -26,7 +47,11 @@ const ZoomButtons: React.FC<ZoomControlProps> = ({
 	);
 
 	return (
-		<div id="map-zoom-control" className="absolute bottom-6 left-6 z-20 overflow-y-auto">
+		<div
+			className="absolute bottom-6 left-6 z-20 overflow-y-auto"
+			data-raster="false"
+			id={uniqueId}
+		>
 			<div
 				className={cn(
 					'zoom-control',
@@ -36,14 +61,14 @@ const ZoomButtons: React.FC<ZoomControlProps> = ({
 			>
 				<button
 					onClick={onZoomIn}
-					className={cn(buttonClasses, className)}
+					className={cn(classNameForButton, className)}
 					aria-label={__('Zoom In')}
 				>
 					<Plus className="w-4 h-4 text-zinc-900" />
 				</button>
 				<button
 					onClick={onZoomOut}
-					className={cn(buttonClasses, className)}
+					className={cn(classNameForButton, className)}
 					aria-label={__('Zoom Out')}
 				>
 					<Minus className="w-4 h-4 text-zinc-900" />
@@ -52,5 +77,7 @@ const ZoomButtons: React.FC<ZoomControlProps> = ({
 		</div>
 	);
 };
+
+ZoomButtons.displayName = 'ZoomButtons'; // Explicit string literal, or this name would be lost in production.
 
 export default ZoomButtons;

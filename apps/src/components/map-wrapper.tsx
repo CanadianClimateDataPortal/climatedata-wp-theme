@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
-import { MapInfoData } from "@/types/types";
-import { fetchMapInfoData } from "@/services/services";
-import { useClimateVariable } from "@/hooks/use-climate-variable";
-import MapHeader from "@/components/map-header";
-import Map from '@/components/map';
+import React, {
+	useEffect,
+	useState,
+} from 'react';
+import { MapInfoData } from '@/types/types';
+import { fetchMapInfoData } from '@/services/services';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import MapHeader from '@/components/map-header';
+import { MapRoot } from '@/components/map';
 
-const MapWrapper = () => {
+const MapWrapper = (
+): React.ReactElement => {
 	const { climateVariable } = useClimateVariable();
 	const [mapInfo, setMapInfo] = useState<MapInfoData | null>(null);
-	
+
 	useEffect(() => {
 		const postId = climateVariable?.getPostId();
 		if (typeof postId !== 'number') return;
@@ -27,13 +31,13 @@ const MapWrapper = () => {
 			map events can interfere with the app's state.
 			*/}
 			{climateVariable ?
-				<Map /> :
+				<MapRoot /> :
 				null
 			}
 		</div>
 	);
-}
+};
 
-export {
-	MapWrapper
-}
+MapWrapper.displayName = 'MapWrapper'; // Explicit string literal, or this name would be lost in production.
+
+export default MapWrapper;

@@ -9,6 +9,7 @@ import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, GEOSERVER_BASE_URL } from '@/lib/const
 import { MapFeatureProps } from '@/types/types';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { getFeatureId } from '@/lib/utils';
+import { GridTypes } from '@/lib/vocabulary';
 
 /**
  * Component that allows to select cells on the map and tally the number of cells selected
@@ -25,7 +26,7 @@ const SelectableCellsGridLayer = forwardRef<{
 	// @ts-expect-error: suppress leaflet typescript error
 	const gridLayerRef = useRef<L.VectorGrid | null>(null);
 
-	const gridName = climateVariable?.getGridType() ?? 'canadagrid';
+	const gridName = climateVariable?.getGridType() ?? GridTypes.CANADAGRID;
 	const tileLayerUrl = `${GEOSERVER_BASE_URL}/geoserver/gwc/service/tms/1.0.0/CDC:${gridName}@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf`;
 
 	const tileLayerStyles = useMemo(

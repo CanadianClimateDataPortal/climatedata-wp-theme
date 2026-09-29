@@ -10,7 +10,7 @@ import { DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM } from '@/lib/constants';
  * This component adds buttons to zoom in and out of the map.
  *
  */
-export default function ZoomControlLayer() {
+const ZoomControlLayer = (): React.ReactElement => {
 	const map = useMap();
 
 	const handleZoomIn = useCallback(() => {
@@ -29,3 +29,7 @@ export default function ZoomControlLayer() {
 
 	return <ZoomButtons onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} />;
 }
+
+ZoomControlLayer.displayName = 'ZoomControlLayer'; // Explicit string literal, or this name would be lost in production.
+
+export default ZoomControlLayer;

@@ -59,6 +59,7 @@ export const ModalSummaryPopover = (
 							CN_ROUNDED_BIG_BUTTON_TEXT,
 						)}
 						title={popoverTriggerButtonTitle !== '' ? popoverTriggerButtonTitle : undefined}
+						data-raster="false"
 					>
 						{popoverTriggerButtonInner}
 					</Button>

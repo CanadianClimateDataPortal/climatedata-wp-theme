@@ -53,6 +53,7 @@ const Sidebar = React.forwardRef<
 						'bg-sidebar text-sidebar-foreground',
 						className
 					)}
+					data-raster="false"
 					id={id}
 					ref={ref}
 					{...props}
@@ -114,6 +115,7 @@ const Sidebar = React.forwardRef<
 				data-collapsible={state === 'collapsed' ? collapsible : ''}
 				data-variant={variant}
 				data-side={side}
+				data-raster="false"
 				id={id}
 			>
 				{/* This is what handles the sidebar gap on desktop */}
@@ -161,10 +163,14 @@ const SidebarTrigger = React.forwardRef<
 		<Button
 			ref={ref}
 			data-sidebar="trigger"
+			data-raster="false"
 			variant="ghost"
-			id="sidebar-toggle"
 			size="icon"
-			className={cn('h-7 w-7', className)}
+			className={cn(
+				'h-7 w-7',
+				'sidebar-toggle',
+				className,
+			)}
 			onClick={(event) => {
 				onClick?.(event);
 				toggleSidebar();
@@ -190,7 +196,7 @@ const SidebarRail = React.forwardRef<
 			data-sidebar="rail"
 			aria-label="Toggle Sidebar"
 			tabIndex={-1}
-			id="sidebar-toggle"
+			data-raster="false"
 			onClick={toggleSidebar}
 			title="Toggle Sidebar"
 			className={cn(
@@ -200,6 +206,7 @@ const SidebarRail = React.forwardRef<
 				'group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full group-data-[collapsible=offcanvas]:hover:bg-sidebar',
 				'[[data-side=left][data-collapsible=offcanvas]_&]:-right-2',
 				'[[data-side=right][data-collapsible=offcanvas]_&]:-left-2',
+				'sidebar-toggle',
 				className
 			)}
 			{...props}

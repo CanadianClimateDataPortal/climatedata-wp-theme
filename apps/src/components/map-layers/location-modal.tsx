@@ -1,7 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import React, {
+	useEffect,
+	useMemo,
+	useRef,
+} from 'react';
+import { nanoid } from 'nanoid';
 import { X } from 'lucide-react';
 import L from 'leaflet';
+import { LOCATION_MODAL_BASE_CLASS_NAMES } from '@/lib/location-modal-class-names';
 import { cn } from '@/lib/utils';
+import { __ } from '@/context/locale-provider';
 
 interface LocationModalProps {
 	isOpen: boolean;
@@ -20,6 +27,11 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 	({ isOpen, onClose, className, children, ...props }, ref) => {
 		const internalRef = useRef<HTMLDivElement>(null);
 
+		const uniqueId = useMemo(() => {
+			const suffix = nanoid(5);
+			return 'location-modal-' + suffix;
+		}, []);
+
 		// Prevent Leaflet from capturing mouse events, to allow the user
 		// to scroll inside the modal, and select the text
 		useEffect(() => {
@@ -34,14 +46,11 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 
 		// classNames for the top-level element of this component.
 		const topElementClassNames = cn(
-			'location-modal',
-			'font-sans',
-			'bg-white rounded-lg shadow-lg',
-			'flex flex-col',
-			'gap-6 p-6',
+			...LOCATION_MODAL_BASE_CLASS_NAMES,
 			// External overrides from className prop
 			className
 		);
+
 
 		return (
 			<div
@@ -60,14 +69,16 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 				aria-modal="true"
 				aria-labelledby="modal-title" // Links to the title for accessibility
 				aria-describedby="modal-description" // Links to the description for accessibility
+				id={uniqueId}
 				{...props}
 			>
 				<button
 					className={cn(
 						'absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none'
 					)}
+					data-raster="false"
 					onClick={onClose}
-					aria-label="Close Modal"
+					aria-label={__('Close Modal')}
 				>
 					<X className="h-4 w-4" />
 				</button>

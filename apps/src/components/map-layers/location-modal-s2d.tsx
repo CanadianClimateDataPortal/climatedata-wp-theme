@@ -789,6 +789,9 @@ const ForecastProbabilitiesPart = (
 			<p className="mt-2">
 				{__('The probabilities may not add exactly to 100% due to rounding.')}
 			</p>
+			<p className="mt-2">
+				{__('These values are rounded to one decimal place.')}
+			</p>
 		</div>
 	) : null;
 

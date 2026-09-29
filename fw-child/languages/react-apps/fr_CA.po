@@ -1330,6 +1330,9 @@ msgstr "par rapport à la climatologie historique de 1991 à 2020."
 msgid  "The probabilities may not add exactly to 100% due to rounding."
 msgstr "Les probabilités peuvent ne pas totaliser exactement 100 % en raison de l'arrondi."
 
+msgid  "These values are rounded to one decimal place."
+msgstr "Ces valeurs sont arrondies à une décimale."
+
 msgid  "Historical Median"
 msgstr "Médiane historique"
 

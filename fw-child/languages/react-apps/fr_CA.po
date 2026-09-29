@@ -1518,6 +1518,15 @@ msgstr "Pour accéder aux données de prévision S2D mondiales ou pour configure
        "<a href=\"https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_fr/\" %s>GeoMet</a> "
        "(site d'Environnement et Changement climatique Canada)."
 
+msgid  "For access to global forecast data or to set up automated downloads, please visit the following "
+       "Environment and Climate Change Canada sites:<br />"
+       "- Seasonal: <a href=\"https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_en/\" %s>GeoMet</a><br />"
+       "- Decadal: <a href=\"https://crd-data-donnees-rdc.ec.gc.ca/CCCMA/products/CCCS/Decadal_CanESM5\" %s>ClimRes server</a>"
+msgstr "Pour accéder aux données de prévisions mondiales ou pour configurer des téléchargements automatiques, veuillez "
+       "consulter les sites suivants d'Environnement et Changement climatique Canada:<br />"
+       "- Saisonnières: <a href=\"https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_fr/\" %s>GeoMet</a><br />"
+       "- Décennales: <a href=\"https://crd-data-donnees-rdc.ec.gc.ca/CCCMA/products/CCCS/Decadal_CanESM5\" %s>Serveur ClimRes</a>"
+
 msgid  "An unknown error occurred. Please try again."
 msgstr "Une erreur inconnue s'est produite. Veuillez réessayer."
 

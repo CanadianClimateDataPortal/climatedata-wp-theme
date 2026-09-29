@@ -108,7 +108,8 @@ const tooltipClimatology = __(
 		'season, or decadal time period of interest for the 30 years between ' +
 		'1991 and 2020. The historical median provides context for typical ' +
 		'past conditions at this location. The cutoff values provide the ' +
-		'exact values that define the forecast outcomes for this location.'
+		'exact values that define the forecast outcomes for this location. ' +
+		'These values are rounded to one decimal place.'
 );
 
 /**

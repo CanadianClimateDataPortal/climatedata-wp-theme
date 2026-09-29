@@ -216,6 +216,7 @@ Both files below are ignored by Git, so nothing tracked changes.
            add_header 'Access-Control-Allow-Origin'  '*'                     always;
            add_header 'Access-Control-Allow-Headers' 'Content-Type'          always;
            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS'    always;
+           add_header 'Access-Control-Expose-Headers' 'Content-Disposition'  always;
        }
    }
    ```

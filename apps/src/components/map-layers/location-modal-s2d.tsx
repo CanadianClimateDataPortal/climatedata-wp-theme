@@ -14,9 +14,11 @@ import { cn, utc } from '@/lib/utils';
 import {
 	buildForecastProbabilitiesCategories,
 	extractSkillLevelData,
+	findPeriodIndexForDateRange,
 	formatYear,
 	generatePeriodRangeLabel,
 	getPeriodEnd,
+	getPeriods,
 	getProbabilityColour,
 	normalizeProbabilitiesBarChartPercent,
 	type LocationS2DData,
@@ -55,6 +57,7 @@ interface LocationModalContentPartProps {
 	frequency: S2DFrequencyType;
 	forecastType: ForecastType;
 	forecastDisplay: ForecastDisplay;
+	releaseDate: Date | null;
 	unit: string;
 }
 
@@ -68,10 +71,16 @@ interface ForecastProbabilitiesPartProps {
 
 interface SkillLevelPartProps {
 	locationData: LocationS2DData | null;
+	frequency: S2DFrequencyType;
+	dateRangeStart: string | null;
+	releaseDate: Date | null;
 }
 
 interface ForecastValuesPartProps {
 	locationData: LocationS2DData | null;
+	frequency: S2DFrequencyType;
+	dateRangeStart: string | null;
+	releaseDate: Date | null;
 	unit: string;
 }
 
@@ -96,13 +105,48 @@ const tooltipTemperatureRange = __(
 		'range is defined using the middle third, providing a range of typical past conditions.'
 );
 
-const tooltipSkillLevelSuffix = __(
-	'The past performance or “skill” of the prediction system is measured ' +
-		'using the continuous ranked probability skill score (CRPSS). CRPSS ' +
-		'measures the accuracy of forecasts produced for the same lead time as ' +
-		'the selected forecast and for the same month, season, or decadal time ' +
-		'period over 1991 to 2020.'
-);
+const getTooltipSkillLevelSuffix = (frequency: S2DFrequencyType, dateRangeStart: string | null, releaseDate: Date | null): string => {
+	const baseText = __(
+		'The past performance or “skill” of the prediction system is measured ' +
+			'using the continuous ranked probability skill score (CRPSS). CRPSS ' +
+			'measures the accuracy of forecasts produced for the same lead time as ' +
+			'the selected forecast '
+	);
+
+	const isDecadal = isFrequencyTypeS2DDecadal(frequency);
+
+	if (isDecadal && dateRangeStart && releaseDate) {
+		// Get the available periods for this release date and frequency
+		const periods = getPeriods(releaseDate, frequency);
+
+		if (periods.length > 0) {
+			// Find which period the current dateRangeStart belongs to
+			const periodIndex = findPeriodIndexForDateRange(
+				[dateRangeStart, dateRangeStart],  // only the first date of the range is used
+				periods
+			);
+
+			if (periodIndex === 0) {
+				// First period (Yr1-5)
+				return baseText + __('over 1996 to 2020.');
+			} else if (periodIndex === 1) {
+				// Second period (Yr6-10)
+				return baseText + __('over 2006 to 2020.');
+			}
+		}
+	}
+
+	if (frequency === S2DFrequencyTypes.MONTHLY) {
+		return baseText + __('and for the same month over 1991 to 2020.');
+	}
+
+	if (frequency === S2DFrequencyTypes.SEASONAL) {
+		return baseText + __('and for the same season over 1991 to 2020.');
+	}
+
+	// Fallback
+	return baseText + __('and for the same month, season, or decadal time period over 1991 to 2020.');
+};
 
 const tooltipClimatology = (frequency: S2DFrequencyType) => {
 	const isDecadal = isFrequencyTypeS2DDecadal(frequency);
@@ -269,6 +313,7 @@ export const LocationModalS2D = (
 			frequency={frequency}
 			forecastType={forecastType}
 			forecastDisplay={forecastDisplay}
+			releaseDate={releaseDate}
 			unit={unit}
 		/>
 	);
@@ -302,6 +347,9 @@ const SkillLevelPart = (
 ): React.ReactElement => {
 	const {
 		locationData,
+		frequency,
+		dateRangeStart,
+		releaseDate,
 	} = props;
 
 	const { locale } = useLocale();
@@ -317,7 +365,7 @@ const SkillLevelPart = (
 	const tooltipSkillLevel = hasSkillLevel ? (
 		<>
 			<p className="mb-2">{SKILL_LEVEL_TOOLTIP[skillLevel]}</p>
-			<p>{tooltipSkillLevelSuffix}</p>
+			<p>{getTooltipSkillLevelSuffix(frequency, dateRangeStart, releaseDate)}</p>
 		</>
 	) : null;
 
@@ -384,6 +432,9 @@ const ForecastValuesPart = (
 ): React.ReactElement => {
 	const {
 		locationData,
+		frequency,
+		dateRangeStart,
+		releaseDate,
 		unit,
 	} = props;
 
@@ -422,7 +473,7 @@ const ForecastValuesPart = (
 	return (
 		<>
 			{/* Skill Level */}
-			<SkillLevelPart locationData={locationData} />
+			<SkillLevelPart locationData={locationData} frequency={frequency} dateRangeStart={dateRangeStart} releaseDate={releaseDate} />
 
 			{/* Historical Median */}
 			<div
@@ -894,6 +945,7 @@ const LocationModalContentPart = (
 		frequency,
 		forecastType,
 		forecastDisplay,
+		releaseDate,
 		unit,
 	} = props;
 
@@ -959,19 +1011,22 @@ const LocationModalContentPart = (
 						{DateRangeLine}
 					</dd>
 				</div>
-				{isForecast ? (
-					<ForecastValuesPart
-						locationData={locationData}
-						unit={unit}
-					/>
-				) : (
-					<ClimatologyValuesPart
-						locationData={locationData}
-						forecastType={forecastType}
-						frequency={frequency}
-						unit={unit}
-					/>
-				)}
+			{isForecast ? (
+				<ForecastValuesPart
+					locationData={locationData}
+					frequency={frequency}
+					dateRangeStart={dateRangeStart}
+					releaseDate={releaseDate}
+					unit={unit}
+				/>
+			) : (
+				<ClimatologyValuesPart
+					locationData={locationData}
+					forecastType={forecastType}
+					frequency={frequency}
+					unit={unit}
+				/>
+			)}
 			</dl>
 
 			{isForecast && (

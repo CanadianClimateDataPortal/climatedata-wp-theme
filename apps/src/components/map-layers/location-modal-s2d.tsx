@@ -78,6 +78,7 @@ interface ForecastValuesPartProps {
 interface ClimatologyValuesPartProps {
 	locationData: LocationS2DData | null;
 	forecastType: ForecastType;
+	frequency: S2DFrequencyType;
 	unit: string;
 }
 
@@ -103,14 +104,26 @@ const tooltipSkillLevelSuffix = __(
 		'period over 1991 to 2020.'
 );
 
-const tooltipClimatology = __(
-	'The historical climatology contains data corresponding to the month, ' +
-		'season, or decadal time period of interest for the 30 years between ' +
-		'1991 and 2020. The historical median provides context for typical ' +
-		'past conditions at this location. The cutoff values provide the ' +
-		'exact values that define the forecast outcomes for this location. ' +
-		'These values are rounded to one decimal place.'
-);
+const tooltipClimatology = (frequency: S2DFrequencyType) => {
+	const isDecadal = isFrequencyTypeS2DDecadal(frequency);
+	return (
+		<>
+			<p className="mb-2">{__(
+				'The historical climatology contains data corresponding to the month, ' +
+			  'season, or decadal time period of interest for the 30 years between ' +
+			  '1991 and 2020. The historical median provides context for typical ' +
+			  'past conditions at this location. The cutoff values provide the ' +
+			  'exact values that define the forecast outcomes for this location.'
+			)}</p>
+			<p>{__('These values are rounded to one decimal place.')}</p>
+			{isDecadal && (
+				<p className="mt-2">{__(
+					'The climatology is calculated as an average over all overlapping 5-year periods between 1991 and 2020.'
+				)}</p>
+			)}
+		</>
+	);
+};
 
 /**
  * Frequency labels for the location modal.
@@ -475,6 +488,7 @@ const ClimatologyValuesPart = (
 	const {
 		locationData,
 		forecastType,
+		frequency,
 		unit,
 	} = props;
 
@@ -538,7 +552,7 @@ const ClimatologyValuesPart = (
 					<span className="text-base font-semibold">
 						{__('Climatology (1991 to 2020)')}
 					</span>
-					<TooltipWidget tooltip={tooltipClimatology} />
+					<TooltipWidget tooltip={tooltipClimatology(frequency)} />
 				</div>
 
 				{/* Above normal/unusual high */}
@@ -952,6 +966,7 @@ const LocationModalContentPart = (
 					<ClimatologyValuesPart
 						locationData={locationData}
 						forecastType={forecastType}
+						frequency={frequency}
 						unit={unit}
 					/>
 				)}

@@ -122,9 +122,15 @@
 #   Expose port 61000 from the task-runner container. Ladle will be installed at
 #   runtime when running `./dev.sh ladle-apps` and doesn't affect the production
 #   build. The server will be accessible at http://localhost:61000
+#   For live reload, also set `LADLE_HMR_PORT` and publish that same port. The
+#   number must be the same in all three places. Then run `./dev.sh restart`.
+#   See docs/developing-with-ladle.md
 #
 # services:
 #   task-runner:
+#     environment:
+#       LADLE_HMR_PORT: "24678"  # Read by apps/.ladle/config.mjs
 #     ports:
 #       - "61000:61000"  # Ladle development server
+#       - "24678:24678"  # Ladle live reload websocket
 #

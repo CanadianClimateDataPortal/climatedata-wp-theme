@@ -17,6 +17,7 @@ import {
 } from '@/lib/s2d';
 import { isFrequencyTypeS2DDecadal } from '@/types/assertions';
 import {
+	type ForecastDisplay,
 	ForecastDisplays,
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
@@ -24,6 +25,37 @@ import {
 export interface TimePeriodsControlS2DProps {
 	tooltip?: React.ReactNode;
 }
+
+type S2DTimePeriodsSliderClassNames = {
+	rootClassName?: string;
+	thumbClassName?: string;
+};
+
+/**
+ * Extra classes for the slider Root and Thumb of the Time Periods control.
+ *
+ * A decadal forecast always has two periods: two 5-year spans of one decade.
+ * The thumb becomes a pill as wide as half of the track, so each of its two
+ * positions covers its own period. Any other case gets no extra classes.
+ *
+ * `50cqw` measures the slider only while the Root carries
+ * `[container-type:inline-size]`. Without it, `cqw` falls back to the viewport.
+ */
+const getS2DTimePeriodsSliderClassNames = (
+	frequencyType: S2DFrequencyType | null,
+	forecastDisplay: ForecastDisplay | null,
+): S2DTimePeriodsSliderClassNames => {
+	const isDecadal = isFrequencyTypeS2DDecadal(frequencyType);
+	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
+	const outcome: S2DTimePeriodsSliderClassNames = {};
+
+	if (isDecadal && isForecast) {
+		outcome.rootClassName = '[container-type:inline-size]';
+		outcome.thumbClassName = 'w-[50cqw] rounded-full';
+	}
+
+	return outcome;
+};
 
 /**
  * Time period selector for S2D variables.
@@ -72,6 +104,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		frequencyType,
 	);
 	const tickLabel = periods ? tickLabels[selectedPeriod] : '...';
+	const sliderClassNames = getS2DTimePeriodsSliderClassNames(frequencyType, forecastDisplay);
 
 	let controlTooltip: React.ReactNode = __(
 		'Move the slider to select your time period of interest.'
@@ -147,7 +180,8 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 					className={cn(
 						'relative flex items-center select-none mx-6',
 						'mt-16 [touch-action:none]',
-						isLoadingReleaseDate && 'opacity-50'
+						isLoadingReleaseDate && 'opacity-50',
+						sliderClassNames.rootClassName,
 					)}
 					min={0}
 					max={periods ? periods.length - 1 : 0}
@@ -173,7 +207,8 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 							'relative block w-[20px] h-[20px]',
 							'bg-white rounded-[10px]',
 							'[box-shadow:0_2px_10px_hsl(var(--cold-grey-005))]',
-							'hover:bg-white focus:outline-none focus:[box-shadow:0_0_0_2px_hsl(var(--cold-grey-005))]'
+							'hover:bg-white focus:outline-none focus:[box-shadow:0_0_0_2px_hsl(var(--cold-grey-005))]',
+							sliderClassNames.thumbClassName,
 						)}
 					>
 						<div

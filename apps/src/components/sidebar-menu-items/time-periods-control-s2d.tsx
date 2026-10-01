@@ -26,20 +26,47 @@ export interface TimePeriodsControlS2DProps {
 	tooltip?: React.ReactNode;
 }
 
+
+/**
+ * Extra CSS class names for the slider of the `TimePeriodsControlS2D` component.
+ *
+ * Each field targets one part of the Radix slider. An absent field keeps the
+ * base styling of that part. The values go last into `cn()`, so they override
+ * any conflicting base class.
+ */
 type S2DTimePeriodsSliderClassNames = {
 	rootClassName?: string;
 	thumbClassName?: string;
+	/**
+	 * Classes for the active track: the part of the track from the minimum
+	 * value to the thumb, as Material Design names it. Radix `Slider.Range`
+	 * receives them.
+	 *
+	 * A decadal forecast hides the active track. Its red would mark the earlier
+	 * half as included, while the pill already marks the selected half.
+	 */
+	activeTrackClassName?: string;
 };
 
 /**
- * Extra classes for the slider Root and Thumb of the Time Periods control.
+ * Extra CSS class names for the slider of the `TimePeriodsControlS2D` component.
  *
- * A decadal forecast always has two periods: two 5-year spans of one decade.
- * The thumb becomes a pill as wide as half of the track, so each of its two
- * positions covers its own period. Any other case gets no extra classes.
+ * Default, for every case except a decadal forecast: no extra classes.
+ * - `rootClassName`: none. The Root keeps its base layout.
+ * - `thumbClassName`: none. The thumb stays a 20px round handle.
+ * - `activeTrackClassName`: none. The red active track runs from the minimum
+ *   to the thumb.
  *
- * `50cqw` measures the slider only while the Root carries
- * `[container-type:inline-size]`. Without it, `cqw` falls back to the viewport.
+ * Decadal forecast: the slider always has two periods, two 5-year spans of
+ * one decade.
+ * - `rootClassName`: makes the Root an inline-size container. `50cqw` on the
+ *   thumb measures the slider only through it. Without it, `cqw` falls back
+ *   to the viewport.
+ * - `thumbClassName`: the thumb becomes a pill as wide as half of the track,
+ *   so each of its two positions covers its own period.
+ * - `activeTrackClassName`: hides the active track. The field itself says why.
+ *
+ * @returns {@link S2DTimePeriodsSliderClassNames} object containing the extra CSS class names.
  */
 const getS2DTimePeriodsSliderClassNames = (
 	frequencyType: S2DFrequencyType | null,
@@ -52,6 +79,7 @@ const getS2DTimePeriodsSliderClassNames = (
 	if (isDecadal && isForecast) {
 		outcome.rootClassName = '[container-type:inline-size]';
 		outcome.thumbClassName = 'w-[50cqw] rounded-full';
+		outcome.activeTrackClassName = 'hidden';
 	}
 
 	return outcome;
@@ -198,7 +226,8 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 						<Slider.Range
 							className={cn(
 								'absolute rounded-full h-full',
-								'bg-[hsl(var(--destructive-red))]'
+								'bg-[hsl(var(--destructive-red))]',
+								sliderClassNames.activeTrackClassName,
 							)}
 						/>
 					</Slider.Track>

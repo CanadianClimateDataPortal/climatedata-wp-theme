@@ -733,8 +733,8 @@ msgstr "Cliquez sur les éléments suivants pour obtenir des informations spéci
 msgid "Relevant articles"
 msgstr "Articles pertinents"
 
-msgid "To help you get more of our data."
-msgstr "Pour vous aider à obtenir plus de nos données."
+msgid "To help you get more out of our data."
+msgstr "Pour vous aider à tirer le meilleur parti de nos données."
 
 msgid "Check out the Canadian climate data map"
 msgstr "Consultez la carte des données climatiques du Canada"

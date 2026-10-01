@@ -180,10 +180,12 @@ const StepResult = React.forwardRef(() => {
 					<p className="mt-4" dangerouslySetInnerHTML={{ __html:
 						sprintf(
 							__(
-								'For access to global S2D forecast data or to set up automated downloads, please ' +
-								'visit <a href="https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_en/" %s>GeoMet</a> ' +
-								'(Environment and Climate Change Canada site).'
+								'For access to global forecast data or to set up automated downloads, please visit the following ' +
+								'Environment and Climate Change Canada sites:<br />' +
+								'- Seasonal: <a href="https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_en/" %s>GeoMet</a><br />' +
+								'- Decadal: <a href="https://crd-data-donnees-rdc.ec.gc.ca/CCCMA/products/CCCS/Decadal_CanESM5" %s>ClimRes server</a>'
 							),
+							externalLinkAttrs,
 							externalLinkAttrs,
 						)
 					}}

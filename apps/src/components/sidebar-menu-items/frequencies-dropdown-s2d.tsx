@@ -14,6 +14,7 @@ import {
 	S2DFrequencyTypes,
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
+import {S2D_DECADAL_FREQUENCY_LABELS} from "@/lib/constants.tsx";
 
 const formatLabelDecadalFrequencyField = (label: string): string => {
 	return sprintf(
@@ -44,15 +45,15 @@ const FrequencyField = {
 const S2D_FREQUENCIES_TO_ADD_SUPPORT = [
 	{
 		value: S2DFrequencyTypes.DECADAL_ANNUAL,
-		label: formatLabelDecadalFrequencyField('Annual'),
+		label: formatLabelDecadalFrequencyField(S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_ANNUAL]!),
 	},
 	{
 		value: S2DFrequencyTypes.DECADAL_MAY_SEP,
-		label: formatLabelDecadalFrequencyField('May-Sep'),
+		label: formatLabelDecadalFrequencyField(S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_MAY_SEP]!),
 	},
 	{
 		value: S2DFrequencyTypes.DECADAL_NOV_MAR,
-		label: formatLabelDecadalFrequencyField('Nov-Mar'),
+		label: formatLabelDecadalFrequencyField(S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_NOV_MAR]!),
 	},
 ];
 

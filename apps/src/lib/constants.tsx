@@ -10,6 +10,7 @@ import {
 import { GridTypes } from '@/lib/vocabulary';
 
 import mapPinIcon from '@/assets/map-pin.svg';
+import {__} from "@/context/locale-provider.tsx";
 
 export const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 export const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -218,6 +219,15 @@ export const S2D_FORECAST_CONVENTIONAL_NB_PERIODS: Record<S2DFrequencyType, numb
 	[S2DFrequencyTypes.DECADAL_NOV_MAR]:
 		S2D_FORECAST_CONVENTIONAL_NB_PERIODS_WHEN_DECADAL,
  } as const;
+
+/**
+ * Map S2D decadal frequency types to their display labels, used in frequency dropdowns, and other descriptive texts.
+ */
+export const S2D_DECADAL_FREQUENCY_LABELS: Partial<Record<S2DFrequencyType, string>> = {
+	[S2DFrequencyTypes.DECADAL_ANNUAL]: __('Jan-Dec'),
+	[S2DFrequencyTypes.DECADAL_MAY_SEP]: __('May-Sep'),
+	[S2DFrequencyTypes.DECADAL_NOV_MAR]: __('Nov-Mar'),
+} as const;
 
 export const AHCCD_SQUARE_ICON = (
 	<svg width="20" height="20" viewBox="0 0 20 20">

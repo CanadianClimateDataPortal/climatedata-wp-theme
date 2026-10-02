@@ -133,6 +133,8 @@ You start the Ladle development server with:
 More technical documentation is available in [the README of the ladle/
 directory](../apps/src/lib/ladle/README.md).
 
+To get live reload in your browser, see [Developing with Ladle](./developing-with-ladle.md).
+
 ### Database access
 
 The database container has the port `3306` opened, so you can connect to it

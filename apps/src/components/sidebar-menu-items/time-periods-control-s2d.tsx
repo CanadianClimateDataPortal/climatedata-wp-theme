@@ -38,12 +38,14 @@ type S2DTimePeriodsSliderClassNames = {
 	rootClassName?: string;
 	thumbClassName?: string;
 	/**
-	 * Classes for the active track: the part of the track from the minimum
-	 * value to the thumb, as Material Design names it. Radix `Slider.Range`
-	 * receives them.
+	 * Classes for the active track, Radix `Slider.Range`: the part of the track
+	 * from the minimum to the thumb, as Material Design names it. The slider
+	 * holds one value, the index of one period from `getPeriods`. So the active
+	 * track only paints. It does not mark a selected range.
 	 *
-	 * A decadal forecast hides the active track. Its red would mark the earlier
-	 * half as included, while the pill already marks the selected half.
+	 * A decadal forecast gives the active track no red. With two periods, the
+	 * red would make the earlier half look selected, while the pill already
+	 * marks the selected half.
 	 */
 	activeTrackClassName?: string;
 };
@@ -51,11 +53,11 @@ type S2DTimePeriodsSliderClassNames = {
 /**
  * Extra CSS class names for the slider of the `TimePeriodsControlS2D` component.
  *
- * Default, for every case except a decadal forecast: no extra classes.
+ * Default, for all cases but a decadal forecast: only the red active track.
  * - `rootClassName`: none. The Root keeps its base layout.
  * - `thumbClassName`: none. The thumb stays a 20px round handle.
- * - `activeTrackClassName`: none. The red active track runs from the minimum
- *   to the thumb.
+ * - `activeTrackClassName`: the red background. The red active track runs from
+ *   the minimum to the thumb.
  *
  * Decadal forecast: the slider always has two periods, two 5-year spans of
  * one decade.
@@ -64,7 +66,8 @@ type S2DTimePeriodsSliderClassNames = {
  *   to the viewport.
  * - `thumbClassName`: the thumb becomes a pill as wide as half of the track,
  *   so each of its two positions covers its own period.
- * - `activeTrackClassName`: hides the active track. The field itself says why.
+ * - `activeTrackClassName`: empty, so the active track shows no red. The field
+ *   itself says why.
  *
  * @returns {@link S2DTimePeriodsSliderClassNames} object containing the extra CSS class names.
  */

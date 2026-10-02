@@ -1,9 +1,9 @@
 
 /**
- * Story for the TimePeriodsControl component, and make sure it behaves correctly and uses the other variations of TimePeriodsControl.
- *
- * Links:
- * - https://www.radix-ui.com/themes/docs/components/slider
+ * Stories for the time periods controls of this folder: `time-periods-control.tsx`,
+ * `-single.tsx`, `-for-sea-level.tsx` and `-s2d.tsx`. The {@link S2D} story
+ * covers {@link TimePeriodsControlS2D}.
+ * @see https://www.radix-ui.com/themes/docs/components/slider
  */
 
 import React from 'react';
@@ -15,13 +15,15 @@ import {
 
 import { store } from '@/app/store';
 import { setReleaseDate } from '@/features/s2d/s2d-slice';
+import { type ClimateVariableContextType } from '@/context/climate-variable-provider';
 import ClimateVariableContext from '@/hooks/use-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import {
-	type ForecastDisplay,
 	ForecastDisplays,
-	type S2DFrequencyType,
 	S2DFrequencyTypes,
+	type ClimateVariableConfigInterface,
+	type ForecastDisplay,
+	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
 import { URL_PARAMS } from '@/lib/url-params';
 import { TimePeriodsControlS2D } from './time-periods-control-s2d';
@@ -60,25 +62,38 @@ Object.values(S2DFrequencyTypes).forEach((frequency) => {
 	);
 });
 
+
+/**
+ * Story args for {@link S2D}.
+ *
+ * {@link TimePeriodsControlS2D} varies widely with the forecast display and
+ * the frequency. This type keys those two by their {@link URL_PARAMS} name,
+ * and gives each one its value type.
+ *
+ * Each arg goes by a different name in each layer, and no type links them:
+ *
+ * | Arg and URL parameter                      | Values and type                                     | Config field      | In the control    |
+ * | ------------------------------------------ | --------------------------------------------------- | ----------------- | ----------------- |
+ * | `fcastDisp`, `URL_PARAMS.FORECAST_DISPLAY` | {@link ForecastDisplays}, {@link ForecastDisplay}   | `forecastDisplay` | `forecastDisplay` |
+ * | `freq`, `URL_PARAMS.FREQUENCY`             | {@link S2DFrequencyTypes}, {@link S2DFrequencyType} | `frequency`       | `frequencyType`   |
+ *
+ * The config field belongs to {@link ClimateVariableConfigInterface}.
+ */
 type S2DStoryProps = {
-	fcastDisp: ForecastDisplay;
-	freq: S2DFrequencyType;
+	[URL_PARAMS.FORECAST_DISPLAY]: ForecastDisplay;
+	[URL_PARAMS.FREQUENCY]: S2DFrequencyType;
 };
 
 /**
- * The real TimePeriodsControlS2D, unchanged.
+ * Renders the real {@link TimePeriodsControlS2D}, so that its variations show
+ * for each combination of forecast display and frequency.
  *
- * The `freq` and `fcastDisp` controls feed the climate variable, as the
- * sidebar's own frequency and forecast display controls do on the portal.
- * Every combination renders from this one story. The args carry the names and
- * values of the Maps page URL parameters (`URL_PARAMS` in `@/lib/url-params`),
- * so `/maps/?freq=decadal-may-sep&fcastDisp=forecast` reads here as
- * `&arg-freq=decadal-may-sep&arg-fcastDisp=forecast`.
- *
- * It needs a ClimateVariableContext value holding an S2DClimateVariable (for
- * `useS2D()`), and a `setDateRange` that feeds the date range back. The
- * release date comes from the store, seeded above. The sidebar is 300px wide
- * on the portal, and the control sits in a list.
+ * In the app, `useUrlSync()` reads the URL query parameters named in
+ * {@link URL_PARAMS} into the climate variable, and the control reads that
+ * variable. Both apps share these parameters.
+ * The story args are the same parameters, as {@link S2DStoryProps} declares.
+ * So a Ladle URL with `arg-<name>=<value>` maps one to one
+ * to an app URL with `<name>=<value>`.
  */
 export const S2D: Story<S2DStoryProps> = ({
 	fcastDisp,
@@ -87,7 +102,7 @@ export const S2D: Story<S2DStoryProps> = ({
 	const [
 		dateRange,
 		setDateRange,
-	] = React.useState(undefined);
+	] = React.useState<string[] | undefined>(undefined);
 	const climateVariable = React.useMemo(
 		() =>
 			new S2DClimateVariable({
@@ -95,19 +110,24 @@ export const S2D: Story<S2DStoryProps> = ({
 				frequency: freq,
 				dateRange,
 				forecastDisplay: fcastDisp,
-			}),
+			} as ClimateVariableConfigInterface),
 		[
 			dateRange,
 			fcastDisp,
 			freq,
 		]
 	);
+	// Only the members the control uses. The app's provider supplies them all.
+	const contextValue: Partial<ClimateVariableContextType> = {
+		climateVariable,
+		setDateRange,
+	};
 
 	return (
 		<div className="w-[300px]">
 			<ul>
 				<ClimateVariableContext.Provider
-					value={{ climateVariable, setDateRange }}
+					value={contextValue as ClimateVariableContextType}
 				>
 					<TimePeriodsControlS2D />
 				</ClimateVariableContext.Provider>

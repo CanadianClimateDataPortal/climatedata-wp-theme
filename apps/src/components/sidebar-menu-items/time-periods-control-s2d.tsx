@@ -34,7 +34,7 @@ export interface TimePeriodsControlS2DProps {
  * base styling of that part. The values go last into `cn()`, so they override
  * any conflicting base class.
  */
-type S2DTimePeriodsSliderClassNames = {
+type TimePeriodsSliderClassNames = {
 	rootClassName?: string;
 	thumbClassName?: string;
 	/**
@@ -69,15 +69,15 @@ type S2DTimePeriodsSliderClassNames = {
  * - `activeTrackClassName`: empty, so the active track shows no red. The field
  *   itself says why.
  *
- * @returns {@link S2DTimePeriodsSliderClassNames} object containing the extra CSS class names.
+ * @returns {@link TimePeriodsSliderClassNames} object containing the extra CSS class names.
  */
 const getS2DTimePeriodsSliderClassNames = (
 	frequencyType: S2DFrequencyType | null,
 	forecastDisplay: ForecastDisplay | null,
-): S2DTimePeriodsSliderClassNames => {
+): TimePeriodsSliderClassNames => {
 	const isDecadal = isFrequencyTypeS2DDecadal(frequencyType);
 	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
-	const outcome: S2DTimePeriodsSliderClassNames = {
+	const outcome: TimePeriodsSliderClassNames = {
 		activeTrackClassName: 'bg-[hsl(var(--destructive-red))]',
 	};
 

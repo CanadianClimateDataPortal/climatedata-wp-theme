@@ -64,11 +64,13 @@ Object.values(S2DFrequencyTypes).forEach((frequency) => {
 /**
  * Story args for {@link S2D}.
  *
- * {@link TimePeriodsControlS2D} varies widely with the forecast display and
- * the frequency. This type keys those two by their {@link URL_PARAMS} name,
- * and gives each one its value type.
+ * {@link TimePeriodsControlS2D} varies with the forecast display and the
+ * frequency. With the release date, they decide which periods it offers.
+ * The app keeps both in its URL, under the {@link URL_PARAMS} keys that the
+ * Maps and Download apps share. This type uses the same keys, so a story URL
+ * and an app URL use the same names, and each key leads to its definition.
  *
- * Each arg goes by a different name in each layer, and no type links them:
+ * The same value has a different name in each layer, and no type links them:
  *
  * | Arg and URL parameter                      | Values and type                                     | Config field      | In the control    |
  * | ------------------------------------------ | --------------------------------------------------- | ----------------- | ----------------- |
@@ -90,8 +92,6 @@ type S2DStoryProps = {
  * {@link URL_PARAMS} into the climate variable, and the control reads that
  * variable. Both apps share these parameters.
  * The story args are the same parameters, as {@link S2DStoryProps} declares.
- * So a Ladle URL with `arg-<name>=<value>` maps one to one
- * to an app URL with `<name>=<value>`.
  */
 export const S2D: Story<S2DStoryProps> = ({
 	fcastDisp,

@@ -13,8 +13,6 @@ import '@/Global.css';
  * Wraps every story in the Redux store and the locale context, as
  * `src/main-map.tsx` does for the app. A component that calls `useLocale()`
  * or `useAppSelector` throws without them, and the error blanks the story.
- * The time periods stories are one case: `useS2D()` reads the store, and
- * `TimePeriodsControlS2D` calls `useLocale()`.
  *
  * The store is the `@/app/store` singleton. A story that needs state imports
  * that same `store` and dispatches into it at module level, before rendering.

@@ -1,17 +1,10 @@
 
 /**
- * WIP Notes during work of starting up work on CLIM-1491:
- *
  * Story for the TimePeriodsControl component, and make sure it behaves correctly and uses the other variations of TimePeriodsControl.
- *
- * DO NOT REMOVE NOTES UNTIL I REMOVE THEM MYSELF.
  *
  * Links:
  * - https://www.radix-ui.com/themes/docs/components/slider
  */
-
-/* eslint-disable */
-// @ts-nocheck
 
 import React from 'react';
 

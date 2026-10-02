@@ -17,6 +17,7 @@ import {
 } from '@/lib/s2d';
 import { isFrequencyTypeS2DDecadal } from '@/types/assertions';
 import {
+	type ForecastDisplay,
 	ForecastDisplays,
 	S2DFrequencyType,
 } from '@/types/climate-variable-interface';
@@ -24,6 +25,70 @@ import {
 export interface TimePeriodsControlS2DProps {
 	tooltip?: React.ReactNode;
 }
+
+
+/**
+ * Extra CSS class names for the slider of the `TimePeriodsControlS2D` component.
+ *
+ * Each field targets one part of the Radix slider. An absent field keeps the
+ * base styling of that part. The values go last into `cn()`, so they override
+ * any conflicting base class.
+ */
+type TimePeriodsSliderClassNames = {
+	rootClassName?: string;
+	thumbClassName?: string;
+	/**
+	 * Classes for the active track, Radix `Slider.Range`: the part of the track
+	 * from the minimum to the thumb, as Material Design names it. The slider
+	 * holds one value, the index of one period from `getPeriods`. So the active
+	 * track only paints. It does not mark a selected range.
+	 *
+	 * A decadal forecast gives the active track no red. With two periods, the
+	 * red would make the earlier half look selected, while the pill already
+	 * marks the selected half.
+	 */
+	activeTrackClassName?: string;
+};
+
+/**
+ * Extra CSS class names for the slider of the `TimePeriodsControlS2D` component.
+ *
+ * Default, for all cases but a decadal forecast: only the red active track.
+ * - `rootClassName`: none. The Root keeps its base layout.
+ * - `thumbClassName`: none. The thumb stays a 20px round handle.
+ * - `activeTrackClassName`: the red background. The red active track runs from
+ *   the minimum to the thumb.
+ *
+ * Decadal forecast: the slider always has two periods, two 5-year spans of
+ * one decade.
+ * - `rootClassName`: makes the Root an inline-size container. `50cqw` on the
+ *   thumb measures the slider only through it. Without it, `cqw` falls back
+ *   to the viewport.
+ * - `thumbClassName`: the thumb becomes a pill as wide as half of the track,
+ *   so each of its two positions covers its own period.
+ * - `activeTrackClassName`: empty, so the active track shows no red. The field
+ *   itself says why.
+ *
+ * @returns {@link TimePeriodsSliderClassNames} object containing the extra CSS class names.
+ */
+const getS2DTimePeriodsSliderClassNames = (
+	frequencyType: S2DFrequencyType | null,
+	forecastDisplay: ForecastDisplay | null,
+): TimePeriodsSliderClassNames => {
+	const isDecadal = isFrequencyTypeS2DDecadal(frequencyType);
+	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
+	const outcome: TimePeriodsSliderClassNames = {
+		activeTrackClassName: 'bg-[hsl(var(--destructive-red))]',
+	};
+
+	if (isDecadal && isForecast) {
+		outcome.rootClassName = '[container-type:inline-size]';
+		outcome.thumbClassName = 'w-[50cqw] rounded-full';
+		outcome.activeTrackClassName = '';
+	}
+
+	return outcome;
+};
 
 /**
  * Time period selector for S2D variables.
@@ -72,6 +137,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		frequencyType,
 	);
 	const tickLabel = periods ? tickLabels[selectedPeriod] : '...';
+	const sliderClassNames = getS2DTimePeriodsSliderClassNames(frequencyType, forecastDisplay);
 
 	let controlTooltip: React.ReactNode = __(
 		'Move the slider to select your time period of interest.'
@@ -147,7 +213,8 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 					className={cn(
 						'relative flex items-center select-none mx-6',
 						'mt-16 [touch-action:none]',
-						isLoadingReleaseDate && 'opacity-50'
+						isLoadingReleaseDate && 'opacity-50',
+						sliderClassNames.rootClassName,
 					)}
 					min={0}
 					max={periods ? periods.length - 1 : 0}
@@ -164,7 +231,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 						<Slider.Range
 							className={cn(
 								'absolute rounded-full h-full',
-								'bg-[hsl(var(--destructive-red))]'
+								sliderClassNames.activeTrackClassName,
 							)}
 						/>
 					</Slider.Track>
@@ -173,7 +240,8 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 							'relative block w-[20px] h-[20px]',
 							'bg-white rounded-[10px]',
 							'[box-shadow:0_2px_10px_hsl(var(--cold-grey-005))]',
-							'hover:bg-white focus:outline-none focus:[box-shadow:0_0_0_2px_hsl(var(--cold-grey-005))]'
+							'hover:bg-white focus:outline-none focus:[box-shadow:0_0_0_2px_hsl(var(--cold-grey-005))]',
+							sliderClassNames.thumbClassName,
 						)}
 					>
 						<div

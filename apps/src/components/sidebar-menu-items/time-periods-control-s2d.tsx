@@ -74,12 +74,14 @@ const getS2DTimePeriodsSliderClassNames = (
 ): S2DTimePeriodsSliderClassNames => {
 	const isDecadal = isFrequencyTypeS2DDecadal(frequencyType);
 	const isForecast = forecastDisplay === ForecastDisplays.FORECAST;
-	const outcome: S2DTimePeriodsSliderClassNames = {};
+	const outcome: S2DTimePeriodsSliderClassNames = {
+		activeTrackClassName: 'bg-[hsl(var(--destructive-red))]',
+	};
 
 	if (isDecadal && isForecast) {
 		outcome.rootClassName = '[container-type:inline-size]';
 		outcome.thumbClassName = 'w-[50cqw] rounded-full';
-		outcome.activeTrackClassName = 'hidden';
+		outcome.activeTrackClassName = '';
 	}
 
 	return outcome;
@@ -226,7 +228,6 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 						<Slider.Range
 							className={cn(
 								'absolute rounded-full h-full',
-								'bg-[hsl(var(--destructive-red))]',
 								sliderClassNames.activeTrackClassName,
 							)}
 						/>

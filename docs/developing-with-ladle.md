@@ -40,12 +40,10 @@ as the one in the container.
 
 Your `compose.override.yaml` file is ignored by Git, so nothing tracked changes.
 
-Add a `task-runner` entry. The file has one `services:` key, and every service
-goes under it. For example:
+Add a `task-runner` entry and adjust your local stack so you can see from your host:
 
 ```yaml
 services:
-  # Local development only. Lets the browser reach Ladle and its live reload.
   task-runner:
     environment:
       # Read by apps/.ladle/config.mjs. Must match the published port below.

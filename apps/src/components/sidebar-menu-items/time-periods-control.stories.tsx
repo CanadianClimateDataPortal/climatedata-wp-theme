@@ -27,8 +27,6 @@ import {
 } from '@/types/climate-variable-interface';
 import { URL_PARAMS } from '@/lib/url-params';
 import { TimePeriodsControlS2D } from './time-periods-control-s2d';
-
-// Static illustrative data for these stories, in the examples file beside this one.
 import {
 	EXAMPLE_S2D_CLIMATE_VARIABLE_ID,
 	EXAMPLE_S2D_DECADAL_RELEASE_DATE,

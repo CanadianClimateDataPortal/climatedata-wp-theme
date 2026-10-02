@@ -16,9 +16,6 @@
  *
  * This file holds data only. Anything that writes to the Redux store, such as
  * seeding the release date cache, stays in the story that needs it.
- *
- * SECTIONS:
- * - @see EXAMPLE_S2D_CLIMATE_VARIABLE_ID - S2D decadal
  */
 
 // ============================================================================

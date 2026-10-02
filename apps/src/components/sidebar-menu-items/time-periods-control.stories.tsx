@@ -25,10 +25,12 @@ import { setReleaseDate } from '@/features/s2d/s2d-slice';
 import ClimateVariableContext from '@/hooks/use-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import {
+	type ForecastDisplay,
 	ForecastDisplays,
+	type S2DFrequencyType,
 	S2DFrequencyTypes,
 } from '@/types/climate-variable-interface';
-
+import { URL_PARAMS } from '@/lib/url-params';
 import { TimePeriodsControlS2D } from './time-periods-control-s2d';
 
 // Static illustrative data for these stories, in the examples file beside this one.
@@ -65,6 +67,11 @@ Object.values(S2DFrequencyTypes).forEach((frequency) => {
 	);
 });
 
+type S2DStoryProps = {
+	fcastDisp: ForecastDisplay;
+	freq: S2DFrequencyType;
+};
+
 /**
  * The real TimePeriodsControlS2D, unchanged.
  *
@@ -80,11 +87,14 @@ Object.values(S2DFrequencyTypes).forEach((frequency) => {
  * release date comes from the store, seeded above. The sidebar is 300px wide
  * on the portal, and the control sits in a list.
  */
-export const S2D: Story = ({
+export const S2D: Story<S2DStoryProps> = ({
 	fcastDisp,
 	freq,
 }) => {
-	const [dateRange, setDateRange] = React.useState(undefined);
+	const [
+		dateRange,
+		setDateRange,
+	] = React.useState(undefined);
 	const climateVariable = React.useMemo(
 		() =>
 			new S2DClimateVariable({

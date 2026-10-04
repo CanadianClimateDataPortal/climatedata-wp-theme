@@ -12,7 +12,7 @@ import '@/Global.css';
 /**
  * Wraps every story in the Redux store and the locale context, as
  * `src/main-map.tsx` does for the app. A component that calls `useLocale()`
- * or `useAppSelector` throws without them, and the error blanks the story.
+ * or `useAppSelector` throws without them and we end up with a broken workbench.
  *
  * The store is the `@/app/store` singleton. A story that needs state imports
  * that same `store` and dispatches into it at module level, before rendering.

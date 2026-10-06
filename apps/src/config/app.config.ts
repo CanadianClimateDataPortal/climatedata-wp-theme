@@ -1,7 +1,7 @@
 import { sprintf } from '@wordpress/i18n';
-import {__} from "@/context/locale-provider.tsx";
-import {S2DFrequencyTypes} from '@/types/climate-variable-interface';
-import {S2D_DECADAL_FREQUENCY_LABELS} from "@/lib/constants.tsx";
+import { __ } from '@/context/locale-provider';
+import { S2DFrequencyTypes } from '@/types/climate-variable-interface';
+import { S2D_DECADAL_FREQUENCY_LABELS } from '@/lib/constants';
 
 const appConfig = {
 	versions: [

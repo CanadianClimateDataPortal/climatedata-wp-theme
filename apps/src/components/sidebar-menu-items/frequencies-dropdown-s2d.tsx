@@ -14,7 +14,7 @@ import {
 	S2DFrequencyTypes,
 	type S2DFrequencyType,
 } from '@/types/climate-variable-interface';
-import {S2D_DECADAL_FREQUENCY_LABELS} from "@/lib/constants.tsx";
+import { S2D_DECADAL_FREQUENCY_LABELS } from '@/lib/constants';
 
 const formatLabelDecadalFrequencyField = (label: string): string => {
 	return sprintf(

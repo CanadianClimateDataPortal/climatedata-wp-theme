@@ -45,7 +45,7 @@ import TooltipWidget from '@/components/ui/tooltip-widget';
 import StarRating from '@/components/ui/star-rating';
 import S2DReleaseDate from '@/components/s2d-release-date';
 import { Spinner } from '@/components/ui/spinner';
-import {S2D_DECADAL_FREQUENCY_LABELS} from "@/lib/constants.tsx";
+import { S2D_DECADAL_FREQUENCY_LABELS } from '@/lib/constants';
 
 interface LocationModalS2DProps {
 	latlng: Pick<L.LatLng, 'lat' | 'lng'>;
@@ -105,7 +105,11 @@ const tooltipTemperatureRange = __(
 		'range is defined using the middle third, providing a range of typical past conditions.'
 );
 
-const getTooltipSkillLevelSuffix = (frequency: S2DFrequencyType, dateRangeStart: string | null, releaseDate: Date | null): string => {
+const getTooltipSkillLevelSuffix = (
+	frequency: S2DFrequencyType,
+	dateRangeStart: string | null,
+	releaseDate: Date | null
+): string => {
 	const baseText = __(
 		'The past performance or “skill” of the prediction system is measured ' +
 			'using the continuous ranked probability skill score (CRPSS). CRPSS ' +

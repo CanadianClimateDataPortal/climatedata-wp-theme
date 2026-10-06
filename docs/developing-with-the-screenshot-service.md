@@ -35,38 +35,52 @@ Its `/raster` endpoint loads a map page in a headless Chrome and returns a PNG i
 
 ## Why a proxy is needed
 
+As a frontend developer, you run your own copy of the screenshot service next to the local portal.
+With it, you can develop and test the frontend features that depend on it, for example the Download button.
+You can also change the service itself when the frontend needs it.
+
+The portal serves the map page over TLS, for example at `https://dev-en.climatedata.ca/maps/`.
+Your copy of the service listens on port `5000` of the host, with plain HTTP.
+The page needs an HTTPS address on the development hostname that it can call.
+The proxy gives it that address, `https://dev-en.climatedata.ca:5001`, and forwards `/raster` to your copy.
+
+Only `/raster` moves to that address, through a temporary edit in
+[step 5](#5-point-the-frontend-at-the-proxy).
+`window.DATA_URL` stays on the deployed `climatedata-api`, because the map uses it for more than `/raster`,
+for example GeoServer.
+Your local copy only needs to run the screenshot service.
+
 The `/map` React app calls `/raster` with a
 [cross-origin ("CORS")](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS 'Cross-Origin Resource Sharing')
 `POST` request that [sends JSON](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type)
-over TLS. Without this procedure, we get an error when trying to call a production endpoint.
+with `Content-Type: application/json`, not a form content type.
 
-Because we're sending JSON using correct `Content-Type: application/json`, and the production and development
-Virtual Hosts serving our React app, we also have to make the `/raster` endpoint to be properly compliant so
-we do not get web browser security errors.
-
-Natively, the browser first sends a CORS preflight (`OPTIONS`) request.
+Because of that content type, the browser first sends a CORS preflight (`OPTIONS`) request.
+A form post would not need a preflight, so JSON adds one more point where CORS can fail.
 The Flask application of `climatedata-api` answers that preflight, but with no CORS headers,
 so the browser would reject the call.
+
+In a cross-origin call, the page's JavaScript cannot read `Content-Disposition`
+unless the response lists it in `Access-Control-Expose-Headers`.
+Without it, `headers.get('content-disposition')` returns `null`, and the browser picks the file name.
+The view in `climatedata_api/raster.py` sends that header on a successful `POST`.
 
 The `installation.txt` file in the [`climatedata-api`](https://github.com/CanadianClimateDataPortal/climatedata-api)
 repository is an old setup note, not the deployed configuration.
 The nginx block it shows adds the `Access-Control-Allow-Origin` header only.
 It does not answer a preflight.
+The deployed staging and production servers are set up outside this repository and differ from `installation.txt`.
+Their front server answers the preflight. It sends `Access-Control-Allow-Origin`,
+`Access-Control-Allow-Headers` and `Access-Control-Allow-Methods`.
 
-Since this document is about developing locally on the service, we'll compensate what would normally be the production server's responsibility.
-
-Listening to the port `5001` with TLS, and properly answering to preflight with the CORS headers on the `/raster`
-path on a running service clone of the code maintained in the `climatedata-api` project, and we'll proxy
-`/raster` (e.g. `https://dev-en.climatedata.ca:5001/raster`) to the screenshot service on port `5000`
-of our cloned copy of that backend.
+Locally, the proxy on port `5001` does that job.
+The call is cross-origin because the port differs from the page.
 The other reason is that in production, the hostname to serve this service is a completely different hostname (e.g. `data.climatedata.ca`)
 
 ### Why the hostname matters
 
-Chrome and Firefox allow an HTTPS page to call `http://localhost`.
-So the real blockers are about Web Browser security regarding Cross-Origin Resource Sharing (a.k.a. *CORS*),
-described in [Why a proxy is needed](#why-a-proxy-is-needed),
-and the name on the certificate that your own browser checks.
+The browser blocks a call from an HTTPS page to a plain HTTP address on the development hostname.
+So the service needs an HTTPS address, and your browser checks the name on its certificate.
 
 The certificate in `dockerfiles/mounts/ssl/` is a publicly trusted
 wildcard certificate for the `climatedata.ca` and `donneesclimatiques.ca`
@@ -170,6 +184,12 @@ firewall on the host can also block the traffic from the container to the host.
 
 ### 4. Add the HTTPS proxy to the portal
 
+The nginx of the portal container loads every `.conf` file in `/etc/nginx/conf.d/`.
+You can bind-mount your own file there, from `dockerfiles/mounts/config/`, through your `compose.override.yaml`.
+Each file needs its own bind mount entry.
+With this, you can proxy the portal's nginx to any other service that runs on your machine.
+The `raster-proxy.conf` file below is one example, for the screenshot service.
+
 Both files below are ignored by Git, so nothing tracked changes.
 
 1. Create the directory for the configuration file. It does not exist by
@@ -253,7 +273,8 @@ While you test locally, point the raster call of the map app at the proxy.
 This step edits one tracked file. It is the only tracked file the procedure
 touches: everything else you create is ignored by Git or lives outside the
 repository.
-`git status` must show only this one-line edit.
+This one-line edit must be the only tracked change the procedure makes.
+`git status`, or the commit that holds the edit, must show nothing else.
 
 In
 `apps/src/lib/map/image-rastering/create-fetch-target-to-raster-with-encoded-url.ts`,
@@ -276,10 +297,13 @@ This one line redirects the raster call only, and leaves the rest untouched.
 The URL uses the hostname, not `127.0.0.1`, for the reason given in
 [Why the hostname matters](#why-the-hostname-matters).
 
-**Do not commit this change.** When you are done, undo it:
-```shell
-git checkout -- apps/src/lib/map/image-rastering/create-fetch-target-to-raster-with-encoded-url.ts
-```
+**This change must never reach `main`.** Choose one of these two ways:
+* Keep the edit uncommitted. When you are done, undo it:
+  ```shell
+  git checkout -- apps/src/lib/map/image-rastering/create-fetch-target-to-raster-with-encoded-url.ts
+  ```
+* Commit the edit on its own, with nothing else in that commit.
+  Revert that commit before the squash-merge.
 
 ## Download a map image
 

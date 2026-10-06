@@ -1,5 +1,7 @@
 import { sprintf } from '@wordpress/i18n';
-import {__} from "@/context/locale-provider.tsx";
+import { __ } from '@/context/locale-provider';
+import { S2DFrequencyTypes } from '@/types/climate-variable-interface';
+import { S2D_DECADAL_FREQUENCY_LABELS } from '@/lib/constants';
 
 const appConfig = {
 	versions: [
@@ -184,16 +186,16 @@ const appConfig = {
 			label: "Seasonal",
 		},
 		{
-			value: "decadal-ann",
-			label: sprintf(__("Decadal (%s)"), __("Annual")),
+			value: S2DFrequencyTypes.DECADAL_ANNUAL,
+			label: sprintf(__("Decadal (%s)"), S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_ANNUAL]),
 		},
 		{
-			value: "decadal-may-sep",
-			label: sprintf(__("Decadal (%s)"), __("May-Sep")),
+			value: S2DFrequencyTypes.DECADAL_MAY_SEP,
+			label: sprintf(__("Decadal (%s)"), S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_MAY_SEP]),
 		},
 		{
-			value: "decadal-nov-mar",
-			label: sprintf(__("Decadal (%s)"), __("Nov-Mar")),
+			value: S2DFrequencyTypes.DECADAL_NOV_MAR,
+			label: sprintf(__("Decadal (%s)"), S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_NOV_MAR]),
 		},
 	],
 }

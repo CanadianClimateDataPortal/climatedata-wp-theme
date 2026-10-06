@@ -14,6 +14,8 @@ import S2DReleaseDate from '@/components/s2d-release-date';
 
 import { type ProgressBarProps } from '@/types/progress-bar';
 
+import { isFrequencyTypeS2DDecadal } from '@/types/assertions';
+
 import {
 	ModalSummaryPopover,
 } from '@/components/ui/modal-summary-popover';
@@ -354,6 +356,8 @@ const ForecastSummaryContents = (
 		locationData,
 	} = props;
 
+	const { climateVariable } = useClimateVariable();
+
 	// To make S2D Release Date look like the rest of the text
 	// we have to negate all className from the S2DReleaseDate
 	// component.
@@ -364,6 +368,9 @@ const ForecastSummaryContents = (
 		'tracking-normal',
 		'-uppercase',
 	];
+
+	const frequency = climateVariable?.getFrequency();
+	const isDecadal = isFrequencyTypeS2DDecadal(frequency ?? '');
 
 	return (
 		<>
@@ -390,9 +397,11 @@ const ForecastSummaryContents = (
 					tooltip={false}
 				/>
 			</p>
-			<p className="mt-2">
-				{__('Consider checking back for updated forecasts!')}
-			</p>
+			{!isDecadal && (
+				<p className="mt-2">
+					{__('Consider checking back for updated forecasts!')}
+				</p>
+			)}
 		</>
 	);
 };

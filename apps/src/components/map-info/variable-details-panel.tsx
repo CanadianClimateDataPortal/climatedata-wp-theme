@@ -90,7 +90,7 @@ const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
 							{__('Relevant articles')}
 						</SectionHeading>
 						<SectionText
-							content={__('To help you get more of our data.')}
+							content={__('To help you get more out of our data.')}
 						/>
 						<RelevantTrainings items={mapInfo.relevantTrainings} />
 					</div>

@@ -1,5 +1,5 @@
 import { sprintf } from '@wordpress/i18n';
-import { S2D_FORECAST_CONVENTIONAL_NB_PERIODS } from '@/lib/constants';
+import { S2D_DECADAL_FREQUENCY_LABELS, S2D_FORECAST_CONVENTIONAL_NB_PERIODS } from '@/lib/constants';
 import {
 	ForecastDisplay,
 	ForecastDisplays,
@@ -256,7 +256,17 @@ export const generatePeriodRangeLabel = (
 		? formatYear(periodEnd, locale)
 		: formatIntlDate(periodEnd, locale, { month: 'long' });
 
-	return sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
+	let label = sprintf(__('%s to %s'), periodStartLabel, periodEndLabel);
+
+	// Add frequency detail for decadal frequencies
+	if (isDecadalFrequencyType) {
+		const frequencyDetail = S2D_DECADAL_FREQUENCY_LABELS[frequency];
+		if (frequencyDetail) {
+			label = sprintf(__('%s (%s)'), label, frequencyDetail);
+		}
+	}
+
+	return label;
 };
 
 /**

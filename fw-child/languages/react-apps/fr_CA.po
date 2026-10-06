@@ -733,8 +733,8 @@ msgstr "Cliquez sur les éléments suivants pour obtenir des informations spéci
 msgid "Relevant articles"
 msgstr "Articles pertinents"
 
-msgid "To help you get more of our data."
-msgstr "Pour vous aider à obtenir plus de nos données."
+msgid "To help you get more out of our data."
+msgstr "Pour vous aider à tirer le meilleur parti de nos données."
 
 msgid "Check out the Canadian climate data map"
 msgstr "Consultez la carte des données climatiques du Canada"
@@ -1137,15 +1137,16 @@ msgstr "environ"
 msgid "Forecast Types"
 msgstr "Types de prévisions"
 
-# Tooltip: Forecast Types
-msgid "S2D forecasts are shown as probabilities for how conditions will compare to historical climate conditions between 1991 and 2020. "
-  "“Expected conditions” show whether conditions are expected to be above, near or below normal. "
-  "“Unusual conditions” show whether conditions are expected to be unusually high or low. "
-  "Select a forecast type from the options in the dropdown menu."
-msgstr "Les prévisions S2D sont présentées sous forme de probabilités comparant les conditions prévues aux conditions climatiques historiques "
-  "entre 1991 et 2020. Les « Conditions attendues » indiquent si on s’attend à ce que les conditions soient au-dessus de la normale, "
-  "près de la normale ou sous la normale. Les « Conditions inhabituelles » indiquent si on s’attend à ce que les conditions soient "
-  "inhabituellement élevées ou faibles. Sélectionnez un type de prévision parmi les options du menu déroulant."
+# Tooltip: Forecast Types (on both Maps and Download pages)
+msgid "S2D forecasts are shown as probabilities for how conditions will compare to historical climate conditions "
+  "between 1991 and 2020. “Expected conditions” show whether conditions are expected to be above, near or below "
+  "normal. “Unusual conditions” show whether conditions are expected to be unusually high or low. Select a forecast "
+  "type from the options in the dropdown menu."
+msgstr "Les prévisions S2D sont présentées sous forme de probabilités comparant les conditions prévues aux conditions "
+  "climatiques historiques entre 1991 et 2020. Les « Conditions attendues » indiquent si on s'attend à ce que les "
+  "conditions soient au-dessus de la normale, près de la normale ou en dessous de la normale. Les « Conditions "
+  "inhabituelles » indiquent si on s'attend à ce que les conditions soient inhabituellement élevées ou faibles. "
+  "Sélectionnez un type de prévision parmi les options du menu déroulant."
 
 msgid "Expected Conditions"
 msgstr "Conditions attendues"
@@ -1209,6 +1210,9 @@ msgstr "Décennale (%s)"
 
 msgid "Decadal %s probability:"
 msgstr "Probabilité décennale pour \"%s\""
+
+msgid  "Jan-Dec"
+msgstr "Jan-Déc"
 
 msgid  "May-Sep"
 msgstr "Mai-Sep"
@@ -1327,6 +1331,9 @@ msgstr "par rapport à la climatologie historique de 1991 à 2020."
 msgid  "The probabilities may not add exactly to 100% due to rounding."
 msgstr "Les probabilités peuvent ne pas totaliser exactement 100 % en raison de l'arrondi."
 
+msgid  "These values are rounded to one decimal place."
+msgstr "Ces valeurs sont arrondies à une décimale."
+
 msgid  "Historical Median"
 msgstr "Médiane historique"
 
@@ -1363,11 +1370,25 @@ msgstr "Le niveau d'habileté à cet endroit est Élevé (valeur CRPSS supérieu
 
 msgid  "The past performance or “skill” of the prediction system is measured using the continuous ranked probability "
        "skill score (CRPSS). CRPSS measures the accuracy of forecasts produced for the same lead time as the selected "
-       "forecast and for the same month, season, or decadal time period over 1991 to 2020."
+       "forecast "
 msgstr "Les performances passées ou « habileté » du système de prévision sont mesurées à l'aide du score d’habileté de "
        "l’indice continu de probabilité ordonnée (CRPSS). Le CRPSS mesure l'exactitude des prévisions produites pour le "
-       "même délai de prévision que la prévision sélectionnée et pour le même mois, la même saison ou la même période "
-       "décennale entre 1991 et 2020."
+       "même délai de prévision que la prévision sélectionnée "
+
+msgid  "over 1996 to 2020."
+msgstr "entre 1996 et 2020."
+
+msgid  "over 2006 to 2020."
+msgstr "entre 2006 et 2020."
+
+msgid  "and for the same month over 1991 to 2020."
+msgstr "et pour le même mois entre 1991 et 2020."
+
+msgid  "and for the same season over 1991 to 2020."
+msgstr "et pour la même saison entre 1991 et 2020."
+
+msgid  "and for the same month, season, or decadal time period over 1991 to 2020."
+msgstr "et pour le même mois, la même saison ou la même période décennale entre 1991 et 2020."
 
 msgid  "The skill level is “%s”. %s for this location, time period, and month of release."
 msgstr "Le niveau d’habilité est « %s ». %s  pour cet endroit, cette période et ce mois de sortie."
@@ -1412,7 +1433,7 @@ msgid "unusually high or low"
 msgstr "inhabituellement élevée ou faible"
 
 msgid "above, near, or below normal"
-msgstr "au-dessus, près ou sous la normale"
+msgstr "au-dessus, près ou en dessous de la normale"
 
 msgid "%s: probability that this variable will be %s relative to the 1991 to 2020 historical climatology."
 msgstr "%s : probabilité que cette variable soit %s par rapport à la climatologie historique de 1991 à 2020."
@@ -1460,6 +1481,10 @@ msgstr "La climatologie historique contient des données correspondant au mois, 
        "valeurs seuils fournissent les valeurs exactes qui définissent les "
        "résultats de prévision pour cet endroit."
 
+msgid  "The climatology is calculated as an average over all overlapping 5-year periods between 1991 and 2020."
+msgstr "La climatologie est calculée comme une moyenne sur l'ensemble des périodes de cinq ans qui se chevauchent "
+       "entre 1991 et 2020."
+
 msgid "Above normal"
 msgstr "Au-dessus de la normale"
 
@@ -1486,16 +1511,6 @@ msgid_plural "%d periods"
 msgstr[0] "%d période"
 msgstr[1] "%d périodes"
 
-msgid  "S2D forecasts are shown as probabilities for how conditions will compare to historical climate conditions "
-       "between 1991 and 2020. “Expected conditions” show whether conditions are expected to be above, near or below "
-       "normal. “Unusual conditions” show whether conditions are expected to be unusually high or low. Select a forecast "
-       "type from the options in the dropdown menu."
-msgstr "Les prévisions S2D sont présentées sous forme de probabilités comparant les conditions prévues aux conditions "
-       "climatiques historiques entre 1991 et 2020. Les « Conditions attendues » indiquent si on s'attend à ce que les "
-       "conditions soient au-dessus de la normale, près de la normale ou sous la normale. Les « Conditions "
-       "inhabituelles » indiquent si on s'attend à ce que les conditions soient inhabituellement élevées ou faibles. "
-       "Sélectionnez un type de prévision parmi les options du menu déroulant."
-
 msgid  "Forecasts are available for different frequencies, from a month to 5 years. The available time periods will "
        "change based on the frequency selected. Select a temporal frequency from the options in the dropdown menu. "
        "Note: Only the first three months are available individually, as skill tends to be low for later months."
@@ -1510,6 +1525,15 @@ msgid  "For access to global S2D forecast data or to set up automated downloads,
 msgstr "Pour accéder aux données de prévision S2D mondiales ou pour configurer des téléchargements automatiques, veuillez consulter "
        "<a href=\"https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_fr/\" %s>GeoMet</a> "
        "(site d'Environnement et Changement climatique Canada)."
+
+msgid  "For access to global forecast data or to set up automated downloads, please visit the following "
+       "Environment and Climate Change Canada sites:<br />"
+       "- Seasonal: <a href=\"https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_en/\" %s>GeoMet</a><br />"
+       "- Decadal: <a href=\"https://crd-data-donnees-rdc.ec.gc.ca/CCCMA/products/CCCS/Decadal_CanESM5\" %s>ClimRes server</a>"
+msgstr "Pour accéder aux données de prévisions mondiales ou pour configurer des téléchargements automatiques, veuillez "
+       "consulter les sites suivants d'Environnement et Changement climatique Canada:<br />"
+       "- Saisonnières: <a href=\"https://eccc-msc.github.io/open-data/msc-data/nwp_cansips/readme_cansips_fr/\" %s>GeoMet</a><br />"
+       "- Décennales: <a href=\"https://crd-data-donnees-rdc.ec.gc.ca/CCCMA/products/CCCS/Decadal_CanESM5\" %s>Serveur ClimRes</a>"
 
 msgid  "An unknown error occurred. Please try again."
 msgstr "Une erreur inconnue s'est produite. Veuillez réessayer."

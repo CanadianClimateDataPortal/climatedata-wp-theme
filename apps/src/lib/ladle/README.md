@@ -21,7 +21,9 @@ import { ladleLazy, LadleMockLocaleProvider } from '@/lib/ladle';
 ## Available Utilities
 
 - **`ladleLazy`**: Artificial lazy loading for demonstrating Suspense boundaries without dynamic imports
-- **`LadleMockLocaleProvider`**: Mock i18n and locale context for testing translated components
+- **`LadleMockLocaleProvider`**: Mock i18n and locale context for testing translated components. The global provider in `apps/.ladle/components.tsx` already supplies the Redux store and a default `LocaleProvider` to every story. That default locale is `'en'`, with no translations. Use this one only to switch the locale or to supply French strings. Such a story declares the `locale` arg (`StoryWithLocale`, `createLadleMockLocaleStoryArgTypes()`), which shows up as a Ladle control, and passes it to `LadleMockLocaleProvider`.
+
+  A story that needs Redux state imports `store` from `@/app/store` and dispatches into it before rendering. It is the same store the global provider mounts, and its state persists across stories.
 
 ## Build Exclusion
 

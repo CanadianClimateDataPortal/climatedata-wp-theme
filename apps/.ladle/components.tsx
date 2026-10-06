@@ -1,28 +1,41 @@
 import 'react';
 
 import { type GlobalProvider } from '@ladle/react';
+import { Provider as ReduxProvider } from 'react-redux';
 
-import Header from '@/components/header';
+import { store } from '@/app/store';
+import { LocaleProvider } from '@/context/locale-provider';
 
 import '@/App.css';
 import '@/Global.css';
 
-export const Provider: GlobalProvider = ({ children }) => {
+/**
+ * Wraps every story in the Redux store and the locale context, as
+ * `src/main-map.tsx` does for the app. A component that calls `useLocale()`
+ * or `useAppSelector` throws without them and we end up with a broken workbench.
+ *
+ * The store is the `@/app/store` singleton. A story that needs state imports
+ * that same `store` and dispatches into it at module level, before rendering.
+ * The state then persists across every story of the Ladle session.
+ *
+ * `LocaleProvider` reads the locale from `data-app-lang` on `#root`. Ladle
+ * has no such attribute, so the locale is `'en'` and no translations load.
+ * A story that needs French opts in with the helpers of `@/lib/ladle`. It
+ * declares the `locale` arg (`StoryWithLocale`,
+ * `createLadleMockLocaleStoryArgTypes()`), and wraps itself in
+ * `LadleMockLocaleProvider` with its French strings. That provider overrides
+ * the locale for the story subtree only.
+ */
+export const Provider: GlobalProvider = ({
+	children,
+}) => {
 	return (
-		<div className="container relative grid grid-flow-row gap-8 mx-auto columns-1 auto-rows-max">
-			<div className="mb-8">
-				<Header />
-			</div>
-			<div className="mb-8">
-				<div
-					style={{
-						borderBottom: '1px solid hsl(var(--border))'
-					}
-				}></div>
-			</div>
-			<div className="relative flex justify-center">
-				{children}
-			</div>
-		</div>
+		<ReduxProvider store={store}>
+			<LocaleProvider>
+				<div className="relative flex justify-center">
+					{children}
+				</div>
+			</LocaleProvider>
+		</ReduxProvider>
 	);
 };

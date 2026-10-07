@@ -50,7 +50,7 @@ Set the toggle from the URL, as the next section describes.
 The supported way to set a toggle is a URL query parameter.
 It is the only supported way, and it stays this simple on purpose.
 The parameter has the same name as the cookie.
-`?NAME=1` enables the toggle, and `?NAME=0` disables it.
+`?NAME=1` creates the cookie, and `?NAME=0` deletes it.
 
 ```
 https://climatedata.ca/maps/?…&LOREMIPSUM=1
@@ -67,9 +67,10 @@ The handler removes the parameter from the URL after it reads it, and keeps the 
 A link copied afterwards therefore does not pass the toggle to someone who did not ask for it.
 
 `enableCookieToggle(name)` and `disableCookieToggle(name)` write the cookie.
-`enableCookieToggle` writes `NAME=yes` with `path=/` and a lifetime of 90 days.
+`enableCookieToggle` creates the cookie with `path=/` and a lifetime of 90 days.
 `disableCookieToggle` deletes the cookie on `path=/`.
 Check a toggle set this way with `hasCookie`.
+The check asks only whether the cookie exists. Its value does not matter.
 
 ## Three checks
 
@@ -80,12 +81,9 @@ The library parses cookies in the simplest way, on purpose, to stay simple.
 - `isCookieTrue` matches only the exact string `NAME=true`.
 - `isCookieFalse` matches only the exact string `NAME=false`.
 
-No other value counts: not `1`, not `yes`, not `TRUE`.
+No other value counts: not `1`, not `TRUE`.
 The library applies no truthiness rules, in the style of Perl or JavaScript.
 
-The URL route reaches `hasCookie` only.
-It writes `NAME=yes`, and the two boolean checks never match that value.
-So the boolean parsing is not reachable from the URL. This is a design property.
 The boolean checks exist for a future way of setting a toggle, other than the URL route.
 No such way exists today, and none is needed now.
 
@@ -97,6 +95,7 @@ No such way exists today, and none is needed now.
 
 Choose the check that matches the behaviour you are fencing.
 Use `hasCookie` for a toggle set from the URL. This is the supported case.
+It asks only whether the cookie exists. Its value does not matter.
 Use `isCookieTrue` only when the feature must stay off unless a developer sets the cookie to exactly `true` by hand.
 An absent or unreadable value then counts as "no".
 
@@ -126,7 +125,8 @@ Anyone can set these cookies from the console, so do not use them to gate data.
 - **Per browser, at runtime.** A toggle lives in one browser. It is not per user, not server-side, and not a build-time switch. PHP cannot see it.
 - **Maps app only, for the URL.** Only the Maps app runs `use-url-sync.ts`. The Download app never reads the URL parameter.
 - **No change event.** Nothing announces a change to the cookie. Code sees the new value on its next read, so reload the page after a change.
-- **The URL reaches `hasCookie` only.** The URL route and `enableCookieToggle` write `NAME=yes`. By design, `isCookieTrue` and `isCookieFalse` never match it.
+- **The URL route is an existence toggle.** `?NAME=1` creates the cookie, and `?NAME=0` deletes it. `hasCookie` checks only that the cookie exists, and its value does not matter.
+- **Cookie values have no type.** A browser stores every cookie value as a string. `isCookieTrue` and `isCookieFalse` compare that string to exactly `true` or `false`, and nothing else. The URL route cannot reach either one, because it only creates or deletes the cookie. This is the cost of letting a non-developer remove a toggle without DevTools.
 - **Names are plain strings.** A typo in a name still compiles, and the check silently returns `false`. Import the constant from `toggle-names.ts` rather than retype the string.
 - **No tests ship** with this library.
 - **DevTools cookies need `path=/`.** This applies to the developer convenience above. Without it, the browser gives the cookie the current path. `disableCookieToggle` deletes on `path=/`, so it can fail to delete that cookie. Use `document.cookie = "NAME=true; path=/"`.

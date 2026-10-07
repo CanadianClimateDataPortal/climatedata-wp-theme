@@ -15,17 +15,30 @@ People reach a feature by clicking a button, and that button is what a toggle co
 ## Usage
 
 ```ts
-import { hasCookie } from '@/lib/feature-toggling';
+// File: `src/lib/feature-toggling/toggle-names.ts`
 
-const options = hasCookie('S2D_FREQUENCIES_TO_ADD_SUPPORT')
-	? OPTIONS_WITH_THE_NEW_THING
-	: OPTIONS;
+export const TOGGLE_COOKIE_NAME_BOOLEAN_LOREM_IPSUM =
+	'<some ASCII string we can add in an URL Search Query and as cookie name, e.g. LOREMIPSUM>' as const;
+```
+
+Then using the symbolic name elsewhere in the code;
+
+```ts
+// Somewhere else where we need to check the toggle
+
+import {
+	hasCookie,
+  TOGGLE_COOKIE_NAME_BOOLEAN_LOREM_IPSUM, // Example of a toggle cookie name to check for existence
+} from '@/lib/feature-toggling';
+
+// This test is about whether the cookie name exists as a boolean check where existence means enabled.
+const hasToggleLoremIpsum: boolean = hasCookie(TOGGLE_COOKIE_NAME_BOOLEAN_LOREM_IPSUM)
 ```
 
 Enable a toggle in the DevTools console, then reload the page:
 
 ```js
-document.cookie = 'S2D_FREQUENCIES_TO_ADD_SUPPORT=yes';
+document.cookie = 'LOREMIPSUM=yes'; // 
 ```
 
 ## From a URL
@@ -35,8 +48,8 @@ The parameter has the same name as the cookie.
 Use `1` to add the cookie and `0` to remove it.
 
 ```
-https://climatedata.ca/maps/?…&S2D_FREQUENCIES_TO_ADD_SUPPORT=1
-https://donneesclimatiques.ca/cartes/?…&S2D_FREQUENCIES_TO_ADD_SUPPORT=0
+https://climatedata.ca/maps/?…&LOREMIPSUM=1
+https://donneesclimatiques.ca/cartes/?…&LOREMIPSUM=0
 ```
 
 Any other value does nothing.
@@ -46,6 +59,9 @@ A link copied afterwards therefore does not pass the toggle to someone who did n
 `enableCookieToggle(name)` and `disableCookieToggle(name)` write the cookie.
 
 ## Three checks
+
+Current implementation only supports boolean toggles.
+We can make variations of enabling/disabling some code path by using negative or positive terms, e.g. `NO_LOREMIPSUM` vs `LOREMIPSUM`.
 
 | Function | True when |
 |---|---|
@@ -61,6 +77,17 @@ An absent or unreadable value then counts as "no".
 These checks do not establish trust.
 Anyone can set these cookies from the console, so do not use them to gate data.
 
+
+### Non-Implemented Toggles
+
+- Non scalar objects (e.g. `{ "enabled": true }`, `["foo", "bar"]`) description and checking values inside
+- More than one value for one toggle name
+- Parsing the value directly from the cookie string (e.g. `LOREMIPSUM=TrUe`, `LOREMIPSUM=4`), and normalizing it to a boolean (e.g. as boolean `true`, as number `4`) -- Cookies are always strings (unless we add parsing).
+
+### Limitations
+
+- No parsing of cookie values (e.g. `LOREMIPSUM=TrUe`) and the current implementation would only support for existence (`) .
+
 ## Testing
 
 `parseCookieString` is pure and does not touch the DOM.
@@ -68,5 +95,5 @@ Each check accepts parsed entries as an optional second argument, so tests remai
 plain unit tests:
 
 ```ts
-expect(isCookieTrue('FLAG', parseCookieString('FLAG=true'))).toBe(true);
+expect(isCookieTrue('LOREMIPSUM', parseCookieString('LOREMIPSUM=true'))).toBe(true);
 ```

@@ -86,6 +86,8 @@ The library applies no truthiness rules, in the style of Perl or JavaScript.
 The URL route reaches `hasCookie` only.
 It writes `NAME=yes`, and the two boolean checks never match that value.
 So the boolean parsing is not reachable from the URL. This is a design property.
+The boolean checks exist for a future way of setting a toggle, other than the URL route.
+No such way exists today, and none is needed now.
 
 | Function | True when |
 |---|---|

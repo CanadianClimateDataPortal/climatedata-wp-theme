@@ -43,18 +43,14 @@ import {
 const hasToggleLoremIpsum: boolean = hasCookie(TOGGLE_COOKIE_NAME_BOOLEAN_LOREM_IPSUM);
 ```
 
-Enable a toggle in the DevTools console, then reload the page:
-
-```js
-// `path=/` matches the writers, so `disableCookieToggle` can delete this cookie later.
-document.cookie = 'LOREMIPSUM=true; path=/';
-```
+Set the toggle from the URL, as the next section describes.
 
 ## From a URL
 
-Someone who does not write JavaScript can set the same cookie from the address bar.
+The supported way to set a toggle is a URL query parameter.
+It is the only supported way, and it stays this simple on purpose.
 The parameter has the same name as the cookie.
-Use `1` to add the cookie and `0` to remove it.
+`?NAME=1` enables the toggle, and `?NAME=0` disables it.
 
 ```
 https://climatedata.ca/maps/?…&LOREMIPSUM=1
@@ -73,6 +69,7 @@ A link copied afterwards therefore does not pass the toggle to someone who did n
 `enableCookieToggle(name)` and `disableCookieToggle(name)` write the cookie.
 `enableCookieToggle` writes `NAME=yes` with `path=/` and a lifetime of 90 days.
 `disableCookieToggle` deletes the cookie on `path=/`.
+Check a toggle set this way with `hasCookie`.
 
 ## Three checks
 
@@ -86,6 +83,10 @@ The library parses cookies in the simplest way, on purpose, to stay simple.
 No other value counts: not `1`, not `yes`, not `TRUE`.
 The library applies no truthiness rules, in the style of Perl or JavaScript.
 
+The URL route reaches `hasCookie` only.
+It writes `NAME=yes`, and the two boolean checks never match that value.
+So the boolean parsing is not reachable from the URL. This is a design property.
+
 | Function | True when |
 |---|---|
 | `hasCookie(name)` | The cookie is set, whatever its value. |
@@ -93,9 +94,17 @@ The library applies no truthiness rules, in the style of Perl or JavaScript.
 | `isCookieFalse(name)` | The cookie is set and its value is exactly `false`. |
 
 Choose the check that matches the behaviour you are fencing.
-Use `hasCookie` when the worst outcome is a visible but unfinished entry point.
-Use `isCookieTrue` when the feature must stay off unless someone explicitly enables it.
+Use `hasCookie` for a toggle set from the URL. This is the supported case.
+Use `isCookieTrue` only when the feature must stay off unless a developer sets the cookie to exactly `true` by hand.
 An absent or unreadable value then counts as "no".
+
+A developer can exercise the boolean checks from the DevTools console, then reload the page.
+This is a developer convenience, not a supported way to set a toggle.
+
+```js
+// `path=/` matches the writers, so `disableCookieToggle` can delete this cookie later.
+document.cookie = 'LOREMIPSUM=true; path=/';
+```
 
 To fence the opposite behaviour, give it a name of its own, for example `NO_LOREMIPSUM` beside `LOREMIPSUM`.
 This is a naming convention only. The library gives `NO_` no meaning.
@@ -115,10 +124,10 @@ Anyone can set these cookies from the console, so do not use them to gate data.
 - **Per browser, at runtime.** A toggle lives in one browser. It is not per user, not server-side, and not a build-time switch. PHP cannot see it.
 - **Maps app only, for the URL.** Only the Maps app runs `use-url-sync.ts`. The Download app never reads the URL parameter.
 - **No change event.** Nothing announces a change to the cookie. Code sees the new value on its next read, so reload the page after a change.
-- **The writers write `yes`.** A cookie set through the URL or `enableCookieToggle` satisfies `hasCookie`, but never `isCookieTrue` or `isCookieFalse`. Those two need a cookie set by hand to exactly `true` or `false`.
+- **The URL reaches `hasCookie` only.** The URL route and `enableCookieToggle` write `NAME=yes`. By design, `isCookieTrue` and `isCookieFalse` never match it.
 - **Names are plain strings.** A typo in a name still compiles, and the check silently returns `false`. Import the constant from `toggle-names.ts` rather than retype the string.
 - **No tests ship** with this library.
-- **DevTools cookies need `path=/`.** Without it, the browser gives the cookie the current path. `disableCookieToggle` deletes on `path=/`, so it can fail to delete that cookie. Use `document.cookie = "NAME=true; path=/"`.
+- **DevTools cookies need `path=/`.** This applies to the developer convenience above. Without it, the browser gives the cookie the current path. `disableCookieToggle` deletes on `path=/`, so it can fail to delete that cookie. Use `document.cookie = "NAME=true; path=/"`.
 - **Shared cache.** `readCookieEntries` caches the parsed cookies at module level. Tests that rely on the default `entries` argument share that state.
 
 ## Testing

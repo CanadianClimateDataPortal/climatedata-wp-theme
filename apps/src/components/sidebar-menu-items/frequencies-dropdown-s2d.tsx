@@ -35,34 +35,20 @@ const FrequencyField = {
 			value: S2DFrequencyTypes.SEASONAL,
 			label: __('Seasonal (3 months)'),
 		},
+		{
+			value: S2DFrequencyTypes.DECADAL_ANNUAL,
+			label: formatLabelDecadalFrequencyField(S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_ANNUAL]!),
+		},
+		{
+			value: S2DFrequencyTypes.DECADAL_MAY_SEP,
+			label: formatLabelDecadalFrequencyField(S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_MAY_SEP]!),
+		},
+		{
+			value: S2DFrequencyTypes.DECADAL_NOV_MAR,
+			label: formatLabelDecadalFrequencyField(S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_NOV_MAR]!),
+		},
 	],
 };
-
-const DECADAL_FREQUENCIES = [
-	{
-		value: S2DFrequencyTypes.DECADAL_ANNUAL,
-		label: formatLabelDecadalFrequencyField(S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_ANNUAL]!),
-	},
-	{
-		value: S2DFrequencyTypes.DECADAL_MAY_SEP,
-		label: formatLabelDecadalFrequencyField(S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_MAY_SEP]!),
-	},
-	{
-		value: S2DFrequencyTypes.DECADAL_NOV_MAR,
-		label: formatLabelDecadalFrequencyField(S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_NOV_MAR]!),
-	},
-];
-
-// Build this list once so it already contains every option if it becomes the
-// dropdown's default list later.
-//
-// The decadal options stay hidden until they are ready for a public audience.
-// `TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS` documents how to reveal them.
-// Removing the toggle means merging these two option lists into one.
-const FREQUENCY_OPTIONS = [
-	...FrequencyField.options,
-	...DECADAL_FREQUENCIES,
-];
 
 interface FrequenciesDropdownS2DProps {
 	tooltip?: React.ReactNode;
@@ -80,7 +66,7 @@ export const FrequenciesDropdownS2D = (
 
 	const value = climateVariable?.getFrequency() ?? S2DFrequencyTypes.MONTHLY;
 
-	const options = FREQUENCY_OPTIONS;
+	const options = FrequencyField.options;
 
 	const fieldProps = {
 		label: FrequencyField.label,

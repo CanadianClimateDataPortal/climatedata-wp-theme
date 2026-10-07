@@ -1,34 +1,36 @@
-import { TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS } from './toggle-names';
 import { enableCookieToggle, disableCookieToggle } from './cookie-writes';
 
 /**
- * Uses a specific string as a marker to create a cookie with a non-empty value.
+ * Sets or deletes the toggle cookie `name` from a URL parameter of the same name.
  *
- * Only specific values are recognised; see `toggle-names.ts`.
- * When the toggle checks only whether a cookie exists (`hasCookie`), the same
- * string can be used for the URL parameter and the cookie name.
+ * `?NAME=1` writes the cookie through `enableCookieToggle`.
+ * `?NAME=0` deletes it through `disableCookieToggle`.
+ * Any other value changes nothing.
+ * The parameter is then removed from the address bar, and the hash is kept.
+ * A link copied afterwards therefore does not pass the toggle on.
  *
- * Use `?EXAMPLE_TOGGLE_NAME=1` to add the cookie and `=0` to remove it.
+ * Only the name passed by the caller is read.
+ * The cookie then satisfies `hasCookie(name)`, so the parameter and the cookie can share one name.
  */
-export const applyFeatureToggleFromUrl = (): void => {
+export const applyFeatureToggleFromUrl = (name: string): void => {
 	if (typeof window === 'undefined') {
 		return;
 	}
 
 	const params = new URLSearchParams(window.location.search);
-	const value = params.get(TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS);
+	const value = params.get(name);
 
 	if (value === null) {
 		return;
 	}
 
 	if (value === '1') {
-		enableCookieToggle(TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS);
+		enableCookieToggle(name);
 	} else if (value === '0') {
-		disableCookieToggle(TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS);
+		disableCookieToggle(name);
 	}
 
-	params.delete(TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS);
+	params.delete(name);
 
 	const search = params.toString();
 	const newUrl = `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`;

@@ -5,10 +5,6 @@ import { __ } from '@/context/locale-provider';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 import Dropdown from '@/components/ui/dropdown';
-import {
-	hasCookie,
-	TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS,
-} from '@/lib/feature-toggling';
 
 import {
 	S2DFrequencyTypes,
@@ -42,7 +38,7 @@ const FrequencyField = {
 	],
 };
 
-const S2D_FREQUENCIES_TO_ADD_SUPPORT = [
+const DECADAL_FREQUENCIES = [
 	{
 		value: S2DFrequencyTypes.DECADAL_ANNUAL,
 		label: formatLabelDecadalFrequencyField(S2D_DECADAL_FREQUENCY_LABELS[S2DFrequencyTypes.DECADAL_ANNUAL]!),
@@ -63,9 +59,9 @@ const S2D_FREQUENCIES_TO_ADD_SUPPORT = [
 // The decadal options stay hidden until they are ready for a public audience.
 // `TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS` documents how to reveal them.
 // Removing the toggle means merging these two option lists into one.
-const FREQUENCY_OPTIONS_WITH_DECADAL = [
+const FREQUENCY_OPTIONS = [
 	...FrequencyField.options,
-	...S2D_FREQUENCIES_TO_ADD_SUPPORT,
+	...DECADAL_FREQUENCIES,
 ];
 
 interface FrequenciesDropdownS2DProps {
@@ -84,9 +80,7 @@ export const FrequenciesDropdownS2D = (
 
 	const value = climateVariable?.getFrequency() ?? S2DFrequencyTypes.MONTHLY;
 
-	const options = hasCookie(TOGGLE_COOKIE_DECADAL_FREQUENCY_OPTIONS)
-		? FREQUENCY_OPTIONS_WITH_DECADAL
-		: FrequencyField.options;
+	const options = FREQUENCY_OPTIONS;
 
 	const fieldProps = {
 		label: FrequencyField.label,

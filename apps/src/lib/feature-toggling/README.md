@@ -54,14 +54,19 @@ It is the only supported way, and it stays this simple on purpose.
 The parameter has the same name as the cookie.
 `?NAME=1` creates the cookie, and `?NAME=0` deletes it.
 Any other value of the parameter, such as `?NAME=true`, leaves the cookie unchanged.
+The route exists only to add and remove a cookie, so `hasCookie` is the only check, and the library does not parse cookie values.
+If a toggle ever needs a value, write a string parser at that time.
 
 ```
 https://climatedata.ca/maps/?…&TRY_NEW_THING=1
 https://donneesclimatiques.ca/cartes/?…&TRY_NEW_THING=0
+https://climatedata.ca/download/?…&TRY_NEW_THING=1
+https://donneesclimatiques.ca/telechargement/?…&TRY_NEW_THING=0
 ```
 
-`src/hooks/use-url-sync.ts` calls `applyFeatureToggleFromUrl()` on every Maps page load, before the other URL processing.
-That hook runs in the Maps app only, so the route works on Maps pages only.
+Both entry points, `src/main-map.tsx` and `src/main-download.tsx`, call `applyFeatureToggleFromUrl()` at module scope, before React renders.
+A gated component then reads the cookie on its first render.
+So the route works on Maps pages and on Download pages.
 
 The handler reads only the names listed in `URL_FEATURE_TOGGLES`, in `toggle-names.ts`.
 When the list is empty, no URL parameter sets a toggle.
@@ -79,61 +84,37 @@ export const URL_FEATURE_TOGGLES: readonly string[] = [
 
 The handler removes the parameter from the URL after it reads it, whatever its value, and keeps the hash.
 It rewrites the URL once, and only when it removed at least one parameter.
-`use-url-sync.ts` keeps the app state in the URL, but a toggle is not app state.
+Each app keeps its state in the URL, but a toggle is not app state.
+The Maps app syncs the URL in `use-url-sync.ts`, and the Download app syncs it in `use-download-url-sync.ts`.
 So the handler runs first and removes its parameter, and the toggle parameter does not stay in the URL.
 
 `enableCookieToggle(name)` and `disableCookieToggle(name)` write the cookie.
 `enableCookieToggle` creates the cookie with `path=/` and a lifetime of 90 days.
 `disableCookieToggle` deletes the cookie on `path=/`.
+The same code serves two domains, climatedata.ca and donneesclimatiques.ca.
+The apps live at a different path per language, for example `/maps/`, `/cartes/` or `/download/`.
+So the writers set the cookie with `path=/` and with no domain attribute.
 Check a toggle set this way with `hasCookie`.
 The check asks only whether the cookie exists. Its value does not matter.
 
-## Three checks
+## The check
 
-Each check returns a boolean.
+`hasCookie` returns a boolean.
+It checks only that the cookie exists. It never reads the value.
 The library parses cookies in the simplest way, on purpose, to stay simple.
 
-- `hasCookie` checks only that the cookie exists. It never reads the value.
-- `isCookieTrue` matches only the exact string `NAME=true`.
-- `isCookieFalse` matches only the exact string `NAME=false`.
-
-No other value counts: not `1`, not `TRUE`.
 A browser gives URL parameter values and cookie values as plain strings, with no type.
 The library does not parse them into typed values.
 The URL handler compares the parameter to exactly the strings `'1'` and `'0'`.
-`isCookieTrue` and `isCookieFalse` compare the cookie to exactly the strings `'true'` and `'false'`.
-
-The boolean checks exist for a way of setting a toggle other than the URL route.
-Only a cookie set by hand reaches them, as the DevTools example below shows.
 
 | Function | True when |
 |---|---|
 | `hasCookie(name)` | The cookie is set, whatever its value. |
-| `isCookieTrue(name)` | The cookie is set and its value is exactly `true`. |
-| `isCookieFalse(name)` | The cookie is set and its value is exactly `false`. |
-
-Choose the check that matches the behaviour you are fencing.
-Use `hasCookie` for a toggle set from the URL. This is the supported case.
-Use `isCookieTrue` only when the feature must stay off unless a developer sets the cookie to exactly `true` by hand.
-An absent or unreadable value then counts as "no".
-
-A developer can exercise the boolean checks from the DevTools console, then reload the page.
-This is a developer convenience, not a supported way to set a toggle.
-
-```js
-document.cookie = 'TRY_NEW_THING=true; path=/';
-```
-
-The same code serves two domains, climatedata.ca and donneesclimatiques.ca.
-The apps live at a different path per language, for example `/maps/`, `/cartes/` or `/download/`.
-So the writers set the cookie with `path=/` and with no domain attribute.
-A cookie set by hand must use `path=/` too.
-Without it, the browser gives the cookie the current path, and `disableCookieToggle` cannot delete it.
 
 To fence the opposite behaviour, give it a name of its own, for example `NO_TRY_NEW_THING` beside `TRY_NEW_THING`.
 This is a naming convention only. The library gives `NO_` no meaning.
 
-These checks do not establish trust.
+This check does not establish trust.
 Anyone can set these cookies from the console, so do not use them to gate data.
 
 ### Non-implemented toggles
@@ -146,21 +127,21 @@ Anyone can set these cookies from the console, so do not use them to gate data.
 
 - **Listed names only.** The URL route covers only the names in `URL_FEATURE_TOGGLES`. See [From a URL](#from-a-url).
 - **Per browser, at runtime.** A toggle lives in one browser. It is not per user, not server-side, and not a build-time switch. PHP cannot see it.
-- **Maps app only, for the URL.** Only the Maps app runs `use-url-sync.ts`. The Download app never reads the URL parameter.
-- **No change event.** Nothing announces a change to the cookie. Code sees the new value on its next read, so reload the page after a change.
+- **Two entry points.** `main-map.tsx` and `main-download.tsx` each call the handler. A new app entry point needs its own call, or the URL route does nothing there.
+- **No change event.** Nothing announces a change to the cookie. Code sees the new value on its next read, so reload the page after you change the cookie by hand, for example from DevTools.
 - **The URL route is an existence toggle.** `?NAME=1` creates the cookie, and `?NAME=0` deletes it. `hasCookie` checks only that the cookie exists, and its value does not matter.
-- **Cookie values have no type.** The URL route cannot reach `isCookieTrue` or `isCookieFalse`, because it only creates or deletes the cookie. This is the cost of letting a non-developer remove a toggle without DevTools.
 - **Names are plain strings.** A typo in a name still compiles, and the check silently returns `false`. Import the constant from `toggle-names.ts` rather than retype the string.
 - **No tests ship** with this library.
 
 ## Testing
 
 `parseCookieString` is pure and does not touch the DOM.
-Each check accepts parsed entries as an optional second argument, so tests remain
+`hasCookie` accepts parsed entries as an optional second argument, so tests remain
 plain unit tests:
 
 ```ts
-expect(isCookieTrue('TRY_NEW_THING', parseCookieString('TRY_NEW_THING=true'))).toBe(true);
+expect(hasCookie('TRY_NEW_THING', parseCookieString('TRY_NEW_THING=1'))).toBe(true);
+expect(hasCookie('TRY_NEW_THING', parseCookieString('OTHER_THING=1'))).toBe(false);
 ```
 
 Pass `entries` explicitly in tests, so that each test controls its own cookies.

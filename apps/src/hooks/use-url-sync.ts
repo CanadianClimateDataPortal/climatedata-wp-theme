@@ -30,7 +30,6 @@ import {
 	assertIsForecastDisplay,
 	assertIsForecastType,
 } from '@/types/assertions';
-import { applyFeatureToggleFromUrl } from '@/lib/feature-toggling';
 
 /**
  * Synchronizes state with URL params from climate variable state
@@ -487,9 +486,6 @@ export const useUrlSync = () => {
 	 * current URL parameters and default values.
 	 */
 	useEffect(() => {
-		// Read and remove the feature-toggle parameter before processing any other URL state.
-		applyFeatureToggleFromUrl();
-
 		if (isInitialized || urlProcessingCompleteRef.current) return;
 		const params = new URLSearchParams(window.location.search);
 

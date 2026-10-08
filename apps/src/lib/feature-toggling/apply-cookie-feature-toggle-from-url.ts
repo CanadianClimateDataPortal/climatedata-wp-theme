@@ -13,8 +13,11 @@ import { enableCookieToggle, disableCookieToggle } from './cookie-writes';
  *
  * The address bar is rewritten once, and only when at least one parameter was removed.
  * The hash is kept.
- * `use-url-sync.ts` keeps the app state in the URL, and a toggle is not app state.
- * So the handler runs first and removes its parameter.
+ * Each app keeps its state in the URL, and a toggle is not app state.
+ * The Maps app syncs the URL in `use-url-sync.ts`.
+ * The Download app syncs it in `use-download-url-sync.ts`, through `useDownloadUrlSync` in `download-provider.tsx`.
+ * So both entry points, `main-map.tsx` and `main-download.tsx`, call this handler at module scope, before React renders.
+ * That order removes the parameter before either URL sync can copy it into the app state.
  * When `URL_FEATURE_TOGGLES` is empty, the handler does nothing.
  *
  * The cookie then satisfies `hasCookie(NAME)`, so the parameter and the cookie can share one name.

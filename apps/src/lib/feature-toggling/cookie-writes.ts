@@ -1,5 +1,5 @@
 /**
- * Writes the cookies read by the checks in `cookie-toggles.ts`.
+ * Writes the cookies read by the check in `cookie-toggles.ts`.
  *
  * A toggle is read on every render and written only when someone enables or
  * disables it, so reading and writing live in separate files.

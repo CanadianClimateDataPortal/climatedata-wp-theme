@@ -149,7 +149,7 @@ Anyone can set these cookies from the console, so do not use them to gate data.
 - **Maps app only, for the URL.** Only the Maps app runs `use-url-sync.ts`. The Download app never reads the URL parameter.
 - **No change event.** Nothing announces a change to the cookie. Code sees the new value on its next read, so reload the page after a change.
 - **The URL route is an existence toggle.** `?NAME=1` creates the cookie, and `?NAME=0` deletes it. `hasCookie` checks only that the cookie exists, and its value does not matter.
-- **Cookie values have no type.** The URL route cannot reach either one, because it only creates or deletes the cookie. This is the cost of letting a non-developer remove a toggle without DevTools.
+- **Cookie values have no type.** The URL route cannot reach `isCookieTrue` or `isCookieFalse`, because it only creates or deletes the cookie. This is the cost of letting a non-developer remove a toggle without DevTools.
 - **Names are plain strings.** A typo in a name still compiles, and the check silently returns `false`. Import the constant from `toggle-names.ts` rather than retype the string.
 - **No tests ship** with this library.
 

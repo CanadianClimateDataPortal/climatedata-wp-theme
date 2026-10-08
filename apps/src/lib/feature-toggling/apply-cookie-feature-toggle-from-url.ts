@@ -8,12 +8,13 @@ import { enableCookieToggle, disableCookieToggle } from './cookie-writes';
  * For each name:
  * - `?NAME=1` writes the cookie through `enableCookieToggle`.
  * - `?NAME=0` deletes it through `disableCookieToggle`.
- * - Any other value changes nothing.
+ * - Any other value leaves the cookie unchanged.
  * - The parameter is then removed from the address bar.
  *
  * The address bar is rewritten once, and only when at least one parameter was removed.
  * The hash is kept.
- * A link copied afterwards therefore does not pass the toggle on.
+ * `use-url-sync.ts` keeps the app state in the URL, and a toggle is not app state.
+ * So the handler runs first and removes its parameter.
  * When `URL_FEATURE_TOGGLES` is empty, the handler does nothing.
  *
  * The cookie then satisfies `hasCookie(NAME)`, so the parameter and the cookie can share one name.

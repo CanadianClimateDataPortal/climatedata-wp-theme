@@ -57,13 +57,22 @@ https://climatedata.ca/maps/?…&LOREMIPSUM=1
 https://donneesclimatiques.ca/cartes/?…&LOREMIPSUM=0
 ```
 
-This works only when the code calls `applyFeatureToggleFromUrl('LOREMIPSUM')` with that name.
-Nothing calls it today.
-To enable the route, call it from `src/hooks/use-url-sync.ts`, before the other URL processing.
+`src/hooks/use-url-sync.ts` already calls `applyFeatureToggleFromUrl()` on every Maps page load, before the other URL processing.
 That hook runs in the Maps app only, so the route works on Maps pages only.
+
+The handler reads only the names listed in `URL_FEATURE_TOGGLES`, in `toggle-names.ts`.
+That list is empty today, so no URL parameter sets a toggle.
+To enable the route for a toggle, declare its name in `toggle-names.ts`, then add it to the list.
+
+```ts
+// File: `src/lib/feature-toggling/toggle-names.ts`
+
+export const URL_FEATURE_TOGGLES: readonly string[] = [TOGGLE_COOKIE_NAME_BOOLEAN_LOREM_IPSUM];
+```
 
 Any other value does nothing.
 The handler removes the parameter from the URL after it reads it, and keeps the hash.
+It rewrites the URL once, and only when it removed at least one parameter.
 A link copied afterwards therefore does not pass the toggle to someone who did not ask for it.
 
 `enableCookieToggle(name)` and `disableCookieToggle(name)` write the cookie.
@@ -121,7 +130,7 @@ Anyone can set these cookies from the console, so do not use them to gate data.
 
 ### Limitations
 
-- **One name per call.** `applyFeatureToggleFromUrl(name)` handles only the name its caller passes, and nothing calls it today. To get the `?NAME=1` and `?NAME=0` route, call `applyFeatureToggleFromUrl(NAME)` from `src/hooks/use-url-sync.ts`.
+- **Listed names only.** `applyFeatureToggleFromUrl()` handles only the names in `URL_FEATURE_TOGGLES`, and that list is empty today. `src/hooks/use-url-sync.ts` already calls it. To get the `?NAME=1` and `?NAME=0` route for a toggle, add its name to that list.
 - **Per browser, at runtime.** A toggle lives in one browser. It is not per user, not server-side, and not a build-time switch. PHP cannot see it.
 - **Maps app only, for the URL.** Only the Maps app runs `use-url-sync.ts`. The Download app never reads the URL parameter.
 - **No change event.** Nothing announces a change to the cookie. Code sees the new value on its next read, so reload the page after a change.

@@ -67,7 +67,9 @@ To enable the route for a toggle, declare its name in `toggle-names.ts`, then ad
 ```ts
 // File: `src/lib/feature-toggling/toggle-names.ts`
 
-export const URL_FEATURE_TOGGLES: readonly string[] = [TOGGLE_COOKIE_NAME_BOOLEAN_LOREM_IPSUM];
+export const URL_FEATURE_TOGGLES: readonly string[] = [
+	TOGGLE_COOKIE_NAME_BOOLEAN_LOREM_IPSUM,
+];
 ```
 
 Any other value does nothing.

@@ -11,9 +11,15 @@ import App from '@/components/download/app';
 import { store } from '@/app/store';
 import SectionContext from "@/context/section-provider";
 import { ShapefileProvider } from '@/context/shapefile-provider';
+import { applyFeatureToggleFromUrl } from '@/lib/feature-toggling';
 
 import '@/Global.css';
 import { ClimateVariableProvider } from "@/context/climate-variable-provider";
+
+// Runs while this module is still evaluating, ahead of the React render below.
+// A gated component then reads the toggle cookie on its first render.
+// It removes the toggle parameter before `useDownloadUrlSync` (`use-download-url-sync.ts`) reads the URL.
+applyFeatureToggleFromUrl();
 
 const i18n = createI18n();
 

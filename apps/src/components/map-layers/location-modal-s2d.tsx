@@ -250,6 +250,7 @@ export const LocationModalS2D = (
 	const dateRangeStart = dateRange ? dateRange[0] : null;
 
 	useEffect(() => {
+		setNoDataAvailable(false);
 		const loadingKey = `${latlng.lat}-${latlng.lng}-${variableId}-${frequency}-${dateRangeStart}`;
 		const period = dateRangeStart ? utc(dateRangeStart) : null;
 
@@ -276,7 +277,6 @@ export const LocationModalS2D = (
 				}
 
 				setLocationData(loadedLocationData);
-				setNoDataAvailable(false);
 			} catch (error) {
 				setNoDataAvailable(true);
 				if (error instanceof FetchError) {

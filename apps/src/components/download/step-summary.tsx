@@ -93,7 +93,7 @@ const StepSummary = () => {
 		if (stepNames.includes("StepVariable")) {
 			summaryData.push({
 				title: __('Variable'),
-				content: [__(climateVariable?.getTitle() ?? '')],
+				content: [climateVariable?.getTitle(locale) ?? ''],
 			});
 		}
 

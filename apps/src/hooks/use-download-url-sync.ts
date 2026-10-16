@@ -8,6 +8,7 @@ import { fetchTaxonomyData, fetchPostsData } from '@/services/services';
 import { initializeDownloadUrlSync, setDownloadUrlParamsLoaded, resetDownloadUrlSync } from '@/features/download/download-url-sync-slice';
 import { buildDownloadUrlParams, URL_PARAMS } from '@/lib/url-params';
 import { normalizePostData } from '@/lib/format';
+import { useLocale } from '@/hooks/use-locale';
 
 /**
  * Synchronizes download state with URL params
@@ -17,6 +18,7 @@ export const useDownloadUrlSync = () => {
 	const updateTimeoutRef = useRef<number | null>(null);
 	const urlProcessingCompleteRef = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
+	const { locale } = useLocale();
 
 	// Get the URL sync state
 	const isInitialized = useAppSelector((state) => state.downloadUrlSync.isInitialized);
@@ -113,7 +115,7 @@ export const useDownloadUrlSync = () => {
 
 						if (variableParam) {
 							const variables = await fetchPostsData('variables', 'download', matchedDataset, {});
-							const normalizedVariables = await normalizePostData(variables, 'en');
+							const normalizedVariables = await normalizePostData(variables, locale);
 
 							// Find the matching config
 							const matchedVariable = ClimateVariables.find(
@@ -153,7 +155,7 @@ export const useDownloadUrlSync = () => {
 				dispatch(setDownloadUrlParamsLoaded(true));
 			}
 		})();
-	}, [dispatch, isInitialized]);
+	}, [dispatch, isInitialized, locale]);
 
 	useEffect(() => {
 		if (!isInitialized) return;

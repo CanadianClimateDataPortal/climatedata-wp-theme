@@ -490,7 +490,7 @@ export interface ClimateVariableInterface {
 	/** Returns the post ID for the variable, if available. */
 	getPostId(): number | undefined;
 
-	getTitle(): string | null;
+	getTitle(locale?: string): string | null;
 
 	getDatasetType(): string | null;
 

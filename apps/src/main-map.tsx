@@ -7,6 +7,7 @@ import { I18nProvider } from '@wordpress/react-i18n';
 import { LocaleProvider } from '@/context/locale-provider';
 import { store } from '@/app/store';
 import { installPrepareRasterStub } from '@/lib/map/image-rastering';
+import { applyFeatureToggleFromUrl } from '@/lib/feature-toggling';
 
 import App from '@/App';
 
@@ -15,6 +16,10 @@ import SectionContext from "@/context/section-provider";
 
 // Runs while this module is still evaluating, ahead of the React render below.
 installPrepareRasterStub();
+
+// Also runs ahead of the React render, so a gated component reads the toggle cookie on its first render.
+// It removes the toggle parameter before `use-url-sync.ts` reads the URL.
+applyFeatureToggleFromUrl();
 
 const i18n = createI18n();
 

@@ -29,6 +29,18 @@ The name must be valid both as a cookie name and as a URL parameter.
 export const TOGGLE_EXAMPLE_FEATURE = 'TRY_NEW_THING' as const;
 ```
 
+To enable the route for a toggle, declare its name in `toggle-names.ts`, then add it to the list.
+
+```ts
+// File: `src/lib/feature-toggling/toggle-names.ts`
+
+// At the bottom, after the other (possible) feature toggle names.
+
+export const URL_FEATURE_TOGGLES: readonly string[] = [
+	TOGGLE_EXAMPLE_FEATURE,
+];
+```
+
 The constant name and the toggle name are two different things.
 Code imports the constant, and the cookie and the URL parameter use the string.
 
@@ -70,17 +82,6 @@ So the route works on Maps pages and on Download pages.
 
 The handler reads only the names listed in `URL_FEATURE_TOGGLES`, in `toggle-names.ts`.
 When the list is empty, no URL parameter sets a toggle.
-To enable the route for a toggle, declare its name in `toggle-names.ts`, then add it to the list.
-
-```ts
-// File: `src/lib/feature-toggling/toggle-names.ts`
-
-// At the bottom, after the other (possible) feature toggle names.
-
-export const URL_FEATURE_TOGGLES: readonly string[] = [
-	TOGGLE_EXAMPLE_FEATURE,
-];
-```
 
 The handler removes the parameter from the URL after it reads it, whatever its value, and keeps the hash.
 It rewrites the URL once, and only when it removed at least one parameter.

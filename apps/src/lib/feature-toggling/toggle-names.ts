@@ -1,8 +1,7 @@
 /**
  * Names of the cookies that toggle unfinished features.
  *
- * To declare one, export a string constant here, for example
- * `export const TOGGLE_EXAMPLE_FEATURE = 'TRY_NEW_THING' as const;`
+ * To declare one, export a string constant here.
  * The constant name and the toggle name are two different things.
  *
  * The toggle name is a plain string because it is the key that
@@ -14,6 +13,9 @@
  * A name lives here, not beside the code it gates, because more than one place
  * reads it: the check that gates the feature, and `applyFeatureToggleFromUrl`
  * when the toggle can also be set from a URL.
+ *
+ * @example
+ * export const TOGGLE_EXAMPLE_FEATURE = 'TRY_NEW_THING' as const;
  */
 
 /**

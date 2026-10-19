@@ -236,6 +236,8 @@ export const LocationModalS2D = (
 
 	const hasDataLoaded = !!(locationData && releaseDate);
 
+	const [ noDataAvailable, setNoDataAvailable ] = useState<boolean>(false);
+
 	const variableId = climateVariable?.getId() ?? '';
 	const unit = climateVariable?.getUnit() ?? '';
 	const frequency = (climateVariable?.getFrequency() ??
@@ -248,6 +250,7 @@ export const LocationModalS2D = (
 	const dateRangeStart = dateRange ? dateRange[0] : null;
 
 	useEffect(() => {
+		setNoDataAvailable(false);
 		const loadingKey = `${latlng.lat}-${latlng.lng}-${variableId}-${frequency}-${dateRangeStart}`;
 		const period = dateRangeStart ? utc(dateRangeStart) : null;
 
@@ -275,6 +278,7 @@ export const LocationModalS2D = (
 
 				setLocationData(loadedLocationData);
 			} catch (error) {
+				setNoDataAvailable(true);
 				if (error instanceof FetchError) {
 					// In case of a fetch error, we show it in the console, but
 					// we don't propagate it to avoid blocking the rest of the
@@ -309,6 +313,18 @@ export const LocationModalS2D = (
 	// Until both the location data and the release date are loaded, we pass
 	// `null` as location data to the component.
 	const effectiveLocationData = hasDataLoaded ? locationData : null;
+
+	if (noDataAvailable) {
+		return (
+			<>
+				<section className="mt-4 mb-3">
+					<div className="text-base text-neutral-grey-medium italic">
+						{__('No data available.')}
+					</div>
+				</section>
+			</>
+		)
+	}
 
 	return (
 		<LocationModalContentPart

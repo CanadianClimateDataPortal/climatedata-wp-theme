@@ -158,7 +158,7 @@ Breadcrumbs.displayName = 'Breadcrumbs';
 
 const ModalToggleButtons: React.FC<{
 	onToggleShare: () => void;
-}> = ({ onToggleShare, onToggleDownload }) => {
+}> = ({ onToggleShare }) => {
 	const buttonClassName = cn(MAP_HEADER_BUTTON_CLASS_NAME, 'border border-cold-grey-4');
 
 	return (

@@ -8,6 +8,7 @@ import { __ } from '@/context/locale-provider';
 import { useMapHeaderButtonsDownload } from '@/hooks/use-map-header-buttons-download';
 
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 
 export const MAP_HEADER_BUTTON_CLASS_NAME = [
 	'text-md font-normal leading-6 tracking-[0.8px] uppercase',
@@ -37,8 +38,9 @@ export const DownloadMapSplitButton = (
 			<div className="py-2">{__('Download') + ':'}</div>
 			<Button
 				variant="destructive"
-				className={buttonClassName}
+				className={buttonClassName + (imageDownloadButtonWorking ? ' opacity-50 pointer-events-none' : '')}
 				onClick={imageDownloadOnClick}
+				disabled={imageDownloadButtonWorking}
 			>
 				<span className="hidden sm:block">
 					{__('Map')}{' '}
@@ -46,7 +48,7 @@ export const DownloadMapSplitButton = (
 						{__('image from your viewport')}
 					</span>
 				</span>
-				<Camera />
+				{imageDownloadButtonWorking ? <Spinner className="stroke-white" /> : <Camera />}
 			</Button>
 			<Button
 				variant="destructive"

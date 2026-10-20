@@ -41,11 +41,14 @@ export const DownloadMapSplitButton = (
 				className={buttonClassName + (imageDownloadButtonWorking ? ' opacity-50 pointer-events-none' : '')}
 				onClick={imageDownloadOnClick}
 				disabled={imageDownloadButtonWorking}
+				aria-live="polite"
+				aria-atomic="true"
+  			aria-busy={imageDownloadButtonWorking ? 'true' : 'false'}
 			>
 				<span className="hidden sm:block">
 					{__('Map')}{' '}
 					<span className="sr-only">
-						{__('image from your viewport')}
+						{__('Download image from viewport')}
 					</span>
 				</span>
 				{imageDownloadButtonWorking ? <Spinner className="stroke-white" /> : <Camera />}

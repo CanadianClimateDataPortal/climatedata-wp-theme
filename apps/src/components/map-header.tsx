@@ -7,14 +7,17 @@
  *
  */
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { Info, Share2, Download } from 'lucide-react';
+import { Info, Share2 } from 'lucide-react';
 import { __ } from '@/context/locale-provider';
 import { cn } from '@/lib/utils';
 
 // components
 import VariableDetailsPanel from '@/components/map-info/variable-details-panel';
 import ShareMapModal from '@/components/map-info/share-map-modal';
-import DownloadMapModal from '@/components/map-info/download-map-modal';
+import {
+	DownloadMapSplitButton,
+	MAP_HEADER_BUTTON_CLASS_NAME,
+} from '@/components/map-info/download-map-split-button';
 import { Button } from '@/components/ui/button';
 
 // other
@@ -29,7 +32,6 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
  */
 const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement => {
 	const [shareInfo, setShareInfo] = useState<boolean>(false);
-	const [downloadInfo, setDownloadInfo] = useState<boolean>(false);
 	const [panelProps, setPanelProps] = useState<
 		ProviderPanelProps | undefined
 	>(undefined);
@@ -57,15 +59,6 @@ const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement 
 	 */
 	const toggleShareInfo = () => {
 		setShareInfo((prev) => !prev);
-		setDownloadInfo(false);
-	};
-
-	/**
-	 * Toggles the visibility of the Download modal.
-	 */
-	const toggleDownloadInfo = () => {
-		setDownloadInfo((prev) => !prev);
-		setShareInfo(false);
 	};
 
 	/**
@@ -90,19 +83,18 @@ const toggleVariableDetailsPanel = () => {
 						<Breadcrumbs
 							onClick={toggleVariableDetailsPanel}
 						/>
-						<ModalToggleButtons
-							onToggleShare={toggleShareInfo}
-							onToggleDownload={toggleDownloadInfo}
-						/>
+
+						<div className="flex gap-3 sm:gap-5 ml-auto">
+							<ModalToggleButtons
+								onToggleShare={toggleShareInfo}
+							/>
+							<DownloadMapSplitButton />
+						</div>
 					</div>
 				</div>
 			</aside>
 
 			<ShareMapModal isOpen={shareInfo} onClose={toggleShareInfo} />
-			<DownloadMapModal
-				isOpen={downloadInfo}
-				onClose={toggleDownloadInfo}
-			/>
 		</>
 	);
 };
@@ -166,41 +158,23 @@ Breadcrumbs.displayName = 'Breadcrumbs';
 
 const ModalToggleButtons: React.FC<{
 	onToggleShare: () => void;
-	onToggleDownload: () => void;
 }> = ({ onToggleShare, onToggleDownload }) => {
-	const buttonClasses =
-		'text-md font-normal leading-6 tracking-[0.8px] uppercase rounded-full h-7 sm:h-9 max-sm:py-1.5 max-sm:px-3';
+	const buttonClassName = cn(MAP_HEADER_BUTTON_CLASS_NAME, 'border border-cold-grey-4');
 
 	return (
-		<div className="flex gap-3 sm:gap-5 ml-auto">
-			<Button
-				variant="outline"
-				className={cn(buttonClasses, 'border border-cold-grey-4')}
-				onClick={onToggleShare}
-			>
-				<div className="hidden sm:block text-dark-purple">
-					{__('Share')}{' '}
-					<span className="sr-only">
-						{__('the current visible map')}
-					</span>
-				</div>
-				<Share2 />
-			</Button>
-
-			<Button
-				variant="destructive"
-				className={buttonClasses}
-				onClick={onToggleDownload}
-			>
-				<div className="hidden sm:block">
-					{__('Download')}{' '}
-					<span className="sr-only">
-						{__('image from your viewport')}
-					</span>
-				</div>
-				<Download />
-			</Button>
-		</div>
+		<Button
+			variant="outline"
+			className={buttonClassName}
+			onClick={onToggleShare}
+		>
+			<div className="hidden sm:block text-dark-purple">
+				{__('Share')}{' '}
+				<span className="sr-only">
+					{__('the current visible map')}
+				</span>
+			</div>
+			<Share2 />
+		</Button>
 	);
 };
 ModalToggleButtons.displayName = 'ModalToggleButtons';

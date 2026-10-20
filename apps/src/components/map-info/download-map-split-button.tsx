@@ -5,6 +5,8 @@ import { Download, Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { __ } from '@/context/locale-provider';
 
+import { useMapHeaderButtonsDownload } from '@/hooks/use-map-header-buttons-download';
+
 import { Button } from '@/components/ui/button';
 
 export const MAP_HEADER_BUTTON_CLASS_NAME = [
@@ -14,15 +16,29 @@ export const MAP_HEADER_BUTTON_CLASS_NAME = [
 
 export const DownloadMapSplitButton = (
 ): React.ReactElement => {
+	const {
+		downloadDataHref,
+		imageDownloadOnClick,
+		imageDownloadButtonWorking,
+	} = useMapHeaderButtonsDownload();
 
 	const buttonClassName = cn(MAP_HEADER_BUTTON_CLASS_NAME, 'gap-2 sm:gap-2');
 
+	const goToDataDownloadOnClick: React.MouseEventHandler<HTMLButtonElement> = (
+	) => {
+		window.open(downloadDataHref);
+	};
+
 	return (
-		<div className="flex gap-2">
+		<div
+			className="flex gap-2"
+			data-part="download-map-split-button"
+		>
 			<div className="py-2">{__('Download') + ':'}</div>
 			<Button
 				variant="destructive"
 				className={buttonClassName}
+				onClick={imageDownloadOnClick}
 			>
 				<span className="hidden sm:block">
 					{__('Map')}{' '}
@@ -35,12 +51,13 @@ export const DownloadMapSplitButton = (
 			<Button
 				variant="destructive"
 				className={buttonClassName}
+				onClick={goToDataDownloadOnClick}
+				aria-label={__(
+					'Go to download sections (opens in a new tab)'
+				)}
 			>
 				<span className="hidden sm:block">
 					{__('Data')}{' '}
-					<span className="sr-only">
-						{__('section to select data download')}
-					</span>
 				</span>
 				<Download />
 			</Button>

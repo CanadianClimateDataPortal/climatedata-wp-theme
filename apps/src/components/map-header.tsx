@@ -3,7 +3,8 @@
  *
  * A component serving as the header for the map. It displays the breadcrumbs
  * for the selected state of the map, a toggle for the variable details panel,
- * and buttons that toggle share and download map modals.
+ * a button that opens the share map modal, and the Map and Data download
+ * buttons.
  *
  */
 import React, { useEffect, useRef, useState, useMemo } from 'react';

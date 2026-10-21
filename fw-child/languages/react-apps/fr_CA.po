@@ -1664,3 +1664,6 @@ msgstr "Période de retour"
 
 msgid "Map"
 msgstr "Carte"
+
+msgid "Download:"
+msgstr "Télécharger :"

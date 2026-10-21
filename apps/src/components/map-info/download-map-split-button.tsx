@@ -51,7 +51,7 @@ export const DownloadMapSplitButton = (
 				className="max-sm:text-sm"
 				aria-hidden="true"
 			>
-				{__('Download') + ':'}
+				{__('Download:')}
 			</div>
 			<Button
 				variant="destructive"

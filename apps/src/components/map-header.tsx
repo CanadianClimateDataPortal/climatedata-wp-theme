@@ -86,10 +86,9 @@ const toggleVariableDetailsPanel = () => {
 						/>
 
 						<div className="flex gap-3 sm:gap-5 ml-auto">
-							<ModalToggleButtons
+							<ActionButtons
 								onToggleShare={toggleShareInfo}
 							/>
-							<DownloadMapSplitButton />
 						</div>
 					</div>
 				</div>
@@ -153,17 +152,17 @@ const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 };
 Breadcrumbs.displayName = 'Breadcrumbs';
 
-interface ModalToggleButtonsProps {
+interface ActionButtonsProps {
 	onToggleShare: () => void;
 }
 
 /**
- * ModalToggleButtons component, shows the button that toggles the share map modal.
- * The Map and Data download buttons live in `DownloadMapSplitButton`.
+ * ActionButtons, the buttons on the right of the breadcrumb to do actions about the map.
+ * Share button (instead of copying the map link) and Download buttons
  */
 
-const ModalToggleButtons = (
-	props: ModalToggleButtonsProps,
+const ActionButtons = (
+	props: ActionButtonsProps,
 ): React.ReactElement => {
 	const{
 		onToggleShare,
@@ -171,21 +170,24 @@ const ModalToggleButtons = (
 	const buttonClassName = cn(MAP_HEADER_BUTTON_CLASS_NAME, 'border border-cold-grey-4');
 
 	return (
-		<Button
-			variant="outline"
-			className={buttonClassName}
-			onClick={onToggleShare}
-		>
-			<div className="sr-only sm:not-sr-only text-dark-purple">
-				{__('Share')}{' '}
-				<span className="sr-only">
-					{__('the current visible map')}
-				</span>
-			</div>
-			<Share2 aria-hidden="true" />
-		</Button>
+		<>
+			<Button
+				variant="outline"
+				className={buttonClassName}
+				onClick={onToggleShare}
+			>
+				<div className="sr-only sm:not-sr-only text-dark-purple">
+					{__('Share')}{' '}
+					<span className="sr-only">
+						{__('the current visible map')}
+					</span>
+				</div>
+				<Share2 aria-hidden="true" />
+			</Button>
+			<DownloadMapSplitButton />
+		</>
 	);
 };
-ModalToggleButtons.displayName = 'ModalToggleButtons';
+ActionButtons.displayName = 'ActionButtons';
 
 export default MapHeader;

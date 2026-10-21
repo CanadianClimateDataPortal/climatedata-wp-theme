@@ -16,7 +16,10 @@ export const MAP_HEADER_BUTTON_CLASS_NAME = [
 ] as Readonly<string[]>;
 
 /**
- * A widget with two buttons: one for downloading the map image and one for downloading the data.
+ * The download buttons of the map header.
+ * The Map button saves a PNG image of the current map view, which the screenshot service makes.
+ * The Data button opens the Download app in a new tab, with the current dataset and variable selected.
+ * The two buttons sit close together, because both are about a download.
  */
 export const DownloadButtonGroup = (
 ): React.ReactElement => {

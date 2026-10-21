@@ -21,7 +21,7 @@ import { INTERNAL_URLS } from '@/lib/constants';
 export interface UseMapHeaderDownloadHook {
 	dataDownloadPageHref: string;
 	mapImageDownloadPending: boolean;
-	mapImageDownloadOnClick: () => Promise<void>;
+	startMapImageDownload: () => Promise<void>;
 }
 
 export const useMapHeaderDownload = (
@@ -148,7 +148,7 @@ export const useMapHeaderDownload = (
 
 	return {
 		mapImageDownloadPending: isGenerating,
-		mapImageDownloadOnClick: handleDownloadClick,
+		startMapImageDownload: handleDownloadClick,
 		dataDownloadPageHref: getDownloadUrl,
 	}
 };

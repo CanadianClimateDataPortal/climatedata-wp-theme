@@ -47,9 +47,9 @@ export const DownloadMapSplitButton = (
 			>
 				<span className="hidden sm:block">
 					{__('Map')}{' '}
-					<span className="sr-only">
-						{__('Download image from viewport')}
-					</span>
+				</span>
+				<span className="sr-only">
+					{__('Download image from viewport')}
 				</span>
 				{imageDownloadButtonWorking ? <Spinner className="stroke-white" /> : <Camera />}
 			</Button>

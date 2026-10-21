@@ -69,10 +69,12 @@ const PREPARE_RASTER_STUB_POLL_INTERVAL_MS = 50;
  * is registered inside the registration effect of
  * `useMapHeaderButtonsDownload`, which cannot run before the bundle finishes
  * parsing and React mounts.
- * A call arriving AFTER that component unmounts still finds a working function,
+ * A call arriving AFTER `DownloadMapSplitButton`, the component that calls that
+ * hook, unmounts still finds a working function,
  * and that is why its cleanup reinstalls this stub rather than clearing the key:
  * an absent key sends the service's call into `undefined`, warm load or cold.
- * That file registers the real implementation as
+ * That hook, in `hooks/use-map-header-buttons-download.ts`, registers the real
+ * implementation as
  * `window.$.fn.prepare_raster = prepare_raster` on mount, and calls this function
  * on unmount.
  *

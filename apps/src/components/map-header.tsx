@@ -154,7 +154,8 @@ const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 Breadcrumbs.displayName = 'Breadcrumbs';
 
 /**
- * ModalToggleButtons component, shows buttons that toggle modals with extra functionality for the map.
+ * ModalToggleButtons component, shows the button that toggles the share map modal.
+ * The Map and Data download buttons live in `DownloadMapSplitButton`.
  */
 
 const ModalToggleButtons: React.FC<{

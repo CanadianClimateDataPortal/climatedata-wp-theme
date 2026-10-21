@@ -30,6 +30,17 @@ export const DownloadMapSplitButton = (
 		window.open(downloadDataHref);
 	};
 
+	// `aria-disabled` keeps the button focusable while the service generates the
+	// image, so Enter and Space still reach this handler, which ignores them.
+	// A native `disabled` would move keyboard focus to the page body instead.
+	const mapDownloadOnClick: React.MouseEventHandler<HTMLButtonElement> = (
+	) => {
+		if (imageDownloadButtonWorking) {
+			return;
+		}
+		imageDownloadOnClick();
+	};
+
 	return (
 		<div
 			className="flex gap-2"
@@ -39,11 +50,8 @@ export const DownloadMapSplitButton = (
 			<Button
 				variant="destructive"
 				className={buttonClassName + (imageDownloadButtonWorking ? ' opacity-50 pointer-events-none' : '')}
-				onClick={imageDownloadOnClick}
-				disabled={imageDownloadButtonWorking}
-				aria-live="polite"
-				aria-atomic="true"
-  			aria-busy={imageDownloadButtonWorking ? 'true' : 'false'}
+				onClick={mapDownloadOnClick}
+				aria-disabled={imageDownloadButtonWorking}
 			>
 				<span className="hidden sm:block">
 					{__('Map')}{' '}
@@ -66,6 +74,12 @@ export const DownloadMapSplitButton = (
 				</span>
 				<Download />
 			</Button>
+			<span
+				role="status"
+				className="sr-only"
+			>
+				{imageDownloadButtonWorking ? __('Generating...') : ''}
+			</span>
 		</div>
 	)
 };

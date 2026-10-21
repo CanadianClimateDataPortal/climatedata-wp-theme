@@ -153,14 +153,21 @@ const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 };
 Breadcrumbs.displayName = 'Breadcrumbs';
 
+interface ModalToggleButtonsProps {
+	onToggleShare: () => void;
+}
+
 /**
  * ModalToggleButtons component, shows the button that toggles the share map modal.
  * The Map and Data download buttons live in `DownloadMapSplitButton`.
  */
 
-const ModalToggleButtons: React.FC<{
-	onToggleShare: () => void;
-}> = ({ onToggleShare }) => {
+const ModalToggleButtons = (
+	props: ModalToggleButtonsProps,
+): React.ReactElement => {
+	const{
+		onToggleShare,
+	} = props;
 	const buttonClassName = cn(MAP_HEADER_BUTTON_CLASS_NAME, 'border border-cold-grey-4');
 
 	return (

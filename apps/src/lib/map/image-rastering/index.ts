@@ -1,5 +1,5 @@
 /**
- * Screenshot round trip for the map Download button — sender in the user's browser,
+ * Screenshot round trip for the Map download button — sender in the user's browser,
  * receiver in the screenshot service's headless browser via `$.fn.prepare_raster()`.
  * Full walkthrough and symbol-by-symbol map: ./README.md.
  */

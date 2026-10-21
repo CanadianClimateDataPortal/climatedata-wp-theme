@@ -86,7 +86,7 @@ export const useMapHeaderButtonsDownload = (
 	]);
 
 	/**
-	 * Handles the click on the modal's "Download" button.
+	 * Handles the click on the "Map" button of `DownloadMapSplitButton`.
 	 *
 	 * POSTs the current view to the screenshot service, then saves the returned PNG as the downloaded map image.
 	 */

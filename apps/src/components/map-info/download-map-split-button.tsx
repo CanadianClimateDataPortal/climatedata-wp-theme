@@ -67,7 +67,7 @@ export const DownloadMapSplitButton = (
 				</span>
 				{imageDownloadButtonWorking
 					// `Spinner` takes no other props, so this wrapper hides it from assistive technology.
-					? <span className="flex" aria-hidden="true"><Spinner className="stroke-white" /></span>
+					? <span className="flex" aria-hidden="true"><Spinner className="stroke-white" size="1rem" /></span>
 					: <Camera aria-hidden="true" />
 				}
 			</Button>

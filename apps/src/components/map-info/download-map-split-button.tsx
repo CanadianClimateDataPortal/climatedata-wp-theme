@@ -43,12 +43,12 @@ export const DownloadMapSplitButton = (
 
 	return (
 		<div
-			className="flex gap-2"
+			className="flex items-center gap-2"
 			data-part="download-map-split-button"
 		>
 			{/* Each button's accessible name already says it downloads, so this label would only repeat it. */}
 			<div
-				className="py-2"
+				className="max-sm:text-sm"
 				aria-hidden="true"
 			>
 				{__('Download') + ':'}

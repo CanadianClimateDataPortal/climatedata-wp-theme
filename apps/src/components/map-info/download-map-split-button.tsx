@@ -46,7 +46,13 @@ export const DownloadMapSplitButton = (
 			className="flex gap-2"
 			data-part="download-map-split-button"
 		>
-			<div className="py-2">{__('Download') + ':'}</div>
+			{/* Each button's accessible name already says it downloads, so this label would only repeat it. */}
+			<div
+				className="py-2"
+				aria-hidden="true"
+			>
+				{__('Download') + ':'}
+			</div>
 			<Button
 				variant="destructive"
 				className={buttonClassName + (imageDownloadButtonWorking ? ' opacity-50 pointer-events-none' : '')}

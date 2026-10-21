@@ -15,10 +15,9 @@ import { cn } from '@/lib/utils';
 // components
 import VariableDetailsPanel from '@/components/map-info/variable-details-panel';
 import ShareMapModal from '@/components/map-info/share-map-modal';
-import {
-	DownloadMapSplitButton,
+import DownloadButtonGroup, {
 	MAP_HEADER_BUTTON_CLASS_NAME,
-} from '@/components/map-info/download-map-split-button';
+} from '@/components/map-header/download-button-group';
 import { Button } from '@/components/ui/button';
 
 // other
@@ -32,7 +31,7 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.
  */
 const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement => {
-	const [shareInfo, setShareInfo] = useState<boolean>(false);
+	const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
 	const [panelProps, setPanelProps] = useState<
 		ProviderPanelProps | undefined
 	>(undefined);
@@ -58,8 +57,8 @@ const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement 
 	/**
 	 * Toggles the visibility of the Share modal.
 	 */
-	const toggleShareInfo = () => {
-		setShareInfo((prev) => !prev);
+	const toggleShareModal = () => {
+		setShareModalOpen((prev) => !prev);
 	};
 
 	/**
@@ -81,29 +80,29 @@ const toggleVariableDetailsPanel = () => {
 					className="absolute top-0 left-0 overflow-y-auto w-full"
 				>
 					<div className="flex items-center gap-x-2 bg-white p-4">
-						<Breadcrumbs
+						<Breadcrumb
 							onClick={toggleVariableDetailsPanel}
 						/>
 
 						<div className="flex gap-3 sm:gap-5 ml-auto">
 							<ActionButtons
-								onToggleShare={toggleShareInfo}
+								onToggleShare={toggleShareModal}
 							/>
 						</div>
 					</div>
 				</div>
 			</aside>
 
-			<ShareMapModal isOpen={shareInfo} onClose={toggleShareInfo} />
+			<ShareMapModal isOpen={shareModalOpen} onClose={toggleShareModal} />
 		</>
 	);
 };
 MapHeader.displayName = 'MapHeader';
 
 /**
- * Breadcrumbs component, displays the breadcrumbs for the selected state of the map.
+ * Breadcrumb component, displays the breadcrumbs for the selected state of the map.
  */
-const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
+const Breadcrumb: React.FC<{ onClick: () => void }> = ({
 	onClick,
 }) => {
 	const { locale, getLocalized } = useLocale();
@@ -150,7 +149,7 @@ const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 		</div>
 	);
 };
-Breadcrumbs.displayName = 'Breadcrumbs';
+Breadcrumb.displayName = 'Breadcrumb';
 
 interface ActionButtonsProps {
 	onToggleShare: () => void;
@@ -184,7 +183,7 @@ const ActionButtons = (
 				</div>
 				<Share2 aria-hidden="true" />
 			</Button>
-			<DownloadMapSplitButton />
+			<DownloadButtonGroup />
 		</>
 	);
 };

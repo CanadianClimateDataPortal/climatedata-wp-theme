@@ -18,14 +18,14 @@ import { useMapMarker } from '@/hooks/use-map-marker';
 
 import { INTERNAL_URLS } from '@/lib/constants';
 
-export interface UseMapHeaderButtonsDownloadHook {
-	downloadDataHref: string;
-	imageDownloadButtonWorking: boolean;
-	imageDownloadOnClick: () => Promise<void>;
+export interface UseMapHeaderDownloadHook {
+	dataDownloadPageHref: string;
+	mapImageDownloadPending: boolean;
+	mapImageDownloadOnClick: () => Promise<void>;
 }
 
-export const useMapHeaderButtonsDownload = (
-): UseMapHeaderButtonsDownloadHook => {
+export const useMapHeaderDownload = (
+): UseMapHeaderDownloadHook => {
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
 	const localeContext = useContext(LocaleContext);
 	const currentLocale = localeContext?.locale || 'en';
@@ -86,7 +86,7 @@ export const useMapHeaderButtonsDownload = (
 	]);
 
 	/**
-	 * Handles the click on the "Map" button of `DownloadMapSplitButton`.
+	 * Handles the click on the "Map" button of `DownloadButtonGroup`.
 	 *
 	 * POSTs the current view to the screenshot service, then saves the returned PNG as the downloaded map image.
 	 */
@@ -147,8 +147,8 @@ export const useMapHeaderButtonsDownload = (
 	}, [dataset, climateVariableData, currentLocale]);
 
 	return {
-		imageDownloadButtonWorking: isGenerating,
-		imageDownloadOnClick: handleDownloadClick,
-		downloadDataHref: getDownloadUrl,
+		mapImageDownloadPending: isGenerating,
+		mapImageDownloadOnClick: handleDownloadClick,
+		dataDownloadPageHref: getDownloadUrl,
 	}
 };

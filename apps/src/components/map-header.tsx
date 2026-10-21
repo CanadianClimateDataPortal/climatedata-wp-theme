@@ -167,7 +167,7 @@ const ModalToggleButtons: React.FC<{
 			className={buttonClassName}
 			onClick={onToggleShare}
 		>
-			<div className="hidden sm:block text-dark-purple">
+			<div className="sr-only sm:not-sr-only text-dark-purple">
 				{__('Share')}{' '}
 				<span className="sr-only">
 					{__('the current visible map')}

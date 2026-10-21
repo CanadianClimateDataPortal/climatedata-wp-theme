@@ -72,7 +72,7 @@ export const DownloadButtonGroup = (
 					{__('Download image from viewport')}
 				</span>
 				{mapImageDownloadPending
-					// `Spinner` takes no other props, so this wrapper hides it from assistive technology.
+					// `Spinner` passes on only `className` and `size`, not `aria-hidden`, so this wrapper hides it from assistive technology.
 					? <span className="flex" aria-hidden="true"><Spinner className="stroke-white" size="1rem" /></span>
 					: <Camera aria-hidden="true" />
 				}

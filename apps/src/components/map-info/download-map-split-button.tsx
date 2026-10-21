@@ -65,7 +65,11 @@ export const DownloadMapSplitButton = (
 				<span className="sr-only">
 					{__('Download image from viewport')}
 				</span>
-				{imageDownloadButtonWorking ? <Spinner className="stroke-white" /> : <Camera />}
+				{imageDownloadButtonWorking
+					// `Spinner` takes no other props, so this wrapper hides it from assistive technology.
+					? <span className="flex" aria-hidden="true"><Spinner className="stroke-white" /></span>
+					: <Camera aria-hidden="true" />
+				}
 			</Button>
 			<Button
 				variant="destructive"
@@ -78,7 +82,7 @@ export const DownloadMapSplitButton = (
 				<span className="sr-only">
 					{__('Go to download sections (opens in a new tab)')}
 				</span>
-				<Download />
+				<Download aria-hidden="true" />
 			</Button>
 			<span
 				role="status"

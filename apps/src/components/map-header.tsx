@@ -173,7 +173,7 @@ const ModalToggleButtons: React.FC<{
 					{__('the current visible map')}
 				</span>
 			</div>
-			<Share2 />
+			<Share2 aria-hidden="true" />
 		</Button>
 	);
 };

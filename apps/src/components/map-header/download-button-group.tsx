@@ -25,8 +25,8 @@ export const DownloadButtonGroup = (
 ): React.ReactElement => {
 	const {
 		dataDownloadPageHref,
-		mapImageDownloadOnClick,
 		mapImageDownloadPending,
+		startMapImageDownload,
 	} = useMapHeaderDownload();
 
 	const buttonClassName = cn(MAP_HEADER_BUTTON_CLASS_NAME, 'gap-2 sm:gap-2');
@@ -44,7 +44,7 @@ export const DownloadButtonGroup = (
 		if (mapImageDownloadPending) {
 			return;
 		}
-		mapImageDownloadOnClick();
+		startMapImageDownload();
 	};
 
 	return (

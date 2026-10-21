@@ -55,7 +55,7 @@ export const DownloadMapSplitButton = (
 			</div>
 			<Button
 				variant="destructive"
-				className={buttonClassName + (imageDownloadButtonWorking ? ' opacity-50 pointer-events-none' : '')}
+				className={cn(buttonClassName, imageDownloadButtonWorking && 'opacity-50 pointer-events-none')}
 				onClick={mapDownloadOnClick}
 				aria-disabled={imageDownloadButtonWorking}
 			>

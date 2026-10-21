@@ -15,7 +15,7 @@ type ClearMarkers = ReturnType<typeof useMapMarker>['clearMarkers'];
  * `LocationModal` DOM or marker for it to strip in the first place — this
  * is what lets `prepareRaster` build one before stripping chrome.
  *
- * Supplied by `useMapHeaderButtonsDownload`, the only caller, via `useMap()` and
+ * Supplied by `useMapHeaderDownload`, the only caller, via `useMap()` and
  * `useMapMarker()` — `prepareRaster` is a plain module-level function with
  * no React context of its own.
  */

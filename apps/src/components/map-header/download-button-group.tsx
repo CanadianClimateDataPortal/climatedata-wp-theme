@@ -5,7 +5,7 @@ import { Download, Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { __ } from '@/context/locale-provider';
 
-import { useMapHeaderButtonsDownload } from '@/hooks/use-map-header-buttons-download';
+import { useMapHeaderDownload } from '@/hooks/use-map-header-download';
 
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -15,36 +15,39 @@ export const MAP_HEADER_BUTTON_CLASS_NAME = [
 	'rounded-full h-7 sm:h-9 max-sm:py-1.5 max-sm:px-3',
 ] as Readonly<string[]>;
 
-export const DownloadMapSplitButton = (
+/**
+ * A widget with two buttons: one for downloading the map image and one for downloading the data.
+ */
+export const DownloadButtonGroup = (
 ): React.ReactElement => {
 	const {
-		downloadDataHref,
-		imageDownloadOnClick,
-		imageDownloadButtonWorking,
-	} = useMapHeaderButtonsDownload();
+		dataDownloadPageHref,
+		mapImageDownloadOnClick,
+		mapImageDownloadPending,
+	} = useMapHeaderDownload();
 
 	const buttonClassName = cn(MAP_HEADER_BUTTON_CLASS_NAME, 'gap-2 sm:gap-2');
 
-	const goToDataDownloadOnClick: React.MouseEventHandler<HTMLButtonElement> = (
+	const handleDataDownloadPageOpen: React.MouseEventHandler<HTMLButtonElement> = (
 	) => {
-		window.open(downloadDataHref);
+		window.open(dataDownloadPageHref);
 	};
 
 	// `aria-disabled` keeps the button focusable while the service generates the
 	// image, so Enter and Space still reach this handler, which ignores them.
 	// A native `disabled` would move keyboard focus to the page body instead.
-	const mapDownloadOnClick: React.MouseEventHandler<HTMLButtonElement> = (
+	const handleMapImageDownloadActivate: React.MouseEventHandler<HTMLButtonElement> = (
 	) => {
-		if (imageDownloadButtonWorking) {
+		if (mapImageDownloadPending) {
 			return;
 		}
-		imageDownloadOnClick();
+		mapImageDownloadOnClick();
 	};
 
 	return (
 		<div
 			className="flex items-center gap-2"
-			data-part="download-map-split-button"
+			data-part="map-header-download-button-group"
 		>
 			{/* Each button's accessible name already says it downloads, so this label would only repeat it. */}
 			<div
@@ -55,9 +58,9 @@ export const DownloadMapSplitButton = (
 			</div>
 			<Button
 				variant="destructive"
-				className={cn(buttonClassName, imageDownloadButtonWorking && 'opacity-50 pointer-events-none')}
-				onClick={mapDownloadOnClick}
-				aria-disabled={imageDownloadButtonWorking}
+				className={cn(buttonClassName, mapImageDownloadPending && 'opacity-50 pointer-events-none')}
+				onClick={handleMapImageDownloadActivate}
+				aria-disabled={mapImageDownloadPending}
 			>
 				<span className="hidden sm:block">
 					{__('Map')}{' '}
@@ -65,7 +68,7 @@ export const DownloadMapSplitButton = (
 				<span className="sr-only">
 					{__('Download image from viewport')}
 				</span>
-				{imageDownloadButtonWorking
+				{mapImageDownloadPending
 					// `Spinner` takes no other props, so this wrapper hides it from assistive technology.
 					? <span className="flex" aria-hidden="true"><Spinner className="stroke-white" size="1rem" /></span>
 					: <Camera aria-hidden="true" />
@@ -74,7 +77,7 @@ export const DownloadMapSplitButton = (
 			<Button
 				variant="destructive"
 				className={buttonClassName}
-				onClick={goToDataDownloadOnClick}
+				onClick={handleDataDownloadPageOpen}
 			>
 				<span className="hidden sm:block">
 					{__('Data')}{' '}
@@ -88,10 +91,12 @@ export const DownloadMapSplitButton = (
 				role="status"
 				className="sr-only"
 			>
-				{imageDownloadButtonWorking ? __('Generating...') : ''}
+				{mapImageDownloadPending ? __('Generating...') : ''}
 			</span>
 		</div>
 	)
 };
 
-DownloadMapSplitButton.displayName = 'DownloadMapSplitButton';
+DownloadButtonGroup.displayName = 'DownloadButtonGroup';
+
+export default DownloadButtonGroup;

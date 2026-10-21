@@ -65,12 +65,12 @@ export const DownloadMapSplitButton = (
 				variant="destructive"
 				className={buttonClassName}
 				onClick={goToDataDownloadOnClick}
-				aria-label={__(
-					'Go to download sections (opens in a new tab)'
-				)}
 			>
 				<span className="hidden sm:block">
 					{__('Data')}{' '}
+				</span>
+				<span className="sr-only">
+					{__('Go to download sections (opens in a new tab)')}
 				</span>
 				<Download />
 			</Button>

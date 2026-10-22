@@ -94,7 +94,7 @@ export const DownloadButtonGroup = (
 				role="status"
 				className="sr-only"
 			>
-				{mapImageDownloadPending ? __('Generating...') : ''}
+				{mapImageDownloadPending ? __('Loading...') : ''}
 			</span>
 		</div>
 	)

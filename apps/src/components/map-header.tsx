@@ -151,7 +151,7 @@ Breadcrumb.displayName = 'Breadcrumb';
 
 interface ActionButtonsProps {
 	onToggleShare: () => void;
-	className: string[];
+	className: string;
 }
 
 /**

@@ -83,12 +83,10 @@ const toggleVariableDetailsPanel = () => {
 						<Breadcrumb
 							onClick={toggleVariableDetailsPanel}
 						/>
-
-						<div className="flex gap-3 sm:gap-5 ml-auto">
-							<ActionButtons
-								onToggleShare={toggleShareModal}
-							/>
-						</div>
+						<ActionButtons
+							className="flex gap-3 sm:gap-5 ml-auto"
+							onToggleShare={toggleShareModal}
+						/>
 					</div>
 				</div>
 			</aside>
@@ -153,6 +151,7 @@ Breadcrumb.displayName = 'Breadcrumb';
 
 interface ActionButtonsProps {
 	onToggleShare: () => void;
+	className: string[];
 }
 
 /**
@@ -165,14 +164,15 @@ const ActionButtons = (
 ): React.ReactElement => {
 	const{
 		onToggleShare,
+		className,
 	} = props;
-	const buttonClassName = cn(MAP_HEADER_BUTTON_CLASS_NAME, 'border border-cold-grey-4');
 
 	return (
-		<>
+		<div className={cn('flex gap-3', className)}>
+
 			<Button
 				variant="outline"
-				className={buttonClassName}
+				className={cn(MAP_HEADER_BUTTON_CLASS_NAME, 'border border-cold-grey-4')}
 				onClick={onToggleShare}
 			>
 				<div className="sr-only sm:not-sr-only text-dark-purple">
@@ -183,8 +183,10 @@ const ActionButtons = (
 				</div>
 				<Share2 aria-hidden="true" />
 			</Button>
+
 			<DownloadButtonGroup />
-		</>
+
+		</div>
 	);
 };
 ActionButtons.displayName = 'ActionButtons';

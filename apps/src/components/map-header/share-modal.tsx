@@ -32,7 +32,7 @@ export const ShareModal: React.FC<{
 
 	// Get the URL sync state to ensure URL parameters are loaded
 	const isUrlSyncInitialized = useAppSelector((state) => state.urlSync.isInitialized);
-	
+
 	// Get the climate variable data to use in the share title
 	const climateVariable = useAppSelector((state) => state.climateVariable.data);
 	const variableTitle = climateVariable?.title || __('Climate Data Map');
@@ -47,7 +47,7 @@ export const ShareModal: React.FC<{
 		if (inputRef.current) {
 			inputRef.current.select();
 			navigator.clipboard.writeText(currentUrl);
-			
+
 			setCopyLinkVariant('secondary');
 			setTimeout(() => {
 				setCopyLinkVariant('destructive');

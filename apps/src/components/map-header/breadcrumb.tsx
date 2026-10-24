@@ -44,7 +44,10 @@ export const Breadcrumb: React.FC<{ onClick: () => void }> = ({
 	}, [climateVariable, variableList]);
 
 	return (
-		<div className="flex items-center gap-2 breadcrumb">
+		<div
+			className="flex items-center gap-2 breadcrumb"
+			data-part="map-header-breadcrumb"
+		>
 			{datasetName && <span className='hidden md:inline'>{datasetName}</span>}
 			{datasetName && variableTitle && <span className='hidden md:inline'>/</span>}
 			{variableTitle && (

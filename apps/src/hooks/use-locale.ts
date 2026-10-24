@@ -1,7 +1,7 @@
 /**
  * useLocale hook to get the locale context from the LocaleProvider
  */
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
 import { LocaleContext } from '@/context/locale-provider';
 
 export const useLocale = () => {
@@ -19,7 +19,7 @@ export const useLocale = () => {
 	 * - Objects shaped like { en: '...', fr: '...' }
 	 * Falls back to the English ('en') version, or an empty string if none found.
 	 */
-	const getLocalized = (obj: any): string => {
+	const getLocalized = useCallback((obj: any): string => {
 		if (!obj) return '';
 
 		const keys = ['label', 'title'];
@@ -38,7 +38,7 @@ export const useLocale = () => {
 
 		// fallback if obj is directly { en: '...', fr: '...' }
 		return obj?.[locale] || obj?.en || '';
-	};
+	}, [locale]);
 
 	return { locale, setLocale, getLocalized };
 };

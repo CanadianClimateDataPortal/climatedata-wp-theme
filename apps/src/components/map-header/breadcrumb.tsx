@@ -22,18 +22,16 @@ export const Breadcrumb: React.FC<{ onClick: () => void }> = ({
 	const variableList = useAppSelector((state) => state.map.variableList);
 	const { climateVariable } = useClimateVariable();
 
-	// No useMemo here. useLocale returns a new getLocalized function on each
-	// render, so a memo that depends on it runs on each render anyway.
-	// The lookup is cheap, and it returns '' when there is no dataset.
-	// @see https://react.dev/reference/react/useMemo#parameters
-	//   React compares each dependency with Object.is.
-	// @see https://react.dev/reference/react/useMemo#memoizing-a-function
-	//   A function made during render is a different function on each render.
-	// @see https://react.dev/reference/react/useMemo#memoizing-a-dependency-of-another-hook
-	//   A dependency that is different each time makes the memo run each time.
-	// @see https://react.dev/reference/react/useMemo#skipping-expensive-recalculations
-	//   useMemo is only a performance optimization, so removing it keeps behaviour.
-	const datasetName = getLocalized(dataset);
+	const datasetName = useMemo(() => {
+		if (!dataset) {
+			return '';
+		}
+
+		return getLocalized(dataset);
+	}, [
+		dataset,
+		getLocalized,
+	]);
 
 	const variableTitle = useMemo(() => {
 		if (climateVariable && climateVariable.toObject().postId) {

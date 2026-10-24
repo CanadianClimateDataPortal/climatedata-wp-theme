@@ -11,7 +11,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 // components
 import VariableDetailsPanel from '@/components/map-info/variable-details-panel';
-import ShareMapModal from '@/components/map-info/share-map-modal';
+import { ShareModal } from '@/components/map-header/share-modal';
 import { ActionButtons } from '@/components/map-header/action-buttons';
 import { Breadcrumb } from '@/components/map-header/breadcrumb';
 
@@ -83,7 +83,7 @@ const toggleVariableDetailsPanel = () => {
 				</div>
 			</aside>
 
-			<ShareMapModal isOpen={shareModalOpen} onClose={toggleShareModal} />
+			<ShareModal isOpen={shareModalOpen} onClose={toggleShareModal} />
 		</>
 	);
 };

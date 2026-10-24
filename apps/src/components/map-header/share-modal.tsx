@@ -20,7 +20,7 @@ import {
 import Modal from '@/components/ui/modal';
 import { useAppSelector } from '@/app/hooks';
 
-const ShareMapModal: React.FC<{
+export const ShareModal: React.FC<{
 	isOpen: boolean;
 	onClose: () => void;
 }> = ({ isOpen, onClose }) => {
@@ -99,6 +99,4 @@ const ShareMapModal: React.FC<{
 		</Modal>
 	);
 };
-ShareMapModal.displayName = 'ShareMapModal';
-
-export default ShareMapModal;
+ShareModal.displayName = 'ShareModal';

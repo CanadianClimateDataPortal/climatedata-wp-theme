@@ -22,11 +22,10 @@ export const Breadcrumb: React.FC<{ onClick: () => void }> = ({
 	const variableList = useAppSelector((state) => state.map.variableList);
 	const { climateVariable } = useClimateVariable();
 
-	const datasetName = useMemo(() => {
-		if (!dataset) return '';
-
-		return getLocalized(dataset);
-	}, [dataset, getLocalized]);
+	// No useMemo here. useLocale returns a new getLocalized function on each
+	// render, so a memo that depends on it runs on each render anyway.
+	// The lookup is cheap, and it returns '' when there is no dataset.
+	const datasetName = getLocalized(dataset);
 
 	const variableTitle = useMemo(() => {
 		if (climateVariable && climateVariable.toObject().postId) {

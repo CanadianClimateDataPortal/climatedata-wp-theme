@@ -57,7 +57,7 @@ export const ShareModal: React.FC<{
 
 	return (
 		<Modal isOpen={isOpen} onClose={onClose}>
-			<ModalSection className="share-map-modal">
+			<ModalSection className="share-modal">
 				<ModalSectionBlock className="mb-4">
 					<ModalSectionBlockTitle>
 						{__('Sharing this map')}

@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 export const Breadcrumb: React.FC<{ onClick: () => void }> = ({
 	onClick,
 }) => {
-	const { locale, getLocalized } = useLocale();
+	const { getLocalized } = useLocale();
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const variableList = useAppSelector((state) => state.map.variableList);
 	const { climateVariable } = useClimateVariable();
@@ -26,7 +26,7 @@ export const Breadcrumb: React.FC<{ onClick: () => void }> = ({
 		if (!dataset) return '';
 
 		return getLocalized(dataset);
-	}, [dataset, locale]);
+	}, [dataset, getLocalized]);
 
 	const variableTitle = useMemo(() => {
 		if (climateVariable && climateVariable.toObject().postId) {

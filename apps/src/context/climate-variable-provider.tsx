@@ -138,16 +138,33 @@ export const ClimateVariableProvider: React.FC<{
 
 			if (matchedVariable) {
 				// Combine important properties from API with the config data.
-				dispatch(setClimateVariable({
+				const newData: ClimateVariableConfigInterface = {
 					...matchedVariable,
 					postId: variable.postId,
 					title: variable.title,
 					datasetType: dataset?.dataset_type,
-				}));
+				};
+
+				// CLIM-1452 keep-or-default rule, scenario only (CLIM-1500 try,
+				// case E-3). Carry the selected scenario over when the new
+				// variable offers it for its own version. Otherwise leave it
+				// unset: getScenario() then falls to the CLIM-1096 default, and
+				// the URL writer leaves `scen` out, so the sidebar and the URL
+				// agree.
+				const previousScenario = climateVariableData?.scenario;
+				const newVariableClass = CLIMATE_VARIABLE_CLASS_MAP[newData.class];
+				if (previousScenario && newVariableClass) {
+					const newVariable = new newVariableClass(newData);
+					if (newVariable.getScenarios().includes(previousScenario)) {
+						newData.scenario = previousScenario;
+					}
+				}
+
+				dispatch(setClimateVariable(newData));
 			} else {
 				throw new Error(`No matching variable found for id: ${variable.id}`);
 			}
-		}, [dispatch]);
+		}, [dispatch, climateVariableData]);
 
 	/**
 	 * Updates the version of the climate variable and dispatches the updated information.

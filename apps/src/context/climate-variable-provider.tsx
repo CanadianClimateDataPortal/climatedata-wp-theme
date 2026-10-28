@@ -160,6 +160,20 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
+				// CLIM-1452 keep-or-default rule, interactive region only
+				// (CLIM-1500 try, case E-2). Carry the selected region over when
+				// the region config of the new variable has it, the same check
+				// as getInteractiveRegion(). Otherwise leave it unset: the getter
+				// then falls to the first active region, and the URL writer
+				// leaves `region` out, so the sidebar and the URL agree.
+				const previousRegion = climateVariableData?.interactiveRegion;
+				if (previousRegion && newVariableClass) {
+					const newVariable = new newVariableClass(newData);
+					if (newVariable.getInteractiveRegionConfig()?.[previousRegion]) {
+						newData.interactiveRegion = previousRegion;
+					}
+				}
+
 				dispatch(setClimateVariable(newData));
 			} else {
 				throw new Error(`No matching variable found for id: ${variable.id}`);

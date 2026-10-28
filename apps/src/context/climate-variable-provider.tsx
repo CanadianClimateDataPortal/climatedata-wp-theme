@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import ClimateVariableContext from '@/hooks/use-climate-variable';
@@ -29,7 +29,8 @@ import StationClimateVariable from '@/lib/station-climate-variable';
 import StationDataClimateVariable from "@/lib/station-data-climate-variable";
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
-import { formatUTCDate } from '@/lib/utils';
+import { formatUTCDate, isFrequencyOffered } from '@/lib/utils';
+import SectionContext from '@/context/section-provider';
 import ReturnPeriodClimateVariable from '@/lib/return-period-climate-variable';
 
 export type ClimateVariableContextType = {
@@ -95,6 +96,7 @@ export const ClimateVariableProvider: React.FC<{
 	children: React.ReactNode;
 }> = ({ children }) => {
 	const dispatch = useAppDispatch();
+	const section = useContext(SectionContext);
 
 	const { data: climateVariableData } = useAppSelector(
 		(state) => state.climateVariable
@@ -171,6 +173,22 @@ export const ClimateVariableProvider: React.FC<{
 					const newVariable = new newVariableClass(newData);
 					if (newVariable.getInteractiveRegionConfig()?.[previousRegion]) {
 						newData.interactiveRegion = previousRegion;
+					}
+				}
+
+				// CLIM-1452 keep-or-default rule, frequency only (CLIM-1500 try,
+				// case E-1). Carry the selected frequency over when the frequency
+				// config of the new variable offers it in this section, as
+				// FrequencySelect renders it. getFrequencyConfig() includes the
+				// class fallback for a variable with no frequencyConfig. Otherwise
+				// leave it unset: FrequenciesDropdown then shows the default of
+				// getDefaultFrequency(), and the URL writer leaves `freq` out.
+				const previousFrequency = climateVariableData?.frequency;
+				if (previousFrequency && newVariableClass) {
+					const newVariable = new newVariableClass(newData);
+					const frequencyConfig = newVariable.getFrequencyConfig();
+					if (frequencyConfig && isFrequencyOffered(frequencyConfig, section, previousFrequency)) {
+						newData.frequency = previousFrequency;
 					}
 				}
 

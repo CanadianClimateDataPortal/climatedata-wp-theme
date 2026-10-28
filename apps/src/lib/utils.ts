@@ -133,6 +133,37 @@ export const getDefaultFrequency = (
 
 	return defaultValue;
 };
+
+/**
+ * Tells whether a frequency code is offered by a frequency config in a section.
+ * It mirrors the options that FrequencySelect renders: a month code needs
+ * MONTHLY or ALL_MONTHS, a season code needs SEASONAL, and any other code
+ * needs its own key in the config.
+ */
+export const isFrequencyOffered = (
+	config: FrequencyConfig,
+	section: string,
+	frequency: string
+): boolean => {
+	if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
+		return isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
+			|| isFrequencyEnabled(config, section, FrequencyType.ALL_MONTHS);
+	}
+
+	if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
+		return isFrequencyEnabled(config, section, FrequencyType.SEASONAL);
+	}
+
+	// FrequencySelect renders the MONTHLY item for ALL_MONTHS too, in the
+	// download type ANALYZED.
+	if (frequency === FrequencyType.MONTHLY) {
+		return isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
+			|| isFrequencyEnabled(config, section, FrequencyType.ALL_MONTHS);
+	}
+
+	return Object.values(FrequencyType).includes(frequency as FrequencyType)
+		&& isFrequencyEnabled(config, section, frequency as FrequencyType);
+};
 /**
  * Converts a date format string (e.g., 'YYYY-MM-DD', 'MM-DD') into a regular expression for validation.
  */

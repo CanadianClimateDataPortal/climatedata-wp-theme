@@ -7,7 +7,13 @@ import {
 	toJSONString,
 	utc,
 	arraySize,
+	isFrequencyOffered,
 } from './utils';
+import {
+	FrequencyConfig,
+	FrequencyDisplayModeOption,
+	FrequencyType,
+} from '@/types/climate-variable-interface';
 
 describe('findCeilingIndex', () => {
 	test('returns exact index for exact value', () => {
@@ -373,5 +379,44 @@ describe('arraySize', () => {
 		const mixed = [1, 'text', [true, false], { key: 'value' }];
 		// 1 (1) + 'text' (1) + [true, false] (2) + {key: 'value'} (1) = 5
 		expect(arraySize(mixed)).toBe(5);
+	});
+});
+
+describe('isFrequencyOffered', () => {
+	const annualOnly: FrequencyConfig = {
+		[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+	};
+	const monthsOnMapAndAll: FrequencyConfig = {
+		[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+	};
+
+	test('offers a month when MONTHLY is enabled', () => {
+		expect(isFrequencyOffered(monthsOnMapAndAll, 'map', 'aug')).toBe(true);
+	});
+
+	test('does not offer a month under an annual-only config', () => {
+		expect(isFrequencyOffered(annualOnly, 'map', 'aug')).toBe(false);
+		expect(isFrequencyOffered(annualOnly, 'map', 'ann')).toBe(true);
+	});
+
+	test('offers a month through ALL_MONTHS only in its section', () => {
+		const config: FrequencyConfig = {
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+		};
+		expect(isFrequencyOffered(config, 'download', 'aug')).toBe(true);
+		expect(isFrequencyOffered(config, 'map', 'aug')).toBe(false);
+	});
+
+	test('offers a season only under SEASONAL', () => {
+		const config: FrequencyConfig = {
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		};
+		expect(isFrequencyOffered(config, 'map', 'summer')).toBe(true);
+		expect(isFrequencyOffered(monthsOnMapAndAll, 'map', 'summer')).toBe(false);
+	});
+
+	test('does not offer an unknown code', () => {
+		expect(isFrequencyOffered(monthsOnMapAndAll, 'map', 'foo')).toBe(false);
 	});
 });

@@ -99,4 +99,6 @@ export const ShareModal: React.FC<{
 		</Modal>
 	);
 };
-ShareModal.displayName = 'ShareModal';
+ShareModal.displayName = 'ShareModal'; // Explicit string literal, or this name would be lost in production.
+
+export default ShareModal;

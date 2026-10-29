@@ -100,6 +100,6 @@ export const DownloadButtonGroup = (
 	)
 };
 
-DownloadButtonGroup.displayName = 'DownloadButtonGroup';
+DownloadButtonGroup.displayName = 'DownloadButtonGroup'; // Explicit string literal, or this name would be lost in production.
 
 export default DownloadButtonGroup;

@@ -14,9 +14,16 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 import { Button } from '@/components/ui/button';
 
-export const Breadcrumb: React.FC<{ onClick: () => void }> = ({
-	onClick,
-}) => {
+interface BreadcrumbProps {
+	onClick: () => void;
+}
+
+export const Breadcrumb = (
+	props: BreadcrumbProps,
+): React.ReactElement => {
+	const {
+		onClick,
+	} = props;
 	const { getLocalized } = useLocale();
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const variableList = useAppSelector((state) => state.map.variableList);
@@ -69,4 +76,6 @@ export const Breadcrumb: React.FC<{ onClick: () => void }> = ({
 		</div>
 	);
 };
-Breadcrumb.displayName = 'Breadcrumb';
+Breadcrumb.displayName = 'Breadcrumb'; // Explicit string literal, or this name would be lost in production.
+
+export default Breadcrumb;

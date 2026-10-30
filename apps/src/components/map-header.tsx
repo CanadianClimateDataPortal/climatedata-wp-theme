@@ -56,10 +56,10 @@ const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement 
 	/**
 	* Toggles the visibility of the Variable Details panel.
 	*/
-const toggleVariableDetailsPanel = () => {
-	if (!data) return;
-	togglePanel(<VariableDetailsPanel mapInfo={data} />, panelProps);
-};
+	const toggleVariableDetailsPanel = () => {
+		if (!data) return;
+		togglePanel(<VariableDetailsPanel mapInfo={data} />, panelProps);
+	};
 
 	return (
 		<>

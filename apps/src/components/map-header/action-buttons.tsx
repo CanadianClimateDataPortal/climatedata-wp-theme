@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 import DownloadButtonGroup, {
 	MAP_HEADER_BUTTON_CLASS_NAME,
-} from '@/components/map-header/download-button-group';
+} from './download-button-group';
 import { Button } from '@/components/ui/button';
 
 interface ActionButtonsProps {

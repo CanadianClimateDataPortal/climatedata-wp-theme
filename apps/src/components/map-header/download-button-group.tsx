@@ -57,7 +57,7 @@ export const DownloadButtonGroup = (
 				className="max-sm:text-sm"
 				aria-hidden="true"
 			>
-				{__('Download:')}
+				{__('Download') + /* Non-breakable space or it becomes multi-line in smallest screen-size */ ' :'}
 			</div>
 			<Button
 				variant="destructive"

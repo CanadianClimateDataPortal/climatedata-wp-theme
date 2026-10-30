@@ -1664,6 +1664,3 @@ msgstr "Période de retour"
 
 msgid "Map"
 msgstr "Carte"
-
-msgid "Download:"
-msgstr "Télécharger :" # Non-breakable space or it shows bad in smallest

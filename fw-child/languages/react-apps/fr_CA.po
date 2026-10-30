@@ -1664,3 +1664,6 @@ msgstr "Période de retour"
 
 msgid "Map"
 msgstr "Carte"
+
+msgid "Go to download section (opens in a new tab)"
+msgsrc "Allez à la section de téléchargement (ouvre dans un nouvel onglet)"

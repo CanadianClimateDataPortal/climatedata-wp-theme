@@ -20,7 +20,7 @@ import {
 import Modal from '@/components/ui/modal';
 import { useAppSelector } from '@/app/hooks';
 
-const ShareMapModal: React.FC<{
+export const ShareModal: React.FC<{
 	isOpen: boolean;
 	onClose: () => void;
 }> = ({ isOpen, onClose }) => {
@@ -32,7 +32,7 @@ const ShareMapModal: React.FC<{
 
 	// Get the URL sync state to ensure URL parameters are loaded
 	const isUrlSyncInitialized = useAppSelector((state) => state.urlSync.isInitialized);
-	
+
 	// Get the climate variable data to use in the share title
 	const climateVariable = useAppSelector((state) => state.climateVariable.data);
 	const variableTitle = climateVariable?.title || __('Climate Data Map');
@@ -47,7 +47,7 @@ const ShareMapModal: React.FC<{
 		if (inputRef.current) {
 			inputRef.current.select();
 			navigator.clipboard.writeText(currentUrl);
-			
+
 			setCopyLinkVariant('secondary');
 			setTimeout(() => {
 				setCopyLinkVariant('destructive');
@@ -57,7 +57,7 @@ const ShareMapModal: React.FC<{
 
 	return (
 		<Modal isOpen={isOpen} onClose={onClose}>
-			<ModalSection className="share-map-modal">
+			<ModalSection className="share-modal">
 				<ModalSectionBlock className="mb-4">
 					<ModalSectionBlockTitle>
 						{__('Sharing this map')}
@@ -99,6 +99,6 @@ const ShareMapModal: React.FC<{
 		</Modal>
 	);
 };
-ShareMapModal.displayName = 'ShareMapModal';
+ShareModal.displayName = 'ShareModal'; // Explicit string literal, or this name would be lost in production.
 
-export default ShareMapModal;
+export default ShareModal;

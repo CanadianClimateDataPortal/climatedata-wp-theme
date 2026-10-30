@@ -86,7 +86,7 @@ export const DownloadButtonGroup = (
 					{__('Data')}{' '}
 				</span>
 				<span className="sr-only">
-					{__('Go to download sections (opens in a new tab)')}
+					{__('Go to download section (opens in a new tab)')}
 				</span>
 				<Download aria-hidden="true" />
 			</Button>
@@ -100,6 +100,6 @@ export const DownloadButtonGroup = (
 	)
 };
 
-DownloadButtonGroup.displayName = 'DownloadButtonGroup';
+DownloadButtonGroup.displayName = 'DownloadButtonGroup'; // Explicit string literal, or this name would be lost in production.
 
 export default DownloadButtonGroup;

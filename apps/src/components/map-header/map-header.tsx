@@ -11,18 +11,27 @@ import React, { useEffect, useRef, useState } from 'react';
 
 // components
 import VariableDetailsPanel from '@/components/map-info/variable-details-panel';
-import { ShareModal } from '@/components/map-header/share-modal';
-import { ActionButtons } from '@/components/map-header/action-buttons';
-import { Breadcrumb } from '@/components/map-header/breadcrumb';
+import { ShareModal } from './share-modal';
+import { ActionButtons } from './action-buttons';
+import { Breadcrumb } from './breadcrumb';
 
 // other
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
-import { MapInfoProps, ProviderPanelProps } from '@/types/types';
+import type { MapInfoData, ProviderPanelProps } from '@/types/types';
+
+interface MapHeaderProps {
+	data: MapInfoData | null;
+}
 
 /**
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.
  */
-const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement => {
+export const MapHeader = (
+	props: MapHeaderProps,
+): React.ReactElement => {
+	const {
+		data = null,
+	} = props;
 	const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
 	const [panelProps, setPanelProps] = useState<
 		ProviderPanelProps | undefined
@@ -87,6 +96,6 @@ const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement 
 		</>
 	);
 };
-MapHeader.displayName = 'MapHeader';
+MapHeader.displayName = 'MapHeader'; // Explicit string literal, or this name would be lost in production.
 
 export default MapHeader;

@@ -488,6 +488,13 @@ export interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
+ * Props for the MapInfo component.
+ */
+export interface MapInfoProps {
+	data: MapInfoData | null;
+}
+
+/**
  * Represents a single color palette option.
  */
 export interface ColorPaletteOption {

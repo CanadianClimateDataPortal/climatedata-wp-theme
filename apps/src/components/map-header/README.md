@@ -1,4 +1,4 @@
-# `@/components/map-header`
+# `components/map-header/`
 
 The parts of the strip above the map: the breadcrumb on the left, and the action buttons on the right.
 
@@ -6,4 +6,3 @@ The parts of the strip above the map: the breadcrumb on the left, and the action
 - [`breadcrumb.tsx`](./breadcrumb.tsx) → `Breadcrumb` — the dataset and variable names on the left; the variable name opens the variable details panel.
 - [`action-buttons.tsx`](./action-buttons.tsx) → `ActionButtons` — the buttons on the right of the breadcrumb: Share, then the download button group.
 - [`share-modal.tsx`](./share-modal.tsx) → `ShareModal` — the modal to copy the map link or share it on social media.
-- [`map-header.tsx`](./map-header.tsx) → `MapHeader` — The default module entry point

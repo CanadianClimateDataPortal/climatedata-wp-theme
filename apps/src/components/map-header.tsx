@@ -11,27 +11,18 @@ import React, { useEffect, useRef, useState } from 'react';
 
 // components
 import VariableDetailsPanel from '@/components/map-info/variable-details-panel';
-import { ShareModal } from './share-modal';
-import { ActionButtons } from './action-buttons';
-import { Breadcrumb } from './breadcrumb';
+import { ShareModal } from '@/components/map-header/share-modal';
+import { ActionButtons } from '@/components/map-header/action-buttons';
+import { Breadcrumb } from '@/components/map-header/breadcrumb';
 
 // other
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
-import type { MapInfoData, ProviderPanelProps } from '@/types/types';
-
-export interface MapHeaderProps {
-	data: MapInfoData | null;
-}
+import { MapInfoProps, ProviderPanelProps } from '@/types/types';
 
 /**
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.
  */
-export const MapHeader = (
-	props: MapHeaderProps,
-): React.ReactElement => {
-	const {
-		data = null,
-	} = props;
+const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement => {
 	const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
 	const [panelProps, setPanelProps] = useState<
 		ProviderPanelProps | undefined
@@ -65,10 +56,10 @@ export const MapHeader = (
 	/**
 	* Toggles the visibility of the Variable Details panel.
 	*/
-	const toggleVariableDetailsPanel = () => {
-		if (!data) return;
-		togglePanel(<VariableDetailsPanel mapInfo={data} />, panelProps);
-	};
+const toggleVariableDetailsPanel = () => {
+	if (!data) return;
+	togglePanel(<VariableDetailsPanel mapInfo={data} />, panelProps);
+};
 
 	return (
 		<>
@@ -96,6 +87,6 @@ export const MapHeader = (
 		</>
 	);
 };
-MapHeader.displayName = 'MapHeader'; // Explicit string literal, or this name would be lost in production.
+MapHeader.displayName = 'MapHeader';
 
 export default MapHeader;

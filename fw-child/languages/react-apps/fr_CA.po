@@ -1666,4 +1666,4 @@ msgid "Map"
 msgstr "Carte"
 
 msgid "Go to download section (opens in a new tab)"
-msgsrc "Allez dans la section de téléchargement (ouvre dans un nouvel onglet)"
+msgsrc "Allez à la section de téléchargement (ouvre dans un nouvel onglet)"

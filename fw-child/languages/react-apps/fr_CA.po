@@ -1661,3 +1661,6 @@ msgstr "Périodes de retour"
 
 msgid "Return Period"
 msgstr "Période de retour"
+
+msgid "Map"
+msgstr "Carte"

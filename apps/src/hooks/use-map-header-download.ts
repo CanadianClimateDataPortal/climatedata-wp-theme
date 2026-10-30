@@ -1,13 +1,6 @@
-/**
- * Download map modal component.
- *
- * A modal component that allows users to download the map as an image.
- *
- */
-import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { __, LocaleContext } from '@/context/locale-provider';
-import { Download, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { LocaleContext } from '@/context/locale-provider';
+
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { selectSelectedLocation, setLegendOpen } from '@/features/map/map-slice';
 import {
@@ -23,22 +16,16 @@ import { getFilenameFromContentDisposition } from '@/lib/download/get-filename-f
 import { useMap } from '@/hooks/use-map';
 import { useMapMarker } from '@/hooks/use-map-marker';
 
-// components
-import Modal from '@/components/ui/modal';
-import {
-	ModalSection,
-	ModalSectionBlock,
-	ModalSectionBlockDescription,
-	ModalSectionBlockTitle,
-} from '@/components/map-info/modal-section';
-
 import { INTERNAL_URLS } from '@/lib/constants';
 
+export interface UseMapHeaderDownloadHook {
+	dataDownloadPageHref: string;
+	mapImageDownloadPending: boolean;
+	startMapImageDownload: () => Promise<void>;
+}
 
-const DownloadMapModal: React.FC<{
-	isOpen: boolean;
-	onClose: () => void;
-}> = ({ isOpen, onClose }) => {
+export const useMapHeaderDownload = (
+): UseMapHeaderDownloadHook => {
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
 	const localeContext = useContext(LocaleContext);
 	const currentLocale = localeContext?.locale || 'en';
@@ -99,7 +86,7 @@ const DownloadMapModal: React.FC<{
 	]);
 
 	/**
-	 * Handles the click on the modal's "Download" button.
+	 * Handles the click on the "Map" button of `DownloadButtonGroup`.
 	 *
 	 * POSTs the current view to the screenshot service, then saves the returned PNG as the downloaded map image.
 	 */
@@ -147,6 +134,7 @@ const DownloadMapModal: React.FC<{
 		}
 	};
 
+
 	// Generate download section URL with dataset and variable parameters
 	const getDownloadUrl = useMemo(() => {
 		const downloadBaseUrl = INTERNAL_URLS[`download-${currentLocale}`] || '';
@@ -158,73 +146,9 @@ const DownloadMapModal: React.FC<{
 		return `${downloadBaseUrl}?dataset=${encodeURIComponent(dataset.term_id.toString())}&var=${encodeURIComponent(climateVariableData.id)}`;
 	}, [dataset, climateVariableData, currentLocale]);
 
-	const buttonText = useMemo(() => {
-		if (isGenerating) {
-			return __('Generating...');
-		}
-
-		return (
-			<div className="flex items-center gap-2">
-				{__('Download')}
-				<Download className="w-4 h-4 text-[#FAFAFA] -mt-1" />
-			</div>
-		);
-	}, [
-		isGenerating,
-	]);
-
-	return (
-		<Modal isOpen={isOpen} onClose={onClose}>
-			<ModalSection className="download-map-modal">
-				<ModalSectionBlock>
-					<ModalSectionBlockTitle>
-						{__('Download image from viewport')}
-					</ModalSectionBlockTitle>
-					<ModalSectionBlockDescription>
-						{__(
-							'Your export will showcase your various data options. The map position will be the one you see on your screen.'
-						)}
-					</ModalSectionBlockDescription>
-					<Button
-						aria-label={__(
-							'Download current map image (opens in a new tab)'
-						)}
-						className={`inline-flex text-md font-normal leading-6 tracking-[0.8px] uppercase rounded-full px-4 py-2 bg-destructive text-destructive-foreground hover:bg-destructive/90 ${
-							isGenerating ? 'opacity-50 pointer-events-none' : ''
-						}`}
-						onClick={handleDownloadClick}
-					>
-						{buttonText}
-					</Button>
-				</ModalSectionBlock>
-
-				<ModalSectionBlock>
-					<ModalSectionBlockTitle>
-						{__('Need control over your own data?')}
-					</ModalSectionBlockTitle>
-					<ModalSectionBlockDescription>
-						{__(
-							'Head over to the download section where you can select multiple grid cells and personalize more data options.'
-						)}
-					</ModalSectionBlockDescription>
-					<a
-						href={getDownloadUrl}
-						target="_blank"
-						aria-label={__(
-							'Go to download sections (opens in a new tab)'
-						)}
-						className="text-brand-blue font-normal text-md leading-6"
-					>
-						<div className="flex items-center gap-2 ms-2">
-							{__('Go to Download Section')}
-							<ExternalLink className="w-4 h-4" />
-						</div>
-					</a>
-				</ModalSectionBlock>
-			</ModalSection>
-		</Modal>
-	);
+	return {
+		mapImageDownloadPending: isGenerating,
+		startMapImageDownload: handleDownloadClick,
+		dataDownloadPageHref: getDownloadUrl,
+	}
 };
-DownloadMapModal.displayName = 'DownloadMapModal';
-
-export default DownloadMapModal;

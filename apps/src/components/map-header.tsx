@@ -3,18 +3,21 @@
  *
  * A component serving as the header for the map. It displays the breadcrumbs
  * for the selected state of the map, a toggle for the variable details panel,
- * and buttons that toggle share and download map modals.
+ * a button that opens the share map modal, and the Map and Data download
+ * buttons.
  *
  */
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { Info, Share2, Download } from 'lucide-react';
+import { Info, Share2 } from 'lucide-react';
 import { __ } from '@/context/locale-provider';
 import { cn } from '@/lib/utils';
 
 // components
 import VariableDetailsPanel from '@/components/map-info/variable-details-panel';
 import ShareMapModal from '@/components/map-info/share-map-modal';
-import DownloadMapModal from '@/components/map-info/download-map-modal';
+import DownloadButtonGroup, {
+	MAP_HEADER_BUTTON_CLASS_NAME,
+} from '@/components/map-header/download-button-group';
 import { Button } from '@/components/ui/button';
 
 // other
@@ -28,8 +31,7 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.
  */
 const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement => {
-	const [shareInfo, setShareInfo] = useState<boolean>(false);
-	const [downloadInfo, setDownloadInfo] = useState<boolean>(false);
+	const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
 	const [panelProps, setPanelProps] = useState<
 		ProviderPanelProps | undefined
 	>(undefined);
@@ -55,17 +57,8 @@ const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement 
 	/**
 	 * Toggles the visibility of the Share modal.
 	 */
-	const toggleShareInfo = () => {
-		setShareInfo((prev) => !prev);
-		setDownloadInfo(false);
-	};
-
-	/**
-	 * Toggles the visibility of the Download modal.
-	 */
-	const toggleDownloadInfo = () => {
-		setDownloadInfo((prev) => !prev);
-		setShareInfo(false);
+	const toggleShareModal = () => {
+		setShareModalOpen((prev) => !prev);
 	};
 
 	/**
@@ -87,31 +80,27 @@ const toggleVariableDetailsPanel = () => {
 					className="absolute top-0 left-0 overflow-y-auto w-full"
 				>
 					<div className="flex items-center gap-x-2 bg-white p-4">
-						<Breadcrumbs
+						<Breadcrumb
 							onClick={toggleVariableDetailsPanel}
 						/>
-						<ModalToggleButtons
-							onToggleShare={toggleShareInfo}
-							onToggleDownload={toggleDownloadInfo}
+						<ActionButtons
+							className="flex gap-3 sm:gap-5 ml-auto"
+							onToggleShare={toggleShareModal}
 						/>
 					</div>
 				</div>
 			</aside>
 
-			<ShareMapModal isOpen={shareInfo} onClose={toggleShareInfo} />
-			<DownloadMapModal
-				isOpen={downloadInfo}
-				onClose={toggleDownloadInfo}
-			/>
+			<ShareMapModal isOpen={shareModalOpen} onClose={toggleShareModal} />
 		</>
 	);
 };
 MapHeader.displayName = 'MapHeader';
 
 /**
- * Breadcrumbs component, displays the breadcrumbs for the selected state of the map.
+ * Breadcrumb component, displays the breadcrumbs for the selected state of the map.
  */
-const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
+const Breadcrumb: React.FC<{ onClick: () => void }> = ({
 	onClick,
 }) => {
 	const { locale, getLocalized } = useLocale();
@@ -158,51 +147,48 @@ const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 		</div>
 	);
 };
-Breadcrumbs.displayName = 'Breadcrumbs';
+Breadcrumb.displayName = 'Breadcrumb';
+
+interface ActionButtonsProps {
+	onToggleShare: () => void;
+	className: string;
+}
 
 /**
- * ModalToggleButtons component, shows buttons that toggle modals with extra functionality for the map.
+ * ActionButtons, the buttons on the right of the breadcrumb to do actions about the map.
+ * Share button (instead of copying the map link) and Download buttons
  */
 
-const ModalToggleButtons: React.FC<{
-	onToggleShare: () => void;
-	onToggleDownload: () => void;
-}> = ({ onToggleShare, onToggleDownload }) => {
-	const buttonClasses =
-		'text-md font-normal leading-6 tracking-[0.8px] uppercase rounded-full h-7 sm:h-9 max-sm:py-1.5 max-sm:px-3';
+const ActionButtons = (
+	props: ActionButtonsProps,
+): React.ReactElement => {
+	const{
+		onToggleShare,
+		className,
+	} = props;
 
 	return (
-		<div className="flex gap-3 sm:gap-5 ml-auto">
+		<div className={cn('flex gap-3', className)}>
+
 			<Button
 				variant="outline"
-				className={cn(buttonClasses, 'border border-cold-grey-4')}
+				className={cn(MAP_HEADER_BUTTON_CLASS_NAME, 'border border-cold-grey-4')}
 				onClick={onToggleShare}
 			>
-				<div className="hidden sm:block text-dark-purple">
+				<div className="sr-only sm:not-sr-only text-dark-purple">
 					{__('Share')}{' '}
 					<span className="sr-only">
 						{__('the current visible map')}
 					</span>
 				</div>
-				<Share2 />
+				<Share2 aria-hidden="true" />
 			</Button>
 
-			<Button
-				variant="destructive"
-				className={buttonClasses}
-				onClick={onToggleDownload}
-			>
-				<div className="hidden sm:block">
-					{__('Download')}{' '}
-					<span className="sr-only">
-						{__('image from your viewport')}
-					</span>
-				</div>
-				<Download />
-			</Button>
+			<DownloadButtonGroup />
+
 		</div>
 	);
 };
-ModalToggleButtons.displayName = 'ModalToggleButtons';
+ActionButtons.displayName = 'ActionButtons';
 
 export default MapHeader;

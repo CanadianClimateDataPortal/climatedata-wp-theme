@@ -10,7 +10,7 @@ import type { Window_Fn_Prepare_Raster } from './types';
  * This 5s and that 9s are separate give-up points rather than two shares of the
  * same 10s; a page that spends all of both has already lost the service.
  * What 5s buys is time for the bundle to parse, React to mount
- * `DownloadMapModal`, and its registration effect to run.
+ * `DownloadButtonGroup`, and its registration effect to run.
  * Measured directly on a warm load, that registration takes roughly 34ms — far
  * under this budget — so 5s is headroom against an untested cold load rather
  * than a figure tuned against an observed failure.
@@ -24,7 +24,7 @@ export const PREPARE_RASTER_STUB_POLL_DEADLINE_MS = 5_000;
  * real `$.fn.prepare_raster`.
  *
  * `setTimeout` measures wall-clock passage, which is what this check needs:
- * `DownloadMapModal`'s registration effect runs once React commits it, a
+ * `useMapHeaderDownload`'s registration effect runs once React commits it, a
  * moment defined by script execution, not by a paint.
  * 50ms bounds the check count against the deadline above to 100 at most,
  * while staying prompt once the real implementation lands.
@@ -47,7 +47,7 @@ const PREPARE_RASTER_STUB_POLL_INTERVAL_MS = 50;
  * A synchronous throw from the real implementation propagates straight out through
  * `current.call(fn, ...args)`, and because `prepare_raster` is async, a rejection
  * reached along this path is discarded rather than caught the way
- * `download-map-modal.tsx` catches it at its own call site.
+ * `useMapHeaderDownload` catches it at its own call site.
  *
  * Called at module scope in `main-map.tsx`, before React renders anything, so
  * the stub is the first thing to occupy `window.$.fn.prepare_raster`.
@@ -66,13 +66,15 @@ const PREPARE_RASTER_STUB_POLL_INTERVAL_MS = 50;
  * The stub serves two situations, and the evidence behind them differs.
  * A call arriving BEFORE registration is defence in depth against a race that
  * is real in principle and unmeasured on a cold load: the real implementation
- * is registered inside `DownloadMapModal`'s registration effect
- * (`download-map-modal.tsx`), which cannot run before the bundle finishes
+ * is registered inside the registration effect of
+ * `useMapHeaderDownload`, which cannot run before the bundle finishes
  * parsing and React mounts.
- * A call arriving AFTER that component unmounts still finds a working function,
+ * A call arriving AFTER `DownloadButtonGroup`, the component that calls that
+ * hook, unmounts still finds a working function,
  * and that is why its cleanup reinstalls this stub rather than clearing the key:
  * an absent key sends the service's call into `undefined`, warm load or cold.
- * That file registers the real implementation as
+ * That hook, in `hooks/use-map-header-download.ts`, registers the real
+ * implementation as
  * `window.$.fn.prepare_raster = prepare_raster` on mount, and calls this function
  * on unmount.
  *

@@ -104,7 +104,7 @@ const TimePeriodsControlForSeaLevel: React.FC = () => {
 
 	return (
 		<SidebarMenuItem>
-			<div className="time-periods-control">
+			<div className="time-periods-control" data-part="TimePeriodsControlForSeaLevel">
 				<ControlTitle
 					title={__('Time Periods')}
 					tooltip={__('Move the slider to select your time period of interest.')}

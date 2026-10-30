@@ -48,7 +48,7 @@ const EmissionScenariosControl: React.FC = () => {
 
 	return (
 		<SidebarMenuItem>
-			<div className="flex flex-col gap-4">
+			<div className="flex flex-col gap-4" data-part="EmissionScenariosControl">
 				<Dropdown
 					key={climateVariable?.getId()}
 					label={__('Emissions Scenarios')}
@@ -67,6 +67,8 @@ const EmissionScenariosControl: React.FC = () => {
 						className="text-brand-red"
 						checked={climateVariable?.getScenarioCompare() ?? false}
 						onCheckedChange={handleCompareChange}
+						data-tracking-url-query="cmp"
+
 					/>
 					<label
 						htmlFor="compare-scenarios"
@@ -84,6 +86,7 @@ const EmissionScenariosControl: React.FC = () => {
 						) ?? []}
 						value={climateVariable?.getScenarioCompareTo() ?? undefined}
 						onChange={setScenarioCompareTo}
+						data-tracking-url-query="cmpTo"
 					/>
 				)}
 			</div>

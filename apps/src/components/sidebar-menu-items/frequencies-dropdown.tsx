@@ -29,7 +29,7 @@ const FrequenciesDropdown: React.FC = () => {
 	);
 
 	return (
-		<SidebarMenuItem>
+		<SidebarMenuItem data-part="FrequenciesDropdown">
 			<FrequencySelect
 				title={'Frequencies'}
 				config={frequencyConfig}

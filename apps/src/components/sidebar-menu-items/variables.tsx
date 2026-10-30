@@ -45,7 +45,7 @@ const VariablesMenuItem: React.FC = () => {
 	};
 
 	return (
-		<SidebarMenuItem className="cursor-pointer">
+		<SidebarMenuItem className="cursor-pointer" data-part="VariablesMenuItem">
 			<SidebarMenuButton
 				size="md"
 				isActive={isPanelActive(slug)}
@@ -110,7 +110,7 @@ const VariablesPanel: React.FC<VariablesPanelProps> = ({
 	};
 
 	return (
-		<SidebarPanel id={slug} className="w-[--sidebar-width] md:w-[36rem]">
+		<SidebarPanel id={slug} className="w-[--sidebar-width] md:w-[36rem]" data-part="VariablesPanel">
 			<Card className="border-0 shadow-none h-full flex flex-col">
 				<CardHeader className="p-4 sticky top-0 bg-white z-10">
 					<CardTitle className="text-lg">

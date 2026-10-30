@@ -48,7 +48,7 @@ const DatasetsMenuItem: React.FC = () => {
 	};
 
 	return (
-		<SidebarMenuItem className="cursor-pointer">
+		<SidebarMenuItem className="cursor-pointer" data-part="DatasetsMenuItem">
 			<SidebarMenuButton
 				size="md"
 				isActive={isPanelActive(slug)}
@@ -78,7 +78,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	const { selectClimateVariable } = useClimateVariable();
 	const hasSelectedVariable = useAppSelector((state) => !!state.climateVariable.data?.id);
 	const urlParamsLoaded = useAppSelector((state) => state.urlSync.isLoaded);
-	
+
 	// Tracking refs
 	const initialLoadCompletedRef = useRef<boolean>(false);
 	const isUserSelectedDatasetRef = useRef<boolean>(false);
@@ -86,7 +86,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	const handleDatasetSelect = useCallback(async (dataset: TaxonomyData, isUserSelection = true) => {
 		// Mark this as a user selection (not from URL)
 		isUserSelectedDatasetRef.current = isUserSelection;
-		
+
 		onSelect(dataset);
 		dispatch(setVariableListLoading(true));
 		dispatch(setVariableList([]));
@@ -98,7 +98,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 
 			// Store the variables in Redux
 			dispatch(setVariableList(variables));
-			
+
 			// Always select first variable for user selections regardless of URL params
 			// For URL-driven selections, only select if no variable is specified
 			if (variables.length > 0) {
@@ -119,16 +119,16 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 			try {
 				const fetchedDatasets = await fetchTaxonomyData(slug, 'map');
 				setDatasets(fetchedDatasets);
-				
+
 				// Auto-select first dataset only if:
 				// 1. We have datasets available
-				// 2. No dataset is already selected 
+				// 2. No dataset is already selected
 				// 3. URL params are loaded
 				// 4. Initial load hasn't been completed yet
 				if (
-					fetchedDatasets.length > 0 && 
-					!selected && 
-					urlParamsLoaded && 
+					fetchedDatasets.length > 0 &&
+					!selected &&
+					urlParamsLoaded &&
 					!initialLoadCompletedRef.current
 				) {
 					initialLoadCompletedRef.current = true;
@@ -140,16 +140,16 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 				setDatasets([]);
 			}
 		};
-		
+
 		fetchDatasets();
 	}, [handleDatasetSelect, selected, urlParamsLoaded]);
 
 	// When URL params finish loading, handle any delayed auto-selection
 	useEffect(() => {
 		if (
-			urlParamsLoaded && 
-			selected && 
-			!hasSelectedVariable && 
+			urlParamsLoaded &&
+			selected &&
+			!hasSelectedVariable &&
 			!isUserSelectedDatasetRef.current &&
 			!initialLoadCompletedRef.current
 		) {
@@ -164,7 +164,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	}
 
 	return (
-		<SidebarPanel id={slug} className="w-[--sidebar-width] md:w-96">
+		<SidebarPanel id={slug} className="w-[--sidebar-width] md:w-96" data-part="DatasetsPanel">
 			<Card className="h-full flex flex-col">
 				<CardHeader className="p-4 sticky top-0 bg-white z-10">
 					<CardTitle className="text-lg">

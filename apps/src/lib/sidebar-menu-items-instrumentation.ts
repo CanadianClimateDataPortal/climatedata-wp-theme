@@ -103,6 +103,19 @@ type VariablesInternalDataType = MapState['variableList']; /* eslint-disable-lin
  */
 const SEED_FIELDS_TO_TRACK: TrackedField[] = [
 	{
+		/**
+		 * There always and only :
+		 * - Seasonal to Decadal Forecasts
+		 * - Marine Climate Projections
+		 * - Climate Normals
+		 * - Statistically Downscaled Global Climate Projections
+		 *
+		 * This element is level 0 [[LLM-Context-ClimateData-Programming-FrontEnd-Sidebar#Interactive Elements]], it shapes
+		 * the possibilities of all the others. It is the parent that tells which climate variable are available.
+		 *
+		 * NO NEED TO TRACK all possible values, this field is always visible
+		 * Changing from one dataset to another, we can't get "the same value" between two
+		 */
 		exportedCmpName: 'DatasetsMenuItem',
 		sourcePath: 'apps/src/components/sidebar-menu-items/datasets.tsx',
 		fieldType: 'enum',
@@ -114,6 +127,13 @@ const SEED_FIELDS_TO_TRACK: TrackedField[] = [
 	},
 
 	{
+		/**
+		 * The list is dependent of which dataset we are in.
+		 * - Seasonal to Decadal Forecasts has 2
+		 * - Marine Climate Projections has 2
+		 * - Climate Normals has 1 -- but it's currently broken so we can't fix it for now.
+		 * - Statistically Downscaled Global Climate Projections has the rest
+		 */
 		exportedCmpName: 'VariablesMenuItem',
 		sourcePath: 'apps/src/components/sidebar-menu-items/variables.tsx',
 		fieldType: 'enum',

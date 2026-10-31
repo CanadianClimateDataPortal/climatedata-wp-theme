@@ -8,6 +8,8 @@ import { LocaleProvider } from '@/context/locale-provider';
 import { store } from '@/app/store';
 import { installPrepareRasterStub } from '@/lib/map/image-rastering';
 
+import '@/lib/sidebar-menu-items-instrumentation';
+
 import App from '@/App';
 
 import '@/Global.css';

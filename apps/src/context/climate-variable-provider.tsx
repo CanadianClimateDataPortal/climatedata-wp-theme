@@ -206,6 +206,26 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
+				// CLIM-1452 keep-or-default rule, S2D forecast type and display
+				// only (CLIM-1500 try, S2D). Carry both over when the new
+				// variable is S2D. Every S2D variable offers the same fixed
+				// lists, so no value check is needed. Otherwise leave both
+				// unset: the getters then return their defaults, and the URL
+				// writer leaves `fcastType` and `fcastDisp` out.
+				const previousForecastType = climateVariableData?.forecastType;
+				const previousForecastDisplay = climateVariableData?.forecastDisplay;
+				if ((previousForecastType || previousForecastDisplay) && newVariableClass) {
+					const newVariable = new newVariableClass(newData);
+					if (newVariable instanceof S2DClimateVariable) {
+						if (previousForecastType) {
+							newData.forecastType = previousForecastType;
+						}
+						if (previousForecastDisplay) {
+							newData.forecastDisplay = previousForecastDisplay;
+						}
+					}
+				}
+
 				dispatch(setClimateVariable(newData));
 			} else {
 				throw new Error(`No matching variable found for id: ${variable.id}`);

@@ -9,6 +9,8 @@ import { store } from '@/app/store';
 import { installPrepareRasterStub } from '@/lib/map/image-rastering';
 import { applyFeatureToggleFromUrl } from '@/lib/feature-toggling';
 
+import '@/lib/sidebar-menu-items-instrumentation';
+
 import App from '@/App';
 
 import '@/Global.css';

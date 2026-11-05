@@ -29,7 +29,7 @@ import StationClimateVariable from '@/lib/station-climate-variable';
 import StationDataClimateVariable from "@/lib/station-data-climate-variable";
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
-import { formatUTCDate, isFrequencyOffered } from '@/lib/utils';
+import { formatUTCDate, isFrequencyOffered, thresholdValueForSameLabel } from '@/lib/utils';
 import SectionContext from '@/context/section-provider';
 import ReturnPeriodClimateVariable from '@/lib/return-period-climate-variable';
 
@@ -223,6 +223,33 @@ export const ClimateVariableProvider: React.FC<{
 						if (previousForecastDisplay) {
 							newData.forecastDisplay = previousForecastDisplay;
 						}
+					}
+				}
+
+				// CLIM-1452 keep-or-default rule, threshold only (CLIM-1500 try,
+				// TH). Carry the selected threshold over when the new variable
+				// offers a threshold with the same label. The value differs per
+				// variable, for example rl20tasmax and rl20pr for "1-in-20
+				// year", so the old value maps to its label through the old
+				// variable, then the label to the new value. The old instance is
+				// built from climateVariableData, which the callback already
+				// depends on. Otherwise leave it unset: getThreshold() then
+				// falls to the first threshold, and the URL writer leaves `th`
+				// out.
+				const previousThreshold = climateVariableData?.threshold;
+				const previousVariableClass = climateVariableData
+					? CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class]
+					: undefined;
+				if (previousThreshold && climateVariableData && previousVariableClass && newVariableClass) {
+					const previousVariable = new previousVariableClass(climateVariableData);
+					const newVariable = new newVariableClass(newData);
+					const threshold = thresholdValueForSameLabel(
+						previousVariable.getThresholds(),
+						newVariable.getThresholds(),
+						previousThreshold
+					);
+					if (threshold) {
+						newData.threshold = threshold;
 					}
 				}
 

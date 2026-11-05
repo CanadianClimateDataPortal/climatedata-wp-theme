@@ -8,6 +8,7 @@ import {
 	FrequencyType,
 	InteractiveRegionOption,
 	type S2DFrequencyType,
+	type ThresholdInterface,
 } from '@/types/climate-variable-interface';
 import { __ } from '@/context/locale-provider';
 import { ParsedLatLon } from '@/types/types';
@@ -163,6 +164,26 @@ export const isFrequencyOffered = (
 
 	return Object.values(FrequencyType).includes(frequency as FrequencyType)
 		&& isFrequencyEnabled(config, section, frequency as FrequencyType);
+};
+/**
+ * Finds the threshold value of the next variable that carries the same label
+ * as the previous value in the previous variable. The values differ per
+ * variable, for example rl20tasmax and rl20pr, while the label, here
+ * "1-in-20 year", is the same. An empty label never matches.
+ */
+export const thresholdValueForSameLabel = (
+	previousThresholds: ThresholdInterface[],
+	nextThresholds: ThresholdInterface[],
+	previousValue: string
+): string | null => {
+	const label = previousThresholds.find(
+		(threshold) => threshold.value === previousValue
+	)?.label;
+	if (!label) {
+		return null;
+	}
+
+	return nextThresholds.find((threshold) => threshold.label === label)?.value ?? null;
 };
 /**
  * Converts a date format string (e.g., 'YYYY-MM-DD', 'MM-DD') into a regular expression for validation.

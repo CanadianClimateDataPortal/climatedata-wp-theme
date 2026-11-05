@@ -3,6 +3,7 @@ import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
 import { isFrequencyTypeS2D } from '@/types/assertions';
 import {
+	DateRangeConfig,
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
 	FrequencyType,
@@ -184,6 +185,43 @@ export const thresholdValueForSameLabel = (
 	}
 
 	return nextThresholds.find((threshold) => threshold.label === label)?.value ?? null;
+};
+/**
+ * Gives the previous date range back when the time period control of the next
+ * variable could have produced it, else null. The range control
+ * (TimePeriodsControl) stores a start and an end exactly one interval apart.
+ * The single-thumb control (TimePeriodsControlSingle) stores the same year
+ * twice. Both ends must lie inside the min and max of the config. The stored
+ * shape tells a range pair from a single year, so a range pair never passes
+ * for a single-thumb variable, nor the reverse. The ends and the bounds are
+ * read as years. A pair or a config of full dates never matches, such as an
+ * S2D date range or the day-type config of StationDataClimateVariable.
+ */
+export const dateRangeOfferedBy = (
+	config: DateRangeConfig | null,
+	isRange: boolean,
+	previousDateRange: string[] | null | undefined
+): string[] | null => {
+	if (!config || !previousDateRange || previousDateRange.length !== 2) {
+		return null;
+	}
+
+	const start = Number(previousDateRange[0]);
+	const end = Number(previousDateRange[1]);
+	const min = Number(config.min);
+	const max = Number(config.max);
+	if (![start, end, min, max].every(Number.isInteger)) {
+		return null;
+	}
+	if (start < min || end > max) {
+		return null;
+	}
+
+	const shapeMatches = isRange
+		? end - start === config.interval
+		: start === end;
+
+	return shapeMatches ? previousDateRange : null;
 };
 /**
  * Converts a date format string (e.g., 'YYYY-MM-DD', 'MM-DD') into a regular expression for validation.

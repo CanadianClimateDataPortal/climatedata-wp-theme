@@ -9,8 +9,10 @@ import {
 	arraySize,
 	isFrequencyOffered,
 	thresholdValueForSameLabel,
+	dateRangeOfferedBy,
 } from './utils';
 import {
+	DateRangeConfig,
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
 	FrequencyType,
@@ -475,5 +477,53 @@ describe('thresholdValueForSameLabel', () => {
 		expect(thresholdValueForSameLabel([], precipitation, 'rl20tasmax')).toBeNull();
 		expect(thresholdValueForSameLabel(maxTemp, [], 'rl20tasmax')).toBeNull();
 		expect(thresholdValueForSameLabel([], [], 'rl20tasmax')).toBeNull();
+	});
+});
+
+describe('dateRangeOfferedBy', () => {
+	// The fallback config of RasterPrecalculatedClimateVariable, which the
+	// variables of dataset 216 use.
+	const projection: DateRangeConfig = { min: '1950', max: '2100', interval: 30 };
+	// The config of the allowance variable, a single-thumb control.
+	const allowance: DateRangeConfig = { min: '2020', max: '2100', interval: 10 };
+
+	test('keeps a range pair inside the bounds with the same interval', () => {
+		expect(dateRangeOfferedBy(projection, true, ['2070', '2100'])).toEqual(['2070', '2100']);
+	});
+
+	test('gives null when the end lies above max', () => {
+		expect(dateRangeOfferedBy(projection, true, ['2080', '2110'])).toBeNull();
+	});
+
+	test('gives null when the start lies below min', () => {
+		expect(dateRangeOfferedBy(projection, true, ['1940', '1970'])).toBeNull();
+	});
+
+	test('gives null when the span differs from the interval', () => {
+		expect(dateRangeOfferedBy({ ...projection, interval: 10 }, true, ['2070', '2100'])).toBeNull();
+	});
+
+	test('keeps a single year inside the bounds for a single-thumb variable', () => {
+		expect(dateRangeOfferedBy(allowance, false, ['2060', '2060'])).toEqual(['2060', '2060']);
+	});
+
+	test('gives null for a range pair on a single-thumb variable, and the reverse', () => {
+		expect(dateRangeOfferedBy(allowance, false, ['2070', '2100'])).toBeNull();
+		expect(dateRangeOfferedBy(projection, true, ['2060', '2060'])).toBeNull();
+	});
+
+	test('gives null for an S2D date range of full dates', () => {
+		expect(dateRangeOfferedBy(projection, true, ['2027-06-01', '2027-08-31'])).toBeNull();
+	});
+
+	test('gives null for a config of full dates', () => {
+		const days: DateRangeConfig = { min: '1840-01-01', max: '2026-11-05', interval: 1, type: 'day' };
+		expect(dateRangeOfferedBy(days, true, ['2070', '2071'])).toBeNull();
+	});
+
+	test('gives null with no config or no previous range', () => {
+		expect(dateRangeOfferedBy(null, true, ['2070', '2100'])).toBeNull();
+		expect(dateRangeOfferedBy(projection, true, undefined)).toBeNull();
+		expect(dateRangeOfferedBy(projection, true, null)).toBeNull();
 	});
 });

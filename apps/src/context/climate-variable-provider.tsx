@@ -30,7 +30,7 @@ import StationDataClimateVariable from "@/lib/station-data-climate-variable";
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { isFrequencyTypeS2D } from '@/types/assertions';
-import { formatUTCDate, isFrequencyOffered, thresholdValueForSameLabel } from '@/lib/utils';
+import { dateRangeOfferedBy, formatUTCDate, isFrequencyOffered, thresholdValueForSameLabel } from '@/lib/utils';
 import SectionContext from '@/context/section-provider';
 import ReturnPeriodClimateVariable from '@/lib/return-period-climate-variable';
 
@@ -282,6 +282,38 @@ export const ClimateVariableProvider: React.FC<{
 						}
 						if (previousDateRange) {
 							newData.dateRange = previousDateRange;
+						}
+					}
+				}
+
+				// CLIM-1452 keep-or-default rule, projection time period only
+				// (CLIM-1500 try, PERIOD). Carry the selected date range over
+				// when the time period control of the new variable could have
+				// produced it, as dateRangeOfferedBy() checks: both ends inside
+				// getDateRangeConfig(), and the shape that isTimePeriodARange()
+				// asks for. This block runs after the version block, because
+				// the range config of SeaLevelClimateVariable depends on the
+				// version. It skips an S2D variable on either side. An S2D
+				// variable inherits the RasterPrecalculatedClimateVariable
+				// fallback range (1950 to 2100), so a projection pair would
+				// pass for an S2D target, and the S2D-PERIOD block above owns
+				// the S2D-to-S2D case. Only dateRange is set. The sync effect of
+				// TimePeriodsControl and TimePeriodsControlSingle then updates
+				// timePeriodEnd in the map state. Otherwise keep the dateRange of
+				// the static config, which only allowance sets: getDateRange()
+				// then falls to the default range, and the URL writer leaves
+				// `dateRange` out.
+				if (previousDateRange && climateVariableData && previousVariableClass && newVariableClass) {
+					const previousVariable = new previousVariableClass(climateVariableData);
+					const newVariable = new newVariableClass(newData);
+					if (!(previousVariable instanceof S2DClimateVariable) && !(newVariable instanceof S2DClimateVariable)) {
+						const dateRange = dateRangeOfferedBy(
+							newVariable.getDateRangeConfig(),
+							newVariable.isTimePeriodARange(),
+							previousDateRange
+						);
+						if (dateRange) {
+							newData.dateRange = dateRange;
 						}
 					}
 				}

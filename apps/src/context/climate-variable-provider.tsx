@@ -198,11 +198,18 @@ export const ClimateVariableProvider: React.FC<{
 				// class fallback for a variable with no frequencyConfig. Otherwise
 				// leave it unset: FrequenciesDropdown then shows the default of
 				// getDefaultFrequency(), and the URL writer leaves `freq` out.
+				// This block skips an S2D target. The S2D sidebar offers its own
+				// frequency codes (months, seasons and the decadal codes) from
+				// FrequenciesDropdownS2D, not from frequencyConfig. An S2D
+				// variable inherits the RasterPrecalculatedClimateVariable
+				// fallback config (ANNUAL and MONTHLY), so isFrequencyOffered
+				// would accept `ann`, a code the S2D sidebar does not offer. The
+				// S2D-PERIOD block below owns the S2D-to-S2D case.
 				const previousFrequency = climateVariableData?.frequency;
 				if (previousFrequency && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
 					const frequencyConfig = newVariable.getFrequencyConfig();
-					if (frequencyConfig && isFrequencyOffered(frequencyConfig, section, previousFrequency)) {
+					if (!(newVariable instanceof S2DClimateVariable) && frequencyConfig && isFrequencyOffered(frequencyConfig, section, previousFrequency)) {
 						newData.frequency = previousFrequency;
 					}
 				}

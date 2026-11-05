@@ -8,11 +8,13 @@ import {
 	utc,
 	arraySize,
 	isFrequencyOffered,
+	thresholdValueForSameLabel,
 } from './utils';
 import {
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
 	FrequencyType,
+	ThresholdInterface,
 } from '@/types/climate-variable-interface';
 
 describe('findCeilingIndex', () => {
@@ -418,5 +420,41 @@ describe('isFrequencyOffered', () => {
 
 	test('does not offer an unknown code', () => {
 		expect(isFrequencyOffered(monthsOnMapAndAll, 'map', 'foo')).toBe(false);
+	});
+});
+
+describe('thresholdValueForSameLabel', () => {
+	const maxTemp: ThresholdInterface[] = [
+		{ value: 'rl5tasmax', label: '1-in-5 year' },
+		{ value: 'rl20tasmax', label: '1-in-20 year' },
+	];
+	const precipitation: ThresholdInterface[] = [
+		{ value: 'rl5pr', label: '1-in-5 year' },
+		{ value: 'rl20pr', label: '1-in-20 year' },
+	];
+
+	test('maps the value to the next value with the same label', () => {
+		expect(thresholdValueForSameLabel(maxTemp, precipitation, 'rl20tasmax')).toBe('rl20pr');
+	});
+
+	test('gives null when the next thresholds lack the label', () => {
+		const other: ThresholdInterface[] = [{ value: 'r10mm', label: '>= 10 mm' }];
+		expect(thresholdValueForSameLabel(maxTemp, other, 'rl20tasmax')).toBeNull();
+	});
+
+	test('gives null when the label is empty', () => {
+		const unlabelled: ThresholdInterface[] = [{ value: 'tx_max', label: '' }];
+		const otherUnlabelled: ThresholdInterface[] = [{ value: 'tn_min', label: '' }];
+		expect(thresholdValueForSameLabel(unlabelled, otherUnlabelled, 'tx_max')).toBeNull();
+	});
+
+	test('gives null when the previous thresholds lack the value', () => {
+		expect(thresholdValueForSameLabel(maxTemp, precipitation, 'rl50tasmax')).toBeNull();
+	});
+
+	test('gives null on empty arrays', () => {
+		expect(thresholdValueForSameLabel([], precipitation, 'rl20tasmax')).toBeNull();
+		expect(thresholdValueForSameLabel(maxTemp, [], 'rl20tasmax')).toBeNull();
+		expect(thresholdValueForSameLabel([], [], 'rl20tasmax')).toBeNull();
 	});
 });

@@ -29,6 +29,7 @@ import StationClimateVariable from '@/lib/station-climate-variable';
 import StationDataClimateVariable from "@/lib/station-data-climate-variable";
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import { isFrequencyTypeS2D } from '@/types/assertions';
 import { formatUTCDate, isFrequencyOffered, thresholdValueForSameLabel } from '@/lib/utils';
 import SectionContext from '@/context/section-provider';
 import ReturnPeriodClimateVariable from '@/lib/return-period-climate-variable';
@@ -250,6 +251,31 @@ export const ClimateVariableProvider: React.FC<{
 					);
 					if (threshold) {
 						newData.threshold = threshold;
+					}
+				}
+
+				// CLIM-1452 keep-or-default rule, S2D frequency and time period
+				// only (CLIM-1500 try, S2D-PERIOD). Carry both over when the old
+				// and the new variable are S2D. The period cannot survive
+				// without its frequency, so both go together. The frequency is
+				// checked against S2DFrequencyTypes, the list that
+				// FrequenciesDropdownS2D offers for every S2D variable. The E-1
+				// block does not cover it: an S2D config has no
+				// frequencyConfig, and isFrequencyOffered() rejects the decadal
+				// codes. The date range is carried as is. TimePeriodsControlS2D
+				// snaps a date range that matches no period to the first one.
+				const previousS2DFrequency = climateVariableData?.frequency;
+				const previousDateRange = climateVariableData?.dateRange;
+				if ((previousS2DFrequency || previousDateRange) && climateVariableData && previousVariableClass && newVariableClass) {
+					const previousVariable = new previousVariableClass(climateVariableData);
+					const newVariable = new newVariableClass(newData);
+					if (previousVariable instanceof S2DClimateVariable && newVariable instanceof S2DClimateVariable) {
+						if (previousS2DFrequency && isFrequencyTypeS2D(previousS2DFrequency)) {
+							newData.frequency = previousS2DFrequency;
+						}
+						if (previousDateRange) {
+							newData.dateRange = previousDateRange;
+						}
 					}
 				}
 

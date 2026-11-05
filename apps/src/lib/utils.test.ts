@@ -16,6 +16,8 @@ import {
 	FrequencyType,
 	ThresholdInterface,
 } from '@/types/climate-variable-interface';
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import { isFrequencyTypeS2D } from '@/types/assertions';
 
 describe('findCeilingIndex', () => {
 	test('returns exact index for exact value', () => {
@@ -420,6 +422,23 @@ describe('isFrequencyOffered', () => {
 
 	test('does not offer an unknown code', () => {
 		expect(isFrequencyOffered(monthsOnMapAndAll, 'map', 'foo')).toBe(false);
+	});
+
+	// The S2D sidebar offers its codes from FrequenciesDropdownS2D, not from
+	// frequencyConfig. An S2D variable inherits the fallback config of
+	// RasterPrecalculatedClimateVariable, so this check accepts `ann` for it.
+	// This test pins that fact. It is the reason why the frequency carry in
+	// selectClimateVariable skips an S2D target, for example on a switch from
+	// a projection variable with `freq=ann`.
+	test('accepts `ann` for an S2D variable, so an S2D target needs its own guard', () => {
+		const s2dVariable = new S2DClimateVariable({
+			id: 'test',
+			class: 'S2DClimateVariable',
+		});
+		const config = s2dVariable.getFrequencyConfig();
+		expect(config).not.toBeNull();
+		expect(isFrequencyOffered(config!, 'map', 'ann')).toBe(true);
+		expect(isFrequencyTypeS2D('ann')).toBe(false);
 	});
 });
 

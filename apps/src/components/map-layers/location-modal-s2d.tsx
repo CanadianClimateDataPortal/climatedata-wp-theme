@@ -132,10 +132,10 @@ const getTooltipSkillLevelSuffix = (
 
 			if (periodIndex === 0) {
 				// First period (Yr1-5)
-				return baseText + __('over 1996 to 2020.');
+				return baseText + __('using all 26 overlapping 5-year forecasts covering 1996 to 2025.');
 			} else if (periodIndex === 1) {
 				// Second period (Yr6-10)
-				return baseText + __('over 2006 to 2020.');
+				return baseText + __('using all 16 overlapping 5-year forecasts covering 2006 to 2025.');
 			}
 		}
 	}

@@ -1375,11 +1375,11 @@ msgstr "Les performances passées ou « habileté » du système de prévision s
        "l’indice continu de probabilité ordonnée (CRPSS). Le CRPSS mesure l'exactitude des prévisions produites pour le "
        "même délai de prévision que la prévision sélectionnée "
 
-msgid  "over 1996 to 2020."
-msgstr "entre 1996 et 2020."
+msgid  "using all 26 overlapping 5-year forecasts covering 1996 to 2025."
+msgstr "et est évaluée à l'aide des 26 prévisions quinquennales qui se chevauchent et qui couvrent de 1996 à 2025."
 
-msgid  "over 2006 to 2020."
-msgstr "entre 2006 et 2020."
+msgid  "using all 16 overlapping 5-year forecasts covering 2006 to 2025."
+msgstr "et est évaluée à l'aide des 16 prévisions quinquennales qui se chevauchent et qui couvrent de 2006 à 2025."
 
 msgid  "and for the same month over 1991 to 2020."
 msgstr "et pour le même mois entre 1991 et 2020."

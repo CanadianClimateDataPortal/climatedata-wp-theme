@@ -1,9 +1,21 @@
 /**
- * @REMARK CLIM-1500 END: Instrumentation is a good idea, 
+ * @REMARK CLIM-1500 END: Instrumentation is a good idea,
  * Needed for CLIM-1508:
  * - It's best to to improve foundation first.
  * - If foundation holds, and we want to activate and see in production using a feature toggle from `apply-cookie-feature-toggle-from-url` to conditionally load this.
+ *
+ * *** GENERAL REMARKS ***
+ * - This file will be the foundation of CLIM-1508 "Refactoring pour simplifier la gestion des paramètres"
+ * - From the perspective of CLIM-1506 (PR 735) but this commit should be the kept in the shared base, so we can have it available when forking off from commit `CLIM-1500 END: SHARED_BASE_COMMIT`
+ * - Ideally the resulting work of CLIM-1508 will remove more code than adding.
+ *
+ * Context:
+ *   Early on during CLIM-1500, I realized it would help to "visualize" the state and document from the code itself
+ *   the important variables and guide the session(s) (it's more than 9600704 bytes of notes in `2026102401-ClimateData-CLIM-1500/`!).
+ *   This file was like a Debugging Signals helpers to guide context and after having written this file I realized I was re-implementing
+ *   what a Vuex/Redux store should normally do.
  */
+
 //
 // CURRENT STATE: ILLUSTRATION
 //

@@ -167,6 +167,13 @@ export const ClimateVariableProvider: React.FC<{
 				const newVariableClass =
 					CLIMATE_VARIABLE_CLASS_MAP[newData.class];
 
+				/**
+				 * @REMARK CLIM-1500 END This looks good. Planned for parts of this file to be merged in CLIM-1506 (PR #735)
+				 * But to be merged we'll need:
+				 * - Remove or clarify the comments we've added in the code during CLIM-1500_Spike-Analysis-LOCAL-ONLY
+				 * - Confirm and document (in PR 735) what these changes covers (see if we are still missing too)
+				 */
+
 				// CLIM-1452 keep-or-default rule, version only (CLIM-1500 try,
 				// VER). Carry the selected version over when the new variable
 				// offers it. Otherwise leave it unset: getVersion() then falls

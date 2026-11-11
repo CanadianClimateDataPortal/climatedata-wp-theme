@@ -140,6 +140,15 @@ export const getDefaultFrequency = (
 };
 
 /**
+ * @REMARK CLIM-1500 END: These looks good, in order to merge we need further reviewing.
+ * - Comments should describe things that we cannot see while reading the code
+ * - Formatting adjustments (Renoir will make a commit with message body RENOIR_FORMATTING_ADJUSTMENTS)
+ * - Ensure we make-use of existing symbols (e.g. if there's an existing list of months as string, do not make a new one KEEPING_ONLY_ONE_LIST_OF_STRINGS_ENGLISH_MONTHS_NAMES)
+ *
+ * What's great in what's been added here is that they are tested outside of a web browser.
+ */
+
+/**
  * Tells whether a frequency code is offered by a frequency config in a section.
  * It mirrors the options that FrequencySelect renders: a month code needs
  * MONTHLY or ALL_MONTHS, a season code needs SEASONAL, and any other code
@@ -150,7 +159,7 @@ export const isFrequencyOffered = (
 	section: string,
 	frequency: string
 ): boolean => {
-	if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
+	if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) { // KEEPING_ONLY_ONE_LIST_OF_STRINGS_ENGLISH_MONTHS_NAMES(?)
 		return isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
 			|| isFrequencyEnabled(config, section, FrequencyType.ALL_MONTHS);
 	}

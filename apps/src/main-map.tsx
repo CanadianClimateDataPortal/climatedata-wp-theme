@@ -9,7 +9,7 @@ import { store } from '@/app/store';
 import { installPrepareRasterStub } from '@/lib/map/image-rastering';
 import { applyFeatureToggleFromUrl } from '@/lib/feature-toggling';
 
-import '@/lib/sidebar-menu-items-instrumentation';
+import '@/lib/sidebar-menu-items-instrumentation'; // CLIM-1500 END: Will we keep this? TBD.
 
 import App from '@/App';
 

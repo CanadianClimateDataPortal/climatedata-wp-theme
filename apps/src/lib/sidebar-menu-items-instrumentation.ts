@@ -1,3 +1,6 @@
+/**
+ * @REMARK CLIM-1500 END: Instrumentation is a good idea, but it would be best to improve foundation first.
+ */
 //
 // CURRENT STATE: ILLUSTRATION
 //

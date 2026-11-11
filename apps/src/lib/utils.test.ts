@@ -397,6 +397,10 @@ describe('arraySize', () => {
 	});
 });
 
+/**
+ * @REMARK CLIM-1500 END: These added needs further reviewing but are a good idea.
+ * We need to confirm and ensure we test useful system aspects.
+ */
 describe('isFrequencyOffered', () => {
 	const annualOnly: FrequencyConfig = {
 		[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,

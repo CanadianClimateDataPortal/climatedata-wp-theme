@@ -10,6 +10,7 @@ import {
 	isFrequencyOffered,
 	thresholdValueForSameLabel,
 	dateRangeOfferedBy,
+	scenarioCompareToOfferedBy,
 } from './utils';
 import {
 	DateRangeConfig,
@@ -525,5 +526,37 @@ describe('dateRangeOfferedBy', () => {
 		expect(dateRangeOfferedBy(null, true, ['2070', '2100'])).toBeNull();
 		expect(dateRangeOfferedBy(projection, true, undefined)).toBeNull();
 		expect(dateRangeOfferedBy(projection, true, null)).toBeNull();
+	});
+});
+
+describe('scenarioCompareToOfferedBy', () => {
+	// The cmip6 fallback list of RasterPrecalculatedClimateVariable, which the
+	// variables of dataset 216 use.
+	const cmip6 = ['ssp126', 'ssp245', 'ssp370', 'ssp585'];
+	// A sea level list, where every scenario carries a percentile suffix.
+	const seaLevel = ['rcp26-p50', 'rcp45-p50', 'rcp85-p50'];
+
+	test('keeps a compared scenario that is offered and differs from the main scenario', () => {
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp585', 'ssp126')).toBe('ssp126');
+		expect(scenarioCompareToOfferedBy(seaLevel, 'rcp45-p50', 'rcp85-p50')).toBe('rcp85-p50');
+	});
+
+	test('gives null when the compared scenario equals the main scenario', () => {
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', 'ssp245')).toBeNull();
+	});
+
+	test('gives null when the compared scenario is not offered', () => {
+		expect(scenarioCompareToOfferedBy(['ssp126', 'ssp245', 'ssp585'], 'ssp585', 'ssp370')).toBeNull();
+	});
+
+	test('gives null for a cmip5 compared scenario against a cmip6 list', () => {
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', 'rcp85')).toBeNull();
+	});
+
+	test('gives null with no previous compared scenario or an empty list', () => {
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', null)).toBeNull();
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', undefined)).toBeNull();
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', '')).toBeNull();
+		expect(scenarioCompareToOfferedBy([], null, 'ssp126')).toBeNull();
 	});
 });

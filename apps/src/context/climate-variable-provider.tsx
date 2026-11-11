@@ -30,7 +30,7 @@ import StationDataClimateVariable from "@/lib/station-data-climate-variable";
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { isFrequencyTypeS2D } from '@/types/assertions';
-import { dateRangeOfferedBy, formatUTCDate, isFrequencyOffered, thresholdValueForSameLabel } from '@/lib/utils';
+import { dateRangeOfferedBy, formatUTCDate, isFrequencyOffered, scenarioCompareToOfferedBy, thresholdValueForSameLabel } from '@/lib/utils';
 import SectionContext from '@/context/section-provider';
 import ReturnPeriodClimateVariable from '@/lib/return-period-climate-variable';
 
@@ -174,6 +174,36 @@ export const ClimateVariableProvider: React.FC<{
 					const newVariable = new newVariableClass(newData);
 					if (newVariable.getScenarios().includes(previousScenario)) {
 						newData.scenario = previousScenario;
+					}
+				}
+
+				// CLIM-1452 keep-or-default rule, scenario comparison only
+				// (CLIM-1500 try, CMP). Keep Compare scenarios checked and
+				// keep the compared scenario when the new variable offers it
+				// for its own version and it differs from the main scenario
+				// that the sidebar shows, as scenarioCompareToOfferedBy()
+				// checks. The main scenario is read from getScenario() after
+				// the scenario block above ran, so it is the carried scenario
+				// or the CLIM-1096 default. The two values travel together.
+				// Otherwise leave both unset: the checkbox shows unchecked, and
+				// the URL writer leaves `cmp` and `cmpTo` out. A checked box
+				// alone would show no comparison map, and on a variable with no
+				// scenarios the sidebar hides the checkbox while the URL writer
+				// still writes `cmp`. An S2D or a station target gets no carry:
+				// S2DClimateVariable overrides getScenarios() to give an empty
+				// list, and StationClimateVariable gives an empty scenario
+				// config when its own config has none.
+				const previousScenarioCompareTo = climateVariableData?.scenarioCompareTo;
+				if (climateVariableData?.scenarioCompare === true && previousScenarioCompareTo && newVariableClass) {
+					const newVariable = new newVariableClass(newData);
+					const scenarioCompareTo = scenarioCompareToOfferedBy(
+						newVariable.getScenarios(),
+						newVariable.getScenario(),
+						previousScenarioCompareTo
+					);
+					if (scenarioCompareTo) {
+						newData.scenarioCompare = true;
+						newData.scenarioCompareTo = scenarioCompareTo;
 					}
 				}
 

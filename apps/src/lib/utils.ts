@@ -224,6 +224,27 @@ export const dateRangeOfferedBy = (
 	return shapeMatches ? previousDateRange : null;
 };
 /**
+ * Gives the previous compared scenario back when the next variable offers it
+ * and it differs from the main scenario of the next variable, else null. The
+ * list is the one getScenarios() gives for the version of the next variable,
+ * so a cmip5 scenario never passes against a cmip6 list. The main scenario is
+ * the one the sidebar shows, from getScenario(), which may be the default
+ * rather than the previous main scenario. EmissionScenariosControl hides the
+ * main scenario from the second select, so a compared scenario equal to it
+ * could not have been chosen there.
+ */
+export const scenarioCompareToOfferedBy = (
+	nextScenarios: string[],
+	nextMainScenario: string | null,
+	previousCompareTo: string | null | undefined
+): string | null => {
+	if (!previousCompareTo || previousCompareTo === nextMainScenario) {
+		return null;
+	}
+
+	return nextScenarios.includes(previousCompareTo) ? previousCompareTo : null;
+};
+/**
  * Converts a date format string (e.g., 'YYYY-MM-DD', 'MM-DD') into a regular expression for validation.
  */
 export const dateFormatCheck = (format: string): RegExp => {

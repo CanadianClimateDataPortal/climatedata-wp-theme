@@ -79,7 +79,7 @@ export const getFrequencyType = (
 		frequencyCode = FrequencyType.YS;
 	} else if (frequency === 'annual_jul_jun') {
 		frequencyCode = FrequencyType.YSJUL;
-	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
+	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) { // KEEPING_ONLY_ONE_LIST_OF_STRINGS_ENGLISH_MONTHS_NAMES(?)
 		frequencyCode = FrequencyType.MS;
 	} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
 		frequencyCode = FrequencyType.QSDEC;

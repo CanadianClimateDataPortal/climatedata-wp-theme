@@ -165,11 +165,12 @@ export const ClimateVariableProvider: React.FC<{
 				}
 
 				// CLIM-1452 keep-or-default rule, scenario only (CLIM-1500 try,
-				// case E-3). Carry the selected scenario over when the new
+				// scenario). Carry the selected scenario over when the new
 				// variable offers it for its own version. Otherwise leave it
-				// unset: getScenario() then falls to the CLIM-1096 default, and
-				// the URL writer leaves `scen` out, so the sidebar and the URL
-				// agree.
+				// unset: getScenario() then falls to getDefaultScenario(), the
+				// preferred scenario (SSP2-4.5 for cmip6, RCP4.5 for cmip5) when
+				// the version offers it, else the first one. The URL writer
+				// leaves `scen` out, so the sidebar and the URL agree.
 				const previousScenario = climateVariableData?.scenario;
 				if (previousScenario && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
@@ -185,7 +186,8 @@ export const ClimateVariableProvider: React.FC<{
 				// that the sidebar shows, as scenarioCompareToOfferedBy()
 				// checks. The main scenario is read from getScenario() after
 				// the scenario block above ran, so it is the carried scenario
-				// or the CLIM-1096 default. The two values travel together.
+				// or the default of getDefaultScenario(). The two values travel
+				// together.
 				// Otherwise leave both unset: the checkbox shows unchecked, and
 				// the URL writer leaves `cmp` and `cmpTo` out. A checked box
 				// alone would show no comparison map, and on a variable with no
@@ -209,7 +211,7 @@ export const ClimateVariableProvider: React.FC<{
 				}
 
 				// CLIM-1452 keep-or-default rule, interactive region only
-				// (CLIM-1500 try, case E-2). Carry the selected region over when
+				// (CLIM-1500 try, region). Carry the selected region over when
 				// the region config of the new variable has it, the same check
 				// as getInteractiveRegion(). Otherwise leave it unset: the getter
 				// then falls to the first active region, and the URL writer
@@ -223,7 +225,7 @@ export const ClimateVariableProvider: React.FC<{
 				}
 
 				// CLIM-1452 keep-or-default rule, frequency only (CLIM-1500 try,
-				// case E-1). Carry the selected frequency over when the frequency
+				// frequency). Carry the selected frequency over when the frequency
 				// config of the new variable offers it in this section, as
 				// FrequencySelect renders it. getFrequencyConfig() includes the
 				// class fallback for a variable with no frequencyConfig. Otherwise
@@ -248,9 +250,14 @@ export const ClimateVariableProvider: React.FC<{
 				// CLIM-1452 keep-or-default rule, S2D forecast type and display
 				// only (CLIM-1500 try, S2D). Carry both over when the new
 				// variable is S2D. Every S2D variable offers the same fixed
-				// lists, so no value check is needed. Otherwise leave both
-				// unset: the getters then return their defaults, and the URL
-				// writer leaves `fcastType` and `fcastDisp` out.
+				// lists, so no value check is needed. The block does not test
+				// the old variable either. Only the S2D dropdowns and the URL
+				// sync set these two fields, and both accept only values of
+				// those fixed lists. So a stored value is valid for any S2D
+				// target, even when the old variable is a projection variable
+				// that took it from the URL. Otherwise leave both unset: the
+				// getters then return their defaults, and the URL writer leaves
+				// `fcastType` and `fcastDisp` out.
 				const previousForecastType = climateVariableData?.forecastType;
 				const previousForecastDisplay = climateVariableData?.forecastDisplay;
 				if ((previousForecastType || previousForecastDisplay) && newVariableClass) {
@@ -297,11 +304,13 @@ export const ClimateVariableProvider: React.FC<{
 				// and the new variable are S2D. The period cannot survive
 				// without its frequency, so both go together. The frequency is
 				// checked against S2DFrequencyTypes, the list that
-				// FrequenciesDropdownS2D offers for every S2D variable. The E-1
-				// block does not cover it: an S2D config has no
-				// frequencyConfig, and isFrequencyOffered() rejects the decadal
-				// codes. The date range is carried as is. TimePeriodsControlS2D
-				// snaps a date range that matches no period to the first one.
+				// FrequenciesDropdownS2D offers for every S2D variable. The
+				// frequency block above does not cover it, because it skips an
+				// S2D target on purpose: the fallback frequency config that an
+				// S2D variable inherits would accept codes the S2D sidebar does
+				// not offer, and isFrequencyOffered() rejects the decadal codes.
+				// The date range is carried as is. TimePeriodsControlS2D snaps a
+				// date range that matches no period to the first one.
 				const previousS2DFrequency = climateVariableData?.frequency;
 				const previousDateRange = climateVariableData?.dateRange;
 				if ((previousS2DFrequency || previousDateRange) && climateVariableData && previousVariableClass && newVariableClass) {

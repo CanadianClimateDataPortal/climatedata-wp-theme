@@ -148,6 +148,10 @@ export const ClimateVariableProvider: React.FC<{
 					title: variable.title,
 					datasetType: dataset?.dataset_type,
 				};
+				/**
+				 * Class definition we can instantiate throughout this process.
+				 */
+				const newVariableClass = CLIMATE_VARIABLE_CLASS_MAP[newData.class];
 
 				// CLIM-1452 keep-or-default rule, version only (CLIM-1500 try,
 				// VER). Carry the selected version over when the new variable
@@ -156,7 +160,6 @@ export const ClimateVariableProvider: React.FC<{
 				// out. This block runs before the scenario block, because
 				// getScenarios() lists the scenarios of the version on newData.
 				const previousVersion = climateVariableData?.version;
-				const newVariableClass = CLIMATE_VARIABLE_CLASS_MAP[newData.class];
 				if (previousVersion && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
 					if (newVariable.getVersions().includes(previousVersion)) {

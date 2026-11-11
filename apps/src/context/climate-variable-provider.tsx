@@ -172,6 +172,13 @@ export const ClimateVariableProvider: React.FC<{
 				 * But to be merged we'll need:
 				 * - Remove or clarify the comments we've added in the code during CLIM-1500_Spike-Analysis-LOCAL-ONLY
 				 * - Confirm and document (in PR 735) what these changes covers (see if we are still missing too)
+				 *
+				 * *** GENERAL REMARKS ***
+				 * - Split between CLIM-1506, CLIM-1507 and CLIM-1508:
+				 *   - Need to figure out what's needed, and in which PRs
+				 *   - Regarding CLIM-1507
+				 *     - ...and (always) keep important parameters in URL Search query, request to have is an hypothesis, we need to confirm whether these changes improves without needing to change URL sync with the store.
+				 *       (in other words: the changes here do they fix CLIM-1500 and original issue CLIM-1452 by themselves or we need something further, like the hypothesis of URL Search query is warranted)
 				 */
 
 				// CLIM-1452 keep-or-default rule, version only (CLIM-1500 try,

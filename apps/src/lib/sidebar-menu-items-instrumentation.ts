@@ -1,5 +1,8 @@
 /**
- * @REMARK CLIM-1500 END: Instrumentation is a good idea, but it would be best to improve foundation first.
+ * @REMARK CLIM-1500 END: Instrumentation is a good idea, 
+ * Needed for CLIM-1508:
+ * - It's best to to improve foundation first.
+ * - If foundation holds, and we want to activate and see in production using a feature toggle from `apply-cookie-feature-toggle-from-url` to conditionally load this.
  */
 //
 // CURRENT STATE: ILLUSTRATION

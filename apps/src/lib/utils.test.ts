@@ -11,8 +11,15 @@ import {
 	thresholdValueForSameLabel,
 	dateRangeOfferedBy,
 	scenarioCompareToOfferedBy,
+	dataValueOfferedBy,
+	colourSchemeOfferedBy,
+	colourTypeOfferedBy,
+	averagingTypeOfferedBy,
 } from './utils';
 import {
+	AveragingType,
+	ColourType,
+	CustomColourSchemes,
 	DateRangeConfig,
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
@@ -21,6 +28,7 @@ import {
 } from '@/types/climate-variable-interface';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { isFrequencyTypeS2D } from '@/types/assertions';
+import { DEFAULT_COLOUR_SCHEMES } from '@/lib/constants';
 
 describe('findCeilingIndex', () => {
 	test('returns exact index for exact value', () => {
@@ -558,5 +566,108 @@ describe('scenarioCompareToOfferedBy', () => {
 		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', undefined)).toBeNull();
 		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', '')).toBeNull();
 		expect(scenarioCompareToOfferedBy([], null, 'ssp126')).toBeNull();
+	});
+});
+
+describe('dataValueOfferedBy', () => {
+	test('keeps the data value when the next variable shows the Values control', () => {
+		expect(dataValueOfferedBy(true, 'delta')).toBe('delta');
+		expect(dataValueOfferedBy(true, 'absolute')).toBe('absolute');
+	});
+
+	test('gives null when the next variable has no delta, so the control is hidden', () => {
+		expect(dataValueOfferedBy(false, 'delta')).toBeNull();
+		expect(dataValueOfferedBy(undefined, 'delta')).toBeNull();
+	});
+
+	test('gives null with no previous data value', () => {
+		expect(dataValueOfferedBy(true, null)).toBeNull();
+		expect(dataValueOfferedBy(true, undefined)).toBeNull();
+		expect(dataValueOfferedBy(true, '')).toBeNull();
+	});
+});
+
+describe('colourSchemeOfferedBy', () => {
+	// The one custom scheme of building_climate_zones, cut to one colour.
+	const buildingClimateZones: CustomColourSchemes = {
+		default: {
+			colours: [{ label: 'Climate Zone 4', colour: '#C90000', quantity: 3000 }],
+			type: 'discrete',
+		},
+	};
+
+	test('keeps a default scheme key when the next variable has no custom schemes', () => {
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, 'temp_seq')).toBe('temp_seq');
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, 'prec_div')).toBe('prec_div');
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, 'default')).toBe('default');
+	});
+
+	test('keeps a custom scheme key that the next variable lists', () => {
+		expect(colourSchemeOfferedBy(true, buildingClimateZones, DEFAULT_COLOUR_SCHEMES, 'default')).toBe('default');
+	});
+
+	test('gives null when the scheme is not offered', () => {
+		expect(colourSchemeOfferedBy(true, buildingClimateZones, DEFAULT_COLOUR_SCHEMES, 'temp_seq')).toBeNull();
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, 'unknown_scheme')).toBeNull();
+	});
+
+	test('gives null when the next variable hides the Map colours control', () => {
+		expect(colourSchemeOfferedBy(false, null, DEFAULT_COLOUR_SCHEMES, 'temp_seq')).toBeNull();
+		expect(colourSchemeOfferedBy(false, buildingClimateZones, DEFAULT_COLOUR_SCHEMES, 'default')).toBeNull();
+	});
+
+	test('gives null with no previous scheme', () => {
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, null)).toBeNull();
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, undefined)).toBeNull();
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, '')).toBeNull();
+	});
+});
+
+describe('colourTypeOfferedBy', () => {
+	test('keeps the colour type when a scheme other than default was carried', () => {
+		expect(colourTypeOfferedBy('temp_seq', ColourType.DISCRETE)).toBe('intervals');
+		expect(colourTypeOfferedBy('prec_div', ColourType.CONTINUOUS)).toBe('ramp');
+	});
+
+	test('gives null when no scheme was carried, so the choice is hidden', () => {
+		expect(colourTypeOfferedBy(null, ColourType.DISCRETE)).toBeNull();
+	});
+
+	test('gives null when the carried scheme is default, so the choice is hidden', () => {
+		expect(colourTypeOfferedBy('default', ColourType.DISCRETE)).toBeNull();
+	});
+
+	test('gives null for a value outside the enum or no previous value', () => {
+		expect(colourTypeOfferedBy('temp_seq', 'stripes')).toBeNull();
+		expect(colourTypeOfferedBy('temp_seq', null)).toBeNull();
+		expect(colourTypeOfferedBy('temp_seq', undefined)).toBeNull();
+	});
+});
+
+describe('averagingTypeOfferedBy', () => {
+	// The fallback list of RasterPrecalculatedClimateVariable.
+	const bothOptions = [AveragingType.ALL_YEARS, AveragingType.THIRTY_YEARS];
+
+	test('keeps an averaging type that the next variable offers', () => {
+		expect(averagingTypeOfferedBy(false, bothOptions, AveragingType.THIRTY_YEARS)).toBe('30years');
+		expect(averagingTypeOfferedBy(false, [AveragingType.ALL_YEARS], AveragingType.ALL_YEARS)).toBe('allYears');
+	});
+
+	test('gives null when the next variable does not offer it', () => {
+		expect(averagingTypeOfferedBy(false, [AveragingType.ALL_YEARS], AveragingType.THIRTY_YEARS)).toBeNull();
+	});
+
+	test('gives null when the next variable is S2D, so the averaging control is hidden', () => {
+		expect(averagingTypeOfferedBy(true, bothOptions, AveragingType.THIRTY_YEARS)).toBeNull();
+		expect(averagingTypeOfferedBy(true, bothOptions, AveragingType.ALL_YEARS)).toBeNull();
+	});
+
+	test('gives null when the next variable has no averaging options', () => {
+		expect(averagingTypeOfferedBy(false, [], AveragingType.ALL_YEARS)).toBeNull();
+	});
+
+	test('gives null with no previous averaging type', () => {
+		expect(averagingTypeOfferedBy(false, bothOptions, null)).toBeNull();
+		expect(averagingTypeOfferedBy(false, bothOptions, undefined)).toBeNull();
 	});
 });

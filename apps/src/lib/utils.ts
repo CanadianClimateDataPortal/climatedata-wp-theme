@@ -3,6 +3,9 @@ import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
 import { isFrequencyTypeS2D } from '@/types/assertions';
 import {
+	AveragingType,
+	ColourType,
+	type CustomColourSchemes,
 	DateRangeConfig,
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
@@ -243,6 +246,95 @@ export const scenarioCompareToOfferedBy = (
 	}
 
 	return nextScenarios.includes(previousCompareTo) ? previousCompareTo : null;
+};
+/**
+ * Gives the previous data value back when the next variable shows the Values
+ * control, else null. The control is DataValuesControl, and app-sidebar.tsx
+ * renders it only when hasDelta() of the variable is truthy. Its two options,
+ * absolute and delta, are fixed in the component, so the flag is the whole
+ * check. getDataValue() returns a stored delta unchecked, so a delta kept on a
+ * variable without delta would still reach the map layer with no control to
+ * undo it.
+ */
+export const dataValueOfferedBy = (
+	nextHasDelta: boolean | undefined,
+	previousDataValue: string | null | undefined
+): string | null => {
+	if (!nextHasDelta || !previousDataValue) {
+		return null;
+	}
+
+	return previousDataValue;
+};
+/**
+ * Gives the previous colour scheme back when the Map colours control of the
+ * next variable shows and lists it, else null. app-sidebar.tsx renders the
+ * control only when getColourOptionsStatus() is true. A hidden control means
+ * the variable does not offer the scheme, because getColourScheme() still
+ * colours the map and the user would have no control to undo it. The list is
+ * the one ColourSchemeDropdown builds: the keys of the custom schemes when
+ * getCustomColourSchemes() gives some, else the keys of DEFAULT_COLOUR_SCHEMES
+ * plus the item default. The caller passes DEFAULT_COLOUR_SCHEMES, so this
+ * file does not import the map constants.
+ */
+export const colourSchemeOfferedBy = (
+	nextColourOptionsStatus: boolean,
+	nextCustomColourSchemes: CustomColourSchemes | null,
+	defaultColourSchemes: Record<string, unknown>,
+	previousColourScheme: string | null | undefined
+): string | null => {
+	if (!nextColourOptionsStatus || !previousColourScheme) {
+		return null;
+	}
+
+	const offeredSchemes = nextCustomColourSchemes
+		? Object.keys(nextCustomColourSchemes)
+		: ['default', ...Object.keys(defaultColourSchemes)];
+
+	return offeredSchemes.includes(previousColourScheme) ? previousColourScheme : null;
+};
+/**
+ * Gives the previous colour type back when the colour scheme carried to the
+ * next variable shows the Discrete and Continuous choice, else null.
+ * MapColorsDropdown renders that choice only for a scheme that is set and is
+ * not default, so the type follows the scheme. The caller passes the scheme
+ * that colourSchemeOfferedBy() gave back. A value outside the ColourType enum
+ * never passes.
+ */
+export const colourTypeOfferedBy = (
+	carriedColourScheme: string | null,
+	previousColourType: string | null | undefined
+): string | null => {
+	if (!carriedColourScheme || carriedColourScheme === 'default' || !previousColourType) {
+		return null;
+	}
+
+	return Object.values(ColourType).includes(previousColourType as ColourType)
+		? previousColourType
+		: null;
+};
+/**
+ * Gives the previous averaging type back when the next variable shows the
+ * averaging control and its averaging options include the type, else null.
+ * The only averaging control is the radio group of StepAdditionalDetails in
+ * the download wizard. The map app has none. The radio group lists the options
+ * of getAveragingOptions(), and filters every option out for an S2D variable.
+ * An S2D variable still inherits both options from the fallback of
+ * RasterPrecalculatedClimateVariable, so the caller passes whether the next
+ * variable is S2D. A hidden control means the variable does not offer the
+ * value. The options hold the class fallbacks, for example both options for
+ * RasterPrecalculatedClimateVariable and none for StationClimateVariable.
+ */
+export const averagingTypeOfferedBy = (
+	nextIsS2D: boolean,
+	nextAveragingOptions: AveragingType[],
+	previousAveragingType: AveragingType | null | undefined
+): AveragingType | null => {
+	if (nextIsS2D || !previousAveragingType) {
+		return null;
+	}
+
+	return nextAveragingOptions.includes(previousAveragingType) ? previousAveragingType : null;
 };
 /**
  * Converts a date format string (e.g., 'YYYY-MM-DD', 'MM-DD') into a regular expression for validation.

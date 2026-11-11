@@ -30,7 +30,8 @@ import StationDataClimateVariable from "@/lib/station-data-climate-variable";
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { isFrequencyTypeS2D } from '@/types/assertions';
-import { dateRangeOfferedBy, formatUTCDate, isFrequencyOffered, scenarioCompareToOfferedBy, thresholdValueForSameLabel } from '@/lib/utils';
+import { averagingTypeOfferedBy, colourSchemeOfferedBy, colourTypeOfferedBy, dataValueOfferedBy, dateRangeOfferedBy, formatUTCDate, isFrequencyOffered, scenarioCompareToOfferedBy, thresholdValueForSameLabel } from '@/lib/utils';
+import { DEFAULT_COLOUR_SCHEMES } from '@/lib/constants';
 import SectionContext from '@/context/section-provider';
 import ReturnPeriodClimateVariable from '@/lib/return-period-climate-variable';
 
@@ -345,6 +346,63 @@ export const ClimateVariableProvider: React.FC<{
 						if (dateRange) {
 							newData.dateRange = dateRange;
 						}
+					}
+				}
+
+				// CLIM-1452 keep-or-default rule, data value, colour scheme,
+				// colour type and averaging (CLIM-1500 try, CLR). Each value is
+				// carried on its own, when the new variable offers it. The
+				// getters return these stored values unchecked, so the carry
+				// does the check. The data value needs hasDelta(), the flag that
+				// shows DataValuesControl, as dataValueOfferedBy() checks. The
+				// colour scheme needs the Map colours control shown, from
+				// getColourOptionsStatus(), and the scheme in the list that
+				// ColourSchemeDropdown builds, as colourSchemeOfferedBy() checks.
+				// A hidden control means the variable does not offer the scheme,
+				// because the scheme would still colour the map with no control
+				// to undo it. The colour type follows the carried scheme, as
+				// colourTypeOfferedBy() checks, because MapColorsDropdown shows
+				// the type only for a scheme other than default. The averaging
+				// type needs getAveragingOptions() to include it and a target
+				// that is not S2D, as averagingTypeOfferedBy() checks. An S2D
+				// variable inherits both options from the fallback of
+				// RasterPrecalculatedClimateVariable, but the averaging control
+				// of the download wizard shows none for it, and the map app has
+				// no averaging control at all. Otherwise leave each unset:
+				// the getters then return their defaults, and the URL writer
+				// leaves `dataVal`, `clr`, `clrType` and `avg` out.
+				if (newVariableClass && (climateVariableData?.dataValue || climateVariableData?.colourScheme || climateVariableData?.averagingType)) {
+					const newVariable = new newVariableClass(newData);
+					const dataValue = dataValueOfferedBy(
+						newVariable.hasDelta(),
+						climateVariableData?.dataValue
+					);
+					if (dataValue) {
+						newData.dataValue = dataValue;
+					}
+					const colourScheme = colourSchemeOfferedBy(
+						newVariable.getColourOptionsStatus(),
+						newVariable.getCustomColourSchemes(),
+						DEFAULT_COLOUR_SCHEMES,
+						climateVariableData?.colourScheme
+					);
+					if (colourScheme) {
+						newData.colourScheme = colourScheme;
+					}
+					const colourType = colourTypeOfferedBy(
+						colourScheme,
+						climateVariableData?.colourType
+					);
+					if (colourType) {
+						newData.colourType = colourType;
+					}
+					const averagingType = averagingTypeOfferedBy(
+						newVariable instanceof S2DClimateVariable,
+						newVariable.getAveragingOptions(),
+						climateVariableData?.averagingType
+					);
+					if (averagingType) {
+						newData.averagingType = averagingType;
 					}
 				}
 

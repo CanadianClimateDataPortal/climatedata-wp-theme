@@ -10,7 +10,7 @@ import { InteractiveRegionDisplay } from '@/types/climate-variable-interface';
 
 const InteractiveRegionsMenuItem: React.FC = () => {
 	return (
-		<SidebarMenuItem data-part="InteractiveRegionsMenuItem">
+		<SidebarMenuItem>
 			<InteractiveRegionSelect
 				displayMode={InteractiveRegionDisplay.MAP}
 			/>

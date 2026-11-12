@@ -40,9 +40,7 @@ const tooltipTimePeriods = __(
 const SidebarInnerS2D = () => {
 	return (
 		<>
-			<SidebarMenuItem
-				data-part="ForecastTypeDropdownS2D"
-			>
+			<SidebarMenuItem>
 				<ForecastTypeDropdownS2D
 					tooltip={tooltipForecastTypes}
 				/>

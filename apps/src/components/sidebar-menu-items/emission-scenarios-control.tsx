@@ -47,9 +47,7 @@ const EmissionScenariosControl: React.FC = () => {
 	}
 
 	return (
-		<SidebarMenuItem
-			data-part="EmissionScenariosControl"
-		>
+		<SidebarMenuItem>
 			<div className="flex flex-col gap-4">
 				<Dropdown
 					key={climateVariable?.getId()}

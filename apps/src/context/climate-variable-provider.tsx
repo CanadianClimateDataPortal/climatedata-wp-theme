@@ -172,12 +172,9 @@ export const ClimateVariableProvider: React.FC<{
 				// keeps a value of the old variable when the new variable offers
 				// it. Otherwise it leaves the field unset, so the getter gives
 				// the default and the URL writer leaves the parameter out.
-				// A block comment that ends with a `[data-part="..."]` line names
-				// the sidebar control of the field, by its `data-part` attribute.
 				//
 				// Version. This block runs first, because the scenarios and the
 				// sea level date range config depend on the version.
-				// `[data-part="VersionsDropdown"]`
 				const previousVersion = climateVariableData?.version;
 				if (previousVersion && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
@@ -187,7 +184,6 @@ export const ClimateVariableProvider: React.FC<{
 				}
 
 				// Scenario, among the scenarios of the version kept above.
-				// `[data-part="EmissionScenariosControl"]`
 				const previousScenario = climateVariableData?.scenario;
 				if (previousScenario && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
@@ -201,7 +197,6 @@ export const ClimateVariableProvider: React.FC<{
 				// The main scenario comes from the block above, so it can be the
 				// default rather than the old one. A variable with no scenarios,
 				// such as S2D, gets no comparison.
-				// `[data-part="EmissionScenariosControl"]`
 				const previousScenarioCompareTo =
 					climateVariableData?.scenarioCompareTo;
 				if (
@@ -222,7 +217,6 @@ export const ClimateVariableProvider: React.FC<{
 				}
 
 				// Interactive region, with the check of getInteractiveRegion().
-				// `[data-part="InteractiveRegionsMenuItem"]`
 				const previousRegion = climateVariableData?.interactiveRegion;
 				if (previousRegion && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
@@ -242,7 +236,6 @@ export const ClimateVariableProvider: React.FC<{
 				// S2D codes `months` and `seasons`, which the map control shows
 				// only as group labels, never as a value. The S2D period block
 				// below handles S2D.
-				// `[data-part="FrequenciesDropdown"]`
 				const previousFrequency = climateVariableData?.frequency;
 				if (previousFrequency && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
@@ -265,7 +258,6 @@ export const ClimateVariableProvider: React.FC<{
 				// same fixed lists, and only those lists can set these fields.
 				// So a stored value is valid for any S2D target, whatever the
 				// old variable.
-				// `[data-part="ForecastTypeDropdownS2D"]`
 				const previousForecastType = climateVariableData?.forecastType;
 				const previousForecastDisplay =
 					climateVariableData?.forecastDisplay;
@@ -287,7 +279,6 @@ export const ClimateVariableProvider: React.FC<{
 				// Threshold. The value differs per variable for the same label,
 				// so the old value maps to its label through the old variable,
 				// then the label maps to the value of the new variable.
-				// `[data-part="ThresholdValuesDropdown"]`
 				const previousThreshold = climateVariableData?.threshold;
 				const previousVariableClass = climateVariableData
 					? CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class]

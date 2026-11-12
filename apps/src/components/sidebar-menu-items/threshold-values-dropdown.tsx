@@ -26,9 +26,7 @@ const ThresholdValuesDropdown: React.FC = () => {
 	);
 
 	return (
-		<SidebarMenuItem
-			data-part="ThresholdValuesDropdown"
-		>
+		<SidebarMenuItem>
 			<Dropdown
 				key={climateVariable?.getId()}
 				placeholder={__('Select an option')}

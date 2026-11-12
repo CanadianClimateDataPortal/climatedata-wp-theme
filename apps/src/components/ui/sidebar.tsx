@@ -657,15 +657,8 @@ const SidebarPanel = React.forwardRef<
 	{
 		id: string; // used to identify the panel and keep track of its state.. must be unique
 		onClose?: () => void;
-	} & Omit<
-		React.ComponentProps<'div'>,
-		// motion.div defines these handlers with other signatures
-		| 'onAnimationStart'
-		| 'onDrag'
-		| 'onDragEnd'
-		| 'onDragStart'
-	>
->(({ id, onClose, children, className, ...props }, ref) => {
+	} & React.ComponentProps<'div'>
+>(({ id, onClose, children, className }, ref) => {
 	const [sidebarWidth, setSidebarWidth] = useState(0);
 
 	const { isPanelActive, closePanel } = useSidebar();
@@ -736,8 +729,6 @@ const SidebarPanel = React.forwardRef<
 		<AnimatePresence>
 			{isActive && (
 				<motion.div
-					// Spread first, so the attributes below keep precedence.
-					{...props}
 					ref={(node) => {
 						panelRef.current = node;
 

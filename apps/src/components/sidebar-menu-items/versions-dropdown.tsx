@@ -32,9 +32,7 @@ const VersionsDropdown: React.FC = () => {
 	};
 
 	return (
-		<SidebarMenuItem
-			data-part="VersionsDropdown"
-		>
+		<SidebarMenuItem>
 			<Dropdown
 				key={climateVariable?.getId()}
 				label={__('Versions')}

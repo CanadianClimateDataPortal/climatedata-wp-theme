@@ -103,9 +103,7 @@ const TimePeriodsControlForSeaLevel: React.FC = () => {
 	}, [climateVariable, year, min, scenario]);
 
 	return (
-		<SidebarMenuItem
-			data-part="TimePeriodsControlForSeaLevel"
-		>
+		<SidebarMenuItem>
 			<div className="time-periods-control">
 				<ControlTitle
 					title={__('Time Periods')}

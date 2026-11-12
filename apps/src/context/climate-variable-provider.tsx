@@ -1,4 +1,8 @@
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, {
+	useCallback,
+	useContext,
+	useMemo,
+} from 'react';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import ClimateVariableContext from '@/hooks/use-climate-variable';
@@ -21,16 +25,25 @@ import {
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
-import RasterPrecalculatedWithDailyFormatsClimateVariable
-	from '@/lib/raster-precalculated-with-daily-formats-climate-variable';
+import RasterPrecalculatedWithDailyFormatsClimateVariable from '@/lib/raster-precalculated-with-daily-formats-climate-variable';
 import RasterAnalyzeClimateVariable from '@/lib/raster-analyze-climate-variable';
 import SeaLevelClimateVariable from '@/lib/sea-level-climate-variable';
 import StationClimateVariable from '@/lib/station-climate-variable';
-import StationDataClimateVariable from "@/lib/station-data-climate-variable";
+import StationDataClimateVariable from '@/lib/station-data-climate-variable';
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { isFrequencyTypeS2D } from '@/types/assertions';
-import { averagingTypeOfferedBy, colourSchemeOfferedBy, colourTypeOfferedBy, dataValueOfferedBy, dateRangeOfferedBy, formatUTCDate, isFrequencyOffered, scenarioCompareToOfferedBy, thresholdValueForSameLabel } from '@/lib/utils';
+import {
+	averagingTypeOfferedBy,
+	colourSchemeOfferedBy,
+	colourTypeOfferedBy,
+	dataValueOfferedBy,
+	dateRangeOfferedBy,
+	formatUTCDate,
+	isFrequencyOffered,
+	scenarioCompareToOfferedBy,
+	thresholdValueForSameLabel,
+} from '@/lib/utils';
 import { DEFAULT_COLOUR_SCHEMES } from '@/lib/constants';
 import SectionContext from '@/context/section-provider';
 import ReturnPeriodClimateVariable from '@/lib/return-period-climate-variable';
@@ -151,7 +164,8 @@ export const ClimateVariableProvider: React.FC<{
 				/**
 				 * Class definition we can instantiate throughout this process.
 				 */
-				const newVariableClass = CLIMATE_VARIABLE_CLASS_MAP[newData.class];
+				const newVariableClass =
+					CLIMATE_VARIABLE_CLASS_MAP[newData.class];
 
 				// CLIM-1452 keep-or-default rule, version only (CLIM-1500 try,
 				// VER). Carry the selected version over when the new variable
@@ -202,8 +216,13 @@ export const ClimateVariableProvider: React.FC<{
 				// list, and StationClimateVariable gives an empty scenario
 				// config when its own config has none.
 				// `[data-part="EmissionScenariosControl"]`
-				const previousScenarioCompareTo = climateVariableData?.scenarioCompareTo;
-				if (climateVariableData?.scenarioCompare === true && previousScenarioCompareTo && newVariableClass) {
+				const previousScenarioCompareTo =
+					climateVariableData?.scenarioCompareTo;
+				if (
+					climateVariableData?.scenarioCompare === true &&
+					previousScenarioCompareTo &&
+					newVariableClass
+				) {
 					const newVariable = new newVariableClass(newData);
 					const scenarioCompareTo = scenarioCompareToOfferedBy(
 						newVariable.getScenarios(),
@@ -226,7 +245,11 @@ export const ClimateVariableProvider: React.FC<{
 				const previousRegion = climateVariableData?.interactiveRegion;
 				if (previousRegion && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
-					if (newVariable.getInteractiveRegionConfig()?.[previousRegion]) {
+					if (
+						newVariable.getInteractiveRegionConfig()?.[
+							previousRegion
+						]
+					) {
 						newData.interactiveRegion = previousRegion;
 					}
 				}
@@ -250,7 +273,15 @@ export const ClimateVariableProvider: React.FC<{
 				if (previousFrequency && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
 					const frequencyConfig = newVariable.getFrequencyConfig();
-					if (!(newVariable instanceof S2DClimateVariable) && frequencyConfig && isFrequencyOffered(frequencyConfig, section, previousFrequency)) {
+					if (
+						!(newVariable instanceof S2DClimateVariable) &&
+						frequencyConfig &&
+						isFrequencyOffered(
+							frequencyConfig,
+							section,
+							previousFrequency
+						)
+					) {
 						newData.frequency = previousFrequency;
 					}
 				}
@@ -268,8 +299,12 @@ export const ClimateVariableProvider: React.FC<{
 				// `fcastType` and `fcastDisp` out.
 				// `[data-part="ForecastTypeDropdownS2D"]`
 				const previousForecastType = climateVariableData?.forecastType;
-				const previousForecastDisplay = climateVariableData?.forecastDisplay;
-				if ((previousForecastType || previousForecastDisplay) && newVariableClass) {
+				const previousForecastDisplay =
+					climateVariableData?.forecastDisplay;
+				if (
+					(previousForecastType || previousForecastDisplay) &&
+					newVariableClass
+				) {
 					const newVariable = new newVariableClass(newData);
 					if (newVariable instanceof S2DClimateVariable) {
 						if (previousForecastType) {
@@ -296,8 +331,15 @@ export const ClimateVariableProvider: React.FC<{
 				const previousVariableClass = climateVariableData
 					? CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class]
 					: undefined;
-				if (previousThreshold && climateVariableData && previousVariableClass && newVariableClass) {
-					const previousVariable = new previousVariableClass(climateVariableData);
+				if (
+					previousThreshold &&
+					climateVariableData &&
+					previousVariableClass &&
+					newVariableClass
+				) {
+					const previousVariable = new previousVariableClass(
+						climateVariableData
+					);
 					const newVariable = new newVariableClass(newData);
 					const threshold = thresholdValueForSameLabel(
 						previousVariable.getThresholds(),
@@ -324,11 +366,24 @@ export const ClimateVariableProvider: React.FC<{
 				// `[data-part="FrequenciesDropdownS2D"]`
 				const previousS2DFrequency = climateVariableData?.frequency;
 				const previousDateRange = climateVariableData?.dateRange;
-				if ((previousS2DFrequency || previousDateRange) && climateVariableData && previousVariableClass && newVariableClass) {
-					const previousVariable = new previousVariableClass(climateVariableData);
+				if (
+					(previousS2DFrequency || previousDateRange) &&
+					climateVariableData &&
+					previousVariableClass &&
+					newVariableClass
+				) {
+					const previousVariable = new previousVariableClass(
+						climateVariableData
+					);
 					const newVariable = new newVariableClass(newData);
-					if (previousVariable instanceof S2DClimateVariable && newVariable instanceof S2DClimateVariable) {
-						if (previousS2DFrequency && isFrequencyTypeS2D(previousS2DFrequency)) {
+					if (
+						previousVariable instanceof S2DClimateVariable &&
+						newVariable instanceof S2DClimateVariable
+					) {
+						if (
+							previousS2DFrequency &&
+							isFrequencyTypeS2D(previousS2DFrequency)
+						) {
 							newData.frequency = previousS2DFrequency;
 						}
 						if (previousDateRange) {
@@ -355,10 +410,20 @@ export const ClimateVariableProvider: React.FC<{
 				// then falls to the default range, and the URL writer leaves
 				// `dateRange` out.
 				// `[data-part=""]`
-				if (previousDateRange && climateVariableData && previousVariableClass && newVariableClass) {
-					const previousVariable = new previousVariableClass(climateVariableData);
+				if (
+					previousDateRange &&
+					climateVariableData &&
+					previousVariableClass &&
+					newVariableClass
+				) {
+					const previousVariable = new previousVariableClass(
+						climateVariableData
+					);
 					const newVariable = new newVariableClass(newData);
-					if (!(previousVariable instanceof S2DClimateVariable) && !(newVariable instanceof S2DClimateVariable)) {
+					if (
+						!(previousVariable instanceof S2DClimateVariable) &&
+						!(newVariable instanceof S2DClimateVariable)
+					) {
 						const dateRange = dateRangeOfferedBy(
 							newVariable.getDateRangeConfig(),
 							newVariable.isTimePeriodARange(),
@@ -393,7 +458,12 @@ export const ClimateVariableProvider: React.FC<{
 				// the getters then return their defaults, and the URL writer
 				// leaves `dataVal`, `clr`, `clrType` and `avg` out.
 				// `[data-part=""]`
-				if (newVariableClass && (climateVariableData?.dataValue || climateVariableData?.colourScheme || climateVariableData?.averagingType)) {
+				if (
+					newVariableClass &&
+					(climateVariableData?.dataValue ||
+						climateVariableData?.colourScheme ||
+						climateVariableData?.averagingType)
+				) {
 					const newVariable = new newVariableClass(newData);
 					const dataValue = dataValueOfferedBy(
 						newVariable.hasDelta(),
@@ -432,11 +502,13 @@ export const ClimateVariableProvider: React.FC<{
 			} else {
 				throw new Error(`No matching variable found for id: ${variable.id}`);
 			}
-		}, [
+		},
+		[
 			climateVariableData,
 			dispatch,
 			section,
-		]);
+		]
+	);
 
 	/**
 	 * Updates the version of the climate variable and dispatches the updated information.
@@ -451,12 +523,17 @@ export const ClimateVariableProvider: React.FC<{
 			const currentData = climateVariableData;
 			if (!currentData || currentData.version === version) return;
 
-			const validScenario = climateVariable?.getValidScenarioForVersion(version);
+			const validScenario =
+				climateVariable?.getValidScenarioForVersion(version);
 			const updatePayload: Partial<ClimateVariableConfigInterface> = {
-				version
+				version,
 			};
 
-			if (validScenario && (!currentData.scenario || currentData.scenario !== validScenario)) {
+			if (
+				validScenario &&
+				(!currentData.scenario ||
+					currentData.scenario !== validScenario)
+			) {
 				updatePayload.scenario = validScenario;
 			}
 
@@ -713,7 +790,6 @@ export const ClimateVariableProvider: React.FC<{
 					selectedRegion: null,
 				})
 			);
-
 		},
 		[dispatch, climateVariableData]
 	);

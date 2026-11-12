@@ -236,9 +236,12 @@ export const ClimateVariableProvider: React.FC<{
 				}
 
 				// Frequency, as FrequencySelect offers it in this section. This
-				// block skips an S2D target on purpose. An S2D variable inherits
-				// a fallback frequency config that accepts `ann`, a code the S2D
-				// sidebar does not offer. The S2D period block below handles S2D.
+				// block skips S2D on either side on purpose. An S2D variable
+				// inherits a fallback frequency config that accepts `ann`, a code
+				// the S2D sidebar does not offer. A projection config accepts the
+				// S2D codes `months` and `seasons`, which the map control shows
+				// only as group labels, never as a value. The S2D period block
+				// below handles S2D.
 				// `[data-part="FrequenciesDropdown"]`
 				const previousFrequency = climateVariableData?.frequency;
 				if (previousFrequency && newVariableClass) {

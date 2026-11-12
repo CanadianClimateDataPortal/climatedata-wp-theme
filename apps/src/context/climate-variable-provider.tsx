@@ -168,17 +168,35 @@ export const ClimateVariableProvider: React.FC<{
 					CLIMATE_VARIABLE_CLASS_MAP[newData.class];
 
 				/**
-				 * @REMARK CLIM-1500 END This looks good. Planned for parts of this file to be merged in CLIM-1506 (PR #735)
-				 * But to be merged we'll need:
-				 * - Remove or clarify the comments we've added in the code during CLIM-1500_Spike-Analysis-LOCAL-ONLY
-				 * - Confirm and document (in PR 735) what these changes covers (see if we are still missing too)
+				 * @REMARK CLIM-1500 END Notes for the branches that fork from
+				 * this commit. Later CLIM-1506 commits remove them.
 				 *
-				 * *** GENERAL REMARKS ***
-				 * - Split between CLIM-1506, CLIM-1507 and CLIM-1508:
-				 *   - Need to figure out what's needed, and in which PRs
-				 *   - Regarding CLIM-1507
-				 *     - ...and (always) keep important parameters in URL Search query, request to have is an hypothesis, we need to confirm whether these changes improves without needing to change URL sync with the store.
-				 *       (in other words: the changes here do they fix CLIM-1500 and original issue CLIM-1452 by themselves or we need something further, like the hypothesis of URL Search query is warranted)
+				 * CLIM-1506, CLIM-1507 and CLIM-1508 are three steps. CLIM-1506
+				 * merges what works now. The other two improve it.
+				 *
+				 * CLIM-1506 (PR 735): when the user changes the climate variable,
+				 * a field keeps its value when the new variable offers an
+				 * equivalent value. The carry blocks below look good. They all
+				 * merge through CLIM-1506, almost as they are. Before the merge:
+				 * - Shorten or remove the comments that CLIM-1500 added to them.
+				 * - In PR 735, list the fields they cover and the fields they
+				 *   still miss.
+				 * CLIM-1500 was the analysis that found the problem and tried
+				 * these blocks. CLIM-1452 is the original issue. Code structure
+				 * improvements wait for CLIM-1507 and CLIM-1508.
+				 *
+				 * CLIM-1507: the URL and the state stay in sync. A default value
+				 * goes to the URL only when a check shows it is a useful change.
+				 * Correcting the problems comes first. Hypothesis to test: do the
+				 * carry blocks alone fix CLIM-1452, or is the URL change needed?
+				 *
+				 * Each carry block comment ends with a `[data-part="..."]` line.
+				 * It names the sidebar control whose value the block carries, as
+				 * a selector on the `data-part` attribute, to find that control
+				 * in the DOM. The sidebar `data-part` attributes go to `main`
+				 * with CLIM-1506: they help to see which control holds which
+				 * value. Few commits add them, so a `git revert` of those
+				 * commits removes them if they are not wanted later.
 				 */
 
 				// CLIM-1452 keep-or-default rule, version only (CLIM-1500 try,
@@ -312,7 +330,8 @@ export const ClimateVariableProvider: React.FC<{
 				// that took it from the URL. Otherwise leave both unset: the
 				// getters then return their defaults, and the URL writer leaves
 				// `fcastType` and `fcastDisp` out.
-				// `[data-part="ForecastTypeDropdownS2D"]`
+				// `[data-part="ForecastTypeDropdownS2D"]`. ForecastDisplayDropdownS2D
+				// has no `data-part` yet.
 				const previousForecastType = climateVariableData?.forecastType;
 				const previousForecastDisplay =
 					climateVariableData?.forecastDisplay;
@@ -378,7 +397,8 @@ export const ClimateVariableProvider: React.FC<{
 				// not offer, and isFrequencyOffered() rejects the decadal codes.
 				// The date range is carried as is. TimePeriodsControlS2D snaps a
 				// date range that matches no period to the first one.
-				// `[data-part="FrequenciesDropdownS2D"]`
+				// `[data-part]`: none yet. FrequenciesDropdownS2D and
+				// TimePeriodsControlS2D have no `data-part`.
 				const previousS2DFrequency = climateVariableData?.frequency;
 				const previousDateRange = climateVariableData?.dateRange;
 				if (
@@ -424,7 +444,9 @@ export const ClimateVariableProvider: React.FC<{
 				// the static config, which only allowance sets: getDateRange()
 				// then falls to the default range, and the URL writer leaves
 				// `dateRange` out.
-				// `[data-part=""]`
+				// `[data-part]`: not chosen yet. TimePeriodsControl,
+				// TimePeriodsControlSingle and TimePeriodsControlForSeaLevel
+				// each have their own `data-part`.
 				if (
 					previousDateRange &&
 					climateVariableData &&
@@ -472,7 +494,8 @@ export const ClimateVariableProvider: React.FC<{
 				// no averaging control at all. Otherwise leave each unset:
 				// the getters then return their defaults, and the URL writer
 				// leaves `dataVal`, `clr`, `clrType` and `avg` out.
-				// `[data-part=""]`
+				// `[data-part]`: none yet. The data value, colour scheme,
+				// colour type and averaging controls have no `data-part`.
 				if (
 					newVariableClass &&
 					(climateVariableData?.dataValue ||

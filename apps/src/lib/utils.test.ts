@@ -398,8 +398,10 @@ describe('arraySize', () => {
 });
 
 /**
- * @REMARK CLIM-1500 END: These added needs further reviewing but are a good idea.
- * We need to confirm and ensure we test useful system aspects.
+ * @REMARK CLIM-1500 END: The describe blocks from isFrequencyOffered to the
+ * end of this file test the helpers that the carry blocks of
+ * selectClimateVariable use. They are a good idea. Before the CLIM-1506
+ * merge, review them: each test must check a useful aspect of the system.
  */
 describe('isFrequencyOffered', () => {
 	const annualOnly: FrequencyConfig = {

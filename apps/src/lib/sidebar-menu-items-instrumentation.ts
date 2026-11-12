@@ -1,19 +1,27 @@
 /**
- * @REMARK CLIM-1500 END: Instrumentation is a good idea,
+ * @REMARK CLIM-1500 END: Instrumentation is a good idea. This module is the
+ * start point of CLIM-1508 ("Refactoring pour simplifier la gestion des
+ * paramètres", in English: refactor to simplify parameter handling).
+ * CLIM-1508 puts the properties in one store namespace, with tests written
+ * once, and removes the duplicate tests. Ideally it removes more code than
+ * it adds.
+ *
  * Needed for CLIM-1508:
- * - It's best to to improve foundation first.
- * - If foundation holds, and we want to activate and see in production using a feature toggle from `apply-cookie-feature-toggle-from-url` to conditionally load this.
+ * - Improve the foundation first.
+ * - If the foundation holds: open question, does production load this
+ *   module behind a feature toggle (applyFeatureToggleFromUrl in
+ *   `apply-cookie-feature-toggle-from-url.ts`)?
  *
- * *** GENERAL REMARKS ***
- * - This file will be the foundation of CLIM-1508 "Refactoring pour simplifier la gestion des paramètres"
- * - From the perspective of CLIM-1506 (PR 735) but this commit should be the kept in the shared base, so we can have it available when forking off from commit `CLIM-1500 END: SHARED_BASE_COMMIT`
- * - Ideally the resulting work of CLIM-1508 will remove more code than adding.
+ * This module, its import in `main-map.tsx` and the
+ * `data-tracking-url-query` attributes do not go to `main` with CLIM-1506.
+ * They stay in the commit that later branches fork from, so CLIM-1508 has
+ * them. Find that commit with `git log --grep SHARED_BASE_COMMIT`.
  *
- * Context:
- *   Early on during CLIM-1500, I realized it would help to "visualize" the state and document from the code itself
- *   the important variables and guide the session(s) (it's more than 9600704 bytes of notes in `2026102401-ClimateData-CLIM-1500/`!).
- *   This file was like a Debugging Signals helpers to guide context and after having written this file I realized I was re-implementing
- *   what a Vuex/Redux store should normally do.
+ * Context: during CLIM-1500, this module made the state visible and
+ * documented the important variables from the code itself, to guide the
+ * sessions (notes in workspace `2026102401-ClimateData-CLIM-1500/`).
+ * Writing it showed that it re-implements what a Vuex/Redux store should
+ * normally do.
  */
 
 //

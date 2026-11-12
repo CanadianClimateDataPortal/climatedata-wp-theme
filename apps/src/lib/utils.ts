@@ -140,12 +140,20 @@ export const getDefaultFrequency = (
 };
 
 /**
- * @REMARK CLIM-1500 END: These looks good, in order to merge we need further reviewing.
- * - Comments should describe things that we cannot see while reading the code
- * - Formatting adjustments (Renoir will make a commit with message body RENOIR_FORMATTING_ADJUSTMENTS)
- * - Ensure we make-use of existing symbols (e.g. if there's an existing list of months as string, do not make a new one KEEPING_ONLY_ONE_LIST_OF_STRINGS_ENGLISH_MONTHS_NAMES)
+ * @REMARK CLIM-1500 END: The helpers from isFrequencyOffered to
+ * averagingTypeOfferedBy serve the carry blocks of selectClimateVariable.
+ * They look good and merge through CLIM-1506, after a review:
+ * - Comments describe only what the code does not show.
+ * - Renoir adjusts the formatting in a commit with the message body
+ *   RENOIR_FORMATTING_ADJUSTMENTS.
+ * - Reuse existing symbols instead of adding new ones.
  *
- * What's great in what's been added here is that they are tested outside of a web browser.
+ * KEEPING_ONLY_ONE_LIST_OF_STRINGS_ENGLISH_MONTHS_NAMES is a search token.
+ * It marks each copy of the list of English month codes ('jan' to 'dec').
+ * The goal is one list. That work belongs to a follow-up ticket, not to
+ * CLIM-1506. Which copy stays is an open question.
+ *
+ * What is great here: tests cover these helpers outside a web browser.
  */
 
 /**

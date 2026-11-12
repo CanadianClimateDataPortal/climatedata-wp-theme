@@ -419,7 +419,11 @@ export const ClimateVariableProvider: React.FC<{
 			} else {
 				throw new Error(`No matching variable found for id: ${variable.id}`);
 			}
-		}, [dispatch, climateVariableData]);
+		}, [
+			climateVariableData,
+			dispatch,
+			section,
+		]);
 
 	/**
 	 * Updates the version of the climate variable and dispatches the updated information.

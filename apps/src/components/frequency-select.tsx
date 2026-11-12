@@ -76,7 +76,7 @@ const FrequencySelect = ({
 		}
 	}, [selectValue, value, onValueChange, hasMonths, hasAllMonths, hasSeasons, hasDaily, hasAnnual, hasAnnualJulJun]);
 
-	const months = [ // CLIM-1500 END KEEPING_ONLY_ONE_LIST_OF_STRINGS_ENGLISH_MONTHS_NAMES
+	const months = [
 		'jan',
 		'feb',
 		'mar',
@@ -156,7 +156,7 @@ const FrequencySelect = ({
 	const FrequencyOptions = () => {
 		// The "Annual" label becomes "Annual (January to December) if we also have the "Annual (July to June)" option
 		const annualLabel = hasAnnualJulJun ? 'Annual (January to December)' : 'Annual';
-
+		
 		return (
 			<SelectContent>
 				{hasAnnual && <SelectItem value={FrequencyType.ANNUAL}>

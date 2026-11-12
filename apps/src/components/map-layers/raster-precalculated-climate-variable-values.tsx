@@ -143,7 +143,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			// If monthly, we take the frequency month index
 			// If seasonal, we take the related month index
 			let month = 0;
-			const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']; // KEEPING_ONLY_ONE_LIST_OF_STRINGS_ENGLISH_MONTHS_NAMES(?)
+			const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 			const seasons = ['spring', 'summer', 'fall', 'winter'];
 			if(months.includes(frequency)) {
 				month = months.indexOf(frequency);

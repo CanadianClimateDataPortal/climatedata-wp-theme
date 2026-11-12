@@ -79,7 +79,7 @@ export const getFrequencyType = (
 		frequencyCode = FrequencyType.YS;
 	} else if (frequency === 'annual_jul_jun') {
 		frequencyCode = FrequencyType.YSJUL;
-	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) { // KEEPING_ONLY_ONE_LIST_OF_STRINGS_ENGLISH_MONTHS_NAMES(?)
+	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
 		frequencyCode = FrequencyType.MS;
 	} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
 		frequencyCode = FrequencyType.QSDEC;
@@ -140,23 +140,6 @@ export const getDefaultFrequency = (
 };
 
 /**
- * @REMARK CLIM-1500 END: The helpers from isFrequencyOffered to
- * averagingTypeOfferedBy serve the carry blocks of selectClimateVariable.
- * They look good and merge through CLIM-1506, after a review:
- * - Comments describe only what the code does not show.
- * - Renoir adjusts the formatting in a commit with the message body
- *   RENOIR_FORMATTING_ADJUSTMENTS.
- * - Reuse existing symbols instead of adding new ones.
- *
- * KEEPING_ONLY_ONE_LIST_OF_STRINGS_ENGLISH_MONTHS_NAMES is a search token.
- * It marks each copy of the list of English month codes ('jan' to 'dec').
- * The goal is one list. That work belongs to a follow-up ticket, not to
- * CLIM-1506. Which copy stays is an open question.
- *
- * What is great here: tests cover these helpers outside a web browser.
- */
-
-/**
  * Tells whether a frequency code is offered by a frequency config in a section.
  * It mirrors the options that FrequencySelect renders: a month code needs
  * MONTHLY or ALL_MONTHS, a season code needs SEASONAL, and any other code
@@ -167,7 +150,7 @@ export const isFrequencyOffered = (
 	section: string,
 	frequency: string
 ): boolean => {
-	if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) { // KEEPING_ONLY_ONE_LIST_OF_STRINGS_ENGLISH_MONTHS_NAMES(?)
+	if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
 		return isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
 			|| isFrequencyEnabled(config, section, FrequencyType.ALL_MONTHS);
 	}

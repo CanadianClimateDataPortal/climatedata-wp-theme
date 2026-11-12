@@ -159,6 +159,7 @@ export const ClimateVariableProvider: React.FC<{
 				// to the first offered version, and the URL writer leaves `ver`
 				// out. This block runs before the scenario block, because
 				// getScenarios() lists the scenarios of the version on newData.
+				// `[data-part="VersionsDropdown"]`
 				const previousVersion = climateVariableData?.version;
 				if (previousVersion && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
@@ -174,6 +175,7 @@ export const ClimateVariableProvider: React.FC<{
 				// preferred scenario (SSP2-4.5 for cmip6, RCP4.5 for cmip5) when
 				// the version offers it, else the first one. The URL writer
 				// leaves `scen` out, so the sidebar and the URL agree.
+				// `[data-part="EmissionScenariosControl"]`
 				const previousScenario = climateVariableData?.scenario;
 				if (previousScenario && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
@@ -199,6 +201,7 @@ export const ClimateVariableProvider: React.FC<{
 				// S2DClimateVariable overrides getScenarios() to give an empty
 				// list, and StationClimateVariable gives an empty scenario
 				// config when its own config has none.
+				// `[data-part="EmissionScenariosControl"]`
 				const previousScenarioCompareTo = climateVariableData?.scenarioCompareTo;
 				if (climateVariableData?.scenarioCompare === true && previousScenarioCompareTo && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
@@ -219,6 +222,7 @@ export const ClimateVariableProvider: React.FC<{
 				// as getInteractiveRegion(). Otherwise leave it unset: the getter
 				// then falls to the first active region, and the URL writer
 				// leaves `region` out, so the sidebar and the URL agree.
+				// `[data-part="InteractiveRegionsMenuItem"]`
 				const previousRegion = climateVariableData?.interactiveRegion;
 				if (previousRegion && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
@@ -241,6 +245,7 @@ export const ClimateVariableProvider: React.FC<{
 				// fallback config (ANNUAL and MONTHLY), so isFrequencyOffered
 				// would accept `ann`, a code the S2D sidebar does not offer. The
 				// S2D-PERIOD block below owns the S2D-to-S2D case.
+				// `[data-part="FrequenciesDropdown"]`
 				const previousFrequency = climateVariableData?.frequency;
 				if (previousFrequency && newVariableClass) {
 					const newVariable = new newVariableClass(newData);
@@ -261,6 +266,7 @@ export const ClimateVariableProvider: React.FC<{
 				// that took it from the URL. Otherwise leave both unset: the
 				// getters then return their defaults, and the URL writer leaves
 				// `fcastType` and `fcastDisp` out.
+				// `[data-part="ForecastTypeDropdownS2D"]`
 				const previousForecastType = climateVariableData?.forecastType;
 				const previousForecastDisplay = climateVariableData?.forecastDisplay;
 				if ((previousForecastType || previousForecastDisplay) && newVariableClass) {
@@ -285,6 +291,7 @@ export const ClimateVariableProvider: React.FC<{
 				// depends on. Otherwise leave it unset: getThreshold() then
 				// falls to the first threshold, and the URL writer leaves `th`
 				// out.
+				// `[data-part="ThresholdValuesDropdown"]`
 				const previousThreshold = climateVariableData?.threshold;
 				const previousVariableClass = climateVariableData
 					? CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class]
@@ -314,6 +321,7 @@ export const ClimateVariableProvider: React.FC<{
 				// not offer, and isFrequencyOffered() rejects the decadal codes.
 				// The date range is carried as is. TimePeriodsControlS2D snaps a
 				// date range that matches no period to the first one.
+				// `[data-part="FrequenciesDropdownS2D"]`
 				const previousS2DFrequency = climateVariableData?.frequency;
 				const previousDateRange = climateVariableData?.dateRange;
 				if ((previousS2DFrequency || previousDateRange) && climateVariableData && previousVariableClass && newVariableClass) {
@@ -346,6 +354,7 @@ export const ClimateVariableProvider: React.FC<{
 				// the static config, which only allowance sets: getDateRange()
 				// then falls to the default range, and the URL writer leaves
 				// `dateRange` out.
+				// `[data-part=""]`
 				if (previousDateRange && climateVariableData && previousVariableClass && newVariableClass) {
 					const previousVariable = new previousVariableClass(climateVariableData);
 					const newVariable = new newVariableClass(newData);
@@ -383,6 +392,7 @@ export const ClimateVariableProvider: React.FC<{
 				// no averaging control at all. Otherwise leave each unset:
 				// the getters then return their defaults, and the URL writer
 				// leaves `dataVal`, `clr`, `clrType` and `avg` out.
+				// `[data-part=""]`
 				if (newVariableClass && (climateVariableData?.dataValue || climateVariableData?.colourScheme || climateVariableData?.averagingType)) {
 					const newVariable = new newVariableClass(newData);
 					const dataValue = dataValueOfferedBy(

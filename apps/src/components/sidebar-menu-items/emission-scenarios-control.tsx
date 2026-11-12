@@ -69,8 +69,6 @@ const EmissionScenariosControl: React.FC = () => {
 						className="text-brand-red"
 						checked={climateVariable?.getScenarioCompare() ?? false}
 						onCheckedChange={handleCompareChange}
-						data-tracking-url-query="cmp"
-
 					/>
 					<label
 						htmlFor="compare-scenarios"
@@ -88,7 +86,6 @@ const EmissionScenariosControl: React.FC = () => {
 						) ?? []}
 						value={climateVariable?.getScenarioCompareTo() ?? undefined}
 						onChange={setScenarioCompareTo}
-						data-tracking-url-query="cmpTo"
 					/>
 				)}
 			</div>

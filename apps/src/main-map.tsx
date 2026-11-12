@@ -9,8 +9,6 @@ import { store } from '@/app/store';
 import { installPrepareRasterStub } from '@/lib/map/image-rastering';
 import { applyFeatureToggleFromUrl } from '@/lib/feature-toggling';
 
-import '@/lib/sidebar-menu-items-instrumentation'; // CLIM-1500 END: For CLIM-1508, not shipped with CLIM-1506. See the module header.
-
 import App from '@/App';
 
 import '@/Global.css';

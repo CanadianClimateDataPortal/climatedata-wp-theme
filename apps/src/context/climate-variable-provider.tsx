@@ -162,19 +162,21 @@ export const ClimateVariableProvider: React.FC<{
 					datasetType: dataset?.dataset_type,
 				};
 				/**
-				 * Class definition we can instantiate throughout this process.
+				 * Each block below builds its own instance from newData, as the
+				 * blocks before it left it.
 				 */
 				const newVariableClass =
 					CLIMATE_VARIABLE_CLASS_MAP[newData.class];
 
-				// CLIM-1452 keep-or-default rule, version only (CLIM-1500 try,
-				// VER). Carry the selected version over when the new variable
-				// offers it. Otherwise leave it unset: getVersion() then falls
-				// to the first offered version, and the URL writer leaves `ver`
-				// out. This block runs before the scenario block, because
-				// getScenarios() lists the scenarios of the version on newData.
-				// The last line of each such comment selects the sidebar control
-				// of the field, by its `data-part` attribute.
+				// CLIM-1452: on a change of climate variable, each block below
+				// keeps a value of the old variable when the new variable offers
+				// it. Otherwise it leaves the field unset, so the getter gives
+				// the default and the URL writer leaves the parameter out.
+				// A block comment that ends with a `[data-part="..."]` line names
+				// the sidebar control of the field, by its `data-part` attribute.
+				//
+				// Version. This block runs first, because the scenarios and the
+				// sea level date range config depend on the version.
 				// `[data-part="VersionsDropdown"]`
 				const previousVersion = climateVariableData?.version;
 				if (previousVersion && newVariableClass) {
@@ -184,13 +186,7 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
-				// CLIM-1452 keep-or-default rule, scenario only (CLIM-1500 try,
-				// scenario). Carry the selected scenario over when the new
-				// variable offers it for its own version. Otherwise leave it
-				// unset: getScenario() then falls to getDefaultScenario(), the
-				// preferred scenario (SSP2-4.5 for cmip6, RCP4.5 for cmip5) when
-				// the version offers it, else the first one. The URL writer
-				// leaves `scen` out, so the sidebar and the URL agree.
+				// Scenario, among the scenarios of the version kept above.
 				// `[data-part="EmissionScenariosControl"]`
 				const previousScenario = climateVariableData?.scenario;
 				if (previousScenario && newVariableClass) {
@@ -200,23 +196,11 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
-				// CLIM-1452 keep-or-default rule, scenario comparison only
-				// (CLIM-1500 try, CMP). Keep Compare scenarios checked and
-				// keep the compared scenario when the new variable offers it
-				// for its own version and it differs from the main scenario
-				// that the sidebar shows, as scenarioCompareToOfferedBy()
-				// checks. The main scenario is read from getScenario() after
-				// the scenario block above ran, so it is the carried scenario
-				// or the default of getDefaultScenario(). The two values travel
-				// together.
-				// Otherwise leave both unset: the checkbox shows unchecked, and
-				// the URL writer leaves `cmp` and `cmpTo` out. A checked box
-				// alone would show no comparison map, and on a variable with no
-				// scenarios the sidebar hides the checkbox while the URL writer
-				// still writes `cmp`. An S2D or a station target gets no carry:
-				// S2DClimateVariable overrides getScenarios() to give an empty
-				// list, and StationClimateVariable gives an empty scenario
-				// config when its own config has none.
+				// Scenario comparison. The checkbox and the compared scenario go
+				// together, because a checked box alone shows no comparison map.
+				// The main scenario comes from the block above, so it can be the
+				// default rather than the old one. A variable with no scenarios,
+				// such as S2D, gets no comparison.
 				// `[data-part="EmissionScenariosControl"]`
 				const previousScenarioCompareTo =
 					climateVariableData?.scenarioCompareTo;
@@ -237,12 +221,7 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
-				// CLIM-1452 keep-or-default rule, interactive region only
-				// (CLIM-1500 try, region). Carry the selected region over when
-				// the region config of the new variable has it, the same check
-				// as getInteractiveRegion(). Otherwise leave it unset: the getter
-				// then falls to the first active region, and the URL writer
-				// leaves `region` out, so the sidebar and the URL agree.
+				// Interactive region, with the check of getInteractiveRegion().
 				// `[data-part="InteractiveRegionsMenuItem"]`
 				const previousRegion = climateVariableData?.interactiveRegion;
 				if (previousRegion && newVariableClass) {
@@ -256,20 +235,10 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
-				// CLIM-1452 keep-or-default rule, frequency only (CLIM-1500 try,
-				// frequency). Carry the selected frequency over when the frequency
-				// config of the new variable offers it in this section, as
-				// FrequencySelect renders it. getFrequencyConfig() includes the
-				// class fallback for a variable with no frequencyConfig. Otherwise
-				// leave it unset: FrequenciesDropdown then shows the default of
-				// getDefaultFrequency(), and the URL writer leaves `freq` out.
-				// This block skips an S2D target. The S2D sidebar offers its own
-				// frequency codes (months, seasons and the decadal codes) from
-				// FrequenciesDropdownS2D, not from frequencyConfig. An S2D
-				// variable inherits the RasterPrecalculatedClimateVariable
-				// fallback config (ANNUAL and MONTHLY), so isFrequencyOffered
-				// would accept `ann`, a code the S2D sidebar does not offer. The
-				// S2D-PERIOD block below owns the S2D-to-S2D case.
+				// Frequency, as FrequencySelect offers it in this section. This
+				// block skips an S2D target on purpose. An S2D variable inherits
+				// a fallback frequency config that accepts `ann`, a code the S2D
+				// sidebar does not offer. The S2D period block below handles S2D.
 				// `[data-part="FrequenciesDropdown"]`
 				const previousFrequency = climateVariableData?.frequency;
 				if (previousFrequency && newVariableClass) {
@@ -289,17 +258,10 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
-				// CLIM-1452 keep-or-default rule, S2D forecast type and display
-				// only (CLIM-1500 try, S2D). Carry both over when the new
-				// variable is S2D. Every S2D variable offers the same fixed
-				// lists, so no value check is needed. The block does not test
-				// the old variable either. Only the S2D dropdowns and the URL
-				// sync set these two fields, and both accept only values of
-				// those fixed lists. So a stored value is valid for any S2D
-				// target, even when the old variable is a projection variable
-				// that took it from the URL. Otherwise leave both unset: the
-				// getters then return their defaults, and the URL writer leaves
-				// `fcastType` and `fcastDisp` out.
+				// S2D forecast type and display. Every S2D variable offers the
+				// same fixed lists, and only those lists can set these fields.
+				// So a stored value is valid for any S2D target, whatever the
+				// old variable.
 				// `[data-part="ForecastTypeDropdownS2D"]`
 				const previousForecastType = climateVariableData?.forecastType;
 				const previousForecastDisplay =
@@ -319,16 +281,9 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
-				// CLIM-1452 keep-or-default rule, threshold only (CLIM-1500 try,
-				// TH). Carry the selected threshold over when the new variable
-				// offers a threshold with the same label. The value differs per
-				// variable, for example rl20tasmax and rl20pr for "1-in-20
-				// year", so the old value maps to its label through the old
-				// variable, then the label to the new value. The old instance is
-				// built from climateVariableData, which the callback already
-				// depends on. Otherwise leave it unset: getThreshold() then
-				// falls to the first threshold, and the URL writer leaves `th`
-				// out.
+				// Threshold. The value differs per variable for the same label,
+				// so the old value maps to its label through the old variable,
+				// then the label maps to the value of the new variable.
 				// `[data-part="ThresholdValuesDropdown"]`
 				const previousThreshold = climateVariableData?.threshold;
 				const previousVariableClass = climateVariableData
@@ -354,18 +309,10 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
-				// CLIM-1452 keep-or-default rule, S2D frequency and time period
-				// only (CLIM-1500 try, S2D-PERIOD). Carry both over when the old
-				// and the new variable are S2D. The period cannot survive
-				// without its frequency, so both go together. The frequency is
-				// checked against S2DFrequencyTypes, the list that
-				// FrequenciesDropdownS2D offers for every S2D variable. The
-				// frequency block above does not cover it, because it skips an
-				// S2D target on purpose: the fallback frequency config that an
-				// S2D variable inherits would accept codes the S2D sidebar does
-				// not offer, and isFrequencyOffered() rejects the decadal codes.
-				// The date range is carried as is. TimePeriodsControlS2D snaps a
-				// date range that matches no period to the first one.
+				// S2D frequency and time period, from one S2D variable to
+				// another. The period needs its frequency, so both go together.
+				// The date range needs no check, because TimePeriodsControlS2D
+				// snaps a date range that matches no period to the first one.
 				const previousS2DFrequency = climateVariableData?.frequency;
 				const previousDateRange = climateVariableData?.dateRange;
 				if (
@@ -394,23 +341,12 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
-				// CLIM-1452 keep-or-default rule, projection time period only
-				// (CLIM-1500 try, PERIOD). Carry the selected date range over
-				// when the time period control of the new variable could have
-				// produced it, as dateRangeOfferedBy() checks: both ends inside
-				// getDateRangeConfig(), and the shape that isTimePeriodARange()
-				// asks for. This block runs after the version block, because
-				// the range config of SeaLevelClimateVariable depends on the
-				// version. It skips an S2D variable on either side. An S2D
-				// variable inherits the RasterPrecalculatedClimateVariable
-				// fallback range (1950 to 2100), so a projection pair would
-				// pass for an S2D target, and the S2D-PERIOD block above owns
-				// the S2D-to-S2D case. Only dateRange is set. The sync effect of
-				// TimePeriodsControl and TimePeriodsControlSingle then updates
-				// timePeriodEnd in the map state. Otherwise keep the dateRange of
-				// the static config, which only allowance sets: getDateRange()
-				// then falls to the default range, and the URL writer leaves
-				// `dateRange` out.
+				// Projection time period. It skips S2D on either side, because
+				// an S2D variable inherits a fallback range that a projection
+				// pair would pass. The block sets only dateRange, and the time
+				// period controls then update timePeriodEnd in the map state.
+				// When the block keeps no range, newData keeps the date range of
+				// its static config, which only allowance sets.
 				if (
 					previousDateRange &&
 					climateVariableData &&
@@ -436,28 +372,12 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
-				// CLIM-1452 keep-or-default rule, data value, colour scheme,
-				// colour type and averaging (CLIM-1500 try, CLR). Each value is
-				// carried on its own, when the new variable offers it. The
-				// getters return these stored values unchecked, so the carry
-				// does the check. The data value needs hasDelta(), the flag that
-				// shows DataValuesControl, as dataValueOfferedBy() checks. The
-				// colour scheme needs the Map colours control shown, from
-				// getColourOptionsStatus(), and the scheme in the list that
-				// ColourSchemeDropdown builds, as colourSchemeOfferedBy() checks.
-				// A hidden control means the variable does not offer the scheme,
-				// because the scheme would still colour the map with no control
-				// to undo it. The colour type follows the carried scheme, as
-				// colourTypeOfferedBy() checks, because MapColorsDropdown shows
-				// the type only for a scheme other than default. The averaging
-				// type needs getAveragingOptions() to include it and a target
-				// that is not S2D, as averagingTypeOfferedBy() checks. An S2D
-				// variable inherits both options from the fallback of
-				// RasterPrecalculatedClimateVariable, but the averaging control
-				// of the download wizard shows none for it, and the map app has
-				// no averaging control at all. Otherwise leave each unset:
-				// the getters then return their defaults, and the URL writer
-				// leaves `dataVal`, `clr`, `clrType` and `avg` out.
+				// Data value, colour scheme, colour type and averaging, each on
+				// its own. Their getters return a stored value unchecked, so the
+				// check happens here. A value counts as offered only when its
+				// control shows: a hidden control would leave the value in
+				// effect with no way to undo it. The colour type follows the
+				// colour scheme kept here.
 				if (
 					newVariableClass &&
 					(climateVariableData?.dataValue ||

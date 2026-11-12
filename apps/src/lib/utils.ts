@@ -191,14 +191,10 @@ export const thresholdValueForSameLabel = (
 };
 /**
  * Gives the previous date range back when the time period control of the next
- * variable could have produced it, else null. The range control
- * (TimePeriodsControl) stores a start and an end exactly one interval apart.
- * The single-thumb control (TimePeriodsControlSingle) stores the same year
- * twice. Both ends must lie inside the min and max of the config. The stored
- * shape tells a range pair from a single year, so a range pair never passes
- * for a single-thumb variable, nor the reverse. The ends and the bounds are
- * read as years. A pair or a config of full dates never matches, such as an
- * S2D date range or the day-type config of StationDataClimateVariable.
+ * variable could have produced it, else null. A range control stores a start
+ * and an end one interval apart. A single-thumb control stores the same year
+ * twice. Both ends must lie inside the bounds of the config. Full dates never
+ * match, because the check reads the ends and the bounds as years.
  */
 export const dateRangeOfferedBy = (
 	config: DateRangeConfig | null,
@@ -229,12 +225,7 @@ export const dateRangeOfferedBy = (
 /**
  * Gives the previous compared scenario back when the next variable offers it
  * and it differs from the main scenario of the next variable, else null. The
- * list is the one getScenarios() gives for the version of the next variable,
- * so a cmip5 scenario never passes against a cmip6 list. The main scenario is
- * the one the sidebar shows, from getScenario(), which may be the default
- * rather than the previous main scenario. EmissionScenariosControl hides the
- * main scenario from the second select, so a compared scenario equal to it
- * could not have been chosen there.
+ * sidebar never offers the main scenario as the compared one.
  */
 export const scenarioCompareToOfferedBy = (
 	nextScenarios: string[],
@@ -248,13 +239,9 @@ export const scenarioCompareToOfferedBy = (
 	return nextScenarios.includes(previousCompareTo) ? previousCompareTo : null;
 };
 /**
- * Gives the previous data value back when the next variable shows the Values
- * control, else null. The control is DataValuesControl, and app-sidebar.tsx
- * renders it only when hasDelta() of the variable is truthy. Its two options,
- * absolute and delta, are fixed in the component, so the flag is the whole
- * check. getDataValue() returns a stored delta unchecked, so a delta kept on a
- * variable without delta would still reach the map layer with no control to
- * undo it.
+ * Gives the previous data value back when the next variable has a delta, so
+ * the Values control shows, else null. The control offers the same two options
+ * for every variable, so the flag is the whole check.
  */
 export const dataValueOfferedBy = (
 	nextHasDelta: boolean | undefined,
@@ -268,14 +255,9 @@ export const dataValueOfferedBy = (
 };
 /**
  * Gives the previous colour scheme back when the Map colours control of the
- * next variable shows and lists it, else null. app-sidebar.tsx renders the
- * control only when getColourOptionsStatus() is true. A hidden control means
- * the variable does not offer the scheme, because getColourScheme() still
- * colours the map and the user would have no control to undo it. The list is
- * the one ColourSchemeDropdown builds: the keys of the custom schemes when
- * getCustomColourSchemes() gives some, else the keys of DEFAULT_COLOUR_SCHEMES
- * plus the item default. The caller passes DEFAULT_COLOUR_SCHEMES, so this
- * file does not import the map constants.
+ * next variable shows and lists it, else null. The list is the one
+ * ColourSchemeDropdown builds: the custom schemes of the variable when it has
+ * some, else the default schemes plus the item default.
  */
 export const colourSchemeOfferedBy = (
 	nextColourOptionsStatus: boolean,
@@ -314,16 +296,10 @@ export const colourTypeOfferedBy = (
 		: null;
 };
 /**
- * Gives the previous averaging type back when the next variable shows the
- * averaging control and its averaging options include the type, else null.
- * The only averaging control is the radio group of StepAdditionalDetails in
- * the download wizard. The map app has none. The radio group lists the options
- * of getAveragingOptions(), and filters every option out for an S2D variable.
- * An S2D variable still inherits both options from the fallback of
- * RasterPrecalculatedClimateVariable, so the caller passes whether the next
- * variable is S2D. A hidden control means the variable does not offer the
- * value. The options hold the class fallbacks, for example both options for
- * RasterPrecalculatedClimateVariable and none for StationClimateVariable.
+ * Gives the previous averaging type back when the next variable offers it,
+ * else null. The averaging control of the download wizard shows no option for
+ * an S2D variable, although an S2D variable inherits averaging options. So the
+ * caller passes whether the next variable is S2D.
  */
 export const averagingTypeOfferedBy = (
 	nextIsS2D: boolean,

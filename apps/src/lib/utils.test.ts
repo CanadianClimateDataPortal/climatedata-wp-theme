@@ -435,12 +435,9 @@ describe('isFrequencyOffered', () => {
 		expect(isFrequencyOffered(monthsOnMapAndAll, 'map', 'foo')).toBe(false);
 	});
 
-	// The S2D sidebar offers its codes from FrequenciesDropdownS2D, not from
-	// frequencyConfig. An S2D variable inherits the fallback config of
-	// RasterPrecalculatedClimateVariable, so this check accepts `ann` for it.
-	// This test pins that fact. It is the reason why the frequency carry in
-	// selectClimateVariable skips an S2D target, for example on a switch from
-	// a projection variable with `freq=ann`.
+	// An S2D variable inherits a fallback frequency config, so this check
+	// accepts `ann`, a code that the S2D sidebar does not offer. A caller must
+	// guard an S2D variable on its own.
 	test('accepts `ann` for an S2D variable, so an S2D target needs its own guard', () => {
 		const s2dVariable = new S2DClimateVariable({
 			id: 'test',
@@ -504,8 +501,7 @@ describe('thresholdValueForSameLabel', () => {
 });
 
 describe('dateRangeOfferedBy', () => {
-	// The fallback config of RasterPrecalculatedClimateVariable, which the
-	// variables of dataset 216 use.
+	// The fallback config of RasterPrecalculatedClimateVariable.
 	const projection: DateRangeConfig = { min: '1950', max: '2100', interval: 30 };
 	// The config of the allowance variable, a single-thumb control.
 	const allowance: DateRangeConfig = { min: '2020', max: '2100', interval: 10 };
@@ -552,8 +548,7 @@ describe('dateRangeOfferedBy', () => {
 });
 
 describe('scenarioCompareToOfferedBy', () => {
-	// The cmip6 fallback list of RasterPrecalculatedClimateVariable, which the
-	// variables of dataset 216 use.
+	// The cmip6 fallback list of RasterPrecalculatedClimateVariable.
 	const cmip6 = ['ssp126', 'ssp245', 'ssp370', 'ssp585'];
 	// A sea level list, where every scenario carries a percentile suffix.
 	const seaLevel = ['rcp26-p50', 'rcp45-p50', 'rcp85-p50'];

@@ -288,6 +288,7 @@ export const ClimateVariableProvider: React.FC<{
 					const newVariable = new newVariableClass(newData);
 					const frequencyConfig = newVariable.getFrequencyConfig();
 					if (
+						!(climateVariable instanceof S2DClimateVariable) &&
 						!(newVariable instanceof S2DClimateVariable) &&
 						frequencyConfig &&
 						isFrequencyOffered(
@@ -518,6 +519,7 @@ export const ClimateVariableProvider: React.FC<{
 			}
 		},
 		[
+			climateVariable,
 			climateVariableData,
 			dispatch,
 			section,

@@ -455,6 +455,20 @@ describe('isFrequencyOffered', () => {
 		expect(isFrequencyOffered(config!, 'map', 'ann')).toBe(true);
 		expect(isFrequencyTypeS2D('ann')).toBe(false);
 	});
+
+	// A projection config accepts the S2D codes `months` and `seasons`, which
+	// the map control shows only as group labels. A caller must guard an S2D
+	// source on its own.
+	test('accepts the S2D codes `months` and `seasons` for a projection config, so an S2D source needs its own guard', () => {
+		const config: FrequencyConfig = {
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		};
+		expect(isFrequencyOffered(config, 'map', 'months')).toBe(true);
+		expect(isFrequencyOffered(config, 'map', 'seasons')).toBe(true);
+		expect(isFrequencyTypeS2D('months')).toBe(true);
+		expect(isFrequencyTypeS2D('seasons')).toBe(true);
+	});
 });
 
 describe('thresholdValueForSameLabel', () => {

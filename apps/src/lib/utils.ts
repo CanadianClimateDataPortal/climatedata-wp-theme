@@ -3,11 +3,16 @@ import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
 import { isFrequencyTypeS2D } from '@/types/assertions';
 import {
+	AveragingType,
+	ColourType,
+	type CustomColourSchemes,
+	DateRangeConfig,
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
 	FrequencyType,
 	InteractiveRegionOption,
 	type S2DFrequencyType,
+	type ThresholdInterface,
 } from '@/types/climate-variable-interface';
 import { __ } from '@/context/locale-provider';
 import { ParsedLatLon } from '@/types/types';
@@ -132,6 +137,180 @@ export const getDefaultFrequency = (
 	}
 
 	return defaultValue;
+};
+
+/**
+ * Tells whether a frequency code is offered by a frequency config in a section.
+ * It mirrors the options that FrequencySelect renders: a month code needs
+ * MONTHLY or ALL_MONTHS, a season code needs SEASONAL, and any other code
+ * needs its own key in the config.
+ */
+export const isFrequencyOffered = (
+	config: FrequencyConfig,
+	section: string,
+	frequency: string
+): boolean => {
+	if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
+		return isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
+			|| isFrequencyEnabled(config, section, FrequencyType.ALL_MONTHS);
+	}
+
+	if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
+		return isFrequencyEnabled(config, section, FrequencyType.SEASONAL);
+	}
+
+	// FrequencySelect renders the MONTHLY item for ALL_MONTHS too, in the
+	// download type ANALYZED.
+	if (frequency === FrequencyType.MONTHLY) {
+		return isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
+			|| isFrequencyEnabled(config, section, FrequencyType.ALL_MONTHS);
+	}
+
+	return Object.values(FrequencyType).includes(frequency as FrequencyType)
+		&& isFrequencyEnabled(config, section, frequency as FrequencyType);
+};
+/**
+ * Finds the threshold value of the next variable that carries the same label
+ * as the previous value in the previous variable. The values differ per
+ * variable, for example rl20tasmax and rl20pr, while the label, here
+ * "1-in-20 year", is the same. An empty label never matches.
+ */
+export const thresholdValueForSameLabel = (
+	previousThresholds: ThresholdInterface[],
+	nextThresholds: ThresholdInterface[],
+	previousValue: string
+): string | null => {
+	const label = previousThresholds.find(
+		(threshold) => threshold.value === previousValue
+	)?.label;
+	if (!label) {
+		return null;
+	}
+
+	return nextThresholds.find((threshold) => threshold.label === label)?.value ?? null;
+};
+/**
+ * Gives the previous date range back when the time period control of the next
+ * variable could have produced it, else null. A range control stores a start
+ * and an end one interval apart. A single-thumb control stores the same year
+ * twice. Both ends must lie inside the bounds of the config. Full dates never
+ * match, because the check reads the ends and the bounds as years.
+ */
+export const dateRangeOfferedBy = (
+	config: DateRangeConfig | null,
+	isRange: boolean,
+	previousDateRange: string[] | null | undefined
+): string[] | null => {
+	if (!config || !previousDateRange || previousDateRange.length !== 2) {
+		return null;
+	}
+
+	const start = Number(previousDateRange[0]);
+	const end = Number(previousDateRange[1]);
+	const min = Number(config.min);
+	const max = Number(config.max);
+	if (![start, end, min, max].every(Number.isInteger)) {
+		return null;
+	}
+	if (start < min || end > max) {
+		return null;
+	}
+
+	const shapeMatches = isRange
+		? end - start === config.interval
+		: start === end;
+
+	return shapeMatches ? previousDateRange : null;
+};
+/**
+ * Gives the previous compared scenario back when the next variable offers it
+ * and it differs from the main scenario of the next variable, else null. The
+ * sidebar never offers the main scenario as the compared one.
+ */
+export const scenarioCompareToOfferedBy = (
+	nextScenarios: string[],
+	nextMainScenario: string | null,
+	previousCompareTo: string | null | undefined
+): string | null => {
+	if (!previousCompareTo || previousCompareTo === nextMainScenario) {
+		return null;
+	}
+
+	return nextScenarios.includes(previousCompareTo) ? previousCompareTo : null;
+};
+/**
+ * Gives the previous data value back when the next variable has a delta, so
+ * the Values control shows, else null. The control offers the same two options
+ * for every variable, so the flag is the whole check.
+ */
+export const dataValueOfferedBy = (
+	nextHasDelta: boolean | undefined,
+	previousDataValue: string | null | undefined
+): string | null => {
+	if (!nextHasDelta || !previousDataValue) {
+		return null;
+	}
+
+	return previousDataValue;
+};
+/**
+ * Gives the previous colour scheme back when the Map colours control of the
+ * next variable shows and lists it, else null. The list is the one
+ * ColourSchemeDropdown builds: the custom schemes of the variable when it has
+ * some, else the default schemes plus the item default.
+ */
+export const colourSchemeOfferedBy = (
+	nextColourOptionsStatus: boolean,
+	nextCustomColourSchemes: CustomColourSchemes | null,
+	defaultColourSchemes: Record<string, unknown>,
+	previousColourScheme: string | null | undefined
+): string | null => {
+	if (!nextColourOptionsStatus || !previousColourScheme) {
+		return null;
+	}
+
+	const offeredSchemes = nextCustomColourSchemes
+		? Object.keys(nextCustomColourSchemes)
+		: ['default', ...Object.keys(defaultColourSchemes)];
+
+	return offeredSchemes.includes(previousColourScheme) ? previousColourScheme : null;
+};
+/**
+ * Gives the previous colour type back when the colour scheme carried to the
+ * next variable shows the Discrete and Continuous choice, else null.
+ * MapColorsDropdown renders that choice only for a scheme that is set and is
+ * not default, so the type follows the scheme. The caller passes the scheme
+ * that colourSchemeOfferedBy() gave back. A value outside the ColourType enum
+ * never passes.
+ */
+export const colourTypeOfferedBy = (
+	carriedColourScheme: string | null,
+	previousColourType: string | null | undefined
+): string | null => {
+	if (!carriedColourScheme || carriedColourScheme === 'default' || !previousColourType) {
+		return null;
+	}
+
+	return Object.values(ColourType).includes(previousColourType as ColourType)
+		? previousColourType
+		: null;
+};
+/**
+ * Gives the previous averaging type back when the next variable offers it,
+ * else null. The averaging control of the download wizard shows no option for
+ * an S2D variable, although an S2D variable inherits averaging options. So the
+ * caller passes whether the next variable is S2D.
+ */
+export const averagingTypeOfferedBy = (
+	nextIsS2D: boolean,
+	nextAveragingOptions: AveragingType[],
+	previousAveragingType: AveragingType | null | undefined
+): AveragingType | null => {
+	if (nextIsS2D || !previousAveragingType) {
+		return null;
+	}
+
+	return nextAveragingOptions.includes(previousAveragingType) ? previousAveragingType : null;
 };
 /**
  * Converts a date format string (e.g., 'YYYY-MM-DD', 'MM-DD') into a regular expression for validation.

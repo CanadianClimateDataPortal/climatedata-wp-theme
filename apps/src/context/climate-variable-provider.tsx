@@ -1,4 +1,8 @@
-import React, { useCallback, useMemo } from 'react';
+import React, {
+	useCallback,
+	useContext,
+	useMemo,
+} from 'react';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import ClimateVariableContext from '@/hooks/use-climate-variable';
@@ -21,15 +25,27 @@ import {
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
-import RasterPrecalculatedWithDailyFormatsClimateVariable
-	from '@/lib/raster-precalculated-with-daily-formats-climate-variable';
+import RasterPrecalculatedWithDailyFormatsClimateVariable from '@/lib/raster-precalculated-with-daily-formats-climate-variable';
 import RasterAnalyzeClimateVariable from '@/lib/raster-analyze-climate-variable';
 import SeaLevelClimateVariable from '@/lib/sea-level-climate-variable';
 import StationClimateVariable from '@/lib/station-climate-variable';
-import StationDataClimateVariable from "@/lib/station-data-climate-variable";
+import StationDataClimateVariable from '@/lib/station-data-climate-variable';
 import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
-import { formatUTCDate } from '@/lib/utils';
+import { isFrequencyTypeS2D } from '@/types/assertions';
+import {
+	averagingTypeOfferedBy,
+	colourSchemeOfferedBy,
+	colourTypeOfferedBy,
+	dataValueOfferedBy,
+	dateRangeOfferedBy,
+	formatUTCDate,
+	isFrequencyOffered,
+	scenarioCompareToOfferedBy,
+	thresholdValueForSameLabel,
+} from '@/lib/utils';
+import { DEFAULT_COLOUR_SCHEMES } from '@/lib/constants';
+import SectionContext from '@/context/section-provider';
 import ReturnPeriodClimateVariable from '@/lib/return-period-climate-variable';
 
 export type ClimateVariableContextType = {
@@ -95,6 +111,7 @@ export const ClimateVariableProvider: React.FC<{
 	children: React.ReactNode;
 }> = ({ children }) => {
 	const dispatch = useAppDispatch();
+	const section = useContext(SectionContext);
 
 	const { data: climateVariableData } = useAppSelector(
 		(state) => state.climateVariable
@@ -138,16 +155,275 @@ export const ClimateVariableProvider: React.FC<{
 
 			if (matchedVariable) {
 				// Combine important properties from API with the config data.
-				dispatch(setClimateVariable({
+				const newData: ClimateVariableConfigInterface = {
 					...matchedVariable,
 					postId: variable.postId,
 					title: variable.title,
 					datasetType: dataset?.dataset_type,
-				}));
+				};
+				/**
+				 * Each block below builds its own instance from newData, as the
+				 * blocks before it left it.
+				 */
+				const newVariableClass =
+					CLIMATE_VARIABLE_CLASS_MAP[newData.class];
+
+				// CLIM-1452: on a change of climate variable, each block below
+				// keeps a value of the old variable when the new variable offers
+				// it. Otherwise it leaves the field unset, so the getter gives
+				// the default and the URL writer leaves the parameter out.
+				//
+				// Version. This block runs first, because the scenarios and the
+				// sea level date range config depend on the version.
+				const previousVersion = climateVariableData?.version;
+				if (previousVersion && newVariableClass) {
+					const newVariable = new newVariableClass(newData);
+					if (newVariable.getVersions().includes(previousVersion)) {
+						newData.version = previousVersion;
+					}
+				}
+
+				// Scenario, among the scenarios of the version kept above.
+				const previousScenario = climateVariableData?.scenario;
+				if (previousScenario && newVariableClass) {
+					const newVariable = new newVariableClass(newData);
+					if (newVariable.getScenarios().includes(previousScenario)) {
+						newData.scenario = previousScenario;
+					}
+				}
+
+				// Scenario comparison. The checkbox and the compared scenario go
+				// together, because a checked box alone shows no comparison map.
+				// The main scenario comes from the block above, so it can be the
+				// default rather than the old one. A variable with no scenarios,
+				// such as S2D, gets no comparison.
+				const previousScenarioCompareTo =
+					climateVariableData?.scenarioCompareTo;
+				if (
+					climateVariableData?.scenarioCompare === true &&
+					previousScenarioCompareTo &&
+					newVariableClass
+				) {
+					const newVariable = new newVariableClass(newData);
+					const scenarioCompareTo = scenarioCompareToOfferedBy(
+						newVariable.getScenarios(),
+						newVariable.getScenario(),
+						previousScenarioCompareTo
+					);
+					if (scenarioCompareTo) {
+						newData.scenarioCompare = true;
+						newData.scenarioCompareTo = scenarioCompareTo;
+					}
+				}
+
+				// Interactive region, with the check of getInteractiveRegion().
+				const previousRegion = climateVariableData?.interactiveRegion;
+				if (previousRegion && newVariableClass) {
+					const newVariable = new newVariableClass(newData);
+					if (
+						newVariable.getInteractiveRegionConfig()?.[
+							previousRegion
+						]
+					) {
+						newData.interactiveRegion = previousRegion;
+					}
+				}
+
+				// Frequency, as FrequencySelect offers it in this section. This
+				// block skips S2D on either side on purpose. An S2D variable
+				// inherits a fallback frequency config that accepts `ann`, a code
+				// the S2D sidebar does not offer. A projection config accepts the
+				// S2D codes `months` and `seasons`, which the map control shows
+				// only as group labels, never as a value. The S2D period block
+				// below handles S2D.
+				const previousFrequency = climateVariableData?.frequency;
+				if (previousFrequency && newVariableClass) {
+					const newVariable = new newVariableClass(newData);
+					const frequencyConfig = newVariable.getFrequencyConfig();
+					if (
+						!(climateVariable instanceof S2DClimateVariable) &&
+						!(newVariable instanceof S2DClimateVariable) &&
+						frequencyConfig &&
+						isFrequencyOffered(
+							frequencyConfig,
+							section,
+							previousFrequency
+						)
+					) {
+						newData.frequency = previousFrequency;
+					}
+				}
+
+				// S2D forecast type and display. Every S2D variable offers the
+				// same fixed lists, and only those lists can set these fields.
+				// So a stored value is valid for any S2D target, whatever the
+				// old variable.
+				const previousForecastType = climateVariableData?.forecastType;
+				const previousForecastDisplay =
+					climateVariableData?.forecastDisplay;
+				if (
+					(previousForecastType || previousForecastDisplay) &&
+					newVariableClass
+				) {
+					const newVariable = new newVariableClass(newData);
+					if (newVariable instanceof S2DClimateVariable) {
+						if (previousForecastType) {
+							newData.forecastType = previousForecastType;
+						}
+						if (previousForecastDisplay) {
+							newData.forecastDisplay = previousForecastDisplay;
+						}
+					}
+				}
+
+				// Threshold. The value differs per variable for the same label,
+				// so the old value maps to its label through the old variable,
+				// then the label maps to the value of the new variable.
+				const previousThreshold = climateVariableData?.threshold;
+				const previousVariableClass = climateVariableData
+					? CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class]
+					: undefined;
+				if (
+					previousThreshold &&
+					climateVariableData &&
+					previousVariableClass &&
+					newVariableClass
+				) {
+					const previousVariable = new previousVariableClass(
+						climateVariableData
+					);
+					const newVariable = new newVariableClass(newData);
+					const threshold = thresholdValueForSameLabel(
+						previousVariable.getThresholds(),
+						newVariable.getThresholds(),
+						previousThreshold
+					);
+					if (threshold) {
+						newData.threshold = threshold;
+					}
+				}
+
+				// S2D frequency and time period, from one S2D variable to
+				// another. The period needs its frequency, so both go together.
+				// The date range needs no check, because TimePeriodsControlS2D
+				// snaps a date range that matches no period to the first one.
+				const previousS2DFrequency = climateVariableData?.frequency;
+				const previousDateRange = climateVariableData?.dateRange;
+				if (
+					(previousS2DFrequency || previousDateRange) &&
+					climateVariableData &&
+					previousVariableClass &&
+					newVariableClass
+				) {
+					const previousVariable = new previousVariableClass(
+						climateVariableData
+					);
+					const newVariable = new newVariableClass(newData);
+					if (
+						previousVariable instanceof S2DClimateVariable &&
+						newVariable instanceof S2DClimateVariable
+					) {
+						if (
+							previousS2DFrequency &&
+							isFrequencyTypeS2D(previousS2DFrequency)
+						) {
+							newData.frequency = previousS2DFrequency;
+						}
+						if (previousDateRange) {
+							newData.dateRange = previousDateRange;
+						}
+					}
+				}
+
+				// Projection time period. It skips S2D on either side, because
+				// an S2D variable inherits a fallback range that a projection
+				// pair would pass. The block sets only dateRange, and the time
+				// period controls then update timePeriodEnd in the map state.
+				// When the block keeps no range, newData keeps the date range of
+				// its static config, which only allowance sets.
+				if (
+					previousDateRange &&
+					climateVariableData &&
+					previousVariableClass &&
+					newVariableClass
+				) {
+					const previousVariable = new previousVariableClass(
+						climateVariableData
+					);
+					const newVariable = new newVariableClass(newData);
+					if (
+						!(previousVariable instanceof S2DClimateVariable) &&
+						!(newVariable instanceof S2DClimateVariable)
+					) {
+						const dateRange = dateRangeOfferedBy(
+							newVariable.getDateRangeConfig(),
+							newVariable.isTimePeriodARange(),
+							previousDateRange
+						);
+						if (dateRange) {
+							newData.dateRange = dateRange;
+						}
+					}
+				}
+
+				// Data value, colour scheme, colour type and averaging, each on
+				// its own. Their getters return a stored value unchecked, so the
+				// check happens here. A value counts as offered only when its
+				// control shows: a hidden control would leave the value in
+				// effect with no way to undo it. The colour type follows the
+				// colour scheme kept here.
+				if (
+					newVariableClass &&
+					(climateVariableData?.dataValue ||
+						climateVariableData?.colourScheme ||
+						climateVariableData?.averagingType)
+				) {
+					const newVariable = new newVariableClass(newData);
+					const dataValue = dataValueOfferedBy(
+						newVariable.hasDelta(),
+						climateVariableData?.dataValue
+					);
+					if (dataValue) {
+						newData.dataValue = dataValue;
+					}
+					const colourScheme = colourSchemeOfferedBy(
+						newVariable.getColourOptionsStatus(),
+						newVariable.getCustomColourSchemes(),
+						DEFAULT_COLOUR_SCHEMES,
+						climateVariableData?.colourScheme
+					);
+					if (colourScheme) {
+						newData.colourScheme = colourScheme;
+					}
+					const colourType = colourTypeOfferedBy(
+						colourScheme,
+						climateVariableData?.colourType
+					);
+					if (colourType) {
+						newData.colourType = colourType;
+					}
+					const averagingType = averagingTypeOfferedBy(
+						newVariable instanceof S2DClimateVariable,
+						newVariable.getAveragingOptions(),
+						climateVariableData?.averagingType
+					);
+					if (averagingType) {
+						newData.averagingType = averagingType;
+					}
+				}
+
+				dispatch(setClimateVariable(newData));
 			} else {
 				throw new Error(`No matching variable found for id: ${variable.id}`);
 			}
-		}, [dispatch]);
+		},
+		[
+			climateVariable,
+			climateVariableData,
+			dispatch,
+			section,
+		]
+	);
 
 	/**
 	 * Updates the version of the climate variable and dispatches the updated information.
@@ -162,12 +438,17 @@ export const ClimateVariableProvider: React.FC<{
 			const currentData = climateVariableData;
 			if (!currentData || currentData.version === version) return;
 
-			const validScenario = climateVariable?.getValidScenarioForVersion(version);
+			const validScenario =
+				climateVariable?.getValidScenarioForVersion(version);
 			const updatePayload: Partial<ClimateVariableConfigInterface> = {
-				version
+				version,
 			};
 
-			if (validScenario && (!currentData.scenario || currentData.scenario !== validScenario)) {
+			if (
+				validScenario &&
+				(!currentData.scenario ||
+					currentData.scenario !== validScenario)
+			) {
 				updatePayload.scenario = validScenario;
 			}
 
@@ -424,7 +705,6 @@ export const ClimateVariableProvider: React.FC<{
 					selectedRegion: null,
 				})
 			);
-
 		},
 		[dispatch, climateVariableData]
 	);

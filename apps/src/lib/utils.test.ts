@@ -7,7 +7,28 @@ import {
 	toJSONString,
 	utc,
 	arraySize,
+	isFrequencyOffered,
+	thresholdValueForSameLabel,
+	dateRangeOfferedBy,
+	scenarioCompareToOfferedBy,
+	dataValueOfferedBy,
+	colourSchemeOfferedBy,
+	colourTypeOfferedBy,
+	averagingTypeOfferedBy,
 } from './utils';
+import {
+	AveragingType,
+	ColourType,
+	CustomColourSchemes,
+	DateRangeConfig,
+	FrequencyConfig,
+	FrequencyDisplayModeOption,
+	FrequencyType,
+	ThresholdInterface,
+} from '@/types/climate-variable-interface';
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import { isFrequencyTypeS2D } from '@/types/assertions';
+import { DEFAULT_COLOUR_SCHEMES } from '@/lib/constants';
 
 describe('findCeilingIndex', () => {
 	test('returns exact index for exact value', () => {
@@ -373,5 +394,289 @@ describe('arraySize', () => {
 		const mixed = [1, 'text', [true, false], { key: 'value' }];
 		// 1 (1) + 'text' (1) + [true, false] (2) + {key: 'value'} (1) = 5
 		expect(arraySize(mixed)).toBe(5);
+	});
+});
+
+describe('isFrequencyOffered', () => {
+	const annualOnly: FrequencyConfig = {
+		[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+	};
+	const monthsOnMapAndAll: FrequencyConfig = {
+		[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+	};
+
+	test('offers a month when MONTHLY is enabled', () => {
+		expect(isFrequencyOffered(monthsOnMapAndAll, 'map', 'aug')).toBe(true);
+	});
+
+	test('does not offer a month under an annual-only config', () => {
+		expect(isFrequencyOffered(annualOnly, 'map', 'aug')).toBe(false);
+		expect(isFrequencyOffered(annualOnly, 'map', 'ann')).toBe(true);
+	});
+
+	test('offers a month through ALL_MONTHS only in its section', () => {
+		const config: FrequencyConfig = {
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+		};
+		expect(isFrequencyOffered(config, 'download', 'aug')).toBe(true);
+		expect(isFrequencyOffered(config, 'map', 'aug')).toBe(false);
+	});
+
+	test('offers a season only under SEASONAL', () => {
+		const config: FrequencyConfig = {
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		};
+		expect(isFrequencyOffered(config, 'map', 'summer')).toBe(true);
+		expect(isFrequencyOffered(monthsOnMapAndAll, 'map', 'summer')).toBe(false);
+	});
+
+	test('does not offer an unknown code', () => {
+		expect(isFrequencyOffered(monthsOnMapAndAll, 'map', 'foo')).toBe(false);
+	});
+
+	// An S2D variable inherits a fallback frequency config, so this check
+	// accepts `ann`, a code that the S2D sidebar does not offer. A caller must
+	// guard an S2D variable on its own.
+	test('accepts `ann` for an S2D variable, so an S2D target needs its own guard', () => {
+		const s2dVariable = new S2DClimateVariable({
+			id: 'test',
+			class: 'S2DClimateVariable',
+		});
+		const config = s2dVariable.getFrequencyConfig();
+		expect(config).not.toBeNull();
+		expect(isFrequencyOffered(config!, 'map', 'ann')).toBe(true);
+		expect(isFrequencyTypeS2D('ann')).toBe(false);
+	});
+
+	// A projection config accepts the S2D codes `months` and `seasons`, which
+	// the map control shows only as group labels. A caller must guard an S2D
+	// source on its own.
+	test('accepts the S2D codes `months` and `seasons` for a projection config, so an S2D source needs its own guard', () => {
+		const config: FrequencyConfig = {
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		};
+		expect(isFrequencyOffered(config, 'map', 'months')).toBe(true);
+		expect(isFrequencyOffered(config, 'map', 'seasons')).toBe(true);
+		expect(isFrequencyTypeS2D('months')).toBe(true);
+		expect(isFrequencyTypeS2D('seasons')).toBe(true);
+	});
+});
+
+describe('thresholdValueForSameLabel', () => {
+	const maxTemp: ThresholdInterface[] = [
+		{ value: 'rl5tasmax', label: '1-in-5 year' },
+		{ value: 'rl20tasmax', label: '1-in-20 year' },
+	];
+	const precipitation: ThresholdInterface[] = [
+		{ value: 'rl5pr', label: '1-in-5 year' },
+		{ value: 'rl20pr', label: '1-in-20 year' },
+	];
+
+	test('maps the value to the next value with the same label', () => {
+		expect(thresholdValueForSameLabel(maxTemp, precipitation, 'rl20tasmax')).toBe('rl20pr');
+	});
+
+	test('gives null when the next thresholds lack the label', () => {
+		const other: ThresholdInterface[] = [{ value: 'r10mm', label: '>= 10 mm' }];
+		expect(thresholdValueForSameLabel(maxTemp, other, 'rl20tasmax')).toBeNull();
+	});
+
+	test('gives null when the label is empty', () => {
+		const unlabelled: ThresholdInterface[] = [{ value: 'tx_max', label: '' }];
+		const otherUnlabelled: ThresholdInterface[] = [{ value: 'tn_min', label: '' }];
+		expect(thresholdValueForSameLabel(unlabelled, otherUnlabelled, 'tx_max')).toBeNull();
+	});
+
+	test('gives null when the previous thresholds lack the value', () => {
+		expect(thresholdValueForSameLabel(maxTemp, precipitation, 'rl50tasmax')).toBeNull();
+	});
+
+	test('gives null on empty arrays', () => {
+		expect(thresholdValueForSameLabel([], precipitation, 'rl20tasmax')).toBeNull();
+		expect(thresholdValueForSameLabel(maxTemp, [], 'rl20tasmax')).toBeNull();
+		expect(thresholdValueForSameLabel([], [], 'rl20tasmax')).toBeNull();
+	});
+});
+
+describe('dateRangeOfferedBy', () => {
+	// The fallback config of RasterPrecalculatedClimateVariable.
+	const projection: DateRangeConfig = { min: '1950', max: '2100', interval: 30 };
+	// The config of the allowance variable, a single-thumb control.
+	const allowance: DateRangeConfig = { min: '2020', max: '2100', interval: 10 };
+
+	test('keeps a range pair inside the bounds with the same interval', () => {
+		expect(dateRangeOfferedBy(projection, true, ['2070', '2100'])).toEqual(['2070', '2100']);
+	});
+
+	test('gives null when the end lies above max', () => {
+		expect(dateRangeOfferedBy(projection, true, ['2080', '2110'])).toBeNull();
+	});
+
+	test('gives null when the start lies below min', () => {
+		expect(dateRangeOfferedBy(projection, true, ['1940', '1970'])).toBeNull();
+	});
+
+	test('gives null when the span differs from the interval', () => {
+		expect(dateRangeOfferedBy({ ...projection, interval: 10 }, true, ['2070', '2100'])).toBeNull();
+	});
+
+	test('keeps a single year inside the bounds for a single-thumb variable', () => {
+		expect(dateRangeOfferedBy(allowance, false, ['2060', '2060'])).toEqual(['2060', '2060']);
+	});
+
+	test('gives null for a range pair on a single-thumb variable, and the reverse', () => {
+		expect(dateRangeOfferedBy(allowance, false, ['2070', '2100'])).toBeNull();
+		expect(dateRangeOfferedBy(projection, true, ['2060', '2060'])).toBeNull();
+	});
+
+	test('gives null for an S2D date range of full dates', () => {
+		expect(dateRangeOfferedBy(projection, true, ['2027-06-01', '2027-08-31'])).toBeNull();
+	});
+
+	test('gives null for a config of full dates', () => {
+		const days: DateRangeConfig = { min: '1840-01-01', max: '2026-11-05', interval: 1, type: 'day' };
+		expect(dateRangeOfferedBy(days, true, ['2070', '2071'])).toBeNull();
+	});
+
+	test('gives null with no config or no previous range', () => {
+		expect(dateRangeOfferedBy(null, true, ['2070', '2100'])).toBeNull();
+		expect(dateRangeOfferedBy(projection, true, undefined)).toBeNull();
+		expect(dateRangeOfferedBy(projection, true, null)).toBeNull();
+	});
+});
+
+describe('scenarioCompareToOfferedBy', () => {
+	// The cmip6 fallback list of RasterPrecalculatedClimateVariable.
+	const cmip6 = ['ssp126', 'ssp245', 'ssp370', 'ssp585'];
+	// A sea level list, where every scenario carries a percentile suffix.
+	const seaLevel = ['rcp26-p50', 'rcp45-p50', 'rcp85-p50'];
+
+	test('keeps a compared scenario that is offered and differs from the main scenario', () => {
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp585', 'ssp126')).toBe('ssp126');
+		expect(scenarioCompareToOfferedBy(seaLevel, 'rcp45-p50', 'rcp85-p50')).toBe('rcp85-p50');
+	});
+
+	test('gives null when the compared scenario equals the main scenario', () => {
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', 'ssp245')).toBeNull();
+	});
+
+	test('gives null when the compared scenario is not offered', () => {
+		expect(scenarioCompareToOfferedBy(['ssp126', 'ssp245', 'ssp585'], 'ssp585', 'ssp370')).toBeNull();
+	});
+
+	test('gives null for a cmip5 compared scenario against a cmip6 list', () => {
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', 'rcp85')).toBeNull();
+	});
+
+	test('gives null with no previous compared scenario or an empty list', () => {
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', null)).toBeNull();
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', undefined)).toBeNull();
+		expect(scenarioCompareToOfferedBy(cmip6, 'ssp245', '')).toBeNull();
+		expect(scenarioCompareToOfferedBy([], null, 'ssp126')).toBeNull();
+	});
+});
+
+describe('dataValueOfferedBy', () => {
+	test('keeps the data value when the next variable shows the Values control', () => {
+		expect(dataValueOfferedBy(true, 'delta')).toBe('delta');
+		expect(dataValueOfferedBy(true, 'absolute')).toBe('absolute');
+	});
+
+	test('gives null when the next variable has no delta, so the control is hidden', () => {
+		expect(dataValueOfferedBy(false, 'delta')).toBeNull();
+		expect(dataValueOfferedBy(undefined, 'delta')).toBeNull();
+	});
+
+	test('gives null with no previous data value', () => {
+		expect(dataValueOfferedBy(true, null)).toBeNull();
+		expect(dataValueOfferedBy(true, undefined)).toBeNull();
+		expect(dataValueOfferedBy(true, '')).toBeNull();
+	});
+});
+
+describe('colourSchemeOfferedBy', () => {
+	// The one custom scheme of building_climate_zones, cut to one colour.
+	const buildingClimateZones: CustomColourSchemes = {
+		default: {
+			colours: [{ label: 'Climate Zone 4', colour: '#C90000', quantity: 3000 }],
+			type: 'discrete',
+		},
+	};
+
+	test('keeps a default scheme key when the next variable has no custom schemes', () => {
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, 'temp_seq')).toBe('temp_seq');
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, 'prec_div')).toBe('prec_div');
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, 'default')).toBe('default');
+	});
+
+	test('keeps a custom scheme key that the next variable lists', () => {
+		expect(colourSchemeOfferedBy(true, buildingClimateZones, DEFAULT_COLOUR_SCHEMES, 'default')).toBe('default');
+	});
+
+	test('gives null when the scheme is not offered', () => {
+		expect(colourSchemeOfferedBy(true, buildingClimateZones, DEFAULT_COLOUR_SCHEMES, 'temp_seq')).toBeNull();
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, 'unknown_scheme')).toBeNull();
+	});
+
+	test('gives null when the next variable hides the Map colours control', () => {
+		expect(colourSchemeOfferedBy(false, null, DEFAULT_COLOUR_SCHEMES, 'temp_seq')).toBeNull();
+		expect(colourSchemeOfferedBy(false, buildingClimateZones, DEFAULT_COLOUR_SCHEMES, 'default')).toBeNull();
+	});
+
+	test('gives null with no previous scheme', () => {
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, null)).toBeNull();
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, undefined)).toBeNull();
+		expect(colourSchemeOfferedBy(true, null, DEFAULT_COLOUR_SCHEMES, '')).toBeNull();
+	});
+});
+
+describe('colourTypeOfferedBy', () => {
+	test('keeps the colour type when a scheme other than default was carried', () => {
+		expect(colourTypeOfferedBy('temp_seq', ColourType.DISCRETE)).toBe('intervals');
+		expect(colourTypeOfferedBy('prec_div', ColourType.CONTINUOUS)).toBe('ramp');
+	});
+
+	test('gives null when no scheme was carried, so the choice is hidden', () => {
+		expect(colourTypeOfferedBy(null, ColourType.DISCRETE)).toBeNull();
+	});
+
+	test('gives null when the carried scheme is default, so the choice is hidden', () => {
+		expect(colourTypeOfferedBy('default', ColourType.DISCRETE)).toBeNull();
+	});
+
+	test('gives null for a value outside the enum or no previous value', () => {
+		expect(colourTypeOfferedBy('temp_seq', 'stripes')).toBeNull();
+		expect(colourTypeOfferedBy('temp_seq', null)).toBeNull();
+		expect(colourTypeOfferedBy('temp_seq', undefined)).toBeNull();
+	});
+});
+
+describe('averagingTypeOfferedBy', () => {
+	// The fallback list of RasterPrecalculatedClimateVariable.
+	const bothOptions = [AveragingType.ALL_YEARS, AveragingType.THIRTY_YEARS];
+
+	test('keeps an averaging type that the next variable offers', () => {
+		expect(averagingTypeOfferedBy(false, bothOptions, AveragingType.THIRTY_YEARS)).toBe('30years');
+		expect(averagingTypeOfferedBy(false, [AveragingType.ALL_YEARS], AveragingType.ALL_YEARS)).toBe('allYears');
+	});
+
+	test('gives null when the next variable does not offer it', () => {
+		expect(averagingTypeOfferedBy(false, [AveragingType.ALL_YEARS], AveragingType.THIRTY_YEARS)).toBeNull();
+	});
+
+	test('gives null when the next variable is S2D, so the averaging control is hidden', () => {
+		expect(averagingTypeOfferedBy(true, bothOptions, AveragingType.THIRTY_YEARS)).toBeNull();
+		expect(averagingTypeOfferedBy(true, bothOptions, AveragingType.ALL_YEARS)).toBeNull();
+	});
+
+	test('gives null when the next variable has no averaging options', () => {
+		expect(averagingTypeOfferedBy(false, [], AveragingType.ALL_YEARS)).toBeNull();
+	});
+
+	test('gives null with no previous averaging type', () => {
+		expect(averagingTypeOfferedBy(false, bothOptions, null)).toBeNull();
+		expect(averagingTypeOfferedBy(false, bothOptions, undefined)).toBeNull();
 	});
 });

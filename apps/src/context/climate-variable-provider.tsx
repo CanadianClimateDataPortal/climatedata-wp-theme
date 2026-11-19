@@ -105,6 +105,22 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 };
 
 /**
+ * Returns an instance of the class that `config.class` names in
+ * {@link CLIMATE_VARIABLE_CLASS_MAP}.
+ *
+ * @throws When the map does not have that class.
+ */
+const createClimateVariable = (
+	config: ClimateVariableConfigInterface
+): ClimateVariableInterface => {
+	const climateVariableClass = CLIMATE_VARIABLE_CLASS_MAP[config.class];
+	if (!climateVariableClass) {
+		throw new Error(`Invalid climate variable class: ${config.class}`);
+	}
+	return new climateVariableClass(config);
+};
+
+/**
  * Provides the ClimateVariable context to the component tree.
  */
 export const ClimateVariableProvider: React.FC<{
@@ -119,23 +135,15 @@ export const ClimateVariableProvider: React.FC<{
 
 	/**
 	 * Returns an instance of a climate variable class, derived from the provided climate variable data.
-	 *
-	 * The climate variable class is determined by mapping the `class` property of `climateVariableData`
-	 * using the `CLIMATE_VARIABLE_CLASS_MAP`. If the specified class is not found in the map, an error
-	 * is thrown.
+	 * @see {@link createClimateVariable}
 	 */
-	const climateVariable = useMemo((): ClimateVariableInterface | null => {
-		if (!climateVariableData) return null;
-
-		const climateVariableClass =
-			CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class];
-		if (!climateVariableClass) {
-			throw new Error(
-				`Invalid climate variable class: ${climateVariableData.class}`
-			);
-		}
-		return new climateVariableClass(climateVariableData);
-	}, [climateVariableData]);
+	const climateVariable = useMemo(
+		(): ClimateVariableInterface | null =>
+			climateVariableData
+				? createClimateVariable(climateVariableData)
+				: null,
+		[climateVariableData]
+	);
 
 	/**
 	 * A callback function to select and dispatch a climate variable
@@ -145,7 +153,8 @@ export const ClimateVariableProvider: React.FC<{
 	 * @param {PostData} variable - The input data containing details of a climate variable to be selected.
 	 * @param {TaxonomyData} [dataset] - Optional dataset that may provide additional context.
 	 *
-	 * @throws {Error} Throws an error if no matching variable is found in the `ClimateVariables` array.
+	 * @throws {Error} Throws an error if no matching variable is found in the `ClimateVariables` array,
+	 *   or if `CLIMATE_VARIABLE_CLASS_MAP` has no class for the variable.
 	 */
 	const selectClimateVariable = useCallback(
 		(variable: PostData, dataset?: TaxonomyData) => {
@@ -161,12 +170,13 @@ export const ClimateVariableProvider: React.FC<{
 					title: variable.title,
 					datasetType: dataset?.dataset_type,
 				};
+
 				/**
-				 * Each block below builds its own instance from newData, as the
-				 * blocks before it left it.
+				 * ClimateVariableBase keeps newData by reference.
+				 * Its getters and the subclass overrides read it on each call and store nothing.
+				 * So this one instance sees the values that each block below sets.
 				 */
-				const newVariableClass =
-					CLIMATE_VARIABLE_CLASS_MAP[newData.class];
+				const newVariable = createClimateVariable(newData);
 
 				// CLIM-1452: on a change of climate variable, each block below
 				// keeps a value of the old variable when the new variable offers
@@ -176,8 +186,7 @@ export const ClimateVariableProvider: React.FC<{
 				// Version. This block runs first, because the scenarios and the
 				// sea level date range config depend on the version.
 				const previousVersion = climateVariableData?.version;
-				if (previousVersion && newVariableClass) {
-					const newVariable = new newVariableClass(newData);
+				if (previousVersion) {
 					if (newVariable.getVersions().includes(previousVersion)) {
 						newData.version = previousVersion;
 					}
@@ -185,8 +194,7 @@ export const ClimateVariableProvider: React.FC<{
 
 				// Scenario, among the scenarios of the version kept above.
 				const previousScenario = climateVariableData?.scenario;
-				if (previousScenario && newVariableClass) {
-					const newVariable = new newVariableClass(newData);
+				if (previousScenario) {
 					if (newVariable.getScenarios().includes(previousScenario)) {
 						newData.scenario = previousScenario;
 					}
@@ -201,10 +209,8 @@ export const ClimateVariableProvider: React.FC<{
 					climateVariableData?.scenarioCompareTo;
 				if (
 					climateVariableData?.scenarioCompare === true &&
-					previousScenarioCompareTo &&
-					newVariableClass
+					previousScenarioCompareTo
 				) {
-					const newVariable = new newVariableClass(newData);
 					const scenarioCompareTo = scenarioCompareToOfferedBy(
 						newVariable.getScenarios(),
 						newVariable.getScenario(),
@@ -218,8 +224,7 @@ export const ClimateVariableProvider: React.FC<{
 
 				// Interactive region, with the check of getInteractiveRegion().
 				const previousRegion = climateVariableData?.interactiveRegion;
-				if (previousRegion && newVariableClass) {
-					const newVariable = new newVariableClass(newData);
+				if (previousRegion) {
 					if (
 						newVariable.getInteractiveRegionConfig()?.[
 							previousRegion
@@ -237,8 +242,7 @@ export const ClimateVariableProvider: React.FC<{
 				// only as group labels, never as a value. The S2D period block
 				// below handles S2D.
 				const previousFrequency = climateVariableData?.frequency;
-				if (previousFrequency && newVariableClass) {
-					const newVariable = new newVariableClass(newData);
+				if (previousFrequency) {
 					const frequencyConfig = newVariable.getFrequencyConfig();
 					if (
 						!(climateVariable instanceof S2DClimateVariable) &&
@@ -262,10 +266,9 @@ export const ClimateVariableProvider: React.FC<{
 				const previousForecastDisplay =
 					climateVariableData?.forecastDisplay;
 				if (
-					(previousForecastType || previousForecastDisplay) &&
-					newVariableClass
+					previousForecastDisplay ||
+					previousForecastType
 				) {
-					const newVariable = new newVariableClass(newData);
 					if (newVariable instanceof S2DClimateVariable) {
 						if (previousForecastType) {
 							newData.forecastType = previousForecastType;
@@ -280,19 +283,13 @@ export const ClimateVariableProvider: React.FC<{
 				// so the old value maps to its label through the old variable,
 				// then the label maps to the value of the new variable.
 				const previousThreshold = climateVariableData?.threshold;
-				const previousVariableClass = climateVariableData
-					? CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class]
-					: undefined;
+				const previousVariable = climateVariableData
+					? createClimateVariable(climateVariableData)
+					: null;
 				if (
 					previousThreshold &&
-					climateVariableData &&
-					previousVariableClass &&
-					newVariableClass
+					previousVariable
 				) {
-					const previousVariable = new previousVariableClass(
-						climateVariableData
-					);
-					const newVariable = new newVariableClass(newData);
 					const threshold = thresholdValueForSameLabel(
 						previousVariable.getThresholds(),
 						newVariable.getThresholds(),
@@ -310,15 +307,12 @@ export const ClimateVariableProvider: React.FC<{
 				const previousS2DFrequency = climateVariableData?.frequency;
 				const previousDateRange = climateVariableData?.dateRange;
 				if (
-					(previousS2DFrequency || previousDateRange) &&
-					climateVariableData &&
-					previousVariableClass &&
-					newVariableClass
+					(
+						previousDateRange ||
+						previousS2DFrequency
+					) &&
+					previousVariable
 				) {
-					const previousVariable = new previousVariableClass(
-						climateVariableData
-					);
-					const newVariable = new newVariableClass(newData);
 					if (
 						previousVariable instanceof S2DClimateVariable &&
 						newVariable instanceof S2DClimateVariable
@@ -343,14 +337,8 @@ export const ClimateVariableProvider: React.FC<{
 				// its static config, which only allowance sets.
 				if (
 					previousDateRange &&
-					climateVariableData &&
-					previousVariableClass &&
-					newVariableClass
+					previousVariable
 				) {
-					const previousVariable = new previousVariableClass(
-						climateVariableData
-					);
-					const newVariable = new newVariableClass(newData);
 					if (
 						!(previousVariable instanceof S2DClimateVariable) &&
 						!(newVariable instanceof S2DClimateVariable)
@@ -373,12 +361,10 @@ export const ClimateVariableProvider: React.FC<{
 				// effect with no way to undo it. The colour type follows the
 				// colour scheme kept here.
 				if (
-					newVariableClass &&
-					(climateVariableData?.dataValue ||
-						climateVariableData?.colourScheme ||
-						climateVariableData?.averagingType)
+					climateVariableData?.averagingType ||
+					climateVariableData?.colourScheme ||
+					climateVariableData?.dataValue
 				) {
-					const newVariable = new newVariableClass(newData);
 					const dataValue = dataValueOfferedBy(
 						newVariable.hasDelta(),
 						climateVariableData?.dataValue

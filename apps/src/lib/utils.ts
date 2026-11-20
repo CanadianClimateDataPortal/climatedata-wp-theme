@@ -3,7 +3,6 @@ import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
 import { isFrequencyTypeS2D } from '@/types/assertions';
 import {
-	AveragingType,
 	ColourType,
 	type CustomColourSchemes,
 	DateRangeConfig,
@@ -294,23 +293,6 @@ export const colourTypeOfferedBy = (
 	return Object.values(ColourType).includes(previousColourType as ColourType)
 		? previousColourType
 		: null;
-};
-/**
- * Gives the previous averaging type back when the next variable offers it,
- * else null. The averaging control of the download wizard shows no option for
- * an S2D variable, although an S2D variable inherits averaging options. So the
- * caller passes whether the next variable is S2D.
- */
-export const averagingTypeOfferedBy = (
-	nextIsS2D: boolean,
-	nextAveragingOptions: AveragingType[],
-	previousAveragingType: AveragingType | null | undefined
-): AveragingType | null => {
-	if (nextIsS2D || !previousAveragingType) {
-		return null;
-	}
-
-	return nextAveragingOptions.includes(previousAveragingType) ? previousAveragingType : null;
 };
 /**
  * Converts a date format string (e.g., 'YYYY-MM-DD', 'MM-DD') into a regular expression for validation.

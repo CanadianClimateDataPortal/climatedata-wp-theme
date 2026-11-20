@@ -34,7 +34,6 @@ import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 import S2DClimateVariable from '@/lib/s2d-climate-variable';
 import { isFrequencyTypeS2D } from '@/types/assertions';
 import {
-	averagingTypeOfferedBy,
 	colourSchemeOfferedBy,
 	colourTypeOfferedBy,
 	dataValueOfferedBy,
@@ -354,14 +353,13 @@ export const ClimateVariableProvider: React.FC<{
 					}
 				}
 
-				// Data value, colour scheme, colour type and averaging, each on
+				// Data value, colour scheme and colour type, each on
 				// its own. Their getters return a stored value unchecked, so the
 				// check happens here. A value counts as offered only when its
 				// control shows: a hidden control would leave the value in
 				// effect with no way to undo it. The colour type follows the
 				// colour scheme kept here.
 				if (
-					climateVariableData?.averagingType ||
 					climateVariableData?.colourScheme ||
 					climateVariableData?.dataValue
 				) {
@@ -387,14 +385,6 @@ export const ClimateVariableProvider: React.FC<{
 					);
 					if (colourType) {
 						newData.colourType = colourType;
-					}
-					const averagingType = averagingTypeOfferedBy(
-						newVariable instanceof S2DClimateVariable,
-						newVariable.getAveragingOptions(),
-						climateVariableData?.averagingType
-					);
-					if (averagingType) {
-						newData.averagingType = averagingType;
 					}
 				}
 

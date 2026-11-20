@@ -14,10 +14,8 @@ import {
 	dataValueOfferedBy,
 	colourSchemeOfferedBy,
 	colourTypeOfferedBy,
-	averagingTypeOfferedBy,
 } from './utils';
 import {
-	AveragingType,
 	ColourType,
 	CustomColourSchemes,
 	DateRangeConfig,
@@ -650,33 +648,5 @@ describe('colourTypeOfferedBy', () => {
 		expect(colourTypeOfferedBy('temp_seq', 'stripes')).toBeNull();
 		expect(colourTypeOfferedBy('temp_seq', null)).toBeNull();
 		expect(colourTypeOfferedBy('temp_seq', undefined)).toBeNull();
-	});
-});
-
-describe('averagingTypeOfferedBy', () => {
-	// The fallback list of RasterPrecalculatedClimateVariable.
-	const bothOptions = [AveragingType.ALL_YEARS, AveragingType.THIRTY_YEARS];
-
-	test('keeps an averaging type that the next variable offers', () => {
-		expect(averagingTypeOfferedBy(false, bothOptions, AveragingType.THIRTY_YEARS)).toBe('30years');
-		expect(averagingTypeOfferedBy(false, [AveragingType.ALL_YEARS], AveragingType.ALL_YEARS)).toBe('allYears');
-	});
-
-	test('gives null when the next variable does not offer it', () => {
-		expect(averagingTypeOfferedBy(false, [AveragingType.ALL_YEARS], AveragingType.THIRTY_YEARS)).toBeNull();
-	});
-
-	test('gives null when the next variable is S2D, so the averaging control is hidden', () => {
-		expect(averagingTypeOfferedBy(true, bothOptions, AveragingType.THIRTY_YEARS)).toBeNull();
-		expect(averagingTypeOfferedBy(true, bothOptions, AveragingType.ALL_YEARS)).toBeNull();
-	});
-
-	test('gives null when the next variable has no averaging options', () => {
-		expect(averagingTypeOfferedBy(false, [], AveragingType.ALL_YEARS)).toBeNull();
-	});
-
-	test('gives null with no previous averaging type', () => {
-		expect(averagingTypeOfferedBy(false, bothOptions, null)).toBeNull();
-		expect(averagingTypeOfferedBy(false, bothOptions, undefined)).toBeNull();
 	});
 });

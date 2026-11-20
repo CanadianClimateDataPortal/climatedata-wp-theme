@@ -69,6 +69,58 @@ export const splitTextByMatch = (
 	return result.filter((part) => part.text.length > 0);
 };
 
+/**
+ * Month code of each calendar number: 2 is February, 12 is December.
+ * The URL (`freq`), the store, the values of FrequencySelect and the data
+ * requests use these codes. They are not display text: getFrequencyName()
+ * gives the translated label.
+ */
+export const MONTH_CODE_BY_NUMBER: Readonly<Record<number, string>> = {
+	1: 'jan',
+	2: 'feb',
+	3: 'mar',
+	4: 'apr',
+	5: 'may',
+	6: 'jun',
+	7: 'jul',
+	8: 'aug',
+	9: 'sep',
+	10: 'oct',
+	11: 'nov',
+	12: 'dec',
+};
+
+/**
+ * Month codes in calendar order. Integer keys keep their numeric order, so
+ * Object.values() gives January first. They are not display text:
+ * getFrequencyName() gives the translated label.
+ */
+export const MONTH_CODES: readonly string[] = Object.values(MONTH_CODE_BY_NUMBER);
+
+/**
+ * Season codes. The URL (`freq`), the store, the values of FrequencySelect
+ * and the data requests use these codes. They are not display text:
+ * getFrequencyName() gives the translated label.
+ */
+export const SEASON_CODES: readonly string[] = [
+	'spring',
+	'summer',
+	'fall',
+	'winter',
+];
+
+/**
+ * Tells whether a frequency is a month code, such as `feb`.
+ */
+export const isMonthCode = (frequency: string): boolean =>
+	MONTH_CODES.includes(frequency);
+
+/**
+ * Tells whether a frequency is a season code, such as `spring`.
+ */
+export const isSeasonCode = (frequency: string): boolean =>
+	SEASON_CODES.includes(frequency);
+
 export const getFrequencyType = (
 	frequency: string,
 ): S2DFrequencyType | FrequencyType | undefined =>  {
@@ -78,9 +130,9 @@ export const getFrequencyType = (
 		frequencyCode = FrequencyType.YS;
 	} else if (frequency === 'annual_jul_jun') {
 		frequencyCode = FrequencyType.YSJUL;
-	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
+	} else if (isMonthCode(frequency)) {
 		frequencyCode = FrequencyType.MS;
-	} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
+	} else if (isSeasonCode(frequency)) {
 		frequencyCode = FrequencyType.QSDEC;
 	} else if (isFrequencyTypeS2D(frequency)) {
 		frequencyCode = frequency;
@@ -149,12 +201,12 @@ export const isFrequencyOffered = (
 	section: string,
 	frequency: string
 ): boolean => {
-	if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
+	if (isMonthCode(frequency)) {
 		return isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
 			|| isFrequencyEnabled(config, section, FrequencyType.ALL_MONTHS);
 	}
 
-	if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
+	if (isSeasonCode(frequency)) {
 		return isFrequencyEnabled(config, section, FrequencyType.SEASONAL);
 	}
 

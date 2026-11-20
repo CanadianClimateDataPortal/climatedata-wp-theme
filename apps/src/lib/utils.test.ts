@@ -14,6 +14,10 @@ import {
 	dataValueOfferedBy,
 	colourSchemeOfferedBy,
 	colourTypeOfferedBy,
+	MONTH_CODE_BY_NUMBER,
+	MONTH_CODES,
+	isMonthCode,
+	isSeasonCode,
 } from './utils';
 import {
 	ColourType,
@@ -392,6 +396,58 @@ describe('arraySize', () => {
 		const mixed = [1, 'text', [true, false], { key: 'value' }];
 		// 1 (1) + 'text' (1) + [true, false] (2) + {key: 'value'} (1) = 5
 		expect(arraySize(mixed)).toBe(5);
+	});
+});
+
+describe('MONTH_CODE_BY_NUMBER', () => {
+	test('gives the month code of a calendar number', () => {
+		expect(MONTH_CODE_BY_NUMBER[1]).toBe('jan');
+		expect(MONTH_CODE_BY_NUMBER[2]).toBe('feb');
+		expect(MONTH_CODE_BY_NUMBER[12]).toBe('dec');
+	});
+
+	test('gives nothing outside 1 to 12', () => {
+		expect(MONTH_CODE_BY_NUMBER[0]).toBeUndefined();
+		expect(MONTH_CODE_BY_NUMBER[13]).toBeUndefined();
+	});
+
+	test('MONTH_CODES lists the twelve months in calendar order', () => {
+		expect(MONTH_CODES).toEqual([
+			'jan',
+			'feb',
+			'mar',
+			'apr',
+			'may',
+			'jun',
+			'jul',
+			'aug',
+			'sep',
+			'oct',
+			'nov',
+			'dec',
+		]);
+	});
+
+	test('the month 04 of 2026-04-01 gives apr once read as a number', () => {
+		const paddedMonth = '2026-04-01'.split('-')[1]; // '04'
+		const month = Number(paddedMonth); // 4
+		expect(MONTH_CODE_BY_NUMBER[month]).toBe('apr');
+	});
+});
+
+describe('isMonthCode and isSeasonCode', () => {
+	test('isMonthCode accepts a month code only', () => {
+		expect(isMonthCode('feb')).toBe(true);
+		expect(isMonthCode('Feb')).toBe(false);
+		expect(isMonthCode('spring')).toBe(false);
+		expect(isMonthCode('ann')).toBe(false);
+	});
+
+	test('isSeasonCode accepts a season code only', () => {
+		expect(isSeasonCode('spring')).toBe(true);
+		expect(isSeasonCode('Spring')).toBe(false);
+		expect(isSeasonCode('feb')).toBe(false);
+		expect(isSeasonCode('seasons')).toBe(false);
 	});
 });
 

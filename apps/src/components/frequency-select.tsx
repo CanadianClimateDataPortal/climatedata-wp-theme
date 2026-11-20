@@ -15,7 +15,13 @@ import {
 	FrequencyType,
 } from "@/types/climate-variable-interface";
 import { ControlTitle } from "@/components/ui/control-title";
-import { cn, getFrequencyName, isFrequencyEnabled } from '@/lib/utils';
+import {
+	cn,
+	getFrequencyName,
+	isFrequencyEnabled,
+	MONTH_CODES,
+	SEASON_CODES,
+} from '@/lib/utils';
 
 interface FrequencySelectProps {
 	config: FrequencyConfig;
@@ -76,27 +82,15 @@ const FrequencySelect = ({
 		}
 	}, [selectValue, value, onValueChange, hasMonths, hasAllMonths, hasSeasons, hasDaily, hasAnnual, hasAnnualJulJun]);
 
-	const months = [
-		'jan',
-		'feb',
-		'mar',
-		'apr',
-		'may',
-		'jun',
-		'jul',
-		'aug',
-		'sep',
-		'oct',
-		'nov',
-		'dec',
-	].map(monthCode => ({ label: getFrequencyName(monthCode), value: monthCode }));
+	const months = MONTH_CODES.map((monthCode) => ({
+		label: getFrequencyName(monthCode),
+		value: monthCode,
+	}));
 
-	const seasons = [
-		'spring',
-		'summer',
-		'fall',
-		'winter',
-	].map(seasonCode => ({ label: getFrequencyName(seasonCode), value: seasonCode }));
+	const seasons = SEASON_CODES.map((seasonCode) => ({
+		label: getFrequencyName(seasonCode),
+		value: seasonCode,
+	}));
 
 	const renderMonthlyOptions = () => {
 		if (!hasMonths && !hasAllMonths) {

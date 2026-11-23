@@ -64,7 +64,11 @@ export type ClimateVariableContextType = {
 	setAnalysisFieldValue: (key: string, value: string | null) => void;
 	setAveragingType: (type: AveragingType) => void;
 	setSelectedPeriods: (periods: Date[]) => void;
-	setDateRange: (dates: string[]) => void;
+	/**
+	 * Store `dateRange`. With `picked`, also store `dateRangePicked`. Without
+	 * it, `dateRangePicked` keeps its value.
+	 */
+	setDateRange: (dates: string[], picked?: boolean) => void;
 	setPercentiles: (percentiles: string[]) => void;
 	setMissingData: (missingData: string) => void;
 	setModel: (model: string) => void;
@@ -324,6 +328,8 @@ export const ClimateVariableProvider: React.FC<{
 						}
 						if (previousDateRange) {
 							newData.dateRange = previousDateRange;
+							newData.dateRangePicked =
+								climateVariableData?.dateRangePicked;
 						}
 					}
 				}
@@ -584,10 +590,11 @@ export const ClimateVariableProvider: React.FC<{
 	);
 
 	const setDateRange = useCallback(
-		(dates: string[]) => {
+		(dates: string[], picked?: boolean) => {
 			dispatch(
 				updateClimateVariable({
 					dateRange: dates,
+					...(picked !== undefined && { dateRangePicked: picked }),
 				})
 			);
 		},

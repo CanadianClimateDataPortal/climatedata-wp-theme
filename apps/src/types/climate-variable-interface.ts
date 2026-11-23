@@ -392,6 +392,14 @@ export interface ClimateVariableConfigInterface {
 	/** Stores the selected date range */
 	dateRange?: string[] | null;
 
+	/**
+	 * Whether the person picked `dateRange`: a move of the time period slider
+	 * of the S2D sidebar, or a `dateRange` in a link. The URL writer writes an
+	 * S2D `dateRange` only when this is true, because `TimePeriodsControlS2D`
+	 * fills the first period by itself when none is stored.
+	 */
+	dateRangePicked?: boolean;
+
 	/** Stores the default date range */
 	defaultDateRange?: string[] | null;
 

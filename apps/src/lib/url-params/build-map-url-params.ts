@@ -65,9 +65,14 @@ const addClimateVariableParamsToUrl = (
 		}
 	}
 
-	// Add date range
+	// Add date range. An S2D date range is added only once picked, because
+	// its time period control fills the first period by itself.
+	const isUnpickedS2DDateRange =
+		climateData.class === 'S2DClimateVariable' &&
+		!climateData.dateRangePicked;
 	if (climateData.dateRange &&
-		climateData.dateRange.length > 0) {
+		climateData.dateRange.length > 0 &&
+		!isUnpickedS2DDateRange) {
 		const defaultDateRange = defaultConfig?.dateRange;
 		const currentDateRangeStr = climateData.dateRange.join(',');
 		const defaultDateRangeStr = defaultDateRange?.join(',');

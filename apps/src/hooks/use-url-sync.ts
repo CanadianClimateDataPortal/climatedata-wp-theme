@@ -194,6 +194,7 @@ export const useUrlSync = () => {
 			const dateRangeStr = params.get(URL_PARAMS.DATE_RANGE);
 			if (dateRangeStr) {
 				newConfig.dateRange = dateRangeStr.split(',');
+				newConfig.dateRangePicked = true;
 				
 				const dateRange = dateRangeStr.split(',');
 				if (dateRange.length > 1) {

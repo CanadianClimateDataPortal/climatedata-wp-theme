@@ -160,7 +160,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 
 		const period = periods[selectedPeriod];
 
-		setDateRange(formatPeriodRange(period));
+		setDateRange(formatPeriodRange(period), false);
 	}, [
 		matchingDatePeriodIndex,
 		selectedPeriod,
@@ -184,7 +184,7 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 
 		const period = periods[periodIndex];
 
-		setDateRange(formatPeriodRange(period));
+		setDateRange(formatPeriodRange(period), true);
 	};
 
 	if (isDecadalClimatology) {

@@ -132,15 +132,69 @@ export const mapScenarioLabelOpacityPicked = (): MapUrlScenario => ({
 });
 
 /**
+ * An S2D variable whose time period control filled the first period, with no
+ * pick: the date range stays out of the query.
+ *
+ * @returns Scenario expecting no `dateRange`.
+ */
+export const mapScenarioS2DDateRangeNotPicked = (): MapUrlScenario => ({
+	label: 'S2D date range not picked',
+	input: {
+		climateVariable: {
+			id: 's2d_precip_accum',
+			class: 'S2DClimateVariable',
+			dateRange: ['2026-11-01', '2027-01-31'],
+		},
+		dataset: MAP_FIXTURE_DATASET,
+		opacity: { mapData: 1, labels: 1 },
+		opacityPicked: { mapData: false, labels: false },
+		mapCoordinates: { lat: 45.5, lng: -73.6, zoom: 7 },
+		isLowSkillVisible: true,
+	},
+	expected:
+		'var=s2d_precip_accum&dataset=30' +
+		'&lat=45.50000&lng=-73.60000&zoom=7',
+});
+
+/**
+ * An S2D variable whose time period the person picked: the date range enters
+ * the query.
+ *
+ * @returns Scenario expecting `dateRange`.
+ */
+export const mapScenarioS2DDateRangePicked = (): MapUrlScenario => ({
+	label: 'S2D date range picked',
+	input: {
+		climateVariable: {
+			id: 's2d_precip_accum',
+			class: 'S2DClimateVariable',
+			dateRange: ['2026-12-01', '2027-02-28'],
+			dateRangePicked: true,
+		},
+		dataset: MAP_FIXTURE_DATASET,
+		opacity: { mapData: 1, labels: 1 },
+		opacityPicked: { mapData: false, labels: false },
+		mapCoordinates: { lat: 45.5, lng: -73.6, zoom: 7 },
+		isLowSkillVisible: true,
+	},
+	expected:
+		'var=s2d_precip_accum&dateRange=2026-12-01%2C2027-02-28&dataset=30' +
+		'&lat=45.50000&lng=-73.60000&zoom=7',
+});
+
+/**
  * Every Map scenario, in table order. Fed straight into `test.each`.
  *
- * @returns The selector-guard, full-state and single-opacity-pick scenarios.
+ * @returns The selector-guard, full-state, single-opacity-pick and S2D date
+ * range scenarios.
  */
 export const mapUrlScenarios = (): readonly MapUrlScenario[] => [
 	mapScenarioNoVariable(),
 	mapScenarioFullState(),
 	mapScenarioDataOpacityPicked(),
 	mapScenarioLabelOpacityPicked(),
+	mapScenarioS2DDateRangeNotPicked(),
+	mapScenarioS2DDateRangePicked(),
 ];
 
 /**

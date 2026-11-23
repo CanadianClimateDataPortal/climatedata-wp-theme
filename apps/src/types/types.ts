@@ -235,6 +235,14 @@ export interface MapState {
 		mapData: number;
 		labels: number;
 	};
+	/**
+	 * Whether the person picked each opacity, by a move of its slider or by a
+	 * valid value in a link. An opacity enters the URL only once picked.
+	 *
+	 * A sibling of `opacity`, not a key inside it: `LayerOpacities` draws one
+	 * slider per key of `opacity`.
+	 */
+	opacityPicked: Record<keyof MapItemsOpacity, boolean>;
 	variableList: PostData[];
 	variableListLoading: boolean;
 	mapCoordinates: MapCoordinates;

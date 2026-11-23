@@ -48,6 +48,7 @@ export const useUrlSync = () => {
 
 	// Map state selectors
 	const opacity = useAppSelector((state) => state.map.opacity);
+	const opacityPicked = useAppSelector((state) => state.map.opacityPicked);
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const mapCoordinates = useAppSelector((state) => state.map.mapCoordinates);
 	const lowSkillVisibility = useAppSelector(selectLowSkillVisibility());
@@ -106,6 +107,7 @@ export const useUrlSync = () => {
 				climateVariable: climateVariableData,
 				dataset,
 				opacity,
+				opacityPicked,
 				mapCoordinates,
 				isLowSkillVisible: lowSkillVisibility,
 			});
@@ -124,6 +126,7 @@ export const useUrlSync = () => {
 	}, [
 		climateVariableData,
 		opacity,
+		opacityPicked,
 		dataset,
 		mapCoordinates,
 		isInitialized,
@@ -387,8 +390,6 @@ export const useUrlSync = () => {
 			
 			const firstDataset = datasets[0];
 			dispatch(setDataset(firstDataset));
-			dispatch(setOpacity({ key: 'mapData', value: 100 }));
-			dispatch(setOpacity({ key: 'labels', value: 100 }));
 			dispatch(setVariableListLoading(true));
 			
 			try {
@@ -454,8 +455,6 @@ export const useUrlSync = () => {
 						const coords = CANADA_CENTER as [number, number] || [62.51231793838694, -98.48144531250001];
 
 						params.set(URL_PARAMS.DATASET, firstDataset.term_id.toString());
-						params.set(URL_PARAMS.DATA_OPACITY, '100');
-						params.set(URL_PARAMS.LABEL_OPACITY, '100');
 						params.set(URL_PARAMS.LATITUDE, coords[0].toFixed(5));
 						params.set(URL_PARAMS.LONGITUDE, coords[1].toFixed(5));
 						params.set(URL_PARAMS.ZOOM_LEVEL, DEFAULT_ZOOM.toString());
@@ -565,7 +564,7 @@ export const useUrlSync = () => {
 		if (climateVariableData) {
 			updateUrlWithDebounce();
 		}
-	}, [climateVariableData, opacity, dataset, updateUrlWithDebounce, isInitialized]);
+	}, [climateVariableData, opacity, opacityPicked, dataset, updateUrlWithDebounce, isInitialized]);
 
 	/**
 	 * Update the window's URL parameters when the map's coordinates or zoom

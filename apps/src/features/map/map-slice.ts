@@ -74,6 +74,10 @@ const initialState: MapState = {
 		mapData: 1,
 		labels: 1,
 	},
+	opacityPicked: {
+		mapData: false,
+		labels: false,
+	},
 	legendData: {},
 	transformedLegendEntry: [],
 	variableList: [],
@@ -179,6 +183,7 @@ const mapSlice = createSlice({
 				const minValue = MAP_OPACITY_MIN[key];
 				if (value >= minValue && value <= 100) {
 					state.opacity[key] = value / 100;
+					state.opacityPicked[key] = true;
 				}
 			}
 		},

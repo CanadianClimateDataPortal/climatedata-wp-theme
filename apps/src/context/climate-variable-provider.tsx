@@ -187,11 +187,28 @@ export const ClimateVariableProvider: React.FC<{
 				// the default and the URL writer leaves the parameter out.
 				//
 				// Version. This block runs first, because the scenarios and the
-				// sea level date range config depend on the version.
+				// sea level date range config depend on the version. With a
+				// picked scenario and no picked version, it takes the version
+				// that the old variable shows, only when the new variable lists
+				// the scenario under that version and not under its default one.
+				// Otherwise the scenario block below would drop the scenario.
 				const previousVersion = climateVariableData?.version;
 				if (previousVersion) {
 					if (newVariable.getVersions().includes(previousVersion)) {
 						newData.version = previousVersion;
+					}
+				} else if (climateVariableData?.scenario) {
+					const pickedScenario = climateVariableData.scenario;
+					const shownVersion = climateVariable?.getVersion();
+					if (
+						shownVersion &&
+						newVariable.getVersions().includes(shownVersion) &&
+						!newVariable.getScenarios().includes(pickedScenario) &&
+						createClimateVariable({ ...newData, version: shownVersion })
+							.getScenarios()
+							.includes(pickedScenario)
+					) {
+						newData.version = shownVersion;
 					}
 				}
 

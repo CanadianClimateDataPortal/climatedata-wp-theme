@@ -552,13 +552,15 @@ export const useUrlSync = () => {
 	/**
 	 * Update the URL parameters when some configuration changes.
 	 *
-	 * Map location changes are ignored (they are treated in another
-	 * useEffect()).
+	 * This is the only writer of the URL after the page load, so that a map
+	 * move cannot cancel the write of a setting change.
 	 *
 	 * URL is updated with:
 	 * - climate variable configuration change
 	 * - Map opacity change
 	 * - Selected dataset change
+	 * - Map location or zoom change (`updateUrlWithDebounce` depends on
+	 *   `mapCoordinates`, so a map move re-runs this effect)
 	 */
 	useEffect(() => {
 		if (!isInitialized || isUpdatingFromMapRef.current) return;
@@ -566,49 +568,6 @@ export const useUrlSync = () => {
 			updateUrlWithDebounce();
 		}
 	}, [climateVariableData, opacity, opacityPicked, dataset, updateUrlWithDebounce, isInitialized]);
-
-	/**
-	 * Update the window's URL parameters when the map's coordinates or zoom
-	 * change.
-	 */
-	useEffect(() => {
-		if (!isInitialized || isUpdatingFromMapRef.current) return;
-		
-		if (mapCoordinates && typeof window !== 'undefined') {
-			if (updateTimeoutRef.current !== null) {
-				window.clearTimeout(updateTimeoutRef.current);
-			}
-			
-			updateTimeoutRef.current = window.setTimeout(() => {
-				const params = new URLSearchParams(window.location.search);
-				
-				params.set(URL_PARAMS.LATITUDE, mapCoordinates.lat.toFixed(5));
-				params.set(URL_PARAMS.LONGITUDE, mapCoordinates.lng.toFixed(5));
-				params.set(URL_PARAMS.ZOOM_LEVEL, mapCoordinates.zoom.toString());
-				
-				const currentParams = new URLSearchParams(window.location.search);
-				const currentLat = parseFloat(currentParams.get(URL_PARAMS.LATITUDE) || '0');
-				const currentLng = parseFloat(currentParams.get(URL_PARAMS.LONGITUDE) || '0');
-				const currentZoom = parseInt(currentParams.get(URL_PARAMS.ZOOM_LEVEL) || '0');
-				
-				if (
-					Math.abs(currentLat - mapCoordinates.lat) > 0.0001 ||
-					Math.abs(currentLng - mapCoordinates.lng) > 0.0001 ||
-					currentZoom !== mapCoordinates.zoom
-				) {
-					const newUrl = `${window.location.pathname}?${params.toString()}`;
-					
-					// Prevent duplicate updates
-					if (newUrl !== lastUrlUpdateRef.current) {
-						lastUrlUpdateRef.current = newUrl;
-						window.history.replaceState({}, '', newUrl);
-					}
-				}
-				
-				updateTimeoutRef.current = null;
-			}, 400); // Longer debounce for map movements
-		}
-	}, [mapCoordinates, isInitialized]);
 
 	// Clean up timeout on unmount
 	useEffect(() => {

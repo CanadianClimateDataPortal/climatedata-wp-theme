@@ -445,35 +445,8 @@ export const useUrlSync = () => {
 						
 						params.set(URL_PARAMS.VARIABLE_ID, matchingConfig.id);
 						
-						if (matchingConfig.version) {
-							params.set(URL_PARAMS.VERSION, matchingConfig.version);
-						} else if (matchingConfig.versions?.length) {
-							params.set(URL_PARAMS.VERSION, matchingConfig.versions[0]);
-						}
-						
 						if (matchingConfig.threshold) {
 							params.set(URL_PARAMS.THRESHOLD, matchingConfig.threshold.toString());
-						}
-						
-						if (matchingConfig.scenario) {
-							params.set(URL_PARAMS.SCENARIO, matchingConfig.scenario);
-						} else if (matchingConfig.versions && matchingConfig.versions[0] && matchingConfig.scenarios) {
-							const firstVersion = matchingConfig.versions[0];
-							const scenarios = typeof matchingConfig.scenarios === 'object' ? 
-								matchingConfig.scenarios[firstVersion as keyof typeof matchingConfig.scenarios] : 
-								matchingConfig.scenarios;
-								
-							if (Array.isArray(scenarios) && scenarios.length > 0) {
-								params.set(URL_PARAMS.SCENARIO, scenarios[0]);
-							}
-						}
-						
-						if (matchingConfig.interactiveRegion) {
-							params.set(URL_PARAMS.INTERACTIVE_REGION, matchingConfig.interactiveRegion);
-						}
-						
-						if (matchingConfig.dateRange && matchingConfig.dateRange.length > 0) {
-							params.set(URL_PARAMS.DATE_RANGE, matchingConfig.dateRange.join(','));
 						}
 
 						const coords = CANADA_CENTER as [number, number] || [62.51231793838694, -98.48144531250001];

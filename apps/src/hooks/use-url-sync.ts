@@ -564,7 +564,14 @@ export const useUrlSync = () => {
 		if (climateVariableData) {
 			updateUrlWithDebounce();
 		}
-	}, [climateVariableData, opacity, opacityPicked, dataset, updateUrlWithDebounce, isInitialized]);
+	}, [
+		climateVariableData,
+		opacity,
+		opacityPicked,
+		dataset,
+		updateUrlWithDebounce,
+		isInitialized,
+	]);
 
 	// Clean up timeout on unmount
 	useEffect(() => {

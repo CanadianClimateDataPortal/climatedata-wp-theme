@@ -1,4 +1,8 @@
-import React, { useCallback, useContext, useMemo } from "react";
+import React, {
+	useCallback,
+	useContext,
+	useMemo,
+} from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SectionContext from "@/context/section-provider";
 import { cn } from "@/lib/utils.ts";
@@ -109,7 +113,14 @@ const ColourSchemeDropdown = ({
 				))}
 			</SelectContent>
 		);
-	}, [climateVariable, legendColours, renderColourOption, isMap, value, onValueChange]);
+	}, [
+		climateVariable,
+		legendColours,
+		renderColourOption,
+		isMap,
+		value,
+		onValueChange,
+	]);
 
 	return (
 		<div className={cn('dropdown z-50', className)}>

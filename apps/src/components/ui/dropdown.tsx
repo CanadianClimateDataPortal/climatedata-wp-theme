@@ -5,7 +5,12 @@
  * an optional heading title and tooltip (ControlTitle component).
  *
  */
-import React, { useState, useMemo, forwardRef, useContext } from 'react';
+import React, {
+	useState,
+	useMemo,
+	forwardRef,
+	useContext,
+} from 'react';
 import { __ } from '@/context/locale-provider';
 import SectionContext from '@/context/section-provider';
 

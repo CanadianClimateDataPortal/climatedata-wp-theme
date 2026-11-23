@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { __ } from '@/context/locale-provider';
+import SectionContext from '@/context/section-provider';
 import {
 	Select,
 	SelectContent,
@@ -22,6 +23,7 @@ import {
 	MONTH_CODES,
 	SEASON_CODES,
 } from '@/lib/utils';
+import { pickProps } from '@/lib/pick';
 
 interface FrequencySelectProps {
 	config: FrequencyConfig;
@@ -56,6 +58,8 @@ const FrequencySelect = ({
 	const hasOptions = hasAnnual || hasAnnualJulJun || hasMonths || hasAllMonths || hasSeasons || hasDaily;
 
 	const [selectValue, setSelectValue] = useState<string | undefined>(value);
+	const isMap = useContext(SectionContext) === 'map';
+	const pick = (itemValue: string) => isMap ? pickProps('listItem', itemValue, selectValue, onValueChange) : undefined;
 
 	useEffect(() => {
 		if (value !== undefined) {
@@ -99,7 +103,7 @@ const FrequencySelect = ({
 
 		if (downloadType === DownloadType.ANALYZED) {
 			return (
-				<SelectItem value={FrequencyType.MONTHLY}>
+				<SelectItem value={FrequencyType.MONTHLY} {...pick(FrequencyType.MONTHLY)}>
 					{__('Monthly')}
 				</SelectItem>
 			);
@@ -108,12 +112,12 @@ const FrequencySelect = ({
 				<SelectGroup>
 					<SelectLabel className={'pl-2'}>{__('Monthly')}</SelectLabel>
 					{hasAllMonths && (
-						<SelectItem value={FrequencyType.ALL_MONTHS} className={'pl-4'}>
+						<SelectItem value={FrequencyType.ALL_MONTHS} className={'pl-4'} {...pick(FrequencyType.ALL_MONTHS)}>
 							{__('All months')}
 						</SelectItem>
 					)}
 					{months.map((option) => (
-						<SelectItem key={option.value} value={option.value} className={'pl-4'}>
+						<SelectItem key={option.value} value={option.value} className={'pl-4'} {...pick(option.value)}>
 							{option.label}
 						</SelectItem>
 					))}
@@ -129,7 +133,7 @@ const FrequencySelect = ({
 
 		if (downloadType === DownloadType.ANALYZED) {
 			return (
-				<SelectItem value={FrequencyType.SEASONAL}>
+				<SelectItem value={FrequencyType.SEASONAL} {...pick(FrequencyType.SEASONAL)}>
 					{__('Seasonal')}
 				</SelectItem>
 			);
@@ -138,7 +142,7 @@ const FrequencySelect = ({
 				<SelectGroup>
 					<SelectLabel className={'pl-2'}>{__('Seasonal')}</SelectLabel>
 					{seasons.map((option) => (
-						<SelectItem key={option.value} value={option.value} className={'pl-4'}>
+						<SelectItem key={option.value} value={option.value} className={'pl-4'} {...pick(option.value)}>
 							{option.label}
 						</SelectItem>
 					))}
@@ -153,13 +157,13 @@ const FrequencySelect = ({
 		
 		return (
 			<SelectContent>
-				{hasAnnual && <SelectItem value={FrequencyType.ANNUAL}>
+				{hasAnnual && <SelectItem value={FrequencyType.ANNUAL} {...pick(FrequencyType.ANNUAL)}>
 					{__(annualLabel)}
 				</SelectItem>}
-				{hasAnnualJulJun && <SelectItem value={FrequencyType.ANNUAL_JUL_JUN}>
+				{hasAnnualJulJun && <SelectItem value={FrequencyType.ANNUAL_JUL_JUN} {...pick(FrequencyType.ANNUAL_JUL_JUN)}>
 					{__('Annual (July to June)')}
 				</SelectItem>}
-				{hasDaily && <SelectItem value={FrequencyType.DAILY}>
+				{hasDaily && <SelectItem value={FrequencyType.DAILY} {...pick(FrequencyType.DAILY)}>
 					{__('Daily')}
 				</SelectItem>}
 				{renderMonthlyOptions()}

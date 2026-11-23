@@ -4,11 +4,13 @@
  * A custom radio group component that uses the Radix RadioGroupPrimitive components
  * to render a group of radio buttons.
  */
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useContext } from 'react';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import { Circle } from 'lucide-react';
 
+import SectionContext from '@/context/section-provider';
 import { cn } from '@/lib/utils';
+import { pickProps } from '@/lib/pick';
 import { normalizeOptions } from '@/lib/format';
 import { ControlTitle } from '@/components/ui/control-title';
 
@@ -77,6 +79,8 @@ const RadioGroupFactory = forwardRef<
 		},
 		ref
 	) => {
+		const isMap = useContext(SectionContext) === 'map';
+
 		// when receiving an array of strings or numbers as options we will convert them valid value/label objects
 		const normalizedOptions = normalizeOptions(options);
 
@@ -115,6 +119,7 @@ const RadioGroupFactory = forwardRef<
 							<RadioGroupItem
 								value={option.value}
 								id={`radio-${name}-${index}`}
+								{...(isMap && props.onValueChange ? pickProps('radioItem', option.value, props.value, props.onValueChange) : undefined)}
 							/>
 							<label
 								htmlFor={`radio-${name}-${index}`}

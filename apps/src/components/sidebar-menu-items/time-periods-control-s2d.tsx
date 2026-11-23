@@ -146,26 +146,43 @@ const TimePeriodsControlS2D: React.FC<TimePeriodsControlS2DProps> = ({
 		controlTooltip = tooltip;
 	}
 
+	// findPeriodIndexForDateRange matches the start date only, so a range kept
+	// from a longer frequency can match a period and still name another end.
+	let isMatchedEndDifferent = false;
+	if (periods && matchingDatePeriodIndex !== null) {
+		const [periodStart, periodEnd] = formatPeriodRange(periods[matchingDatePeriodIndex]);
+		isMatchedEndDifferent = dateRange?.[0] !== periodStart || dateRange?.[1] !== periodEnd;
+	}
+
 	/**
 	 * Ensure the dateRange is synchronized with the selected period.
 	 *
 	 * A disynchronisation can occur when switching from another frequency or
 	 * another variable that has a different date range. Can also occur if an
 	 * invalid date range is supplied in the URL.
+	 *
+	 * A range with no matching period snaps to the first one, which nobody
+	 * picked. A range whose start matches a period gets the end of that period,
+	 * and keeps its picked flag, because the person picked that start.
 	 */
 	useEffect(() => {
-		if (!periods || matchingDatePeriodIndex === selectedPeriod) {
+		if (!periods) {
 			return;
 		}
 
 		const period = periods[selectedPeriod];
 
-		setDateRange(formatPeriodRange(period), false);
+		if (matchingDatePeriodIndex !== selectedPeriod) {
+			setDateRange(formatPeriodRange(period), false);
+		} else if (isMatchedEndDifferent) {
+			setDateRange(formatPeriodRange(period));
+		}
 	}, [
 		matchingDatePeriodIndex,
 		selectedPeriod,
 		periods,
 		setDateRange,
+		isMatchedEndDifferent,
 	]);
 
 	/**

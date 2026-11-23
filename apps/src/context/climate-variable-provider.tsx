@@ -364,7 +364,9 @@ export const ClimateVariableProvider: React.FC<{
 				// check happens here. A value counts as offered only when its
 				// control shows: a hidden control would leave the value in
 				// effect with no way to undo it. The colour type follows the
-				// colour scheme kept here.
+				// colour scheme kept here, the default scheme included. That
+				// scheme hides the type control, which shows the kept type again
+				// at the next scheme pick.
 				if (
 					climateVariableData?.colourScheme ||
 					climateVariableData?.dataValue

@@ -327,18 +327,19 @@ export const colourSchemeOfferedBy = (
 	return offeredSchemes.includes(previousColourScheme) ? previousColourScheme : null;
 };
 /**
- * Gives the previous colour type back when the colour scheme carried to the
- * next variable shows the Discrete and Continuous choice, else null.
- * MapColorsDropdown renders that choice only for a scheme that is set and is
- * not default, so the type follows the scheme. The caller passes the scheme
- * that colourSchemeOfferedBy() gave back. A value outside the ColourType enum
- * never passes.
+ * Gives the previous colour type back when the caller carried a colour
+ * scheme to the next variable, else null. The default scheme counts too.
+ * MapColorsDropdown hides the Discrete and Continuous choice under it, and
+ * the choice shows the kept type again once the person picks another
+ * scheme, as it does with no change of variable. The caller passes the
+ * scheme that colourSchemeOfferedBy() gave back. A value outside the
+ * ColourType enum never passes.
  */
 export const colourTypeOfferedBy = (
 	carriedColourScheme: string | null,
 	previousColourType: string | null | undefined
 ): string | null => {
-	if (!carriedColourScheme || carriedColourScheme === 'default' || !previousColourType) {
+	if (!carriedColourScheme || !previousColourType) {
 		return null;
 	}
 

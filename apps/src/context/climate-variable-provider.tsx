@@ -113,7 +113,7 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
  *
  * @throws When the map does not have that class.
  */
-const createClimateVariable = (
+export const createClimateVariable = (
 	config: ClimateVariableConfigInterface
 ): ClimateVariableInterface => {
 	const climateVariableClass = CLIMATE_VARIABLE_CLASS_MAP[config.class];

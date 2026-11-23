@@ -8,9 +8,14 @@
  * For a click on another item, `onValueChange` reports the pick, once.
  *
  * This is the one place that knows which event a pick listens to. A list
- * item listens to `pointerup`, because Radix closes the list on it and the
- * item gets no `click`. A radio item listens to `click`, which a click on its
- * label also sends. These props add nothing for a pick with the keyboard.
+ * item listens to `pointerup`, which every kind of pointer sends on release
+ * before any `click`, so the pick does not depend on whether the item still
+ * gets a `click` once the list closes. The release of the press that opens a
+ * list cannot count as a pick only because `SelectContent` places the list
+ * beside its trigger (`position` 'popper'), not over it. A radio item listens
+ * to `click`, which a click on its label also sends. Space on the checked
+ * radio button sends a `click` too, so it counts as a pick. These props add
+ * nothing for a pick in a list with the keyboard.
  */
 export const pickProps = <T extends string>(
 	kind: 'listItem' | 'radioItem',

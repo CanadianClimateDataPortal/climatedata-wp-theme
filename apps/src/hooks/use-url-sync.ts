@@ -176,8 +176,9 @@ export const useUrlSync = () => {
 		}
 		// Keep the frequency of a link only when the variable offers it, as the
 		// Frequencies control does, so a hand-written value cannot leave the
-		// map with no data. `months` and `seasons` are group labels of that
-		// control, never a value.
+		// map with no data. For a variable that is not S2D, `months` and
+		// `seasons` are group labels of that control, never a value. An S2D
+		// variable offers both as values.
 		const frequency = params.get(URL_PARAMS.FREQUENCY);
 		if (frequency) {
 			const variable = createClimateVariable(matchedVariable);

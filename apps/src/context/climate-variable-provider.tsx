@@ -420,18 +420,19 @@ export const ClimateVariableProvider: React.FC<{
 			const currentData = climateVariableData;
 			if (!currentData || currentData.version === version) return;
 
-			const validScenario =
-				climateVariable?.getValidScenarioForVersion(version);
 			const updatePayload: Partial<ClimateVariableConfigInterface> = {
 				version,
 			};
 
+			// A version pick is no scenario pick, so it stores no scenario. A
+			// stored scenario stays when the new version lists it. Otherwise the
+			// payload clears it, and the scenario getter gives the default.
+			const scenario = currentData.scenario;
 			if (
-				validScenario &&
-				(!currentData.scenario ||
-					currentData.scenario !== validScenario)
+				scenario != null &&
+				!climateVariable?.getScenariosConfig()?.[version]?.includes(scenario)
 			) {
-				updatePayload.scenario = validScenario;
+				updatePayload.scenario = null;
 			}
 
 			dispatch(updateClimateVariable(updatePayload));

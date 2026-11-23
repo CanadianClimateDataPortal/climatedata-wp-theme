@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useLocale } from '@/hooks/use-locale';
 import {
@@ -16,8 +16,13 @@ import { ClimateVariables } from '@/config/climate-variables.config';
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
+	FrequencyType,
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
+import { createClimateVariable } from '@/context/climate-variable-provider';
+import SectionContext from '@/context/section-provider';
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import { isFrequencyOffered } from '@/lib/utils';
 import { fetchPostsData, fetchTaxonomyData } from '@/services/services';
 import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-sync-slice';
 import { normalizePostData } from '@/lib/format';
@@ -29,6 +34,7 @@ import {
 	AssertionError,
 	assertIsForecastDisplay,
 	assertIsForecastType,
+	isFrequencyTypeS2D,
 } from '@/types/assertions';
 
 /**
@@ -42,6 +48,7 @@ export const useUrlSync = () => {
 	const isUpdatingFromMapRef = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
 	const { locale } = useLocale();
+	const section = useContext(SectionContext);
 
 	// Get the URL sync state
 	const isInitialized = useAppSelector((state) => state.urlSync.isInitialized);
@@ -167,8 +174,24 @@ export const useUrlSync = () => {
 				newConfig.threshold = params.get(URL_PARAMS.THRESHOLD) || undefined;
 			}
 		}
-		if (params.has(URL_PARAMS.FREQUENCY))
-			newConfig.frequency = params.get(URL_PARAMS.FREQUENCY) || undefined;
+		// Keep the frequency of a link only when the variable offers it, as the
+		// Frequencies control does, so a hand-written value cannot leave the
+		// map with no data. `months` and `seasons` are group labels of that
+		// control, never a value.
+		const frequency = params.get(URL_PARAMS.FREQUENCY);
+		if (frequency) {
+			const variable = createClimateVariable(matchedVariable);
+			const frequencyConfig = variable.getFrequencyConfig();
+			const isOffered = variable instanceof S2DClimateVariable
+				? isFrequencyTypeS2D(frequency)
+				: frequency !== FrequencyType.MONTHLY &&
+					frequency !== FrequencyType.SEASONAL &&
+					!!frequencyConfig &&
+					isFrequencyOffered(frequencyConfig, section, frequency);
+			if (isOffered) {
+				newConfig.frequency = frequency;
+			}
+		}
 		if (params.has(URL_PARAMS.SCENARIO))
 			newConfig.scenario = params.get(URL_PARAMS.SCENARIO) || undefined;
 		if (params.has(URL_PARAMS.DO_COMPARE))

@@ -1,3 +1,16 @@
+
+/**
+ * React Event handlers to respond to when a person interacts with a palpable element.
+ *
+ * @see {@link PickProps} for
+ */
+interface PickPropsReturnType {
+	onPointerUp?: () => void;
+	onClick?: () => void;
+}
+
+export type PickProps = typeof pickProps;
+
 /**
  * The props that make a click on the item that a control already shows
  * count as a pick.
@@ -17,12 +30,12 @@
  * radio button sends a `click` too, so it counts as a pick. These props add
  * nothing for a pick in a list with the keyboard.
  */
-export const pickProps = <T extends string>(
+const pickProps = <T extends string>(
 	kind: 'listItem' | 'radioItem',
 	itemValue: T,
 	shownValue: T | undefined,
 	onPick: (value: T) => void,
-): { onPointerUp?: () => void; onClick?: () => void } => {
+): PickPropsReturnType => {
 	const handlePick = () => {
 		if (itemValue === shownValue) {
 			onPick(itemValue);
@@ -33,3 +46,7 @@ export const pickProps = <T extends string>(
 		? { onPointerUp: handlePick }
 		: { onClick: handlePick };
 };
+
+export {
+	pickProps,
+}

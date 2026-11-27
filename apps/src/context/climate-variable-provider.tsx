@@ -715,11 +715,11 @@ export const ClimateVariableProvider: React.FC<{
 	const removeSelectedPoint = useCallback(
 		(gid: string) => {
 			if (!climateVariableData) return;
-			const { [gid]: removed, ...rest } =
-				climateVariableData.selectedPoints ?? {};
+			const selectedPoints = { ...climateVariableData.selectedPoints };
+			delete selectedPoints[gid];
 			dispatch(
 				updateClimateVariable({
-					selectedPoints: rest,
+					selectedPoints,
 				})
 			);
 		},

@@ -10,7 +10,7 @@ import { Circle } from 'lucide-react';
 
 import SectionContext from '@/context/section-provider';
 import { cn } from '@/lib/utils';
-import { pickProps } from '@/lib/pick';
+import { captureSelectionIntent } from '@/lib/capture-selection-intent';
 import { normalizeOptions } from '@/lib/format';
 import { ControlTitle } from '@/components/ui/control-title';
 
@@ -119,7 +119,11 @@ const RadioGroupFactory = forwardRef<
 							<RadioGroupItem
 								value={option.value}
 								id={`radio-${name}-${index}`}
-								{...(isMap && props.onValueChange ? pickProps('radioItem', option.value, props.value, props.onValueChange) : undefined)}
+								{...(
+									isMap && props.onValueChange
+										? captureSelectionIntent('radioItem', option.value, props.value, props.onValueChange)
+										: undefined
+								)}
 							/>
 							<label
 								htmlFor={`radio-${name}-${index}`}

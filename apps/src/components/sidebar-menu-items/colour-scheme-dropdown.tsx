@@ -6,7 +6,7 @@ import React, {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SectionContext from "@/context/section-provider";
 import { cn } from "@/lib/utils.ts";
-import { pickProps } from "@/lib/pick";
+import { captureSelectionIntent } from "@/lib/capture-selection-intent";
 import { ControlTitle } from "@/components/ui/control-title";
 import { __ } from '@/context/locale-provider';
 import { DEFAULT_COLOUR_SCHEMES } from "@/lib/constants";
@@ -96,7 +96,11 @@ const ColourSchemeDropdown = ({
 					<SelectItem
 						value={'default'}
 						className="w-full [&>*:first-child]:w-full"
-						{...(isMap ? pickProps('listItem', 'default', value, onValueChange) : undefined)}
+						{...(
+							isMap
+								? captureSelectionIntent('listItem', 'default', value, onValueChange)
+								: undefined
+						)}
 					>
 						{renderColourOption(legendColours)}
 					</SelectItem>
@@ -106,7 +110,11 @@ const ColourSchemeDropdown = ({
 						key={key}
 						value={key}
 						className="w-full [&>*:first-child]:w-full"
-						{...(isMap ? pickProps('listItem', key, value, onValueChange) : undefined)}
+						{...(
+							isMap
+								? captureSelectionIntent('listItem', key, value, onValueChange)
+								: undefined
+						)}
 					>
 						{renderColourOption(scheme.colours)}
 					</SelectItem>

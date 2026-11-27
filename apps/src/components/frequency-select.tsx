@@ -27,7 +27,7 @@ import {
 	MONTH_CODES,
 	SEASON_CODES,
 } from '@/lib/utils';
-import { pickProps } from '@/lib/pick';
+import { captureSelectionIntent } from '@/lib/capture-selection-intent';
 
 interface FrequencySelectProps {
 	config: FrequencyConfig;
@@ -68,7 +68,7 @@ const FrequencySelect = (
 	const isMap = useContext(SectionContext) === 'map';
 	const pick = (itemValue: string) =>
 		isMap
-			? pickProps('listItem', itemValue, selectValue, onValueChange)
+			? captureSelectionIntent('listItem', itemValue, selectValue, onValueChange)
 			: undefined;
 
 	useEffect(() => {

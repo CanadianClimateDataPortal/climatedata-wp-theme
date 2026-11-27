@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 
 import { cn } from '@/lib/utils';
-import { pickProps } from '@/lib/pick';
+import { captureSelectionIntent } from '@/lib/capture-selection-intent';
 import { DropdownOption, DropdownProps } from '@/types/types';
 
 // using generics like this because forwardRef does not support generic types
@@ -115,7 +115,11 @@ const DropdownGeneric = <T extends string | undefined>(
 						<SelectItem
 							key={index}
 							value={option.value}
-							{...(isMap ? pickProps('listItem', option.value, value as string | undefined, handleValueChanged) : undefined)}
+							{...(
+								isMap
+									? captureSelectionIntent('listItem', option.value, value as string | undefined, handleValueChanged)
+									: undefined
+							)}
 						>
 							{option.label}
 						</SelectItem>

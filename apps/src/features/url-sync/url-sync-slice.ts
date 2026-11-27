@@ -51,6 +51,7 @@ export const selectMapUrlSearch = createSelector(
 		(state: RootState) => state.climateVariable.data,
 		(state: RootState) => state.map.dataset,
 		(state: RootState) => state.map.opacity,
+		(state: RootState) => state.map.opacityPicked,
 		(state: RootState) => state.map.mapCoordinates,
 		(state: RootState) => state.map.isLowSkillVisible,
 	],
@@ -58,6 +59,7 @@ export const selectMapUrlSearch = createSelector(
 		climateVariable,
 		dataset,
 		opacity,
+		opacityPicked,
 		mapCoordinates,
 		isLowSkillVisible,
 	): string => {
@@ -68,6 +70,7 @@ export const selectMapUrlSearch = createSelector(
 			climateVariable,
 			dataset,
 			opacity,
+			opacityPicked,
 			mapCoordinates,
 			isLowSkillVisible,
 		});

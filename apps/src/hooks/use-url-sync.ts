@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useLocale } from '@/hooks/use-locale';
 import {
@@ -16,8 +16,13 @@ import { ClimateVariables } from '@/config/climate-variables.config';
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
+	FrequencyType,
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
+import { createClimateVariable } from '@/context/climate-variable-provider';
+import SectionContext from '@/context/section-provider';
+import S2DClimateVariable from '@/lib/s2d-climate-variable';
+import { isFrequencyOffered } from '@/lib/utils';
 import { fetchPostsData, fetchTaxonomyData } from '@/services/services';
 import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-sync-slice';
 import { normalizePostData } from '@/lib/format';
@@ -29,6 +34,7 @@ import {
 	AssertionError,
 	assertIsForecastDisplay,
 	assertIsForecastType,
+	isFrequencyTypeS2D,
 } from '@/types/assertions';
 
 /**
@@ -42,12 +48,14 @@ export const useUrlSync = () => {
 	const isUpdatingFromMapRef = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
 	const { locale } = useLocale();
+	const section = useContext(SectionContext);
 
 	// Get the URL sync state
 	const isInitialized = useAppSelector((state) => state.urlSync.isInitialized);
 
 	// Map state selectors
 	const opacity = useAppSelector((state) => state.map.opacity);
+	const opacityPicked = useAppSelector((state) => state.map.opacityPicked);
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const mapCoordinates = useAppSelector((state) => state.map.mapCoordinates);
 	const lowSkillVisibility = useAppSelector(selectLowSkillVisibility());
@@ -106,6 +114,7 @@ export const useUrlSync = () => {
 				climateVariable: climateVariableData,
 				dataset,
 				opacity,
+				opacityPicked,
 				mapCoordinates,
 				isLowSkillVisible: lowSkillVisibility,
 			});
@@ -124,6 +133,7 @@ export const useUrlSync = () => {
 	}, [
 		climateVariableData,
 		opacity,
+		opacityPicked,
 		dataset,
 		mapCoordinates,
 		isInitialized,
@@ -164,8 +174,25 @@ export const useUrlSync = () => {
 				newConfig.threshold = params.get(URL_PARAMS.THRESHOLD) || undefined;
 			}
 		}
-		if (params.has(URL_PARAMS.FREQUENCY))
-			newConfig.frequency = params.get(URL_PARAMS.FREQUENCY) || undefined;
+		// Keep the frequency of a link only when the variable offers it, as the
+		// Frequencies control does, so a hand-written value cannot leave the
+		// map with no data. For a variable that is not S2D, `months` and
+		// `seasons` are group labels of that control, never a value. An S2D
+		// variable offers both as values.
+		const frequency = params.get(URL_PARAMS.FREQUENCY);
+		if (frequency) {
+			const variable = createClimateVariable(matchedVariable);
+			const frequencyConfig = variable.getFrequencyConfig();
+			const isOffered = variable instanceof S2DClimateVariable
+				? isFrequencyTypeS2D(frequency)
+				: frequency !== FrequencyType.MONTHLY &&
+					frequency !== FrequencyType.SEASONAL &&
+					!!frequencyConfig &&
+					isFrequencyOffered(frequencyConfig, section, frequency);
+			if (isOffered) {
+				newConfig.frequency = frequency;
+			}
+		}
 		if (params.has(URL_PARAMS.SCENARIO))
 			newConfig.scenario = params.get(URL_PARAMS.SCENARIO) || undefined;
 		if (params.has(URL_PARAMS.DO_COMPARE))
@@ -191,6 +218,7 @@ export const useUrlSync = () => {
 			const dateRangeStr = params.get(URL_PARAMS.DATE_RANGE);
 			if (dateRangeStr) {
 				newConfig.dateRange = dateRangeStr.split(',');
+				newConfig.dateRangePicked = true;
 				
 				const dateRange = dateRangeStr.split(',');
 				if (dateRange.length > 1) {
@@ -387,8 +415,6 @@ export const useUrlSync = () => {
 			
 			const firstDataset = datasets[0];
 			dispatch(setDataset(firstDataset));
-			dispatch(setOpacity({ key: 'mapData', value: 100 }));
-			dispatch(setOpacity({ key: 'labels', value: 100 }));
 			dispatch(setVariableListLoading(true));
 			
 			try {
@@ -420,42 +446,13 @@ export const useUrlSync = () => {
 						
 						params.set(URL_PARAMS.VARIABLE_ID, matchingConfig.id);
 						
-						if (matchingConfig.version) {
-							params.set(URL_PARAMS.VERSION, matchingConfig.version);
-						} else if (matchingConfig.versions?.length) {
-							params.set(URL_PARAMS.VERSION, matchingConfig.versions[0]);
-						}
-						
 						if (matchingConfig.threshold) {
 							params.set(URL_PARAMS.THRESHOLD, matchingConfig.threshold.toString());
-						}
-						
-						if (matchingConfig.scenario) {
-							params.set(URL_PARAMS.SCENARIO, matchingConfig.scenario);
-						} else if (matchingConfig.versions && matchingConfig.versions[0] && matchingConfig.scenarios) {
-							const firstVersion = matchingConfig.versions[0];
-							const scenarios = typeof matchingConfig.scenarios === 'object' ? 
-								matchingConfig.scenarios[firstVersion as keyof typeof matchingConfig.scenarios] : 
-								matchingConfig.scenarios;
-								
-							if (Array.isArray(scenarios) && scenarios.length > 0) {
-								params.set(URL_PARAMS.SCENARIO, scenarios[0]);
-							}
-						}
-						
-						if (matchingConfig.interactiveRegion) {
-							params.set(URL_PARAMS.INTERACTIVE_REGION, matchingConfig.interactiveRegion);
-						}
-						
-						if (matchingConfig.dateRange && matchingConfig.dateRange.length > 0) {
-							params.set(URL_PARAMS.DATE_RANGE, matchingConfig.dateRange.join(','));
 						}
 
 						const coords = CANADA_CENTER as [number, number] || [62.51231793838694, -98.48144531250001];
 
 						params.set(URL_PARAMS.DATASET, firstDataset.term_id.toString());
-						params.set(URL_PARAMS.DATA_OPACITY, '100');
-						params.set(URL_PARAMS.LABEL_OPACITY, '100');
 						params.set(URL_PARAMS.LATITUDE, coords[0].toFixed(5));
 						params.set(URL_PARAMS.LONGITUDE, coords[1].toFixed(5));
 						params.set(URL_PARAMS.ZOOM_LEVEL, DEFAULT_ZOOM.toString());
@@ -552,63 +549,29 @@ export const useUrlSync = () => {
 	/**
 	 * Update the URL parameters when some configuration changes.
 	 *
-	 * Map location changes are ignored (they are treated in another
-	 * useEffect()).
+	 * This is the only writer of the URL after the page load, so that a map
+	 * move cannot cancel the write of a setting change.
 	 *
 	 * URL is updated with:
 	 * - climate variable configuration change
 	 * - Map opacity change
 	 * - Selected dataset change
+	 * - Map location or zoom change (`updateUrlWithDebounce` depends on
+	 *   `mapCoordinates`, so a map move re-runs this effect)
 	 */
 	useEffect(() => {
 		if (!isInitialized || isUpdatingFromMapRef.current) return;
 		if (climateVariableData) {
 			updateUrlWithDebounce();
 		}
-	}, [climateVariableData, opacity, dataset, updateUrlWithDebounce, isInitialized]);
-
-	/**
-	 * Update the window's URL parameters when the map's coordinates or zoom
-	 * change.
-	 */
-	useEffect(() => {
-		if (!isInitialized || isUpdatingFromMapRef.current) return;
-		
-		if (mapCoordinates && typeof window !== 'undefined') {
-			if (updateTimeoutRef.current !== null) {
-				window.clearTimeout(updateTimeoutRef.current);
-			}
-			
-			updateTimeoutRef.current = window.setTimeout(() => {
-				const params = new URLSearchParams(window.location.search);
-				
-				params.set(URL_PARAMS.LATITUDE, mapCoordinates.lat.toFixed(5));
-				params.set(URL_PARAMS.LONGITUDE, mapCoordinates.lng.toFixed(5));
-				params.set(URL_PARAMS.ZOOM_LEVEL, mapCoordinates.zoom.toString());
-				
-				const currentParams = new URLSearchParams(window.location.search);
-				const currentLat = parseFloat(currentParams.get(URL_PARAMS.LATITUDE) || '0');
-				const currentLng = parseFloat(currentParams.get(URL_PARAMS.LONGITUDE) || '0');
-				const currentZoom = parseInt(currentParams.get(URL_PARAMS.ZOOM_LEVEL) || '0');
-				
-				if (
-					Math.abs(currentLat - mapCoordinates.lat) > 0.0001 ||
-					Math.abs(currentLng - mapCoordinates.lng) > 0.0001 ||
-					currentZoom !== mapCoordinates.zoom
-				) {
-					const newUrl = `${window.location.pathname}?${params.toString()}`;
-					
-					// Prevent duplicate updates
-					if (newUrl !== lastUrlUpdateRef.current) {
-						lastUrlUpdateRef.current = newUrl;
-						window.history.replaceState({}, '', newUrl);
-					}
-				}
-				
-				updateTimeoutRef.current = null;
-			}, 400); // Longer debounce for map movements
-		}
-	}, [mapCoordinates, isInitialized]);
+	}, [
+		climateVariableData,
+		opacity,
+		opacityPicked,
+		dataset,
+		updateUrlWithDebounce,
+		isInitialized,
+	]);
 
 	// Clean up timeout on unmount
 	useEffect(() => {

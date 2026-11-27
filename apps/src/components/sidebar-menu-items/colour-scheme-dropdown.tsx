@@ -1,6 +1,12 @@
-import React, { useCallback, useMemo } from "react";
+import React, {
+	useCallback,
+	useContext,
+	useMemo,
+} from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import SectionContext from "@/context/section-provider";
 import { cn } from "@/lib/utils.ts";
+import { captureSelectionIntent } from "@/lib/capture-selection-intent";
 import { ControlTitle } from "@/components/ui/control-title";
 import { __ } from '@/context/locale-provider';
 import { DEFAULT_COLOUR_SCHEMES } from "@/lib/constants";
@@ -27,6 +33,7 @@ const ColourSchemeDropdown = ({
 }: ColourSchemeDropdownProps) => {
 	const legendData = useAppSelector((state) => state.map.legendData);
 	const { climateVariable } = useClimateVariable();
+	const isMap = useContext(SectionContext) === 'map';
 
 	const legendColours = useMemo(() => {
 		if (!legendData) return;
@@ -86,18 +93,42 @@ const ColourSchemeDropdown = ({
 		return (
 			<SelectContent>
 				{(!customColourSchemes && legendColours && legendColours.length > 0) && (
-					<SelectItem value={'default'} className="w-full [&>*:first-child]:w-full">
+					<SelectItem
+						value={'default'}
+						className="w-full [&>*:first-child]:w-full"
+						{...(
+							isMap
+								? captureSelectionIntent('listItem', 'default', value, onValueChange)
+								: undefined
+						)}
+					>
 						{renderColourOption(legendColours)}
 					</SelectItem>
 				)}
-				{Object.entries(colourSchemes).map(([key, value]) => (
-					<SelectItem key={key} value={key} className="w-full [&>*:first-child]:w-full">
-						{renderColourOption(value.colours)}
+				{Object.entries(colourSchemes).map(([key, scheme]) => (
+					<SelectItem
+						key={key}
+						value={key}
+						className="w-full [&>*:first-child]:w-full"
+						{...(
+							isMap
+								? captureSelectionIntent('listItem', key, value, onValueChange)
+								: undefined
+						)}
+					>
+						{renderColourOption(scheme.colours)}
 					</SelectItem>
 				))}
 			</SelectContent>
 		);
-	}, [climateVariable, legendColours, renderColourOption]);
+	}, [
+		climateVariable,
+		legendColours,
+		renderColourOption,
+		isMap,
+		value,
+		onValueChange,
+	]);
 
 	return (
 		<div className={cn('dropdown z-50', className)}>

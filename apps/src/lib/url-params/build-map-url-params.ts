@@ -21,6 +21,7 @@ export interface MapUrlParamsInput {
 	climateVariable: ClimateVariableConfigInterface;
 	dataset: TaxonomyData | null | undefined;
 	opacity: MapItemsOpacity | null | undefined;
+	opacityPicked: Record<keyof MapItemsOpacity, boolean> | null | undefined;
 	mapCoordinates: MapCoordinates | null | undefined;
 	isLowSkillVisible: boolean;
 }
@@ -64,9 +65,14 @@ const addClimateVariableParamsToUrl = (
 		}
 	}
 
-	// Add date range
+	// Add date range. An S2D date range is added only once picked, because
+	// its time period control fills the first period by itself.
+	const isUnpickedS2DDateRange =
+		climateData.class === 'S2DClimateVariable' &&
+		!climateData.dateRangePicked;
 	if (climateData.dateRange &&
-		climateData.dateRange.length > 0) {
+		climateData.dateRange.length > 0 &&
+		!isUnpickedS2DDateRange) {
 		const defaultDateRange = defaultConfig?.dateRange;
 		const currentDateRangeStr = climateData.dateRange.join(',');
 		const defaultDateRangeStr = defaultDateRange?.join(',');
@@ -101,7 +107,8 @@ const addClimateVariableParamsToUrl = (
 
 /**
  * Save in a URL parameter list the Map-only elements of the store (dataset,
- * opacity, coordinates, low-skill mask).
+ * opacity, coordinates, low-skill mask). An opacity is saved only once the
+ * person picked it.
  *
  * No existing parameters are removed.
  *
@@ -115,6 +122,7 @@ const addMapOnlyParamsToUrl = (
 	const {
 		dataset,
 		opacity,
+		opacityPicked,
 		mapCoordinates,
 		isLowSkillVisible,
 	} = input;
@@ -126,12 +134,12 @@ const addMapOnlyParamsToUrl = (
 
 	// Opacity
 	if (opacity) {
-		if (opacity.mapData !== undefined) {
+		if (opacity.mapData !== undefined && opacityPicked?.mapData) {
 			const urlOpacityValue = Math.round(opacity.mapData * 100);
 			params.set(URL_PARAMS.DATA_OPACITY, urlOpacityValue.toString());
 		}
 
-		if (opacity.labels !== undefined) {
+		if (opacity.labels !== undefined && opacityPicked?.labels) {
 			const urlOpacityValue = Math.round(opacity.labels * 100);
 			params.set(URL_PARAMS.LABEL_OPACITY, urlOpacityValue.toString());
 		}

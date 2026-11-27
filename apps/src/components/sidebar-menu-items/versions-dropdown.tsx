@@ -24,7 +24,13 @@ const VersionsDropdown: React.FC = () => {
 	);
 
 	const handleChange = (value: string) => {
+		const isShownVersion = value === climateVariable?.getVersion();
+
 		setVersion(value);
+
+		// A click on the version already shown is a pick, not a change, so the
+		// scenario comparison stays.
+		if (isShownVersion) return;
 
 		// Also reset compare scenarios checkbox
 		setScenarioCompare(false);

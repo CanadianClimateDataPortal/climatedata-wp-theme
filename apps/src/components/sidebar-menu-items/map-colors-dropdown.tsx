@@ -32,10 +32,6 @@ const MapColorsDropdown: React.FC = () => {
 		return climateVariable?.getDataValue() === 'delta' ? ColourType.DISCRETE : ColourType.CONTINUOUS;
 	}, [climateVariable]);
 
-	const onColourSchemeChange = (value: string) => {
-		setColourScheme(value);
-	}
-
 	return (
 		<SidebarMenuItem className={"space-y-4"}>
 			<ColourSchemeDropdown
@@ -43,7 +39,7 @@ const MapColorsDropdown: React.FC = () => {
 				placeholder={__('Select an option')}
 				tooltip={<Tooltip />}
 				value={climateVariable?.getColourScheme() ?? 'default'}
-				onValueChange={onColourSchemeChange}
+				onValueChange={setColourScheme}
 			/>
 			{climateVariable?.getColourScheme() && climateVariable?.getColourScheme() !== 'default' && <RadioGroupFactory
 				name="colour-type"

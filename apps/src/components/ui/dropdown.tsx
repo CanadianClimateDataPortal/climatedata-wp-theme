@@ -5,8 +5,14 @@
  * an optional heading title and tooltip (ControlTitle component).
  *
  */
-import React, { useState, useMemo, forwardRef } from 'react';
+import React, {
+	useState,
+	useMemo,
+	forwardRef,
+	useContext,
+} from 'react';
 import { __ } from '@/context/locale-provider';
+import SectionContext from '@/context/section-provider';
 
 import { Input } from '@/components/ui/input';
 import { ControlTitle } from '@/components/ui/control-title';
@@ -19,6 +25,7 @@ import {
 } from '@/components/ui/select';
 
 import { cn } from '@/lib/utils';
+import { captureSelectionIntent } from '@/lib/capture-selection-intent';
 import { DropdownOption, DropdownProps } from '@/types/types';
 
 // using generics like this because forwardRef does not support generic types
@@ -38,6 +45,7 @@ const DropdownGeneric = <T extends string | undefined>(
 ) => {
 	const [selected, setSelected] = useState<T | undefined>(value);
 	const [search, setSearch] = useState<string>('');
+	const isMap = useContext(SectionContext) === 'map';
 
 	// translate default placeholders if they are not provided
 	const searchPlaceholderTranslated = searchPlaceholder ?? __('Search...');
@@ -104,7 +112,15 @@ const DropdownGeneric = <T extends string | undefined>(
 						<SelectItem value="all">{placeholder}</SelectItem>
 					)}
 					{filteredOptions.map((option, index) => (
-						<SelectItem key={index} value={option.value}>
+						<SelectItem
+							key={index}
+							value={option.value}
+							{...(
+								isMap
+									? captureSelectionIntent('listItem', option.value, value as string | undefined, handleValueChanged)
+									: undefined
+							)}
+						>
 							{option.label}
 						</SelectItem>
 					))}

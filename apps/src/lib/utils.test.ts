@@ -696,8 +696,12 @@ describe('colourTypeOfferedBy', () => {
 		expect(colourTypeOfferedBy(null, ColourType.DISCRETE)).toBeNull();
 	});
 
-	test('gives null when the carried scheme is default, so the choice is hidden', () => {
-		expect(colourTypeOfferedBy('default', ColourType.DISCRETE)).toBeNull();
+	test('keeps the colour type when the carried scheme is default, which hides the choice', () => {
+		expect(colourTypeOfferedBy('default', ColourType.DISCRETE)).toBe('intervals');
+	});
+
+	test('gives null when the carried scheme is default and no colour type was picked', () => {
+		expect(colourTypeOfferedBy('default', undefined)).toBeNull();
 	});
 
 	test('gives null for a value outside the enum or no previous value', () => {

@@ -64,8 +64,8 @@ const DEFAULT_SCENARIO_PERCENTILE_SUFFIX = '-p50';
  * Resolve the default scenario for a given version from a list of scenarios,
  * applying the CLIM-1096 preference cascade. Single implementation shared by
  * {@link ClimateVariableBase.getDefaultScenario} and
- * {@link ClimateVariableBase.getValidScenarioForVersion} so the lazy read and
- * the eager version-change reset never diverge.
+ * {@link ClimateVariableBase.getValidScenarioForVersion}, so both give the
+ * same default for a version.
  *
  * Cascade (always SSP2-4.5/RCP4.5 when available; never force an inapplicable
  * choice):
@@ -193,8 +193,8 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	 * (cmip6) or RCP4.5 (cmip5) whenever that scenario is applicable, and never
 	 * force an inapplicable choice. Delegates the cascade to
 	 * {@link resolveDefaultScenario}, which both this method and
-	 * {@link ClimateVariableBase.getValidScenarioForVersion} share so the lazy
-	 * read and the eager version-change reset agree.
+	 * {@link ClimateVariableBase.getValidScenarioForVersion} share, so both
+	 * give the same default for a version.
 	 *
 	 * @returns The preferred default scenario for the current version, or
 	 *   `null` when the variable exposes no scenarios (e.g. S2D, AHCCD).
@@ -207,8 +207,8 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getValidScenarioForVersion(version: string): string | null {
 		// Get scenarios for the specified version, then apply the same
-		// CLIM-1096 preference cascade as getDefaultScenario so the eager
-		// version-change reset and the lazy read never diverge.
+		// CLIM-1096 preference cascade as getDefaultScenario, so both give
+		// the same default.
 		const scenariosConfig = this.getScenariosConfig() ?? {};
 		const scenarios = scenariosConfig[version] ?? [];
 		return resolveDefaultScenario(version, scenarios);

@@ -1,5 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, {
+	useContext,
+	useEffect,
+	useState,
+} from 'react';
 import { __ } from '@/context/locale-provider';
+import SectionContext from '@/context/section-provider';
 import {
 	Select,
 	SelectContent,
@@ -8,13 +13,13 @@ import {
 	SelectLabel,
 	SelectTrigger,
 	SelectValue
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
 	DownloadType,
 	FrequencyConfig,
 	FrequencyType,
-} from "@/types/climate-variable-interface";
-import { ControlTitle } from "@/components/ui/control-title";
+} from '@/types/climate-variable-interface';
+import { ControlTitle } from '@/components/ui/control-title';
 import {
 	cn,
 	getFrequencyName,
@@ -22,6 +27,7 @@ import {
 	MONTH_CODES,
 	SEASON_CODES,
 } from '@/lib/utils';
+import { captureSelectionIntent } from '@/lib/capture-selection-intent';
 
 interface FrequencySelectProps {
 	config: FrequencyConfig;
@@ -35,17 +41,20 @@ interface FrequencySelectProps {
 	downloadType?: DownloadType;
 }
 
-const FrequencySelect = ({
-	config,
-	section,
-	title,
-	value,
-	placeholder,
-	tooltip,
-	onValueChange,
-	className,
-	downloadType,
-}: FrequencySelectProps) => {
+const FrequencySelect = (
+	props: FrequencySelectProps,
+) => {
+	const {
+		config,
+		section,
+		title,
+		value,
+		placeholder,
+		tooltip,
+		onValueChange,
+		className,
+		downloadType,
+	} = props;
 
 	const hasAnnual = isFrequencyEnabled(config, section, FrequencyType.ANNUAL);
 	const hasAnnualJulJun = isFrequencyEnabled(config, section, FrequencyType.ANNUAL_JUL_JUN);
@@ -56,6 +65,11 @@ const FrequencySelect = ({
 	const hasOptions = hasAnnual || hasAnnualJulJun || hasMonths || hasAllMonths || hasSeasons || hasDaily;
 
 	const [selectValue, setSelectValue] = useState<string | undefined>(value);
+	const isMap = useContext(SectionContext) === 'map';
+	const pick = (itemValue: string) =>
+		isMap
+			? captureSelectionIntent('listItem', itemValue, selectValue, onValueChange)
+			: undefined;
 
 	useEffect(() => {
 		if (value !== undefined) {
@@ -99,7 +113,10 @@ const FrequencySelect = ({
 
 		if (downloadType === DownloadType.ANALYZED) {
 			return (
-				<SelectItem value={FrequencyType.MONTHLY}>
+				<SelectItem
+					value={FrequencyType.MONTHLY}
+					{...pick(FrequencyType.MONTHLY)}
+				>
 					{__('Monthly')}
 				</SelectItem>
 			);
@@ -108,12 +125,21 @@ const FrequencySelect = ({
 				<SelectGroup>
 					<SelectLabel className={'pl-2'}>{__('Monthly')}</SelectLabel>
 					{hasAllMonths && (
-						<SelectItem value={FrequencyType.ALL_MONTHS} className={'pl-4'}>
+						<SelectItem
+							value={FrequencyType.ALL_MONTHS}
+							className={'pl-4'}
+							{...pick(FrequencyType.ALL_MONTHS)}
+						>
 							{__('All months')}
 						</SelectItem>
 					)}
 					{months.map((option) => (
-						<SelectItem key={option.value} value={option.value} className={'pl-4'}>
+						<SelectItem
+							key={option.value}
+							value={option.value}
+							className={'pl-4'}
+							{...pick(option.value)}
+						>
 							{option.label}
 						</SelectItem>
 					))}
@@ -129,7 +155,10 @@ const FrequencySelect = ({
 
 		if (downloadType === DownloadType.ANALYZED) {
 			return (
-				<SelectItem value={FrequencyType.SEASONAL}>
+				<SelectItem
+					value={FrequencyType.SEASONAL}
+					{...pick(FrequencyType.SEASONAL)}
+				>
 					{__('Seasonal')}
 				</SelectItem>
 			);
@@ -138,7 +167,12 @@ const FrequencySelect = ({
 				<SelectGroup>
 					<SelectLabel className={'pl-2'}>{__('Seasonal')}</SelectLabel>
 					{seasons.map((option) => (
-						<SelectItem key={option.value} value={option.value} className={'pl-4'}>
+						<SelectItem
+							key={option.value}
+							value={option.value}
+							className={'pl-4'}
+							{...pick(option.value)}
+						>
 							{option.label}
 						</SelectItem>
 					))}
@@ -149,24 +183,41 @@ const FrequencySelect = ({
 
 	const FrequencyOptions = () => {
 		// The "Annual" label becomes "Annual (January to December) if we also have the "Annual (July to June)" option
-		const annualLabel = hasAnnualJulJun ? 'Annual (January to December)' : 'Annual';
-		
+		const annualLabel = hasAnnualJulJun
+			? 'Annual (January to December)'
+			: 'Annual';
+
 		return (
 			<SelectContent>
-				{hasAnnual && <SelectItem value={FrequencyType.ANNUAL}>
-					{__(annualLabel)}
-				</SelectItem>}
-				{hasAnnualJulJun && <SelectItem value={FrequencyType.ANNUAL_JUL_JUN}>
-					{__('Annual (July to June)')}
-				</SelectItem>}
-				{hasDaily && <SelectItem value={FrequencyType.DAILY}>
-					{__('Daily')}
-				</SelectItem>}
+				{hasAnnual && (
+					<SelectItem
+						value={FrequencyType.ANNUAL}
+						{...pick(FrequencyType.ANNUAL)}
+					>
+						{__(annualLabel)}
+					</SelectItem>
+				)}
+				{hasAnnualJulJun && (
+					<SelectItem
+						value={FrequencyType.ANNUAL_JUL_JUN}
+						{...pick(FrequencyType.ANNUAL_JUL_JUN)}
+					>
+						{__('Annual (July to June)')}
+					</SelectItem>
+				)}
+				{hasDaily && (
+					<SelectItem
+						value={FrequencyType.DAILY}
+						{...pick(FrequencyType.DAILY)}
+					>
+						{__('Daily')}
+					</SelectItem>
+				)}
 				{renderMonthlyOptions()}
 				{renderSeasonalOptions()}
 			</SelectContent>
 		);
-	}
+	};
 
 	if (!hasOptions) {
 		return;

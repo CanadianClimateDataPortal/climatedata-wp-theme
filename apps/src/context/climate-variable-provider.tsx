@@ -64,7 +64,11 @@ export type ClimateVariableContextType = {
 	setAnalysisFieldValue: (key: string, value: string | null) => void;
 	setAveragingType: (type: AveragingType) => void;
 	setSelectedPeriods: (periods: Date[]) => void;
-	setDateRange: (dates: string[]) => void;
+	/**
+	 * Store `dateRange`. With `picked`, also store `dateRangePicked`. Without
+	 * it, `dateRangePicked` keeps its value.
+	 */
+	setDateRange: (dates: string[], picked?: boolean) => void;
 	setPercentiles: (percentiles: string[]) => void;
 	setMissingData: (missingData: string) => void;
 	setModel: (model: string) => void;
@@ -109,7 +113,7 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
  *
  * @throws When the map does not have that class.
  */
-const createClimateVariable = (
+export const createClimateVariable = (
 	config: ClimateVariableConfigInterface
 ): ClimateVariableInterface => {
 	const climateVariableClass = CLIMATE_VARIABLE_CLASS_MAP[config.class];
@@ -183,11 +187,28 @@ export const ClimateVariableProvider: React.FC<{
 				// the default and the URL writer leaves the parameter out.
 				//
 				// Version. This block runs first, because the scenarios and the
-				// sea level date range config depend on the version.
+				// sea level date range config depend on the version. With a
+				// picked scenario and no picked version, it takes the version
+				// that the old variable shows, only when the new variable lists
+				// the scenario under that version and not under its default one.
+				// Otherwise the scenario block below would drop the scenario.
 				const previousVersion = climateVariableData?.version;
 				if (previousVersion) {
 					if (newVariable.getVersions().includes(previousVersion)) {
 						newData.version = previousVersion;
+					}
+				} else if (climateVariableData?.scenario) {
+					const pickedScenario = climateVariableData.scenario;
+					const shownVersion = climateVariable?.getVersion();
+					if (
+						shownVersion &&
+						newVariable.getVersions().includes(shownVersion) &&
+						!newVariable.getScenarios().includes(pickedScenario) &&
+						createClimateVariable({ ...newData, version: shownVersion })
+							.getScenarios()
+							.includes(pickedScenario)
+					) {
+						newData.version = shownVersion;
 					}
 				}
 
@@ -324,6 +345,8 @@ export const ClimateVariableProvider: React.FC<{
 						}
 						if (previousDateRange) {
 							newData.dateRange = previousDateRange;
+							newData.dateRangePicked =
+								climateVariableData?.dateRangePicked;
 						}
 					}
 				}
@@ -358,7 +381,9 @@ export const ClimateVariableProvider: React.FC<{
 				// check happens here. A value counts as offered only when its
 				// control shows: a hidden control would leave the value in
 				// effect with no way to undo it. The colour type follows the
-				// colour scheme kept here.
+				// colour scheme kept here, the default scheme included. That
+				// scheme hides the type control, which shows the kept type again
+				// at the next scheme pick.
 				if (
 					climateVariableData?.colourScheme ||
 					climateVariableData?.dataValue
@@ -414,18 +439,19 @@ export const ClimateVariableProvider: React.FC<{
 			const currentData = climateVariableData;
 			if (!currentData || currentData.version === version) return;
 
-			const validScenario =
-				climateVariable?.getValidScenarioForVersion(version);
 			const updatePayload: Partial<ClimateVariableConfigInterface> = {
 				version,
 			};
 
+			// A version pick is no scenario pick, so it stores no scenario. A
+			// stored scenario stays when the new version lists it. Otherwise the
+			// payload clears it, and the scenario getter gives the default.
+			const scenario = currentData.scenario;
 			if (
-				validScenario &&
-				(!currentData.scenario ||
-					currentData.scenario !== validScenario)
+				scenario != null &&
+				!climateVariable?.getScenariosConfig()?.[version]?.includes(scenario)
 			) {
-				updatePayload.scenario = validScenario;
+				updatePayload.scenario = null;
 			}
 
 			dispatch(updateClimateVariable(updatePayload));
@@ -584,10 +610,11 @@ export const ClimateVariableProvider: React.FC<{
 	);
 
 	const setDateRange = useCallback(
-		(dates: string[]) => {
+		(dates: string[], picked?: boolean) => {
 			dispatch(
 				updateClimateVariable({
 					dateRange: dates,
+					...(picked !== undefined && { dateRangePicked: picked }),
 				})
 			);
 		},
@@ -688,11 +715,11 @@ export const ClimateVariableProvider: React.FC<{
 	const removeSelectedPoint = useCallback(
 		(gid: string) => {
 			if (!climateVariableData) return;
-			const { [gid]: removed, ...rest } =
-				climateVariableData.selectedPoints ?? {};
+			const selectedPoints = { ...climateVariableData.selectedPoints };
+			delete selectedPoints[gid];
 			dispatch(
 				updateClimateVariable({
-					selectedPoints: rest,
+					selectedPoints,
 				})
 			);
 		},

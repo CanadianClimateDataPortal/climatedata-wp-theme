@@ -48,6 +48,41 @@ const captureSelectionIntent = <T extends string>(
 		}
 	};
 
+	/**
+	 * `onPointerUp` and `onClick` here are React props, not the HTML
+	 * attributes `onpointerup` and `onclick`. React uses the same names, but
+	 * it does not put them on the element. In the browser, the item gets no
+	 * `onclick` attribute and no `addEventListener` call. React listens once,
+	 * on the element that `createRoot` renders into. When an event bubbles up
+	 * there, React calls the handler props of each element on the path of
+	 * that event.
+	 *
+	 * The caller spreads these props on a Radix item, not on a bare element.
+	 * Radix already handles `pointerup` and `click` on that item. It joins the
+	 * handler of the caller and its own handler through `composeEventHandlers`
+	 * (`@radix-ui/primitive`), which does this:
+	 *
+	 *     callerHandler(event);
+	 *     if (!event.defaultPrevented) radixHandler(event);
+	 *
+	 * So `handlePick` runs first. Then Radix selects the item, as it does
+	 * without these props. `handlePick` never calls `preventDefault()`, so the
+	 * Radix handler always runs.
+	 *
+	 * The element and its accessibility stay the ones that Radix renders:
+	 * - A list item (`@radix-ui/react-select`) is a `div` with
+	 *   `role="option"`, `tabindex="-1"`, `aria-selected` and `data-state`.
+	 *   The list moves the focus and handles the keys.
+	 * - A radio item (`@radix-ui/react-radio-group`) is a native `button`
+	 *   with `role="radio"` and `aria-checked`.
+	 *
+	 * These props add no attribute, no role and no key handling. The HTML of
+	 * the item is the same with and without them.
+	 *
+	 * @see `SelectItem` in `@radix-ui/react-select`: its `onPointerUp` and `onClick`.
+	 * @see `Radio` in `@radix-ui/react-radio-group`: its `onClick`.
+	 * @see `composeEventHandlers` in `@radix-ui/primitive`.
+	 */
 	return kind === 'listItem'
 		? { onPointerUp: handlePick }
 		: { onClick: handlePick };

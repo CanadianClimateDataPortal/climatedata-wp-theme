@@ -6,7 +6,12 @@ import { useLocale } from '@/hooks/use-locale';
 import { fetchDeltaValues, generateChartData } from '@/services/services';
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 import { doyFormatter, formatValue } from '@/lib/format';
-import { getDefaultFrequency } from "@/lib/utils";
+import {
+	getDefaultFrequency,
+	isMonthCode,
+	isSeasonCode,
+	MONTH_CODES,
+} from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
 
 interface RasterPrecalcultatedClimateVariableValuesProps {
@@ -140,14 +145,13 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			const deltaValueKey = 'delta7100_' + _scenario + '_median';
 
 			// If annual, we take the first month (so 0)
-			// If monthly, we take the frequency month index
+			// If monthly, we take the frequency month index, which counts
+			// from 0 as Date.UTC expects
 			// If seasonal, we take the related month index
 			let month = 0;
-			const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-			const seasons = ['spring', 'summer', 'fall', 'winter'];
-			if(months.includes(frequency)) {
-				month = months.indexOf(frequency);
-			} else if(seasons.includes(frequency)) {
+			if (isMonthCode(frequency)) {
+				month = MONTH_CODES.indexOf(frequency);
+			} else if (isSeasonCode(frequency)) {
 				if(frequency == 'spring') month = 2;
 				else if(frequency == 'summer') month = 5;
 				else if(frequency == 'fall') month = 8;

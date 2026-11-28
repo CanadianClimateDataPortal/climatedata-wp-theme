@@ -3,11 +3,15 @@ import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
 import { isFrequencyTypeS2D } from '@/types/assertions';
 import {
+	ColourType,
+	type CustomColourSchemes,
+	DateRangeConfig,
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
 	FrequencyType,
 	InteractiveRegionOption,
 	type S2DFrequencyType,
+	type ThresholdInterface,
 } from '@/types/climate-variable-interface';
 import { __ } from '@/context/locale-provider';
 import { ParsedLatLon } from '@/types/types';
@@ -65,6 +69,58 @@ export const splitTextByMatch = (
 	return result.filter((part) => part.text.length > 0);
 };
 
+/**
+ * Month code of each calendar number: 2 is February, 12 is December.
+ * The URL (`freq`), the store, the values of FrequencySelect and the data
+ * requests use these codes. They are not display text: getFrequencyName()
+ * gives the translated label.
+ */
+export const MONTH_CODE_BY_NUMBER: Readonly<Record<number, string>> = {
+	1: 'jan',
+	2: 'feb',
+	3: 'mar',
+	4: 'apr',
+	5: 'may',
+	6: 'jun',
+	7: 'jul',
+	8: 'aug',
+	9: 'sep',
+	10: 'oct',
+	11: 'nov',
+	12: 'dec',
+};
+
+/**
+ * Month codes in calendar order. Integer keys keep their numeric order, so
+ * Object.values() gives January first. They are not display text:
+ * getFrequencyName() gives the translated label.
+ */
+export const MONTH_CODES: readonly string[] = Object.values(MONTH_CODE_BY_NUMBER);
+
+/**
+ * Season codes. The URL (`freq`), the store, the values of FrequencySelect
+ * and the data requests use these codes. They are not display text:
+ * getFrequencyName() gives the translated label.
+ */
+export const SEASON_CODES: readonly string[] = [
+	'spring',
+	'summer',
+	'fall',
+	'winter',
+];
+
+/**
+ * Tells whether a frequency is a month code, such as `feb`.
+ */
+export const isMonthCode = (frequency: string): boolean =>
+	MONTH_CODES.includes(frequency);
+
+/**
+ * Tells whether a frequency is a season code, such as `spring`.
+ */
+export const isSeasonCode = (frequency: string): boolean =>
+	SEASON_CODES.includes(frequency);
+
 export const getFrequencyType = (
 	frequency: string,
 ): S2DFrequencyType | FrequencyType | undefined =>  {
@@ -74,9 +130,9 @@ export const getFrequencyType = (
 		frequencyCode = FrequencyType.YS;
 	} else if (frequency === 'annual_jul_jun') {
 		frequencyCode = FrequencyType.YSJUL;
-	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
+	} else if (isMonthCode(frequency)) {
 		frequencyCode = FrequencyType.MS;
-	} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
+	} else if (isSeasonCode(frequency)) {
 		frequencyCode = FrequencyType.QSDEC;
 	} else if (isFrequencyTypeS2D(frequency)) {
 		frequencyCode = frequency;
@@ -132,6 +188,163 @@ export const getDefaultFrequency = (
 	}
 
 	return defaultValue;
+};
+
+/**
+ * Tells whether a frequency code is offered by a frequency config in a section.
+ * It mirrors the options that FrequencySelect renders: a month code needs
+ * MONTHLY or ALL_MONTHS, a season code needs SEASONAL, and any other code
+ * needs its own key in the config.
+ */
+export const isFrequencyOffered = (
+	config: FrequencyConfig,
+	section: string,
+	frequency: string
+): boolean => {
+	if (isMonthCode(frequency)) {
+		return isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
+			|| isFrequencyEnabled(config, section, FrequencyType.ALL_MONTHS);
+	}
+
+	if (isSeasonCode(frequency)) {
+		return isFrequencyEnabled(config, section, FrequencyType.SEASONAL);
+	}
+
+	// FrequencySelect renders the MONTHLY item for ALL_MONTHS too, in the
+	// download type ANALYZED.
+	if (frequency === FrequencyType.MONTHLY) {
+		return isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
+			|| isFrequencyEnabled(config, section, FrequencyType.ALL_MONTHS);
+	}
+
+	return Object.values(FrequencyType).includes(frequency as FrequencyType)
+		&& isFrequencyEnabled(config, section, frequency as FrequencyType);
+};
+/**
+ * Finds the threshold value of the next variable that carries the same label
+ * as the previous value in the previous variable. The values differ per
+ * variable, for example rl20tasmax and rl20pr, while the label, here
+ * "1-in-20 year", is the same. An empty label never matches.
+ */
+export const thresholdValueForSameLabel = (
+	previousThresholds: ThresholdInterface[],
+	nextThresholds: ThresholdInterface[],
+	previousValue: string
+): string | null => {
+	const label = previousThresholds.find(
+		(threshold) => threshold.value === previousValue
+	)?.label;
+	if (!label) {
+		return null;
+	}
+
+	return nextThresholds.find((threshold) => threshold.label === label)?.value ?? null;
+};
+/**
+ * Gives the previous date range back when the time period control of the next
+ * variable could have produced it, else null. A range control stores a start
+ * and an end one interval apart. A single-thumb control stores the same year
+ * twice. Both ends must lie inside the bounds of the config. Full dates never
+ * match, because the check reads the ends and the bounds as years.
+ */
+export const dateRangeOfferedBy = (
+	config: DateRangeConfig | null,
+	isRange: boolean,
+	previousDateRange: string[] | null | undefined
+): string[] | null => {
+	if (!config || !previousDateRange || previousDateRange.length !== 2) {
+		return null;
+	}
+
+	const start = Number(previousDateRange[0]);
+	const end = Number(previousDateRange[1]);
+	const min = Number(config.min);
+	const max = Number(config.max);
+	if (![start, end, min, max].every(Number.isInteger)) {
+		return null;
+	}
+	if (start < min || end > max) {
+		return null;
+	}
+
+	const shapeMatches = isRange
+		? end - start === config.interval
+		: start === end;
+
+	return shapeMatches ? previousDateRange : null;
+};
+/**
+ * Gives the previous compared scenario back when the next variable offers it
+ * and it differs from the main scenario of the next variable, else null. The
+ * sidebar never offers the main scenario as the compared one.
+ */
+export const scenarioCompareToOfferedBy = (
+	nextScenarios: string[],
+	nextMainScenario: string | null,
+	previousCompareTo: string | null | undefined
+): string | null => {
+	if (!previousCompareTo || previousCompareTo === nextMainScenario) {
+		return null;
+	}
+
+	return nextScenarios.includes(previousCompareTo) ? previousCompareTo : null;
+};
+/**
+ * Gives the previous data value back when the next variable has a delta, so
+ * the Values control shows, else null. The control offers the same two options
+ * for every variable, so the flag is the whole check.
+ */
+export const dataValueOfferedBy = (
+	nextHasDelta: boolean | undefined,
+	previousDataValue: string | null | undefined
+): string | null => {
+	if (!nextHasDelta || !previousDataValue) {
+		return null;
+	}
+
+	return previousDataValue;
+};
+/**
+ * Gives the previous colour scheme back when the Map colours control of the
+ * next variable shows and lists it, else null. The list is the one
+ * ColourSchemeDropdown builds: the custom schemes of the variable when it has
+ * some, else the default schemes plus the item default.
+ */
+export const colourSchemeOfferedBy = (
+	nextColourOptionsStatus: boolean,
+	nextCustomColourSchemes: CustomColourSchemes | null,
+	defaultColourSchemes: Record<string, unknown>,
+	previousColourScheme: string | null | undefined
+): string | null => {
+	if (!nextColourOptionsStatus || !previousColourScheme) {
+		return null;
+	}
+
+	const offeredSchemes = nextCustomColourSchemes
+		? Object.keys(nextCustomColourSchemes)
+		: ['default', ...Object.keys(defaultColourSchemes)];
+
+	return offeredSchemes.includes(previousColourScheme) ? previousColourScheme : null;
+};
+/**
+ * Gives the previous colour type back when the colour scheme carried to the
+ * next variable shows the Discrete and Continuous choice, else null.
+ * MapColorsDropdown renders that choice only for a scheme that is set and is
+ * not default, so the type follows the scheme. The caller passes the scheme
+ * that colourSchemeOfferedBy() gave back. A value outside the ColourType enum
+ * never passes.
+ */
+export const colourTypeOfferedBy = (
+	carriedColourScheme: string | null,
+	previousColourType: string | null | undefined
+): string | null => {
+	if (!carriedColourScheme || carriedColourScheme === 'default' || !previousColourType) {
+		return null;
+	}
+
+	return Object.values(ColourType).includes(previousColourType as ColourType)
+		? previousColourType
+		: null;
 };
 /**
  * Converts a date format string (e.g., 'YYYY-MM-DD', 'MM-DD') into a regular expression for validation.
